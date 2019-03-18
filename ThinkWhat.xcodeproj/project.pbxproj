@@ -53,6 +53,11 @@
 		AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */; };
 		AB3C6861223FD7E800B57580 /* AuthNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */; };
 		AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */; };
+		AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6864223FDC5200B57580 /* Root.storyboard */; };
+		AB3C6867223FDD9600B57580 /* Auth.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6866223FDD9600B57580 /* Auth.storyboard */; };
+		AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6868223FDDAF00B57580 /* App.storyboard */; };
+		AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C686A223FDEEA00B57580 /* AuthViewController.swift */; };
+		AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C686C223FDF3D00B57580 /* AppLogo.swift */; };
 		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
 /* End PBXBuildFile section */
 
@@ -128,6 +133,11 @@
 		AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingTabBarUtils.swift; sourceTree = "<group>"; };
 		AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNavigationController.swift; sourceTree = "<group>"; };
 		AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNotificationDelegate.swift; sourceTree = "<group>"; };
+		AB3C6864223FDC5200B57580 /* Root.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Root.storyboard; sourceTree = "<group>"; };
+		AB3C6866223FDD9600B57580 /* Auth.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Auth.storyboard; sourceTree = "<group>"; };
+		AB3C6868223FDDAF00B57580 /* App.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = App.storyboard; sourceTree = "<group>"; };
+		AB3C686A223FDEEA00B57580 /* AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
+		AB3C686C223FDF3D00B57580 /* AppLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogo.swift; sourceTree = "<group>"; };
 		BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
 		C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
 		CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -267,6 +277,7 @@
 		AB3C6813223FCE2500B57580 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				AB3C686A223FDEEA00B57580 /* AuthViewController.swift */,
 				AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */,
 				AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */,
 			);
@@ -348,6 +359,7 @@
 				AB3C6841223FD3EE00B57580 /* SocialLogosStyleKit.swift */,
 				AB3C6842223FD3EE00B57580 /* LogoAnimView.swift */,
 				AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */,
+				AB3C686C223FDF3D00B57580 /* AppLogo.swift */,
 			);
 			path = Logos;
 			sourceTree = "<group>";
@@ -355,6 +367,9 @@
 		AB3C6857223FD6AB00B57580 /* Storyboards */ = {
 			isa = PBXGroup;
 			children = (
+				AB3C6864223FDC5200B57580 /* Root.storyboard */,
+				AB3C6866223FDD9600B57580 /* Auth.storyboard */,
+				AB3C6868223FDDAF00B57580 /* App.storyboard */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -469,6 +484,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */,
 				AB3C684B223FD3EE00B57580 /* OpenSans-Light.ttf in Resources */,
 				AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */,
 				AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */,
@@ -476,10 +492,12 @@
 				AB3C6826223FD1E900B57580 /* CustomAlertView.xib in Resources */,
 				AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */,
 				AB3C684A223FD3EE00B57580 /* OpenSans-Semibold.ttf in Resources */,
+				AB3C6867223FDD9600B57580 /* Auth.storyboard in Resources */,
 				AB3C6851223FD3EF00B57580 /* OpenSans-ExtraBoldItalic.ttf in Resources */,
 				AB3C684C223FD3EE00B57580 /* OpenSans-Italic.ttf in Resources */,
 				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
 				AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */,
+				AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */,
 				AB3C684E223FD3EE00B57580 /* OpenSans-LightItalic.ttf in Resources */,
 				AB3C6852223FD3EF00B57580 /* OpenSans-Regular.ttf in Resources */,
 				AB3C6850223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf in Resources */,
@@ -646,6 +664,8 @@
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
 				AB3C685E223FD74E00B57580 /* FileStoring.swift in Sources */,
+				AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */,
+				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="m0s-uj-J6Y">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Launch View Controller-->
+        <scene sceneID="5L3-OS-tS5">
+            <objects>
+                <viewController storyboardIdentifier="Launch" id="m0s-uj-J6Y" customClass="LaunchViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="4Bs-l1-1ki">
+                        <rect key="frame" x="0.0" y="0.0" width="400" height="400"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XYw-cM-Gh6" customClass="LogoAnimView" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="100" y="100" width="200" height="200"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="XYw-cM-Gh6" firstAttribute="centerY" secondItem="aox-Tb-DST" secondAttribute="centerY" id="AFY-yn-1wv"/>
+                            <constraint firstItem="XYw-cM-Gh6" firstAttribute="centerX" secondItem="aox-Tb-DST" secondAttribute="centerX" id="H71-7z-BSA"/>
+                            <constraint firstItem="XYw-cM-Gh6" firstAttribute="height" secondItem="4Bs-l1-1ki" secondAttribute="height" multiplier="0.5" id="OIK-UG-yQG"/>
+                            <constraint firstItem="XYw-cM-Gh6" firstAttribute="width" secondItem="4Bs-l1-1ki" secondAttribute="width" multiplier="0.5" id="QqJ-oe-GvN"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="aox-Tb-DST"/>
+                    </view>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="400" height="400"/>
+                    <connections>
+                        <segue destination="ztt-pI-lPa" kind="show" identifier="AUTH" id="zbW-yF-z6z"/>
+                        <segue destination="bbs-F0-mbc" kind="show" identifier="APP" id="YjP-h0-cdJ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="noW-4G-wMj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-349" y="-83"/>
+        </scene>
+        <!--Auth-->
+        <scene sceneID="5MN-15-o4D">
+            <objects>
+                <viewControllerPlaceholder storyboardName="Auth" id="ztt-pI-lPa" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qFt-xc-eUY" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="209" y="-250"/>
+        </scene>
+        <!--App-->
+        <scene sceneID="Nci-Ps-QMn">
+            <objects>
+                <viewControllerPlaceholder storyboardName="App" id="bbs-F0-mbc" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Y2E-qW-f9g" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="206" y="85"/>
+        </scene>
+    </scenes>
+</document>
