@@ -1,0 +1,608 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
+		AB3C67E1223FBB6400B57580 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E0223FBB6400B57580 /* ViewController.swift */; };
+		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
+		AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */; };
+		AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E8223FBB6600B57580 /* Assets.xcassets */; };
+		AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67EA223FBB6600B57580 /* LaunchScreen.storyboard */; };
+		AB3C67F7223FBB6600B57580 /* ThinkWhatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67F6223FBB6600B57580 /* ThinkWhatTests.swift */; };
+		AB3C6802223FBB6600B57580 /* ThinkWhatUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6801223FBB6600B57580 /* ThinkWhatUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AB3C67F3223FBB6600B57580 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AB3C67D3223FBB6400B57580 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AB3C67DA223FBB6400B57580;
+			remoteInfo = ThinkWhat;
+		};
+		AB3C67FE223FBB6600B57580 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AB3C67D3223FBB6400B57580 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AB3C67DA223FBB6400B57580;
+			remoteInfo = ThinkWhat;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AB3C67E0223FBB6400B57580 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		AB3C67E3223FBB6400B57580 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		AB3C67E6223FBB6400B57580 /* ThinkWhat.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ThinkWhat.xcdatamodel; sourceTree = "<group>"; };
+		AB3C67E8223FBB6600B57580 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AB3C67EB223FBB6600B57580 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		AB3C67ED223FBB6600B57580 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB3C67F2223FBB6600B57580 /* ThinkWhatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ThinkWhatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB3C67F6223FBB6600B57580 /* ThinkWhatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkWhatTests.swift; sourceTree = "<group>"; };
+		AB3C67F8223FBB6600B57580 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB3C67FD223FBB6600B57580 /* ThinkWhatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ThinkWhatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB3C6801223FBB6600B57580 /* ThinkWhatUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkWhatUITests.swift; sourceTree = "<group>"; };
+		AB3C6803223FBB6600B57580 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AB3C67D8223FBB6400B57580 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB3C67EF223FBB6600B57580 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB3C67FA223FBB6600B57580 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AB3C67D2223FBB6400B57580 = {
+			isa = PBXGroup;
+			children = (
+				AB3C67DD223FBB6400B57580 /* ThinkWhat */,
+				AB3C67F5223FBB6600B57580 /* ThinkWhatTests */,
+				AB3C6800223FBB6600B57580 /* ThinkWhatUITests */,
+				AB3C67DC223FBB6400B57580 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AB3C67DC223FBB6400B57580 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C67DB223FBB6400B57580 /* ThinkWhat.app */,
+				AB3C67F2223FBB6600B57580 /* ThinkWhatTests.xctest */,
+				AB3C67FD223FBB6600B57580 /* ThinkWhatUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AB3C67DD223FBB6400B57580 /* ThinkWhat */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C67DE223FBB6400B57580 /* AppDelegate.swift */,
+				AB3C67E0223FBB6400B57580 /* ViewController.swift */,
+				AB3C67E2223FBB6400B57580 /* Main.storyboard */,
+				AB3C67E8223FBB6600B57580 /* Assets.xcassets */,
+				AB3C67EA223FBB6600B57580 /* LaunchScreen.storyboard */,
+				AB3C67ED223FBB6600B57580 /* Info.plist */,
+				AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */,
+			);
+			path = ThinkWhat;
+			sourceTree = "<group>";
+		};
+		AB3C67F5223FBB6600B57580 /* ThinkWhatTests */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C67F6223FBB6600B57580 /* ThinkWhatTests.swift */,
+				AB3C67F8223FBB6600B57580 /* Info.plist */,
+			);
+			path = ThinkWhatTests;
+			sourceTree = "<group>";
+		};
+		AB3C6800223FBB6600B57580 /* ThinkWhatUITests */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C6801223FBB6600B57580 /* ThinkWhatUITests.swift */,
+				AB3C6803223FBB6600B57580 /* Info.plist */,
+			);
+			path = ThinkWhatUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AB3C67DA223FBB6400B57580 /* ThinkWhat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB3C6806223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhat" */;
+			buildPhases = (
+				AB3C67D7223FBB6400B57580 /* Sources */,
+				AB3C67D8223FBB6400B57580 /* Frameworks */,
+				AB3C67D9223FBB6400B57580 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ThinkWhat;
+			productName = ThinkWhat;
+			productReference = AB3C67DB223FBB6400B57580 /* ThinkWhat.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AB3C67F1223FBB6600B57580 /* ThinkWhatTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB3C6809223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhatTests" */;
+			buildPhases = (
+				AB3C67EE223FBB6600B57580 /* Sources */,
+				AB3C67EF223FBB6600B57580 /* Frameworks */,
+				AB3C67F0223FBB6600B57580 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AB3C67F4223FBB6600B57580 /* PBXTargetDependency */,
+			);
+			name = ThinkWhatTests;
+			productName = ThinkWhatTests;
+			productReference = AB3C67F2223FBB6600B57580 /* ThinkWhatTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		AB3C67FC223FBB6600B57580 /* ThinkWhatUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB3C680C223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhatUITests" */;
+			buildPhases = (
+				AB3C67F9223FBB6600B57580 /* Sources */,
+				AB3C67FA223FBB6600B57580 /* Frameworks */,
+				AB3C67FB223FBB6600B57580 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AB3C67FF223FBB6600B57580 /* PBXTargetDependency */,
+			);
+			name = ThinkWhatUITests;
+			productName = ThinkWhatUITests;
+			productReference = AB3C67FD223FBB6600B57580 /* ThinkWhatUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AB3C67D3223FBB6400B57580 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1010;
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = "Pavel Bukharov";
+				TargetAttributes = {
+					AB3C67DA223FBB6400B57580 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+					AB3C67F1223FBB6600B57580 = {
+						CreatedOnToolsVersion = 10.1;
+						TestTargetID = AB3C67DA223FBB6400B57580;
+					};
+					AB3C67FC223FBB6600B57580 = {
+						CreatedOnToolsVersion = 10.1;
+						TestTargetID = AB3C67DA223FBB6400B57580;
+					};
+				};
+			};
+			buildConfigurationList = AB3C67D6223FBB6400B57580 /* Build configuration list for PBXProject "ThinkWhat" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AB3C67D2223FBB6400B57580;
+			productRefGroup = AB3C67DC223FBB6400B57580 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AB3C67DA223FBB6400B57580 /* ThinkWhat */,
+				AB3C67F1223FBB6600B57580 /* ThinkWhatTests */,
+				AB3C67FC223FBB6600B57580 /* ThinkWhatUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AB3C67D9223FBB6400B57580 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */,
+				AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */,
+				AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB3C67F0223FBB6600B57580 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB3C67FB223FBB6600B57580 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AB3C67D7223FBB6400B57580 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB3C67E1223FBB6400B57580 /* ViewController.swift in Sources */,
+				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
+				AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB3C67EE223FBB6600B57580 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB3C67F7223FBB6600B57580 /* ThinkWhatTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB3C67F9223FBB6600B57580 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB3C6802223FBB6600B57580 /* ThinkWhatUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AB3C67F4223FBB6600B57580 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AB3C67DA223FBB6400B57580 /* ThinkWhat */;
+			targetProxy = AB3C67F3223FBB6600B57580 /* PBXContainerItemProxy */;
+		};
+		AB3C67FF223FBB6600B57580 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AB3C67DA223FBB6400B57580 /* ThinkWhat */;
+			targetProxy = AB3C67FE223FBB6600B57580 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		AB3C67E2223FBB6400B57580 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AB3C67E3223FBB6400B57580 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		AB3C67EA223FBB6600B57580 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AB3C67EB223FBB6600B57580 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		AB3C6804223FBB6600B57580 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AB3C6805223FBB6600B57580 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AB3C6807223FBB6600B57580 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				INFOPLIST_FILE = ThinkWhat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AB3C6808223FBB6600B57580 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				INFOPLIST_FILE = ThinkWhat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AB3C680A223FBB6600B57580 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				INFOPLIST_FILE = ThinkWhatTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ThinkWhat.app/ThinkWhat";
+			};
+			name = Debug;
+		};
+		AB3C680B223FBB6600B57580 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				INFOPLIST_FILE = ThinkWhatTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ThinkWhat.app/ThinkWhat";
+			};
+			name = Release;
+		};
+		AB3C680D223FBB6600B57580 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				INFOPLIST_FILE = ThinkWhatUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ThinkWhat;
+			};
+			name = Debug;
+		};
+		AB3C680E223FBB6600B57580 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				INFOPLIST_FILE = ThinkWhatUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ThinkWhat;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AB3C67D6223FBB6400B57580 /* Build configuration list for PBXProject "ThinkWhat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB3C6804223FBB6600B57580 /* Debug */,
+				AB3C6805223FBB6600B57580 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB3C6806223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB3C6807223FBB6600B57580 /* Debug */,
+				AB3C6808223FBB6600B57580 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB3C6809223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhatTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB3C680A223FBB6600B57580 /* Debug */,
+				AB3C680B223FBB6600B57580 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB3C680C223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhatUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB3C680D223FBB6600B57580 /* Debug */,
+				AB3C680E223FBB6600B57580 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				AB3C67E6223FBB6400B57580 /* ThinkWhat.xcdatamodel */,
+			);
+			currentVersion = AB3C67E6223FBB6400B57580 /* ThinkWhat.xcdatamodel */;
+			path = ThinkWhat.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = AB3C67D3223FBB6400B57580 /* Project object */;
+}
