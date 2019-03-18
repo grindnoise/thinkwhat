@@ -8,15 +8,34 @@
 
 import UIKit
 import CoreData
+import Swinject
+import UserNotifications
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    let container               = Container()
+    let center                  = UNUserNotificationCenter.current()
+    let notificationDelegate    = CustomNotificationDelegate()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        center.delegate                         = notificationDelegate
+        let rootStoryboard                      = UIStoryboard(name: "Root", bundle: nil)
+        let launchViewController                = rootStoryboard.instantiateViewController(withIdentifier: "Launch") as! LaunchViewController
+        self.window                             = UIWindow(frame: UIScreen.main.bounds)
+        self.window!.rootViewController         = launchViewController
+        
+        self.registerContainers()
+        
+        _ = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.checkInternetConnection), userInfo: nil, repeats: true)
+        
+        self.window!.makeKeyAndVisible()
+        
+        let statusBarFrame = UIView(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: (UIApplication.shared.keyWindow?.bounds.width)!, height: UIApplication.shared.statusBarFrame.height)))
+        statusBarFrame.backgroundColor = UIColor.white
+        UIApplication.shared.keyWindow?.addSubview(statusBarFrame)
         return true
     }
 
@@ -86,6 +105,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
+        }
+    }
+    
+    func registerContainers() {
+        container.register(APIServerProtocol.self) {
+            _ in APIServer()
+        }
+        container.register(FileStoringProtocol.self) {
+            _ in FileStorage()
+        }
+    }
+    
+    @objc func checkInternetConnection() {
+        
+        if Reachability.isConnectedToNetwork() {
+            internetConnection = .Available
+        } else {
+            internetConnection = .None
         }
     }
 

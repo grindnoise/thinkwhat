@@ -1,0 +1,33 @@
+//
+//  LaunchViewController.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 18.03.2019.
+//  Copyright © 2019 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+
+class LaunchViewController: UIViewController {
+    
+    @IBOutlet weak var logo: LogoAnimView!
+    
+    override func viewDidLoad() {
+        
+        super.viewDidLoad()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        logo.addUntitled1Animation { (completed) in
+            if appData.session == .guest {
+                self.performSegue(withIdentifier: kSegueAuth, sender: nil)
+                //MARK: Временная заглушка для тестирования
+                //                self.performSegue(withIdentifier: "segueCustomer", sender: nil)
+            } else {
+                self.performSegue(withIdentifier: kSegueApp, sender: nil)
+            }
+        }
+    }
+}
+

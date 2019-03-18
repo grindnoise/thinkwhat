@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
 		AB3C67E1223FBB6400B57580 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E0223FBB6400B57580 /* ViewController.swift */; };
 		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
@@ -15,6 +16,44 @@
 		AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67EA223FBB6600B57580 /* LaunchScreen.storyboard */; };
 		AB3C67F7223FBB6600B57580 /* ThinkWhatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67F6223FBB6600B57580 /* ThinkWhatTests.swift */; };
 		AB3C6802223FBB6600B57580 /* ThinkWhatUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6801223FBB6600B57580 /* ThinkWhatUITests.swift */; };
+		AB3C6812223FC71600B57580 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6811223FC71600B57580 /* Main.swift */; };
+		AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */; };
+		AB3C681B223FD04500B57580 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6817223FD04500B57580 /* Animations.swift */; };
+		AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6818223FD04500B57580 /* SMSResponse.swift */; };
+		AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6819223FD04500B57580 /* KeychainService.swift */; };
+		AB3C681E223FD04500B57580 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C681A223FD04500B57580 /* Extensions.swift */; };
+		AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6821223FD1E800B57580 /* CustomAlertSign.swift */; };
+		AB3C6825223FD1E900B57580 /* CustomAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6822223FD1E800B57580 /* CustomAlertView.swift */; };
+		AB3C6826223FD1E900B57580 /* CustomAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6823223FD1E900B57580 /* CustomAlertView.xib */; };
+		AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6827223FD24A00B57580 /* BorderedView.swift */; };
+		AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C682A223FD38E00B57580 /* LoadingIndicator.swift */; };
+		AB3C682D223FD3C300B57580 /* QC.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C682C223FD3C300B57580 /* QC.swift */; };
+		AB3C6844223FD3EE00B57580 /* Google.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C682F223FD3EE00B57580 /* Google.swift */; };
+		AB3C6845223FD3EE00B57580 /* Facebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6830223FD3EE00B57580 /* Facebook.swift */; };
+		AB3C6846223FD3EE00B57580 /* VK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6831223FD3EE00B57580 /* VK.swift */; };
+		AB3C6847223FD3EE00B57580 /* Instagram.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6832223FD3EE00B57580 /* Instagram.swift */; };
+		AB3C6848223FD3EE00B57580 /* ParentLoginButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6833223FD3EE00B57580 /* ParentLoginButton.swift */; };
+		AB3C6849223FD3EE00B57580 /* UpdateButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6834223FD3EE00B57580 /* UpdateButton.swift */; };
+		AB3C684A223FD3EE00B57580 /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6836223FD3EE00B57580 /* OpenSans-Semibold.ttf */; };
+		AB3C684B223FD3EE00B57580 /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6837223FD3EE00B57580 /* OpenSans-Light.ttf */; };
+		AB3C684C223FD3EE00B57580 /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6838223FD3EE00B57580 /* OpenSans-Italic.ttf */; };
+		AB3C684D223FD3EE00B57580 /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6839223FD3EE00B57580 /* OpenSans-ExtraBold.ttf */; };
+		AB3C684E223FD3EE00B57580 /* OpenSans-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C683A223FD3EE00B57580 /* OpenSans-LightItalic.ttf */; };
+		AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C683B223FD3EE00B57580 /* OpenSans-Bold.ttf */; };
+		AB3C6850223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C683C223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf */; };
+		AB3C6851223FD3EF00B57580 /* OpenSans-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C683D223FD3EE00B57580 /* OpenSans-ExtraBoldItalic.ttf */; };
+		AB3C6852223FD3EF00B57580 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C683E223FD3EE00B57580 /* OpenSans-Regular.ttf */; };
+		AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C683F223FD3EE00B57580 /* OpenSans-BoldItalic.ttf */; };
+		AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6841223FD3EE00B57580 /* SocialLogosStyleKit.swift */; };
+		AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6842223FD3EE00B57580 /* LogoAnimView.swift */; };
+		AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */; };
+		AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6858223FD74C00B57580 /* Reachability.swift */; };
+		AB3C685D223FD74E00B57580 /* APIServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6859223FD74D00B57580 /* APIServer.swift */; };
+		AB3C685E223FD74E00B57580 /* FileStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685A223FD74D00B57580 /* FileStoring.swift */; };
+		AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */; };
+		AB3C6861223FD7E800B57580 /* AuthNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */; };
+		AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */; };
+		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +74,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0B8B18E3907FC78604B9BB73 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; sourceTree = "<group>"; };
+		10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
+		A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AB3C67E0223FBB6400B57580 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -49,6 +91,46 @@
 		AB3C67FD223FBB6600B57580 /* ThinkWhatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ThinkWhatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C6801223FBB6600B57580 /* ThinkWhatUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkWhatUITests.swift; sourceTree = "<group>"; };
 		AB3C6803223FBB6600B57580 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB3C6811223FC71600B57580 /* Main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
+		AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
+		AB3C6817223FD04500B57580 /* Animations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB3C6818223FD04500B57580 /* SMSResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMSResponse.swift; sourceTree = "<group>"; };
+		AB3C6819223FD04500B57580 /* KeychainService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		AB3C681A223FD04500B57580 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		AB3C6821223FD1E800B57580 /* CustomAlertSign.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAlertSign.swift; sourceTree = "<group>"; };
+		AB3C6822223FD1E800B57580 /* CustomAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAlertView.swift; sourceTree = "<group>"; };
+		AB3C6823223FD1E900B57580 /* CustomAlertView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CustomAlertView.xib; sourceTree = "<group>"; };
+		AB3C6827223FD24A00B57580 /* BorderedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BorderedView.swift; sourceTree = "<group>"; };
+		AB3C682A223FD38E00B57580 /* LoadingIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingIndicator.swift; sourceTree = "<group>"; };
+		AB3C682C223FD3C300B57580 /* QC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QC.swift; sourceTree = "<group>"; };
+		AB3C682F223FD3EE00B57580 /* Google.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Google.swift; sourceTree = "<group>"; };
+		AB3C6830223FD3EE00B57580 /* Facebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Facebook.swift; sourceTree = "<group>"; };
+		AB3C6831223FD3EE00B57580 /* VK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VK.swift; sourceTree = "<group>"; };
+		AB3C6832223FD3EE00B57580 /* Instagram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Instagram.swift; sourceTree = "<group>"; };
+		AB3C6833223FD3EE00B57580 /* ParentLoginButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParentLoginButton.swift; sourceTree = "<group>"; };
+		AB3C6834223FD3EE00B57580 /* UpdateButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateButton.swift; sourceTree = "<group>"; };
+		AB3C6836223FD3EE00B57580 /* OpenSans-Semibold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Semibold.ttf"; sourceTree = "<group>"; };
+		AB3C6837223FD3EE00B57580 /* OpenSans-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Light.ttf"; sourceTree = "<group>"; };
+		AB3C6838223FD3EE00B57580 /* OpenSans-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Italic.ttf"; sourceTree = "<group>"; };
+		AB3C6839223FD3EE00B57580 /* OpenSans-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-ExtraBold.ttf"; sourceTree = "<group>"; };
+		AB3C683A223FD3EE00B57580 /* OpenSans-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-LightItalic.ttf"; sourceTree = "<group>"; };
+		AB3C683B223FD3EE00B57580 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Bold.ttf"; sourceTree = "<group>"; };
+		AB3C683C223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-SemiboldItalic.ttf"; sourceTree = "<group>"; };
+		AB3C683D223FD3EE00B57580 /* OpenSans-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
+		AB3C683E223FD3EE00B57580 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
+		AB3C683F223FD3EE00B57580 /* OpenSans-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-BoldItalic.ttf"; sourceTree = "<group>"; };
+		AB3C6841223FD3EE00B57580 /* SocialLogosStyleKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialLogosStyleKit.swift; sourceTree = "<group>"; };
+		AB3C6842223FD3EE00B57580 /* LogoAnimView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogoAnimView.swift; sourceTree = "<group>"; };
+		AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogoStyleKit.swift; sourceTree = "<group>"; };
+		AB3C6858223FD74C00B57580 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		AB3C6859223FD74D00B57580 /* APIServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIServer.swift; sourceTree = "<group>"; };
+		AB3C685A223FD74D00B57580 /* FileStoring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileStoring.swift; sourceTree = "<group>"; };
+		AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingTabBarUtils.swift; sourceTree = "<group>"; };
+		AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNavigationController.swift; sourceTree = "<group>"; };
+		AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNotificationDelegate.swift; sourceTree = "<group>"; };
+		BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
+		C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
+		CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +138,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +146,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,6 +160,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3BE0E5F06FA4B493FFF8C0E0 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */,
+				C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */,
+				10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */,
+				0B8B18E3907FC78604B9BB73 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		69AB746D40F296BDC8D5D954 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */,
+				CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AB3C67D2223FBB6400B57580 = {
 			isa = PBXGroup;
 			children = (
@@ -83,6 +187,8 @@
 				AB3C67F5223FBB6600B57580 /* ThinkWhatTests */,
 				AB3C6800223FBB6600B57580 /* ThinkWhatUITests */,
 				AB3C67DC223FBB6400B57580 /* Products */,
+				3BE0E5F06FA4B493FFF8C0E0 /* Pods */,
+				69AB746D40F296BDC8D5D954 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,13 +205,16 @@
 		AB3C67DD223FBB6400B57580 /* ThinkWhat */ = {
 			isa = PBXGroup;
 			children = (
+				AB3C6810223FC6F500B57580 /* Algorithms */,
 				AB3C67DE223FBB6400B57580 /* AppDelegate.swift */,
-				AB3C67E0223FBB6400B57580 /* ViewController.swift */,
-				AB3C67E2223FBB6400B57580 /* Main.storyboard */,
 				AB3C67E8223FBB6600B57580 /* Assets.xcassets */,
-				AB3C67EA223FBB6600B57580 /* LaunchScreen.storyboard */,
+				AB3C680F223FC6D700B57580 /* Controllers */,
 				AB3C67ED223FBB6600B57580 /* Info.plist */,
+				AB3C67EA223FBB6600B57580 /* LaunchScreen.storyboard */,
+				AB3C67E2223FBB6400B57580 /* Main.storyboard */,
 				AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */,
+				AB3C681F223FD1B100B57580 /* UI */,
+				AB3C67E0223FBB6400B57580 /* ViewController.swift */,
 			);
 			path = ThinkWhat;
 			sourceTree = "<group>";
@@ -128,6 +237,128 @@
 			path = ThinkWhatUITests;
 			sourceTree = "<group>";
 		};
+		AB3C680F223FC6D700B57580 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C6814223FCE2F00B57580 /* App */,
+				AB3C6813223FCE2500B57580 /* Auth */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		AB3C6810223FC6F500B57580 /* Algorithms */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C6817223FD04500B57580 /* Animations.swift */,
+				AB3C6859223FD74D00B57580 /* APIServer.swift */,
+				AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */,
+				AB3C681A223FD04500B57580 /* Extensions.swift */,
+				AB3C685A223FD74D00B57580 /* FileStoring.swift */,
+				AB3C6819223FD04500B57580 /* KeychainService.swift */,
+				AB3C6811223FC71600B57580 /* Main.swift */,
+				AB3C682C223FD3C300B57580 /* QC.swift */,
+				AB3C6858223FD74C00B57580 /* Reachability.swift */,
+				AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */,
+				AB3C6818223FD04500B57580 /* SMSResponse.swift */,
+			);
+			path = Algorithms;
+			sourceTree = "<group>";
+		};
+		AB3C6813223FCE2500B57580 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */,
+				AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		AB3C6814223FCE2F00B57580 /* App */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		AB3C681F223FD1B100B57580 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C6857223FD6AB00B57580 /* Storyboards */,
+				AB3C682E223FD3EE00B57580 /* Buttons */,
+				AB3C6835223FD3EE00B57580 /* Fonts */,
+				AB3C6840223FD3EE00B57580 /* Logos */,
+				AB3C6829223FD37200B57580 /* LoadingIndicator */,
+				AB3C6827223FD24A00B57580 /* BorderedView.swift */,
+				AB3C6820223FD1C000B57580 /* CustomAlertView */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		AB3C6820223FD1C000B57580 /* CustomAlertView */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C6821223FD1E800B57580 /* CustomAlertSign.swift */,
+				AB3C6822223FD1E800B57580 /* CustomAlertView.swift */,
+				AB3C6823223FD1E900B57580 /* CustomAlertView.xib */,
+			);
+			path = CustomAlertView;
+			sourceTree = "<group>";
+		};
+		AB3C6829223FD37200B57580 /* LoadingIndicator */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C682A223FD38E00B57580 /* LoadingIndicator.swift */,
+			);
+			path = LoadingIndicator;
+			sourceTree = "<group>";
+		};
+		AB3C682E223FD3EE00B57580 /* Buttons */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C682F223FD3EE00B57580 /* Google.swift */,
+				AB3C6830223FD3EE00B57580 /* Facebook.swift */,
+				AB3C6831223FD3EE00B57580 /* VK.swift */,
+				AB3C6832223FD3EE00B57580 /* Instagram.swift */,
+				AB3C6833223FD3EE00B57580 /* ParentLoginButton.swift */,
+				AB3C6834223FD3EE00B57580 /* UpdateButton.swift */,
+			);
+			path = Buttons;
+			sourceTree = "<group>";
+		};
+		AB3C6835223FD3EE00B57580 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C6836223FD3EE00B57580 /* OpenSans-Semibold.ttf */,
+				AB3C6837223FD3EE00B57580 /* OpenSans-Light.ttf */,
+				AB3C6838223FD3EE00B57580 /* OpenSans-Italic.ttf */,
+				AB3C6839223FD3EE00B57580 /* OpenSans-ExtraBold.ttf */,
+				AB3C683A223FD3EE00B57580 /* OpenSans-LightItalic.ttf */,
+				AB3C683B223FD3EE00B57580 /* OpenSans-Bold.ttf */,
+				AB3C683C223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf */,
+				AB3C683D223FD3EE00B57580 /* OpenSans-ExtraBoldItalic.ttf */,
+				AB3C683E223FD3EE00B57580 /* OpenSans-Regular.ttf */,
+				AB3C683F223FD3EE00B57580 /* OpenSans-BoldItalic.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		AB3C6840223FD3EE00B57580 /* Logos */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C6841223FD3EE00B57580 /* SocialLogosStyleKit.swift */,
+				AB3C6842223FD3EE00B57580 /* LogoAnimView.swift */,
+				AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */,
+			);
+			path = Logos;
+			sourceTree = "<group>";
+		};
+		AB3C6857223FD6AB00B57580 /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Storyboards;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -135,9 +366,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB3C6806223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhat" */;
 			buildPhases = (
+				5632526F0839F50E39A91D2D /* [CP] Check Pods Manifest.lock */,
 				AB3C67D7223FBB6400B57580 /* Sources */,
 				AB3C67D8223FBB6400B57580 /* Frameworks */,
 				AB3C67D9223FBB6400B57580 /* Resources */,
+				A79FA05FB19CEB958411C690 /* [CP] Embed Pods Frameworks */,
+				578620238140CFC8BCC3024F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -152,9 +386,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB3C6809223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhatTests" */;
 			buildPhases = (
+				9D36A2A888D3161A7069CD99 /* [CP] Check Pods Manifest.lock */,
 				AB3C67EE223FBB6600B57580 /* Sources */,
 				AB3C67EF223FBB6600B57580 /* Frameworks */,
 				AB3C67F0223FBB6600B57580 /* Resources */,
+				BE710C01A172DC35015000B5 /* [CP] Embed Pods Frameworks */,
+				5C037367DAC8B7A6F2E07E86 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -232,9 +469,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB3C684B223FD3EE00B57580 /* OpenSans-Light.ttf in Resources */,
 				AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */,
 				AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */,
+				AB3C684D223FD3EE00B57580 /* OpenSans-ExtraBold.ttf in Resources */,
+				AB3C6826223FD1E900B57580 /* CustomAlertView.xib in Resources */,
 				AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */,
+				AB3C684A223FD3EE00B57580 /* OpenSans-Semibold.ttf in Resources */,
+				AB3C6851223FD3EF00B57580 /* OpenSans-ExtraBoldItalic.ttf in Resources */,
+				AB3C684C223FD3EE00B57580 /* OpenSans-Italic.ttf in Resources */,
+				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
+				AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */,
+				AB3C684E223FD3EE00B57580 /* OpenSans-LightItalic.ttf in Resources */,
+				AB3C6852223FD3EF00B57580 /* OpenSans-Regular.ttf in Resources */,
+				AB3C6850223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,13 +502,156 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		5632526F0839F50E39A91D2D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ThinkWhat-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		578620238140CFC8BCC3024F /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5C037367DAC8B7A6F2E07E86 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9D36A2A888D3161A7069CD99 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ThinkWhat-ThinkWhatTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A79FA05FB19CEB958411C690 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
+				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BE710C01A172DC35015000B5 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
+				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
+				"${BUILT_PRODUCTS_DIR}/Nimble/Nimble.framework",
+				"${BUILT_PRODUCTS_DIR}/Quick/Quick.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nimble.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Quick.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		AB3C67D7223FBB6400B57580 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
 				AB3C67E1223FBB6400B57580 /* ViewController.swift in Sources */,
+				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
+				AB3C6825223FD1E900B57580 /* CustomAlertView.swift in Sources */,
+				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
+				AB3C6845223FD3EE00B57580 /* Facebook.swift in Sources */,
+				AB3C6849223FD3EE00B57580 /* UpdateButton.swift in Sources */,
+				AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */,
+				AB3C6861223FD7E800B57580 /* AuthNavigationController.swift in Sources */,
+				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
+				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
+				AB3C685D223FD74E00B57580 /* APIServer.swift in Sources */,
+				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
+				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
+				AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */,
+				AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */,
+				AB3C6848223FD3EE00B57580 /* ParentLoginButton.swift in Sources */,
 				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
+				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
+				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
+				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
+				AB3C685E223FD74E00B57580 /* FileStoring.swift in Sources */,
+				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
+				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
+				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
+				AB3C6812223FC71600B57580 /* Main.swift in Sources */,
+				AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */,
+				AB3C6847223FD3EE00B57580 /* Instagram.swift in Sources */,
 				AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -434,6 +825,7 @@
 		};
 		AB3C6807223FBB6600B57580 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -453,6 +845,7 @@
 		};
 		AB3C6808223FBB6600B57580 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -472,6 +865,7 @@
 		};
 		AB3C680A223FBB6600B57580 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -493,6 +887,7 @@
 		};
 		AB3C680B223FBB6600B57580 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0B8B18E3907FC78604B9BB73 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
