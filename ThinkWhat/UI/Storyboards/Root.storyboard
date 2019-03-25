@@ -20,21 +20,24 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XYw-cM-Gh6" customClass="LogoAnimView" customModule="ThinkWhat" customModuleProvider="target">
                                 <rect key="frame" x="100" y="100" width="200" height="200"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="XYw-cM-Gh6" secondAttribute="height" multiplier="1:1" id="t8G-zQ-guH"/>
+                                </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="XYw-cM-Gh6" firstAttribute="centerY" secondItem="aox-Tb-DST" secondAttribute="centerY" id="AFY-yn-1wv"/>
+                            <constraint firstItem="XYw-cM-Gh6" firstAttribute="width" secondItem="4Bs-l1-1ki" secondAttribute="width" multiplier="0.5" id="Frs-6j-ACd"/>
                             <constraint firstItem="XYw-cM-Gh6" firstAttribute="centerX" secondItem="aox-Tb-DST" secondAttribute="centerX" id="H71-7z-BSA"/>
-                            <constraint firstItem="XYw-cM-Gh6" firstAttribute="height" secondItem="4Bs-l1-1ki" secondAttribute="height" multiplier="0.5" id="OIK-UG-yQG"/>
-                            <constraint firstItem="XYw-cM-Gh6" firstAttribute="width" secondItem="4Bs-l1-1ki" secondAttribute="width" multiplier="0.5" id="QqJ-oe-GvN"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="aox-Tb-DST"/>
                     </view>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="400" height="400"/>
                     <connections>
+                        <outlet property="logo" destination="XYw-cM-Gh6" id="F5w-br-5I8"/>
                         <segue destination="ztt-pI-lPa" kind="show" identifier="AUTH" id="zbW-yF-z6z"/>
                         <segue destination="bbs-F0-mbc" kind="show" identifier="APP" id="YjP-h0-cdJ"/>
                     </connections>

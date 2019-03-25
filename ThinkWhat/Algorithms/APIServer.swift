@@ -22,7 +22,7 @@ protocol APIServerProtocol {
     func requestSMSValidationCode(phoneNumber: String, completion: @escaping (JSON?) -> ())
     func userExists(phoneNumber: String, completion: @escaping (JSON?) -> ())
     func uploadUserImage(image: UIImage, completion: @escaping (JSON?) -> ())
-
+    func recoverPassword(_ password: String, completion: @escaping (JSON?) -> ())
 }
 
 class APIServer: APIServerProtocol {
@@ -564,6 +564,18 @@ class APIServer: APIServerProtocol {
     }
     
     func uploadUserImage(image: UIImage, completion: @escaping (JSON?) -> ()) {
+        checkForReachability {
+            completed in
+            self.isProxyEnabled = completed
+            performRequest()
+        }
+        
+        func performRequest() {
+            
+        }
+    }
+    
+    func recoverPassword(_ password: String, completion: @escaping (JSON?) -> ()) {
         checkForReachability {
             completed in
             self.isProxyEnabled = completed

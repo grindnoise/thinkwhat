@@ -13,20 +13,19 @@ class LaunchViewController: UIViewController {
     @IBOutlet weak var logo: LogoAnimView!
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        logo.addUntitled1Animation { (completed) in
+        delay(seconds: 1) {
+        self.logo.addUntitled1Animation() { (completed) in
             if appData.session == .guest {
                 self.performSegue(withIdentifier: kSegueAuth, sender: nil)
-                //MARK: Временная заглушка для тестирования
-                //                self.performSegue(withIdentifier: "segueCustomer", sender: nil)
+                //Временная заглушка для тестирования
             } else {
                 self.performSegue(withIdentifier: kSegueApp, sender: nil)
             }
+        }
         }
     }
 }

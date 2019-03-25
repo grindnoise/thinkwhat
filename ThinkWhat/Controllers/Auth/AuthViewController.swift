@@ -10,18 +10,15 @@ import UIKit
 
 class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
-    @IBOutlet weak var phoneButton: UIButton!
-    @IBOutlet weak var phoneButtonTmp: UIButton!
     @IBOutlet weak var termsOfUseButton: UIButton!
-    @IBOutlet weak var vkButton:                    VKButton!
-    @IBOutlet weak var instButton:                  InstagramButton!
-    @IBOutlet weak var fbButton:                    VKButton!
-    @IBOutlet weak var okButton:                    VKButton!
+    @IBOutlet weak var vkButton:                    VKButtonView!
+    @IBOutlet weak var instButton:                  InstagramButtonView!
+    @IBOutlet weak var fbButton:                    FacebookButtonView!
     private var buttons:                            [ParentLoginButton] = []
     private var selectedAuth:                       Int = 0
-    
+
     private var isViewSetupCompleted = false
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -31,13 +28,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         setupGestures()
         setupViews()
     }
-    
-    @IBAction func signupViaPhoneButton(_ sender: UIButton) {
-       performSegue(withIdentifier: segueSignup, sender: self)
-     //   let signupVC = storyboard?.instantiateViewController(withIdentifier: "signupVC")
-     //  navigationController?.pushViewController(signupVC!, animated: true)
-    }
-    
+
     private func setupViews() {
         DispatchQueue.main.async {
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
@@ -46,93 +37,99 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             self.navigationController?.isNavigationBarHidden         = false
             self.navigationController?.navigationBar.barTintColor    = .white
             self.navigationController?.navigationBar.tintColor       = .black
-            self.buttons = [self.vkButton, self.instButton, self.fbButton, self.okButton]
+            self.buttons = [self.vkButton, self.instButton, self.fbButton]
             self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
             for button in self.buttons {
                 let tap = UITapGestureRecognizer(target: self, action: #selector(AuthViewController.handleTap(gesture:)))
                 button.addGestureRecognizer(tap)
             }
-            
+
         }
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         self.view.setNeedsLayout()
         self.view.layoutIfNeeded()
         if !isViewSetupCompleted {
-            self.phoneButton.layer.cornerRadius = self.phoneButton.frame.height / 2
-            self.isViewSetupCompleted = true
-            self.phoneButtonTmp.backgroundColor = K_COLOR_RED
-            self.phoneButton.backgroundColor = K_COLOR_RED
+//            self.phoneButton.layer.cornerRadius = self.phoneButton.frame.height / 2
+//            self.isViewSetupCompleted = true
+//            self.phoneButtonTmp.backgroundColor = K_COLOR_RED
+//            self.phoneButton.backgroundColor = K_COLOR_RED
         }
         for button in buttons {
             button.state = .disabled
         }
     }
-    
+
     private func setupGestures() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(AuthViewController.showTermsOfUse(gesture:)))
         termsOfUseButton.addGestureRecognizer(tapGesture)
     }
-    
+
     @objc private func showTermsOfUse(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended {
-            performSegue(withIdentifier: segueTermsFromAuth, sender: nil)
+            performSegue(withIdentifier: kSegueTerms, sender: nil)
         }
     }
-    
+
     @objc private func handleTap(gesture: UITapGestureRecognizer) {
         var selectedIndex = 0
         if let view = gesture.view {
             selectedIndex = view.tag
-            if selectedIndex == 1 {
-                (view as! InstagramButton).state = .enabled
-            } else if selectedIndex == 2 {
-                (view as! VKButton).state = .enabled
+            if selectedIndex == 2 {
+                (view as! InstagramButtonView).state = .enabled
+            } else if selectedIndex == 1 {
+                (view as! VKButtonView).state = .enabled
             } else if selectedIndex == 3 {
-                (view as! VKButton).state = .enabled
-            } else if selectedIndex == 4 {
-                (view as! VKButton).state = .enabled
+                (view as! FacebookButtonView).state = .enabled
             }
+//            } else if selectedIndex == 4 {
+//                (view as! VKButton).state = .enabled
+//            }
 
             selectedAuth = selectedIndex
             for button in buttons {
                 if button.tag == selectedIndex {
                     continue
                 }
-                if button is VKButton {
-                    (button as! VKButton).state = .disabled
-                } else if button is InstagramButton {
-                    (button as! InstagramButton).state = .disabled
+                if button is VKButtonView {
+                    (button as! VKButtonView).state = .disabled
+                } else if button is InstagramButtonView {
+                    (button as! InstagramButtonView).state = .disabled
                 }
             }
         }
-        //delay(seconds: 0.05) {
-            self.performSegue(withIdentifier: segueSocialAuth, sender: nil)
-        //}
+        
+        delay(seconds: 0.05) {
+            if self.getAuthMethod() == .Mail {
+                self.performSegue(withIdentifier: kSegueMailAuth, sender: nil)
+            } else {
+                self.performSegue(withIdentifier: kSegueSocialAuth, sender: nil)
+            }
+        }
     }
-    
+
     private func getAuthMethod() -> AuthVariant {
         switch selectedAuth {
         case 1:
-            return .Instagram
-        case 2:
             return .VK
+        case 2:
+            return .Instagram
         case 3:
-            return .Facebook
+            return .Mail
         case 4:
             return .OK
         default:
             fatalError("\(selectedAuth) selectedAuth not found")
         }
     }
-    
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == segueSocialAuth {
+        if segue.identifier == kSegueSocialAuth {
             if let destinationVC = segue.destination as? SocialAuthViewController {
                 destinationVC.authVariant = getAuthMethod()
             }
-        } else if segue.identifier == segueTermsFromAuth {
+        } else if segue.identifier == kSegueTerms {
             if let destinationVC = segue.destination as? TermsOfUseViewController {
                 destinationVC.isBackButtonHidden = false
                 destinationVC.isStackViewHidden  = true

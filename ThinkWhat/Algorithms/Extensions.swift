@@ -142,17 +142,17 @@ extension String {
         return self.count //characters.count
     }
     
-    subscript (i: Int) -> String {
-        return self[Range(i ..< i + 1)]
-    }
-    
-    func substring(from: Int) -> String {
-        return self[Range(min(from, length) ..< length)]
-    }
-    
-    func substring(to: Int) -> String {
-        return self[Range(0 ..< max(0, to))]
-    }
+//    subscript (i: Int) -> String {
+//        return self[Range(i ..< i + 1)]
+//    }
+//
+//    func substring(from: Int) -> String {
+//        return self[Range(min(from, length) ..< length)]
+//    }
+//
+//    func substring(to: Int) -> String {
+//        return self[Range(0 ..< max(0, to))]
+//    }
     
     subscript (r: Range<Int>) -> String {
         let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),

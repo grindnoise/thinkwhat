@@ -82,6 +82,7 @@ enum AuthVariant: String {
     case Facebook   = "Facebook"
     case Google     = "Google"
     case Phone      = "Phone"
+    case Mail       = "Mail"
     case Undefined  = "Undefined"
 }
 
@@ -149,7 +150,10 @@ let appDelegate                                  = UIApplication.shared.delegate
 //MARKS: - Segues
 let kSegueApp                                    = "APP"
 let kSegueAuth                                   = "AUTH"
-
+let kSegueSocialAuth                             = "SOCIAL"
+let kSegueTerms                                  = "TERMS"
+let kSegueMailAuth                               = "MAILAUTH"
+let kSeguePwdRecovery                            = "PWD"
 //let segueBarberData                             = "segueBarberData"
 //let segueSignup                                 = "segueSignup"
 //let segueConfirm                                = "segueConfirm"
@@ -398,7 +402,7 @@ struct SERVER_URLS {
 
 
 //MARK: - Methods
-func isValidEmail(testStr:String) -> Bool {
+func isValidEmail(_ testStr:String) -> Bool {
     let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
     let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
     return emailTest.evaluate(with: testStr)

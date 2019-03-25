@@ -58,6 +58,14 @@
 		AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6868223FDDAF00B57580 /* App.storyboard */; };
 		AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C686A223FDEEA00B57580 /* AuthViewController.swift */; };
 		AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C686C223FDF3D00B57580 /* AppLogo.swift */; };
+		AB6083B72240E77B002C0D7E /* SocialAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083B62240E77B002C0D7E /* SocialAuthViewController.swift */; };
+		AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */; };
+		AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BA2240F761002C0D7E /* MailAuthViewController.swift */; };
+		AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BC2240FF14002C0D7E /* UnderlinedTextField.swift */; };
+		AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */; };
+		AB6083C122410131002C0D7E /* ValidSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083C022410130002C0D7E /* ValidSign.swift */; };
+		AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */; };
+		AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */; };
 		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
 /* End PBXBuildFile section */
 
@@ -138,6 +146,14 @@
 		AB3C6868223FDDAF00B57580 /* App.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = App.storyboard; sourceTree = "<group>"; };
 		AB3C686A223FDEEA00B57580 /* AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		AB3C686C223FDF3D00B57580 /* AppLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogo.swift; sourceTree = "<group>"; };
+		AB6083B62240E77B002C0D7E /* SocialAuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialAuthViewController.swift; sourceTree = "<group>"; };
+		AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TermsOfUseViewController.swift; sourceTree = "<group>"; };
+		AB6083BA2240F761002C0D7E /* MailAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAuthViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB6083BC2240FF14002C0D7E /* UnderlinedTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderlinedTextField.swift; sourceTree = "<group>"; };
+		AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderlinedSignTextField.swift; sourceTree = "<group>"; };
+		AB6083C022410130002C0D7E /* ValidSign.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidSign.swift; sourceTree = "<group>"; };
+		AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryViewController.swift; sourceTree = "<group>"; };
+		AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRegistrationViewController.swift; sourceTree = "<group>"; };
 		BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
 		C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
 		CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -250,6 +266,8 @@
 		AB3C680F223FC6D700B57580 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */,
+				AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */,
 				AB3C6814223FCE2F00B57580 /* App */,
 				AB3C6813223FCE2500B57580 /* Auth */,
 			);
@@ -277,9 +295,12 @@
 		AB3C6813223FCE2500B57580 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				AB6083B62240E77B002C0D7E /* SocialAuthViewController.swift */,
 				AB3C686A223FDEEA00B57580 /* AuthViewController.swift */,
-				AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */,
 				AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */,
+				AB6083BA2240F761002C0D7E /* MailAuthViewController.swift */,
+				AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */,
+				AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -294,6 +315,9 @@
 		AB3C681F223FD1B100B57580 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				AB6083C022410130002C0D7E /* ValidSign.swift */,
+				AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */,
+				AB6083BC2240FF14002C0D7E /* UnderlinedTextField.swift */,
 				AB3C6857223FD6AB00B57580 /* Storyboards */,
 				AB3C682E223FD3EE00B57580 /* Buttons */,
 				AB3C6835223FD3EE00B57580 /* Fonts */,
@@ -642,14 +666,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
 				AB3C67E1223FBB6400B57580 /* ViewController.swift in Sources */,
 				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
+				AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */,
 				AB3C6825223FD1E900B57580 /* CustomAlertView.swift in Sources */,
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
+				AB6083B72240E77B002C0D7E /* SocialAuthViewController.swift in Sources */,
 				AB3C6845223FD3EE00B57580 /* Facebook.swift in Sources */,
 				AB3C6849223FD3EE00B57580 /* UpdateButton.swift in Sources */,
 				AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */,
+				AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */,
+				AB6083C122410131002C0D7E /* ValidSign.swift in Sources */,
 				AB3C6861223FD7E800B57580 /* AuthNavigationController.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
@@ -659,10 +688,12 @@
 				AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */,
 				AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */,
 				AB3C6848223FD3EE00B57580 /* ParentLoginButton.swift in Sources */,
+				AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */,
 				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
+				AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */,
 				AB3C685E223FD74E00B57580 /* FileStoring.swift in Sources */,
 				AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */,
 				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
@@ -671,6 +702,7 @@
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
 				AB3C6812223FC71600B57580 /* Main.swift in Sources */,
 				AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */,
+				AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */,
 				AB3C6847223FD3EE00B57580 /* Instagram.swift in Sources */,
 				AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */,
 			);
@@ -778,7 +810,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -833,7 +865,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -848,6 +880,7 @@
 			baseConfigurationReference = BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhat/Info.plist;
@@ -856,8 +889,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat;
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -868,6 +902,7 @@
 			baseConfigurationReference = C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhat/Info.plist;
@@ -876,8 +911,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat;
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
