@@ -104,10 +104,10 @@ extension PasswordRecoveryViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField === mailTF {
             textField.resignFirstResponder()
-            serverAPI.recoverPassword(mailTF.text!) {
-                callback in
-                print(callback)
-            }
+//            serverAPI.recoverPassword(mailTF.text!) {
+//                callback in
+//                print(callback)
+//            }
         }
         return true
     }

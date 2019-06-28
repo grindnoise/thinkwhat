@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "performRequest #1 () in APIServer.logInViaSocialMedia(authToken:socialMedia:completion:):APIServer.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "SERVER_URLS.BASE_URL + SERVER_URLS.TOKEN_CONVERT_URL">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in APIServer.checkForReachability(completion:) [inlined]:APIServer.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "retVal">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in performRequest #1 () in APIServer.logInViaSocialMedia(authToken:socialMedia:completion:):APIServer.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "response">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

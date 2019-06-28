@@ -63,6 +63,9 @@
                                         <state key="normal" title="Условия пользования">
                                             <color key="titleColor" red="0.1960784314" green="0.1960784314" blue="0.1960784314" alpha="1" colorSpace="calibratedRGB"/>
                                         </state>
+                                        <connections>
+                                            <segue destination="FJ5-sn-RN9" kind="show" id="Gm7-eu-ocp"/>
+                                        </connections>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="v9j-4G-Rbu">
                                         <rect key="frame" x="56.5" y="78.5" width="262.5" height="112.5"/>
@@ -335,8 +338,7 @@
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
-                                                    <action selector="textFieldChanged:" destination="7dC-m7-s4Q" eventType="editingDidEnd" id="Ahj-Ut-LiI"/>
-                                                    <action selector="textFieldChanged:" destination="Pnl-G9-xfW" eventType="editingDidEnd" id="WJd-Ki-IMW"/>
+                                                    <action selector="textFieldChanged:" destination="Pnl-G9-xfW" eventType="editingDidEnd" id="ANB-d2-r2j"/>
                                                 </connections>
                                             </textField>
                                         </subviews>
@@ -377,7 +379,7 @@
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
-                                                    <action selector="textFieldChanged:" destination="7dC-m7-s4Q" eventType="editingChanged" id="soF-0l-Kmg"/>
+                                                    <action selector="textFieldChanged:" destination="Pnl-G9-xfW" eventType="editingDidEnd" id="k3V-sj-sWD"/>
                                                 </connections>
                                             </textField>
                                         </subviews>
@@ -418,7 +420,7 @@
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
-                                                    <action selector="textFieldChanged:" destination="7dC-m7-s4Q" eventType="editingDidEnd" id="web-Dw-W7f"/>
+                                                    <action selector="textFieldChanged:" destination="Pnl-G9-xfW" eventType="editingDidEnd" id="5Vi-Uq-Moh"/>
                                                 </connections>
                                             </textField>
                                         </subviews>
@@ -471,6 +473,21 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bmK-xS-9RE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2801" y="521"/>
+        </scene>
+        <!--Terms Of Use View Controller-->
+        <scene sceneID="yI6-UH-hZE">
+            <objects>
+                <viewController id="FJ5-sn-RN9" customClass="TermsOfUseViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="qa5-QB-X9J">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="liC-v9-G7u"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="u2B-wu-wTJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1489" y="1619"/>
         </scene>
         <!--Password Recovery View Controller-->
         <scene sceneID="2NA-4n-aqW">

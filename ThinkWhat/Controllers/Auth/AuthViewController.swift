@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FBSDKLoginKit
 
 class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
@@ -16,8 +17,9 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     @IBOutlet weak var fbButton:                    FacebookButtonView!
     private var buttons:                            [ParentLoginButton] = []
     private var selectedAuth:                       Int = 0
-
-    private var isViewSetupCompleted = false
+    private var fbLoggedIn                          = false
+    private var serverAPI:                          APIServer!
+    private var isViewSetupCompleted                = false
 
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -27,6 +29,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         super.viewDidLoad()
         setupGestures()
         setupViews()
+        serverAPI = (self.navigationController as! AuthNavigationController).serverAPI as! APIServer
     }
 
     private func setupViews() {
@@ -99,24 +102,59 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                 }
             }
         }
-        
-        delay(seconds: 0.05) {
-            if self.getAuthMethod() == .Mail {
-                self.performSegue(withIdentifier: kSegueMailAuth, sender: nil)
-            } else {
-                self.performSegue(withIdentifier: kSegueSocialAuth, sender: nil)
+        delay(seconds: 0.03) {
+            let authCase = self.getAuthCase()
+            switch authCase {
+            case .Facebook:
+                if FBSDKAccessToken.current() == nil {
+                    FBManager.performLogin(viewController: self) {
+                        (success) in
+                        if success {
+                            self.serverAPI.logInViaSocialMedia(authToken: (FBSDKAccessToken.current()?.tokenString)!, socialMedia: .Facebook) {
+                                state in
+                                tokenState = state
+                            }
+                        } else {
+                            //TODO Error handling
+                        }
+                    }
+                } else {
+                    self.serverAPI.logInViaSocialMedia(authToken: (FBSDKAccessToken.current()?.tokenString)!, socialMedia: .Facebook) {
+                        state in
+                        tokenState = state
+                    }
+                }
+                if tokenState == .Received {
+                    self.serverAPI.getFacebookID() {
+                        id in
+                        if id == nil {
+                            FBManager.getUserData()
+                        }
+                    }
+                }
+            case .Instagram:
+                if FBSDKAccessToken.current() != nil {
+                    FBManager.performLogout()
+                }
+                (self.navigationController as! AuthNavigationController).serverAPI.logOut() {
+                    state in
+                    tokenState = state
+                }
+            default:
+                print("")
             }
         }
     }
+    
 
-    private func getAuthMethod() -> AuthVariant {
+    private func getAuthCase() -> AuthVariant {
         switch selectedAuth {
         case 1:
             return .VK
         case 2:
             return .Instagram
         case 3:
-            return .Mail
+            return .Facebook
         case 4:
             return .OK
         default:
@@ -124,18 +162,18 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == kSegueSocialAuth {
-            if let destinationVC = segue.destination as? SocialAuthViewController {
-                destinationVC.authVariant = getAuthMethod()
-            }
-        } else if segue.identifier == kSegueTerms {
-            if let destinationVC = segue.destination as? TermsOfUseViewController {
-                destinationVC.isBackButtonHidden = false
-                destinationVC.isStackViewHidden  = true
-            }
-        }
-    }
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if segue.identifier == kSegueSocialAuth {
+//            if let destinationVC = segue.destination as? SocialAuthViewController {
+//                destinationVC.authVariant = getAuthMethod()
+//            }
+//        } else if segue.identifier == kSegueTerms {
+//            if let destinationVC = segue.destination as? TermsOfUseViewController {
+//                destinationVC.isBackButtonHidden = false
+//                destinationVC.isStackViewHidden  = true
+//            }
+//        }
+//    }
 }
 
 

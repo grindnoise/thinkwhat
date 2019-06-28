@@ -13,16 +13,19 @@ import SwiftyJSON
 
 protocol APIServerProtocol {
 
-    func logIn(username: String, password: String, completion: @escaping (TokenStatus) -> ())
-    func logInViaSocialMedia(authToken: String, socialMedia: AuthVariant, completion: @escaping (TokenStatus) -> ())
-    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
-    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
-    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
+    func logIn(username: String, password: String, completion: @escaping (TokenState) -> ())
+    func logInViaSocialMedia(authToken: String, socialMedia: AuthVariant, completion: @escaping (TokenState) -> ())
+    func logOut(completion: @escaping (TokenState) -> ())
+    func getFacebookID(completion: @escaping (String) -> ())
+    func updateUserProfile(json: JSON, completion: @escaping(Bool) -> ())
+//    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
+//    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
+//    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
 //    func makeOrder(_ order: Order, completion: @escaping (JSON) -> ())
-    func requestSMSValidationCode(phoneNumber: String, completion: @escaping (JSON?) -> ())
-    func userExists(phoneNumber: String, completion: @escaping (JSON?) -> ())
-    func uploadUserImage(image: UIImage, completion: @escaping (JSON?) -> ())
-    func recoverPassword(_ password: String, completion: @escaping (JSON?) -> ())
+//    func requestSMSValidationCode(phoneNumber: String, completion: @escaping (JSON?) -> ())
+//    func userExists(phoneNumber: String, completion: @escaping (JSON?) -> ())
+//    func uploadUserImage(image: UIImage, completion: @escaping (JSON?) -> ())
+//    func recoverPassword(_ password: String, completion: @escaping (JSON?) -> ())
 }
 
 class APIServer: APIServerProtocol {
@@ -46,24 +49,15 @@ class APIServer: APIServerProtocol {
             completed in
             self.isProxyEnabled = completed
         }
-        //
-        //        guard isProxyEnabled != nil else {
-        //            setupProxyConfiguration()
-        //            return
-        //        }
-        //
-        //        print(isProxyEnabled)
-        ////        if isProxyEnabled {
-        ////            setupProxyConfiguration()
-        ////        }
+        
     }
     
     private func checkForReachability(completion: @escaping (Bool) -> ()) {
         
         isProxyEnabled = nil
-        let url = URL(string: SERVER_URLS.SMS_VALIDATION_URL)!
+        let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.TOKEN_URL)
         
-        Alamofire.SessionManager.default.request(url, method: .get, parameters: [:], encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
+        Alamofire.SessionManager.default.request(url, method: .get, parameters: [:], encoding: URLEncoding(), headers: nil).responseJSON(completionHandler: {
             response in
             var retVal = false
             if response.response != nil {
@@ -116,7 +110,7 @@ class APIServer: APIServerProtocol {
         }
     }
 
-    func logIn(username: String, password: String, completion: @escaping (TokenStatus) -> ()) {
+    func logIn(username: String, password: String, completion: @escaping (TokenState) -> ()) {
         
         checkForReachability {
             
@@ -133,8 +127,9 @@ class APIServer: APIServerProtocol {
             //        Alamofire.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
             requestManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
                 response in
+                var _tokenState = TokenState.Error
                 if let error = response.result.error as? AFError {
-                    tokenStatus = .Error
+                    _tokenState = .Error
                     switch error {
                     case .invalidURL(let url):
                         print("Invalid URL: \(url) - \(error.localizedDescription)")
@@ -163,9 +158,6 @@ class APIServer: APIServerProtocol {
                         print("Failure Reason: \(reason)")
                     }
                 } else {
-                    
-                    var tokenState = TokenStatus.Error
-                    
                     if let statusCode  = response.response?.statusCode {
                         
                         if 200...299 ~= statusCode {
@@ -182,7 +174,7 @@ class APIServer: APIServerProtocol {
                                     appData.username = username
 //                                }
                             } else {
-                                tokenState = .Error
+                                _tokenState = .Error
                             }
                         } else if 400...499 ~= statusCode {
                             if let json = try? JSON(data: response.data!) {
@@ -190,34 +182,36 @@ class APIServer: APIServerProtocol {
                                     print("\(attr.0): \(attr.1.stringValue)")
                                 }
                             }
-                            tokenState = .Error
+                            _tokenState = .Error
                         }
                     }
-                    completion(tokenState)
+                    completion(_tokenState)
                 }
             })
         }
     }
     
-    func logInViaSocialMedia(authToken: String, socialMedia: AuthVariant, completion: @escaping (TokenStatus) -> ()) {
+    func logInViaSocialMedia(authToken: String, socialMedia: AuthVariant, completion: @escaping (TokenState) -> ()) {
         
         checkForReachability {
-            
             completed in
             self.isProxyEnabled = completed
             performRequest()
-            
         }
         
         func performRequest() {
             
             let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(socialMedia.rawValue.lowercased())", "token": "\(authToken)"]
             print(parameters)
-            let url = URL(string: SERVER_URLS.TOKEN_CONVERT_URL)!
-            requestManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
+            let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.TOKEN_CONVERT_URL)
+            requestManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseJSON() {
                 response in
+                if response.result.isFailure {
+                    fatalError(response.result.debugDescription)
+                }
+                var _tokenState = TokenState.Error
                 if let error = response.result.error as? AFError {
-                    tokenStatus = .Error
+                    _tokenState = .Error
                     switch error {
                     case .invalidURL(let url):
                         print("Invalid URL: \(url) - \(error.localizedDescription)")
@@ -246,45 +240,194 @@ class APIServer: APIServerProtocol {
                         print("Failure Reason: \(reason)")
                     }
                 } else {
-                    let statusCode  = response.response?.statusCode
-                    var tokenState = TokenStatus.Error
-                    if 200...299 ~= statusCode! {
-                        if let json = try? JSON(data: response.data!) {
-                            for attr in json {
-                                print("\(attr.0): \(attr.1.stringValue)")
+                    if let statusCode  = response.response?.statusCode{
+                        if 200...299 ~= statusCode {
+                            if let json = try? JSON(data: response.data!) {
+                                for attr in json {
+                                    print("\(attr.0): \(attr.1.stringValue)")
+                                }
+                                saveTokenInKeychain(json: json, tokenState: &_tokenState)
+                            } else {
+                                _tokenState = .Error
                             }
-                            saveTokenInKeychain(json: json, tokenState: &tokenState)
-                        } else {
-                            tokenState = .Error
-                        }
-                    } else if 400...499 ~= statusCode! {
-                        if let json = try? JSON(data: response.data!) {
-                            for attr in json {
-                                print("\(attr.0): \(attr.1.stringValue)")
+                        } else if 400...499 ~= statusCode {
+                            if let json = try? JSON(data: response.data!) {
+                                for attr in json {
+                                    print("\(attr.0): \(attr.1.stringValue)")
+                                }
                             }
+                            _tokenState = .Error
                         }
-                        tokenState = .Error
+                        completion(_tokenState)
                     }
-                    completion(tokenState)
                 }
-            })
+            }
         }
     }
     
+    func logOut(completion: @escaping (TokenState) -> ()) {
+        
+        checkForReachability {
+            completed in
+            self.isProxyEnabled = completed
+            performRequest()
+        }
+        
+        func performRequest() {
+            let access_token = KeychainService.loadAccessToken()! as String
+            let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "token": "\(access_token)"]
+            print(parameters)
+            let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.TOKEN_REVOKE_URL)
+            requestManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseJSON() {
+                response in
+                var _tokenState = TokenState.Error
+                if response.result.isFailure {
+                    fatalError(response.result.debugDescription)
+                } else if let error = response.result.error as? AFError {
+                    _tokenState = .Error
+                    switch error {
+                    case .invalidURL(let url):
+                        print("Invalid URL: \(url) - \(error.localizedDescription)")
+                    case .parameterEncodingFailed(let reason):
+                        print("Parameter encoding failed: \(error.localizedDescription)")
+                        print("Failure Reason: \(reason)")
+                    case .multipartEncodingFailed(let reason):
+                        print("Multipart encoding failed: \(error.localizedDescription)")
+                        print("Failure Reason: \(reason)")
+                    case .responseValidationFailed(let reason):
+                        print("Response validation failed: \(error.localizedDescription)")
+                        print("Failure Reason: \(reason)")
+                        
+                        switch reason {
+                        case .dataFileNil, .dataFileReadFailed:
+                            print("Downloaded file could not be read")
+                        case .missingContentType(let acceptableContentTypes):
+                            print("Content Type Missing: \(acceptableContentTypes)")
+                        case .unacceptableContentType(let acceptableContentTypes, let responseContentType):
+                            print("Response content type: \(responseContentType) was unacceptable: \(acceptableContentTypes)")
+                        case .unacceptableStatusCode(let code):
+                            print("Response status code was unacceptable: \(code)")
+                        }
+                    case .responseSerializationFailed(let reason):
+                        print("Response serialization failed: \(error.localizedDescription)")
+                        print("Failure Reason: \(reason)")
+                    }
+                } else {
+                    if let statusCode  = response.response?.statusCode{
+                    if 200...299 ~= statusCode {
+                        if let json = try? JSON(data: response.data!) {
+                            for attr in json {
+                                print("\(attr.0): \(attr.1.stringValue)")
+                            }
+                            KeychainService.saveAccessToken(token: "" as NSString)
+                            KeychainService.saveRefreshToken(token: "" as NSString)
+                        } else {
+                            _tokenState = .Error
+                        }
+                    } else if 400...499 ~= statusCode {
+                        if let json = try? JSON(data: response.data!) {
+                            for attr in json {
+                                print("\(attr.0): \(attr.1.stringValue)")
+                            }
+                        }
+                        _tokenState = .Error
+                    }
+                    completion(_tokenState)
+                }
+            }
+        }
+    }
+    }
+    
+    func getFacebookID(completion: @escaping (String?) -> ()) {
+        
+        checkForReachability {
+            completed in
+            self.isProxyEnabled = completed
+            performRequest()
+        }
+        
+        func performRequest() {
+            let access_token = KeychainService.loadAccessToken()! as String
+            let parameters = ["access_token": "\(access_token)"]
+            print(parameters)
+            let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.GET_FACEBOOK_ID_URL)
+            requestManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseJSON() {
+                response in
+                if response.result.isFailure {
+                    fatalError(response.result.debugDescription)
+                }
+                if let error = response.result.error as? AFError {
+                    switch error {
+                    case .invalidURL(let url):
+                        print("Invalid URL: \(url) - \(error.localizedDescription)")
+                    case .parameterEncodingFailed(let reason):
+                        print("Parameter encoding failed: \(error.localizedDescription)")
+                        print("Failure Reason: \(reason)")
+                    case .multipartEncodingFailed(let reason):
+                        print("Multipart encoding failed: \(error.localizedDescription)")
+                        print("Failure Reason: \(reason)")
+                    case .responseValidationFailed(let reason):
+                        print("Response validation failed: \(error.localizedDescription)")
+                        print("Failure Reason: \(reason)")
+                        
+                        switch reason {
+                        case .dataFileNil, .dataFileReadFailed:
+                            print("Downloaded file could not be read")
+                        case .missingContentType(let acceptableContentTypes):
+                            print("Content Type Missing: \(acceptableContentTypes)")
+                        case .unacceptableContentType(let acceptableContentTypes, let responseContentType):
+                            print("Response content type: \(responseContentType) was unacceptable: \(acceptableContentTypes)")
+                        case .unacceptableStatusCode(let code):
+                            print("Response status code was unacceptable: \(code)")
+                        }
+                    case .responseSerializationFailed(let reason):
+                        print("Response serialization failed: \(error.localizedDescription)")
+                        print("Failure Reason: \(reason)")
+                    }
+                } else {
+                    var id: String
+                    if let statusCode  = response.response?.statusCode{
+                        if 200...299 ~= statusCode {
+                            if let json = try? JSON(data: response.data!) {
+                                for attr in json {
+                                    print("\(attr.0): \(attr.1.stringValue)")
+                                }
+                            }
+                        } else if 400...499 ~= statusCode {
+                            if let json = try? JSON(data: response.data!) {
+                                for attr in json {
+                                    print("\(attr.0): \(attr.1.stringValue)")
+                                }
+                            }
+                        }
+                        completion(id)
+                    }
+                }
+            }
+        }
+    }
+    
+    func updateUserProfile(json: JSON, completion: @escaping(Bool) -> ()) {
+    
+        
+    
+    }
+        
     func checkTokenExpiryDate() {
         if let expString = KeychainService.loadTokenExpireDateTime() as String? {
             let expiryDate = expString.toDateTime()
             if Date() >= expiryDate {
-                tokenStatus = .Expired
+                tokenState = .Expired
                 refreshAccessToken(completion: {
-                    tokenState in
-                    tokenStatus = tokenState
+                    _tokenState in
+                    tokenState = _tokenState
                 })
             }
         }
     }
     
-    func refreshAccessToken(completion: @escaping (TokenStatus) -> ()) {
+    func refreshAccessToken(completion: @escaping (TokenState) -> ()) {
         
         checkForReachability {
             
@@ -301,10 +444,10 @@ class APIServer: APIServerProtocol {
             let url = URL(string: SERVER_URLS.TOKEN_URL)!
             requestManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
                 response in
-                
+                var _tokenState = TokenState.Error
                 if let error = response.result.error as? AFError {
                     
-                    tokenStatus = .Error
+                    _tokenState = .Error
                     
                     switch error {
                     case .invalidURL(let url):
@@ -337,21 +480,20 @@ class APIServer: APIServerProtocol {
                     
                 } else {
                     let statusCode  = response.response?.statusCode
-                    var tokenState = TokenStatus.Error
                     if 200...299 ~= statusCode! {
                         if let json = try? JSON(data: response.data!) {
                             for attr in json {
                                 print("\(attr.0): \(attr.1.stringValue)")
                             }
                             saveTokenInKeychain(json: json, tokenState: &tokenState)
-                            tokenState = TokenStatus.Received
+                            _tokenState = TokenState.Received
                         } else {
-                            tokenState = .Error
+                            _tokenState = .Error
                         }
                     } else if 400...499 ~= statusCode! {
-                        tokenState = .Error
+                        _tokenState = .Error
                     }
-                    completion(tokenState)
+                    completion(_tokenState)
                 }
             })
         }
@@ -496,11 +638,11 @@ class APIServer: APIServerProtocol {
         func performRequest() {
             let parameters = ["phone_number": phoneNumber]
             print(parameters)
-            let url = URL(string: SERVER_URLS.SMS_VALIDATION_URL)!
+            let url = URL(string: SERVER_URLS.TOKEN_URL)!//TODO Change to SMSValidationURL
             requestManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
                 response in
                 if let error = response.result.error as? AFError {
-                    tokenStatus = .Error
+                    tokenState = .Error
                     switch error {
                     case .invalidURL(let url):
                         print("Invalid URL: \(url) - \(error.localizedDescription)")
@@ -588,4 +730,4 @@ class APIServer: APIServerProtocol {
     }
     
 }
-
+}

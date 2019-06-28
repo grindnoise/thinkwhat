@@ -1,0 +1,6 @@
+framework module Pods_ThinkWhat {
+  umbrella header "Pods-ThinkWhat-umbrella.h"
+
+  export *
+  module * { export * }
+}

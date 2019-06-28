@@ -23,7 +23,7 @@ class LaunchViewController: UIViewController {
                 self.performSegue(withIdentifier: kSegueAuth, sender: nil)
                 //Временная заглушка для тестирования
             } else {
-                self.performSegue(withIdentifier: kSegueApp, sender: nil)
+                self.performSegue(withIdentifier: kSegueAuth, sender: nil)
             }
         }
         }

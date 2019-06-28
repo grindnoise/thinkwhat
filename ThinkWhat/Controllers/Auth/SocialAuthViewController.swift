@@ -47,12 +47,12 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
         }
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        let cookieStorage = HTTPCookieStorage.shared
-        for cookie in cookieStorage.cookies ?? [] {
-            cookieStorage.deleteCookie(cookie)
-        }
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        let cookieStorage = HTTPCookieStorage.shared
+//        for cookie in cookieStorage.cookies ?? [] {
+//            cookieStorage.deleteCookie(cookie)
+//        }
+//    }
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
@@ -65,11 +65,9 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
     //MARK: - unSignedRequest
     func unSignedRequest () {
         if authVariant == .Instagram {
-            
             let authURL = String(format: "%@?client_id=%@&redirect_uri=%@&response_type=token&scope=%@&DEBUG=True", arguments: [INSTAGRAM_IDS.INSTAGRAM_AUTHURL,INSTAGRAM_IDS.INSTAGRAM_CLIENT_ID,INSTAGRAM_IDS.INSTAGRAM_REDIRECT_URI, INSTAGRAM_IDS.INSTAGRAM_SCOPE ])
             let urlRequest =  URLRequest.init(url: URL.init(string: authURL)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 60)
             loginWebView.loadRequest(urlRequest)
-            
         }
     }
     
@@ -92,12 +90,12 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
     func handleAuth(authToken: String)  {
         
         (navigationController as! AuthNavigationController).serverAPI.logInViaSocialMedia(authToken: authToken, socialMedia: .Instagram) {
-            receivedToken in
-            tokenStatus = receivedToken
-            if tokenStatus == .Received {
-                (self.navigationController as! AuthNavigationController).serverAPI.pullUserData("", completion: { (json) in
-                    print(json)
-                })
+            apiResponse in
+            tokenState = apiResponse
+            if tokenState == .Received {
+//                (self.navigationController as! AuthNavigationController).serverAPI.pullUserData("", completion: { (json) in
+//                    print(json)
+//                })
             }
         }
         

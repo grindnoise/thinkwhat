@@ -12,8 +12,8 @@ class MailRegistrationViewController: UIViewController {
 
     @IBOutlet weak var continueButton:  UIButton!
     @IBOutlet weak var mailTF:          UnderlinedSignTextField!
-    @IBOutlet weak var loginTF:          UnderlinedTextField!
-    @IBOutlet weak var pwdTF:          UnderlinedTextField!
+    @IBOutlet weak var loginTF:         UnderlinedTextField!
+    @IBOutlet weak var pwdTF:           UnderlinedTextField!
     
     @IBAction func textFieldChanged(_ sender: Any) {
         isMailFilled = isValidEmail(mailTF.text!) ? true : false
