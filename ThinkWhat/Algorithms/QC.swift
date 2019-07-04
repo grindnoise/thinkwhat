@@ -171,7 +171,7 @@ class QCMethod
         CATransaction.setDisableActions(true)
         
         for aLayer in layers{
-            if let keys = aLayer.animationKeys() as [String]!{
+            if let keys = aLayer.animationKeys() as? [String]{
                 for animKey in keys{
                     let anim = aLayer.animation(forKey: animKey)
                     updateValue(forAnimation: anim!, theLayer: aLayer);

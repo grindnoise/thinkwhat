@@ -12,12 +12,12 @@ import SwiftyJSON
 
 class FBManager {
     
-    static let shared = FBSDKLoginManager()
-    private lazy var serverAPI:     APIServerProtocol          = self.initializeServerAPI()
+    static let shared = LoginManager()
+//    private lazy var serverAPI:     APIManagerProtocol          = self.initializeServerAPI()
     
     public class func performLogin(viewController: UIViewController, completionHandler: @escaping(Bool) -> Void) {
         
-        shared.logIn(withReadPermissions: ["public_profile", "email"],
+        shared.logIn(permissions: ["public_profile", "email"],
                                from: viewController) { (result, error) in
                                 if error == nil {
                                     completionHandler(true)
@@ -36,8 +36,8 @@ class FBManager {
     }
     
     public class func getUserData() {//(completionHandler: @escaping() -> Void) {
-        if FBSDKAccessToken.current() != nil {
-            FBSDKGraphRequest(graphPath: "me", parameters: ["fields" : "name, first_name, last_name, email, picture.type(normal)"]).start() {
+        if AccessToken.current != nil {
+            GraphRequest(graphPath: "me", parameters: ["fields" : "name, first_name, last_name, email, picture.type(normal)"]).start() {
                 (connection, result, error) in
                 if let error = error {
                     print(error.localizedDescription)
@@ -45,7 +45,7 @@ class FBManager {
                 }
                 if result != nil {
                     if let json = JSON(result!) as? JSON {
-                        self.serverAPI.
+//                        self.serverAPI.
                         
                         appData.importFacebookData(json)
                         
@@ -55,8 +55,8 @@ class FBManager {
         }
     }
     
-    private func initializeServerAPI() -> APIServerProtocol {
-        return appDelegate.container.resolve(APIServerProtocol.self)!
-    }
+//    private func initializeServerAPI() -> APIManagerProtocol {
+//        return appDelegate.container.resolve(APIManagerProtocol.self)!
+//    }
 }
 

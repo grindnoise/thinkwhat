@@ -3,26 +3,16 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "performRequest #1 () in APIServer.logInViaSocialMedia(authToken:socialMedia:completion:):APIServer.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "SERVER_URLS.BASE_URL + SERVER_URLS.TOKEN_CONVERT_URL">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
       </ContextState>
       <ContextState
-         contextName = "closure #1 in APIServer.checkForReachability(completion:) [inlined]:APIServer.swift">
+         contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
          <PersistentStrings>
             <PersistentString
-               value = "retVal">
+               value = "url">
             </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in performRequest #1 () in APIServer.logInViaSocialMedia(authToken:socialMedia:completion:):APIServer.swift">
-         <PersistentStrings>
             <PersistentString
-               value = "response">
+               value = "response.data!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

@@ -10,7 +10,7 @@ import UIKit
 
 class AuthNavigationController: UINavigationController {
     
-    internal lazy var serverAPI:     APIServerProtocol          = self.initializeServerAPI()
+    internal lazy var apiManagerProtocol: APIManagerProtocol          = self.initializeAPIManagerProtocol()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,7 +19,7 @@ class AuthNavigationController: UINavigationController {
         }
     }
     
-    private func initializeServerAPI() -> APIServerProtocol {
-        return appDelegate.container.resolve(APIServerProtocol.self)!
+    private func initializeAPIManagerProtocol() -> APIManagerProtocol {
+        return appDelegate.container.resolve(APIManagerProtocol.self)!
     }
 }

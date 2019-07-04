@@ -62,7 +62,7 @@ class MailAuthViewController: UIViewController {
         }
     }
     
-    internal lazy var serverAPI: APIServerProtocol = self.initializeServerAPI()
+    internal lazy var serverAPI: APIManagerProtocol = self.initializeServerAPI()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -123,8 +123,8 @@ class MailAuthViewController: UIViewController {
 }
 
 extension MailAuthViewController: UITextFieldDelegate {
-    private func initializeServerAPI() -> APIServerProtocol{
-        return (self.navigationController as! AuthNavigationController).serverAPI
+    private func initializeServerAPI() -> APIManagerProtocol{
+        return (self.navigationController as! AuthNavigationController).apiManagerProtocol
     }
     
     private func findFirstResponder() -> UITextField? {

@@ -7,6 +7,7 @@ target 'ThinkWhat' do
     pod 'Alamofire'
     pod 'SwiftyJSON'
     pod 'FBSDKLoginKit'
+    pod 'VK-ios-sdk'
     target 'ThinkWhatTests' do
 	pod 'Quick'
 	pod 'Nimble'

@@ -397,17 +397,20 @@ struct INSTAGRAM_IDS {
     
 }
 
+struct VK_IDS {
+    
+    static let APP_ID               = "7043775"
+    
+}
+
 struct SERVER_URLS {
     
-    static let BASE_URL             = "https://damp-oasis-64585.herokuapp.com/"
+    static let BASE_URL             = "http://127.0.0.1:8000/"//"https://damp-oasis-64585.herokuapp.com/"
     
-    static let SURVEY_URL           = ""
+    static let CLIENT_ID            = "TK6NnHgbNmrsG18wA68pHSMcG6P74nDyhtNf4Hwt"//"bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"
     
-    static let CLIENT_ID            = "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"
-    
-    static let CLIENT_SECRET        = "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"
-    
-    static let SIGNUP_URL           = ""
+    static let CLIENT_SECRET        = "KikkeyTn2k3UpNQAR2DoYjrdrsbeu4LEmxZJHQtWGvh8fwaUY8fT3tA1ox6qjEYzcvzEVbo7Z9cq7ITLufGrQv5F8ROFuiHifYjyuh0KvG38yBgQnaiBPSvezFlnqZdj"//"Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"
+    static let SIGNUP_URL           = "api/sign_up"
     
     static let TOKEN_URL            = "api/social/token/"
     
@@ -415,9 +418,17 @@ struct SERVER_URLS {
     
     static let TOKEN_REVOKE_URL     = "api/social/revoke-token/"
     
+    
+    
+    static let SURVEY_URL           = "api/surveys/"
+    
+    
+    
+    
+    
     static let CURRENT_USER_URL     = "api/profiles/current/"
     
-    static let GET_FACEBOOKID_URL   = "api/profiles/get_facebook_id/"
+    static let GET_FACEBOOK_ID_URL  = "api/profiles/get_facebook_id/"
     
     static let USER_URL             = ""
     

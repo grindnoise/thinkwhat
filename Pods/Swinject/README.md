@@ -11,6 +11,7 @@ Swinject
 [![License](https://img.shields.io/cocoapods/l/Swinject.svg?style=flat)](http://cocoapods.org/pods/Swinject)
 [![Platforms](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20Linux-lightgrey.svg)](http://cocoapods.org/pods/Swinject)
 [![Swift Version](https://img.shields.io/badge/Swift-2.2--3.1.x-F16D39.svg?style=flat)](https://developer.apple.com/swift)
+[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 Swinject is a lightweight [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) framework for Swift.
 
@@ -192,7 +193,7 @@ Services should be registered in an extension of `SwinjectStoryboard` if you use
 
 ```swift
 extension SwinjectStoryboard {
-    class func setup() {
+    @objc class func setup() {
         defaultContainer.register(Animal.self) { _ in Cat(name: "Mimi") }
         defaultContainer.register(Person.self) { r in
             PetOwner(pet: r.resolve(Animal.self)!)

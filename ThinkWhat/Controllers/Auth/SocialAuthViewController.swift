@@ -89,29 +89,29 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
     
     func handleAuth(authToken: String)  {
         
-        (navigationController as! AuthNavigationController).serverAPI.logInViaSocialMedia(authToken: authToken, socialMedia: .Instagram) {
-            apiResponse in
-            tokenState = apiResponse
-            if tokenState == .Received {
-//                (self.navigationController as! AuthNavigationController).serverAPI.pullUserData("", completion: { (json) in
-//                    print(json)
-//                })
-            }
-        }
-        
-        switch authVariant {
-        case .Instagram:
-            KeychainService.saveInstagramAccessToken(token: (authToken as NSString))
-        case .Facebook:
-            KeychainService.saveFacebookAccessToken(token: (authToken as NSString))
-        case .VK:
-            KeychainService.saveVKAccessToken(token: (authToken as NSString))
-        default:
-            print("Google")
-            //KeychainService.saveGoogleAccessToken(token: (authToken as NSString))
-        }
-        print("\(authVariant) authentication token == ", authToken)
-        appData.session = .authorized
+//        (navigationController as! AuthNavigationController).apiManagerProtocol.logInViaSocialMedia(authToken: authToken, socialMedia: .Instagram) {
+//            apiResponse in
+//            tokenState = apiResponse
+//            if tokenState == .Received {
+////                (self.navigationController as! AuthNavigationController).serverAPI.pullUserData("", completion: { (json) in
+////                    print(json)
+////                })
+//            }
+//        }
+//
+//        switch authVariant {
+//        case .Instagram:
+//            KeychainService.saveInstagramAccessToken(token: (authToken as NSString))
+//        case .Facebook:
+//            KeychainService.saveFacebookAccessToken(token: (authToken as NSString))
+//        case .VK:
+//            KeychainService.saveVKAccessToken(token: (authToken as NSString))
+//        default:
+//            print("Google")
+//            //KeychainService.saveGoogleAccessToken(token: (authToken as NSString))
+//        }
+//        print("\(authVariant) authentication token == ", authToken)
+//        appData.session = .authorized
     }
     
     // MARK: - UIWebViewDelegate

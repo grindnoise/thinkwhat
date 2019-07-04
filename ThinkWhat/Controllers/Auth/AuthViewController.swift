@@ -8,6 +8,7 @@
 
 import UIKit
 import FBSDKLoginKit
+import VK_ios_sdk
 
 class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
@@ -18,8 +19,9 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     private var buttons:                            [ParentLoginButton] = []
     private var selectedAuth:                       Int = 0
     private var fbLoggedIn                          = false
-    private var serverAPI:                          APIServer!
+    private var apiManager:                         APIManager!
     private var isViewSetupCompleted                = false
+    private var vk_sdkInstance:                     VKSdk!
 
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -29,7 +31,10 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         super.viewDidLoad()
         setupGestures()
         setupViews()
-        serverAPI = (self.navigationController as! AuthNavigationController).serverAPI as! APIServer
+        apiManager = (self.navigationController as! AuthNavigationController).apiManagerProtocol as? APIManager
+        vk_sdkInstance = VKSdk.initialize(withAppId: VK_IDS.APP_ID)
+        vk_sdkInstance.register(self as VKSdkDelegate)
+        vk_sdkInstance.uiDelegate = self as VKSdkUIDelegate
     }
 
     private func setupViews() {
@@ -106,37 +111,58 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             let authCase = self.getAuthCase()
             switch authCase {
             case .Facebook:
-                if FBSDKAccessToken.current() == nil {
+                if AccessToken.current == nil {
                     FBManager.performLogin(viewController: self) {
                         (success) in
                         if success {
-                            self.serverAPI.logInViaSocialMedia(authToken: (FBSDKAccessToken.current()?.tokenString)!, socialMedia: .Facebook) {
+//                            self.apiManager.logInViaSocialMedia(authToken: (AccessToken.current?.tokenString)!, socialMedia: .Facebook) {
+                             self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {
                                 state in
                                 tokenState = state
+                                if tokenState == .Received {
+                                    self.apiManager.getFacebookID() {
+                                        id in
+                                        if id == nil {
+                                            FBManager.getUserData()
+                                        }
+                                    }
+                                }
                             }
                         } else {
                             //TODO Error handling
                         }
                     }
                 } else {
-                    self.serverAPI.logInViaSocialMedia(authToken: (FBSDKAccessToken.current()?.tokenString)!, socialMedia: .Facebook) {
+                    self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {//logInViaSocialMedia(authToken: (AccessToken.current?.tokenString)!, socialMedia: .Facebook) {
                         state in
                         tokenState = state
-                    }
-                }
-                if tokenState == .Received {
-                    self.serverAPI.getFacebookID() {
-                        id in
-                        if id == nil {
-                            FBManager.getUserData()
+                        if tokenState == .Received {
+                            self.apiManager.getFacebookID() {
+                                id in
+                                if id == nil {
+                                    FBManager.getUserData()
+                                }
+                            }
                         }
                     }
                 }
+            case .VK:
+                let scope = ["email"]
+                VKSdk.wakeUpSession(scope) {
+                    state, error in
+                    if error != nil {
+                        print(error.debugDescription)
+                    }
+                    if state != VKAuthorizationState.authorized {
+                        VKSdk.authorize(scope, with: [VKAuthorizationOptions.unlimitedToken])
+                        
+                    }
+                }
             case .Instagram:
-                if FBSDKAccessToken.current() != nil {
+                if AccessToken.current != nil {
                     FBManager.performLogout()
                 }
-                (self.navigationController as! AuthNavigationController).serverAPI.logOut() {
+                self.apiManager.logout() {
                     state in
                     tokenState = state
                 }
@@ -174,6 +200,56 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
 //            }
 //        }
 //    }
+}
+
+
+extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
+
+    func vkSdkAccessAuthorizationFinished(with result: VKAuthorizationResult!) {
+        if let error = result.error {
+            //TODO
+            print(error.localizedDescription)
+            return
+        }
+        
+//        switch result.state {
+//        case .authorized:
+//            <#code#>
+//        default:
+//            <#code#>
+//        }
+        
+    }
+
+    func vkSdkUserAuthorizationFailed() {
+        print("FAIL")
+    }
+
+    func vkSdkShouldPresent(_ controller: UIViewController!) {
+        if (self.presentedViewController != nil) {
+            self.dismiss(animated: true, completion: {
+                self.present(controller, animated: true, completion: {
+                })
+            })
+        } else {
+            self.present(controller, animated: true, completion: {
+            })
+        }
+    }
+
+    func vkSdkNeedCaptchaEnter(_ captchaError: VKError!) {
+
+    }
+
+
+    func vkSdkAccessTokenUpdated(newToken:VKAccessToken?, oldToken:VKAccessToken?) -> Void {
+
+    }
+
+    func vkSdkAuthorizationStateUpdated(with result:VKAuthorizationResult) -> Void {
+        print(result.state.rawValue)
+    }
+
 }
 
 

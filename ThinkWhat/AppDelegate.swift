@@ -11,6 +11,7 @@ import CoreData
 import Swinject
 import UserNotifications
 import FBSDKCoreKit
+import VK_ios_sdk
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -19,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let container               = Container()
     let center                  = UNUserNotificationCenter.current()
     let notificationDelegate    = CustomNotificationDelegate()
+//    var VKApp                   = VKSdk.initialize(withAppId: <#T##String!#>)
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         center.delegate                         = notificationDelegate
@@ -36,13 +38,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let statusBarFrame = UIView(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: (UIApplication.shared.keyWindow?.bounds.width)!, height: UIApplication.shared.statusBarFrame.height)))
         statusBarFrame.backgroundColor = UIColor.white
         UIApplication.shared.keyWindow?.addSubview(statusBarFrame)
-        FBSDKApplicationDelegate.sharedInstance()!.application(application, didFinishLaunchingWithOptions: launchOptions)
+        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        let handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, sourceApplication: options[.sourceApplication] as? String, annotation: options[.annotation])
-        return handled
+        VKSdk.processOpen(url, fromApplication: options[.sourceApplication] as? String)
+        ApplicationDelegate.shared.application(app, open: url, sourceApplication: options[.sourceApplication] as? String, annotation: options[.annotation])
+        return true
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
@@ -60,7 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        FBSDKAppEvents.activateApp()
+        AppEvents.activateApp()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -115,8 +118,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func registerContainers() {
-        container.register(APIServerProtocol.self) {
-            _ in APIServer()
+        container.register(APIManagerProtocol.self) {
+            _ in APIManager()
         }
         container.register(FileStoringProtocol.self) {
             _ in FileStorage()
