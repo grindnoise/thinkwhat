@@ -51,7 +51,13 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                 let tap = UITapGestureRecognizer(target: self, action: #selector(AuthViewController.handleTap(gesture:)))
                 button.addGestureRecognizer(tap)
             }
-
+            let notificationCenter = NotificationCenter.default
+            
+            notificationCenter.addObserver(self,
+                                           selector: #selector(AuthViewController.handleTokenStateChange),
+                                           name: UITextField.textDidBeginEditingNotification,
+                                           object: self)
+            
         }
     }
 
@@ -154,8 +160,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                         print(error.debugDescription)
                     }
                     if state != VKAuthorizationState.authorized {
-                        VKSdk.authorize(scope, with: [VKAuthorizationOptions.unlimitedToken])
-                        
+                        VKSdk.authorize(scope)
                     }
                 }
             case .Instagram:
@@ -187,6 +192,10 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             fatalError("\(selectedAuth) selectedAuth not found")
         }
     }
+    
+    @objc private func handleTokenStateChange() {
+        
+    }
 
 //    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 //        if segue.identifier == kSegueSocialAuth {
@@ -212,12 +221,15 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
             return
         }
         
-//        switch result.state {
-//        case .authorized:
-//            <#code#>
-//        default:
-//            <#code#>
-//        }
+        switch result.state {
+        case .authorized:
+            apiManager.login(.VK, username: nil, password: nil, token: result.token.accessToken) {
+                _tokenState in
+                tokenState = _tokenState
+            }
+        default:
+            print("Default")
+        }
         
     }
 

@@ -100,13 +100,13 @@ var tokenState: TokenState    = .Unassigned {
     didSet {
         switch tokenState {
         case .Received:
-            NotificationCenter.default.post(name: kNotificationSuccessToken, object: nil)
+            NotificationCenter.default.post(name: kNotificationTokenSuccess, object: nil)
         case .Error:
-            NotificationCenter.default.post(name: kNotificationFailToken, object: nil)
+            NotificationCenter.default.post(name: kNotificationTokenFail, object: nil)
         case .Revoked:
-            print("TODO")
+            NotificationCenter.default.post(name: kNotificationTokenRevoke, object: nil)
         case .WrongCredentials:
-            NotificationCenter.default.post(name: kNotificationFailToken, object: nil)
+            NotificationCenter.default.post(name: kNotificationTokenWrongCredentials, object: nil)
         default:
             print("TODO")
         }
@@ -144,9 +144,10 @@ var internetConnection: InternetConnection      = .Available {
     }
 }
 let kNotificationInternetConnectionChange        = Notification.Name("InternetConnectionChange")
-let kNotificationSuccessToken                    = Notification.Name("SuccessTokenNotification")
-let kNotificationFailToken                       = Notification.Name("FailTokenNotification")
-let kNotificationWrongCredentialsToken           = Notification.Name("WrongCredentialsTokenNotification")
+let kNotificationTokenSuccess                    = Notification.Name("NotificationTokenSuccess")
+let kNotificationTokenFail                       = Notification.Name("NotificationTokenFail")
+let kNotificationTokenRevoke                     = Notification.Name("NotificationTokenRevoke")
+let kNotificationTokenWrongCredentials           = Notification.Name("NotificationTokenWrongCredentials")
 let kNotificationSMSResponse                     = Notification.Name("smsResponseNotification")
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
