@@ -12,7 +12,7 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
     
     @IBOutlet weak var spinner:         LoadingIndicator!
     @IBOutlet weak var loginWebView:    UIWebView!
-    open           var authVariant:     AuthVariant                 = .Undefined
+    open           var authVariant:     AuthVariant!
     open           var navTitle:        UIView!
     
     override func viewDidLoad() {
@@ -29,17 +29,17 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         loginWebView.delegate                                           = self
         unSignedRequest()
-        NotificationCenter.default.addObserver(self, selector: #selector(SocialAuthViewController.handleSuccessTokenNotification), name: kNotificationTokenSuccess, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SocialAuthViewController.handleSuccessTokenNotification), name: kNotificationTokenReceived, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         spinner.addUntitled1Animation()
-        if authVariant == .Instagram {
-            navTitle                                            = InstagramLogo(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 30, height: 30)))
-            navTitle.isOpaque                                   = false
-            navTitle.alpha                                      = 0
-            navigationItem.titleView                            = navTitle
-        } else if authVariant == .VK {
+//        if authVariant == .Instagram {
+//            navTitle                                            = InstagramLogo(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 30, height: 30)))
+//            navTitle.isOpaque                                   = false
+//            navTitle.alpha                                      = 0
+//            navigationItem.titleView                            = navTitle
+        /*} else*/ if authVariant == .VK {
             navTitle                                            = VKLogo(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 30, height: 30)))
             navTitle.isOpaque                                   = false
             navTitle.alpha                                      = 0
@@ -64,11 +64,11 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
     
     //MARK: - unSignedRequest
     func unSignedRequest () {
-        if authVariant == .Instagram {
-            let authURL = String(format: "%@?client_id=%@&redirect_uri=%@&response_type=token&scope=%@&DEBUG=True", arguments: [INSTAGRAM_IDS.INSTAGRAM_AUTHURL,INSTAGRAM_IDS.INSTAGRAM_CLIENT_ID,INSTAGRAM_IDS.INSTAGRAM_REDIRECT_URI, INSTAGRAM_IDS.INSTAGRAM_SCOPE ])
-            let urlRequest =  URLRequest.init(url: URL.init(string: authURL)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 60)
-            loginWebView.loadRequest(urlRequest)
-        }
+//        if authVariant == .Instagram {
+//            let authURL = String(format: "%@?client_id=%@&redirect_uri=%@&response_type=token&scope=%@&DEBUG=True", arguments: [INSTAGRAM_IDS.INSTAGRAM_AUTHURL,INSTAGRAM_IDS.INSTAGRAM_CLIENT_ID,INSTAGRAM_IDS.INSTAGRAM_REDIRECT_URI, INSTAGRAM_IDS.INSTAGRAM_SCOPE ])
+//            let urlRequest =  URLRequest.init(url: URL.init(string: authURL)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 60)
+//            loginWebView.loadRequest(urlRequest)
+//        }
     }
     
     func checkRequestForCallbackURL(request: URLRequest) -> Bool {

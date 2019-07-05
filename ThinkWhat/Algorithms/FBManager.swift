@@ -20,8 +20,8 @@ class FBManager {
         shared.logIn(permissions: ["public_profile", "email"],
                                from: viewController) { (result, error) in
                                 if error == nil {
-                                    completionHandler(true)
 //                                    getUserData()
+                                    completionHandler(true)
                                 } else {
                                     print(error!.localizedDescription)
                                     completionHandler(false)
@@ -30,9 +30,7 @@ class FBManager {
     }
     
     public class func performLogout() {//(completionHandler: @escaping(Bool) -> Void) {
-        
         shared.logOut()
-        
     }
     
     public class func getUserData() {//(completionHandler: @escaping() -> Void) {
@@ -45,6 +43,7 @@ class FBManager {
                 }
                 if result != nil {
                     if let json = JSON(result!) as? JSON {
+                        print(json)
 //                        self.serverAPI.
                         
                         appData.importFacebookData(json)

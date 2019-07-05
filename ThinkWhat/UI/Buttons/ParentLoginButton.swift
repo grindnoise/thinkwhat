@@ -16,7 +16,7 @@ class ParentLoginButton: UIView, AnimationsRemover {
     }
     
     var state: State = .disabled
-    var authVariant: AuthVariant = .Undefined
+    var authVariant: AuthVariant!
     
     override init(frame: CGRect) {
         super.init(frame: frame)

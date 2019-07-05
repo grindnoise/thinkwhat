@@ -54,9 +54,13 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             let notificationCenter = NotificationCenter.default
             
             notificationCenter.addObserver(self,
-                                           selector: #selector(AuthViewController.handleTokenStateChange),
-                                           name: UITextField.textDidBeginEditingNotification,
-                                           object: self)
+                                           selector: #selector(AuthViewController.handleTokenStateReceived),
+                                           name: kNotificationTokenReceived,
+                                           object: nil)
+            notificationCenter.addObserver(self,
+                                           selector: #selector(AuthViewController.handleTokenStateError),
+                                           name: kNotificationTokenError,
+                                           object: nil)
             
         }
     }
@@ -121,34 +125,31 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     FBManager.performLogin(viewController: self) {
                         (success) in
                         if success {
-//                            self.apiManager.logInViaSocialMedia(authToken: (AccessToken.current?.tokenString)!, socialMedia: .Facebook) {
                              self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {
                                 state in
                                 tokenState = state
-                                if tokenState == .Received {
-                                    self.apiManager.getFacebookID() {
-                                        id in
-                                        if id == nil {
-                                            FBManager.getUserData()
-                                        }
-                                    }
-                                }
                             }
                         } else {
                             //TODO Error handling
                         }
                     }
                 } else {
-                    self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {//logInViaSocialMedia(authToken: (AccessToken.current?.tokenString)!, socialMedia: .Facebook) {
-                        state in
-                        tokenState = state
-                        if tokenState == .Received {
-                            self.apiManager.getFacebookID() {
-                                id in
-                                if id == nil {
-                                    FBManager.getUserData()
+                    if AccessToken.current!.expirationDate < Date() {
+                        FBManager.performLogin(viewController: self) {
+                            (success) in
+                            if success {
+                                self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {
+                                    state in
+                                    tokenState = state
                                 }
+                            } else {
+                                //TODO Error handling
                             }
+                        }
+                    } else {
+                        self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {//logInViaSocialMedia(authToken: (AccessToken.current?.tokenString)!, socialMedia: .Facebook) {
+                            state in
+                            tokenState = state
                         }
                     }
                 }
@@ -159,18 +160,35 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     if error != nil {
                         print(error.debugDescription)
                     }
+                    print(state.rawValue)
                     if state != VKAuthorizationState.authorized {
                         VKSdk.authorize(scope)
+                    } else {
+                        self.apiManager.login(.VK, username: nil, password: nil, token: VKSdk.accessToken()?.accessToken) {
+                            _tokenState in
+                            tokenState = _tokenState
+                        }
                     }
                 }
-            case .Instagram:
-                if AccessToken.current != nil {
-                    FBManager.performLogout()
+            case .Google:
+                DispatchQueue.main.async {
+                    VKSdk.forceLogout()
                 }
-                self.apiManager.logout() {
-                    state in
-                    tokenState = state
+                DispatchQueue.main.async {
+                    self.apiManager.logout() {
+                        state in
+                        tokenState = state
+                    }
                 }
+                
+                
+//                if AccessToken.current != nil {
+//                    FBManager.performLogout()
+//                }
+//                self.apiManager.logout() {
+//                    state in
+//                    tokenState = state
+//                }
             default:
                 print("")
             }
@@ -183,17 +201,32 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         case 1:
             return .VK
         case 2:
-            return .Instagram
+            return .Google
         case 3:
             return .Facebook
-        case 4:
-            return .OK
         default:
             fatalError("\(selectedAuth) selectedAuth not found")
         }
     }
     
-    @objc private func handleTokenStateChange() {
+    @objc private func handleTokenStateReceived() {
+        let auth = getAuthCase()
+        switch auth {
+        case .Facebook:
+            self.apiManager.getFacebookID() {
+                id in
+                if id == nil {
+                    FBManager.getUserData()
+                }
+            }
+        case .VK:
+            print("VK")
+        default:
+            print("handleTokenStateReceived")
+        }
+    }
+    
+    @objc private func handleTokenStateError() {
         
     }
 
@@ -216,7 +249,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
 
     func vkSdkAccessAuthorizationFinished(with result: VKAuthorizationResult!) {
         if let error = result.error {
-            //TODO
+            //TODO Error popup
             print(error.localizedDescription)
             return
         }
@@ -230,7 +263,6 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
         default:
             print("Default")
         }
-        
     }
 
     func vkSdkUserAuthorizationFailed() {

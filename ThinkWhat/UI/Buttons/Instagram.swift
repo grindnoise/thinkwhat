@@ -36,7 +36,7 @@ class InstagramButtonView: ParentLoginButton, CAAnimationDelegate {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.authVariant = .Instagram
+        self.authVariant = .Google//.Instagram
         setupProperties()
         setupLayers()
     }

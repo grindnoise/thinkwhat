@@ -61,7 +61,7 @@ enum TokenState {
 
 enum SessionType: String {
     case authorized     = "authorized"
-    case guest          = "guest"
+    case unauthorized   = "unauthorized"
 }
 
 enum Gender: String {
@@ -76,14 +76,11 @@ enum InternetConnection {
 }
 
 enum AuthVariant: String {
-    case Instagram  = "Instagram"
-    case VK         = "VK"
-    case OK         = "OK"
+    case VK         = "vk-oauth2"
     case Facebook   = "Facebook"
     case Google     = "Google"
     case Phone      = "Phone"
     case Mail       = "Mail"
-    case Undefined  = "Undefined"
 }
 
 enum GPSstate {
@@ -100,11 +97,11 @@ var tokenState: TokenState    = .Unassigned {
     didSet {
         switch tokenState {
         case .Received:
-            NotificationCenter.default.post(name: kNotificationTokenSuccess, object: nil)
+            NotificationCenter.default.post(name: kNotificationTokenReceived, object: nil)
         case .Error:
-            NotificationCenter.default.post(name: kNotificationTokenFail, object: nil)
+            NotificationCenter.default.post(name: kNotificationTokenError, object: nil)
         case .Revoked:
-            NotificationCenter.default.post(name: kNotificationTokenRevoke, object: nil)
+            NotificationCenter.default.post(name: kNotificationTokenRevoked, object: nil)
         case .WrongCredentials:
             NotificationCenter.default.post(name: kNotificationTokenWrongCredentials, object: nil)
         default:
@@ -144,9 +141,9 @@ var internetConnection: InternetConnection      = .Available {
     }
 }
 let kNotificationInternetConnectionChange        = Notification.Name("InternetConnectionChange")
-let kNotificationTokenSuccess                    = Notification.Name("NotificationTokenSuccess")
-let kNotificationTokenFail                       = Notification.Name("NotificationTokenFail")
-let kNotificationTokenRevoke                     = Notification.Name("NotificationTokenRevoke")
+let kNotificationTokenReceived                   = Notification.Name("NotificationTokenReceived")
+let kNotificationTokenError                      = Notification.Name("NotificationTokenError")
+let kNotificationTokenRevoked                    = Notification.Name("NotificationTokenRevoked")
 let kNotificationTokenWrongCredentials           = Notification.Name("NotificationTokenWrongCredentials")
 let kNotificationSMSResponse                     = Notification.Name("smsResponseNotification")
 
@@ -285,12 +282,12 @@ struct AppData {
             }
         }
     }
-    var session: SessionType! = .guest {
+    var session: SessionType! = .unauthorized {
         didSet {
             if session == .authorized {
                 UserDefaults.standard.set(SessionType.authorized.rawValue, forKey: "session")
             } else {
-                UserDefaults.standard.set(SessionType.guest.rawValue, forKey: "session")
+                UserDefaults.standard.set(SessionType.unauthorized.rawValue, forKey: "session")
             }
         }
     }
@@ -361,7 +358,7 @@ struct AppData {
 //        phone                   = ""
         gender                  = .none
         birthDate               = Date(dateString: "01.01.0001")
-        session                 = .guest
+        session                 = .unauthorized
 //        reminder                = .Hours_1
         let langStr = Locale.current.languageCode
         if langStr == "en-US" {

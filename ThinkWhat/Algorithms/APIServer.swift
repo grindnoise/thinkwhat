@@ -182,6 +182,7 @@ class APIManager: APIManagerProtocol {
                             do {
                                 let json = try JSON(data: response.data!)
                                 saveTokenInKeychain(json: json, tokenState: &_tokenState)
+                                _tokenState = .Received
                             } catch {
                                 print(error.localizedDescription)
                             }
@@ -201,13 +202,14 @@ class APIManager: APIManagerProtocol {
         
         func mediaLogin(token: String) {
             parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(auth.rawValue.lowercased())", "token": "\(token)"]
+            print(parameters)
             url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.TOKEN_CONVERT_URL)
             requestManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseJSON() {
                 response in
                 if response.result.isFailure {
                     fatalError(response.result.debugDescription)
                 }
-                var _tokenState = TokenState.Error
+                
                 if let error = response.result.error as? AFError {
                     self.parseError(error)
                 } else {
@@ -218,6 +220,7 @@ class APIManager: APIManagerProtocol {
                                     print("\(attr.0): \(attr.1.stringValue)")
                                 }
                                 saveTokenInKeychain(json: json, tokenState: &_tokenState)
+                                _tokenState = .Received
                             }
                         } else if 400...499 ~= statusCode {
                             do {
@@ -227,9 +230,9 @@ class APIManager: APIManagerProtocol {
                                 print(error.localizedDescription)
                             }
                         }
-                        completion(_tokenState)
                     }
                 }
+                completion(_tokenState)
             }
         }
     }
@@ -312,19 +315,15 @@ class APIManager: APIManagerProtocol {
     }
     
     func getFacebookID(completion: @escaping (String?) -> ()) {
-        
         checkForReachability {
             completed in
             self.isProxyEnabled = completed
             performRequest()
         }
         
-        
-        
         func performRequest() {
-            
             let parameters = ["category": "1"]
-            let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent("api/surveys/by_category/")//SERVER_URLS.GET_FACEBOOK_ID_URL)
+            let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.GET_FACEBOOK_ID_URL)
             
             let headers: HTTPHeaders = [
                 "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
@@ -337,49 +336,28 @@ class APIManager: APIManagerProtocol {
                     print(response.result.debugDescription)
                 }
                 if let error = response.result.error as? AFError {
-                    switch error {
-                    case .invalidURL(let url):
-                        print("Invalid URL: \(url) - \(error.localizedDescription)")
-                    case .parameterEncodingFailed(let reason):
-                        print("Parameter encoding failed: \(error.localizedDescription)")
-                        print("Failure Reason: \(reason)")
-                    case .multipartEncodingFailed(let reason):
-                        print("Multipart encoding failed: \(error.localizedDescription)")
-                        print("Failure Reason: \(reason)")
-                    case .responseValidationFailed(let reason):
-                        print("Response validation failed: \(error.localizedDescription)")
-                        print("Failure Reason: \(reason)")
-                        
-                        switch reason {
-                        case .dataFileNil, .dataFileReadFailed:
-                            print("Downloaded file could not be read")
-                        case .missingContentType(let acceptableContentTypes):
-                            print("Content Type Missing: \(acceptableContentTypes)")
-                        case .unacceptableContentType(let acceptableContentTypes, let responseContentType):
-                            print("Response content type: \(responseContentType) was unacceptable: \(acceptableContentTypes)")
-                        case .unacceptableStatusCode(let code):
-                            print("Response status code was unacceptable: \(code)")
-                        }
-                    case .responseSerializationFailed(let reason):
-                        print("Response serialization failed: \(error.localizedDescription)")
-                        print("Failure Reason: \(reason)")
-                    }
+                    self.parseError(error)
                 } else {
-                    debugPrint(response)
                     var id: String?
                     if let statusCode  = response.response?.statusCode{
                         if 200...299 ~= statusCode {
-                            if let json = try? JSON(data: response.data!) {
+                            do {
+                                let json = try JSON(data: response.data!)
                                 for attr in json {
-                                    print("\(attr.0): \(attr.1.stringValue)")
-                                    id = attr.1.stringValue
+                                    if attr.0 ==  "facebook_ID" {
+                                        id = attr.1.stringValue
+                                        print("\(attr.0): \(attr.1.stringValue)")
+                                    }
                                 }
+                            } catch {
+                                print(error.localizedDescription)
                             }
                         } else if 400...499 ~= statusCode {
-                            if let json = try? JSON(data: response.data!) {
-                                for attr in json {
-                                    print("\(attr.0): \(attr.1.stringValue)")
-                                }
+                            do {
+                                let json = try JSON(data: response.data!)
+                                print(json)
+                            } catch {
+                                print(error.localizedDescription)
                             }
                         }
                     }
