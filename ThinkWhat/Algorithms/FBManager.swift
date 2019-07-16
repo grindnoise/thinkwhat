@@ -33,9 +33,9 @@ class FBManager {
         shared.logOut()
     }
     
-    public class func getUserData() {//(completionHandler: @escaping() -> Void) {
+    public class func getUserData(completionHandler: @escaping(JSON?) -> Void) {//(completionHandler: @escaping() -> Void) {
         if AccessToken.current != nil {
-            GraphRequest(graphPath: "me", parameters: ["fields" : "name, first_name, last_name, email, picture.type(normal)"]).start() {
+            GraphRequest(graphPath: "me", parameters: ["fields" : "name, first_name, last_name, email, picture.type(large)"]).start() {
                 (connection, result, error) in
                 if let error = error {
                     print(error.localizedDescription)
@@ -43,11 +43,7 @@ class FBManager {
                 }
                 if result != nil {
                     if let json = JSON(result!) as? JSON {
-                        print(json)
-//                        self.serverAPI.
-                        
-                        appData.importFacebookData(json)
-                        
+                        completionHandler(json)
                     }
                 }
             }

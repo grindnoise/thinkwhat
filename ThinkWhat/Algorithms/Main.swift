@@ -25,17 +25,9 @@ func delay(seconds: Double, completion:@escaping ()->()) {
     }
 }
 
-//seconds
-enum ReminderInterval: Int {
-    case Minutes_15 = 90
-    case Minutes_30 = 180
-    case Minutes_45 = 270
-    case Hours_1    = 3600
-    case Hours_2    = 7200
-    case Hours_4    = 14400
-    case Hours_6    = 21600
-    case Hours_12   = 43200
-    case Hours_24   = 86400
+enum ImageType: String {
+    case Profile = "profile"
+    case Survey  = "survey"
 }
 
 enum Language: String {
@@ -43,20 +35,20 @@ enum Language: String {
     case Russian = "Русский"
 }
 
-enum AnnotationStatus {
-    case Active
-    case Completed
-    case Unassigned
-}
-
-enum ImageExtension: String {
-    case PNG  = "png"
-    case JPEG = "jpg"
-    case TIFF = "tiff"
+enum FileFormat: String {
+    case PNG        = "png"
+    case JPEG       = "jpg"
+    case TIFF       = "tiff"
+    case GIF        = "gif"
+    case Unknown    = "Unknown"
 }
 
 enum TokenState {
-    case Received, Error, Unassigned, WrongCredentials, Expired, Revoked
+    case Received, Error, Unassigned, WrongCredentials, Expired, Revoked, ConnectionError
+}
+
+enum ApiReachabilityState {
+    case Reachable, None
 }
 
 enum SessionType: String {
@@ -83,12 +75,6 @@ enum AuthVariant: String {
     case Mail       = "Mail"
 }
 
-enum GPSstate {
-    case NoSignal
-    case PoorSignal
-    case PreciseSignal
-}
-
 enum ClientSettingsMode {
     case Reminder, Language
 }
@@ -104,14 +90,11 @@ var tokenState: TokenState    = .Unassigned {
             NotificationCenter.default.post(name: kNotificationTokenRevoked, object: nil)
         case .WrongCredentials:
             NotificationCenter.default.post(name: kNotificationTokenWrongCredentials, object: nil)
+        case .ConnectionError:
+            NotificationCenter.default.post(name: kNotificationTokenConnectionError, object: nil)
         default:
             print("TODO")
         }
-    }
-}
-var userLocation = CLLocation() {
-    didSet {
-        userLocationPoint = MKMapPoint(userLocation.coordinate)
     }
 }
 
@@ -123,7 +106,6 @@ let iOS_11: Bool = {
     }
 }()
 
-var userLocationPoint                           = MKMapPoint()
 var smsResponse: SMSResponse? {
     didSet {
         if smsResponse != nil {
@@ -132,7 +114,7 @@ var smsResponse: SMSResponse? {
     }
 }
 var firstLaunch                                 = true
-var appData                                     = AppData()
+//var appData                                     = AppData()
 var internetConnection: InternetConnection      = .Available {
     didSet {
         if internetConnection != oldValue {
@@ -140,12 +122,28 @@ var internetConnection: InternetConnection      = .Available {
         }
     }
 }
+var apiReachability: ApiReachabilityState = .Reachable {
+    didSet {
+        if oldValue != apiReachability {
+            if apiReachability == .None {
+                NotificationCenter.default.post(name: kNotificationApiNotReachable, object: nil)
+            } else {
+                NotificationCenter.default.post(name: kNotificationApiReachable, object: nil)
+            }
+        }
+    }
+}
+
 let kNotificationInternetConnectionChange        = Notification.Name("InternetConnectionChange")
 let kNotificationTokenReceived                   = Notification.Name("NotificationTokenReceived")
 let kNotificationTokenError                      = Notification.Name("NotificationTokenError")
 let kNotificationTokenRevoked                    = Notification.Name("NotificationTokenRevoked")
 let kNotificationTokenWrongCredentials           = Notification.Name("NotificationTokenWrongCredentials")
+let kNotificationTokenConnectionError            = Notification.Name("NotificationTokenConnectionError")
 let kNotificationSMSResponse                     = Notification.Name("smsResponseNotification")
+
+let kNotificationApiReachable                    = Notification.Name("smsNotificationApiReachable")
+let kNotificationApiNotReachable                 = Notification.Name("smsNotificationApiNotReachable")
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
 
@@ -178,203 +176,236 @@ let K_COLOR_GRAY                                = UIColor(red:0.574, green: 0.57
 let options: UNAuthorizationOptions             = [.alert, .sound, .badge]
 
 //MARK: - Structs
-struct AppData {
+struct ImageHeaderData{
+    static var PNG: [UInt8] = [0x89]
+    static var JPEG: [UInt8] = [0xFF]
+    static var GIF: [UInt8] = [0x47]
+    static var TIFF_01: [UInt8] = [0x49]
+    static var TIFF_02: [UInt8] = [0x4D]
+}
+
+class AppData {
+    static let shared = AppData()
+    var user = User()
+    var userProfile = UserProfile()
+    var system = System()
     
-//    let reminderSettings: [[String: ReminderInterval]] = [["15 мин."   : ReminderInterval.Minutes_15],
-//                                                          ["30 мин."   : ReminderInterval.Minutes_30],
-//                                                          ["45 мин."   : ReminderInterval.Minutes_45],
-//                                                          ["1 ч."      : ReminderInterval.Hours_1],
-//                                                          ["2 ч."      : ReminderInterval.Hours_2],
-//                                                          ["4 ч."      : ReminderInterval.Hours_4],
-//                                                          ["6 ч."      : ReminderInterval.Hours_6],
-//                                                          ["12 ч."     : ReminderInterval.Hours_12],
-//                                                          ["24 ч."     : ReminderInterval.Hours_24]]
-    let languages: [Language] = [.English, .Russian]
-//
-//    var reminder: ReminderInterval! {
-//        didSet {
-//            if reminder != oldValue {
-//                UserDefaults.standard.set(reminder.rawValue, forKey: "reminder")
-//            } else {
-//                UserDefaults.standard.removeObject(forKey: "reminder")
-//            }
-//        }
-//    }
-    var language: Language! {
-        didSet {
-            if language != oldValue {
-                UserDefaults.standard.set(language.rawValue, forKey: "language")
-            } else {
-                UserDefaults.standard.removeObject(forKey: "language")
+    struct User {
+        var ID: String! {
+            didSet {
+                if ID != oldValue {
+                    UserDefaults.standard.set(ID, forKey: "userId")
+                } else if ID.isEmpty {
+                    UserDefaults.standard.removeObject(forKey: "userId")
+                }
             }
         }
-    }
-//    var phone: String! {
-//        didSet {
-//            if phone != oldValue {
-//                UserDefaults.standard.set(username, forKey: "phone")
-//            } else if phone.isEmpty {
-//                UserDefaults.standard.removeObject(forKey: "phone")
-//            }
-//        }
-//    }
-    var username: String! {
-        didSet {
-            if username != oldValue {
-                UserDefaults.standard.set(username, forKey: "username")
-            } else if username.isEmpty {
-                UserDefaults.standard.removeObject(forKey: "username")
+        var username: String! {
+            didSet {
+                if username != oldValue {
+                    UserDefaults.standard.set(username, forKey: "username")
+                } else if username.isEmpty {
+                    UserDefaults.standard.removeObject(forKey: "username")
+                }
             }
         }
-    }
-    var firstName: String! {
-        didSet {
-            if firstName != oldValue {
-                UserDefaults.standard.set(firstName, forKey: "firstName")
-            } else if firstName.isEmpty {
-                UserDefaults.standard.removeObject(forKey: "firstName")
+        var firstName: String! {
+            didSet {
+                if firstName != oldValue {
+                    UserDefaults.standard.set(firstName, forKey: "firstName")
+                } else if firstName.isEmpty {
+                    UserDefaults.standard.removeObject(forKey: "firstName")
+                }
             }
         }
-    }
-    var lastName: String! {
-        didSet {
-            if lastName != oldValue {
-                UserDefaults.standard.set(lastName, forKey: "lastName")
-            } else if lastName.isEmpty {
-                UserDefaults.standard.removeObject(forKey: "lastName")
+        var lastName: String! {
+            didSet {
+                if lastName != oldValue {
+                    UserDefaults.standard.set(lastName, forKey: "lastName")
+                } else if lastName.isEmpty {
+                    UserDefaults.standard.removeObject(forKey: "lastName")
+                }
             }
         }
-    }
-    var profileImagePath: String! {
-        didSet {
-            if !profileImagePath.isEmpty {
-                UserDefaults.standard.set(profileImagePath, forKey: "userImagePath")
-            } else {
-                UserDefaults.standard.removeObject(forKey: "userImagePath")
+        var email: String! {
+            didSet {
+                if email != oldValue {
+                    UserDefaults.standard.set(email, forKey: "userMail")
+                } else if email.isEmpty {
+                    UserDefaults.standard.removeObject(forKey: "userMail")
+                }
             }
         }
-    }
-    var email: String! {
-        didSet {
-            if email != oldValue {
-                UserDefaults.standard.set(email, forKey: "userMail")
-            } else if email.isEmpty {
-                UserDefaults.standard.removeObject(forKey: "userMail")
+        
+        init() {
+            getData()
+        }
+        
+        mutating func getData() {
+            if let kFirstName = UserDefaults.standard.object(forKey: "firstname") {
+                self.firstName = kFirstName as? String
+            }
+            if let kLastName = UserDefaults.standard.object(forKey: "lastname") {
+                self.lastName = kLastName as? String
+            }
+            if let kUserName = UserDefaults.standard.object(forKey: "userName") {
+                self.username = kUserName as? String
+            }
+            if let kUserMail = UserDefaults.standard.object(forKey: "userMail") {
+                self.email = kUserMail as? String
+            }
+            if let kUserID = UserDefaults.standard.object(forKey: "userID") {
+                self.ID = kUserID as? String
             }
         }
-    }
-    var gender: Gender! {
-        didSet {
-            if gender == nil {
-                UserDefaults.standard.removeObject(forKey: "userGender")
-            } else if gender != oldValue {
-                UserDefaults.standard.set(gender.rawValue, forKey: "userGender")
-            }
-        }
-    }
-    var birthDate: Date! {
-        didSet {
-            let defaultDate = Date(dateString: "01.01.0001")
-            if (birthDate != oldValue) && (birthDate != defaultDate)  {
-                UserDefaults.standard.set(birthDate, forKey: "userBirthDate")
-            } else {
-                UserDefaults.standard.removeObject(forKey: "userBirthDate")
-            }
-        }
-    }
-    var session: SessionType! = .unauthorized {
-        didSet {
-            if session == .authorized {
-                UserDefaults.standard.set(SessionType.authorized.rawValue, forKey: "session")
-            } else {
-                UserDefaults.standard.set(SessionType.unauthorized.rawValue, forKey: "session")
-            }
+        
+        mutating func eraseData() {
+            firstName               = ""
+            lastName                = ""
+            username                = ""
+            ID                      = ""
+            email                   = ""
+            KeychainService.saveAccessToken(token: "")
+            KeychainService.saveRefreshToken(token: "")
         }
     }
     
-    init() {
-        retrieveUserData()
+    struct UserProfile {
+        var ID: String! {
+            didSet {
+                if ID != oldValue {
+                    UserDefaults.standard.set(ID, forKey: "userProfileID")
+                } else if ID.isEmpty {
+                    UserDefaults.standard.removeObject(forKey: "userProfileID")
+                }
+            }
+        }
+        var imagePath: String! {
+            didSet {
+                if !imagePath.isEmpty {
+                    UserDefaults.standard.set(imagePath, forKey: "userImagePath")
+                } else {
+                    UserDefaults.standard.removeObject(forKey: "userImagePath")
+                }
+            }
+        }
+        var gender: Gender! {
+            didSet {
+                if gender == nil {
+                    UserDefaults.standard.removeObject(forKey: "userGender")
+                } else if gender != oldValue {
+                    UserDefaults.standard.set(gender.rawValue, forKey: "userGender")
+                }
+            }
+        }
+        var birthDate: Date! {
+            didSet {
+                let defaultDate = Date(dateString: "01.01.0001")
+                if (birthDate != oldValue) && (birthDate != defaultDate)  {
+                    UserDefaults.standard.set(birthDate, forKey: "userBirthDate")
+                } else {
+                    UserDefaults.standard.removeObject(forKey: "userBirthDate")
+                }
+            }
+        }
+        
+        init() {
+            getData()
+        }
+        
+        mutating func getData() {
+            if let kImagePath = UserDefaults.standard.object(forKey: "userImagePath") {
+                self.imagePath = kImagePath as? String
+            }
+            if let kUserBirthDate = UserDefaults.standard.object(forKey: "userBirthDate") {
+                self.birthDate = kUserBirthDate as? Date
+            }
+            if let kUserGender = UserDefaults.standard.object(forKey: "userGender") {
+                self.gender = Gender(rawValue: kUserGender as! String)!
+            }
+            if let kUserID = UserDefaults.standard.object(forKey: "userProfileID") {
+                self.ID = kUserID as? String
+            }
+        }
+        
+        mutating func eraseData() {
+            imagePath = ""
+            birthDate = Date(dateString: "01.01.0001")
+            gender    = .none
+            ID        = ""
+        }
     }
     
-    mutating func retrieveUserData() {
-        
-        if let kSession = UserDefaults.standard.object(forKey: "session") {
-            self.session = SessionType(rawValue: kSession as! String)!
+    struct System {
+        var session: SessionType! = .unauthorized {
+            didSet {
+                if session == .authorized {
+                    UserDefaults.standard.set(SessionType.authorized.rawValue, forKey: "session")
+                } else {
+                    UserDefaults.standard.set(SessionType.unauthorized.rawValue, forKey: "session")
+                }
+            }
+        }
+        var language: Language! {
+            didSet {
+                if language != oldValue {
+                    UserDefaults.standard.set(language.rawValue, forKey: "language")
+                } else {
+                    UserDefaults.standard.removeObject(forKey: "language")
+                }
+            }
         }
         
-        if let kProfileImagePath = UserDefaults.standard.object(forKey: "userImagePath") {
-            self.profileImagePath = kProfileImagePath as? String
-        }
-        if let kFirstName = UserDefaults.standard.object(forKey: "firstname") {
-            self.firstName = kFirstName as? String
-        }
-        if let kLastName = UserDefaults.standard.object(forKey: "lastname") {
-            self.lastName = kLastName as? String
-        }
-        if let kUserName = UserDefaults.standard.object(forKey: "userName") {
-            self.username = kUserName as? String
+        init() {
+            getData()
         }
         
-//        if let kPhone = UserDefaults.standard.object(forKey: "phone") {
-//            self.phone = kPhone as? String
-//        }
-        
-        if let kUserBirthDate = UserDefaults.standard.object(forKey: "userBirthDate") {
-            self.birthDate = kUserBirthDate as? Date
+        mutating func getData() {
+            
+            if let kSession = UserDefaults.standard.object(forKey: "session") {
+                self.session = SessionType(rawValue: kSession as! String)!
+            }
+            
+            if let kLanguage = UserDefaults.standard.object(forKey: "language") {
+                self.language = Language(rawValue: kLanguage as! String)!
+            } else {
+                let langStr = Locale.current.languageCode
+                if langStr == "en-US" {
+                    self.language = .English
+                } else if langStr == "ru" {
+                    self.language = .Russian
+                }
+            }
         }
         
-        if let kUserGender = UserDefaults.standard.object(forKey: "userGender") {
-            self.gender = Gender(rawValue: kUserGender as! String)!
-        }
-        
-        if let kUserMail = UserDefaults.standard.object(forKey: "userMail") {
-            self.email = kUserMail as? String
-        }
-        
-//        if let kReminder = UserDefaults.standard.object(forKey: "reminder") {
-//            self.reminder = ReminderInterval(rawValue: kReminder as! Int)!
-//        } else {
-//            self.reminder = ReminderInterval.Hours_1
-//        }
-        
-        if let kLanguage = UserDefaults.standard.object(forKey: "language") {
-            self.language = Language(rawValue: kLanguage as! String)!
-        } else {
+        mutating func eraseData() {
+            session = .unauthorized
             let langStr = Locale.current.languageCode
             if langStr == "en-US" {
-                self.language = .English
-            } else if langStr == "ru" {
-                self.language = .Russian
+                language = .English
+            } else if langStr == "ru_RU" {
+                language = .Russian
             }
+            KeychainService.saveAccessToken(token: "")
+            KeychainService.saveRefreshToken(token: "")
         }
     }
-    
-    mutating func clearUserData() {
-        firstName               = ""
-        lastName                = ""
-        username                = ""
-        profileImagePath        = ""
-        email                   = ""
-//        phone                   = ""
-        gender                  = .none
-        birthDate               = Date(dateString: "01.01.0001")
-        session                 = .unauthorized
-//        reminder                = .Hours_1
-        let langStr = Locale.current.languageCode
-        if langStr == "en-US" {
-            language = .English
-        } else if langStr == "ru_RU" {
-            language = .Russian
-        }
-//        KeychainService.savePassword(token: "")
-        KeychainService.saveAccessToken(token: "")
-        KeychainService.saveRefreshToken(token: "")
-    }
-    
-    mutating func importFacebookData(_ json: JSON) {
+
+    func importUserData(_ json: JSON) {
         print(json)
-        
+        if let user = json["data"].dictionaryObject, let userProfile = json["userprofile"].dictionaryObject {
+            self.user.email             = user["email"] as? String
+            self.user.firstName         = user["first_name"] as? String
+            self.user.lastName          = user["last_name"] as? String
+            self.user.username          = user["username"] as? String
+            self.user.ID                = user["id"] as? String
+            self.userProfile.ID         = userProfile["id"] as? String
+            self.userProfile.birthDate  = Date(dateString:userProfile["birth_date"] as? String ?? "01.01.0001")
+            self.userProfile.gender     = Gender(rawValue: userProfile["birth_date"] as? String ?? "Unassigned")
+        }
     }
+    
+    private init() {}
 }
 
 struct INSTAGRAM_IDS {
@@ -405,9 +436,9 @@ struct SERVER_URLS {
     
     static let BASE_URL             = "http://127.0.0.1:8000/"//"https://damp-oasis-64585.herokuapp.com/"
     
-    static let CLIENT_ID            = "TK6NnHgbNmrsG18wA68pHSMcG6P74nDyhtNf4Hwt"//"bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"
+    static let CLIENT_ID            = "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//"bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"
     
-    static let CLIENT_SECRET        = "KikkeyTn2k3UpNQAR2DoYjrdrsbeu4LEmxZJHQtWGvh8fwaUY8fT3tA1ox6qjEYzcvzEVbo7Z9cq7ITLufGrQv5F8ROFuiHifYjyuh0KvG38yBgQnaiBPSvezFlnqZdj"//"Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"
+    static let CLIENT_SECRET        = "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"//"Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"
     static let SIGNUP_URL           = "api/sign_up"
     
     static let TOKEN_URL            = "api/social/token/"
@@ -457,7 +488,7 @@ func saveTokenInKeychain(json: JSON, tokenState: inout TokenState) {
         }
     }
     
-    appData.session = .authorized
+    AppData.shared.system.session = .authorized
     
     //    let refresh_token = KeychainService.loadRefreshToken()
     //    let access_token  = KeychainService.loadAccessToken()
@@ -531,4 +562,6 @@ func loadImageFromPath(path: String) -> UIImage? {
     return image
 }
 
-
+@objc protocol ApiReachability {
+    @objc func handleReachabilitySignal()
+}

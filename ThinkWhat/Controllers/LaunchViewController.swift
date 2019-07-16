@@ -19,7 +19,7 @@ class LaunchViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         delay(seconds: 1) {
         self.logo.addUntitled1Animation() { (completed) in
-            if appData.session == .unauthorized {
+            if AppData.shared.system.session == .unauthorized {
                 self.performSegue(withIdentifier: kSegueAuth, sender: nil)
                 //Временная заглушка для тестирования
             } else {

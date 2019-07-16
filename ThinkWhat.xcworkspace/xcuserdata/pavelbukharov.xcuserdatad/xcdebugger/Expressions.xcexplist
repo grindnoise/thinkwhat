@@ -3,14 +3,6 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "closure #3 in closure #1 in AuthViewController.handleTap(gesture:):AuthViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "VKSdk.accessToken()?.accessToken">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
       </ContextState>
       <ContextState
@@ -25,21 +17,18 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in AuthViewController.handleTap(gesture:):AuthViewController.swift">
+         contextName = "closure #1 in closure #1 in AuthViewController.handleTokenStateReceived():AuthViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "AccessToken.current!.expirationDate">
-            </PersistentString>
-            <PersistentString
-               value = "Date()">
+               value = "fbData">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
+         contextName = "closure #1 in static FBManager.getUserData(completionHandler:):FBManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "parameters[&quot;backend&quot;]">
+               value = "json">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

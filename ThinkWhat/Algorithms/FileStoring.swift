@@ -11,18 +11,16 @@ import UIKit
 import CoreData
 
 protocol FileStoringProtocol {
-    func storeImage(_ image: UIImage, fullFileName: String, questionID: String) -> URL?
+    func storeImage(type: ImageType, image: UIImage, fileName: String?, fileFormat: FileFormat, surveyID: String?) -> URL?
 }
 
 class FileStorage: FileStoringProtocol {
     
-    func getImagesDirectoryPath() -> String {
-        
+    func getImagesDirectoryPath() -> URL {
         var imagesDirectoryPath = ""
-        
         let documentDirectoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
+        
         if let documentDirectoryPath = documentDirectoryPath {
-            // create the custom folder path
             imagesDirectoryPath = documentDirectoryPath.appending("/images")
             let fileManager = FileManager.default
             if !fileManager.fileExists(atPath: imagesDirectoryPath) {
@@ -30,68 +28,96 @@ class FileStorage: FileStoringProtocol {
                     try fileManager.createDirectory(atPath: imagesDirectoryPath,
                                                     withIntermediateDirectories: false,
                                                     attributes: nil)
-                    return imagesDirectoryPath
+                    return URL(fileURLWithPath: imagesDirectoryPath)
                 } catch {
                     fatalError("Error creating images folder in documents dir: \(error.localizedDescription)")
                 }
             }
-            print("**********Image subfolder at \(imagesDirectoryPath) exists: \(fileManager.fileExists(atPath: imagesDirectoryPath))")
         }
-        return imagesDirectoryPath
+        return URL(fileURLWithPath: imagesDirectoryPath)
     }
     
-    func storeImage(_ image: UIImage, fullFileName: String, questionID: String) -> URL? {
-        
-        let imagesDirectoryPath = getImagesDirectoryPath()
-        let fileName            = fullFileName.fileName()
-        let fileExtension       = ImageExtension(rawValue: fullFileName.fileExtension())
+    func storeImage(type: ImageType, image: UIImage, fileName: String?, fileFormat: FileFormat, surveyID: String?) -> URL? {
+        var imageURL: URL?
+        let imageDirectory      = getImagesDirectoryPath()
         let separator           = "/"
-        var imageName           = fileName.isEmpty ? generateUniqueFilename() : fileName
-        var imagePath           = imagesDirectoryPath + separator + fullFileName
+        let dot                 = "."
+        var _fileName           = ""
         
-        //Existence check
-        prepareFilePath(filePath: &imagePath, fileName: &imageName, fileExtension: fileExtension!, filesDirectoryPath: imagesDirectoryPath)
-        
-        let imageURL            = URL(fileURLWithPath: imagePath)
-//        switch fileExtension! {
-//        case .JPEG:
-//            do {
-//                try UIImageJPEGRepresentation(image, 0.5)?.write(to: imageURL)
-//                let context         = appDelegate.persistentContainer.viewContext
-//                context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-//                let entity          = NSEntityDescription.entity(forEntityName: "QuestionImages", in: context)!
-//                let record          = QuestionImages(entity: entity, insertInto: context)
-//                record.imageURL     = imagePath
-//                record.questionID   = questionID
-//                try? context.save()
-//                return imageURL
-//            } catch {
-//                print(error)
-//                return nil
-//            }
-//        case .PNG:
-//            do {
-//                try UIImagePNGRepresentation(image)?.write(to: imageURL)//(image, 0.5)?.write(to: imageURL)
-//                let context         = appDelegate.persistentContainer.viewContext
-//                context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-//                let entity          = NSEntityDescription.entity(forEntityName: "QuestionImages", in: context)!
-//                let record          = QuestionImages(entity: entity, insertInto: context)
-//                record.imageURL     = imagePath
-//                record.questionID   = questionID
-//                try? context.save()
-//                return imageURL
-//            } catch {
-//                print(error)
-//                return nil
-//            }
-//        default:
-//            print("")
-//        }
-        
+        switch type {
+        case .Profile:
+            _fileName           = type.rawValue
+            imageURL            = imageDirectory.appendingPathComponent(_fileName + dot + fileFormat.rawValue.lowercased())
+            switch fileFormat {
+            case .JPEG:
+                do {
+                    try image.jpegData(compressionQuality: 0.75)?.write(to: imageURL!)
+                    return imageURL
+                } catch {
+                    print(error.localizedDescription)
+                    return nil
+                }
+            default:
+                print("default")
+            }
+        default:
+            print("TODO Store survey images")
+        }
         return imageURL
     }
     
-    fileprivate func prepareFilePath(filePath: inout String, fileName: inout String, fileExtension: ImageExtension, filesDirectoryPath: String) {
+//    func storeImage(_ image: UIImage, fullFileName: String, questionID: String) -> URL? {
+//
+//        let imagesDirectoryPath = getImagesDirectoryPath()
+//        let fileName            = fullFileName.fileName()
+//        let fileExtension       = ImageExtension(rawValue: fullFileName.fileExtension())
+//        let separator           = "/"
+//        var imageName           = fileName.isEmpty ? generateUniqueFilename() : fileName
+//        var imagePath           = imagesDirectoryPath + separator + fullFileName
+//
+//        //Existence check
+//        prepareFilePath(filePath: &imagePath, fileName: &imageName, fileExtension: fileExtension!, filesDirectoryPath: imagesDirectoryPath)
+//
+//        let imageURL            = URL(fileURLWithPath: imagePath)
+////        switch fileExtension! {
+////        case .JPEG:
+////            do {
+////                try UIImageJPEGRepresentation(image, 0.5)?.write(to: imageURL)
+////                let context         = appDelegate.persistentContainer.viewContext
+////                context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+////                let entity          = NSEntityDescription.entity(forEntityName: "QuestionImages", in: context)!
+////                let record          = QuestionImages(entity: entity, insertInto: context)
+////                record.imageURL     = imagePath
+////                record.questionID   = questionID
+////                try? context.save()
+////                return imageURL
+////            } catch {
+////                print(error)
+////                return nil
+////            }
+////        case .PNG:
+////            do {
+////                try UIImagePNGRepresentation(image)?.write(to: imageURL)//(image, 0.5)?.write(to: imageURL)
+////                let context         = appDelegate.persistentContainer.viewContext
+////                context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+////                let entity          = NSEntityDescription.entity(forEntityName: "QuestionImages", in: context)!
+////                let record          = QuestionImages(entity: entity, insertInto: context)
+////                record.imageURL     = imagePath
+////                record.questionID   = questionID
+////                try? context.save()
+////                return imageURL
+////            } catch {
+////                print(error)
+////                return nil
+////            }
+////        default:
+////            print("")
+////        }
+//
+//        return imageURL
+//    }
+    
+    fileprivate func prepareFilePath(filePath: inout String, fileName: inout String, fileExtension: FileFormat, filesDirectoryPath: String) {
         //Проверяем, существует ли файл по данному пути, если да, тогда генерируем новое имя
         guard !FileManager.default.fileExists(atPath: filePath) else {
             fileName = generateUniqueFilename()

@@ -10,7 +10,8 @@ import UIKit
 
 class AuthNavigationController: UINavigationController {
     
-    internal lazy var apiManagerProtocol: APIManagerProtocol          = self.initializeAPIManagerProtocol()
+    internal lazy var apiManagerProtocol: APIManagerProtocol    = initializeAPIManagerProtocol()
+    internal lazy var storeManagerProtocol: FileStoringProtocol = initializeFileStoringProtocol()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,5 +22,9 @@ class AuthNavigationController: UINavigationController {
     
     private func initializeAPIManagerProtocol() -> APIManagerProtocol {
         return appDelegate.container.resolve(APIManagerProtocol.self)!
+    }
+    
+    private func initializeFileStoringProtocol() -> FileStoringProtocol {
+        return appDelegate.container.resolve(FileStoringProtocol.self)!
     }
 }
