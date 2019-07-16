@@ -58,17 +58,17 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             let notificationCenter = NotificationCenter.default
             
             notificationCenter.addObserver(self,
-                                           selector: #selector(AuthViewController.handleTokenStateReceived),
+                                           selector: #selector(AuthViewController.handleTokenState),
                                            name: kNotificationTokenReceived,
                                            object: nil)
             notificationCenter.addObserver(self,
-                                           selector: #selector(AuthViewController.handleTokenStateError),
+                                           selector: #selector(AuthViewController.handleTokenState),
                                            name: kNotificationTokenError,
                                            object: nil)
-//            notificationCenter.addObserver(self,
-//                                           selector: #selector(AuthViewController.handleTokenStateConnectionError),
-//                                           name: kNotificationTokenConnectionError,
-//                                           object: nil)
+            //            notificationCenter.addObserver(self,
+            //                                           selector: #selector(AuthViewController.handleTokenStateConnectionError),
+            //                                           name: kNotificationTokenConnectionError,
+            //                                           object: nil)
             notificationCenter.addObserver(self,
                                            selector: #selector(AuthViewController.handleReachabilitySignal),
                                            name: kNotificationApiNotReachable,
@@ -221,66 +221,64 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
     
-    @objc private func handleTokenStateReceived() {
-        let auth = getAuthCase()
-        switch auth {
-        case .Facebook:
-            print("df")
-            self.apiManager.getFacebookID() {
-                id in
-                if id.isEmpty {
-                    FBManager.getUserData() {
-                        response in
-                        if response != nil {
-                            var fbData = response!.dictionaryObject!
-                            if let pictureData = JSON(fbData.removeValue(forKey: "picture")) as? JSON {
-                                if let is_silhouette = pictureData["data"]["is_silhouette"].bool {
-                                    if !is_silhouette {
-                                        if let pictureURL = URL(string: pictureData["data"]["url"].string!) as? URL {
-                                            Alamofire.request(pictureURL).responseData {
-                                                response in
-                                                if response.result.isFailure {
-                                                    print(response.result.debugDescription)
-                                                }
-                                                if let error = response.result.error as? AFError {
-                                                    print(error.localizedDescription)
-                                                }
-                                                if let data = response.result.value {
-                                                    if let image = UIImage(data: data) {
-                                                        self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
-                                                        fbData["image"] = image
+    @objc private func handleTokenState() {
+        if tokenState == .Received {
+            let auth = getAuthCase()
+            switch auth {
+            case .Facebook:
+                print("df")
+                self.apiManager.getFacebookID() {
+                    id in
+                    if id.isEmpty {
+                        FBManager.getUserData() {
+                            response in
+                            if response != nil {
+                                var fbData = response!.dictionaryObject!
+                                if let pictureData = JSON(fbData.removeValue(forKey: "picture")) as? JSON {
+                                    if let is_silhouette = pictureData["data"]["is_silhouette"].bool {
+                                        if !is_silhouette {
+                                            if let pictureURL = URL(string: pictureData["data"]["url"].string!) as? URL {
+                                                Alamofire.request(pictureURL).responseData {
+                                                    response in
+                                                    if response.result.isFailure {
+                                                        print(response.result.debugDescription)
+                                                    }
+                                                    if let error = response.result.error as? AFError {
+                                                        print(error.localizedDescription)
+                                                    }
+                                                    if let data = response.result.value {
+                                                        if let image = UIImage(data: data) {
+                                                            self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
+                                                            fbData["image"] = image
+                                                        }
                                                     }
                                                 }
+                                            } else {
+                                                print(pictureData["data"]["url"].error!)
                                             }
-                                        } else {
-                                            print(pictureData["data"]["url"].error!)
                                         }
                                     }
                                 }
-                            }
-                            self.apiManager.updateUserProfile(data: fbData) {
-                                if $0 {
-                                    
+                                self.apiManager.updateUserProfile(data: fbData) {
+                                    if $0 {
+                                        
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            case .VK:
+                print("VK")
+            default:
+                print("handleTokenStateReceived")
             }
-        case .VK:
-            print("VK")
-        default:
-            print("handleTokenStateReceived")
+        } else if tokenState == .Error {
+            print("authorization error")
+        } else if tokenState == .ConnectionError && apiReachability == .Reachable {
+            print("connection error")
         }
     }
-    
-    @objc private func handleTokenStateError() {
-        
-    }
-    
-//    @objc private func handleTokenStateConnectionError() {
-//        print("Internal error")
-//    }
     
     //    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     //        if segue.identifier == kSegueSocialAuth {
@@ -349,7 +347,12 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
 }
 extension AuthViewController: ApiReachability {
     func handleReachabilitySignal() {
-        print("API not reachable")
+        let alertController = UIAlertController(title: "Alert", message: "API not reachable", preferredStyle: .alert)
+        let action1 = UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
+            print("You've pressed default")
+        }
+        alertController.addAction(action1)
+        present(alertController, animated: true)
     }
 }
 

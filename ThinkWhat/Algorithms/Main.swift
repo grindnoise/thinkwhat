@@ -124,12 +124,10 @@ var internetConnection: InternetConnection      = .Available {
 }
 var apiReachability: ApiReachabilityState = .Reachable {
     didSet {
-        if oldValue != apiReachability {
-            if apiReachability == .None {
-                NotificationCenter.default.post(name: kNotificationApiNotReachable, object: nil)
-            } else {
-                NotificationCenter.default.post(name: kNotificationApiReachable, object: nil)
-            }
+        if apiReachability == .None {
+            NotificationCenter.default.post(name: kNotificationApiNotReachable, object: nil)
+        } else {
+            NotificationCenter.default.post(name: kNotificationApiReachable, object: nil)
         }
     }
 }
@@ -393,7 +391,7 @@ class AppData {
 
     func importUserData(_ json: JSON) {
         print(json)
-        if let user = json["data"].dictionaryObject, let userProfile = json["userprofile"].dictionaryObject {
+        if let user = json["user"].dictionaryObject, let userProfile = json["userprofile"].dictionaryObject {
             self.user.email             = user["email"] as? String
             self.user.firstName         = user["first_name"] as? String
             self.user.lastName          = user["last_name"] as? String

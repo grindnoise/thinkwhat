@@ -6,13 +6,18 @@
          contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
       </ContextState>
       <ContextState
-         contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
+         contextName = "AppData.importUserData(_:):Main.swift">
          <PersistentStrings>
             <PersistentString
-               value = "url">
+               value = "json[&quot;user&quot;].dictionaryObject">
             </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AppData.User.ID.didset:Main.swift">
+         <PersistentStrings>
             <PersistentString
-               value = "response.data!">
+               value = "ID">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -21,6 +26,17 @@
          <PersistentStrings>
             <PersistentString
                value = "fbData">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "url">
+            </PersistentString>
+            <PersistentString
+               value = "response.data!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
