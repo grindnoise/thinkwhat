@@ -396,10 +396,12 @@ class AppData {
             self.user.firstName         = user["first_name"] as? String
             self.user.lastName          = user["last_name"] as? String
             self.user.username          = user["username"] as? String
-            self.user.ID                = user["id"] as? String
-            self.userProfile.ID         = userProfile["id"] as? String
+            self.user.ID                = String(describing: user["id"] as? Int)
+            self.userProfile.ID         = String(describing: userProfile["id"] as? Int)
             self.userProfile.birthDate  = Date(dateString:userProfile["birth_date"] as? String ?? "01.01.0001")
             self.userProfile.gender     = Gender(rawValue: userProfile["birth_date"] as? String ?? "Unassigned")
+            print(self.user)
+            print(self.userProfile)
         }
     }
     
