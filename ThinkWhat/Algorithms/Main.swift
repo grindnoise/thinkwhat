@@ -390,19 +390,16 @@ class AppData {
     }
 
     func importUserData(_ json: JSON) {
-        print(json)
-        if let user = json["user"].dictionaryObject, let userProfile = json["userprofile"].dictionaryObject {
-            self.user.email             = user["email"] as? String
-            self.user.firstName         = user["first_name"] as? String
-            self.user.lastName          = user["last_name"] as? String
-            self.user.username          = user["username"] as? String
-            self.user.ID                = String(describing: user["id"] as? Int)
-            self.userProfile.ID         = String(describing: userProfile["id"] as? Int)
-            self.userProfile.birthDate  = Date(dateString:userProfile["birth_date"] as? String ?? "01.01.0001")
-            self.userProfile.gender     = Gender(rawValue: userProfile["birth_date"] as? String ?? "Unassigned")
-            print(self.user)
-            print(self.userProfile)
-        }
+            var userProfileData         = json["userprofile"].dictionaryObject  as! [String: Any]
+            var userData                = userProfileData.removeValue(forKey: "user") as! [String: Any]
+            self.user.email             = userData["email"] as! String
+            self.user.firstName         = userData["first_name"] as! String
+            self.user.lastName          = userData["last_name"] as! String
+            self.user.username          = userData["username"] as! String
+            self.user.ID                = String(describing: userData["id"] as! Int)
+            self.userProfile.ID         = String(describing: userProfileData["id"] as! Int)
+            self.userProfile.birthDate  = (userProfileData["birth_date"] as! NSNull).isKind(of: NSNull.self) ? Date(dateString: "01.01.0001") : Date(dateString:userProfileData["birth_date"] as! String)
+            self.userProfile.gender     = (userProfileData["gender"] as! NSNull).isKind(of: NSNull.self) ? Gender.Unassigned : Gender(rawValue: userProfileData["gender"] as! String)
     }
     
     private init() {}
@@ -428,38 +425,26 @@ struct INSTAGRAM_IDS {
 
 struct VK_IDS {
     
-    static let APP_ID               = "7043775"
+    static let APP_ID                   = "7043775"
     
 }
 
 struct SERVER_URLS {
+    static let BASE_URL                 = "http://127.0.0.1:8000/"//"https://damp-oasis-64585.herokuapp.com/"
+    static let CLIENT_ID                = "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//"bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"
+    static let CLIENT_SECRET            = "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
+    //"Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"
+    static let SIGNUP_URL               = "api/sign_up"
+    static let TOKEN_URL                = "api/social/token/"
+    static let TOKEN_CONVERT_URL        = "api/social/convert-token/"
+    static let TOKEN_REVOKE_URL         = "api/social/revoke-token/"
     
-    static let BASE_URL             = "http://127.0.0.1:8000/"//"https://damp-oasis-64585.herokuapp.com/"
+    static let PROFILE_NEEDS_UPDATE_URL = "api/profiles/needs_social_update/"
+    static let PROFILE_URL              = "api/profiles/"
+    static let CURRENT_USER_URL         = "api/profiles/current/"
+    static let USER_URL                 = "api/users/"
     
-    static let CLIENT_ID            = "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//"bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"
-    
-    static let CLIENT_SECRET        = "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"//"Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"
-    static let SIGNUP_URL           = "api/sign_up"
-    
-    static let TOKEN_URL            = "api/social/token/"
-    
-    static let TOKEN_CONVERT_URL    = "api/social/convert-token/"
-    
-    static let TOKEN_REVOKE_URL     = "api/social/revoke-token/"
-    
-    
-    
-    static let SURVEY_URL           = "api/surveys/"
-    
-    
-    
-    
-    
-    static let CURRENT_USER_URL     = "api/profiles/current/"
-    
-    static let GET_FACEBOOK_ID_URL  = "api/profiles/get_facebook_id/"
-    
-    static let USER_URL             = ""
+    static let SURVEY_URL               = "api/surveys/"
     
 //    static let SMS_VALIDATION_URL   = "http://burber.pythonanywhere.com/passcode/generate/"
     

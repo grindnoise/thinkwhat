@@ -14,8 +14,8 @@ protocol APIManagerProtocol {
 
     func login(_ auth: AuthVariant, username: String?, password: String?, token: String?, completion: @escaping (TokenState) -> ())
     func logout(completion: @escaping (TokenState) -> ())
-    func getFacebookID(completion: @escaping (String) -> ())
-    func updateUserProfile(data: [String: Any], completion: @escaping(Bool) -> ())
+    func getProfileNeedsUpdate(completion: @escaping (Bool) -> ())
+    func updateUserProfile(data: [String: Any], completion: @escaping(JSON?) -> ())
 //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
 //    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
 //    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
@@ -24,6 +24,10 @@ protocol APIManagerProtocol {
 //    func userExists(phoneNumber: String, completion: @escaping (JSON?) -> ())
 //    func uploadUserImage(image: UIImage, completion: @escaping (JSON?) -> ())
 //    func recoverPassword(_ password: String, completion: @escaping (JSON?) -> ())
+}
+
+protocol UserDataPreparatory: class {
+    static func prepareUserData(_ data: [String: Any]) -> [String: Any]
 }
 
 class APIManager: APIManagerProtocol {
@@ -405,23 +409,26 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func getFacebookID(completion: @escaping (String) -> ()) {
+    func getProfileNeedsUpdate(completion: @escaping (Bool) -> ()) {
+        var needsUpdate = false
         checkForReachability {
-            completed in
-//            self.isProxyEnabled = completed
-            performRequest()
+            reachable in
+            if reachable == .Reachable {
+                performRequest()
+            } else {
+                completion(needsUpdate)
+            }
         }
         
         func performRequest() {
-            let parameters = ["category": "1"]
-            let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.GET_FACEBOOK_ID_URL)
+            let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.PROFILE_NEEDS_UPDATE_URL)
             
             let headers: HTTPHeaders = [
                 "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
                 "Content-Type": "application/json"
             ]
 
-            sessionManager.request(url, method: .get, parameters: parameters, headers: headers).responseJSON() {
+            sessionManager.request(url, method: .get, parameters: nil, headers: headers).responseJSON() {
                 response in
                 if response.result.isFailure {
                     print(response.result.debugDescription)
@@ -429,15 +436,14 @@ class APIManager: APIManagerProtocol {
                 if let error = response.result.error as? AFError {
                     self.parseError(error)
                 } else {
-                    var id = ""
+                    
                     if let statusCode  = response.response?.statusCode{
                         if 200...299 ~= statusCode {
                             do {
                                 let json = try JSON(data: response.data!)
                                 for attr in json {
-                                    if attr.0 ==  "facebook_ID" {
-                                        id = attr.1.stringValue
-                                        print("\(attr.0): \(attr.1.stringValue)")
+                                    if attr.0 ==  "needs_update" {
+                                        needsUpdate = attr.1.boolValue
                                     }
                                 }
                             } catch {
@@ -452,71 +458,127 @@ class APIManager: APIManagerProtocol {
                             }
                         }
                     }
-                    completion(id)
+                    completion(needsUpdate)
                 }
             }
         }
     }
     
-    func updateUserProfile(data: [String: Any], completion: @escaping(Bool) -> ()) {
+    func updateUserProfile(data: [String: Any], completion: @escaping(JSON?) -> ()) {
         checkForReachability {
             reachable in
             if reachable == .Reachable {
                 performRequest()
             } else {
-                completion(false)
+                completion(nil)
             }
         }
         
         func performRequest() {
-            print(data)
-            let parameters = data
-            let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.GET_FACEBOOK_ID_URL)
-            
+            var json: JSON?
+            let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.PROFILE_URL + AppData.shared.userProfile.ID + "/")
             let headers: HTTPHeaders = [
                 "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
                 "Content-Type": "application/json"
             ]
             
-            sessionManager.request(url, method: .get, parameters: parameters, headers: headers).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    print(response.result.debugDescription)
-                }
-                if let error = response.result.error as? AFError {
-                    self.parseError(error)
-                } else {
-                    var id = ""
-                    if let statusCode  = response.response?.statusCode{
-                        if 200...299 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                for attr in json {
-                                    if attr.0 ==  "facebook_ID" {
-                                        id = attr.1.stringValue
-                                        print("\(attr.0): \(attr.1.stringValue)")
-                                    }
-                                }
-                            } catch {
-                                print(error.localizedDescription)
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                print(json)
-                            } catch {
-                                print(error.localizedDescription)
-                            }
+            if let image = data["image"] as? UIImage {
+                Alamofire.upload(multipartFormData: { multipartFormData in
+                    let imageData = image.jpegData(compressionQuality: 0.75)
+                    multipartFormData.append(imageData!, withName: "image", fileName: "profile.jpg", mimeType: "jpg/png")
+                    for (key, value) in data {
+                        if value is String || value is Int {
+                            multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
                         }
                     }
-//                    completion(id)
+                }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .patch, headers: headers) {
+                    result in
+                    switch result {
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                        completion(nil)
+                    case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
+                        upload.uploadProgress(closure: { (progress) in
+                            print("Upload Progress: \(progress.fractionCompleted)")
+                        })
+                        upload.responseJSON(completionHandler: { (response) in
+                            if response.result.isFailure {
+                                print(response.result.debugDescription)
+                            }
+                            if let error = response.result.error as? AFError {
+                                self.parseError(error)
+                            } else {
+                                if let statusCode  = response.response?.statusCode{
+                                    if 200...299 ~= statusCode {
+                                        do {
+                                            json = try JSON(data: response.data!)
+                                        } catch {
+                                            print(error.localizedDescription)
+                                        }
+                                    } else if 400...499 ~= statusCode {
+                                        do {
+                                            let error = try JSON(data: response.data!)
+                                            print(error)
+                                        } catch {
+                                            print(error.localizedDescription)
+                                        }
+                                    }
+                                }
+                                completion(json)
+                            }
+//                            switch response.result {
+//                            case .failure(let error):
+//                                print("UploadImageController.requestWith.Alamofire.upload.responseJSON:", error)
+//                                completion(nil)
+//                            case .success( _):
+//                                print("UploadImageController.requestWith.Alamofire.upload.responseJSON Succes")
+//                                guard let data = response.data else { return }
+//                                do {
+//                                    let addInvoiceResponse = try self.decoder.decode(AddInvoiceResponse.self, from: data)
+//
+//                                    completion(true, addInvoiceResponse)
+//
+//                                } catch let jsonError {
+//
+//                                    print("Error serializing json.ProfileController.getProfile:", jsonError)
+//                                    completion(false, nil)
+//                                }
+//                            }
+                        })
+                    }
+                }
+            } else {
+                sessionManager.request(url, method: .patch, parameters: data, encoding: JSONEncoding.default, headers: headers).responseJSON() {//.request(url, method: .patch, parameters: nil, headers: headers).responseJSON() {
+                    response in
+                    if response.result.isFailure {
+                        print(response.result.debugDescription)
+                    }
+                    if let error = response.result.error as? AFError {
+                        self.parseError(error)
+                    } else {
+                        if let statusCode  = response.response?.statusCode{
+                            if 200...299 ~= statusCode {
+                                do {
+                                    json = try JSON(data: response.data!)
+                                } catch {
+                                    print(error.localizedDescription)
+                                }
+                            } else if 400...499 ~= statusCode {
+                                do {
+                                    let error = try JSON(data: response.data!)
+                                    print(error)
+                                } catch {
+                                    print(error.localizedDescription)
+                                }
+                            }
+                        }
+                        completion(json)
+                    }
                 }
             }
         }
-        
-    
     }
-        
+    
     func checkTokenExpiryDate() {
         if let expString = KeychainService.loadTokenExpireDateTime() as String? {
             let expiryDate = expString.toDateTime()

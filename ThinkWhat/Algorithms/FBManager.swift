@@ -13,6 +13,8 @@ import SwiftyJSON
 class FBManager {
     
     static let shared = LoginManager()
+    
+    private init() {}
 //    private lazy var serverAPI:     APIManagerProtocol          = self.initializeServerAPI()
     
     public class func performLogin(viewController: UIViewController, completionHandler: @escaping(Bool) -> Void) {
@@ -20,7 +22,6 @@ class FBManager {
         shared.logIn(permissions: ["public_profile", "email"],
                                from: viewController) { (result, error) in
                                 if error == nil {
-//                                    getUserData()
                                     completionHandler(true)
                                 } else {
                                     print(error!.localizedDescription)
@@ -53,5 +54,24 @@ class FBManager {
 //    private func initializeServerAPI() -> APIManagerProtocol {
 //        return appDelegate.container.resolve(APIManagerProtocol.self)!
 //    }
+}
+
+extension FBManager: UserDataPreparatory {
+    static func prepareUserData(_ dict: [String : Any]) -> [String : Any] {
+        print(dict)
+        var userProfile = [String: Any]()
+        var user = [String: Any]()
+        for (key, value) in dict {
+            if key == "first_name" || key == "last_name" {
+                userProfile[key] = value
+            } else if key == "id" {
+                userProfile["facebook_ID"] = value
+            } else if key == "image" {
+                userProfile[key] = value
+            }
+        }
+        userProfile["user"] = user
+        return userProfile
+    }
 }
 

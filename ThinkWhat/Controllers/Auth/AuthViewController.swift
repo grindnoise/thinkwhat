@@ -226,10 +226,8 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             let auth = getAuthCase()
             switch auth {
             case .Facebook:
-                print("df")
-                self.apiManager.getFacebookID() {
-                    id in
-                    if id.isEmpty {
+                self.apiManager.getProfileNeedsUpdate() {
+                    if $0 {
                         FBManager.getUserData() {
                             response in
                             if response != nil {
@@ -250,6 +248,14 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                         if let image = UIImage(data: data) {
                                                             self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
                                                             fbData["image"] = image
+                                                            let data = FBManager.prepareUserData(fbData)
+                                                            print(data)
+                                                            self.apiManager.updateUserProfile(data: data) {
+                                                                response in
+                                                                if let json = response as? JSON {
+                                                                    print(json)
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -258,10 +264,12 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                             }
                                         }
                                     }
-                                }
-                                self.apiManager.updateUserProfile(data: fbData) {
-                                    if $0 {
-                                        
+                                } else {
+                                    self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
+                                        response in
+                                        if let json = response as? JSON {
+                                            print(json)
+                                        }
                                     }
                                 }
                             }
@@ -345,6 +353,8 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     }
     
 }
+
+
 extension AuthViewController: ApiReachability {
     func handleReachabilitySignal() {
         let alertController = UIAlertController(title: "Alert", message: "API not reachable", preferredStyle: .alert)
