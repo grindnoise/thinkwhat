@@ -465,6 +465,7 @@ class APIManager: APIManagerProtocol {
     }
     
     func updateUserProfile(data: [String: Any], completion: @escaping(JSON?) -> ()) {
+        var dict = data
         checkForReachability {
             reachable in
             if reachable == .Reachable {
@@ -481,12 +482,13 @@ class APIManager: APIManagerProtocol {
                 "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
                 "Content-Type": "application/json"
             ]
-            
             if let image = data["image"] as? UIImage {
+                dict.removeValue(forKey: "image")
+                let test = JSON(dict.removeValue(forKey: "user")).rawString()
                 Alamofire.upload(multipartFormData: { multipartFormData in
-                    let imageData = image.jpegData(compressionQuality: 0.75)
+                    let imageData = image.jpegData(compressionQuality: 1)
                     multipartFormData.append(imageData!, withName: "image", fileName: "profile.jpg", mimeType: "jpg/png")
-                    for (key, value) in data {
+                    for (key, value) in dict {
                         if value is String || value is Int {
                             multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
                         }
@@ -526,24 +528,6 @@ class APIManager: APIManagerProtocol {
                                 }
                                 completion(json)
                             }
-//                            switch response.result {
-//                            case .failure(let error):
-//                                print("UploadImageController.requestWith.Alamofire.upload.responseJSON:", error)
-//                                completion(nil)
-//                            case .success( _):
-//                                print("UploadImageController.requestWith.Alamofire.upload.responseJSON Succes")
-//                                guard let data = response.data else { return }
-//                                do {
-//                                    let addInvoiceResponse = try self.decoder.decode(AddInvoiceResponse.self, from: data)
-//
-//                                    completion(true, addInvoiceResponse)
-//
-//                                } catch let jsonError {
-//
-//                                    print("Error serializing json.ProfileController.getProfile:", jsonError)
-//                                    completion(false, nil)
-//                                }
-//                            }
                         })
                     }
                 }

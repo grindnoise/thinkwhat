@@ -249,7 +249,6 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                             self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
                                                             fbData["image"] = image
                                                             let data = FBManager.prepareUserData(fbData)
-                                                            print(data)
                                                             self.apiManager.updateUserProfile(data: data) {
                                                                 response in
                                                                 if let json = response as? JSON {

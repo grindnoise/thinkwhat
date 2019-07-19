@@ -58,20 +58,28 @@ class FBManager {
 
 extension FBManager: UserDataPreparatory {
     static func prepareUserData(_ dict: [String : Any]) -> [String : Any] {
-        print(dict)
         var userProfile = [String: Any]()
         var user = [String: Any]()
         for (key, value) in dict {
             if key == "first_name" || key == "last_name" {
-                userProfile[key] = value
+//                userProfile[key] = value
+                userProfile["user."+key] = value
             } else if key == "id" {
                 userProfile["facebook_ID"] = value
             } else if key == "image" {
+//                var encodedImage = convertImageToBase64(image: value as! UIImage)
+//                userProfile[key] = encodedImage
                 userProfile[key] = value
             }
         }
-        userProfile["user"] = user
+//        userProfile["user"] = user
         return userProfile
     }
+    
 }
 
+
+func convertImageToBase64(image: UIImage) -> String {
+    let imageData = image.jpegData(compressionQuality: 1)!
+    return imageData.base64EncodedString(options:   Data.Base64EncodingOptions.lineLength64Characters)
+}
