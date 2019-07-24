@@ -15,7 +15,7 @@ protocol APIManagerProtocol {
     func login(_ auth: AuthVariant, username: String?, password: String?, token: String?, completion: @escaping (TokenState) -> ())
     func logout(completion: @escaping (TokenState) -> ())
     func getProfileNeedsUpdate(completion: @escaping (Bool) -> ())
-    func updateUserProfile(data: [String: Any], completion: @escaping(JSON?) -> ())
+    func updateUserProfile(data: [String: Any], completion: @escaping(JSON?, Error?) -> ())
 //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
 //    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
 //    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
@@ -178,6 +178,7 @@ class APIManager: APIManagerProtocol {
                         if 200...299 ~= statusCode {
                             do {
                                 let json = try JSON(data: response.data!)
+                                print(json)
                                 AppData.shared.importUserData(json)
                             } catch {
                                 print(error.localizedDescription)
@@ -464,19 +465,22 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func updateUserProfile(data: [String: Any], completion: @escaping(JSON?) -> ()) {
+    func updateUserProfile(data: [String: Any], completion: @escaping(JSON?, Error?) -> ()) {
         var dict = data
+        var json: JSON?
+        var error: Error?
         checkForReachability {
             reachable in
             if reachable == .Reachable {
                 performRequest()
             } else {
-                completion(nil)
+                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(json, error)
             }
         }
         
         func performRequest() {
-            var json: JSON?
+            
             let url = URL(string: SERVER_URLS.BASE_URL)!.appendingPathComponent(SERVER_URLS.PROFILE_URL + AppData.shared.userProfile.ID + "/")
             let headers: HTTPHeaders = [
                 "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
@@ -484,21 +488,29 @@ class APIManager: APIManagerProtocol {
             ]
             if let image = data["image"] as? UIImage {
                 dict.removeValue(forKey: "image")
-                let test = JSON(dict.removeValue(forKey: "user")).rawString()
                 Alamofire.upload(multipartFormData: { multipartFormData in
-                    let imageData = image.jpegData(compressionQuality: 1)
-                    multipartFormData.append(imageData!, withName: "image", fileName: "profile.jpg", mimeType: "jpg/png")
+                    var imgExt: FileFormat = .Unknown
+                    var imageData: Data?
+                    if let data = image.jpegData(compressionQuality: 1) {
+                        imageData = data
+                        imgExt = .JPEG
+                    } else if let data = image.pngData() {
+                        imageData = data
+                        imgExt = .PNG
+                    }
+                    multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
                     for (key, value) in dict {
                         if value is String || value is Int {
+                            print(value)
                             multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
                         }
                     }
                 }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .patch, headers: headers) {
                     result in
                     switch result {
-                    case .failure(let error):
-                        print(error.localizedDescription)
-                        completion(nil)
+                    case .failure(let _error):
+                        error = _error
+                        completion(json, error)
                     case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
                         upload.uploadProgress(closure: { (progress) in
                             print("Upload Progress: \(progress.fractionCompleted)")
@@ -506,27 +518,31 @@ class APIManager: APIManagerProtocol {
                         upload.responseJSON(completionHandler: { (response) in
                             if response.result.isFailure {
                                 print(response.result.debugDescription)
+                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
                             }
-                            if let error = response.result.error as? AFError {
-                                self.parseError(error)
+                            if let _error = response.result.error as? AFError {
+                                self.parseError(_error)
+                                error = _error
                             } else {
                                 if let statusCode  = response.response?.statusCode{
                                     if 200...299 ~= statusCode {
                                         do {
                                             json = try JSON(data: response.data!)
-                                        } catch {
-                                            print(error.localizedDescription)
+                                        } catch let _error {
+                                            error = _error
                                         }
                                     } else if 400...499 ~= statusCode {
                                         do {
-                                            let error = try JSON(data: response.data!)
-                                            print(error)
-                                        } catch {
-                                            print(error.localizedDescription)
+                                            let errorJSON = try JSON(data: response.data!)
+                                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()]) as Error
+                                        } catch let _error {
+                                            error = _error
                                         }
                                     }
                                 }
-                                completion(json)
+                                print(json)
+                                print(error)
+                                completion(nil, nil)
                             }
                         })
                     }
@@ -549,14 +565,14 @@ class APIManager: APIManagerProtocol {
                                 }
                             } else if 400...499 ~= statusCode {
                                 do {
-                                    let error = try JSON(data: response.data!)
-                                    print(error)
+                                    let errorJSON = try JSON(data: response.data!)
+                                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()]) as Error
                                 } catch {
                                     print(error.localizedDescription)
                                 }
                             }
                         }
-                        completion(json)
+                        completion(json, error)
                     }
                 }
             }

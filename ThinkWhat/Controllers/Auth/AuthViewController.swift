@@ -248,12 +248,12 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                         if let image = UIImage(data: data) {
                                                             self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
                                                             fbData["image"] = image
-                                                            let data = FBManager.prepareUserData(fbData)
-                                                            self.apiManager.updateUserProfile(data: data) {
-                                                                response in
-                                                                if let json = response as? JSON {
-                                                                    print(json)
+                                                            self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
+                                                                response, error in
+                                                                if error != nil {
+                                                                    self.simpleAlert(error!.localizedDescription)
                                                                 }
+                                                                AppData.shared.importUserData(response!)
                                                             }
                                                         }
                                                     }
@@ -265,10 +265,11 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                     }
                                 } else {
                                     self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
-                                        response in
-                                        if let json = response as? JSON {
-                                            print(json)
+                                        response, error in
+                                        if error != nil {
+                                            self.simpleAlert(error!.localizedDescription)
                                         }
+                                        AppData.shared.importUserData(response!)
                                     }
                                 }
                             }
@@ -276,7 +277,63 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     }
                 }
             case .VK:
-                print("VK")
+                self.apiManager.getProfileNeedsUpdate() {
+                    if $0 {
+                        VKManager.getUserData() {
+                            response, error in
+                            if error != nil {
+                                print(error!.localizedDescription)
+                                return
+                            }
+                            
+                            if response != nil {
+                                if let array = response!.dictionaryObject!["response"] {
+                                    if array is Array<[String: Any]> {
+                                        let dict = array as! Array<[String: Any]>
+                                        var vkData = [String: Any]()
+                                        if dict.count != 0 { vkData = dict.first! }
+                                        if let pictureKey = dict.first?.keys.filter( { $0.lowercased().contains("photo")} ).first, let value = vkData[pictureKey] as? String {
+                                            if let pictureURL = URL(string: value) {
+                                                Alamofire.request(pictureURL).responseData {
+                                                    response in
+                                                    if response.result.isFailure {
+                                                        print(response.result.debugDescription)
+                                                    }
+                                                    if let error = response.result.error as? AFError {
+                                                        print(error.localizedDescription)
+                                                    }
+                                                    if let imgData = response.result.value {
+                                                        if let image = UIImage(data: imgData) {
+                                                            let storeManager = appDelegate.container.resolve(FileStoringProtocol.self)!
+                                                            storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: imgData).fileFormat, surveyID: nil)
+                                                            vkData["image"] = image
+                                                            vkData.removeValue(forKey: pictureKey)
+                                                            self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
+                                                                response, error in
+                                                                if error != nil {
+                                                                    self.simpleAlert(error!.localizedDescription)
+                                                                }
+                                                                AppData.shared.importUserData(response!)
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
+                                                response, error in
+                                                if error != nil {
+                                                    self.simpleAlert(error!.localizedDescription)
+                                                }
+                                                AppData.shared.importUserData(response!)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             default:
                 print("handleTokenStateReceived")
             }
@@ -333,8 +390,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
                 })
             })
         } else {
-            self.present(controller, animated: true, completion: {
-            })
+            self.present(controller, animated: true)
         }
     }
     
@@ -356,7 +412,11 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
 
 extension AuthViewController: ApiReachability {
     func handleReachabilitySignal() {
-        let alertController = UIAlertController(title: "Alert", message: "API not reachable", preferredStyle: .alert)
+        simpleAlert("API not reachable")
+    }
+    
+    private func simpleAlert(_ message: String) {
+        let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
         let action1 = UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
             print("You've pressed default")
         }

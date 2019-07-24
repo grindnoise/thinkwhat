@@ -3,6 +3,14 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "specialized static VKManager.prepareUserData(_:):VKManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "key as String">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "AppData.importUserData(_:):Main.swift">
          <PersistentStrings>
             <PersistentString

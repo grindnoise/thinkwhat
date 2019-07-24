@@ -388,18 +388,18 @@ class AppData {
             KeychainService.saveRefreshToken(token: "")
         }
     }
-
+    
     func importUserData(_ json: JSON) {
-            var userProfileData         = json["userprofile"].dictionaryObject  as! [String: Any]
-            var userData                = userProfileData.removeValue(forKey: "user") as! [String: Any]
-            self.user.email             = userData["email"] as! String
-            self.user.firstName         = userData["first_name"] as! String
-            self.user.lastName          = userData["last_name"] as! String
-            self.user.username          = userData["username"] as! String
-            self.user.ID                = String(describing: userData["id"] as! Int)
-            self.userProfile.ID         = String(describing: userProfileData["id"] as! Int)
-            self.userProfile.birthDate  = (userProfileData["birth_date"] as! NSNull).isKind(of: NSNull.self) ? Date(dateString: "01.01.0001") : Date(dateString:userProfileData["birth_date"] as! String)
-            self.userProfile.gender     = (userProfileData["gender"] as! NSNull).isKind(of: NSNull.self) ? Gender.Unassigned : Gender(rawValue: userProfileData["gender"] as! String)
+        var userProfileData         = json.dictionaryObject  as! [String: Any]
+        var userData                = userProfileData.removeValue(forKey: "user") as! [String: Any]
+        self.user.email             = userData["email"] as! String
+        self.user.firstName         = userData["first_name"] as! String
+        self.user.lastName          = userData["last_name"] as! String
+        self.user.username          = userData["username"] as! String
+        self.user.ID                = String(describing: userData["id"] as! Int)
+        self.userProfile.ID         = String(describing: userProfileData["id"] as! Int)
+        self.userProfile.birthDate  = userProfileData["birth_date"] is NSNull ? Date(dateString: "01.01.0001") : Date(dateString:userProfileData["birth_date"] as! String)
+        self.userProfile.gender     = userProfileData["gender"] is NSNull ? Gender.Unassigned : Gender(rawValue: userProfileData["gender"] as! String)
     }
     
     private init() {}
