@@ -79,21 +79,21 @@
                                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="9TO-5U-O9l">
                                                 <rect key="frame" x="0.0" y="30" width="262.5" height="82.5"/>
                                                 <subviews>
-                                                    <view tag="1" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gVO-oM-RV3" customClass="VKButtonView" customModule="ThinkWhat" customModuleProvider="target">
+                                                    <view tag="1" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gVO-oM-RV3" customClass="FacebookButtonView" customModule="ThinkWhat" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="0.0" width="82" height="82.5"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="gVO-oM-RV3" secondAttribute="height" multiplier="1:1" id="K7s-9K-rxm"/>
                                                         </constraints>
                                                     </view>
-                                                    <view tag="2" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hY7-Mf-AwY" customClass="InstagramButtonView" customModule="ThinkWhat" customModuleProvider="target">
+                                                    <view tag="2" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hY7-Mf-AwY" customClass="VKButtonView" customModule="ThinkWhat" customModuleProvider="target">
                                                         <rect key="frame" x="90" y="0.0" width="82" height="82.5"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="hY7-Mf-AwY" secondAttribute="height" multiplier="1:1" id="ZVj-WJ-3la"/>
                                                         </constraints>
                                                     </view>
-                                                    <view tag="3" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KjS-Lb-PFX" customClass="FacebookButtonView" customModule="ThinkWhat" customModuleProvider="target">
+                                                    <view tag="3" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KjS-Lb-PFX" customClass="MailButtonView" customModule="ThinkWhat" customModuleProvider="target">
                                                         <rect key="frame" x="180" y="0.0" width="82.5" height="82.5"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
@@ -135,10 +135,10 @@
                     </view>
                     <navigationItem key="navigationItem" id="ZR8-KQ-Wat"/>
                     <connections>
-                        <outlet property="fbButton" destination="KjS-Lb-PFX" id="ZAV-lq-xWJ"/>
-                        <outlet property="instButton" destination="hY7-Mf-AwY" id="mYD-9m-m9Z"/>
+                        <outlet property="fbButton" destination="gVO-oM-RV3" id="OtV-jH-aBo"/>
+                        <outlet property="mailButton" destination="KjS-Lb-PFX" id="guh-bH-ckJ"/>
                         <outlet property="termsOfUseButton" destination="FoA-Or-0Fh" id="13C-22-CF9"/>
-                        <outlet property="vkButton" destination="gVO-oM-RV3" id="uiJ-wy-41D"/>
+                        <outlet property="vkButton" destination="hY7-Mf-AwY" id="Hbf-AV-Qzb"/>
                         <segue destination="ghj-SQ-8TX" kind="show" identifier="SOCIAL" id="fZ7-o3-jqY"/>
                         <segue destination="7dC-m7-s4Q" kind="show" identifier="MAILAUTH" id="xEH-0M-xDg"/>
                     </connections>
@@ -317,7 +317,7 @@
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Логин" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="RHa-AC-Rki" customClass="UnderlinedTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Логин" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="RHa-AC-Rki" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="20.5" width="300" height="39.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
@@ -337,9 +337,6 @@
                                                         <real key="value" value="2"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
-                                                <connections>
-                                                    <action selector="textFieldChanged:" destination="Pnl-G9-xfW" eventType="editingDidEnd" id="ANB-d2-r2j"/>
-                                                </connections>
                                             </textField>
                                         </subviews>
                                         <constraints>
@@ -378,9 +375,6 @@
                                                         <real key="value" value="2"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
-                                                <connections>
-                                                    <action selector="textFieldChanged:" destination="Pnl-G9-xfW" eventType="editingDidEnd" id="k3V-sj-sWD"/>
-                                                </connections>
                                             </textField>
                                         </subviews>
                                         <constraints>
@@ -419,9 +413,6 @@
                                                         <real key="value" value="2"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
-                                                <connections>
-                                                    <action selector="textFieldChanged:" destination="Pnl-G9-xfW" eventType="editingDidEnd" id="5Vi-Uq-Moh"/>
-                                                </connections>
                                             </textField>
                                         </subviews>
                                         <constraints>

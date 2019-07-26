@@ -22,8 +22,7 @@ class VKManager {
         VKRequest(method: "users.get", parameters: ["user_ids": VKSdk.accessToken()?.userId, "fields":"first_name, last_name, photo_200_orig, sex, bdate"])?.execute(resultBlock: { (response) in
             guard response != nil else { return }
             do {
-                json =  JSON(parseJSON: response!.responseString)//JSON(arrayLiteral: (response!.responseString as! Dictionary <String, AnyObject>))
-                print(json)
+                json =  JSON(parseJSON: response!.responseString)
                 completionHandler(json, error)
             } catch {
                 print(error.localizedDescription)
@@ -61,10 +60,9 @@ extension VKManager: UserDataPreparatory {
                 } else if value as! Int == 2 {
                     userProfile["gender"] = Gender.Male.rawValue
                 }
-//                userProfile["gender"] = 1
             }
         }
-        userProfile["email"] = VKSdk.accessToken()?.email
+        userProfile["user.email"] = VKSdk.accessToken()?.email
         print(userProfile)
         return userProfile
     }

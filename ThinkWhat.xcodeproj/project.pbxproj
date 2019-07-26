@@ -66,6 +66,8 @@
 		AB6083C122410131002C0D7E /* ValidSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083C022410130002C0D7E /* ValidSign.swift */; };
 		AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */; };
 		AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */; };
+		ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C622E9B33700DEA9FD /* Mail.swift */; };
+		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
 		ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1F19E22C253A6008913C3 /* FBManager.swift */; };
 		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
@@ -156,6 +158,8 @@
 		AB6083C022410130002C0D7E /* ValidSign.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidSign.swift; sourceTree = "<group>"; };
 		AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryViewController.swift; sourceTree = "<group>"; };
 		AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRegistrationViewController.swift; sourceTree = "<group>"; };
+		ABC3E7C622E9B33700DEA9FD /* Mail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail.swift; sourceTree = "<group>"; };
+		ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSign.swift; sourceTree = "<group>"; };
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhat.entitlements; sourceTree = "<group>"; };
 		ABF1F19E22C253A6008913C3 /* FBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FBManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -323,6 +327,7 @@
 		AB3C681F223FD1B100B57580 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */,
 				AB6083C022410130002C0D7E /* ValidSign.swift */,
 				AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */,
 				AB6083BC2240FF14002C0D7E /* UnderlinedTextField.swift */,
@@ -364,6 +369,7 @@
 				AB3C6832223FD3EE00B57580 /* Instagram.swift */,
 				AB3C6833223FD3EE00B57580 /* ParentLoginButton.swift */,
 				AB3C6834223FD3EE00B57580 /* UpdateButton.swift */,
+				ABC3E7C622E9B33700DEA9FD /* Mail.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -709,9 +715,11 @@
 				AB3C6861223FD7E800B57580 /* AuthNavigationController.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
+				ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */,
 				AB3C685D223FD74E00B57580 /* APIManager.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
 				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
+				ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */,
 				AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */,
 				AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */,
 				AB3C6848223FD3EE00B57580 /* ParentLoginButton.swift in Sources */,

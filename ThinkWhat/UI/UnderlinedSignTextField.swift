@@ -10,7 +10,22 @@ import UIKit
 
 class UnderlinedSignTextField: UnderlinedTextField {
 
-    private var sign: ValidSign!
+//    public var isWarning = false {
+//        didSet {
+//            if isWarning != oldValue {
+//                if isWarning {
+//                    checkSign.alpha = 0
+//                    warningSign.alpha = 1
+//                } else {
+//                    checkSign.alpha = 1
+//                    warningSign.alpha = 0
+//                }
+//            }
+//        }
+//    }
+    private var checkSign:      ValidSign!
+    private var warningSign:    WarningSign!
+    
     private var signSize = CGSize(width: 32, height: 32) {
         didSet {
             layoutSubviews()
@@ -29,11 +44,15 @@ class UnderlinedSignTextField: UnderlinedTextField {
             rightViewMode = .always
             rightView = UIView()
             rightView?.frame = rightViewRect(forBounds: frame)
+            self.rightView?.alpha = 0
         }
-        if sign == nil {
-            sign = ValidSign(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
-            sign.isOpaque = false
-            sign.addEquallyTo(to: rightView!)
+        if checkSign == nil || warningSign == nil {
+            checkSign = ValidSign(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
+            checkSign.isOpaque = false
+            checkSign.addEquallyTo(to: rightView!)
+            warningSign = WarningSign(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
+            warningSign.isOpaque = false
+            warningSign.addEquallyTo(to: rightView!)
         }
     }
     
@@ -43,6 +62,37 @@ class UnderlinedSignTextField: UnderlinedTextField {
         let rect = CGRect(x: bounds.width - rightViewSize.width, y: bounds.size.height / 2 - height / 2, width: width, height: height)
         
         return rect
+    }
+    
+    public func showSign(isWarning: Bool) {
+        if isWarning {
+            UIView.animate(withDuration: 0.15, animations: {
+                self.checkSign.alpha = 0
+            }) { _ in
+                UIView.animate(withDuration: 0.15) {
+                    self.warningSign.alpha = 1
+                }
+            }
+        } else {
+            UIView.animate(withDuration: 0.15, animations: {
+                self.checkSign.alpha = 1
+            }) { _ in
+                UIView.animate(withDuration: 0.15) {
+                    self.warningSign.alpha = 0
+                }
+            }
+        }
+        if rightView?.alpha == 0 {
+            UIView.animate(withDuration: 0.2) {
+                self.rightView!.alpha = 1
+            }
+        }
+    }
+    
+    public func hideSign(isWarning: Bool) {
+        UIView.animate(withDuration: 0.2) {
+            self.rightView!.alpha = 0
+        }
     }
     /*
     // Only override draw() if you perform custom drawing.

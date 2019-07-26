@@ -7,17 +7,28 @@
 //
 
 import UIKit
+import SwiftyJSON
+import Alamofire
 
 class MailRegistrationViewController: UIViewController {
 
     @IBOutlet weak var continueButton:  UIButton!
     @IBOutlet weak var mailTF:          UnderlinedSignTextField!
-    @IBOutlet weak var loginTF:         UnderlinedTextField!
+    @IBOutlet weak var loginTF:         UnderlinedSignTextField!
     @IBOutlet weak var pwdTF:           UnderlinedTextField!
     
-    @IBAction func textFieldChanged(_ sender: Any) {
-        isMailFilled = isValidEmail(mailTF.text!) ? true : false
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if textField === mailTF {
+            if isValidEmail(mailTF.text!) {
+                isMailFilled = true
+            } else  {
+                mailTF.showSign(isWarning: true)
+            }
+        } else if textField === loginTF {
+            
+        }
     }
+    
     @IBAction func signupTapped(_ sender: UIButton) {
         
     }
@@ -38,12 +49,10 @@ class MailRegistrationViewController: UIViewController {
             }
         }
     }
-    private var isMailFilled            = false {
+    private var isMailFilled = false {
         didSet {
             if isMailFilled {
-                UIView.animate(withDuration: 0.2) {
-                    self.mailTF.rightView!.alpha = 1
-                }
+                mailTF.showSign(isWarning: false)
                 if isPwdFilled && isMailFilled && isLoginFilled {
                     formIsReady = true
                 }
@@ -68,7 +77,7 @@ class MailRegistrationViewController: UIViewController {
             }
         }
     }
-    internal lazy var serverAPI: APIManagerProtocol = self.initializeServerAPI()
+    private var apiManager: APIManager!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,6 +86,7 @@ class MailRegistrationViewController: UIViewController {
         for tf in textFields {
             tf.delegate = self
         }
+        apiManager      = (self.navigationController as! AuthNavigationController).apiManagerProtocol as? APIManager
         setupViews()
         setupGestures()
     }
@@ -112,7 +122,10 @@ class MailRegistrationViewController: UIViewController {
     
     private func performSignup() {
         if formIsReady {
-//            serverAPI.
+//            self.apiManager.signUp(email: mailTF.text!, password: pwdTF.text!, username: loginTF.text!) {
+//                succes in
+////                tokenState = state
+//            }
         }
     }
     /*
@@ -128,12 +141,7 @@ class MailRegistrationViewController: UIViewController {
 }
 
 extension MailRegistrationViewController: UITextFieldDelegate {
-    private func initializeServerAPI() -> APIManagerProtocol{
-        return (self.navigationController as! AuthNavigationController).apiManagerProtocol
-    }
-    
     private func findFirstResponder() -> UITextField? {
-        
         for textField in textFields {
             if textField.isFirstResponder {
                 return textField

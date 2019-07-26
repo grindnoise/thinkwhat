@@ -16,7 +16,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     @IBOutlet weak var termsOfUseButton: UIButton!
     @IBOutlet weak var vkButton:                    VKButtonView!
-    @IBOutlet weak var instButton:                  InstagramButtonView!
+    @IBOutlet weak var mailButton:                  MailButtonView!
     @IBOutlet weak var fbButton:                    FacebookButtonView!
     private var buttons:                            [ParentLoginButton] = []
     private var selectedAuth:                       Int = 0
@@ -49,7 +49,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             self.navigationController?.isNavigationBarHidden         = false
             self.navigationController?.navigationBar.barTintColor    = .white
             self.navigationController?.navigationBar.tintColor       = .black
-            self.buttons = [self.vkButton, self.instButton, self.fbButton]
+            self.buttons = [self.fbButton, self.vkButton, self.mailButton]
             self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
             for button in self.buttons {
                 let tap = UITapGestureRecognizer(target: self, action: #selector(AuthViewController.handleTap(gesture:)))
@@ -105,11 +105,11 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         var selectedIndex = 0
         if let view = gesture.view {
             selectedIndex = view.tag
-            if selectedIndex == 2 {
-                (view as! InstagramButtonView).state = .enabled
-            } else if selectedIndex == 1 {
+            if selectedIndex == 3 {
+                (view as! MailButtonView).state = .enabled
+            } else if selectedIndex == 2 {
                 (view as! VKButtonView).state = .enabled
-            } else if selectedIndex == 3 {
+            } else if selectedIndex == 1 {
                 (view as! FacebookButtonView).state = .enabled
             }
             //            } else if selectedIndex == 4 {
@@ -123,8 +123,8 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                 }
                 if button is VKButtonView {
                     (button as! VKButtonView).state = .disabled
-                } else if button is InstagramButtonView {
-                    (button as! InstagramButtonView).state = .disabled
+                } else if button is MailButtonView {
+                    (button as! MailButtonView).state = .disabled
                 }
             }
         }
@@ -182,16 +182,19 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                         }
                     }
                 }
-            case .Google:
-                DispatchQueue.main.async {
-                    VKSdk.forceLogout()
-                }
-                DispatchQueue.main.async {
-                    self.apiManager.logout() {
-                        state in
-                        tokenState = state
-                    }
-                }
+            case .Mail:
+                self.performSegue(withIdentifier: kSegueMailAuth, sender: nil)
+                
+                
+//                DispatchQueue.main.async {
+//                    VKSdk.forceLogout()
+//                }
+//                DispatchQueue.main.async {
+//                    self.apiManager.logout() {
+//                        state in
+//                        tokenState = state
+//                    }
+//                }
                 
                 
                 //                if AccessToken.current != nil {
@@ -210,11 +213,11 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     private func getAuthCase() -> AuthVariant {
         switch selectedAuth {
-        case 1:
-            return .VK
         case 2:
-            return .Google
+            return .VK
         case 3:
+            return .Mail
+        case 1:
             return .Facebook
         default:
             fatalError("\(selectedAuth) selectedAuth not found")
@@ -223,119 +226,135 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     @objc private func handleTokenState() {
         if tokenState == .Received {
-            let auth = getAuthCase()
-            switch auth {
-            case .Facebook:
-                self.apiManager.getProfileNeedsUpdate() {
-                    if $0 {
-                        FBManager.getUserData() {
-                            response in
-                            if response != nil {
-                                var fbData = response!.dictionaryObject!
-                                if let pictureData = JSON(fbData.removeValue(forKey: "picture")) as? JSON {
-                                    if let is_silhouette = pictureData["data"]["is_silhouette"].bool {
-                                        if !is_silhouette {
-                                            if let pictureURL = URL(string: pictureData["data"]["url"].string!) as? URL {
-                                                Alamofire.request(pictureURL).responseData {
-                                                    response in
-                                                    if response.result.isFailure {
-                                                        print(response.result.debugDescription)
-                                                    }
-                                                    if let error = response.result.error as? AFError {
-                                                        print(error.localizedDescription)
-                                                    }
-                                                    if let data = response.result.value {
-                                                        if let image = UIImage(data: data) {
-                                                            self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
-                                                            fbData["image"] = image
-                                                            self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
-                                                                response, error in
-                                                                if error != nil {
-                                                                    self.simpleAlert(error!.localizedDescription)
+            apiManager.getUserData() {
+                json, error in
+                if error != nil {
+                    self.simpleAlert(error!.localizedDescription)
+                } else if json != nil {
+                    AppData.shared.importUserData(json!)
+                    let auth = self.getAuthCase()
+                    switch auth {
+                    case .Facebook:
+                        self.apiManager.getProfileNeedsUpdate() {
+                            if $0 {
+                                FBManager.getUserData() {
+                                    response in
+                                    if response != nil {
+                                        var fbData = response!.dictionaryObject!
+                                        if let pictureData = JSON(fbData.removeValue(forKey: "picture")) as? JSON {
+                                            if let is_silhouette = pictureData["data"]["is_silhouette"].bool {
+                                                if !is_silhouette {
+                                                    if let pictureURL = URL(string: pictureData["data"]["url"].string!) as? URL {
+                                                        Alamofire.request(pictureURL).responseData {
+                                                            response in
+                                                            if response.result.isFailure {
+                                                                print(response.result.debugDescription)
+                                                            }
+                                                            if let error = response.result.error as? AFError {
+                                                                print(error.localizedDescription)
+                                                            }
+                                                            if let data = response.result.value {
+                                                                if let image = UIImage(data: data) {
+                                                                    self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
+                                                                    fbData["image"] = image
+                                                                    self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
+                                                                        response, error in
+                                                                        if error != nil {
+                                                                            self.simpleAlert(error!.localizedDescription)
+                                                                        }
+                                                                        if response != nil {
+                                                                            AppData.shared.importUserData(response!)
+                                                                        }
+                                                                    }
                                                                 }
-                                                                AppData.shared.importUserData(response!)
                                                             }
                                                         }
-                                                    }
-                                                }
-                                            } else {
-                                                print(pictureData["data"]["url"].error!)
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
-                                        response, error in
-                                        if error != nil {
-                                            self.simpleAlert(error!.localizedDescription)
-                                        }
-                                        AppData.shared.importUserData(response!)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            case .VK:
-                self.apiManager.getProfileNeedsUpdate() {
-                    if $0 {
-                        VKManager.getUserData() {
-                            response, error in
-                            if error != nil {
-                                print(error!.localizedDescription)
-                                return
-                            }
-                            
-                            if response != nil {
-                                if let array = response!.dictionaryObject!["response"] {
-                                    if array is Array<[String: Any]> {
-                                        let dict = array as! Array<[String: Any]>
-                                        var vkData = [String: Any]()
-                                        if dict.count != 0 { vkData = dict.first! }
-                                        if let pictureKey = dict.first?.keys.filter( { $0.lowercased().contains("photo")} ).first, let value = vkData[pictureKey] as? String {
-                                            if let pictureURL = URL(string: value) {
-                                                Alamofire.request(pictureURL).responseData {
-                                                    response in
-                                                    if response.result.isFailure {
-                                                        print(response.result.debugDescription)
-                                                    }
-                                                    if let error = response.result.error as? AFError {
-                                                        print(error.localizedDescription)
-                                                    }
-                                                    if let imgData = response.result.value {
-                                                        if let image = UIImage(data: imgData) {
-                                                            let storeManager = appDelegate.container.resolve(FileStoringProtocol.self)!
-                                                            storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: imgData).fileFormat, surveyID: nil)
-                                                            vkData["image"] = image
-                                                            vkData.removeValue(forKey: pictureKey)
-                                                            self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
-                                                                response, error in
-                                                                if error != nil {
-                                                                    self.simpleAlert(error!.localizedDescription)
-                                                                }
-                                                                AppData.shared.importUserData(response!)
-                                                            }
-                                                        }
+                                                    } else {
+                                                        print(pictureData["data"]["url"].error!)
                                                     }
                                                 }
                                             }
                                         } else {
-                                            self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
+                                            self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
                                                 response, error in
                                                 if error != nil {
                                                     self.simpleAlert(error!.localizedDescription)
                                                 }
-                                                AppData.shared.importUserData(response!)
+                                                if response != nil {
+                                                    AppData.shared.importUserData(response!)
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+                    case .VK:
+                        self.apiManager.getProfileNeedsUpdate() {
+                            if $0 {
+                                VKManager.getUserData() {
+                                    response, error in
+                                    if error != nil {
+                                        print(error!.localizedDescription)
+                                        return
+                                    }
+                                    
+                                    if response != nil {
+                                        if let array = response!.dictionaryObject!["response"] {
+                                            if array is Array<[String: Any]> {
+                                                let dict = array as! Array<[String: Any]>
+                                                var vkData = [String: Any]()
+                                                if dict.count != 0 { vkData = dict.first! }
+                                                if let pictureKey = dict.first?.keys.filter( { $0.lowercased().contains("photo")} ).first, let value = vkData[pictureKey] as? String {
+                                                    if let pictureURL = URL(string: value) {
+                                                        Alamofire.request(pictureURL).responseData {
+                                                            response in
+                                                            if response.result.isFailure {
+                                                                print(response.result.debugDescription)
+                                                            }
+                                                            if let error = response.result.error as? AFError {
+                                                                print(error.localizedDescription)
+                                                            }
+                                                            if let imgData = response.result.value {
+                                                                if let image = UIImage(data: imgData) {
+                                                                    let storeManager = appDelegate.container.resolve(FileStoringProtocol.self)!
+                                                                    storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: imgData).fileFormat, surveyID: nil)
+                                                                    vkData["image"] = image
+                                                                    vkData.removeValue(forKey: pictureKey)
+                                                                    self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
+                                                                        response, error in
+                                                                        if error != nil {
+                                                                            self.simpleAlert(error!.localizedDescription)
+                                                                        }
+                                                                        if response != nil {
+                                                                            AppData.shared.importUserData(response!)
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                } else {
+                                                    self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
+                                                        response, error in
+                                                        if error != nil {
+                                                            self.simpleAlert(error!.localizedDescription)
+                                                        }
+                                                        if response != nil {
+                                                            AppData.shared.importUserData(response!)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    default:
+                        print("handleTokenStateReceived")
                     }
                 }
-            default:
-                print("handleTokenStateReceived")
             }
         } else if tokenState == .Error {
             print("authorization error")
@@ -363,24 +382,32 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     
     func vkSdkAccessAuthorizationFinished(with result: VKAuthorizationResult!) {
         if let error = result.error {
-            //TODO Error popup
-            print(error.localizedDescription)
+            simpleAlert(result.error.localizedDescription)
             return
         }
         
-        switch result.state {
-        case .authorized:
+        print("******VK Auth State = \(result.state.rawValue)********")
+        if result.state != .error {
             apiManager.login(.VK, username: nil, password: nil, token: result.token.accessToken) {
                 _tokenState in
                 tokenState = _tokenState
             }
-        default:
-            print("Default")
+        } else {
+            simpleAlert("******VK Auth Failed State = \(result.state.rawValue)********")
         }
+//        switch result.state {
+//        case .authorized:
+//            apiManager.login(.VK, username: nil, password: nil, token: result.token.accessToken) {
+//                _tokenState in
+//                tokenState = _tokenState
+//            }
+//        default:
+//            simpleAlert("******VK Auth Failed State = \(result.state.rawValue)********")
+//        }
     }
     
     func vkSdkUserAuthorizationFailed() {
-        print("FAIL")
+        simpleAlert("vkSdkUserAuthorizationFailed")
     }
     
     func vkSdkShouldPresent(_ controller: UIViewController!) {
@@ -404,7 +431,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     }
     
     func vkSdkAuthorizationStateUpdated(with result:VKAuthorizationResult) -> Void {
-        print(result.state.rawValue)
+        //print(result.state.rawValue)
     }
     
 }
