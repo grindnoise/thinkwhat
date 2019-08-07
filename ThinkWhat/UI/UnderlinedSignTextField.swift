@@ -9,23 +9,19 @@
 import UIKit
 
 class UnderlinedSignTextField: UnderlinedTextField {
+    
+    enum SignState: String {
+        case Approved
+        case UsernameExists   =   "Username is already used"
+        case EmailExists      =   "Email is already used"
+        case EmailIsIncorrect =   "Email is incorrect"
+        case PasswordIsShort  =   "Password is too short"
+    }
 
-//    public var isWarning = false {
-//        didSet {
-//            if isWarning != oldValue {
-//                if isWarning {
-//                    checkSign.alpha = 0
-//                    warningSign.alpha = 1
-//                } else {
-//                    checkSign.alpha = 1
-//                    warningSign.alpha = 0
-//                }
-//            }
-//        }
-//    }
     private var checkSign:      ValidSign!
     private var warningSign:    WarningSign!
-    
+    private var lowerTextView:  UITextView!
+
     private var signSize = CGSize(width: 32, height: 32) {
         didSet {
             layoutSubviews()
@@ -46,13 +42,21 @@ class UnderlinedSignTextField: UnderlinedTextField {
             rightView?.frame = rightViewRect(forBounds: frame)
             self.rightView?.alpha = 0
         }
-        if checkSign == nil || warningSign == nil {
+        if checkSign == nil || warningSign == nil || lowerTextView == nil {
             checkSign = ValidSign(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
             checkSign.isOpaque = false
             checkSign.addEquallyTo(to: rightView!)
             warningSign = WarningSign(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
             warningSign.isOpaque = false
             warningSign.addEquallyTo(to: rightView!)
+            lowerTextView = UITextView(frame: CGRect(origin: CGPoint(x: 0, y: frame.maxY), size: CGSize(width: frame.width, height: 16)))
+            lowerTextView.alpha = 0
+            lowerTextView.isEditable = false
+            lowerTextView.isSelectable = false
+            lowerTextView.textColor = .red
+            lowerTextView.isScrollEnabled = false
+            lowerTextView.textContainerInset = UIEdgeInsets(top: 0,left: -5,bottom: 0,right: 0)
+            superview?.addSubview(lowerTextView)
         }
     }
     
@@ -64,24 +68,29 @@ class UnderlinedSignTextField: UnderlinedTextField {
         return rect
     }
     
-    public func showSign(isWarning: Bool) {
-        if isWarning {
+    public func showSign(state: SignState) {
+        switch state {
+        case .Approved:
+            UIView.animate(withDuration: 0.15, animations: {
+                self.warningSign.alpha = 0
+                self.lowerTextView.alpha = 0
+            }) { _ in
+                UIView.animate(withDuration: 0.15) {
+                    self.checkSign.alpha = 1
+                }
+            }
+        default:
             UIView.animate(withDuration: 0.15, animations: {
                 self.checkSign.alpha = 0
             }) { _ in
+                self.lowerTextView.text = state.rawValue
                 UIView.animate(withDuration: 0.15) {
+                    self.lowerTextView.alpha = 1
                     self.warningSign.alpha = 1
                 }
             }
-        } else {
-            UIView.animate(withDuration: 0.15, animations: {
-                self.checkSign.alpha = 1
-            }) { _ in
-                UIView.animate(withDuration: 0.15) {
-                    self.warningSign.alpha = 0
-                }
-            }
         }
+        
         if rightView?.alpha == 0 {
             UIView.animate(withDuration: 0.2) {
                 self.rightView!.alpha = 1
@@ -89,17 +98,10 @@ class UnderlinedSignTextField: UnderlinedTextField {
         }
     }
     
-    public func hideSign(isWarning: Bool) {
+    public func hideSign() {
         UIView.animate(withDuration: 0.2) {
             self.rightView!.alpha = 0
+            self.lowerTextView.alpha = 0
         }
     }
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
-    }
-    */
-
 }

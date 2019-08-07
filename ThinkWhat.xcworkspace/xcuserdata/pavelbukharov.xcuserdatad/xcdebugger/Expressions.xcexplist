@@ -3,10 +3,21 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "specialized static VKManager.prepareUserData(_:):VKManager.swift">
+         contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
          <PersistentStrings>
             <PersistentString
-               value = "key as String">
+               value = "url">
+            </PersistentString>
+            <PersistentString
+               value = "response.data!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "EmailResponse.storeEmailResponse() [inlined]:EmailResponse.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "confirmation_code">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -15,6 +26,14 @@
          <PersistentStrings>
             <PersistentString
                value = "dateString:userProfile[&quot;birth_date&quot;]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "specialized AppData.System.emailResponseConfirmationCode.didset:Main.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "emailResponseConfirmationCode">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -49,18 +68,15 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
+         contextName = "specialized static VKManager.prepareUserData(_:):VKManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "url">
-            </PersistentString>
-            <PersistentString
-               value = "response.data!">
+               value = "key as String">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

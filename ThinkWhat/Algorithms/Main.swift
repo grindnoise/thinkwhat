@@ -78,7 +78,6 @@ enum AuthVariant: String {
 enum ClientSettingsMode {
     case Reminder, Language
 }
-
 var tokenState: TokenState    = .Unassigned {
     didSet {
         switch tokenState {
@@ -97,24 +96,14 @@ var tokenState: TokenState    = .Unassigned {
         }
     }
 }
-
-let iOS_11: Bool = {
-    if #available(iOS 11.0, *) {
-        return true
-    } else {
-        return false
-    }
-}()
-
-var smsResponse: SMSResponse? {
+var emailResponse: EmailResponse? {
     didSet {
-        if smsResponse != nil {
-            NotificationCenter.default.post(name: kNotificationSMSResponse, object: nil)
+        if emailResponse != nil {
+            NotificationCenter.default.post(name: kNotificationEmailResponseReceived, object: nil)
         }
     }
 }
 var firstLaunch                                 = true
-//var appData                                     = AppData()
 var internetConnection: InternetConnection      = .Available {
     didSet {
         if internetConnection != oldValue {
@@ -138,7 +127,8 @@ let kNotificationTokenError                      = Notification.Name("Notificati
 let kNotificationTokenRevoked                    = Notification.Name("NotificationTokenRevoked")
 let kNotificationTokenWrongCredentials           = Notification.Name("NotificationTokenWrongCredentials")
 let kNotificationTokenConnectionError            = Notification.Name("NotificationTokenConnectionError")
-let kNotificationSMSResponse                     = Notification.Name("smsResponseNotification")
+let kNotificationEmailResponseReceived           = Notification.Name("NotificationEmailResponseReceived")
+let kNotificationEmailResponseExpired            = Notification.Name("NotificationEmailResponseExpired")
 
 let kNotificationApiReachable                    = Notification.Name("smsNotificationApiReachable")
 let kNotificationApiNotReachable                 = Notification.Name("smsNotificationApiNotReachable")
@@ -353,7 +343,32 @@ class AppData {
                 }
             }
         }
-        
+        var emailResponseExpirationDate: Date? {
+            didSet {
+                if emailResponseExpirationDate != nil  {
+                    UserDefaults.standard.set(emailResponseExpirationDate, forKey: "emailResponseExpirationDate")
+//                    if emailResponseConfirmationCode != nil {
+//                        emailResponse = EmailResponse(confirmation_code: emailResponseConfirmationCode!, expiresIn: emailResponseExpirationDate!)
+//                    }
+                } else {
+                    UserDefaults.standard.removeObject(forKey: "emailResponseExpirationDate")
+//                    emailResponse = nil
+                }
+            }
+        }
+        var emailResponseConfirmationCode: Int? {
+            didSet {
+                if emailResponseConfirmationCode != nil {
+                    UserDefaults.standard.set(emailResponseConfirmationCode, forKey: "emailResponseConfirmationCode")
+//                    if emailResponseExpirationDate != nil {
+//                        emailResponse = EmailResponse(confirmation_code: emailResponseConfirmationCode!, expiresIn: emailResponseExpirationDate!)
+//                    }
+                } else {
+                    UserDefaults.standard.removeObject(forKey: "emailResponseConfirmationCode")
+//                    emailResponse = nil
+                }
+            }
+        }
         init() {
             getData()
         }
@@ -363,7 +378,18 @@ class AppData {
             if let kSession = UserDefaults.standard.object(forKey: "session") {
                 self.session = SessionType(rawValue: kSession as! String)!
             }
-            
+            if let kEmailResponseExpirationDate = UserDefaults.standard.object(forKey: "emailResponseExpirationDate"), let kEmailResponseConfirmationCode = UserDefaults.standard.object(forKey: "emailResponseConfirmationCode"){
+                self.emailResponseExpirationDate = kEmailResponseExpirationDate as? Date
+                self.emailResponseConfirmationCode = kEmailResponseConfirmationCode as? Int
+                if Date() < self.emailResponseExpirationDate! {
+                    emailResponse = EmailResponse(confirmation_code: emailResponseConfirmationCode!, expiresIn: emailResponseExpirationDate!)
+                    print(emailResponse?.confirmation_code)
+                    print(emailResponse?.expiresIn)
+                }
+            }
+//            if let kEmailResponseConfirmationCode = UserDefaults.standard.object(forKey: "emailResponseConfirmationCode") {
+//                self.emailResponseConfirmationCode = kEmailResponseConfirmationCode as? Int
+//            }
             if let kLanguage = UserDefaults.standard.object(forKey: "language") {
                 self.language = Language(rawValue: kLanguage as! String)!
             } else {
@@ -377,6 +403,9 @@ class AppData {
         }
         
         mutating func eraseData() {
+            session = .unauthorized
+            emailResponseExpirationDate = nil
+            emailResponseConfirmationCode = nil
             session = .unauthorized
             let langStr = Locale.current.languageCode
             if langStr == "en-US" {
@@ -405,6 +434,8 @@ class AppData {
     private init() {}
 }
 
+
+
 struct INSTAGRAM_IDS {
     
     static let INSTAGRAM_AUTHURL        = "https://api.instagram.com/oauth/authorize/"
@@ -430,21 +461,24 @@ struct VK_IDS {
 }
 
 struct SERVER_URLS {
-    static let BASE_URL                 = "http://127.0.0.1:8000/"//"https://damp-oasis-64585.herokuapp.com/"
+    static let BASE                     = "http://127.0.0.1:8000/"//"https://damp-oasis-64585.herokuapp.com/"
     static let CLIENT_ID                = "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//"bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"
     static let CLIENT_SECRET            = "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
     //"Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"
-    static let SIGNUP_URL               = "api/sign_up"
-    static let TOKEN_URL                = "api/social/token/"
-    static let TOKEN_CONVERT_URL        = "api/social/convert-token/"
-    static let TOKEN_REVOKE_URL         = "api/social/revoke-token/"
+    static let SIGNUP                   = "api/sign_up"
+    static let TOKEN                    = "api/social/token/"
+    static let TOKEN_CONVERT            = "api/social/convert-token/"
+    static let TOKEN_REVOKE             = "api/social/revoke-token/"
+    static let USERNAME_EXISTS          = "api/profiles/username_exists"
+    static let EMAIL_EXISTS             = "api/profiles/email_exists"
+    static let GET_CONFIRMATION_CODE    = "api/send-confirmation-code"
     
-    static let PROFILE_NEEDS_UPDATE_URL = "api/profiles/needs_social_update/"
-    static let PROFILE_URL              = "api/profiles/"
-    static let CURRENT_USER_URL         = "api/profiles/current/"
-    static let USER_URL                 = "api/users/"
+    static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_social_update/"
+    static let PROFILE                  = "api/profiles/"
+    static let CURRENT_USER             = "api/profiles/current/"
+    static let USER                     = "api/users/"
     
-    static let SURVEY_URL               = "api/surveys/"
+    static let SURVEY                   = "api/surveys/"
     
 //    static let SMS_VALIDATION_URL   = "http://burber.pythonanywhere.com/passcode/generate/"
     
@@ -533,10 +567,6 @@ func showAlert(type: CustomAlertView.AlertType, buttons: [String : [CustomAlertV
 
 func alertIsActive() -> Bool {
     return alert.isActive
-}
-
-func hasSMSPasscodeExpired() -> Bool {
-    return Date() >= smsResponse!.expiryDateTime
 }
 
 func loadImageFromPath(path: String) -> UIImage? {
