@@ -97,7 +97,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     @objc private func showTermsOfUse(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended {
-            performSegue(withIdentifier: kSegueTerms, sender: nil)
+            performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
         }
     }
     
@@ -363,18 +363,14 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
     
-    //    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    //        if segue.identifier == kSegueSocialAuth {
-    //            if let destinationVC = segue.destination as? SocialAuthViewController {
-    //                destinationVC.authVariant = getAuthMethod()
-    //            }
-    //        } else if segue.identifier == kSegueTerms {
-    //            if let destinationVC = segue.destination as? TermsOfUseViewController {
-    //                destinationVC.isBackButtonHidden = false
-    //                destinationVC.isStackViewHidden  = true
-    //            }
-    //        }
-    //    }
+        override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+            if segue.identifier == kSegueTermsFromStartScreen {
+                if let destinationVC = segue.destination as? TermsOfUseViewController {
+                    destinationVC.isBackButtonHidden = false
+                    destinationVC.isStackViewHidden  = true
+                }
+            }
+        }
 }
 
 

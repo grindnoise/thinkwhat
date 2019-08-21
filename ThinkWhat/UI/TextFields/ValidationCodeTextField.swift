@@ -10,24 +10,18 @@ import UIKit
 
 class ValidationCodeTextField: UITextField {
     
-    var seconds: Int    = 600 {
-        didSet {
-            if seconds == 0 {
-                emailResponse = nil
-            }
-        }
-    }
-    var timer           = Timer()
-    var isTimerRunning  = false
-    
-    private var signSize = CGSize(width: 90, height: 32) {
+    fileprivate var caution:  UILabel!
+    fileprivate var seconds: Int    = 600
+    fileprivate var timer           = Timer()
+    fileprivate var isTimerRunning  = false
+    fileprivate var signSize = CGSize(width: 90, height: 32) {
         didSet {
             layoutSubviews()
         }
     }
     
-    private var timerLabel:      UILabel!
-    private var rightViewSize: CGSize {
+    fileprivate var timerLabel:      UILabel!
+    fileprivate var rightViewSize: CGSize {
         return CGSize(
             width: signSize.width,
             height: signSize.height)
@@ -70,12 +64,19 @@ class ValidationCodeTextField: UITextField {
         timerLabel.textAlignment = .right
         timerLabel.addEquallyTo(to: rightView!)
         NotificationCenter.default.addObserver(self, selector: #selector(ValidationCodeTextField.runTimer), name: kNotificationEmailResponseReceived, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(ValidationCodeTextField.destroyEmailResponse), name: kNotificationEmailResponseExpired, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ValidationCodeTextField.showCaution), name: kNotificationEmailResponseExpired, object: nil)
     }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
         rightView?.frame = rightViewRect(forBounds: frame)
+        if caution == nil {
+            caution = UILabel(frame: CGRect(origin: CGPoint(x: 0, y: frame.maxY), size: CGSize(width: frame.width, height: 16)))
+            caution.alpha = 0
+            caution.text = "Code has expired, send again"
+            caution.textColor = .red
+            superview?.addSubview(caution)
+        }
     }
     
     open override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
@@ -101,8 +102,12 @@ class ValidationCodeTextField: UITextField {
     }
     
     @objc private func runTimer() {
-        if emailResponse != nil {
-            seconds = Int(Date().timeIntervalSince(emailResponse!.expiresIn))
+        if !EmailResponse.shared.isEmpty && EmailResponse.shared.isActive {
+            if EmailResponse.shared.getExpireDate() != nil {
+                seconds = Int(Date().timeIntervalSince(EmailResponse.shared.getExpireDate()!))
+            } else {
+                seconds = 60
+            }
             timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(ValidationCodeTextField.updateTimer)), userInfo: nil, repeats: true)
         }
     }
@@ -110,6 +115,9 @@ class ValidationCodeTextField: UITextField {
     @objc private func updateTimer() {
         seconds -= 1
         timerLabel.text = timeString(time: TimeInterval(seconds))
+        if seconds == 0 {
+            NotificationCenter.default.post(name: kNotificationEmailResponseExpired, object: nil)
+        }
     }
     
     fileprivate func timeString(time:TimeInterval) -> String {
@@ -119,8 +127,10 @@ class ValidationCodeTextField: UITextField {
         return String(format: "%02i:%02i"/*:%02i", hours*/, minutes, seconds)
     }
     
-    @objc fileprivate func destroyEmailResponse() {
-        emailResponse = nil
+    @objc fileprivate func showCaution() {
+        UIView.animate(withDuration: 0.15) {
+            self.caution.alpha = 1
+        }
     }
 }
 

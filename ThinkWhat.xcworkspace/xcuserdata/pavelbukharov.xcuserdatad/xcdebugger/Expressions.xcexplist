@@ -17,7 +17,7 @@
          contextName = "EmailResponse.storeEmailResponse() [inlined]:EmailResponse.swift">
          <PersistentStrings>
             <PersistentString
-               value = "confirmation_code">
+               value = "expiresIn">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

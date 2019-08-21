@@ -73,6 +73,7 @@ enum AuthVariant: String {
     case Google     = "Google"
     case Phone      = "Phone"
     case Mail       = "Mail"
+    case Username   = "Username"
 }
 
 enum ClientSettingsMode {
@@ -138,11 +139,18 @@ let appDelegate                                  = UIApplication.shared.delegate
 
 //MARKS: - Segues
 let kSegueApp                                    = "APP"
+let kSegueAppFromMailSignIn                      = "APP_FROM_MAIL_SIGNIN"
+let kSegueAppFromTerms                           = "APP_FROM_TERMS"
 let kSegueAuth                                   = "AUTH"
 let kSegueSocialAuth                             = "SOCIAL"
-let kSegueTerms                                  = "TERMS"
+let kSegueMailValidationFromSignup               = "MAIL_VALID_SIGNUP"
+let kSegueMailValidationFromSignin               = "MAIL_VALID_SIGNIN"
+let kSegueTermsFromValidation                    = "TERMS_VALID"
+let kSegueTermsFromStartScreen                   = "TERMS_START_SCREEN"
 let kSegueMailAuth                               = "MAILAUTH"
-let kSeguePwdRecovery                            = "PWD"
+let kSeguePwdRecovery                            = "PWD_RECOVERY"
+
+
 //let segueBarberData                             = "segueBarberData"
 //let segueSignup                                 = "segueSignup"
 //let segueConfirm                                = "segueConfirm"
@@ -343,32 +351,34 @@ class AppData {
                 }
             }
         }
-        var emailResponseExpirationDate: Date? {
-            didSet {
-                if emailResponseExpirationDate != nil  {
-                    UserDefaults.standard.set(emailResponseExpirationDate, forKey: "emailResponseExpirationDate")
-//                    if emailResponseConfirmationCode != nil {
-//                        emailResponse = EmailResponse(confirmation_code: emailResponseConfirmationCode!, expiresIn: emailResponseExpirationDate!)
-//                    }
-                } else {
-                    UserDefaults.standard.removeObject(forKey: "emailResponseExpirationDate")
-//                    emailResponse = nil
-                }
-            }
-        }
-        var emailResponseConfirmationCode: Int? {
-            didSet {
-                if emailResponseConfirmationCode != nil {
-                    UserDefaults.standard.set(emailResponseConfirmationCode, forKey: "emailResponseConfirmationCode")
-//                    if emailResponseExpirationDate != nil {
-//                        emailResponse = EmailResponse(confirmation_code: emailResponseConfirmationCode!, expiresIn: emailResponseExpirationDate!)
-//                    }
-                } else {
-                    UserDefaults.standard.removeObject(forKey: "emailResponseConfirmationCode")
-//                    emailResponse = nil
-                }
-            }
-        }
+//        var emailResponseExpirationDate: Date? {
+//            didSet {
+//                if emailResponseExpirationDate != nil  {
+//                    UserDefaults.standard.removeObject(forKey: "emailResponseExpirationDate")
+//                    UserDefaults.standard.set(emailResponseExpirationDate, forKey: "emailResponseExpirationDate")
+////                    if emailResponseConfirmationCode != nil {
+////                        emailResponse = EmailResponse(confirmation_code: emailResponseConfirmationCode!, expiresIn: emailResponseExpirationDate!)
+////                    }
+//                } else {
+//                    UserDefaults.standard.removeObject(forKey: "emailResponseExpirationDate")
+////                    emailResponse = nil
+//                }
+//            }
+//        }
+//        var emailResponseConfirmationCode: Int? {
+//            didSet {
+//                if emailResponseConfirmationCode != nil {
+//                    UserDefaults.standard.removeObject(forKey: "emailResponseConfirmationCode")
+//                    UserDefaults.standard.set(emailResponseConfirmationCode, forKey: "emailResponseConfirmationCode")
+////                    if emailResponseExpirationDate != nil {
+////                        emailResponse = EmailResponse(confirmation_code: emailResponseConfirmationCode!, expiresIn: emailResponseExpirationDate!)
+////                    }
+//                } else {
+//                    UserDefaults.standard.removeObject(forKey: "emailResponseConfirmationCode")
+////                    emailResponse = nil
+//                }
+//            }
+//        }
         init() {
             getData()
         }
@@ -378,17 +388,11 @@ class AppData {
             if let kSession = UserDefaults.standard.object(forKey: "session") {
                 self.session = SessionType(rawValue: kSession as! String)!
             }
-            if let kEmailResponseExpirationDate = UserDefaults.standard.object(forKey: "emailResponseExpirationDate"), let kEmailResponseConfirmationCode = UserDefaults.standard.object(forKey: "emailResponseConfirmationCode"){
-                self.emailResponseExpirationDate = kEmailResponseExpirationDate as? Date
-                self.emailResponseConfirmationCode = kEmailResponseConfirmationCode as? Int
-                if Date() < self.emailResponseExpirationDate! {
-                    emailResponse = EmailResponse(confirmation_code: emailResponseConfirmationCode!, expiresIn: emailResponseExpirationDate!)
-                    print(emailResponse?.confirmation_code)
-                    print(emailResponse?.expiresIn)
-                }
-            }
-//            if let kEmailResponseConfirmationCode = UserDefaults.standard.object(forKey: "emailResponseConfirmationCode") {
-//                self.emailResponseConfirmationCode = kEmailResponseConfirmationCode as? Int
+//            print(UserDefaults.standard.object(forKey: "emailResponseExpirationDate"))
+//            if let kEmailResponseExpirationDate = UserDefaults.standard.object(forKey: "emailResponseExpirationDate") as? Date, let kEmailResponseConfirmationCode = UserDefaults.standard.object(forKey: "emailResponseConfirmationCode") as? Int {
+//                if Date() < kEmailResponseExpirationDate {
+//                    emailResponse = EmailResponse(confirmation_code: kEmailResponseConfirmationCode, expiresIn: kEmailResponseExpirationDate)
+//                }
 //            }
             if let kLanguage = UserDefaults.standard.object(forKey: "language") {
                 self.language = Language(rawValue: kLanguage as! String)!
@@ -404,8 +408,8 @@ class AppData {
         
         mutating func eraseData() {
             session = .unauthorized
-            emailResponseExpirationDate = nil
-            emailResponseConfirmationCode = nil
+//            emailResponseExpirationDate = nil
+//            emailResponseConfirmationCode = nil
             session = .unauthorized
             let langStr = Locale.current.languageCode
             if langStr == "en-US" {

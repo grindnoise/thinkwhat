@@ -12,10 +12,11 @@ class UnderlinedSignTextField: UnderlinedTextField {
     
     enum SignState: String {
         case Approved
-        case UsernameExists   =   "Username is already used"
-        case EmailExists      =   "Email is already used"
-        case EmailIsIncorrect =   "Email is incorrect"
-        case PasswordIsShort  =   "Password is too short"
+        case UsernameExists         =   "Username is already used"
+        case UsernameNotFilled      =   "Username is not filled"
+        case EmailExists            =   "Email is already used"
+        case EmailIsIncorrect       =   "Email is incorrect"
+        case PasswordIsShort        =   "Password is too short"
     }
 
     private var checkSign:      ValidSign!

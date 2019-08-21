@@ -17,55 +17,20 @@ class MailRegistrationViewController: UIViewController {
     @IBOutlet weak var loginTF:         UnderlinedSignTextField!
     @IBOutlet weak var pwdTF:           UnderlinedSignTextField!
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        if !textField.text!.isEmpty {
-            if textField === mailTF {
-                if isValidEmail(mailTF.text!) {
-                    apiManager.checkUsernameEmailAvailability(email: textField.text!, username: "") {
-                        exists, error in
-                        if error != nil {
-                            self.simpleAlert(error!.localizedDescription)
-                        }
-                        if exists != nil {
-                            if exists! {
-                                self.mailTF.showSign(state: .EmailExists)
-                                self.isMailFilled = false
-                            } else {
-                                self.isMailFilled = true
-                            }
-                        }
-                    }
-                } else  {
-                    mailTF.showSign(state: .EmailIsIncorrect)
-                }
-            } else if textField === loginTF {
-                apiManager.checkUsernameEmailAvailability(email: "", username: textField.text!) {
-                    exists, error in
-                    if error != nil {
-                        self.simpleAlert(error!.localizedDescription)
-                    }
-                    if exists != nil {
-                        if exists! {
-                            self.loginTF.showSign(state: .UsernameExists)
-                            self.isLoginFilled = false
-                        } else {
-                            self.isLoginFilled = true
-                        }
-                    }
-                }
-            } else {
-                if pwdTF.text!.count < 6 {
-                    pwdTF.showSign(state: .PasswordIsShort)
-                    isPwdFilled = false
-                } else {
-                    isPwdFilled = true
-                }
-            }
-        }
-    }
+    
     
     @IBAction func signupTapped(_ sender: UIButton) {
-        performSignup()
+        if formIsReady {
+            performSignup()
+        }
+    }
+    @IBAction func editingChanged(_ sender: UITextField) {
+        if pwdTF.text!.count < 6 {
+            pwdTF.showSign(state: .PasswordIsShort)
+            isPwdFilled = false
+        } else {
+            isPwdFilled = true
+        }
     }
     private var textFields              = [UnderlinedTextField]()
     private var isViewSetupCompleted    = false
@@ -152,6 +117,7 @@ class MailRegistrationViewController: UIViewController {
             self.navigationController?.navigationBar.isTranslucent   = false
             self.navigationController?.isNavigationBarHidden         = false
             self.navigationController?.navigationBar.barTintColor    = .white
+            self.title                                               = "Регистрация"
             self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
             self.continueButton.backgroundColor = self.isMailFilled ? K_COLOR_RED : K_COLOR_GRAY
         }
@@ -174,7 +140,7 @@ class MailRegistrationViewController: UIViewController {
     }
     
     private func performSignup() {
-        if formIsReady {
+        performSegue(withIdentifier: kSegueMailValidationFromSignup, sender: nil)
             apiManager.getEmailConfirmationCode(email: mailTF.text!, username: loginTF.text!) {
                 json, error in
                 if error != nil {
@@ -182,29 +148,17 @@ class MailRegistrationViewController: UIViewController {
                 }
                 if json != nil {
                     do {
-                        emailResponse = EmailResponse(json: json!)
-                        AppData.shared.system.emailResponseConfirmationCode = emailResponse?.confirmation_code
-                        
-                        self.simpleAlert("\(emailResponse!.confirmation_code)")
+                        EmailResponse.shared.importJson(json!)
+//                        self.simpleAlert("\(EmailResponse.shared.getConfirmationCode())")
                     } catch let error {
                         self.simpleAlert(error.localizedDescription)
                     }
-                    
-                    
-//                    if let emailResponse = EmailResponse(json: json!) {
-//                    if let dict = json!.dictionaryValue as? [String: Any] {
-//                        print(type(of: dict["confirmation_code"]))
-//                        AppData.shared.system.emailResponseConfirmationCode = emailResponse
-//                        AppData.shared.system.emailResponseExpirationDate   = dict["expires_in"] is NSNull ? Date(dateTimeString: "01.01.0001") : Date(dateTimeString:dict["expires_in"] as! String)
-//                        self.simpleAlert("\(emailResponse?.confirmation_code)")
-//                    }
                 }
             }
 //            self.apiManager.signUp(email: mailTF.text!, password: pwdTF.text!, username: loginTF.text!) {
 //                succes in
 ////                tokenState = state
 //            }
-        }
     }
     /*
     // MARK: - Navigation
@@ -239,8 +193,50 @@ extension MailRegistrationViewController: UITextFieldDelegate {
             pwdTF.becomeFirstResponder()
         } else {
             textField.resignFirstResponder()
-            performSignup()
+            if formIsReady {
+                performSignup()
+            }
         }
         return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if !textField.text!.isEmpty {
+            if textField === mailTF {
+                if isValidEmail(mailTF.text!) {
+                    apiManager.checkUsernameEmailAvailability(email: textField.text!, username: "") {
+                        exists, error in
+                        if error != nil {
+                            self.simpleAlert(error!.localizedDescription)
+                        }
+                        if exists != nil {
+                            if exists! {
+                                self.mailTF.showSign(state: .EmailExists)
+                                self.isMailFilled = false
+                            } else {
+                                self.isMailFilled = true
+                            }
+                        }
+                    }
+                } else  {
+                    mailTF.showSign(state: .EmailIsIncorrect)
+                }
+            } else if textField === loginTF {
+                apiManager.checkUsernameEmailAvailability(email: "", username: textField.text!) {
+                    exists, error in
+                    if error != nil {
+                        self.simpleAlert(error!.localizedDescription)
+                    }
+                    if exists != nil {
+                        if exists! {
+                            self.loginTF.showSign(state: .UsernameExists)
+                            self.isLoginFilled = false
+                        } else {
+                            self.isLoginFilled = true
+                        }
+                    }
+                }
+            }
+        }
     }
 }

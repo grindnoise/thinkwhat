@@ -239,7 +239,7 @@ extension CGFloat {
 
 extension NSLayoutConstraint {
 
-    func setMultiplier(_ multiplier:CGFloat) -> NSLayoutConstraint {
+    func setMultiplier(_ multiplier:CGFloat, duration: Double = 0) -> NSLayoutConstraint {
         
         let newConstraint = NSLayoutConstraint(
             item: firstItem as Any,
@@ -253,7 +253,7 @@ extension NSLayoutConstraint {
         newConstraint.shouldBeArchived = self.shouldBeArchived
         newConstraint.identifier = self.identifier
         
-        UIView.animate(withDuration: 0.2, animations: {
+        UIView.animate(withDuration: duration, animations: {
             (self.firstItem as? UIView)?.alpha = 0
         }, completion: {
             _ in

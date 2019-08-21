@@ -7,6 +7,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -15,6 +16,9 @@
         </array>
         <array key="OpenSans-Regular.ttf">
             <string>OpenSans</string>
+        </array>
+        <array key="OpenSans-Semibold.ttf">
+            <string>OpenSans-Semibold</string>
         </array>
     </customFonts>
     <scenes>
@@ -30,7 +34,7 @@
                                 <rect key="frame" x="0.0" y="64" width="375" height="333.5"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Great app's description" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fP4-ga-yuv">
-                                        <rect key="frame" x="37.5" y="321" width="300" height="25"/>
+                                        <rect key="frame" x="37.5" y="323" width="300" height="21"/>
                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="18"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -63,21 +67,18 @@
                                         <state key="normal" title="Условия пользования">
                                             <color key="titleColor" red="0.1960784314" green="0.1960784314" blue="0.1960784314" alpha="1" colorSpace="calibratedRGB"/>
                                         </state>
-                                        <connections>
-                                            <segue destination="FJ5-sn-RN9" kind="show" id="Gm7-eu-ocp"/>
-                                        </connections>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="v9j-4G-Rbu">
-                                        <rect key="frame" x="56.5" y="78.5" width="262.5" height="112.5"/>
+                                        <rect key="frame" x="56.5" y="80.5" width="262.5" height="108.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ВХОД В ПРИЛОЖЕНИЕ" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hGQ-JY-dYt">
-                                                <rect key="frame" x="0.0" y="0.0" width="262.5" height="25"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="262.5" height="21"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="18"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="9TO-5U-O9l">
-                                                <rect key="frame" x="0.0" y="30" width="262.5" height="82.5"/>
+                                                <rect key="frame" x="0.0" y="26" width="262.5" height="82.5"/>
                                                 <subviews>
                                                     <view tag="1" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gVO-oM-RV3" customClass="FacebookButtonView" customModule="ThinkWhat" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="0.0" width="82" height="82.5"/>
@@ -139,13 +140,14 @@
                         <outlet property="mailButton" destination="KjS-Lb-PFX" id="guh-bH-ckJ"/>
                         <outlet property="termsOfUseButton" destination="FoA-Or-0Fh" id="13C-22-CF9"/>
                         <outlet property="vkButton" destination="hY7-Mf-AwY" id="Hbf-AV-Qzb"/>
-                        <segue destination="ghj-SQ-8TX" kind="show" identifier="SOCIAL" id="fZ7-o3-jqY"/>
                         <segue destination="7dC-m7-s4Q" kind="show" identifier="MAILAUTH" id="xEH-0M-xDg"/>
+                        <segue destination="mHx-aR-ok7" kind="show" identifier="TERMS_START_SCREEN" id="rna-jh-vqW"/>
+                        <segue destination="3VR-Bh-PFD" kind="show" identifier="APP" id="h1h-Jz-9YR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Epj-Ey-7ym" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1488.8" y="521.28935532233891"/>
+            <point key="canvasLocation" x="1426" y="1062"/>
         </scene>
         <!--Mail Auth View Controller-->
         <scene sceneID="LX2-rk-6RU">
@@ -156,23 +158,23 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="OtP-Du-gcN">
-                                <rect key="frame" x="37.5" y="64" width="300" height="300"/>
+                                <rect key="frame" x="37.5" y="74" width="300" height="300"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="WcP-Dz-gul">
                                         <rect key="frame" x="0.0" y="0.0" width="300" height="60"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Электронная почта" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="imP-XD-U0f">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Логин" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="imP-XD-U0f">
                                                 <rect key="frame" x="0.0" y="0.0" width="300" height="20.5"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="your@email.com" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QO4-oF-n8f" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Username" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QO4-oF-n8f" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="20.5" width="300" height="39.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
-                                                <textInputTraits key="textInputTraits" returnKeyType="next" textContentType="email"/>
+                                                <textInputTraits key="textInputTraits" returnKeyType="next" textContentType="name"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
                                                         <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -187,9 +189,6 @@
                                                         <real key="value" value="2"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
-                                                <connections>
-                                                    <action selector="textFieldChanged:" destination="7dC-m7-s4Q" eventType="editingChanged" id="rs7-mC-CRz"/>
-                                                </connections>
                                             </textField>
                                         </subviews>
                                         <constraints>
@@ -208,7 +207,7 @@
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="*****" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="t2e-Js-MZ5" customClass="UnderlinedTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="*****" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="t2e-Js-MZ5" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="20.5" width="300" height="39.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
@@ -229,7 +228,7 @@
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
-                                                    <action selector="textFieldChanged:" destination="7dC-m7-s4Q" eventType="editingDidEnd" id="0UV-yy-WuE"/>
+                                                    <action selector="editingChanged:" destination="7dC-m7-s4Q" eventType="editingChanged" id="nCc-Mq-f6x"/>
                                                 </connections>
                                             </textField>
                                         </subviews>
@@ -246,6 +245,9 @@
                                         <state key="normal" title="ВОЙТИ">
                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
+                                        <connections>
+                                            <action selector="signupTapped:" destination="7dC-m7-s4Q" eventType="touchUpInside" id="vV7-1P-MYI"/>
+                                        </connections>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="RcH-py-aXQ">
                                         <rect key="frame" x="0.0" y="240" width="300" height="60"/>
@@ -280,22 +282,23 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="OtP-Du-gcN" firstAttribute="top" secondItem="GnX-KI-oXn" secondAttribute="top" id="DvU-kN-5Gt"/>
                             <constraint firstItem="OtP-Du-gcN" firstAttribute="centerX" secondItem="GnX-KI-oXn" secondAttribute="centerX" id="Ngi-nS-Soq"/>
+                            <constraint firstItem="OtP-Du-gcN" firstAttribute="top" secondItem="GnX-KI-oXn" secondAttribute="top" constant="10" id="dqe-ly-oA0"/>
                             <constraint firstItem="OtP-Du-gcN" firstAttribute="width" secondItem="GnX-KI-oXn" secondAttribute="width" multiplier="0.8" id="mIo-Jy-Xd3"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="GnX-KI-oXn"/>
                     </view>
                     <connections>
                         <outlet property="continueButton" destination="h8w-OY-nuH" id="Mlf-xZ-oCH"/>
-                        <outlet property="mailTF" destination="QO4-oF-n8f" id="PqG-an-LsQ"/>
+                        <outlet property="loginTF" destination="QO4-oF-n8f" id="Cje-e7-Qy2"/>
                         <outlet property="pwdTF" destination="t2e-Js-MZ5" id="BWM-2n-Izv"/>
-                        <segue destination="3VR-Bh-PFD" kind="show" identifier="APP" id="SV6-dd-Kbm"/>
+                        <segue destination="3VR-Bh-PFD" kind="show" identifier="APP_FROM_MAIL_SIGNIN" id="SV6-dd-Kbm"/>
+                        <segue destination="XdA-Pg-jVF" kind="show" identifier="MAIL_VALID_SIGNIN" id="bec-WO-31D"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Sdu-sf-XNA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2270" y="878"/>
+            <point key="canvasLocation" x="2556" y="1062"/>
         </scene>
         <!--Mail Registration View Controller-->
         <scene sceneID="jem-1Q-O3x">
@@ -306,19 +309,19 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="Oox-hI-P5g">
-                                <rect key="frame" x="37.5" y="64" width="300" height="300"/>
+                                <rect key="frame" x="37.5" y="74" width="300" height="300"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="CaZ-2l-91A">
                                         <rect key="frame" x="0.0" y="0.0" width="300" height="60"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Логин" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ktb-gc-Y3Q">
-                                                <rect key="frame" x="0.0" y="0.0" width="300" height="20.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="300" height="17.5"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Логин" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="RHa-AC-Rki" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="20.5" width="300" height="39.5"/>
+                                                <rect key="frame" x="0.0" y="17.5" width="300" height="42.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
@@ -350,13 +353,13 @@
                                         <rect key="frame" x="0.0" y="80" width="300" height="60"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Электронная почта" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nc1-qA-Jgv">
-                                                <rect key="frame" x="0.0" y="0.0" width="300" height="20.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="300" height="17.5"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="your@email.com" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="maW-rY-7Mb" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="20.5" width="300" height="39.5"/>
+                                                <rect key="frame" x="0.0" y="17.5" width="300" height="42.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
@@ -388,13 +391,13 @@
                                         <rect key="frame" x="0.0" y="160" width="300" height="60"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Пароль" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gcc-yB-HVK">
-                                                <rect key="frame" x="0.0" y="0.0" width="300" height="20.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="300" height="17.5"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="*****" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="H8D-a1-Tb4" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="20.5" width="300" height="39.5"/>
+                                                <rect key="frame" x="0.0" y="17.5" width="300" height="42.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
@@ -413,6 +416,9 @@
                                                         <real key="value" value="2"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="editingChanged:" destination="Pnl-G9-xfW" eventType="editingChanged" id="wpw-6b-bPq"/>
+                                                </connections>
                                             </textField>
                                         </subviews>
                                         <constraints>
@@ -442,7 +448,7 @@
                         <constraints>
                             <constraint firstItem="Oox-hI-P5g" firstAttribute="width" secondItem="Gd8-qp-yRi" secondAttribute="width" multiplier="0.8" id="Cs1-vU-iKl"/>
                             <constraint firstItem="Oox-hI-P5g" firstAttribute="centerX" secondItem="m1N-ph-Rlp" secondAttribute="centerX" id="mei-2z-tqz"/>
-                            <constraint firstItem="Oox-hI-P5g" firstAttribute="top" secondItem="m1N-ph-Rlp" secondAttribute="top" id="pyI-9N-v9r"/>
+                            <constraint firstItem="Oox-hI-P5g" firstAttribute="top" secondItem="m1N-ph-Rlp" secondAttribute="top" constant="10" id="pyI-9N-v9r"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="m1N-ph-Rlp"/>
                     </view>
@@ -451,11 +457,176 @@
                         <outlet property="loginTF" destination="RHa-AC-Rki" id="3Wv-57-JXh"/>
                         <outlet property="mailTF" destination="maW-rY-7Mb" id="Sp4-zX-S3x"/>
                         <outlet property="pwdTF" destination="H8D-a1-Tb4" id="Bzb-4f-hBc"/>
+                        <segue destination="XdA-Pg-jVF" kind="show" identifier="MAIL_VALID_SIGNUP" id="DXW-pt-dWO"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5mx-jC-hT9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3055" y="1619"/>
+            <point key="canvasLocation" x="3617" y="2006"/>
+        </scene>
+        <!--Validation View Controller-->
+        <scene sceneID="rz5-lG-6Ay">
+            <objects>
+                <viewController id="XdA-Pg-jVF" customClass="ValidationViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ipp-NY-YFy">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="ETv-AX-VYn">
+                                <rect key="frame" x="37.5" y="74" width="300" height="133.5"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Введите полученный из SMS код" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="7" translatesAutoresizingMaskIntoConstraints="NO" id="xeM-h8-SHS">
+                                        <rect key="frame" x="0.0" y="0.0" width="300" height="24"/>
+                                        <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Код" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="dpH-qo-kcT" customClass="SMSValidationCodeTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="32" width="300" height="40"/>
+                                        <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="textColor" red="0.12549019610000001" green="0.12549019610000001" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="20"/>
+                                        <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="numberPad"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                                <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                <color key="value" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                                <real key="value" value="2"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                <real key="value" value="2"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </textField>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qi0-ac-o4s">
+                                        <rect key="frame" x="0.0" y="80" width="300" height="53.5"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Повторный запрос кода" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XRA-wb-jpU">
+                                                <rect key="frame" x="0.0" y="0.0" width="300" height="53.5"/>
+                                                <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="13"/>
+                                                <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n3l-Zu-9zS">
+                                                <rect key="frame" x="0.0" y="0.0" width="300" height="53.5"/>
+                                                <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="13"/>
+                                                <state key="normal" title="Получить код повторно">
+                                                    <color key="titleColor" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="retryTapped:" destination="XdA-Pg-jVF" eventType="touchUpInside" id="7Xi-Z2-xTv"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="n3l-Zu-9zS" firstAttribute="leading" secondItem="qi0-ac-o4s" secondAttribute="leading" id="6HV-Ay-eUr"/>
+                                            <constraint firstAttribute="trailing" secondItem="XRA-wb-jpU" secondAttribute="trailing" id="7HZ-fe-LUJ"/>
+                                            <constraint firstAttribute="bottom" secondItem="XRA-wb-jpU" secondAttribute="bottom" id="IR8-D1-cOe"/>
+                                            <constraint firstAttribute="trailing" secondItem="n3l-Zu-9zS" secondAttribute="trailing" id="QVL-Y2-xvm"/>
+                                            <constraint firstItem="n3l-Zu-9zS" firstAttribute="top" secondItem="qi0-ac-o4s" secondAttribute="top" id="YqG-4j-upd"/>
+                                            <constraint firstAttribute="bottom" secondItem="n3l-Zu-9zS" secondAttribute="bottom" id="hnR-lX-HOO"/>
+                                            <constraint firstItem="XRA-wb-jpU" firstAttribute="leading" secondItem="qi0-ac-o4s" secondAttribute="leading" id="iPg-QH-umX"/>
+                                            <constraint firstItem="XRA-wb-jpU" firstAttribute="top" secondItem="qi0-ac-o4s" secondAttribute="top" id="ou9-KR-Ads"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="qi0-ac-o4s" firstAttribute="height" secondItem="ETv-AX-VYn" secondAttribute="height" multiplier="0.4" id="A8z-Ok-CiF"/>
+                                    <constraint firstItem="dpH-qo-kcT" firstAttribute="height" secondItem="qi0-ac-o4s" secondAttribute="height" multiplier="0.75" id="eiT-An-BfU"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="ETv-AX-VYn" firstAttribute="width" secondItem="Ipp-NY-YFy" secondAttribute="width" multiplier="0.8" id="66c-4t-k3z"/>
+                            <constraint firstItem="ETv-AX-VYn" firstAttribute="centerX" secondItem="H86-lA-V57" secondAttribute="centerX" id="eSO-dq-YyT"/>
+                            <constraint firstItem="ETv-AX-VYn" firstAttribute="top" secondItem="H86-lA-V57" secondAttribute="top" constant="10" id="lOy-lo-hVD"/>
+                            <constraint firstItem="ETv-AX-VYn" firstAttribute="height" secondItem="Ipp-NY-YFy" secondAttribute="height" multiplier="0.2" id="oTG-nJ-eC1"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="H86-lA-V57"/>
+                    </view>
+                    <connections>
+                        <outlet property="retryTimer" destination="XRA-wb-jpU" id="R31-jr-a72"/>
+                        <outlet property="retryTimerButton" destination="n3l-Zu-9zS" id="eim-Xe-f1A"/>
+                        <outlet property="validationCodeTextField" destination="dpH-qo-kcT" id="CFg-Kq-ZKn"/>
+                        <segue destination="mHx-aR-ok7" kind="show" identifier="TERMS_VALID" id="oO1-ii-gCi"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="DvG-kb-PCa" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3617" y="1062"/>
+        </scene>
+        <!--Terms Of Use View Controller-->
+        <scene sceneID="GHV-2U-pq5">
+            <objects>
+                <viewController id="mHx-aR-ok7" customClass="TermsOfUseViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="7lz-d0-EWd">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="z5u-wp-EiE">
+                                <rect key="frame" x="0.0" y="593.5" width="375" height="73.5"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ag5-JT-2pg">
+                                        <rect key="frame" x="82.5" y="0.0" width="210" height="30"/>
+                                        <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="15"/>
+                                        <state key="normal" title="Согласен, принимаю условия">
+                                            <color key="titleColor" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                    </button>
+                                    <button opaque="NO" tag="1" contentMode="scaleToFill" verticalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6ND-d9-ffc">
+                                        <rect key="frame" x="139.5" y="30" width="96" height="43.5"/>
+                                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
+                                        <state key="normal" title="Не принимаю">
+                                            <color key="titleColor" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FRw-5k-qAS">
+                                <rect key="frame" x="0.0" y="64" width="375" height="529.5"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </webView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zJN-6M-5Xm" customClass="LoadingIndicator" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="95" y="236.5" width="185" height="184.5"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="zJN-6M-5Xm" secondAttribute="height" multiplier="1:1" id="dvX-IV-3r8"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="zJN-6M-5Xm" firstAttribute="centerY" secondItem="FRw-5k-qAS" secondAttribute="centerY" id="Go5-0Y-0CQ"/>
+                            <constraint firstAttribute="bottom" secondItem="z5u-wp-EiE" secondAttribute="bottom" id="JeE-H2-dhI"/>
+                            <constraint firstItem="ovc-at-F9W" firstAttribute="trailing" secondItem="z5u-wp-EiE" secondAttribute="trailing" id="SXe-Tu-18y"/>
+                            <constraint firstItem="FRw-5k-qAS" firstAttribute="leading" secondItem="ovc-at-F9W" secondAttribute="leading" id="UGn-iz-nDo"/>
+                            <constraint firstItem="z5u-wp-EiE" firstAttribute="height" secondItem="7lz-d0-EWd" secondAttribute="height" multiplier="0.11" id="WbD-WY-dhy"/>
+                            <constraint firstItem="z5u-wp-EiE" firstAttribute="leading" secondItem="ovc-at-F9W" secondAttribute="leading" id="d58-kb-tMT"/>
+                            <constraint firstItem="zJN-6M-5Xm" firstAttribute="centerX" secondItem="FRw-5k-qAS" secondAttribute="centerX" id="s0Z-i3-mpx"/>
+                            <constraint firstItem="FRw-5k-qAS" firstAttribute="trailing" secondItem="ovc-at-F9W" secondAttribute="trailing" id="tFN-JQ-4IW"/>
+                            <constraint firstItem="zJN-6M-5Xm" firstAttribute="width" secondItem="FRw-5k-qAS" secondAttribute="height" multiplier="200:573" id="tql-0p-wun"/>
+                            <constraint firstItem="z5u-wp-EiE" firstAttribute="top" secondItem="FRw-5k-qAS" secondAttribute="bottom" id="uJr-9x-CFP"/>
+                            <constraint firstItem="FRw-5k-qAS" firstAttribute="top" secondItem="ovc-at-F9W" secondAttribute="top" id="vv7-OR-0pW"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="ovc-at-F9W"/>
+                    </view>
+                    <connections>
+                        <outlet property="spinner" destination="zJN-6M-5Xm" id="1JO-7z-tqe"/>
+                        <outlet property="stackView" destination="z5u-wp-EiE" id="9C9-DA-Sao"/>
+                        <outlet property="stackViewHeightConstraint" destination="WbD-WY-dhy" id="L3l-MW-mzI"/>
+                        <outlet property="webView" destination="FRw-5k-qAS" id="KCf-hH-mEe"/>
+                        <segue destination="3VR-Bh-PFD" kind="show" identifier="APP_FROM_TERMS" id="hol-gb-e59"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ofy-Zx-UQa" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3617" y="193"/>
         </scene>
         <!--App-->
         <scene sceneID="RFD-MF-PlT">
@@ -463,22 +634,7 @@
                 <viewControllerPlaceholder storyboardName="App" id="3VR-Bh-PFD" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bmK-xS-9RE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2801" y="521"/>
-        </scene>
-        <!--Terms Of Use View Controller-->
-        <scene sceneID="yI6-UH-hZE">
-            <objects>
-                <viewController id="FJ5-sn-RN9" customClass="TermsOfUseViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="qa5-QB-X9J">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <viewLayoutGuide key="safeArea" id="liC-v9-G7u"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="u2B-wu-wTJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1489" y="1619"/>
+            <point key="canvasLocation" x="2556" y="-524"/>
         </scene>
         <!--Password Recovery View Controller-->
         <scene sceneID="2NA-4n-aqW">
@@ -489,19 +645,19 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="SHG-lL-D3s">
-                                <rect key="frame" x="37.5" y="64" width="300" height="140"/>
+                                <rect key="frame" x="37.5" y="74" width="300" height="140"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="00W-pt-hIK">
                                         <rect key="frame" x="0.0" y="0.0" width="300" height="60"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Электронная почта" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CDy-f3-2cS">
-                                                <rect key="frame" x="0.0" y="0.0" width="300" height="20.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="300" height="17.5"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="your@email.com" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ZZY-py-xVR" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="20.5" width="300" height="39.5"/>
+                                                <rect key="frame" x="0.0" y="17.5" width="300" height="42.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
@@ -545,7 +701,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="SHG-lL-D3s" firstAttribute="top" secondItem="1Me-rP-vzu" secondAttribute="top" id="6N8-O7-zai"/>
+                            <constraint firstItem="SHG-lL-D3s" firstAttribute="top" secondItem="1Me-rP-vzu" secondAttribute="top" constant="10" id="6N8-O7-zai"/>
                             <constraint firstItem="SHG-lL-D3s" firstAttribute="width" secondItem="1Me-rP-vzu" secondAttribute="width" multiplier="0.8" id="JBw-rx-3vn"/>
                             <constraint firstItem="SHG-lL-D3s" firstAttribute="centerX" secondItem="1Me-rP-vzu" secondAttribute="centerX" id="R9y-n7-ACg"/>
                         </constraints>
@@ -558,58 +714,21 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pLO-2u-wfC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2270" y="1619"/>
-        </scene>
-        <!--Social Auth View Controller-->
-        <scene sceneID="YWX-Er-SUE">
-            <objects>
-                <viewController id="ghj-SQ-8TX" customClass="SocialAuthViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="SKO-Av-Nb1">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Klh-Ks-N1d" customClass="LoadingIndicator" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="112.5" y="290.5" width="150" height="150"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="Klh-Ks-N1d" secondAttribute="height" multiplier="1:1" id="yfw-M5-5xj"/>
-                                </constraints>
-                            </view>
-                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hJ2-Jz-cxw">
-                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
-                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            </webView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstItem="Klh-Ks-N1d" firstAttribute="width" secondItem="SKO-Av-Nb1" secondAttribute="height" multiplier="150:667" id="2n9-jR-dx0"/>
-                            <constraint firstItem="hJ2-Jz-cxw" firstAttribute="leading" secondItem="7zk-82-DLr" secondAttribute="leading" id="8Wa-bU-g7l"/>
-                            <constraint firstItem="7zk-82-DLr" firstAttribute="bottom" secondItem="hJ2-Jz-cxw" secondAttribute="bottom" id="C1W-0E-fK2"/>
-                            <constraint firstItem="Klh-Ks-N1d" firstAttribute="centerY" secondItem="7zk-82-DLr" secondAttribute="centerY" id="VBl-4c-lsr"/>
-                            <constraint firstItem="hJ2-Jz-cxw" firstAttribute="top" secondItem="7zk-82-DLr" secondAttribute="top" id="j9w-Em-HAN"/>
-                            <constraint firstItem="Klh-Ks-N1d" firstAttribute="centerX" secondItem="7zk-82-DLr" secondAttribute="centerX" id="jfb-z9-da5"/>
-                            <constraint firstItem="7zk-82-DLr" firstAttribute="trailing" secondItem="hJ2-Jz-cxw" secondAttribute="trailing" id="pCy-Gh-vwg"/>
-                        </constraints>
-                        <viewLayoutGuide key="safeArea" id="7zk-82-DLr"/>
-                    </view>
-                    <connections>
-                        <outlet property="loginWebView" destination="hJ2-Jz-cxw" id="iRx-cf-RF6"/>
-                        <outlet property="spinner" destination="Klh-Ks-N1d" id="fqr-gq-qLh"/>
-                        <segue destination="3VR-Bh-PFD" kind="show" identifier="APP" id="Bv3-mh-jog"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dYn-Od-yZc" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2271" y="116"/>
+            <point key="canvasLocation" x="2556" y="2006"/>
         </scene>
         <!--Auth Navigation Controller-->
         <scene sceneID="ho1-lD-cQr">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="cXh-V4-fed" customClass="AuthNavigationController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <toolbarItems/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="qs3-wo-byX">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <textAttributes key="titleTextAttributes">
+                            <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="19"/>
+                            <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </textAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
@@ -618,10 +737,12 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SOg-HP-NxK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="549.60000000000002" y="521.28935532233891"/>
+            <point key="canvasLocation" x="487" y="1062"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="SV6-dd-Kbm"/>
+        <segue reference="rna-jh-vqW"/>
+        <segue reference="bec-WO-31D"/>
     </inferredMetricsTieBreakers>
 </document>

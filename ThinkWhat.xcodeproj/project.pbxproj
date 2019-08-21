@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
-		AB3C67E1223FBB6400B57580 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E0223FBB6400B57580 /* ViewController.swift */; };
 		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
 		AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */; };
 		AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E8223FBB6600B57580 /* Assets.xcassets */; };
@@ -100,7 +99,6 @@
 		A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		AB3C67E0223FBB6400B57580 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		AB3C67E3223FBB6400B57580 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		AB3C67E6223FBB6400B57580 /* ThinkWhat.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ThinkWhat.xcdatamodel; sourceTree = "<group>"; };
 		AB3C67E8223FBB6600B57580 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -258,7 +256,6 @@
 				AB3C67E2223FBB6400B57580 /* Main.storyboard */,
 				AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */,
 				AB3C681F223FD1B100B57580 /* UI */,
-				AB3C67E0223FBB6400B57580 /* ViewController.swift */,
 			);
 			path = ThinkWhat;
 			sourceTree = "<group>";
@@ -284,7 +281,6 @@
 		AB3C680F223FC6D700B57580 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */,
 				AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */,
 				AB3C6814223FCE2F00B57580 /* App */,
 				AB3C6813223FCE2500B57580 /* Auth */,
@@ -324,6 +320,7 @@
 				AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */,
 				AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */,
 				AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */,
+				AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -338,10 +335,7 @@
 		AB3C681F223FD1B100B57580 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */,
-				AB6083C022410130002C0D7E /* ValidSign.swift */,
-				AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */,
-				AB6083BC2240FF14002C0D7E /* UnderlinedTextField.swift */,
+				ABA6E18922FC358500F8F39A /* TextFields */,
 				AB3C6857223FD6AB00B57580 /* Storyboards */,
 				AB3C682E223FD3EE00B57580 /* Buttons */,
 				AB3C6835223FD3EE00B57580 /* Fonts */,
@@ -349,7 +343,6 @@
 				AB3C6829223FD37200B57580 /* LoadingIndicator */,
 				AB3C6827223FD24A00B57580 /* BorderedView.swift */,
 				AB3C6820223FD1C000B57580 /* CustomAlertView */,
-				AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -422,6 +415,18 @@
 				AB3C6868223FDDAF00B57580 /* App.storyboard */,
 			);
 			path = Storyboards;
+			sourceTree = "<group>";
+		};
+		ABA6E18922FC358500F8F39A /* TextFields */ = {
+			isa = PBXGroup;
+			children = (
+				ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */,
+				AB6083C022410130002C0D7E /* ValidSign.swift */,
+				AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */,
+				AB6083BC2240FF14002C0D7E /* UnderlinedTextField.swift */,
+				AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */,
+			);
+			path = TextFields;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -711,7 +716,6 @@
 			files = (
 				AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
-				AB3C67E1223FBB6400B57580 /* ViewController.swift in Sources */,
 				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
 				AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */,
 				ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */,

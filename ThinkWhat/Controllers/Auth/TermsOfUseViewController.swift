@@ -14,8 +14,6 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
     var isStackViewHidden                               = false
     var stackViewHeightConstraintDefaultValue: CGFloat  = 0
     var isFirstLaunch                                   = true
-    var phoneNumber:                                    String!
-    var phoneNumberFormatted:                           String!
     var username                                        = ""
     @IBOutlet weak var spinner:         LoadingIndicator!
     @IBOutlet weak var webView:         UIWebView!
@@ -37,10 +35,10 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        self.title                                                      = "Условия"
+        self.title                                                      = "Соглашение"
         self.navigationItem.setHidesBackButton(isBackButtonHidden, animated: false)
         webView.delegate                                                = self
-        performURLRequest()
+//        performURLRequest()
         spinner.addUntitled1Animation()
     }
     
@@ -54,18 +52,20 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
         }
     }
     
-    override func viewWillLayoutSubviews() {
+    override func viewWillAppear(_ animated: Bool) {
         if isFirstLaunch {
             view.setNeedsLayout()
             stackViewHeightConstraintDefaultValue = stackViewHeightConstraint.multiplier
             isFirstLaunch = false
         }
         if isStackViewHidden {
-            let newConstraint           = stackViewHeightConstraint.setMultiplier(0)
+            print(stackView.frame.height)
+            let newConstraint           = stackViewHeightConstraint.setMultiplier(0, duration: 0)
             stackViewHeightConstraint   = newConstraint
             stackView.alpha             = 0
+            print(stackView.frame.height)
         } else {
-            let newConstraint           = stackViewHeightConstraint.setMultiplier(stackViewHeightConstraintDefaultValue)
+            let newConstraint           = stackViewHeightConstraint.setMultiplier(stackViewHeightConstraintDefaultValue, duration: 0)
             stackViewHeightConstraint   = newConstraint
             stackView.alpha             = 1
         }

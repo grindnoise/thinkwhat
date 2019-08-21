@@ -20,7 +20,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let container               = Container()
     let center                  = UNUserNotificationCenter.current()
     let notificationDelegate    = CustomNotificationDelegate()
-//    var VKApp                   = VKSdk.initialize(withAppId: <#T##String!#>)
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         center.delegate                         = notificationDelegate

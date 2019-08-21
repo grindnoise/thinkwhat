@@ -245,9 +245,9 @@ class APIManager: APIManagerProtocol {
             reachable in
             if reachable == .Reachable {
                 switch auth {
-                case .Mail:
+                case .Username:
                     if let _username = username, let _password = password {
-                        mailLogin(username: _username, password: _password)
+                        usernameLogin(username: _username, password: _password)
                     } else {
                         completion(_tokenState)
                     }
@@ -263,7 +263,7 @@ class APIManager: APIManagerProtocol {
             }
         }
         
-        func mailLogin(username: String, password: String) {
+        func usernameLogin(username: String, password: String) {
             parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
             url = URL(string: SERVER_URLS.TOKEN)!
             sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON() {
@@ -392,7 +392,7 @@ class APIManager: APIManagerProtocol {
         
         func performRequest() {
             let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "grant_type": "password", "email": "\(email)", "password": "\(password)", "username": "\(username)"]
-            let url = URL(string: SERVER_URLS.SIGNUP)!
+            let url =  URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SIGNUP)
             sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON() {
                 response in
 //                var success = false

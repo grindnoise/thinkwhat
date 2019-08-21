@@ -11,28 +11,55 @@ import SwiftyJSON
 
 class EmailResponse {
     
-    var confirmation_code:      Int!
-    var expiresIn:              Date!
+    static let shared = EmailResponse()
     
-    init?(json: JSON) {
+    private init() {
+        if let kEmailResponseExpirationDate = UserDefaults.standard.object(forKey: "emailResponseExpirationDate") as? Date, let kEmailResponseConfirmationCode = UserDefaults.standard.object(forKey: "emailResponseConfirmationCode") as? Int {
+            if Date() < kEmailResponseExpirationDate {
+                self.confirmation_code  = kEmailResponseConfirmationCode
+                self.expiresIn          = kEmailResponseExpirationDate
+                print(self.confirmation_code)
+                print(self.expiresIn)
+            }
+        }
+        NotificationCenter.default.addObserver(self, selector: #selector(EmailResponse.eraseData), name: kNotificationEmailResponseExpired, object: nil)
+    }
+    fileprivate var confirmation_code:  Int?
+    fileprivate var expiresIn:          Date?
+    public var isEmpty:                 Bool {
+        return confirmation_code == nil || expiresIn == nil
+    }
+    public var isActive:                Bool {
+        if expiresIn != nil {
+            return expiresIn! > Date()
+        }
+        return false
+    }
+    
+    public func getExpireDate() -> Date? {
+        return expiresIn
+    }
+    
+    public func getConfirmationCode() -> Int? {
+        return confirmation_code
+    }
+    
+    public func importJson(_ json: JSON) {
         var dict = json.dictionaryObject as! [String: Any]
-        self.confirmation_code = dict["confirmation_code"] as! Int
-        self.expiresIn         = dict["expires_in"] is NSNull ? Date(dateTimeString: "01.01.0001") : Date(dateTimeString:dict["expires_in"] as! String)
-        storeEmailResponse()
-    }
-
-    init?(confirmation_code: Int, expiresIn: Date) {
-        self.confirmation_code = confirmation_code
-        self.expiresIn         = expiresIn
+        confirmation_code = dict["confirmation_code"] as! Int
+        expiresIn         = Date(dateTimeString:dict["expires_in"] as! String)
+        storeData()
     }
     
-    private func storeEmailResponse() {
-        AppData.shared.system.emailResponseConfirmationCode = confirmation_code
-        AppData.shared.system.emailResponseExpirationDate   = expiresIn
+    fileprivate func storeData() {
+        UserDefaults.standard.set(confirmation_code, forKey: "emailResponseConfirmationCode")
+        UserDefaults.standard.set(expiresIn, forKey: "emailResponseExpirationDate")
     }
     
-    deinit {
-        AppData.shared.system.emailResponseConfirmationCode = nil
-        AppData.shared.system.emailResponseExpirationDate   = nil
+    @objc fileprivate  func eraseData() {
+        confirmation_code = nil
+        expiresIn         = nil
+        UserDefaults.standard.removeObject(forKey: "emailResponseConfirmationCode")
+        UserDefaults.standard.removeObject(forKey: "emailResponseExpirationDate")
     }
 }
