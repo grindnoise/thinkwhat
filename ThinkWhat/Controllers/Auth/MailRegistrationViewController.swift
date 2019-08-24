@@ -12,15 +12,18 @@ import Alamofire
 
 class MailRegistrationViewController: UIViewController {
 
-    @IBOutlet weak var continueButton:  UIButton!
-    @IBOutlet weak var mailTF:          UnderlinedSignTextField!
-    @IBOutlet weak var loginTF:         UnderlinedSignTextField!
-    @IBOutlet weak var pwdTF:           UnderlinedSignTextField!
+    @IBOutlet weak var continueButton:      UIButton!
+    @IBOutlet weak var mailTF:              UnderlinedSignTextField!
+    @IBOutlet weak var loginTF:             UnderlinedSignTextField!
+    @IBOutlet weak var pwdTF:               UnderlinedSignTextField!
+    @IBOutlet weak var loadingView:         UIView!
+    @IBOutlet weak var loadingIndicator:    LoadingIndicator!
     
     
     
     @IBAction func signupTapped(_ sender: UIButton) {
         if formIsReady {
+            isLoadingViewVisible = true
             performSignup()
         }
     }
@@ -30,6 +33,22 @@ class MailRegistrationViewController: UIViewController {
             isPwdFilled = false
         } else {
             isPwdFilled = true
+        }
+    }
+    private var isLoadingViewVisible    = false {
+        didSet {
+            if oldValue != isLoadingViewVisible {
+                UIView.animate(withDuration: 0.2, animations: {
+                    let alpha: CGFloat = self.isLoadingViewVisible ? 0.9 : 0
+                    self.loadingView.alpha = alpha
+                }) { completed in
+                    if self.isLoadingViewVisible {
+                        self.loadingIndicator.addUntitled1Animation()
+                    } else {
+                        self.loadingIndicator.removeAllAnimations()
+                    }
+                }
+            }
         }
     }
     private var textFields              = [UnderlinedTextField]()
@@ -108,6 +127,8 @@ class MailRegistrationViewController: UIViewController {
             self.continueButton.layer.cornerRadius = self.continueButton.frame.height / 2
             self.mailTF.rightView!.alpha = 0
         }
+        loadingView.alpha = 0
+        loadingIndicator.removeAllAnimations()
     }
     
     private func setupViews() {
@@ -140,25 +161,25 @@ class MailRegistrationViewController: UIViewController {
     }
     
     private func performSignup() {
-        performSegue(withIdentifier: kSegueMailValidationFromSignup, sender: nil)
-            apiManager.getEmailConfirmationCode(email: mailTF.text!, username: loginTF.text!) {
-                json, error in
-                if error != nil {
-                    self.simpleAlert(error!.localizedDescription)
-                }
-                if json != nil {
-                    do {
+        self.apiManager.signUp(email: mailTF.text!, password: pwdTF.text!, username: loginTF.text!) {
+            error in
+            if error != nil {
+                self.isLoadingViewVisible = false
+                self.simpleAlert(error!.localizedDescription)
+            } else {
+                self.apiManager.getEmailConfirmationCode(email: self.mailTF.text!, username: self.loginTF.text!) {
+                    json, error in
+                    if error != nil {
+                        self.isLoadingViewVisible = false
+                        self.simpleAlert(error!.localizedDescription)
+                    }
+                    if json != nil {
                         EmailResponse.shared.importJson(json!)
-//                        self.simpleAlert("\(EmailResponse.shared.getConfirmationCode())")
-                    } catch let error {
-                        self.simpleAlert(error.localizedDescription)
+                        self.performSegue(withIdentifier: kSegueMailValidationFromSignup, sender: nil)
                     }
                 }
             }
-//            self.apiManager.signUp(email: mailTF.text!, password: pwdTF.text!, username: loginTF.text!) {
-//                succes in
-////                tokenState = state
-//            }
+        }
     }
     /*
     // MARK: - Navigation

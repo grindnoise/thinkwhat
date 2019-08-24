@@ -76,6 +76,10 @@ enum AuthVariant: String {
     case Username   = "Username"
 }
 
+enum DjangoError: String {
+    case InvalidGrant = "invalid_grant"
+}
+
 enum ClientSettingsMode {
     case Reminder, Language
 }
@@ -139,7 +143,7 @@ let appDelegate                                  = UIApplication.shared.delegate
 
 //MARKS: - Segues
 let kSegueApp                                    = "APP"
-let kSegueAppFromMailSignIn                      = "APP_FROM_MAIL_SIGNIN"
+let kSegueAppFromMailSignin                      = "APP_FROM_MAIL_SIGNIN"
 let kSegueAppFromTerms                           = "APP_FROM_TERMS"
 let kSegueAuth                                   = "AUTH"
 let kSegueSocialAuth                             = "SOCIAL"
@@ -469,13 +473,14 @@ struct SERVER_URLS {
     static let CLIENT_ID                = "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//"bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"
     static let CLIENT_SECRET            = "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
     //"Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"
-    static let SIGNUP                   = "api/sign_up"
+    static let SIGNUP                   = "api/sign_up/"
     static let TOKEN                    = "api/social/token/"
     static let TOKEN_CONVERT            = "api/social/convert-token/"
     static let TOKEN_REVOKE             = "api/social/revoke-token/"
     static let USERNAME_EXISTS          = "api/profiles/username_exists"
     static let EMAIL_EXISTS             = "api/profiles/email_exists"
     static let GET_CONFIRMATION_CODE    = "api/send-confirmation-code"
+    static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified"
     
     static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_social_update/"
     static let PROFILE                  = "api/profiles/"

@@ -10,6 +10,11 @@ import UIKit
 
 class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRecognizerDelegate {
     
+    enum TermsRoute {
+        case Profile, App
+    }
+    
+    var termsRoute: TermsRoute!                         = .App
     var isBackButtonHidden                              = true
     var isStackViewHidden                               = false
     var stackViewHeightConstraintDefaultValue: CGFloat  = 0
@@ -21,6 +26,12 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
     @IBOutlet weak var stackViewHeightConstraint: NSLayoutConstraint!
     @IBAction func buttonTapped(_ sender: UIButton) {
         if sender.tag == 0 {
+            if termsRoute == .App {
+                
+                
+                
+                //performSegue(withIdentifier: kSegueAppFromTerms, sender: nil)
+            }
             //performSegue(withIdentifier: segueRoleSelection, sender: nil)
         } else {
             if let authVC = navigationController?.viewControllers[0] as? AuthViewController {

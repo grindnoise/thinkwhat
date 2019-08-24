@@ -3,6 +3,17 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
+      </ContextState>
+      <ContextState
+         contextName = "specialized AppData.System.emailResponseConfirmationCode.didset:Main.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "emailResponseConfirmationCode">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
          <PersistentStrings>
             <PersistentString
@@ -14,56 +25,21 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "EmailResponse.storeEmailResponse() [inlined]:EmailResponse.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "expiresIn">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "AppData.importUserData(_:):Main.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "dateString:userProfile[&quot;birth_date&quot;]">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "specialized AppData.System.emailResponseConfirmationCode.didset:Main.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "emailResponseConfirmationCode">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "closure #1 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in closure #1 in AuthViewController.handleTokenStateReceived():AuthViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "fbData">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
-      </ContextState>
-      <ContextState
-         contextName = "performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIServer.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "(AppData.shared.userProfile.ID as! String)">
-            </PersistentString>
-         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "closure #1 in static FBManager.getUserData(completionHandler:):FBManager.swift">
          <PersistentStrings>
             <PersistentString
                value = "json">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in AuthViewController.handleTokenStateReceived():AuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "fbData">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -76,7 +52,39 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "EmailResponse.storeEmailResponse() [inlined]:EmailResponse.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "expiresIn">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIServer.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "(AppData.shared.userProfile.ID as! String)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AppData.importUserData(_:):Main.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "dateString:userProfile[&quot;birth_date&quot;]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
+      </ContextState>
+      <ContextState
+         contextName = "MailAuthViewController.formIsReady.setter [inlined]:MailAuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "isLoginFilled">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
    </ContextStates>
 </VariablesViewState>

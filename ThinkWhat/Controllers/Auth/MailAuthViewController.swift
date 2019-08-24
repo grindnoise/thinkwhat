@@ -26,14 +26,12 @@ class MailAuthViewController: UIViewController {
             } else {
                 isPwdFilled = true
             }
-        } else {
-            if sender === loginTF {
-                if loginTF.text!.isEmpty {
-                    loginTF.showSign(state: .UsernameNotFilled)
-                    isLoginFilled = false
-                } else {
-                    isLoginFilled = true
-                }
+        } else if sender === loginTF {
+            if loginTF.text!.isEmpty {
+                loginTF.showSign(state: .UsernameNotFilled)
+                isLoginFilled = false
+            } else {
+                isLoginFilled = true
             }
         }
     }
@@ -59,7 +57,7 @@ class MailAuthViewController: UIViewController {
     private var isLoginFilled = false {
         didSet {
             if isLoginFilled {
-                loginTF.showSign(state: .Approved)
+                loginTF.hideSign()
                 if isPwdFilled && isLoginFilled {
                     formIsReady = true
                 }
@@ -132,7 +130,23 @@ class MailAuthViewController: UIViewController {
 
     
     private func performSignin() {
-        apiManager.login(.Mail, username: loginTF.text!, password: pwdTF.text!, token: nil) {
+//        apiManager.getEmailVerified() {
+//            _isEmailVerified, error in
+//            if error != nil {
+//                self.simpleAlert(error!.localizedDescription)
+//            } else if let isEmailVerified = _isEmailVerified {
+//                switch isEmailVerified {
+//                case true:
+//                    self.apiManager.login(.Username, username: self.loginTF.text!, password: self.pwdTF.text!, token: nil) {
+//                        state in
+//                        tokenState = state
+//                    }
+//                case false:
+//                    self.performSegue(withIdentifier: kSegueMailValidationFromSignin, sender: nil)
+//                }
+//            }
+//        }
+        self.apiManager.login(.Username, username: self.loginTF.text!, password: self.pwdTF.text!, token: nil) {
             state in
             tokenState = state
         }
@@ -140,9 +154,27 @@ class MailAuthViewController: UIViewController {
     
     @objc fileprivate func handleTokenState() {
         if tokenState == .WrongCredentials {
-            simpleAlert("Wrong credentials")
+            delay(seconds: 1) {
+                self.simpleAlert("Wrong credentials")
+            }
+//            simpleAlert("Wrong credentials")
         } else {
-            performSegue(withIdentifier: kSegueAppFromMailSignIn, sender: nil)
+            apiManager.getEmailVerified() {
+                _isEmailVerified, error in
+                if error != nil {
+                    print(error!.localizedDescription)
+                    self.simpleAlert("dfd")//error!.localizedDescription)
+                } else {
+                    if let isEmailVerified = _isEmailVerified {
+                        switch isEmailVerified {
+                        case true:
+                            self.performSegue(withIdentifier: kSegueAppFromMailSignin, sender: nil)
+                        case false:
+                            self.performSegue(withIdentifier: kSegueMailValidationFromSignin, sender: nil)
+                        }
+                    }
+                }
+            }
         }
     }
     

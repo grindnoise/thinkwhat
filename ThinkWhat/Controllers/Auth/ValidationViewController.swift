@@ -27,7 +27,9 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
                 if !EmailResponse.shared.isEmpty && EmailResponse.shared.isActive {
                     print(EmailResponse.shared.getConfirmationCode()!)
                     if validationCode == EmailResponse.shared.getConfirmationCode()! {
-                        //TODO: Check if user already exists
+                        //Set email verified
+                        
+                        
                         performSegue(withIdentifier: kSegueTermsFromValidation, sender: nil)
                     } else {
                         //                            showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Неверный код подтверждения")
@@ -51,6 +53,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
             }
         }
     }
+    fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     var phoneNumber:                    String!
     var phoneNumberFormatted:           String!
     var username                        = ""
@@ -125,6 +128,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
                 destinationVC.isBackButtonHidden    = true
                 destinationVC.isStackViewHidden     = false
                 destinationVC.username              = username
+                destinationVC.termsRoute            = .Profile
             }
         }
     }
@@ -150,4 +154,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
         return String(format: "Повторный запрос кода через %02i:%02i"/*:%02i", hours*/, minutes, seconds)
     }
     
+    private func initializeServerAPI() -> APIManagerProtocol{
+        return (self.navigationController as! AuthNavigationController).apiManagerProtocol
+    }
 }

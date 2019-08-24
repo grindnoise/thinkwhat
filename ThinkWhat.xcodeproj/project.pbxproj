@@ -60,6 +60,7 @@
 		AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF63D22F4213C004BA878 /* EmailResponse.swift */; };
 		AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */; };
 		AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */; };
+		AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */; };
 		AB6083B72240E77B002C0D7E /* SocialAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083B62240E77B002C0D7E /* SocialAuthViewController.swift */; };
 		AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */; };
 		AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BA2240F761002C0D7E /* MailAuthViewController.swift */; };
@@ -155,6 +156,7 @@
 		AB3EF63D22F4213C004BA878 /* EmailResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailResponse.swift; sourceTree = "<group>"; };
 		AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailValidationViewController.swift; sourceTree = "<group>"; };
 		AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationCodeTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryUserCredentials.swift; sourceTree = "<group>"; };
 		AB6083B62240E77B002C0D7E /* SocialAuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialAuthViewController.swift; sourceTree = "<group>"; };
 		AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TermsOfUseViewController.swift; sourceTree = "<group>"; };
 		AB6083BA2240F761002C0D7E /* MailAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAuthViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -305,6 +307,7 @@
 				AB3C6818223FD04500B57580 /* SMSResponse.swift */,
 				ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */,
 				AB3EF63D22F4213C004BA878 /* EmailResponse.swift */,
+				AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */,
 			);
 			path = Algorithms;
 			sourceTree = "<group>";
@@ -751,6 +754,7 @@
 				AB3C685E223FD74E00B57580 /* FileStoring.swift in Sources */,
 				AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */,
 				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
+				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
