@@ -154,7 +154,7 @@ class MailRegistrationViewController: UIViewController {
     private func simpleAlert(_ message: String) {
         let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
         let action1 = UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
-            print("You've pressed default")
+            self.isLoadingViewVisible = false
         }
         alertController.addAction(action1)
         present(alertController, animated: true)
@@ -164,13 +164,11 @@ class MailRegistrationViewController: UIViewController {
         self.apiManager.signUp(email: mailTF.text!, password: pwdTF.text!, username: loginTF.text!) {
             error in
             if error != nil {
-                self.isLoadingViewVisible = false
                 self.simpleAlert(error!.localizedDescription)
             } else {
                 self.apiManager.getEmailConfirmationCode(email: self.mailTF.text!, username: self.loginTF.text!) {
                     json, error in
                     if error != nil {
-                        self.isLoadingViewVisible = false
                         self.simpleAlert(error!.localizedDescription)
                     }
                     if json != nil {

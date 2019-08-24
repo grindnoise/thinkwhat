@@ -10,11 +10,14 @@ import UIKit
 
 class MailAuthViewController: UIViewController {
     
-    @IBOutlet weak var continueButton:  UIButton!
-    @IBOutlet weak var loginTF:         UnderlinedSignTextField!
-    @IBOutlet weak var pwdTF:           UnderlinedSignTextField!
+    @IBOutlet weak var continueButton:      UIButton!
+    @IBOutlet weak var loginTF:             UnderlinedSignTextField!
+    @IBOutlet weak var pwdTF:               UnderlinedSignTextField!
+    @IBOutlet weak var loadingView:         UIView!
+    @IBOutlet weak var loadingIndicator:    LoadingIndicator!
     @IBAction func signupTapped(_ sender: UIButton) {
         if formIsReady {
+            isLoadingViewVisible = true
             performSignin()
         }
     }
@@ -36,7 +39,22 @@ class MailAuthViewController: UIViewController {
         }
     }
     
-    
+    private var isLoadingViewVisible    = false {
+        didSet {
+            if oldValue != isLoadingViewVisible {
+                UIView.animate(withDuration: 0.2, animations: {
+                    let alpha: CGFloat = self.isLoadingViewVisible ? 0.9 : 0
+                    self.loadingView.alpha = alpha
+                }) { completed in
+                    if self.isLoadingViewVisible {
+                        self.loadingIndicator.addUntitled1Animation()
+                    } else {
+                        self.loadingIndicator.removeAllAnimations()
+                    }
+                }
+            }
+        }
+    }
     private var textFields              = [UnderlinedTextField]()
     private var formIsReady             = false {
         didSet {
@@ -103,6 +121,8 @@ class MailAuthViewController: UIViewController {
             self.continueButton.layer.cornerRadius = self.continueButton.frame.height / 2
             self.loginTF.rightView!.alpha = 0
         }
+        loadingView.alpha = 0
+        loadingIndicator.removeAllAnimations()
     }
     
     private func setupViews() {
@@ -154,16 +174,13 @@ class MailAuthViewController: UIViewController {
     
     @objc fileprivate func handleTokenState() {
         if tokenState == .WrongCredentials {
-            delay(seconds: 1) {
-                self.simpleAlert("Wrong credentials")
-            }
-//            simpleAlert("Wrong credentials")
+            self.simpleAlert("Wrong credentials")
         } else {
             apiManager.getEmailVerified() {
                 _isEmailVerified, error in
                 if error != nil {
                     print(error!.localizedDescription)
-                    self.simpleAlert("dfd")//error!.localizedDescription)
+                    self.simpleAlert(error!.localizedDescription)
                 } else {
                     if let isEmailVerified = _isEmailVerified {
                         switch isEmailVerified {
@@ -181,7 +198,7 @@ class MailAuthViewController: UIViewController {
     private func simpleAlert(_ message: String) {
         let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
         let action1 = UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
-            print("You've pressed default")
+            self.isLoadingViewVisible = false
         }
         alertController.addAction(action1)
         present(alertController, animated: true)

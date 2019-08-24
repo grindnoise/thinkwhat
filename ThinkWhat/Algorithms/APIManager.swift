@@ -691,7 +691,8 @@ class APIManager: APIManagerProtocol {
                 "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
                 "Content-Type": "application/json"
             ]
-            
+            print(headers)
+            print(url)
             sessionManager.request(url, method: .get, parameters: nil, headers: headers).responseJSON() {
                 response in
                 if response.result.isFailure {
@@ -725,8 +726,8 @@ class APIManager: APIManagerProtocol {
                         }
                     }
                 }
+                completion(isEmailVerified, error)
             }
-            completion(isEmailVerified, error)
         }
     }
     

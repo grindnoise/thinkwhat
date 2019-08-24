@@ -477,14 +477,16 @@ struct SERVER_URLS {
     static let TOKEN                    = "api/social/token/"
     static let TOKEN_CONVERT            = "api/social/convert-token/"
     static let TOKEN_REVOKE             = "api/social/revoke-token/"
+    //Profiles
     static let USERNAME_EXISTS          = "api/profiles/username_exists"
     static let EMAIL_EXISTS             = "api/profiles/email_exists"
-    static let GET_CONFIRMATION_CODE    = "api/send-confirmation-code"
-    static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified"
-    
+    static let GET_CONFIRMATION_CODE    = "api/profiles/send-confirmation-code/"
+    static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified/"
     static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_social_update/"
     static let PROFILE                  = "api/profiles/"
     static let CURRENT_USER             = "api/profiles/current/"
+    
+    
     static let USER                     = "api/users/"
     
     static let SURVEY                   = "api/surveys/"
