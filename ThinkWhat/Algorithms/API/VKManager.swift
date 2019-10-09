@@ -24,28 +24,31 @@ class VKManager {
             do {
                 json =  JSON(parseJSON: response!.responseString)
                 completionHandler(json, error)
-            } catch {
-                print(error.localizedDescription)
+            } catch let _error {
+                print(error!.localizedDescription)
+                error = _error
                 completionHandler(json, error)
             }
         }, errorBlock: { (error) in
             completionHandler(json, error!)
         })
     }
-    
-    private func initializeFileStoringProtocol() -> FileStoringProtocol {
-        return appDelegate.container.resolve(FileStoringProtocol.self)!
-    }
-    
 }
 
 extension VKManager: UserDataPreparatory {
     static func prepareUserData(_ data: [String : Any]) -> [String : Any] {
         var userProfile = [String: Any]()
+        var nestedDict = data.filter{ $0.key == "image" }.isEmpty
+        var owner: [String: Any] = [:]
+        var ownerPrefix = nestedDict ? "" : "owner."
         
         for (key, value) in data {
             if key == "first_name" || key == "last_name" {
-                userProfile["user."+key] = value
+                if nestedDict {
+                    owner[ownerPrefix + key] = value
+                } else {
+                    userProfile[ownerPrefix + key] = value
+                }
             } else if key == "id" {
                 userProfile["vk_ID"] = value
             } else if key == "image" {
@@ -62,8 +65,14 @@ extension VKManager: UserDataPreparatory {
                 }
             }
         }
-        userProfile["user.email"] = VKSdk.accessToken()?.email
-        print(userProfile)
+        
+        if nestedDict {
+            owner[ownerPrefix + "email"] = VKSdk.accessToken()?.email
+            userProfile["owner"] = owner
+        } else {
+            userProfile[ownerPrefix + "email"] = VKSdk.accessToken()?.email
+        }
+        
         return userProfile
     }
 }

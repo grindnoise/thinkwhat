@@ -19,8 +19,6 @@ class MailRegistrationViewController: UIViewController {
     @IBOutlet weak var loadingView:         UIView!
     @IBOutlet weak var loadingIndicator:    LoadingIndicator!
     
-    
-    
     @IBAction func signupTapped(_ sender: UIButton) {
         if formIsReady {
             isLoadingViewVisible = true
@@ -28,13 +26,11 @@ class MailRegistrationViewController: UIViewController {
         }
     }
     @IBAction func editingChanged(_ sender: UITextField) {
-        if pwdTF.text!.count < 6 {
-            pwdTF.showSign(state: .PasswordIsShort)
-            isPwdFilled = false
-        } else {
-            isPwdFilled = true
-        }
+        checkTextField(sender: sender)
     }
+//    private var timeElapsed: Double        = 2.0
+//    private var timer                   = Timer()
+//    private var timerIsRunning          = false
     private var isLoadingViewVisible    = false {
         didSet {
             if oldValue != isLoadingViewVisible {
@@ -105,7 +101,7 @@ class MailRegistrationViewController: UIViewController {
             }
         }
     }
-    private var apiManager: APIManager!
+    fileprivate lazy var apiManager: APIManagerProtocol! = initializeServerAPI()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -114,7 +110,6 @@ class MailRegistrationViewController: UIViewController {
         for tf in textFields {
             tf.delegate = self
         }
-        apiManager      = (self.navigationController as! AuthNavigationController).apiManagerProtocol as? APIManager
         setupViews()
         setupGestures()
     }
@@ -166,7 +161,7 @@ class MailRegistrationViewController: UIViewController {
             if error != nil {
                 self.simpleAlert(error!.localizedDescription)
             } else {
-                self.apiManager.getEmailConfirmationCode(email: self.mailTF.text!, username: self.loginTF.text!) {
+                self.apiManager.getEmailConfirmationCode() {
                     json, error in
                     if error != nil {
                         self.simpleAlert(error!.localizedDescription)
@@ -188,7 +183,45 @@ class MailRegistrationViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+//    @objc private func runTimer() {
+//        if !timerIsRunning {
+//            timer = Timer.scheduledTimer(timeInterval: 2, target: self,   selector: (#selector(MailRegistrationViewController.updateTimer)), userInfo: nil, repeats: false)
+//            timerIsRunning = true
+//        }
+//    }
+//
+//    @objc private func updateTimer() {
+////        timeElapsed    -= 0.1
+////        if timeElapsed <= 0.1 {
+////            self.timerIsRunning = false
+////            timer.invalidate()
+////            timeElapsed = 2
+//            apiManager.checkUsernameEmailAvailability(email: "", username: loginTF.text!) {
+//                exists, error in
+//                self.timerIsRunning = false
+//                if error != nil {
+//                    self.simpleAlert(error!.localizedDescription)
+//                }
+//                if exists != nil {
+//                    if exists! {
+//                        self.loginTF.showSign(state: .UsernameExists)
+//                        self.isLoginFilled = false
+//                    } else {
+//                        if self.loginTF.text!.count >= 4 {
+//                            self.isLoginFilled = true
+//                        }
+//                    }
+//                }
+//                //            }
+//        }
+//    }
+}
 
+extension MailRegistrationViewController: ServerInitializationProtocol {
+    func initializeServerAPI() -> APIManagerProtocol{
+        return (self.navigationController as! AuthNavigationController).apiManager
+    }
 }
 
 extension MailRegistrationViewController: UITextFieldDelegate {
@@ -220,28 +253,64 @@ extension MailRegistrationViewController: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        if !textField.text!.isEmpty {
-            if textField === mailTF {
-                if isValidEmail(mailTF.text!) {
-                    apiManager.checkUsernameEmailAvailability(email: textField.text!, username: "") {
-                        exists, error in
-                        if error != nil {
-                            self.simpleAlert(error!.localizedDescription)
-                        }
-                        if exists != nil {
-                            if exists! {
-                                self.mailTF.showSign(state: .EmailExists)
-                                self.isMailFilled = false
-                            } else {
-                                self.isMailFilled = true
-                            }
-                        }
-                    }
-                } else  {
-                    mailTF.showSign(state: .EmailIsIncorrect)
-                }
-            } else if textField === loginTF {
-                apiManager.checkUsernameEmailAvailability(email: "", username: textField.text!) {
+        checkTextField(sender: textField)
+//        if !textField.text!.isEmpty {
+//            if textField === mailTF {
+//                if isValidEmail(mailTF.text!) {
+//                    apiManager.checkUsernameEmailAvailability(email: textField.text!, username: "") {
+//                        exists, error in
+//                        if error != nil {
+//                            self.simpleAlert(error!.localizedDescription)
+//                        }
+//                        if exists != nil {
+//                            if exists! {
+//                                self.mailTF.showSign(state: .EmailExists)
+//                                self.isMailFilled = false
+//                            } else {
+//                                self.isMailFilled = true
+//                            }
+//                        }
+//                    }
+//                } else  {
+//                    mailTF.showSign(state: .EmailIsIncorrect)
+//                }
+//            } else if textField === loginTF {
+//                apiManager.checkUsernameEmailAvailability(email: "", username: textField.text!) {
+//                    exists, error in
+//                    if error != nil {
+//                        self.simpleAlert(error!.localizedDescription)
+//                    }
+//                    if exists != nil {
+//                        if exists! {
+//                            self.loginTF.showSign(state: .UsernameExists)
+//                            self.isLoginFilled = false
+//                        } else {
+//                            self.isLoginFilled = true
+//                        }
+//                    }
+//                }
+//            }
+//        }
+    }
+    
+    private func checkTextField(sender: UITextField) {
+        if sender === pwdTF {
+            if pwdTF.text!.isEmpty {
+                isPwdFilled = false
+                pwdTF.hideSign()
+            } else if pwdTF.text!.count < 6 {
+                pwdTF.showSign(state: .PasswordIsShort)
+                isPwdFilled = false
+            } else {
+                isPwdFilled = true
+            }
+        } else if sender === loginTF {
+            if !sender.text!.isEmpty && sender.text!.count < 4 {
+                loginTF.showSign(state: .UsernameIsShort)
+                isLoginFilled = false
+            } else if sender.text!.count >= 4 {
+                //                    runTimer()
+                apiManager.checkUsernameEmailAvailability(email: "", username: sender.text!) {
                     exists, error in
                     if error != nil {
                         self.simpleAlert(error!.localizedDescription)
@@ -251,10 +320,39 @@ extension MailRegistrationViewController: UITextFieldDelegate {
                             self.loginTF.showSign(state: .UsernameExists)
                             self.isLoginFilled = false
                         } else {
-                            self.isLoginFilled = true
+                            if self.loginTF.text!.count >= 4 {
+                                self.isLoginFilled = true
+                            }
                         }
                     }
                 }
+            } else {
+                isLoginFilled = true
+                loginTF.hideSign()
+            }
+        } else if sender === mailTF {
+            if sender.text!.isEmpty {
+                mailTF.hideSign()
+                isMailFilled = false
+            }
+            if isValidEmail(sender.text!) {
+                apiManager.checkUsernameEmailAvailability(email: sender.text!, username: "") {
+                    exists, error in
+                    if error != nil {
+                        self.simpleAlert(error!.localizedDescription)
+                    }
+                    if exists != nil {
+                        if exists! {
+                            self.mailTF.showSign(state: .EmailExists)
+                            self.isMailFilled = false
+                        } else {
+                            self.isMailFilled = true
+                        }
+                    }
+                }
+            } else {
+                isMailFilled = false
+                mailTF.showSign(state: .EmailIsIncorrect)
             }
         }
     }

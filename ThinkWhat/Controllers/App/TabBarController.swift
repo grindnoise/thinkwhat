@@ -1,0 +1,66 @@
+//
+//  TabBarController.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 03.10.2019.
+//  Copyright © 2019 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+import UserNotifications
+
+class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
+    
+//    public lazy var serverAPI:     APIServerProtocol          = self.initializeServerAPI()
+//    public lazy var fileStorageAPI: FileStoringProtocol       = self.initializeFileStoringAPI()
+    let sdelegate = ScrollingTabBarControllerDelegate()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        UITabBar.appearance().layer.borderWidth = 0.0
+        UITabBar.appearance().clipsToBounds = true
+        delegate = sdelegate
+        navigationController?.isNavigationBarHidden = true
+        viewControllers?.forEach {
+            if let navController = $0 as? UINavigationController {
+                navController.topViewController?.view
+            } else {
+                $0.view.description
+            }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        appDelegate.center.requestAuthorization(options: options) {
+            (granted, error) in
+            if !granted {
+                print("Something went wrong")
+            }
+        }
+    }
+
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+//    private func initializeServerAPI() -> APIServerProtocol {
+//        return appDelegate.container.resolve(APIServerProtocol.self)!
+//    }
+//
+//    private func initializeFileStoringAPI() -> FileStoringProtocol {
+//        return appDelegate.container.resolve(FileStoringProtocol.self)!
+//    }
+    
+    /*
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
+}

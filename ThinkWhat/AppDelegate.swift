@@ -120,8 +120,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         container.register(APIManagerProtocol.self) {
             _ in APIManager()
         }
-        container.register(FileStoringProtocol.self) {
-            _ in FileStorage()
+        container.register(FileStorageProtocol.self) {
+            _ in FileStorageManager()
         }
     }
     

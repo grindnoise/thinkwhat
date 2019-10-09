@@ -10,33 +10,41 @@ import UIKit
 
 class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRecognizerDelegate {
     
-    enum TermsRoute {
-        case Profile, App
-    }
-    
-    var termsRoute: TermsRoute!                         = .App
+//    enum TermsRoute {
+//        case Profile, App
+//    }
+//
+//    var termsRoute: TermsRoute!                         = .App
+    var launchApp                                       = false
     var isBackButtonHidden                              = true
     var isStackViewHidden                               = false
     var stackViewHeightConstraintDefaultValue: CGFloat  = 0
     var isFirstLaunch                                   = true
     var username                                        = ""
+    fileprivate lazy var apiManager = initializeServerAPI()
     @IBOutlet weak var spinner:         LoadingIndicator!
     @IBOutlet weak var webView:         UIWebView!
     @IBOutlet weak var stackView:       UIStackView!
     @IBOutlet weak var stackViewHeightConstraint: NSLayoutConstraint!
     @IBAction func buttonTapped(_ sender: UIButton) {
         if sender.tag == 0 {
-            if termsRoute == .App {
-                
-                
-                
-                //performSegue(withIdentifier: kSegueAppFromTerms, sender: nil)
+            if launchApp || AppData.shared.userProfile.isEdited {
+                performSegue(withIdentifier: kSegueAppFromTerms, sender: nil)
+            } else {
+                performSegue(withIdentifier: kSegueProfileFromConfirmation, sender: nil)
             }
-            //performSegue(withIdentifier: segueRoleSelection, sender: nil)
         } else {
             if let authVC = navigationController?.viewControllers[0] as? AuthViewController {
-                self.navigationController?.viewControllers = [authVC]
 //                self.dismiss(animated: true, completion: {})
+                if let token = KeychainService.loadAccessToken() as String? {
+                    if !token.isEmpty {
+                        apiManager.logout() {
+                            state in
+                            tokenState = state
+                        }
+                    }
+                }
+//                self.navigationController?.viewControllers = [authVC]
                 self.navigationController?.popViewController(animated: true)
             }
         }
@@ -112,4 +120,10 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
 //            }
 //        }
 //    }
+}
+
+extension TermsOfUseViewController: ServerInitializationProtocol {
+    func initializeServerAPI() -> APIManagerProtocol {
+        return (self.navigationController as! AuthNavigationController).apiManager
+    }
 }

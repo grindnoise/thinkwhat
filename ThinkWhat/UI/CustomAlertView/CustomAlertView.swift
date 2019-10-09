@@ -102,7 +102,8 @@ class CustomAlertView: UIView, CAAnimationDelegate {
     }
     
     public func presentAlert() {
-        UIApplication.shared.windows.last?.addSubview(self)
+        layer.zPosition = 100
+        UIApplication.shared.keyWindow?.addSubview(self)
         //UIApplication.shared.keyWindow?.addSubview(self)
         contentView.alpha = 1
         lightBlurView.alpha = 0

@@ -14,6 +14,7 @@ class UnderlinedSignTextField: UnderlinedTextField {
         case Approved
         case UsernameExists         =   "Username is already used"
         case UsernameNotFilled      =   "Username is not filled"
+        case UsernameIsShort        =   "Username is too short"
         case EmailExists            =   "Email is already used"
         case EmailIsIncorrect       =   "Email is incorrect"
         case PasswordIsShort        =   "Password is too short"

@@ -44,7 +44,14 @@ enum FileFormat: String {
 }
 
 enum TokenState {
-    case Received, Error, Unassigned, WrongCredentials, Expired, Revoked, ConnectionError
+    case Received
+    case Error
+    case Unassigned
+    case WrongCredentials
+    case Expired
+    case Revoked
+    case ConnectionError
+    case AccessDenied
 }
 
 enum ApiReachabilityState {
@@ -77,7 +84,11 @@ enum AuthVariant: String {
 }
 
 enum DjangoError: String {
-    case InvalidGrant = "invalid_grant"
+    case InvalidGrant = "invalid credentials given."
+    case AccessDenied = "access_denied"
+    enum Authentication: String {
+        case ConnectionFailed = "failed to establish a new connection"
+    }
 }
 
 enum ClientSettingsMode {
@@ -96,8 +107,10 @@ var tokenState: TokenState    = .Unassigned {
             NotificationCenter.default.post(name: kNotificationTokenWrongCredentials, object: nil)
         case .ConnectionError:
             NotificationCenter.default.post(name: kNotificationTokenConnectionError, object: nil)
+        case .AccessDenied:
+            NotificationCenter.default.post(name: kNotificationTokenAccessDenied, object: nil)
         default:
-            print("TODO")
+            print(tokenState)
         }
     }
 }
@@ -132,28 +145,39 @@ let kNotificationTokenError                      = Notification.Name("Notificati
 let kNotificationTokenRevoked                    = Notification.Name("NotificationTokenRevoked")
 let kNotificationTokenWrongCredentials           = Notification.Name("NotificationTokenWrongCredentials")
 let kNotificationTokenConnectionError            = Notification.Name("NotificationTokenConnectionError")
+let kNotificationTokenAccessDenied               = Notification.Name("NotificationTokenAccessDenied")
+
 let kNotificationEmailResponseReceived           = Notification.Name("NotificationEmailResponseReceived")
 let kNotificationEmailResponseExpired            = Notification.Name("NotificationEmailResponseExpired")
 
 let kNotificationApiReachable                    = Notification.Name("smsNotificationApiReachable")
 let kNotificationApiNotReachable                 = Notification.Name("smsNotificationApiNotReachable")
 
+let kNotificationUserImageChanged                = Notification.Name("NotificationUserImageChanged")
+
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
 
 
-//MARKS: - Segues
+//MARK: - Segues
+//MARK: Auth
 let kSegueApp                                    = "APP"
 let kSegueAppFromMailSignin                      = "APP_FROM_MAIL_SIGNIN"
 let kSegueAppFromTerms                           = "APP_FROM_TERMS"
+let kSegueAppFromProfile                         = "APP_FROM_PROFILE"
 let kSegueAuth                                   = "AUTH"
 let kSegueSocialAuth                             = "SOCIAL"
 let kSegueMailValidationFromSignup               = "MAIL_VALID_SIGNUP"
 let kSegueMailValidationFromSignin               = "MAIL_VALID_SIGNIN"
+let kSegueTerms                                  = "TERMS"
 let kSegueTermsFromValidation                    = "TERMS_VALID"
 let kSegueTermsFromStartScreen                   = "TERMS_START_SCREEN"
 let kSegueMailAuth                               = "MAILAUTH"
 let kSeguePwdRecovery                            = "PWD_RECOVERY"
+let kSegueProfileFromConfirmation                = "PROFILE_FROM_CONFIRMATION"
+let kSegueProfileFromAuth                        = "PROFILE_FROM_AUTH"
 
+//MARK: App
+let kSegueProfileSettingsSelection               = "PROFILE_SETINGS_SELECTION"
 
 //let segueBarberData                             = "segueBarberData"
 //let segueSignup                                 = "segueSignup"
@@ -191,7 +215,7 @@ class AppData {
     var system = System()
     
     struct User {
-        var ID: String! {
+        var ID: String! = "" {
             didSet {
                 if ID != oldValue {
                     UserDefaults.standard.set(ID, forKey: "userId")
@@ -200,7 +224,7 @@ class AppData {
                 }
             }
         }
-        var username: String! {
+        var username: String! = "" {
             didSet {
                 if username != oldValue {
                     UserDefaults.standard.set(username, forKey: "username")
@@ -209,7 +233,7 @@ class AppData {
                 }
             }
         }
-        var firstName: String! {
+        var firstName: String! = ""{
             didSet {
                 if firstName != oldValue {
                     UserDefaults.standard.set(firstName, forKey: "firstName")
@@ -218,7 +242,7 @@ class AppData {
                 }
             }
         }
-        var lastName: String! {
+        var lastName: String! = "" {
             didSet {
                 if lastName != oldValue {
                     UserDefaults.standard.set(lastName, forKey: "lastName")
@@ -227,7 +251,7 @@ class AppData {
                 }
             }
         }
-        var email: String! {
+        var email: String! = "" {
             didSet {
                 if email != oldValue {
                     UserDefaults.standard.set(email, forKey: "userMail")
@@ -271,7 +295,7 @@ class AppData {
     }
     
     struct UserProfile {
-        var ID: String! {
+        var ID: String! = "" {
             didSet {
                 if ID != oldValue {
                     UserDefaults.standard.set(ID, forKey: "userProfileID")
@@ -280,10 +304,12 @@ class AppData {
                 }
             }
         }
+        //URL local link
         var imagePath: String! {
             didSet {
                 if !imagePath.isEmpty {
                     UserDefaults.standard.set(imagePath, forKey: "userImagePath")
+                    NotificationCenter.default.post(name: kNotificationUserImageChanged, object: nil)
                 } else {
                     UserDefaults.standard.removeObject(forKey: "userImagePath")
                 }
@@ -308,6 +334,21 @@ class AppData {
                 }
             }
         }
+        var isEdited: Bool! {
+            didSet {
+                UserDefaults.standard.set(isEdited, forKey: "userProfileEdited")
+            }
+        }
+        var isBanned: Bool! {
+            didSet {
+                UserDefaults.standard.set(isBanned, forKey: "userProfileBanned")
+            }
+        }
+        var isEmailVerified: Bool! {
+            didSet {
+                UserDefaults.standard.set(isEmailVerified, forKey: "userEmailVerified")
+            }
+        }
         
         init() {
             getData()
@@ -326,24 +367,44 @@ class AppData {
             if let kUserID = UserDefaults.standard.object(forKey: "userProfileID") {
                 self.ID = kUserID as? String
             }
+            if let kIsEdited = UserDefaults.standard.object(forKey: "userProfileEdited") {
+                self.isEdited = kIsEdited as? Bool
+            }
+            if let kIsBanned = UserDefaults.standard.object(forKey: "userProfileBanned") {
+                self.isBanned = kIsBanned as? Bool
+            }
+            if let kIsEmailVerified = UserDefaults.standard.object(forKey: "userEmailVerified") {
+                self.isEmailVerified = kIsEmailVerified as? Bool
+            }
         }
         
         mutating func eraseData() {
-            imagePath = ""
-            birthDate = Date(dateString: "01.01.0001")
-            gender    = .none
-            ID        = ""
+            imagePath       = ""
+            birthDate       = Date(dateString: "01.01.0001")
+            gender          = .none
+            ID              = ""
+            isEdited        = false
+            isBanned        = false
+            isEmailVerified = false
         }
     }
     
     struct System {
-        var session: SessionType! = .unauthorized {
-            didSet {
-                if session == .authorized {
-                    UserDefaults.standard.set(SessionType.authorized.rawValue, forKey: "session")
-                } else {
-                    UserDefaults.standard.set(SessionType.unauthorized.rawValue, forKey: "session")
-                }
+//        var session: SessionType! = .unauthorized {
+//            didSet {
+//                if session == .authorized {
+//                    UserDefaults.standard.set(SessionType.authorized.rawValue, forKey: "session")
+//                } else {
+//                    UserDefaults.standard.set(SessionType.unauthorized.rawValue, forKey: "session")
+//                }
+//            }
+//        }
+        var session: SessionType! {
+            print(AppData.shared.user.username)
+            if AppData.shared.userProfile.ID == nil || AppData.shared.userProfile.ID.isEmpty || String(KeychainService.loadAccessToken()!).isEmpty {
+                return .unauthorized
+            } else {
+                return .authorized
             }
         }
         var language: Language! {
@@ -389,9 +450,9 @@ class AppData {
         
         mutating func getData() {
             
-            if let kSession = UserDefaults.standard.object(forKey: "session") {
-                self.session = SessionType(rawValue: kSession as! String)!
-            }
+//            if let kSession = UserDefaults.standard.object(forKey: "session") {
+//                self.session = SessionType(rawValue: kSession as! String)!
+//            }
 //            print(UserDefaults.standard.object(forKey: "emailResponseExpirationDate"))
 //            if let kEmailResponseExpirationDate = UserDefaults.standard.object(forKey: "emailResponseExpirationDate") as? Date, let kEmailResponseConfirmationCode = UserDefaults.standard.object(forKey: "emailResponseConfirmationCode") as? Int {
 //                if Date() < kEmailResponseExpirationDate {
@@ -411,10 +472,10 @@ class AppData {
         }
         
         mutating func eraseData() {
-            session = .unauthorized
+//            session = .unauthorized
 //            emailResponseExpirationDate = nil
 //            emailResponseConfirmationCode = nil
-            session = .unauthorized
+//            session = .unauthorized
             let langStr = Locale.current.languageCode
             if langStr == "en-US" {
                 language = .English
@@ -426,17 +487,24 @@ class AppData {
         }
     }
     
-    func importUserData(_ json: JSON) {
-        var userProfileData         = json.dictionaryObject  as! [String: Any]
-        var userData                = userProfileData.removeValue(forKey: "user") as! [String: Any]
-        self.user.email             = userData["email"] as! String
-        self.user.firstName         = userData["first_name"] as! String
-        self.user.lastName          = userData["last_name"] as! String
-        self.user.username          = userData["username"] as! String
-        self.user.ID                = String(describing: userData["id"] as! Int)
-        self.userProfile.ID         = String(describing: userProfileData["id"] as! Int)
-        self.userProfile.birthDate  = userProfileData["birth_date"] is NSNull ? Date(dateString: "01.01.0001") : Date(dateString:userProfileData["birth_date"] as! String)
-        self.userProfile.gender     = userProfileData["gender"] is NSNull ? Gender.Unassigned : Gender(rawValue: userProfileData["gender"] as! String)
+    func importUserData(_ json: JSON, _ imagePath: URL? = nil) {
+        var userProfileData                 = json.dictionaryObject  as! [String: Any]
+        var userData                        = userProfileData.removeValue(forKey: "owner") as! [String: Any]
+        self.user.email                     = userData["email"] as! String
+        self.user.firstName                 = userData["first_name"] as! String
+        self.user.lastName                  = userData["last_name"] as! String
+        self.user.username                  = userData["username"] as! String
+        self.user.ID                        = String(describing: userData["id"] as! Int)
+        self.userProfile.ID                 = String(describing: userProfileData["id"] as! Int)
+        self.userProfile.birthDate          = userProfileData["birth_date"] is NSNull ? Date(dateString: "01.01.0001") : Date(dateString:userProfileData["birth_date"] as! String)
+        self.userProfile.gender             = userProfileData["gender"] is NSNull ? Gender.Unassigned : Gender(rawValue: userProfileData["gender"] as! String)
+        self.userProfile.isBanned           = userProfileData["is_banned"] is NSNull ? false : userProfileData["is_banned"] as! Bool
+        self.userProfile.isEdited           = userProfileData["is_edited"] is NSNull ? false : userProfileData["is_edited"] as! Bool
+        self.userProfile.isEmailVerified    = userProfileData["is_email_verified"] is NSNull ? false : userProfileData["is_email_verified"] as! Bool
+        
+        if imagePath != nil {
+            self.userProfile.imagePath = imagePath!.absoluteString
+        }
     }
     
     private init() {}
@@ -469,10 +537,10 @@ struct VK_IDS {
 }
 
 struct SERVER_URLS {
-    static let BASE                     = "http://127.0.0.1:8000/"//"https://damp-oasis-64585.herokuapp.com/"
-    static let CLIENT_ID                = "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//"bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"
-    static let CLIENT_SECRET            = "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
-    //"Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"
+    static let BASE                     = "https://damp-oasis-64585.herokuapp.com/"//"http://127.0.0.1:8000/"//
+    static let CLIENT_ID                = "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
+    static let CLIENT_SECRET            = "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"//"IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
+    //
     static let SIGNUP                   = "api/sign_up/"
     static let TOKEN                    = "api/social/token/"
     static let TOKEN_CONVERT            = "api/social/convert-token/"
@@ -480,12 +548,12 @@ struct SERVER_URLS {
     //Profiles
     static let USERNAME_EXISTS          = "api/profiles/username_exists"
     static let EMAIL_EXISTS             = "api/profiles/email_exists"
-    static let GET_CONFIRMATION_CODE    = "api/profiles/send-confirmation-code/"
+    static let GET_CONFIRMATION_CODE    = "api/profiles/send_confirmation_code/"
     static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified/"
     static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_social_update/"
-    static let PROFILE                  = "api/profiles/"
+    static let PROFILES                 = "api/profiles/"
     static let CURRENT_USER             = "api/profiles/current/"
-    
+//    static let GET_PROFILE_EDITED       = "api/profiles/get_profile_edited/"
     
     static let USER                     = "api/users/"
     
@@ -493,6 +561,27 @@ struct SERVER_URLS {
     
 //    static let SMS_VALIDATION_URL   = "http://burber.pythonanywhere.com/passcode/generate/"
     
+}
+
+struct DjangoVariables {
+    struct User {
+        static let firstName                = "first_name"
+        static let lastName                 = "last_name"
+        static let email                    = "email"
+    }
+    struct UserProfile {
+        static let owner                    = "owner"
+        static let gender                   = "gender"
+        static let birthDate                = "birth_date"
+        static let image                    = "image"
+        static let isDeleted                = "is_del"
+        static let isBanned                 = "is_banned"
+        static let credit                   = "credit"
+        static let facebookID               = "facebook_ID"
+        static let vkID                     = "vk_ID"
+        static let isEdited                 = "is_edited"
+        static let isEmailVerified          = "is_email_verified"
+    }
 }
 
 
@@ -517,15 +606,6 @@ func saveTokenInKeychain(json: JSON, tokenState: inout TokenState) {
             continue
         }
     }
-    
-    AppData.shared.system.session = .authorized
-    
-    //    let refresh_token = KeychainService.loadRefreshToken()
-    //    let access_token  = KeychainService.loadAccessToken()
-    //
-    //    print("refresh_token \(refresh_token!)")
-    //    print("access_token \(access_token!)")
-    
 }
 
 func showAlert(type: CustomAlertView.AlertType, buttons: [String : [CustomAlertView.ButtonType : Closure?]]?, title: String?, body: String?) {
@@ -546,6 +626,8 @@ func showAlert(type: CustomAlertView.AlertType, buttons: [String : [CustomAlertV
         }
     }
 }
+
+
 
 //func fetchOrders(_ onlyActive: Bool = true) -> [Order] {
 //
@@ -580,7 +662,18 @@ func alertIsActive() -> Bool {
     return alert.isActive
 }
 
+func yearsBetweenDate(startDate: Date, endDate: Date) -> Int {
+    let calendar = Calendar.current
+    let components = calendar.dateComponents([.year], from: startDate, to: endDate)
+    return components.year!
+}
+
 func loadImageFromPath(path: String) -> UIImage? {
+    if FileManager.default.fileExists(atPath: path) {
+        print("FILE AVAILABLE")
+    } else {
+        print("FILE NOT AVAILABLE")
+    }
     let image = UIImage(contentsOfFile: path)
     if image == nil {
         print("missing image at: (path)")

@@ -18,15 +18,39 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     @IBOutlet weak var vkButton:                    VKButtonView!
     @IBOutlet weak var mailButton:                  MailButtonView!
     @IBOutlet weak var fbButton:                    FacebookButtonView!
+    @IBOutlet weak var loadingView:         UIView!
+    @IBOutlet weak var loadingIndicator:    LoadingIndicator!
     private var buttons:                            [ParentLoginButton] = []
     private var selectedAuth:                       Int = 0
     private var fbLoggedIn                          = false
-    private var apiManager:                         APIManager!
-    private var storeManager:                       FileStorage!
     private var isViewSetupCompleted                = false
     private var vk_sdkInstance:                     VKSdk!
+    private lazy var apiManager:   APIManagerProtocol = self.initializeServerAPI()
+    private lazy var storeManager: FileStorageProtocol = self.initializeStorageManager()
     
-    deinit {
+    
+//    deinit {
+//        NotificationCenter.default.removeObserver(self)
+//    }
+    private var isLoadingViewVisible    = false {
+        didSet {
+            if oldValue != isLoadingViewVisible {
+                UIView.animate(withDuration: 0.2, animations: {
+                    let alpha: CGFloat = self.isLoadingViewVisible ? 0.9 : 0
+                    self.loadingView.alpha = alpha
+                }) { completed in
+                    if self.isLoadingViewVisible {
+                        self.loadingIndicator.addUntitled1Animation()
+                    } else {
+                        self.loadingIndicator.removeAllAnimations()
+                    }
+                }
+            }
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -34,8 +58,6 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         super.viewDidLoad()
         setupGestures()
         setupViews()
-        apiManager      = (self.navigationController as! AuthNavigationController).apiManagerProtocol as? APIManager
-        storeManager    = (self.navigationController as! AuthNavigationController).storeManagerProtocol as? FileStorage
         vk_sdkInstance  = VKSdk.initialize(withAppId: VK_IDS.APP_ID)
         vk_sdkInstance.register(self as VKSdkDelegate)
         vk_sdkInstance.uiDelegate = self as VKSdkUIDelegate
@@ -55,30 +77,36 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                 let tap = UITapGestureRecognizer(target: self, action: #selector(AuthViewController.handleTap(gesture:)))
                 button.addGestureRecognizer(tap)
             }
-            let notificationCenter = NotificationCenter.default
             
-            notificationCenter.addObserver(self,
-                                           selector: #selector(AuthViewController.handleTokenState),
-                                           name: kNotificationTokenReceived,
-                                           object: nil)
-            notificationCenter.addObserver(self,
-                                           selector: #selector(AuthViewController.handleTokenState),
-                                           name: kNotificationTokenError,
-                                           object: nil)
+            
+            
             //            notificationCenter.addObserver(self,
             //                                           selector: #selector(AuthViewController.handleTokenStateConnectionError),
             //                                           name: kNotificationTokenConnectionError,
             //                                           object: nil)
-            notificationCenter.addObserver(self,
-                                           selector: #selector(AuthViewController.handleReachabilitySignal),
-                                           name: kNotificationApiNotReachable,
-                                           object: nil)
+//            notificationCenter.addObserver(self,
+//                                           selector: #selector(AuthViewController.handleReachabilitySignal),
+//                                           name: kNotificationApiNotReachable,
+//                                           object: nil)
         }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         self.view.setNeedsLayout()
         self.view.layoutIfNeeded()
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self,
+                                       selector: #selector(AuthViewController.handleTokenState),
+                                       name: kNotificationTokenReceived,
+                                       object: nil)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(AuthViewController.handleTokenState),
+                                       name: kNotificationTokenConnectionError,
+                                       object: nil)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(AuthViewController.handleTokenState),
+                                       name: kNotificationTokenError,
+                                       object: nil)
         if !isViewSetupCompleted {
             //            self.phoneButton.layer.cornerRadius = self.phoneButton.frame.height / 2
             //            self.isViewSetupCompleted = true
@@ -97,7 +125,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     @objc private func showTermsOfUse(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended {
-            performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
+            performSegue(withIdentifier: kSegueTerms, sender: nil)
         }
     }
     
@@ -132,6 +160,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             let authCase = self.getAuthCase()
             switch authCase {
             case .Facebook:
+                self.isLoadingViewVisible = true
                 if AccessToken.current == nil {
                     FBManager.performLogin(viewController: self) {
                         (success) in
@@ -166,6 +195,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     }
                 }
             case .VK:
+                self.isLoadingViewVisible = true
                 let scope = ["email"]
                 VKSdk.wakeUpSession(scope) {
                     state, error in
@@ -226,12 +256,15 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     @objc private func handleTokenState() {
         if tokenState == .Received {
+            var imagePath: URL?
             apiManager.getUserData() {
                 json, error in
                 if error != nil {
-                    self.simpleAlert(error!.localizedDescription)
+                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
                 } else if json != nil {
-                    AppData.shared.importUserData(json!)
+                    print(json!)
+                    AppData.shared.userProfile.ID = String(describing: (json!.dictionaryObject  as! [String: Any])["id"] as! Int)
+                    assert(AppData.shared.userProfile.ID != nil || !AppData.shared.userProfile.ID.isEmpty)
                     let auth = self.getAuthCase()
                     switch auth {
                     case .Facebook:
@@ -244,7 +277,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                         if let pictureData = JSON(fbData.removeValue(forKey: "picture")) as? JSON {
                                             if let is_silhouette = pictureData["data"]["is_silhouette"].bool {
                                                 if !is_silhouette {
-                                                    if let pictureURL = URL(string: pictureData["data"]["url"].string!) as? URL {
+                                                    if let pictureURL = URL(string: pictureData["data"]["url"].string!) {
                                                         Alamofire.request(pictureURL).responseData {
                                                             response in
                                                             if response.result.isFailure {
@@ -255,15 +288,17 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                             }
                                                             if let data = response.result.value {
                                                                 if let image = UIImage(data: data) {
-                                                                    self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
+                                                                    imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
                                                                     fbData["image"] = image
-                                                                    self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
-                                                                        response, error in
+                                                                    let data = FBManager.prepareUserData(fbData)
+                                                                    self.apiManager.updateUserProfile(data: data) {
+                                                                        json, error in
                                                                         if error != nil {
-                                                                            self.simpleAlert(error!.localizedDescription)
+                                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
                                                                         }
-                                                                        if response != nil {
-                                                                            AppData.shared.importUserData(response!)
+                                                                        if json != nil {
+                                                                            AppData.shared.importUserData(json!, imagePath)
+                                                                            self.performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
                                                                         }
                                                                     }
                                                                 }
@@ -276,12 +311,13 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                             }
                                         } else {
                                             self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
-                                                response, error in
+                                                json, error in
                                                 if error != nil {
-                                                    self.simpleAlert(error!.localizedDescription)
+                                                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
                                                 }
-                                                if response != nil {
-                                                    AppData.shared.importUserData(response!)
+                                                if json != nil {
+                                                    AppData.shared.importUserData(json!)
+                                                    self.performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
                                                 }
                                             }
                                         }
@@ -317,17 +353,16 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                             }
                                                             if let imgData = response.result.value {
                                                                 if let image = UIImage(data: imgData) {
-                                                                    let storeManager = appDelegate.container.resolve(FileStoringProtocol.self)!
-                                                                    storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: imgData).fileFormat, surveyID: nil)
+                                                                    imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: imgData).fileFormat, surveyID: nil)
                                                                     vkData["image"] = image
                                                                     vkData.removeValue(forKey: pictureKey)
                                                                     self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
                                                                         response, error in
                                                                         if error != nil {
-                                                                            self.simpleAlert(error!.localizedDescription)
+                                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
                                                                         }
                                                                         if response != nil {
-                                                                            AppData.shared.importUserData(response!)
+                                                                            AppData.shared.importUserData(response!, imagePath)
                                                                         }
                                                                     }
                                                                 }
@@ -338,7 +373,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                     self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
                                                         response, error in
                                                         if error != nil {
-                                                            self.simpleAlert(error!.localizedDescription)
+                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
                                                         }
                                                         if response != nil {
                                                             AppData.shared.importUserData(response!)
@@ -356,15 +391,27 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     }
                 }
             }
+        } else if tokenState == .ConnectionError {
+            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; self.isLoadingViewVisible = false } }]], text: "Ошибка соединения с сервером, повторите позже")
         } else if tokenState == .Error {
-            print("authorization error")
+            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: "Ошибка сервера, повторите позже")
         } else if tokenState == .ConnectionError && apiReachability == .Reachable {
             print("connection error")
         }
     }
     
         override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+            isLoadingViewVisible = false
             if segue.identifier == kSegueTermsFromStartScreen {
+                if let destinationVC = segue.destination as? TermsOfUseViewController {
+                    destinationVC.isBackButtonHidden = false
+                    destinationVC.isStackViewHidden  = false
+                    if getAuthCase() == .Facebook || getAuthCase() == .VK {
+                        destinationVC.launchApp = false
+                        destinationVC.isBackButtonHidden = true
+                    }
+                }
+            } else if segue.identifier == kSegueTerms {
                 if let destinationVC = segue.destination as? TermsOfUseViewController {
                     destinationVC.isBackButtonHidden = false
                     destinationVC.isStackViewHidden  = true
@@ -378,7 +425,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     
     func vkSdkAccessAuthorizationFinished(with result: VKAuthorizationResult!) {
         if let error = result.error {
-            simpleAlert(result.error.localizedDescription)
+            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error.localizedDescription)
             return
         }
         
@@ -389,7 +436,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
                 tokenState = _tokenState
             }
         } else {
-            simpleAlert("******VK Auth Failed State = \(result.state.rawValue)********")
+            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "******VK Auth Failed State = \(result.state.rawValue)********")
         }
 //        switch result.state {
 //        case .authorized:
@@ -403,7 +450,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     }
     
     func vkSdkUserAuthorizationFailed() {
-        simpleAlert("vkSdkUserAuthorizationFailed")
+        showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "vkSdkUserAuthorizationFailed")
     }
     
     func vkSdkShouldPresent(_ controller: UIViewController!) {
@@ -433,21 +480,33 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
 }
 
 
-extension AuthViewController: ApiReachability {
-    func handleReachabilitySignal() {
-        simpleAlert("API not reachable")
-    }
-    
-    private func simpleAlert(_ message: String) {
-        let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
-        let action1 = UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
-            print("You've pressed default")
-        }
-        alertController.addAction(action1)
-        present(alertController, animated: true)
+//extension AuthViewController: ApiReachability {
+//    func handleReachabilitySignal() {
+////        simpleAlert("API not reachable")
+//        showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Сервер недоступен")
+//    }
+//
+//    private func simpleAlert(_ message: String) {
+//        let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
+//        let action1 = UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
+//            print("You've pressed default")
+//        }
+//        alertController.addAction(action1)
+//        present(alertController, animated: true)
+//    }
+//}
+
+extension AuthViewController: ServerInitializationProtocol {
+    func initializeServerAPI() -> APIManagerProtocol {
+        return (self.navigationController as! AuthNavigationController).apiManager
     }
 }
 
+extension AuthViewController: StorageInitializationProtocol {
+    func initializeStorageManager() -> FileStorageProtocol {
+        return (self.navigationController as! AuthNavigationController).storeManager
+    }
+}
 
 
 

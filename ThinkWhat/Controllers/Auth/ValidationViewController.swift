@@ -17,24 +17,51 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
         //MARK: TODO: add server request
         isTimerVisible = true
     }
-    
+    @IBOutlet weak var loadingView:         UIView!
+    @IBOutlet weak var loadingIndicator:    LoadingIndicator!
     private var secondsRetry: Int       = 30
     private var timer                   = Timer()
     private var isTimerRunning          = false
+//    private var isProfileEdited         = false
+    private var isLoadingViewVisible    = false {
+        didSet {
+            if oldValue != isLoadingViewVisible {
+                UIView.animate(withDuration: 0.2, animations: {
+                    let alpha: CGFloat = self.isLoadingViewVisible ? 0.9 : 0
+                    self.loadingView.alpha = alpha
+                }) { completed in
+                    if self.isLoadingViewVisible {
+                        self.loadingIndicator.addUntitled1Animation()
+                    } else {
+                        self.loadingIndicator.removeAllAnimations()
+                    }
+                }
+            }
+        }
+    }
     private var validationCode: Int!    = 0000 {
         didSet {
             if oldValue != validationCode {
                 if !EmailResponse.shared.isEmpty && EmailResponse.shared.isActive {
                     print(EmailResponse.shared.getConfirmationCode()!)
                     if validationCode == EmailResponse.shared.getConfirmationCode()! {
-                        //Set email verified
-                        
-                        
-                        performSegue(withIdentifier: kSegueTermsFromValidation, sender: nil)
+                        let owner = [DjangoVariables.User.email : AppData.shared.user.email!]
+                        var data:[String: Any] = [DjangoVariables.UserProfile.isEmailVerified : true]
+                        data["owner"] = owner
+                        apiManager.updateUserProfile(data: data) {
+                            json, error in
+                            if error != nil {
+                                self.simpleAlert(error!.localizedDescription)
+                            } else {
+                                self.performSegue(withIdentifier: kSegueTermsFromValidation, sender: nil)
+                            }
+                        }
                     } else {
+                        simpleAlert("Неверный код подтверждения")
                         //                            showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Неверный код подтверждения")
                     }
                 } else {
+                    simpleAlert("Срок действия кода СМС подтверждения истек, попробуйте заново")
                     //                        showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Срок действия кода СМС подтверждения истек, попробуйте заново")
                 }
             }
@@ -53,7 +80,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
             }
         }
     }
-    fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
+    fileprivate lazy var apiManager: APIManagerProtocol = initializeServerAPI()
     var phoneNumber:                    String!
     var phoneNumberFormatted:           String!
     var username                        = ""
@@ -72,6 +99,8 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
     }
 
     override func viewWillAppear(_ animated: Bool) {
+        loadingView.alpha = 0
+        loadingIndicator.removeAllAnimations()
         isTimerVisible       = true
     }
 
@@ -128,7 +157,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
                 destinationVC.isBackButtonHidden    = true
                 destinationVC.isStackViewHidden     = false
                 destinationVC.username              = username
-                destinationVC.termsRoute            = .Profile
+//                destinationVC.termsRoute            = .Profile
             }
         }
     }
@@ -154,7 +183,18 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
         return String(format: "Повторный запрос кода через %02i:%02i"/*:%02i", hours*/, minutes, seconds)
     }
     
-    private func initializeServerAPI() -> APIManagerProtocol{
-        return (self.navigationController as! AuthNavigationController).apiManagerProtocol
+    private func simpleAlert(_ message: String) {
+        let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
+        let action1 = UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
+            self.isLoadingViewVisible = false
+        }
+        alertController.addAction(action1)
+        present(alertController, animated: true)
+    }
+}
+
+extension ValidationViewController: ServerInitializationProtocol {
+    func initializeServerAPI() -> APIManagerProtocol {
+        return (self.navigationController as! AuthNavigationController).apiManager
     }
 }

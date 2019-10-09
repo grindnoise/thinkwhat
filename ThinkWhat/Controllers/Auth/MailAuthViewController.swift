@@ -16,9 +16,12 @@ class MailAuthViewController: UIViewController {
     @IBOutlet weak var loadingView:         UIView!
     @IBOutlet weak var loadingIndicator:    LoadingIndicator!
     @IBAction func signupTapped(_ sender: UIButton) {
+        hideKeyboard()
         if formIsReady {
             isLoadingViewVisible = true
             performSignin()
+        } else {
+            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: "Введите логип/пароль")
         }
     }
     @IBAction func editingChanged(_ sender: UITextField) {
@@ -111,6 +114,10 @@ class MailAuthViewController: UIViewController {
         }
         NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleTokenState), name: kNotificationTokenReceived, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleTokenState), name: kNotificationTokenWrongCredentials, object: nil)
+//        NotificationCenter.default.addObserver(self,
+//                                       selector: #selector(AuthViewController.handleReachabilitySignal),
+//                                       name: kNotificationApiNotReachable,
+//                                       object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -174,35 +181,74 @@ class MailAuthViewController: UIViewController {
     
     @objc fileprivate func handleTokenState() {
         if tokenState == .WrongCredentials {
-            self.simpleAlert("Wrong credentials")
+            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: "Неверный логип/пароль")
+//            self.simpleAlert("Wrong credentials")
         } else {
-            apiManager.getEmailVerified() {
-                _isEmailVerified, error in
+            apiManager.getUserData() {
+                json, error in
                 if error != nil {
                     print(error!.localizedDescription)
-                    self.simpleAlert(error!.localizedDescription)
-                } else {
-                    if let isEmailVerified = _isEmailVerified {
-                        switch isEmailVerified {
-                        case true:
-                            self.performSegue(withIdentifier: kSegueAppFromMailSignin, sender: nil)
-                        case false:
-                            self.performSegue(withIdentifier: kSegueMailValidationFromSignin, sender: nil)
+                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: error!.localizedDescription)
+//                    self.simpleAlert(error!.localizedDescription)
+                }
+                if json != nil {
+                    AppData.shared.importUserData(json!)
+                    if AppData.shared.userProfile.isEmailVerified && AppData.shared.userProfile.isEdited {
+                        self.performSegue(withIdentifier: kSegueAppFromMailSignin, sender: nil)
+                    } else if AppData.shared.userProfile.isEmailVerified && !AppData.shared.userProfile.isEdited {
+                            self.performSegue(withIdentifier: kSegueProfileFromAuth, sender: nil)
+                    } else {
+                        self.apiManager.getEmailConfirmationCode() {
+                            json, error in
+                            if error != nil {
+                                showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: error!.localizedDescription)
+//                                self.simpleAlert(error!.localizedDescription)
+                            }
+                            if json != nil {
+                                EmailResponse.shared.importJson(json!)
+                                self.performSegue(withIdentifier: kSegueMailValidationFromSignin, sender: nil)
+                            }
                         }
                     }
                 }
             }
+            
+//            apiManager.getEmailVerified() {
+//                _isEmailVerified, error in
+//                if error != nil {
+//                    print(error!.localizedDescription)
+//                    self.simpleAlert(error!.localizedDescription)
+//                } else {
+//                    if let isEmailVerified = _isEmailVerified {
+//                        switch isEmailVerified {
+//                        case true:
+//                            self.performSegue(withIdentifier: kSegueAppFromMailSignin, sender: nil)
+//                        case false:
+//                            self.apiManager.getEmailConfirmationCode() {
+//                                json, error in
+//                                if error != nil {
+//                                    self.simpleAlert(error!.localizedDescription)
+//                                }
+//                                if json != nil {
+//                                    EmailResponse.shared.importJson(json!)
+//                                    self.performSegue(withIdentifier: kSegueMailValidationFromSignin, sender: nil)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
         }
     }
     
-    private func simpleAlert(_ message: String) {
-        let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
-        let action1 = UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
-            self.isLoadingViewVisible = false
-        }
-        alertController.addAction(action1)
-        present(alertController, animated: true)
-    }
+//    private func simpleAlert(_ message: String) {
+//        let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
+//        let action1 = UIAlertAction(title: "Ok", style: .default) { (action:UIAlertAction) in
+//            self.isLoadingViewVisible = false
+//        }
+//        alertController.addAction(action1)
+//        present(alertController, animated: true)
+//    }
     /*
     // MARK: - Navigation
 
@@ -217,7 +263,7 @@ class MailAuthViewController: UIViewController {
 
 extension MailAuthViewController: UITextFieldDelegate {
     private func initializeServerAPI() -> APIManagerProtocol{
-        return (self.navigationController as! AuthNavigationController).apiManagerProtocol
+        return (self.navigationController as! AuthNavigationController).apiManager
     }
     
     private func findFirstResponder() -> UITextField? {
@@ -238,9 +284,15 @@ extension MailAuthViewController: UITextFieldDelegate {
         if textField === loginTF {
             pwdTF.becomeFirstResponder()
         } else {
-            textField.resignFirstResponder()
-            performSignin()
+//            textField.resignFirstResponder()
+            signupTapped(continueButton)
         }
         return true
     }
 }
+
+//extension MailAuthViewController: ApiReachability {
+//    func handleReachabilitySignal() {
+//        showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: "Сервер недоступен")
+//    }
+//}

@@ -34,7 +34,7 @@
                                 <rect key="frame" x="0.0" y="64" width="320" height="284"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Great app's description" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fP4-ga-yuv">
-                                        <rect key="frame" x="32" y="273.5" width="256" height="21"/>
+                                        <rect key="frame" x="32" y="271.5" width="256" height="25"/>
                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="18"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -69,16 +69,16 @@
                                         </state>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="v9j-4G-Rbu">
-                                        <rect key="frame" x="48" y="62.5" width="224" height="95"/>
+                                        <rect key="frame" x="48" y="60.5" width="224" height="99"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ВХОД В ПРИЛОЖЕНИЕ" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hGQ-JY-dYt">
-                                                <rect key="frame" x="0.0" y="0.0" width="224" height="21"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="224" height="25"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="18"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="9TO-5U-O9l">
-                                                <rect key="frame" x="0.0" y="26" width="224" height="69"/>
+                                                <rect key="frame" x="0.0" y="30" width="224" height="69"/>
                                                 <subviews>
                                                     <view tag="1" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gVO-oM-RV3" customClass="FacebookButtonView" customModule="ThinkWhat" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="0.0" width="69.5" height="69"/>
@@ -119,6 +119,20 @@
                                     <constraint firstItem="FoA-Or-0Fh" firstAttribute="width" secondItem="hmG-1M-6F9" secondAttribute="height" multiplier="221:313" id="tgg-bk-sqw"/>
                                 </constraints>
                             </view>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NVJ-iK-C0i">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4qE-2t-JUw" customClass="LoadingIndicator" customModule="ThinkWhat" customModuleProvider="target">
+                                        <rect key="frame" x="48" y="172" width="225" height="225"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="4qE-2t-JUw" secondAttribute="height" multiplier="1:1" id="pu6-OR-EiU"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <viewLayoutGuide key="safeArea" id="WnV-Am-rLq"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -127,7 +141,11 @@
                             <constraint firstItem="IHt-hM-WCd" firstAttribute="height" secondItem="hYx-fl-XtL" secondAttribute="height" multiplier="0.5" id="GSB-XG-Ohx"/>
                             <constraint firstItem="IHt-hM-WCd" firstAttribute="leading" secondItem="fEu-5p-dPW" secondAttribute="leading" id="Sd3-xG-FTk"/>
                             <constraint firstItem="fEu-5p-dPW" firstAttribute="trailing" secondItem="IHt-hM-WCd" secondAttribute="trailing" id="Sdw-50-qlj"/>
+                            <constraint firstItem="NVJ-iK-C0i" firstAttribute="top" secondItem="hYx-fl-XtL" secondAttribute="top" id="XbA-df-ARv"/>
+                            <constraint firstItem="NVJ-iK-C0i" firstAttribute="bottom" secondItem="hmG-1M-6F9" secondAttribute="bottom" id="hTh-RW-IpM"/>
                             <constraint firstItem="IHt-hM-WCd" firstAttribute="top" secondItem="fEu-5p-dPW" secondAttribute="top" id="hwq-P8-2KI"/>
+                            <constraint firstItem="NVJ-iK-C0i" firstAttribute="trailing" secondItem="hmG-1M-6F9" secondAttribute="trailing" id="m8S-Is-Zvq"/>
+                            <constraint firstItem="NVJ-iK-C0i" firstAttribute="leading" secondItem="IHt-hM-WCd" secondAttribute="leading" id="rNe-hT-EI0"/>
                             <constraint firstItem="hmG-1M-6F9" firstAttribute="leading" secondItem="fEu-5p-dPW" secondAttribute="leading" id="ueX-EJ-erm"/>
                             <constraint firstItem="fEu-5p-dPW" firstAttribute="trailing" secondItem="hmG-1M-6F9" secondAttribute="trailing" id="vBM-Hv-RGm"/>
                             <constraint firstItem="fP4-ga-yuv" firstAttribute="centerX" secondItem="fEu-5p-dPW" secondAttribute="centerX" id="y0F-pS-tYJ"/>
@@ -137,12 +155,15 @@
                     <navigationItem key="navigationItem" id="ZR8-KQ-Wat"/>
                     <connections>
                         <outlet property="fbButton" destination="gVO-oM-RV3" id="OtV-jH-aBo"/>
+                        <outlet property="loadingIndicator" destination="4qE-2t-JUw" id="Cbk-TP-z84"/>
+                        <outlet property="loadingView" destination="NVJ-iK-C0i" id="maN-FR-woJ"/>
                         <outlet property="mailButton" destination="KjS-Lb-PFX" id="guh-bH-ckJ"/>
                         <outlet property="termsOfUseButton" destination="FoA-Or-0Fh" id="13C-22-CF9"/>
                         <outlet property="vkButton" destination="hY7-Mf-AwY" id="Hbf-AV-Qzb"/>
                         <segue destination="7dC-m7-s4Q" kind="show" identifier="MAILAUTH" id="xEH-0M-xDg"/>
                         <segue destination="mHx-aR-ok7" kind="show" identifier="TERMS_START_SCREEN" id="rna-jh-vqW"/>
                         <segue destination="3VR-Bh-PFD" kind="show" identifier="APP" id="h1h-Jz-9YR"/>
+                        <segue destination="mHx-aR-ok7" kind="show" identifier="TERMS" id="INB-gA-bu8"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Epj-Ey-7ym" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -321,6 +342,7 @@
                         <outlet property="pwdTF" destination="t2e-Js-MZ5" id="BWM-2n-Izv"/>
                         <segue destination="3VR-Bh-PFD" kind="show" identifier="APP_FROM_MAIL_SIGNIN" id="SV6-dd-Kbm"/>
                         <segue destination="XdA-Pg-jVF" kind="show" identifier="MAIL_VALID_SIGNIN" id="bec-WO-31D"/>
+                        <segue destination="EqB-Lv-Dvs" kind="show" identifier="PROFILE_FROM_AUTH" id="Vze-cD-6tx"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Sdu-sf-XNA" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -342,13 +364,13 @@
                                         <rect key="frame" x="0.0" y="0.0" width="256" height="60"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Логин" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ktb-gc-Y3Q">
-                                                <rect key="frame" x="0.0" y="0.0" width="256" height="17.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="256" height="20.5"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Логин" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="RHa-AC-Rki" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="17.5" width="256" height="42.5"/>
+                                                <rect key="frame" x="0.0" y="20.5" width="256" height="39.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
@@ -367,6 +389,9 @@
                                                         <real key="value" value="2"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="editingChanged:" destination="Pnl-G9-xfW" eventType="editingChanged" id="3rb-es-959"/>
+                                                </connections>
                                             </textField>
                                         </subviews>
                                         <constraints>
@@ -380,13 +405,13 @@
                                         <rect key="frame" x="0.0" y="80" width="256" height="60"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Электронная почта" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nc1-qA-Jgv">
-                                                <rect key="frame" x="0.0" y="0.0" width="256" height="17.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="256" height="20.5"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="your@email.com" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="maW-rY-7Mb" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="17.5" width="256" height="42.5"/>
+                                                <rect key="frame" x="0.0" y="20.5" width="256" height="39.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
@@ -405,6 +430,9 @@
                                                         <real key="value" value="2"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="editingChanged:" destination="Pnl-G9-xfW" eventType="editingChanged" id="Su3-V7-mdh"/>
+                                                </connections>
                                             </textField>
                                         </subviews>
                                         <constraints>
@@ -418,13 +446,13 @@
                                         <rect key="frame" x="0.0" y="160" width="256" height="60"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Пароль" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gcc-yB-HVK">
-                                                <rect key="frame" x="0.0" y="0.0" width="256" height="17.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="256" height="20.5"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="*****" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="H8D-a1-Tb4" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="17.5" width="256" height="42.5"/>
+                                                <rect key="frame" x="0.0" y="20.5" width="256" height="39.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
@@ -591,17 +619,41 @@
                                     <constraint firstItem="dpH-qo-kcT" firstAttribute="height" secondItem="qi0-ac-o4s" secondAttribute="height" multiplier="0.75" id="eiT-An-BfU"/>
                                 </constraints>
                             </stackView>
+                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="psF-Je-gwb">
+                                <rect key="frame" x="0.0" y="32" width="320" height="568"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vDE-1K-JyN" customClass="LoadingIndicator" customModule="ThinkWhat" customModuleProvider="target">
+                                        <rect key="frame" x="47.5" y="171.5" width="225" height="225"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="vDE-1K-JyN" secondAttribute="height" multiplier="1:1" id="sfh-wL-jys"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="vDE-1K-JyN" firstAttribute="centerY" secondItem="psF-Je-gwb" secondAttribute="centerY" id="4ZW-s7-YRE"/>
+                                    <constraint firstItem="vDE-1K-JyN" firstAttribute="centerX" secondItem="psF-Je-gwb" secondAttribute="centerX" id="HAO-Ob-xbI"/>
+                                    <constraint firstItem="vDE-1K-JyN" firstAttribute="width" secondItem="psF-Je-gwb" secondAttribute="height" multiplier="25:63" id="raq-Ft-Ssw"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="ETv-AX-VYn" firstAttribute="width" secondItem="Ipp-NY-YFy" secondAttribute="width" multiplier="0.8" id="66c-4t-k3z"/>
+                            <constraint firstItem="psF-Je-gwb" firstAttribute="centerY" secondItem="H86-lA-V57" secondAttribute="centerY" id="dWE-tv-uYD"/>
                             <constraint firstItem="ETv-AX-VYn" firstAttribute="centerX" secondItem="H86-lA-V57" secondAttribute="centerX" id="eSO-dq-YyT"/>
+                            <constraint firstItem="psF-Je-gwb" firstAttribute="width" secondItem="Ipp-NY-YFy" secondAttribute="width" id="g0f-9q-fhs"/>
+                            <constraint firstItem="psF-Je-gwb" firstAttribute="height" secondItem="Ipp-NY-YFy" secondAttribute="height" id="jY9-gM-gMJ"/>
                             <constraint firstItem="ETv-AX-VYn" firstAttribute="top" secondItem="H86-lA-V57" secondAttribute="top" constant="10" id="lOy-lo-hVD"/>
                             <constraint firstItem="ETv-AX-VYn" firstAttribute="height" secondItem="Ipp-NY-YFy" secondAttribute="height" multiplier="0.2" id="oTG-nJ-eC1"/>
+                            <constraint firstItem="psF-Je-gwb" firstAttribute="centerX" secondItem="H86-lA-V57" secondAttribute="centerX" id="vyG-bT-XbK"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="H86-lA-V57"/>
                     </view>
                     <connections>
+                        <outlet property="loadingIndicator" destination="vDE-1K-JyN" id="Etr-KQ-JeZ"/>
+                        <outlet property="loadingView" destination="psF-Je-gwb" id="cej-JL-NcL"/>
                         <outlet property="retryTimer" destination="XRA-wb-jpU" id="R31-jr-a72"/>
                         <outlet property="retryTimerButton" destination="n3l-Zu-9zS" id="eim-Xe-f1A"/>
                         <outlet property="validationCodeTextField" destination="dpH-qo-kcT" id="CFg-Kq-ZKn"/>
@@ -624,7 +676,7 @@
                                 <rect key="frame" x="0.0" y="505.5" width="320" height="62.5"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="749" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ag5-JT-2pg">
-                                        <rect key="frame" x="55" y="0.0" width="210" height="30"/>
+                                        <rect key="frame" x="47.5" y="0.0" width="225" height="29.5"/>
                                         <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="15"/>
                                         <state key="normal" title="Согласен, принимаю условия">
                                             <color key="titleColor" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -634,7 +686,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" tag="1" contentMode="scaleToFill" verticalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6ND-d9-ffc">
-                                        <rect key="frame" x="112" y="30" width="96" height="32.5"/>
+                                        <rect key="frame" x="108.5" y="29.5" width="103" height="33"/>
                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                         <state key="normal" title="Не принимаю">
                                             <color key="titleColor" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -679,11 +731,12 @@
                         <outlet property="stackViewHeightConstraint" destination="WbD-WY-dhy" id="L3l-MW-mzI"/>
                         <outlet property="webView" destination="FRw-5k-qAS" id="KCf-hH-mEe"/>
                         <segue destination="3VR-Bh-PFD" kind="show" identifier="APP_FROM_TERMS" id="hol-gb-e59"/>
+                        <segue destination="EqB-Lv-Dvs" kind="show" identifier="PROFILE_FROM_CONFIRMATION" id="cof-ML-6cY"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ofy-Zx-UQa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3617" y="193"/>
+            <point key="canvasLocation" x="3617" y="188"/>
         </scene>
         <!--App-->
         <scene sceneID="RFD-MF-PlT">
@@ -708,13 +761,13 @@
                                         <rect key="frame" x="0.0" y="0.0" width="256" height="60"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Электронная почта" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CDy-f3-2cS">
-                                                <rect key="frame" x="0.0" y="0.0" width="256" height="17.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="256" height="20.5"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="your@email.com" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ZZY-py-xVR" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="17.5" width="256" height="42.5"/>
+                                                <rect key="frame" x="0.0" y="20.5" width="256" height="39.5"/>
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
@@ -796,10 +849,194 @@
             </objects>
             <point key="canvasLocation" x="487" y="1062"/>
         </scene>
+        <!--Profile Auth View Controller-->
+        <scene sceneID="Q28-tf-xeJ">
+            <objects>
+                <viewController id="EqB-Lv-Dvs" customClass="ProfileAuthViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="22E-zk-uQt">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0Va-ul-ayg">
+                                <rect key="frame" x="96" y="72" width="128" height="127.5"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="0Va-ul-ayg" secondAttribute="height" multiplier="1:1" id="dTv-cZ-fll"/>
+                                </constraints>
+                            </imageView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="14" translatesAutoresizingMaskIntoConstraints="NO" id="eDe-sz-a9X">
+                                <rect key="frame" x="32" y="207.5" width="256" height="282"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="JrK-52-fKs">
+                                        <rect key="frame" x="0.0" y="0.0" width="256" height="60"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Имя" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RmJ-8g-Mt2">
+                                                <rect key="frame" x="0.0" y="0.0" width="256" height="20.5"/>
+                                                <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Джон Малкович" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="3AT-It-RXL" customClass="UnderlinedTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="20.5" width="256" height="39.5"/>
+                                                <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <nil key="textColor"/>
+                                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="words" returnKeyType="done" textContentType="name"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                        <color key="value" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                        <real key="value" value="2"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                                        <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                                        <real key="value" value="2"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="textFieldEdited:" destination="EqB-Lv-Dvs" eventType="editingChanged" id="rT8-Ri-8gV"/>
+                                                </connections>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="60" id="INf-pH-Kh4"/>
+                                            <constraint firstItem="RmJ-8g-Mt2" firstAttribute="width" secondItem="JrK-52-fKs" secondAttribute="width" id="djM-a5-I70"/>
+                                            <constraint firstItem="3AT-It-RXL" firstAttribute="width" secondItem="JrK-52-fKs" secondAttribute="width" id="g7Y-d0-KGU"/>
+                                        </constraints>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="On0-CC-uix">
+                                        <rect key="frame" x="0.0" y="74" width="256" height="60"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Дата рождения" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="q2Z-i1-5QA">
+                                                <rect key="frame" x="0.0" y="0.0" width="256" height="20.5"/>
+                                                <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Дата рождения" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="yBf-rp-YP3" customClass="UnderlinedTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="20.5" width="256" height="39.5"/>
+                                                <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <nil key="textColor"/>
+                                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
+                                                <textInputTraits key="textInputTraits"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                                        <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                        <color key="value" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                                        <real key="value" value="2"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                        <real key="value" value="2"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="textFieldEdited:" destination="EqB-Lv-Dvs" eventType="editingChanged" id="R9A-nK-m5F"/>
+                                                </connections>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="60" id="6GP-nD-F0Y"/>
+                                            <constraint firstItem="yBf-rp-YP3" firstAttribute="width" secondItem="On0-CC-uix" secondAttribute="width" id="Fd7-PB-oSM"/>
+                                            <constraint firstItem="q2Z-i1-5QA" firstAttribute="width" secondItem="On0-CC-uix" secondAttribute="width" id="yaS-Iu-nok"/>
+                                        </constraints>
+                                        <viewLayoutGuide key="safeArea" id="SPJ-hb-OD3"/>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="HqW-vj-Jzz">
+                                        <rect key="frame" x="0.0" y="148" width="256" height="60"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Пол" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vtN-tZ-jAX">
+                                                <rect key="frame" x="0.0" y="0.0" width="256" height="20.5"/>
+                                                <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="your@email.com" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="7Il-rL-frc" customClass="UnderlinedTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="20.5" width="256" height="39.5"/>
+                                                <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <nil key="textColor"/>
+                                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
+                                                <textInputTraits key="textInputTraits" textContentType="email"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                                        <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                        <color key="value" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                                        <real key="value" value="2"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                        <real key="value" value="2"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="textFieldEdited:" destination="EqB-Lv-Dvs" eventType="editingChanged" id="N5J-a8-4he"/>
+                                                </connections>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="60" id="9Pw-uQ-HNg"/>
+                                            <constraint firstItem="7Il-rL-frc" firstAttribute="width" secondItem="HqW-vj-Jzz" secondAttribute="width" id="ecG-Ns-K5r"/>
+                                            <constraint firstItem="vtN-tZ-jAX" firstAttribute="width" secondItem="HqW-vj-Jzz" secondAttribute="width" id="wuF-X7-bFo"/>
+                                        </constraints>
+                                        <viewLayoutGuide key="safeArea" id="Tuq-mb-3VE"/>
+                                    </stackView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w9v-e6-q4A">
+                                        <rect key="frame" x="0.0" y="222" width="256" height="60"/>
+                                        <color key="backgroundColor" red="0.80392156859999997" green="0.3411764706" blue="0.3411764706" alpha="1" colorSpace="calibratedRGB"/>
+                                        <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="15"/>
+                                        <state key="normal" title="ПРОДОЛЖИТЬ">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="22.5"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="continueTapped:" destination="EqB-Lv-Dvs" eventType="touchUpInside" id="H9w-Ec-NBs"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="0Va-ul-ayg" firstAttribute="centerX" secondItem="J8p-8q-5hO" secondAttribute="centerX" id="Ah1-Lc-gXO"/>
+                            <constraint firstItem="eDe-sz-a9X" firstAttribute="width" secondItem="22E-zk-uQt" secondAttribute="width" multiplier="0.8" id="CQK-2g-8XI"/>
+                            <constraint firstItem="eDe-sz-a9X" firstAttribute="centerX" secondItem="J8p-8q-5hO" secondAttribute="centerX" id="RXv-sV-r7y"/>
+                            <constraint firstItem="0Va-ul-ayg" firstAttribute="top" secondItem="J8p-8q-5hO" secondAttribute="top" constant="8" id="cxC-qb-0FT"/>
+                            <constraint firstItem="eDe-sz-a9X" firstAttribute="top" secondItem="0Va-ul-ayg" secondAttribute="bottom" constant="8" id="lAN-l1-QGb"/>
+                            <constraint firstItem="0Va-ul-ayg" firstAttribute="width" secondItem="22E-zk-uQt" secondAttribute="height" multiplier="150:667" id="nMO-Sh-Y0G"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="J8p-8q-5hO"/>
+                    </view>
+                    <connections>
+                        <outlet property="birthDateTF" destination="yBf-rp-YP3" id="7o5-l8-SjK"/>
+                        <outlet property="continueButton" destination="w9v-e6-q4A" id="Bnr-j9-wy3"/>
+                        <outlet property="first_nameTF" destination="3AT-It-RXL" id="kWp-nK-LwE"/>
+                        <outlet property="genderTF" destination="7Il-rL-frc" id="dGY-rp-mai"/>
+                        <outlet property="stackView" destination="eDe-sz-a9X" id="UJD-rS-rhq"/>
+                        <outlet property="userImage" destination="0Va-ul-ayg" id="U1x-fA-R1T"/>
+                        <segue destination="3VR-Bh-PFD" kind="show" identifier="APP_FROM_PROFILE" id="hT0-PF-8mW"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mIH-eb-tzj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5503" y="189"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="SV6-dd-Kbm"/>
-        <segue reference="rna-jh-vqW"/>
-        <segue reference="DXW-pt-dWO"/>
+        <segue reference="Vze-cD-6tx"/>
+        <segue reference="h1h-Jz-9YR"/>
+        <segue reference="INB-gA-bu8"/>
+        <segue reference="bec-WO-31D"/>
     </inferredMetricsTieBreakers>
 </document>

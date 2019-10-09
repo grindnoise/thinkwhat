@@ -10,11 +10,11 @@ import Foundation
 import UIKit
 import CoreData
 
-protocol FileStoringProtocol {
+protocol FileStorageProtocol {
     func storeImage(type: ImageType, image: UIImage, fileName: String?, fileFormat: FileFormat, surveyID: String?) -> URL?
 }
 
-class FileStorage: FileStoringProtocol {
+class FileStorageManager: FileStorageProtocol {
     
     func getImagesDirectoryPath() -> URL {
         var imagesDirectoryPath = ""
@@ -52,10 +52,16 @@ class FileStorage: FileStoringProtocol {
             case .JPEG:
                 do {
                     try image.jpegData(compressionQuality: 0.75)?.write(to: imageURL!)
+                    let fileManager = FileManager.default
+                    if fileManager.fileExists(atPath: imageURL!.absoluteString) {
+                        print("FILE AVAILABLE")
+                    } else {
+                        print("FILE NOT AVAILABLE")
+                    }
                     return imageURL
                 } catch {
-                    print(error.localizedDescription)
-                    return nil
+                    fatalError(error.localizedDescription)
+                    imageURL = nil
                 }
             default:
                 print("default")

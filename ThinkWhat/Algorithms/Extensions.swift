@@ -417,3 +417,9 @@ extension NSData{
 //    }
 //}
 
+//extension Dictionary where Key == String {
+//    mutating func nestDictionary(_ dictionaryName: String, dictionary: [String : Any]) -> Dictionary {
+//        self[dictionaryName] = dictionary as! Value
+//        return self
+//    }
+//}

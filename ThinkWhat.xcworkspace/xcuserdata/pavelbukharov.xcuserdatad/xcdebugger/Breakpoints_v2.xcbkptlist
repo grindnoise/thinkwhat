@@ -73,62 +73,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/LaunchViewController.swift"
-            timestampString = "584548729.85887"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "23"
-            endingLineNumber = "23"
-            landmarkName = "viewWillAppear(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/LaunchViewController.swift"
-            timestampString = "584548729.858968"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "22"
-            endingLineNumber = "22"
-            landmarkName = "viewWillAppear(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/LaunchViewController.swift"
-            timestampString = "584548729.859048"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "26"
-            endingLineNumber = "26"
-            landmarkName = "viewWillAppear(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthNavigationController.swift"
-            timestampString = "587571593.839798"
+            timestampString = "592307449.839114"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "17"
-            endingLineNumber = "17"
-            landmarkName = "viewDidLoad()"
-            landmarkType = "7">
+            startingLineNumber = "12"
+            endingLineNumber = "12">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -138,11 +88,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
-            timestampString = "588333042.609802"
+            timestampString = "592307449.839288"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "208"
-            endingLineNumber = "208"
+            startingLineNumber = "241"
+            endingLineNumber = "241"
             landmarkName = "textFieldShouldReturn(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -282,7 +232,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.44811"
+            timestampString = "590523223.327741"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "38"
@@ -298,7 +248,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.4486279"
+            timestampString = "590523223.327837"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "41"
@@ -314,7 +264,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.448961"
+            timestampString = "590523223.327909"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "45"
@@ -330,7 +280,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.449288"
+            timestampString = "590523223.3279769"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "22"
@@ -346,7 +296,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.449634"
+            timestampString = "590523223.32816"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "28"
@@ -362,7 +312,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.449983"
+            timestampString = "590523223.32827"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "42"
@@ -378,11 +328,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.581077"
+            timestampString = "592308624.1793621"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "128"
-            endingLineNumber = "128"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -394,11 +344,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.581182"
+            timestampString = "592308624.179459"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "132"
-            endingLineNumber = "132"
+            startingLineNumber = "160"
+            endingLineNumber = "160"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -410,11 +360,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5812581"
+            timestampString = "592308624.179527"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "176"
-            endingLineNumber = "176"
+            startingLineNumber = "206"
+            endingLineNumber = "206"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -426,11 +376,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.581329"
+            timestampString = "592308624.179592"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "177"
-            endingLineNumber = "177"
+            startingLineNumber = "207"
+            endingLineNumber = "207"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -442,7 +392,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.450416"
+            timestampString = "590523223.332083"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "24"
@@ -490,11 +440,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.610739"
+            timestampString = "592308624.179715"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "498"
-            endingLineNumber = "498"
+            startingLineNumber = "586"
+            endingLineNumber = "586"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -506,11 +456,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.581539"
+            timestampString = "592308624.17978"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "178"
-            endingLineNumber = "178"
+            startingLineNumber = "208"
+            endingLineNumber = "208"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
             <Locations>
@@ -554,11 +504,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5816081"
+            timestampString = "592308624.179845"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "128"
-            endingLineNumber = "128"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -570,27 +520,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5816751"
+            timestampString = "592308624.179909"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "155"
+            endingLineNumber = "155"
+            landmarkName = "handleTap(gesture:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.179975"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "127"
             endingLineNumber = "127"
-            landmarkName = "handleTap(gesture:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.581753"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "99"
-            endingLineNumber = "99"
             landmarkName = "showTermsOfUse(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -602,7 +552,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.451885"
+            timestampString = "590523223.336006"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "34"
@@ -618,11 +568,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.581844"
+            timestampString = "592308624.180059"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "129"
-            endingLineNumber = "129"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -714,11 +664,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5819761"
+            timestampString = "592308624.18018"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "383"
-            endingLineNumber = "383"
+            startingLineNumber = "430"
+            endingLineNumber = "430"
             landmarkName = "vkSdkAccessAuthorizationFinished(with:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -730,11 +680,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.582045"
+            timestampString = "592308624.180245"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "416"
-            endingLineNumber = "416"
+            startingLineNumber = "463"
+            endingLineNumber = "463"
             landmarkName = "vkSdkShouldPresent(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -858,11 +808,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.582177"
+            timestampString = "592308624.180365"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "377"
-            endingLineNumber = "377"
+            startingLineNumber = "424"
+            endingLineNumber = "424"
             landmarkName = "AuthViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -874,11 +824,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5822459"
+            timestampString = "592308624.180431"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "427"
-            endingLineNumber = "427"
+            startingLineNumber = "474"
+            endingLineNumber = "474"
             landmarkName = "vkSdkAccessTokenUpdated(newToken:oldToken:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -890,11 +840,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5823129"
+            timestampString = "592308624.180496"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "170"
-            endingLineNumber = "170"
+            startingLineNumber = "200"
+            endingLineNumber = "200"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
             <Locations>
@@ -938,11 +888,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5823801"
+            timestampString = "592308624.18056"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
+            startingLineNumber = "202"
+            endingLineNumber = "202"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -954,11 +904,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.582446"
+            timestampString = "592308624.180624"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "181"
-            endingLineNumber = "181"
+            startingLineNumber = "211"
+            endingLineNumber = "211"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1082,11 +1032,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.582616"
+            timestampString = "592308624.180778"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "135"
-            endingLineNumber = "135"
+            startingLineNumber = "164"
+            endingLineNumber = "164"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1098,7 +1048,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.45278"
+            timestampString = "590523223.345912"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "25"
@@ -1130,11 +1080,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.611704"
+            timestampString = "592308624.180881"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
+            startingLineNumber = "101"
+            endingLineNumber = "101"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -1146,11 +1096,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5827971"
+            timestampString = "592308624.180941"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "141"
-            endingLineNumber = "141"
+            startingLineNumber = "170"
+            endingLineNumber = "170"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1162,11 +1112,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.582865"
+            timestampString = "592308624.181006"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "134"
-            endingLineNumber = "134"
+            startingLineNumber = "162"
+            endingLineNumber = "162"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1242,7 +1192,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.454116"
+            timestampString = "590523223.349072"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "47"
@@ -1290,7 +1240,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.45444"
+            timestampString = "590523223.349151"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "46"
@@ -1306,7 +1256,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FileStoring.swift"
-            timestampString = "585216668.652761"
+            timestampString = "592308624.181145"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "50"
@@ -1318,15 +1268,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FileStoring.swift"
-            timestampString = "585216668.6531"
+            timestampString = "592308624.181621"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "57"
-            endingLineNumber = "57"
+            startingLineNumber = "63"
+            endingLineNumber = "63"
             landmarkName = "storeImage(type:image:fileName:fileFormat:surveyID:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1334,15 +1284,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FileStoring.swift"
-            timestampString = "585216668.653358"
+            timestampString = "592308624.181934"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "55"
-            endingLineNumber = "55"
+            startingLineNumber = "61"
+            endingLineNumber = "61"
             landmarkName = "storeImage(type:image:fileName:fileFormat:surveyID:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1386,11 +1336,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.583118"
+            timestampString = "592308624.182283"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "258"
-            endingLineNumber = "258"
+            startingLineNumber = "291"
+            endingLineNumber = "291"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1398,11 +1348,11 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FileStoring.swift"
-            timestampString = "585216668.659952"
+            timestampString = "592308624.182351"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "54"
@@ -1578,11 +1528,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5833319"
+            timestampString = "592308624.182762"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "145"
-            endingLineNumber = "145"
+            startingLineNumber = "174"
+            endingLineNumber = "174"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1642,11 +1592,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.583463"
+            timestampString = "592308624.182886"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "163"
-            endingLineNumber = "163"
+            startingLineNumber = "192"
+            endingLineNumber = "192"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1658,11 +1608,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.583531"
+            timestampString = "592308624.182952"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "356"
-            endingLineNumber = "356"
+            startingLineNumber = "391"
+            endingLineNumber = "391"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1674,11 +1624,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.583599"
+            timestampString = "592308624.183017"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "228"
-            endingLineNumber = "228"
+            startingLineNumber = "258"
+            endingLineNumber = "258"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1690,11 +1640,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.583666"
+            timestampString = "592308624.1830831"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "138"
-            endingLineNumber = "138"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1706,11 +1656,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.583733"
+            timestampString = "592308624.183147"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "152"
-            endingLineNumber = "152"
+            startingLineNumber = "181"
+            endingLineNumber = "181"
             landmarkName = "handleTap(gesture:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1722,13 +1672,45 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.583799"
+            timestampString = "592308624.183212"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "240"
-            endingLineNumber = "240"
+            startingLineNumber = "273"
+            endingLineNumber = "273"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Bool) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592305073.57908"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "270"
+                  endingLineNumber = "270"
+                  offsetFromSymbolStart = "64">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;) -&gt; () in closure #1 (Swift.Bool) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592305073.582571"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "259"
+                  endingLineNumber = "259"
+                  offsetFromSymbolStart = "40">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1738,11 +1720,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.612787"
+            timestampString = "592308624.183277"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "238"
-            endingLineNumber = "238"
+            startingLineNumber = "261"
+            endingLineNumber = "261"
             landmarkName = "email"
             landmarkType = "24">
          </BreakpointContent>
@@ -1754,11 +1736,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.613359"
+            timestampString = "592308624.1833349"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "202"
-            endingLineNumber = "202"
+            startingLineNumber = "225"
+            endingLineNumber = "225"
             landmarkName = "ID"
             landmarkType = "24">
          </BreakpointContent>
@@ -1770,11 +1752,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.613933"
+            timestampString = "592308624.183392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "442"
-            endingLineNumber = "442"
+            startingLineNumber = "509"
+            endingLineNumber = "509"
             landmarkName = "AppData"
             landmarkType = "3">
          </BreakpointContent>
@@ -1786,11 +1768,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.614547"
+            timestampString = "592308624.183449"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "445"
-            endingLineNumber = "445"
+            startingLineNumber = "512"
+            endingLineNumber = "512"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -1802,11 +1784,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.614978"
+            timestampString = "592308624.183506"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "300"
-            endingLineNumber = "300"
+            startingLineNumber = "325"
+            endingLineNumber = "325"
             landmarkName = "gender"
             landmarkType = "24">
          </BreakpointContent>
@@ -1818,13 +1800,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.615345"
+            timestampString = "592308624.1835639"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "444"
-            endingLineNumber = "444"
-            landmarkName = "unknown"
-            landmarkType = "0">
+            startingLineNumber = "511"
+            endingLineNumber = "511"
+            landmarkName = "AppData"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1834,11 +1816,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.584257"
+            timestampString = "592308624.183624"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "278"
-            endingLineNumber = "278"
+            startingLineNumber = "313"
+            endingLineNumber = "313"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1850,11 +1832,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.584323"
+            timestampString = "592308624.183688"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "239"
-            endingLineNumber = "239"
+            startingLineNumber = "272"
+            endingLineNumber = "272"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1866,11 +1848,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.58439"
+            timestampString = "592308624.1837519"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "257"
-            endingLineNumber = "257"
+            startingLineNumber = "290"
+            endingLineNumber = "290"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1882,11 +1864,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.584457"
+            timestampString = "592308624.183816"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "256"
-            endingLineNumber = "256"
+            startingLineNumber = "289"
+            endingLineNumber = "289"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1898,11 +1880,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.584523"
+            timestampString = "592308624.183879"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "244"
-            endingLineNumber = "244"
+            startingLineNumber = "277"
+            endingLineNumber = "277"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1914,11 +1896,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.584589"
+            timestampString = "592308624.183944"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "249"
-            endingLineNumber = "249"
+            startingLineNumber = "282"
+            endingLineNumber = "282"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1930,11 +1912,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.584655"
+            timestampString = "592308624.184007"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "250"
-            endingLineNumber = "250"
+            startingLineNumber = "283"
+            endingLineNumber = "283"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1946,11 +1928,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.58472"
+            timestampString = "592308624.1840709"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "259"
-            endingLineNumber = "259"
+            startingLineNumber = "292"
+            endingLineNumber = "292"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1962,7 +1944,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.460555"
+            timestampString = "590523223.375284"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "61"
@@ -1978,11 +1960,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.58481"
+            timestampString = "592308624.1841559"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "260"
-            endingLineNumber = "260"
+            startingLineNumber = "294"
+            endingLineNumber = "294"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
             <Locations>
@@ -1990,31 +1972,31 @@
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Foundation.Data&gt;) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;) -&gt; () in closure #1 (Swift.Bool) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Foundation.Data&gt;) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;) -&gt; () in closure #1 (Swift.Bool) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
                   moduleName = "ThinkWhat"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
-                  timestampString = "585230095.900321"
+                  timestampString = "592306556.355484"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "253"
-                  endingLineNumber = "253"
-                  offsetFromSymbolStart = "1753">
+                  startingLineNumber = "292"
+                  endingLineNumber = "292"
+                  offsetFromSymbolStart = "1896">
                </Location>
                <Location
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;) -&gt; () in closure #1 (Alamofire.DataResponse&lt;Foundation.Data&gt;) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;) -&gt; () in closure #1 (Swift.Bool) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  symbolName = "closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in closure #1 (Alamofire.DataResponse&lt;Foundation.Data&gt;) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;) -&gt; () in closure #1 (Swift.Bool) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
                   moduleName = "ThinkWhat"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
-                  timestampString = "585230095.903964"
+                  timestampString = "592306556.360198"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "255"
-                  endingLineNumber = "255"
-                  offsetFromSymbolStart = "81">
+                  startingLineNumber = "259"
+                  endingLineNumber = "259"
+                  offsetFromSymbolStart = "52">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -2026,12 +2008,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.615916"
+            timestampString = "592308624.184221"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "437"
-            endingLineNumber = "437"
-            landmarkName = "importUserData(_:)"
+            startingLineNumber = "497"
+            endingLineNumber = "497"
+            landmarkName = "importUserData(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2042,12 +2024,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.6163549"
+            timestampString = "592308624.184279"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "436"
-            endingLineNumber = "436"
-            landmarkName = "importUserData(_:)"
+            startingLineNumber = "496"
+            endingLineNumber = "496"
+            landmarkName = "importUserData(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2058,7 +2040,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/VKManager.swift"
-            timestampString = "585836914.848454"
+            timestampString = "591633166.054327"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "22"
@@ -2074,7 +2056,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/VKManager.swift"
-            timestampString = "585836914.848896"
+            timestampString = "591633166.054418"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "32"
@@ -2090,11 +2072,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5850509"
+            timestampString = "592308624.184375"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "403"
-            endingLineNumber = "403"
+            startingLineNumber = "450"
+            endingLineNumber = "450"
             landmarkName = "vkSdkAccessAuthorizationFinished(with:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2106,151 +2088,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.585119"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "302"
-            endingLineNumber = "302"
-            landmarkName = "handleTokenState()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.585186"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "296"
-            endingLineNumber = "296"
-            landmarkName = "handleTokenState()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/VKManager.swift"
-            timestampString = "585836914.851612"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "26"
-            endingLineNumber = "26"
-            landmarkName = "getUserData(completionHandler:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.313117"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "591"
-            endingLineNumber = "591"
-            landmarkName = "performRequest()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/VKManager.swift"
-            timestampString = "585836914.852559"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
-            landmarkName = "prepareUserData(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.313628"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "636"
-            endingLineNumber = "636"
-            landmarkName = "performRequest()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.5872149"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "324"
-            endingLineNumber = "324"
-            landmarkName = "handleTokenState()"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 (Alamofire.DataResponse&lt;Foundation.Data&gt;) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in closure #2 (Swift.Bool) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
-                  timestampString = "585661090.911867"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "311"
-                  endingLineNumber = "311"
-                  offsetFromSymbolStart = "1714">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in closure #2 (Alamofire.DataResponse&lt;Foundation.Data&gt;) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in closure #2 (Swift.Bool) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
-                  timestampString = "585661090.920113"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "313"
-                  endingLineNumber = "313"
-                  offsetFromSymbolStart = "26">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.587289"
+            timestampString = "592308624.18444"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "338"
@@ -2266,11 +2104,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.587356"
+            timestampString = "592308624.184504"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "339"
-            endingLineNumber = "339"
+            startingLineNumber = "332"
+            endingLineNumber = "332"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -2281,13 +2119,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.587422"
+            filePath = "ThinkWhat/Algorithms/VKManager.swift"
+            timestampString = "591633166.056564"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "325"
-            endingLineNumber = "325"
-            landmarkName = "handleTokenState()"
+            startingLineNumber = "26"
+            endingLineNumber = "26"
+            landmarkName = "getUserData(completionHandler:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2298,27 +2136,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.314097"
+            timestampString = "591717586.237879"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "458"
-            endingLineNumber = "458"
-            landmarkName = "getProfileNeedsUpdate(completion:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.314477"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "462"
-            endingLineNumber = "462"
+            startingLineNumber = "598"
+            endingLineNumber = "598"
             landmarkName = "performRequest()"
             landmarkType = "9">
          </BreakpointContent>
@@ -2329,13 +2151,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.314837"
+            filePath = "ThinkWhat/Algorithms/VKManager.swift"
+            timestampString = "591633166.0567"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "265"
-            endingLineNumber = "265"
-            landmarkName = "login(_:username:password:token:completion:)"
+            startingLineNumber = "116"
+            endingLineNumber = "116"
+            landmarkName = "prepareUserData(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2346,59 +2168,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.315213"
+            timestampString = "591717586.237991"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "573"
-            endingLineNumber = "573"
-            landmarkName = "updateUserProfile(data:completion:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.591608"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "330"
-            endingLineNumber = "330"
-            landmarkName = "handleTokenState()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.315756"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "570"
-            endingLineNumber = "570"
-            landmarkName = "updateUserProfile(data:completion:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.3161809"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "580"
-            endingLineNumber = "580"
+            startingLineNumber = "643"
+            endingLineNumber = "643"
             landmarkName = "performRequest()"
             landmarkType = "9">
          </BreakpointContent>
@@ -2410,43 +2184,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.59354"
+            timestampString = "592308624.184642"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "430"
-            endingLineNumber = "430"
-            landmarkName = "vkSdkAuthorizationStateUpdated(with:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.593617"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "385"
-            endingLineNumber = "385"
-            landmarkName = "vkSdkAccessAuthorizationFinished(with:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.593686"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "295"
-            endingLineNumber = "295"
+            startingLineNumber = "359"
+            endingLineNumber = "359"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -2458,7 +2200,71 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
-            timestampString = "588331503.593755"
+            timestampString = "592308624.184707"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "373"
+            endingLineNumber = "373"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in closure #2 (Swift.Bool) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592303053.389039"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "370"
+                  endingLineNumber = "370"
+                  offsetFromSymbolStart = "3524">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #3 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in closure #2 (Swift.Bool) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592303053.391706"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "372"
+                  endingLineNumber = "372"
+                  offsetFromSymbolStart = "36">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.1847709"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "374"
+            endingLineNumber = "374"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.184835"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "360"
@@ -2473,12 +2279,188 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
-            timestampString = "588333042.617808"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.239785"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "73"
-            endingLineNumber = "73"
+            startingLineNumber = "464"
+            endingLineNumber = "464"
+            landmarkName = "getProfileNeedsUpdate(completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.239866"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "468"
+            endingLineNumber = "468"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.2399319"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "268"
+            endingLineNumber = "268"
+            landmarkName = "login(_:username:password:token:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.239998"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "579"
+            endingLineNumber = "579"
+            landmarkName = "updateUserProfile(data:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.184971"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "365"
+            endingLineNumber = "365"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.240485"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "576"
+            endingLineNumber = "576"
+            landmarkName = "updateUserProfile(data:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.240551"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "586"
+            endingLineNumber = "586"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.185074"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "477"
+            endingLineNumber = "477"
+            landmarkName = "vkSdkAuthorizationStateUpdated(with:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.1851389"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "432"
+            endingLineNumber = "432"
+            landmarkName = "vkSdkAccessAuthorizationFinished(with:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.185202"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "331"
+            endingLineNumber = "331"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.185267"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "395"
+            endingLineNumber = "395"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
+            timestampString = "592307449.876109"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "69"
+            endingLineNumber = "69"
             landmarkName = "isMailFilled"
             landmarkType = "24">
          </BreakpointContent>
@@ -2490,11 +2472,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
-            timestampString = "588333042.618531"
+            timestampString = "592307449.876393"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "98"
-            endingLineNumber = "98"
+            startingLineNumber = "94"
+            endingLineNumber = "94"
             landmarkName = "isLoginFilled"
             landmarkType = "24">
          </BreakpointContent>
@@ -2506,11 +2488,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
-            timestampString = "588333042.61913"
+            timestampString = "592307449.876677"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "76"
-            endingLineNumber = "76"
+            startingLineNumber = "72"
+            endingLineNumber = "72"
             landmarkName = "isMailFilled"
             landmarkType = "24">
          </BreakpointContent>
@@ -2522,11 +2504,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Main.swift"
-            timestampString = "588333042.619522"
+            timestampString = "592308624.185387"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "382"
-            endingLineNumber = "382"
+            startingLineNumber = "442"
+            endingLineNumber = "442"
             landmarkName = "System"
             landmarkType = "14">
          </BreakpointContent>
@@ -2586,7 +2568,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.465409"
+            timestampString = "590523223.3942879"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "17"
@@ -2602,7 +2584,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/FBManager.swift"
-            timestampString = "586880385.465746"
+            timestampString = "590523223.394361"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "15"
@@ -2650,11 +2632,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/ValidationViewController.swift"
-            timestampString = "588332380.317243"
+            timestampString = "592307449.878024"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "134"
-            endingLineNumber = "134"
+            startingLineNumber = "163"
+            endingLineNumber = "163"
             landmarkName = "prepare(for:sender:)"
             landmarkType = "7">
             <Locations>
@@ -2713,11 +2695,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/ValidationViewController.swift"
-            timestampString = "588332380.3176579"
+            timestampString = "592307449.878262"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "43"
-            endingLineNumber = "43"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
             landmarkName = "isTimerVisible"
             landmarkType = "24">
             <Locations>
@@ -2776,11 +2758,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/ValidationViewController.swift"
-            timestampString = "588332380.318001"
+            timestampString = "592307449.878431"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "138"
-            endingLineNumber = "138"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
             landmarkName = "runTimer()"
             landmarkType = "7">
          </BreakpointContent>
@@ -2792,11 +2774,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/ValidationViewController.swift"
-            timestampString = "588332380.3183481"
+            timestampString = "592307449.878577"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "27"
-            endingLineNumber = "27"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
             landmarkName = "validationCode"
             landmarkType = "24">
          </BreakpointContent>
@@ -2808,11 +2790,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.318681"
+            timestampString = "591717586.243232"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "419"
-            endingLineNumber = "419"
+            startingLineNumber = "422"
+            endingLineNumber = "422"
             landmarkName = "performRequest()"
             landmarkType = "9">
          </BreakpointContent>
@@ -2824,11 +2806,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/TermsOfUseViewController.swift"
-            timestampString = "588322322.926797"
+            timestampString = "592307449.878913"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "74"
-            endingLineNumber = "74"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
             landmarkName = "viewWillAppear(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2840,11 +2822,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.319106"
+            timestampString = "591717586.243711"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "290"
-            endingLineNumber = "290"
+            startingLineNumber = "293"
+            endingLineNumber = "293"
             landmarkName = "usernameLogin(username:password:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -2856,11 +2838,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
-            timestampString = "588333042.620429"
+            timestampString = "592307449.879163"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "25"
-            endingLineNumber = "25"
+            startingLineNumber = "23"
+            endingLineNumber = "23"
             landmarkName = "signupTapped(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2872,11 +2854,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.620842"
+            timestampString = "592307449.879362"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "61"
-            endingLineNumber = "61"
+            startingLineNumber = "64"
+            endingLineNumber = "64"
             landmarkName = "formIsReady"
             landmarkType = "24">
             <Locations>
@@ -2980,11 +2962,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.6212879"
+            timestampString = "592307449.879602"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "63"
-            endingLineNumber = "63"
+            startingLineNumber = "66"
+            endingLineNumber = "66"
             landmarkName = "formIsReady"
             landmarkType = "24">
             <Locations>
@@ -3028,11 +3010,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.621662"
+            timestampString = "592307449.8797849"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
             landmarkName = "formIsReady"
             landmarkType = "24">
             <Locations>
@@ -3106,7 +3088,39 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.6220191"
+            timestampString = "592307449.880011"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "33"
+            endingLineNumber = "33"
+            landmarkName = "editingChanged(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
+            timestampString = "592307449.880192"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "29"
+            endingLineNumber = "29"
+            landmarkName = "editingChanged(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
+            timestampString = "592307449.8804229"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "30"
@@ -3122,11 +3136,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.6223871"
+            timestampString = "592307449.880651"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "26"
-            endingLineNumber = "26"
+            startingLineNumber = "35"
+            endingLineNumber = "35"
             landmarkName = "editingChanged(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3138,11 +3152,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.622743"
+            timestampString = "592307449.8809839"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "27"
-            endingLineNumber = "27"
+            startingLineNumber = "28"
+            endingLineNumber = "28"
             landmarkName = "editingChanged(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3154,43 +3168,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.623093"
+            timestampString = "592307449.881211"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "32"
-            endingLineNumber = "32"
-            landmarkName = "editingChanged(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.623454"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "25"
-            endingLineNumber = "25"
-            landmarkName = "editingChanged(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.623896"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "19"
-            endingLineNumber = "19"
+            startingLineNumber = "20"
+            endingLineNumber = "20"
             landmarkName = "signupTapped(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3202,11 +3184,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.319688"
+            timestampString = "591717586.244436"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "281"
-            endingLineNumber = "281"
+            startingLineNumber = "284"
+            endingLineNumber = "284"
             landmarkName = "usernameLogin(username:password:)"
             landmarkType = "9">
             <Locations>
@@ -3250,11 +3232,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.320066"
+            timestampString = "591717586.2445"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "283"
-            endingLineNumber = "283"
+            startingLineNumber = "286"
+            endingLineNumber = "286"
             landmarkName = "usernameLogin(username:password:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -3266,11 +3248,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.320425"
+            timestampString = "591717586.2445641"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "279"
-            endingLineNumber = "279"
+            startingLineNumber = "282"
+            endingLineNumber = "282"
             landmarkName = "login(_:username:password:token:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3282,11 +3264,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.320791"
+            timestampString = "591717586.244657"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "205"
-            endingLineNumber = "205"
+            startingLineNumber = "208"
+            endingLineNumber = "208"
             landmarkName = "getUserData(completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3298,11 +3280,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.321154"
+            timestampString = "591717586.244738"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "71"
-            endingLineNumber = "71"
+            startingLineNumber = "72"
+            endingLineNumber = "72"
             landmarkName = "APIManager"
             landmarkType = "3">
          </BreakpointContent>
@@ -3314,11 +3296,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.321527"
+            timestampString = "591717586.2448421"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "73"
-            endingLineNumber = "73"
+            startingLineNumber = "74"
+            endingLineNumber = "74"
             landmarkName = "checkForReachability(completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3330,11 +3312,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.321892"
+            timestampString = "591717586.2449369"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "274"
-            endingLineNumber = "274"
+            startingLineNumber = "277"
+            endingLineNumber = "277"
             landmarkName = "login(_:username:password:token:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3346,11 +3328,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.322263"
+            timestampString = "591717586.245041"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "258"
-            endingLineNumber = "258"
+            startingLineNumber = "261"
+            endingLineNumber = "261"
             landmarkName = "login(_:username:password:token:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3362,11 +3344,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.3226219"
+            timestampString = "591717586.245137"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "260"
-            endingLineNumber = "260"
+            startingLineNumber = "263"
+            endingLineNumber = "263"
             landmarkName = "login(_:username:password:token:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3378,11 +3360,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.322993"
+            timestampString = "591717586.245206"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "256"
-            endingLineNumber = "256"
+            startingLineNumber = "259"
+            endingLineNumber = "259"
             landmarkName = "login(_:username:password:token:completion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3394,11 +3376,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.3233761"
+            timestampString = "591717586.245296"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "304"
-            endingLineNumber = "304"
+            startingLineNumber = "307"
+            endingLineNumber = "307"
             landmarkName = "usernameLogin(username:password:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -3410,11 +3392,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
-            timestampString = "588333042.624554"
+            timestampString = "592307449.882041"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "40"
-            endingLineNumber = "40"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
             landmarkName = "isLoadingViewVisible"
             landmarkType = "24">
          </BreakpointContent>
@@ -3426,11 +3408,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.323772"
+            timestampString = "591717586.2455029"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "422"
-            endingLineNumber = "422"
+            startingLineNumber = "425"
+            endingLineNumber = "425"
             landmarkName = "performRequest()"
             landmarkType = "9">
          </BreakpointContent>
@@ -3458,11 +3440,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.324164"
+            timestampString = "591717586.245663"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "297"
-            endingLineNumber = "297"
+            startingLineNumber = "300"
+            endingLineNumber = "300"
             landmarkName = "usernameLogin(username:password:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -3474,11 +3456,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.32463"
+            timestampString = "591717586.245754"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "708"
-            endingLineNumber = "708"
+            startingLineNumber = "721"
+            endingLineNumber = "721"
             landmarkName = "performRequest()"
             landmarkType = "9">
          </BreakpointContent>
@@ -3490,11 +3472,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.325014"
+            timestampString = "591717586.245829"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "709"
-            endingLineNumber = "709"
+            startingLineNumber = "722"
+            endingLineNumber = "722"
             landmarkName = "performRequest()"
             landmarkType = "9">
          </BreakpointContent>
@@ -3506,11 +3488,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.625033"
+            timestampString = "592307449.8824559"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "33"
-            endingLineNumber = "33"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
             landmarkName = "editingChanged(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3522,27 +3504,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.625414"
+            timestampString = "592307449.882656"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "21"
-            endingLineNumber = "21"
-            landmarkName = "signupTapped(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.625764"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "176"
-            endingLineNumber = "176"
+            startingLineNumber = "183"
+            endingLineNumber = "183"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3554,23 +3520,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.325452"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "289"
-            endingLineNumber = "289"
-            landmarkName = "usernameLogin(username:password:)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.325821"
+            timestampString = "591717586.246117"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "292"
@@ -3586,11 +3536,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.326182"
+            timestampString = "591717586.246191"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "696"
-            endingLineNumber = "696"
+            startingLineNumber = "295"
+            endingLineNumber = "295"
+            landmarkName = "usernameLogin(username:password:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.246261"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "709"
+            endingLineNumber = "709"
             landmarkName = "performRequest()"
             landmarkType = "9">
             <Locations>
@@ -3634,11 +3600,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.3265539"
+            timestampString = "591717586.246335"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "704"
-            endingLineNumber = "704"
+            startingLineNumber = "717"
+            endingLineNumber = "717"
             landmarkName = "performRequest()"
             landmarkType = "9">
          </BreakpointContent>
@@ -3650,11 +3616,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.626204"
+            timestampString = "592307449.88302"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "181"
-            endingLineNumber = "181"
+            startingLineNumber = "240"
+            endingLineNumber = "240"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3666,11 +3632,59 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.626561"
+            timestampString = "592307449.883199"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "183"
-            endingLineNumber = "183"
+            startingLineNumber = "240"
+            endingLineNumber = "240"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.246546"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "714"
+            endingLineNumber = "714"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.246616"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "711"
+            endingLineNumber = "711"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
+            timestampString = "592307449.883486"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "240"
+            endingLineNumber = "240"
             landmarkName = "handleTokenState()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3682,13 +3696,957 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.626909"
+            timestampString = "592307449.883649"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "240"
+            endingLineNumber = "240"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/TermsOfUseViewController.swift"
+            timestampString = "592307449.883835"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "34"
+            endingLineNumber = "34"
+            landmarkName = "buttonTapped(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.247291"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "660"
+            endingLineNumber = "660"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.247358"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "592"
+            endingLineNumber = "592"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.247442"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "666"
+            endingLineNumber = "666"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.2475131"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "672"
+            endingLineNumber = "672"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.247582"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "661"
+            endingLineNumber = "661"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.24766"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "658"
+            endingLineNumber = "658"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/VKManager.swift"
+            timestampString = "591633166.067335"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "75"
+            endingLineNumber = "75"
+            landmarkName = "prepareUserData(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.247821"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "210"
+            endingLineNumber = "210"
+            landmarkName = "getUserData(completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/ProfileAuthViewController.swift"
+            timestampString = "592307449.884383"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "60"
+            endingLineNumber = "60"
+            landmarkName = "continueTapped(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.248032"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "627"
+            endingLineNumber = "627"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/Main.swift"
+            timestampString = "592308624.186527"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "625"
+            endingLineNumber = "625"
+            landmarkName = "showAlert(type:buttons:text:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/APIManager.swift"
+            timestampString = "591717586.2485321"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "280"
+            endingLineNumber = "280"
+            landmarkName = "login(_:username:password:token:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/ProfileAuthViewController.swift"
+            timestampString = "592307449.8849829"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "309"
+            endingLineNumber = "309"
+            landmarkName = "imagePickerController(_:didFinishPickingMediaWithInfo:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/ProfileAuthViewController.swift"
+            timestampString = "592307449.885253"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "90"
+            endingLineNumber = "90"
+            landmarkName = "isImageChanged"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/Main.swift"
+            timestampString = "592308624.186643"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "unknown"
+            landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.8858041"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "347"
+            endingLineNumber = "347"
+            landmarkName = "socialMediaLogin(token:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.885964"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "360"
+            endingLineNumber = "360"
+            landmarkName = "socialMediaLogin(token:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.186782"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "178"
+            endingLineNumber = "178"
+            landmarkName = "handleTap(gesture:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.186849"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "179"
+            endingLineNumber = "179"
+            landmarkName = "handleTap(gesture:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in ThinkWhat.AuthViewController.(handleTap in _F954241C9B2F6075428BF9FC3351171B)(gesture: __C.UITapGestureRecognizer) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "591782301.020393"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "150"
+                  endingLineNumber = "150"
+                  offsetFromSymbolStart = "895">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 (Swift.Bool) -&gt; () in closure #1 () -&gt; () in ThinkWhat.AuthViewController.(handleTap in _F954241C9B2F6075428BF9FC3351171B)(gesture: __C.UITapGestureRecognizer) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "591782301.02495"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "152"
+                  endingLineNumber = "152"
+                  offsetFromSymbolStart = "36">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/FBManager.swift"
+            timestampString = "592303052.99972"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "22"
+            endingLineNumber = "22"
+            landmarkName = "performLogin(viewController:completionHandler:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.186951"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "168"
+            endingLineNumber = "168"
+            landmarkName = "handleTap(gesture:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Bool) -&gt; () in closure #1 () -&gt; () in ThinkWhat.AuthViewController.(handleTap in _F954241C9B2F6075428BF9FC3351171B)(gesture: __C.UITapGestureRecognizer) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "591782373.678249"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "139"
+                  endingLineNumber = "139"
+                  offsetFromSymbolStart = "49">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (ThinkWhat.TokenState) -&gt; () in closure #1 (Swift.Bool) -&gt; () in closure #1 () -&gt; () in ThinkWhat.AuthViewController.(handleTap in _F954241C9B2F6075428BF9FC3351171B)(gesture: __C.UITapGestureRecognizer) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "591782373.683273"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "141"
+                  endingLineNumber = "141"
+                  offsetFromSymbolStart = "14">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.187018"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "193"
+            endingLineNumber = "193"
+            landmarkName = "handleTap(gesture:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.187083"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "191"
+            endingLineNumber = "191"
+            landmarkName = "handleTap(gesture:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in ThinkWhat.AuthViewController.(handleTap in _F954241C9B2F6075428BF9FC3351171B)(gesture: __C.UITapGestureRecognizer) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "591786134.520739"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "162"
+                  endingLineNumber = "162"
+                  offsetFromSymbolStart = "1064">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #3 (ThinkWhat.TokenState) -&gt; () in closure #1 () -&gt; () in ThinkWhat.AuthViewController.(handleTap in _F954241C9B2F6075428BF9FC3351171B)(gesture: __C.UITapGestureRecognizer) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "591786134.528357"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "164"
+                  endingLineNumber = "164"
+                  offsetFromSymbolStart = "14">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.889546"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "121"
+            endingLineNumber = "121"
+            landmarkName = "parseDjangoError(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.889647"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "393"
+            endingLineNumber = "393"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.889758"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "396"
+            endingLineNumber = "396"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.889847"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "401"
+            endingLineNumber = "401"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.889936"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "122"
+            endingLineNumber = "122"
+            landmarkName = "parseDjangoError(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.890026"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "367"
+            endingLineNumber = "367"
+            landmarkName = "socialMediaLogin(token:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/Main.swift"
+            timestampString = "592308624.187256"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "404"
+            endingLineNumber = "404"
+            landmarkName = "session"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/Main.swift"
+            timestampString = "592308624.1873159"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "494"
+            endingLineNumber = "494"
+            landmarkName = "importUserData(_:_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/Main.swift"
+            timestampString = "592308624.187374"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "505"
+            endingLineNumber = "505"
+            landmarkName = "importUserData(_:_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
+            timestampString = "592307449.890572"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "195"
+            endingLineNumber = "195"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
+            timestampString = "592307449.890698"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "280"
+            endingLineNumber = "280"
+            landmarkName = "hideKeyboard()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.8907959"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "533"
+            endingLineNumber = "533"
+            landmarkName = "checkUsernameEmailAvailability(email:username:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.187489"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "397"
+            endingLineNumber = "397"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.89138"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "323"
+            endingLineNumber = "323"
+            landmarkName = "usernameLogin(username:password:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.891459"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "308"
+            endingLineNumber = "308"
+            landmarkName = "usernameLogin(username:password:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.891534"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "277"
+            endingLineNumber = "277"
+            landmarkName = "login(_:username:password:token:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.891611"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "443"
+            endingLineNumber = "443"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any&gt;) -&gt; () in performRequest #1 () -&gt; () in ThinkWhat.APIManager.signUp(email: Swift.String, password: Swift.String, username: Swift.String, completion: (Swift.Optional&lt;Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Algorithms/API/APIManager.swift"
+                  timestampString = "592240892.790915"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "443"
+                  endingLineNumber = "443"
+                  offsetFromSymbolStart = "2116">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (ThinkWhat.TokenState) -&gt; () in closure #1 (Alamofire.DataResponse&lt;Any&gt;) -&gt; () in performRequest #1 () -&gt; () in ThinkWhat.APIManager.signUp(email: Swift.String, password: Swift.String, username: Swift.String, completion: (Swift.Optional&lt;Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Algorithms/API/APIManager.swift"
+                  timestampString = "592240892.7940429"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "444"
+                  endingLineNumber = "444"
+                  offsetFromSymbolStart = "16">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
+            timestampString = "592307449.891688"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "164"
+            endingLineNumber = "164"
+            landmarkName = "performSignup()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.MailRegistrationViewController.(performSignup in _B53A571B7F74A54BE64CC4F9ABEC3B0F)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
+                  timestampString = "592240892.802286"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "164"
+                  endingLineNumber = "164"
+                  offsetFromSymbolStart = "500">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in closure #1 (Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.MailRegistrationViewController.(performSignup in _B53A571B7F74A54BE64CC4F9ABEC3B0F)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
+                  timestampString = "592240892.8050669"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "166"
+                  endingLineNumber = "166"
+                  offsetFromSymbolStart = "52">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.891768"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "196"
+            endingLineNumber = "196"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/MailRegistrationViewController.swift"
+            timestampString = "592307449.891838"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
+            landmarkName = "performSignup()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.891908"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "717"
+            endingLineNumber = "717"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.891978"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "723"
+            endingLineNumber = "723"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.892048"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "188"
             endingLineNumber = "188"
-            landmarkName = "handleTokenState()"
-            landmarkType = "7">
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "performRequest #1 () -&gt; () in ThinkWhat.APIManager.getEmailConfirmationCode(completion: (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Algorithms/API/APIManager.swift"
+                  timestampString = "592241287.207718"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "188"
+                  endingLineNumber = "188"
+                  offsetFromSymbolStart = "912">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any&gt;) -&gt; () in performRequest #1 () -&gt; () in ThinkWhat.APIManager.getEmailConfirmationCode(completion: (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Algorithms/API/APIManager.swift"
+                  timestampString = "592241287.210731"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "168"
+                  endingLineNumber = "168"
+                  offsetFromSymbolStart = "64">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -3697,28 +4655,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
-            timestampString = "588333042.627262"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.892118"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "190"
             endingLineNumber = "190"
-            landmarkName = "handleTokenState()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.327008"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "701"
-            endingLineNumber = "701"
             landmarkName = "performRequest()"
             landmarkType = "9">
          </BreakpointContent>
@@ -3729,13 +4671,525 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Algorithms/APIManager.swift"
-            timestampString = "588332380.327384"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.892204"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "698"
-            endingLineNumber = "698"
+            startingLineNumber = "187"
+            endingLineNumber = "187"
             landmarkName = "performRequest()"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "performRequest #1 () -&gt; () in ThinkWhat.APIManager.getEmailConfirmationCode(completion: (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Algorithms/API/APIManager.swift"
+                  timestampString = "592241355.434064"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "188"
+                  endingLineNumber = "188"
+                  offsetFromSymbolStart = "912">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any&gt;) -&gt; () in performRequest #1 () -&gt; () in ThinkWhat.APIManager.getEmailConfirmationCode(completion: (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Algorithms/API/APIManager.swift"
+                  timestampString = "592241355.439198"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "168"
+                  endingLineNumber = "168"
+                  offsetFromSymbolStart = "64">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.892294"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "300"
+            endingLineNumber = "300"
+            landmarkName = "usernameLogin(username:password:)"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "usernameLogin #1 (username: Swift.String, password: Swift.String) -&gt; () in ThinkWhat.APIManager.login(_: ThinkWhat.AuthVariant, username: Swift.Optional&lt;Swift.String&gt;, password: Swift.Optional&lt;Swift.String&gt;, token: Swift.Optional&lt;Swift.String&gt;, completion: (ThinkWhat.TokenState) -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Algorithms/API/APIManager.swift"
+                  timestampString = "592294923.875924"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "300"
+                  endingLineNumber = "300"
+                  offsetFromSymbolStart = "1480">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any&gt;) -&gt; () in usernameLogin #1 (username: Swift.String, password: Swift.String) -&gt; () in ThinkWhat.APIManager.login(_: ThinkWhat.AuthVariant, username: Swift.Optional&lt;Swift.String&gt;, password: Swift.Optional&lt;Swift.String&gt;, token: Swift.Optional&lt;Swift.String&gt;, completion: (ThinkWhat.TokenState) -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Algorithms/API/APIManager.swift"
+                  timestampString = "592294923.879721"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "271"
+                  endingLineNumber = "271"
+                  offsetFromSymbolStart = "64">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.892362"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "302"
+            endingLineNumber = "302"
+            landmarkName = "usernameLogin(username:password:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
+            timestampString = "592307449.892431"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "176"
+            endingLineNumber = "176"
+            landmarkName = "performSignin()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat.MailAuthViewController.(performSignin in _82A6998F4E234EA0E186DE19A6CFE4B6)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
+                  timestampString = "592294993.5705"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "176"
+                  endingLineNumber = "176"
+                  offsetFromSymbolStart = "32">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (ThinkWhat.TokenState) -&gt; () in ThinkWhat.MailAuthViewController.(performSignin in _82A6998F4E234EA0E186DE19A6CFE4B6)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/MailAuthViewController.swift"
+                  timestampString = "592294993.5759391"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "178"
+                  endingLineNumber = "178"
+                  offsetFromSymbolStart = "16">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.8925149"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "341"
+            endingLineNumber = "341"
+            landmarkName = "socialMediaLogin(token:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.187839"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "260"
+            endingLineNumber = "260"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592296610.611029"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "236"
+                  endingLineNumber = "236"
+                  offsetFromSymbolStart = "112">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592296610.614831"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "238"
+                  endingLineNumber = "238"
+                  offsetFromSymbolStart = "52">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/FileStoring.swift"
+            timestampString = "592308624.187905"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "62"
+            endingLineNumber = "62"
+            landmarkName = "storeImage(type:image:fileName:fileFormat:surveyID:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.188229"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "300"
+            endingLineNumber = "300"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.188295"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "271"
+            endingLineNumber = "271"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592305073.601427"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "268"
+                  endingLineNumber = "268"
+                  offsetFromSymbolStart = "1652">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Bool) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592305073.604136"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "259"
+                  endingLineNumber = "259"
+                  offsetFromSymbolStart = "36">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.18836"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "281"
+            endingLineNumber = "281"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;) -&gt; () in closure #1 (Swift.Bool) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592305738.4078389"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "278"
+                  endingLineNumber = "278"
+                  offsetFromSymbolStart = "1804">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Foundation.Data&gt;) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;) -&gt; () in closure #1 (Swift.Bool) -&gt; () in closure #1 (Swift.Optional&lt;SwiftyJSON.JSON&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ThinkWhat.AuthViewController.(handleTokenState in _F954241C9B2F6075428BF9FC3351171B)() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/HDD/Development/Swift/Projects/ThinkWhat/ThinkWhat/Controllers/Auth/AuthViewController.swift"
+                  timestampString = "592305738.410858"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "259"
+                  endingLineNumber = "259"
+                  offsetFromSymbolStart = "48">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.1884249"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "286"
+            endingLineNumber = "286"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.18849"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "296"
+            endingLineNumber = "296"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.8953609"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "590"
+            endingLineNumber = "590"
+            landmarkName = "updateUserProfile(data:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.895431"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "606"
+            endingLineNumber = "606"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.895497"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "626"
+            endingLineNumber = "626"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.89556"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "627"
+            endingLineNumber = "627"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/API/APIManager.swift"
+            timestampString = "592307449.895655"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "628"
+            endingLineNumber = "628"
+            landmarkName = "performRequest()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/AuthViewController.swift"
+            timestampString = "592308624.188646"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "266"
+            endingLineNumber = "266"
+            landmarkName = "handleTokenState()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/Main.swift"
+            timestampString = "592308624.188711"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "506"
+            endingLineNumber = "506"
+            landmarkName = "importUserData(_:_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/Auth/ProfileAuthViewController.swift"
+            timestampString = "592307881.3824559"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "185"
+            endingLineNumber = "185"
+            landmarkName = "viewWillAppear(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Algorithms/Main.swift"
+            timestampString = "592308624.188792"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "677"
+            endingLineNumber = "677"
+            landmarkName = "loadImageFromPath(path:)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

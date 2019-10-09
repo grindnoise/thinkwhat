@@ -84,7 +84,7 @@ class PasswordRecoveryViewController: UIViewController {
 
 extension PasswordRecoveryViewController: UITextFieldDelegate {
     private func initializeAPIManagerProtocol() -> APIManagerProtocol {
-        return (self.navigationController as! AuthNavigationController).apiManagerProtocol
+        return (self.navigationController as! AuthNavigationController).apiManager
     }
     
     private func findFirstResponder() -> UITextField? {

@@ -18,8 +18,9 @@ protocol APIManagerProtocol {
     func getProfileNeedsUpdate(completion: @escaping (Bool) -> ())
     func updateUserProfile(data: [String: Any], completion: @escaping(JSON?, Error?) -> ())
     func checkUsernameEmailAvailability(email: String, username: String, completion: @escaping(Bool?, Error?)->())
-    func getEmailConfirmationCode(email: String, username: String, completion: @escaping(JSON?, Error?)->())
+    func getEmailConfirmationCode(completion: @escaping(JSON?, Error?)->())
     func getEmailVerified(completion: @escaping(Bool?, Error?)->())
+    func signUp(email: String, password: String, username: String, completion: @escaping (Error?) -> ())
 //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
 //    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
 //    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
@@ -117,12 +118,25 @@ class APIManager: APIManagerProtocol {
     private func parseDjangoError(_ json: JSON) -> TokenState {
         var _tokenState = TokenState.Unassigned
         for attr in json {
-            if attr.0 ==  "error" {
-                switch attr.1.stringValue {
-                case DjangoError.InvalidGrant.rawValue:
-                    _tokenState = .WrongCredentials
-                default:
-                    _tokenState = .Unassigned
+            if attr.0 == "error_description"{
+                if let errorDesc = attr.1.stringValue.lowercased() as? String {
+                    if errorDesc.contains(DjangoError.InvalidGrant.rawValue) {
+                        _tokenState = .WrongCredentials
+                    } else if errorDesc.contains(DjangoError.AccessDenied.rawValue) {
+                        _tokenState = .AccessDenied
+                    } else if errorDesc.contains(DjangoError.Authentication.ConnectionFailed.rawValue) {
+                        _tokenState = .ConnectionError
+                    } else {
+                        fatalError("func parseDjangoError failed to downcast attr.1.string")
+                    }
+                    //            case "error_description":
+                    //                print(attr.1.stringValue)
+                    //                switch attr.1.stringValue {
+                    //                case DjangoError.InvalidGrant.rawValue:
+                    //                    _tokenState = .WrongCredentials
+                    //                default:
+                    //                    _tokenState = .Unassigned
+                    //                }
                 }
             }
         }
@@ -149,7 +163,7 @@ class APIManager: APIManagerProtocol {
 //        proxyConfig.timeoutIntervalForRequest = 10
 //        sessionManager = Alamofire.SessionManager(configuration: proxyConfig)
 //    }
-    func getEmailConfirmationCode(email: String, username: String, completion: @escaping(JSON?, Error?)->()) {
+    func getEmailConfirmationCode(completion: @escaping(JSON?, Error?)->()) {
         var returnValue: JSON?
         var error: Error?
         
@@ -166,10 +180,12 @@ class APIManager: APIManagerProtocol {
         func performRequest() {
             let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE)
             
-            let parameters = ["email": email,
-                              "username": username]
+            let headers: HTTPHeaders = [
+                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
+                "Content-Type": "application/json"
+            ]
             
-            sessionManager.request(url, method: .get, parameters: parameters, headers: nil).responseJSON() {
+            sessionManager.request(url, method: .get, parameters: nil, headers: headers).responseJSON() {
                 response in
                 if response.result.isFailure {
                     print(response.result.debugDescription)
@@ -340,6 +356,7 @@ class APIManager: APIManagerProtocol {
                         } else if 400...499 ~= statusCode {
                             do {
                                 let json = try JSON(data: response.data!)
+                                print(json.stringValue)
                                 _tokenState = self.parseDjangoError(json)
                             } catch {
                                 print(error.localizedDescription)
@@ -388,9 +405,9 @@ class APIManager: APIManagerProtocol {
                         }
                     }
                 }
+                completion(_tokenState)
             }
-        }
-        completion(_tokenState)
+        }  
     }
     
     func signUp(email: String, password: String, username: String, completion: @escaping (Error?) -> ()) {
@@ -422,7 +439,10 @@ class APIManager: APIManagerProtocol {
                     if 200...299 ~= statusCode! {
                         do {
                             let json = try JSON(data: response.data!)
-                            TemporaryUserCredentials.shared.importJson(json)
+//                            TemporaryUserCredentials.shared.importJson(json)
+                            self.login(.Username, username: username, password: password, token: nil, completion: { (state) in
+                                tokenState = state
+                            })
                         } catch {
                             print(error.localizedDescription)
                         }
@@ -577,11 +597,12 @@ class APIManager: APIManagerProtocol {
         
         func performRequest() {
             
-            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.PROFILE + AppData.shared.userProfile.ID + "/")
+            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.PROFILES + AppData.shared.userProfile.ID + "/")
             let headers: HTTPHeaders = [
                 "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
                 "Content-Type": "application/json"
             ]
+            print(url)
             if let image = data["image"] as? UIImage {
                 dict.removeValue(forKey: "image")
                 Alamofire.upload(multipartFormData: { multipartFormData in
@@ -639,6 +660,12 @@ class APIManager: APIManagerProtocol {
                     }
                 }
             } else {
+//                let parameters: Parameters = [
+//                    "is_email_verified": true,
+//                    "owner": [
+//                        "email": "test@test.ru"
+//                    ]
+//                ]
                 sessionManager.request(url, method: .patch, parameters: data, encoding: JSONEncoding.default, headers: headers).responseJSON() {//.request(url, method: .patch, parameters: nil, headers: headers).responseJSON() {
                     response in
                     if response.result.isFailure {

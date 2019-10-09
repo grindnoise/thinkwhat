@@ -18,14 +18,15 @@ class LaunchViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         delay(seconds: 1) {
-        self.logo.addUntitled1Animation() { (completed) in
-            if AppData.shared.system.session == .unauthorized {
-                self.performSegue(withIdentifier: kSegueAuth, sender: nil)
-                //Временная заглушка для тестирования
-            } else {
-                self.performSegue(withIdentifier: kSegueAuth, sender: nil)
+            self.logo.addUntitled1Animation() { (completed) in
+                //TODO: переделать на проверку наличия токена и его срока годности, обновить данные с сервера
+                if AppData.shared.system.session == .unauthorized {
+                    self.performSegue(withIdentifier: kSegueAuth, sender: nil)
+                } else {
+                    self.performSegue(withIdentifier: kSegueApp, sender: nil)
+                }
+//                self.performSegue(withIdentifier: kSegueApp, sender: nil)
             }
-        }
         }
     }
 }

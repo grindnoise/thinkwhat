@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
+		AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */; };
 		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
 		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
 		AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */; };
@@ -50,7 +51,6 @@
 		AB3C685D223FD74E00B57580 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6859223FD74D00B57580 /* APIManager.swift */; };
 		AB3C685E223FD74E00B57580 /* FileStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685A223FD74D00B57580 /* FileStoring.swift */; };
 		AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */; };
-		AB3C6861223FD7E800B57580 /* AuthNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */; };
 		AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */; };
 		AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6864223FDC5200B57580 /* Root.storyboard */; };
 		AB3C6867223FDD9600B57580 /* Auth.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6866223FDD9600B57580 /* Auth.storyboard */; };
@@ -70,6 +70,13 @@
 		AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */; };
 		AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */; };
 		ABA6E18822FACAA200F8F39A /* ValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */; };
+		ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */; };
+		ABB46F372344B1F900AF212B /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F362344B1F900AF212B /* Protocols.swift */; };
+		ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F382344B2C300AF212B /* AuthNavigationController.swift */; };
+		ABB46F3E2346373700AF212B /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F3D2346373700AF212B /* TabBarController.swift */; };
+		ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F402347406F00AF212B /* ProfileViewController.swift */; };
+		ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */; };
+		ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */; };
 		ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C622E9B33700DEA9FD /* Mail.swift */; };
 		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
@@ -98,6 +105,7 @@
 		0B8B18E3907FC78604B9BB73 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; sourceTree = "<group>"; };
 		10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthViewController.swift; sourceTree = "<group>"; };
 		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AB3C67E3223FBB6400B57580 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -144,9 +152,8 @@
 		AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogoStyleKit.swift; sourceTree = "<group>"; };
 		AB3C6858223FD74C00B57580 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		AB3C6859223FD74D00B57580 /* APIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		AB3C685A223FD74D00B57580 /* FileStoring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileStoring.swift; sourceTree = "<group>"; };
+		AB3C685A223FD74D00B57580 /* FileStoring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileStoring.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingTabBarUtils.swift; sourceTree = "<group>"; };
-		AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNavigationController.swift; sourceTree = "<group>"; };
 		AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNotificationDelegate.swift; sourceTree = "<group>"; };
 		AB3C6864223FDC5200B57580 /* Root.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Root.storyboard; sourceTree = "<group>"; };
 		AB3C6866223FDD9600B57580 /* Auth.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Auth.storyboard; sourceTree = "<group>"; };
@@ -166,6 +173,13 @@
 		AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryViewController.swift; sourceTree = "<group>"; };
 		AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRegistrationViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidationViewController.swift; sourceTree = "<group>"; };
+		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; };
+		ABB46F362344B1F900AF212B /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
+		ABB46F382344B2C300AF212B /* AuthNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNavigationController.swift; sourceTree = "<group>"; };
+		ABB46F3D2346373700AF212B /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		ABB46F402347406F00AF212B /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsTableViewController.swift; sourceTree = "<group>"; };
+		ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsSelectionTableViewController.swift; sourceTree = "<group>"; };
 		ABC3E7C622E9B33700DEA9FD /* Mail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail.swift; sourceTree = "<group>"; };
 		ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSign.swift; sourceTree = "<group>"; };
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -293,11 +307,10 @@
 		AB3C6810223FC6F500B57580 /* Algorithms */ = {
 			isa = PBXGroup;
 			children = (
+				ABB46F3C2345DDA000AF212B /* API */,
 				AB3C6817223FD04500B57580 /* Animations.swift */,
-				AB3C6859223FD74D00B57580 /* APIManager.swift */,
 				AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */,
 				AB3C681A223FD04500B57580 /* Extensions.swift */,
-				ABF1F19E22C253A6008913C3 /* FBManager.swift */,
 				AB3C685A223FD74D00B57580 /* FileStoring.swift */,
 				AB3C6819223FD04500B57580 /* KeychainService.swift */,
 				AB3C6811223FC71600B57580 /* Main.swift */,
@@ -305,9 +318,10 @@
 				AB3C6858223FD74C00B57580 /* Reachability.swift */,
 				AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */,
 				AB3C6818223FD04500B57580 /* SMSResponse.swift */,
-				ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */,
 				AB3EF63D22F4213C004BA878 /* EmailResponse.swift */,
 				AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */,
+				ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */,
+				ABB46F362344B1F900AF212B /* Protocols.swift */,
 			);
 			path = Algorithms;
 			sourceTree = "<group>";
@@ -318,12 +332,13 @@
 				ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */,
 				AB6083B62240E77B002C0D7E /* SocialAuthViewController.swift */,
 				AB3C686A223FDEEA00B57580 /* AuthViewController.swift */,
-				AB3C6860223FD7E800B57580 /* AuthNavigationController.swift */,
 				AB6083BA2240F761002C0D7E /* MailAuthViewController.swift */,
 				AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */,
 				AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */,
 				AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */,
 				AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */,
+				AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */,
+				ABB46F382344B2C300AF212B /* AuthNavigationController.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -331,6 +346,8 @@
 		AB3C6814223FCE2F00B57580 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				ABB46F3F2347404C00AF212B /* ProfileViewController */,
+				ABB46F3D2346373700AF212B /* TabBarController.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -430,6 +447,26 @@
 				AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */,
 			);
 			path = TextFields;
+			sourceTree = "<group>";
+		};
+		ABB46F3C2345DDA000AF212B /* API */ = {
+			isa = PBXGroup;
+			children = (
+				ABF1F19E22C253A6008913C3 /* FBManager.swift */,
+				AB3C6859223FD74D00B57580 /* APIManager.swift */,
+				ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
+		ABB46F3F2347404C00AF212B /* ProfileViewController */ = {
+			isa = PBXGroup;
+			children = (
+				ABB46F402347406F00AF212B /* ProfileViewController.swift */,
+				ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */,
+				ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */,
+			);
+			path = ProfileViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -719,19 +756,24 @@
 			files = (
 				AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
+				ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */,
 				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
 				AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */,
 				ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */,
 				AB3C6825223FD1E900B57580 /* CustomAlertView.swift in Sources */,
+				ABB46F3E2346373700AF212B /* TabBarController.swift in Sources */,
+				AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */,
+				ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */,
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
+				ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */,
 				ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */,
+				ABB46F372344B1F900AF212B /* Protocols.swift in Sources */,
 				AB6083B72240E77B002C0D7E /* SocialAuthViewController.swift in Sources */,
 				AB3C6845223FD3EE00B57580 /* Facebook.swift in Sources */,
 				AB3C6849223FD3EE00B57580 /* UpdateButton.swift in Sources */,
 				AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */,
 				AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */,
 				AB6083C122410131002C0D7E /* ValidSign.swift in Sources */,
-				AB3C6861223FD7E800B57580 /* AuthNavigationController.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
 				AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */,
@@ -739,6 +781,7 @@
 				AB3C685D223FD74E00B57580 /* APIManager.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
 				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
+				ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */,
 				ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */,
 				AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */,
 				AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */,
@@ -755,6 +798,7 @@
 				AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */,
 				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
 				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,
+				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
@@ -920,6 +964,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -932,7 +977,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0.1;
 				VALIDATE_PRODUCT = YES;
 			};

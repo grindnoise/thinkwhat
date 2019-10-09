@@ -61,7 +61,7 @@ extension FBManager: UserDataPreparatory {
         var userProfile = [String: Any]()
         for (key, value) in data {
             if key == "first_name" || key == "last_name" || key == "email" {
-                userProfile["user."+key] = value
+                userProfile["owner."+key] = value
             } else if key == "id" {
                 userProfile["facebook_ID"] = value
             } else if key == "image" {

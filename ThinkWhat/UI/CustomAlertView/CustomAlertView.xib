@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -19,7 +17,7 @@
         </array>
     </customFonts>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CustomAlertView" customModule="Burb" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CustomAlertView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
                 <outlet property="alertBody" destination="MzQ-71-Zjh" id="oic-J4-Y8d"/>
                 <outlet property="alertText" destination="ahi-fN-SGc" id="hCK-5l-n59"/>
@@ -45,8 +43,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TWP-hf-789" customClass="BorderedView" customModule="Burb" customModuleProvider="target">
-                                <rect key="frame" x="37" y="183" width="300" height="300"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TWP-hf-789" customClass="BorderedView" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="37.5" y="183.5" width="300" height="300"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d43-Yk-ph5">
                                         <rect key="frame" x="0.0" y="0.0" width="300" height="120"/>
@@ -103,7 +101,7 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="c6D-fG-0g3">
                                         <rect key="frame" x="0.0" y="246" width="300" height="54"/>
                                     </view>
-                                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ROG-EV-S2S" customClass="LoadingIndicator" customModule="Burb" customModuleProvider="target">
+                                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ROG-EV-S2S" customClass="LoadingIndicator" customModule="ThinkWhat" customModuleProvider="target">
                                         <rect key="frame" x="30" y="30" width="240" height="240"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="ROG-EV-S2S" secondAttribute="height" multiplier="1:1" id="gql-Y2-hMV"/>
@@ -145,7 +143,6 @@
                                         <real key="value" value="1"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="shadow" value="YES"/>
-                                    <userDefinedRuntimeAttribute type="boolean" keyPath="shadowed" value="NO"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
