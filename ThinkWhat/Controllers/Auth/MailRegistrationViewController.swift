@@ -334,8 +334,7 @@ extension MailRegistrationViewController: UITextFieldDelegate {
             if sender.text!.isEmpty {
                 mailTF.hideSign()
                 isMailFilled = false
-            }
-            if isValidEmail(sender.text!) {
+            } else if isValidEmail(sender.text!) {
                 apiManager.checkUsernameEmailAvailability(email: sender.text!, username: "") {
                     exists, error in
                     if error != nil {

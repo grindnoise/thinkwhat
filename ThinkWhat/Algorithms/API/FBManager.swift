@@ -38,6 +38,9 @@ class FBManager {
         if AccessToken.current != nil {
             GraphRequest(graphPath: "me", parameters: ["fields" : "name, first_name, last_name, email, picture.type(large)"]).start() {
                 (connection, result, error) in
+                if let conn = connection {
+                    print(conn)
+                }
                 if let error = error {
                     print(error.localizedDescription)
                     return

@@ -17,6 +17,12 @@ import UserNotifications
 
 typealias Closure = (()->())
 
+let dateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "dd.MM.yyyy"
+    return formatter
+} ()
+
 func delay(seconds: Double, completion:@escaping ()->()) {
     let popTime = DispatchTime.now() + Double(Int64( Double(NSEC_PER_SEC) * seconds )) / Double(NSEC_PER_SEC)
     
@@ -94,6 +100,15 @@ enum DjangoError: String {
 enum ClientSettingsMode {
     case Reminder, Language
 }
+//var isPushNotificationEnabled: Bool {
+//    guard let settings = UIApplication.shared.currentUserNotificationSettings
+//        else {
+//            return false
+//    }
+//    
+//    return UIApplication.shared.isRegisteredForRemoteNotifications
+//        && !settings.types.isEmpty
+//}
 var tokenState: TokenState    = .Unassigned {
     didSet {
         switch tokenState {
@@ -138,6 +153,7 @@ var apiReachability: ApiReachabilityState = .Reachable {
         }
     }
 }
+var temporaryTokenToRevoke = ""
 
 let kNotificationInternetConnectionChange        = Notification.Name("InternetConnectionChange")
 let kNotificationTokenReceived                   = Notification.Name("NotificationTokenReceived")
@@ -154,6 +170,8 @@ let kNotificationApiReachable                    = Notification.Name("smsNotific
 let kNotificationApiNotReachable                 = Notification.Name("smsNotificationApiNotReachable")
 
 let kNotificationUserImageChanged                = Notification.Name("NotificationUserImageChanged")
+let kNotificationTopSurveysUpdated               = Notification.Name("NotificationTopSurveysUpdated")
+let kNotificationNewSurveysUpdated               = Notification.Name("NotificationNewSurveysUpdated")
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
 
@@ -177,7 +195,9 @@ let kSegueProfileFromConfirmation                = "PROFILE_FROM_CONFIRMATION"
 let kSegueProfileFromAuth                        = "PROFILE_FROM_AUTH"
 
 //MARK: App
-let kSegueProfileSettingsSelection               = "PROFILE_SETINGS_SELECTION"
+let kSegueAppProfileSettingsSelection            = "PROFILE_SETINGS_SELECTION"
+let kSegueAppBackToAuth                          = "BACK_TO_AUTH"
+let kSegueAppProfileToInfo                       = "INFO"
 
 //let segueBarberData                             = "segueBarberData"
 //let segueSignup                                 = "segueSignup"
@@ -196,7 +216,7 @@ let kSegueProfileSettingsSelection               = "PROFILE_SETINGS_SELECTION"
 //let segueClientSettingsPicker                   = "segueClientSettingsPicker"
 let alert                                       = CustomAlertView(frame: (UIApplication.shared.keyWindow?.frame)!)
 let K_COLOR_RED                                 = UIColor(red:0.805, green: 0.342, blue:0.339, alpha:1)
-let K_COLOR_GRAY                                = UIColor(red:0.574, green: 0.574, blue:0.574, alpha:1)
+let K_COLOR_GRAY                                = UIColor(red: 0.149, green: 0.149, blue: 0.149, alpha: 1.000)
 let options: UNAuthorizationOptions             = [.alert, .sound, .badge]
 
 //MARK: - Structs
@@ -215,48 +235,38 @@ class AppData {
     var system = System()
     
     struct User {
-        var ID: String! = "" {
+        var ID: String? {
             didSet {
-                if ID != oldValue {
-                    UserDefaults.standard.set(ID, forKey: "userId")
-                } else if ID.isEmpty {
-                    UserDefaults.standard.removeObject(forKey: "userId")
+                if ID != nil {
+                    UserDefaults.standard.set(ID!, forKey: "userID")
                 }
             }
         }
-        var username: String! = "" {
+        var username: String? {
             didSet {
-                if username != oldValue {
-                    UserDefaults.standard.set(username, forKey: "username")
-                } else if username.isEmpty {
-                    UserDefaults.standard.removeObject(forKey: "username")
+                if username != nil {
+                    UserDefaults.standard.set(username!, forKey: "username")
                 }
             }
         }
-        var firstName: String! = ""{
+        var firstName: String? {
             didSet {
-                if firstName != oldValue {
-                    UserDefaults.standard.set(firstName, forKey: "firstName")
-                } else if firstName.isEmpty {
-                    UserDefaults.standard.removeObject(forKey: "firstName")
+                if firstName != nil {
+                    UserDefaults.standard.set(firstName!, forKey: "firstName")
                 }
             }
         }
-        var lastName: String! = "" {
+        var lastName: String? {
             didSet {
-                if lastName != oldValue {
-                    UserDefaults.standard.set(lastName, forKey: "lastName")
-                } else if lastName.isEmpty {
-                    UserDefaults.standard.removeObject(forKey: "lastName")
+                if lastName != nil {
+                    UserDefaults.standard.set(lastName!, forKey: "lastName")
                 }
             }
         }
-        var email: String! = "" {
+        var email: String? {
             didSet {
-                if email != oldValue {
-                    UserDefaults.standard.set(email, forKey: "userMail")
-                } else if email.isEmpty {
-                    UserDefaults.standard.removeObject(forKey: "userMail")
+                if email != nil {
+                    UserDefaults.standard.set(email!, forKey: "userMail")
                 }
             }
         }
@@ -266,87 +276,90 @@ class AppData {
         }
         
         mutating func getData() {
-            if let kFirstName = UserDefaults.standard.object(forKey: "firstname") {
-                self.firstName = kFirstName as? String
+            if let kFirstName = UserDefaults.standard.object(forKey: "firstName") {
+                self.firstName = (kFirstName as! String)
             }
-            if let kLastName = UserDefaults.standard.object(forKey: "lastname") {
-                self.lastName = kLastName as? String
+            if let kLastName = UserDefaults.standard.object(forKey: "lastName") {
+                self.lastName = (kLastName as! String)
             }
-            if let kUserName = UserDefaults.standard.object(forKey: "userName") {
-                self.username = kUserName as? String
+            if let kUserName = UserDefaults.standard.object(forKey: "username") {
+                self.username = (kUserName as! String)
             }
             if let kUserMail = UserDefaults.standard.object(forKey: "userMail") {
-                self.email = kUserMail as? String
+                self.email = (kUserMail as! String)
             }
             if let kUserID = UserDefaults.standard.object(forKey: "userID") {
-                self.ID = kUserID as? String
+                self.ID = (kUserID as! String)
             }
         }
         
         mutating func eraseData() {
-            firstName               = ""
-            lastName                = ""
-            username                = ""
-            ID                      = ""
-            email                   = ""
+            firstName               = nil
+            lastName                = nil
+            username                = nil
+            ID                      = nil
+            email                   = nil
+            
+            UserDefaults.standard.removeObject(forKey: "userID")
+            UserDefaults.standard.removeObject(forKey: "username")
+            UserDefaults.standard.removeObject(forKey: "firstName")
+            UserDefaults.standard.removeObject(forKey: "lastName")
+            UserDefaults.standard.removeObject(forKey: "userMail")
             KeychainService.saveAccessToken(token: "")
             KeychainService.saveRefreshToken(token: "")
         }
     }
     
-    struct UserProfile {
-        var ID: String! = "" {
+    struct UserProfile: StorageProtocol {
+        var ID: String? {
             didSet {
-                if ID != oldValue {
-                    UserDefaults.standard.set(ID, forKey: "userProfileID")
-                } else if ID.isEmpty {
-                    UserDefaults.standard.removeObject(forKey: "userProfileID")
+                if ID != nil {
+                    UserDefaults.standard.set(ID!, forKey: "userProfileID")
                 }
             }
         }
-        //URL local link
-        var imagePath: String! {
+        //Local
+        var imagePath: String? {
             didSet {
-                if !imagePath.isEmpty {
-                    UserDefaults.standard.set(imagePath, forKey: "userImagePath")
+                if imagePath != nil {
+                    UserDefaults.standard.set(imagePath!, forKey: "userImagePath")
                     NotificationCenter.default.post(name: kNotificationUserImageChanged, object: nil)
-                } else {
-                    UserDefaults.standard.removeObject(forKey: "userImagePath")
                 }
             }
         }
-        var gender: Gender! {
+        var gender: Gender? {
             didSet {
-                if gender == nil {
-                    UserDefaults.standard.removeObject(forKey: "userGender")
-                } else if gender != oldValue {
-                    UserDefaults.standard.set(gender.rawValue, forKey: "userGender")
+                if gender != nil {
+                    UserDefaults.standard.set(gender!.rawValue, forKey: "userGender")
                 }
             }
         }
-        var birthDate: Date! {
+        var birthDate: Date? {
             didSet {
-                let defaultDate = Date(dateString: "01.01.0001")
-                if (birthDate != oldValue) && (birthDate != defaultDate)  {
-                    UserDefaults.standard.set(birthDate, forKey: "userBirthDate")
-                } else {
-                    UserDefaults.standard.removeObject(forKey: "userBirthDate")
+                if birthDate != nil {
+                    UserDefaults.standard.set(birthDate!, forKey: "userBirthDate")
                 }
             }
         }
-        var isEdited: Bool! {
+        var isEdited: Bool? {
             didSet {
-                UserDefaults.standard.set(isEdited, forKey: "userProfileEdited")
+                if isEdited != nil {
+                    UserDefaults.standard.set(isEdited!, forKey: "userProfileEdited")
+                }
             }
         }
-        var isBanned: Bool! {
+        var isBanned: Bool? {
             didSet {
-                UserDefaults.standard.set(isBanned, forKey: "userProfileBanned")
+                if isBanned != nil {
+                    UserDefaults.standard.set(isBanned!, forKey: "userProfileBanned")
+                }
             }
         }
-        var isEmailVerified: Bool! {
+        var isEmailVerified: Bool? {
             didSet {
-                UserDefaults.standard.set(isEmailVerified, forKey: "userEmailVerified")
+                if isEmailVerified != nil {
+                    UserDefaults.standard.set(isEmailVerified!, forKey: "userEmailVerified")
+                }
             }
         }
         
@@ -356,52 +369,53 @@ class AppData {
         
         mutating func getData() {
             if let kImagePath = UserDefaults.standard.object(forKey: "userImagePath") {
-                self.imagePath = kImagePath as? String
+                self.imagePath = (kImagePath as! String)
             }
             if let kUserBirthDate = UserDefaults.standard.object(forKey: "userBirthDate") {
-                self.birthDate = kUserBirthDate as? Date
+                self.birthDate = (kUserBirthDate as! Date)
             }
             if let kUserGender = UserDefaults.standard.object(forKey: "userGender") {
                 self.gender = Gender(rawValue: kUserGender as! String)!
             }
             if let kUserID = UserDefaults.standard.object(forKey: "userProfileID") {
-                self.ID = kUserID as? String
+                self.ID = (kUserID as! String)
             }
             if let kIsEdited = UserDefaults.standard.object(forKey: "userProfileEdited") {
-                self.isEdited = kIsEdited as? Bool
+                self.isEdited = (kIsEdited as! Bool)
             }
             if let kIsBanned = UserDefaults.standard.object(forKey: "userProfileBanned") {
-                self.isBanned = kIsBanned as? Bool
+                self.isBanned = (kIsBanned as! Bool)
             }
             if let kIsEmailVerified = UserDefaults.standard.object(forKey: "userEmailVerified") {
-                self.isEmailVerified = kIsEmailVerified as? Bool
+                self.isEmailVerified = (kIsEmailVerified as! Bool)
             }
         }
         
         mutating func eraseData() {
-            imagePath       = ""
-            birthDate       = Date(dateString: "01.01.0001")
-            gender          = .none
-            ID              = ""
-            isEdited        = false
-            isBanned        = false
-            isEmailVerified = false
+            if imagePath != nil {
+                storeManager.deleteFile(path: imagePath!)
+                imagePath       = nil
+            }
+            birthDate       = nil
+            gender          = nil
+            ID              = nil
+            isEdited        = nil
+            isBanned        = nil
+            isEmailVerified = nil
+            
+            UserDefaults.standard.removeObject(forKey: "userProfileID")
+            UserDefaults.standard.removeObject(forKey: "userGender")
+            UserDefaults.standard.removeObject(forKey: "userBirthDate")
+            UserDefaults.standard.removeObject(forKey: "userImagePath")
+            UserDefaults.standard.removeObject(forKey: "userProfileEdited")
+            UserDefaults.standard.removeObject(forKey: "userProfileBanned")
+            UserDefaults.standard.removeObject(forKey: "userEmailVerified")
         }
     }
     
     struct System {
-//        var session: SessionType! = .unauthorized {
-//            didSet {
-//                if session == .authorized {
-//                    UserDefaults.standard.set(SessionType.authorized.rawValue, forKey: "session")
-//                } else {
-//                    UserDefaults.standard.set(SessionType.unauthorized.rawValue, forKey: "session")
-//                }
-//            }
-//        }
         var session: SessionType! {
-            print(AppData.shared.user.username)
-            if AppData.shared.userProfile.ID == nil || AppData.shared.userProfile.ID.isEmpty || String(KeychainService.loadAccessToken()!).isEmpty {
+            if AppData.shared.userProfile.ID == nil || String(KeychainService.loadAccessToken()!).isEmpty {
                 return .unauthorized
             } else {
                 return .authorized
@@ -449,16 +463,6 @@ class AppData {
         }
         
         mutating func getData() {
-            
-//            if let kSession = UserDefaults.standard.object(forKey: "session") {
-//                self.session = SessionType(rawValue: kSession as! String)!
-//            }
-//            print(UserDefaults.standard.object(forKey: "emailResponseExpirationDate"))
-//            if let kEmailResponseExpirationDate = UserDefaults.standard.object(forKey: "emailResponseExpirationDate") as? Date, let kEmailResponseConfirmationCode = UserDefaults.standard.object(forKey: "emailResponseConfirmationCode") as? Int {
-//                if Date() < kEmailResponseExpirationDate {
-//                    emailResponse = EmailResponse(confirmation_code: kEmailResponseConfirmationCode, expiresIn: kEmailResponseExpirationDate)
-//                }
-//            }
             if let kLanguage = UserDefaults.standard.object(forKey: "language") {
                 self.language = Language(rawValue: kLanguage as! String)!
             } else {
@@ -472,22 +476,18 @@ class AppData {
         }
         
         mutating func eraseData() {
-//            session = .unauthorized
 //            emailResponseExpirationDate = nil
 //            emailResponseConfirmationCode = nil
-//            session = .unauthorized
             let langStr = Locale.current.languageCode
             if langStr == "en-US" {
                 language = .English
             } else if langStr == "ru_RU" {
                 language = .Russian
             }
-            KeychainService.saveAccessToken(token: "")
-            KeychainService.saveRefreshToken(token: "")
         }
     }
     
-    func importUserData(_ json: JSON, _ imagePath: URL? = nil) {
+    func importUserData(_ json: JSON, _ imagePath: String? = nil) {
         var userProfileData                 = json.dictionaryObject  as! [String: Any]
         var userData                        = userProfileData.removeValue(forKey: "owner") as! [String: Any]
         self.user.email                     = userData["email"] as! String
@@ -496,15 +496,21 @@ class AppData {
         self.user.username                  = userData["username"] as! String
         self.user.ID                        = String(describing: userData["id"] as! Int)
         self.userProfile.ID                 = String(describing: userProfileData["id"] as! Int)
-        self.userProfile.birthDate          = userProfileData["birth_date"] is NSNull ? Date(dateString: "01.01.0001") : Date(dateString:userProfileData["birth_date"] as! String)
+        self.userProfile.birthDate          = userProfileData["birth_date"] is NSNull ? nil : Date(dateString:userProfileData["birth_date"] as! String)
         self.userProfile.gender             = userProfileData["gender"] is NSNull ? Gender.Unassigned : Gender(rawValue: userProfileData["gender"] as! String)
         self.userProfile.isBanned           = userProfileData["is_banned"] is NSNull ? false : userProfileData["is_banned"] as! Bool
         self.userProfile.isEdited           = userProfileData["is_edited"] is NSNull ? false : userProfileData["is_edited"] as! Bool
         self.userProfile.isEmailVerified    = userProfileData["is_email_verified"] is NSNull ? false : userProfileData["is_email_verified"] as! Bool
         
         if imagePath != nil {
-            self.userProfile.imagePath = imagePath!.absoluteString
+            self.userProfile.imagePath = imagePath!
         }
+    }
+    
+    func eraseData() {
+        self.user.eraseData()
+        self.userProfile.eraseData()
+        self.system.eraseData()
     }
     
     private init() {}
@@ -545,7 +551,9 @@ struct SERVER_URLS {
     static let TOKEN                    = "api/social/token/"
     static let TOKEN_CONVERT            = "api/social/convert-token/"
     static let TOKEN_REVOKE             = "api/social/revoke-token/"
+    
     //Profiles
+    static let USERS                    = "api/users/"
     static let USERNAME_EXISTS          = "api/profiles/username_exists"
     static let EMAIL_EXISTS             = "api/profiles/email_exists"
     static let GET_CONFIRMATION_CODE    = "api/profiles/send_confirmation_code/"
@@ -553,11 +561,15 @@ struct SERVER_URLS {
     static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_social_update/"
     static let PROFILES                 = "api/profiles/"
     static let CURRENT_USER             = "api/profiles/current/"
-//    static let GET_PROFILE_EDITED       = "api/profiles/get_profile_edited/"
+
+    //Surveys
+    static let SURVEYS                  = "api/surveys/"
+    static let SURVEYS_TOP              = "api/surveys/top/"
+    static let SURVEYS_NEW              = "api/surveys/new/"
+    static let SURVEYS_ALL              = "api/surveys/all/"
     
-    static let USER                     = "api/users/"
+    static let CATEGORIES               = "api/categories/"
     
-    static let SURVEY                   = "api/surveys/"
     
 //    static let SMS_VALIDATION_URL   = "http://burber.pythonanywhere.com/passcode/generate/"
     
@@ -627,7 +639,11 @@ func showAlert(type: CustomAlertView.AlertType, buttons: [String : [CustomAlertV
     }
 }
 
-
+func hideAlert() {
+    if alertIsActive() {
+        alert.dismissAlert()
+    }
+}
 
 //func fetchOrders(_ onlyActive: Bool = true) -> [Order] {
 //

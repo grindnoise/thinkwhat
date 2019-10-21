@@ -11,10 +11,24 @@ import UIKit
 import CoreData
 
 protocol FileStorageProtocol {
-    func storeImage(type: ImageType, image: UIImage, fileName: String?, fileFormat: FileFormat, surveyID: String?) -> URL?
+    func storeImage(type: ImageType, image: UIImage, fileName: String?, fileFormat: FileFormat, surveyID: String?) -> String?
+    func deleteFile(path: String)
 }
 
 class FileStorageManager: FileStorageProtocol {
+    func deleteFile(path: String) {
+        if FileManager.default.fileExists(atPath: path) {
+            do {
+                try FileManager.default.removeItem(atPath: path)
+                
+            } catch let error {
+                fatalError(error.localizedDescription)
+            }
+        } else {
+            print("FILE DOESN'T EXIST")
+        }
+    }
+    
     
     func getImagesDirectoryPath() -> URL {
         var imagesDirectoryPath = ""
@@ -28,6 +42,11 @@ class FileStorageManager: FileStorageProtocol {
                     try fileManager.createDirectory(atPath: imagesDirectoryPath,
                                                     withIntermediateDirectories: false,
                                                     attributes: nil)
+                    if fileManager.fileExists(atPath: imagesDirectoryPath) {
+                        print("FILE AVAILABLE")
+                    } else {
+                        print("FILE NOT AVAILABLE")
+                    }
                     return URL(fileURLWithPath: imagesDirectoryPath)
                 } catch {
                     fatalError("Error creating images folder in documents dir: \(error.localizedDescription)")
@@ -37,9 +56,18 @@ class FileStorageManager: FileStorageProtocol {
         return URL(fileURLWithPath: imagesDirectoryPath)
     }
     
-    func storeImage(type: ImageType, image: UIImage, fileName: String?, fileFormat: FileFormat, surveyID: String?) -> URL? {
-        var imageURL: URL?
-        let imageDirectory      = getImagesDirectoryPath()
+    func storeImage(type: ImageType, image: UIImage, fileName: String?, fileFormat: FileFormat, surveyID: String?) -> String? {
+        var imagePath: String?
+//        var imageURL: URL?
+//        let imageDirectory      = getImagesDirectoryPath()
+        let imageDirectory =  NSHomeDirectory().appending("/Documents/")
+        if !FileManager.default.fileExists(atPath: imageDirectory) {
+            do {
+                try FileManager.default.createDirectory(at: NSURL.fileURL(withPath: imageDirectory), withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print(error)
+            }
+        }
         let separator           = "/"
         let dot                 = "."
         var _fileName           = ""
@@ -47,21 +75,26 @@ class FileStorageManager: FileStorageProtocol {
         switch type {
         case .Profile:
             _fileName           = type.rawValue
-            imageURL            = imageDirectory.appendingPathComponent(_fileName + dot + fileFormat.rawValue.lowercased())
+//            imageURL            = imageDirectory.appendingPathComponent(_fileName + dot + fileFormat.rawValue.lowercased())
+            imagePath            = imageDirectory.appending(_fileName + dot + fileFormat.rawValue.lowercased())
+            let imageURL = NSURL.fileURL(withPath: imagePath!)
             switch fileFormat {
             case .JPEG:
                 do {
-                    try image.jpegData(compressionQuality: 0.75)?.write(to: imageURL!)
-                    let fileManager = FileManager.default
-                    if fileManager.fileExists(atPath: imageURL!.absoluteString) {
+                    try image.jpegData(compressionQuality: 1)?.write(to: imageURL, options: .atomic)
+                    if FileManager.default.fileExists(atPath: imagePath!) {
                         print("FILE AVAILABLE")
                     } else {
                         print("FILE NOT AVAILABLE")
                     }
-                    return imageURL
-                } catch {
+                } catch let error {
                     fatalError(error.localizedDescription)
-                    imageURL = nil
+                }
+            case .PNG:
+                do {
+                    try image.pngData()?.write(to: imageURL, options: .atomic)
+                } catch let error {
+                    fatalError(error.localizedDescription)
                 }
             default:
                 print("default")
@@ -69,7 +102,7 @@ class FileStorageManager: FileStorageProtocol {
         default:
             print("TODO Store survey images")
         }
-        return imageURL
+        return imagePath
     }
     
 //    func storeImage(_ image: UIImage, fullFileName: String, questionID: String) -> URL? {

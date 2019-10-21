@@ -119,20 +119,6 @@
                                     <constraint firstItem="FoA-Or-0Fh" firstAttribute="width" secondItem="hmG-1M-6F9" secondAttribute="height" multiplier="221:313" id="tgg-bk-sqw"/>
                                 </constraints>
                             </view>
-                            <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NVJ-iK-C0i">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                                <subviews>
-                                    <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4qE-2t-JUw" customClass="LoadingIndicator" customModule="ThinkWhat" customModuleProvider="target">
-                                        <rect key="frame" x="48" y="172" width="225" height="225"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" secondItem="4qE-2t-JUw" secondAttribute="height" multiplier="1:1" id="pu6-OR-EiU"/>
-                                        </constraints>
-                                    </view>
-                                </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <viewLayoutGuide key="safeArea" id="WnV-Am-rLq"/>
-                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -141,11 +127,7 @@
                             <constraint firstItem="IHt-hM-WCd" firstAttribute="height" secondItem="hYx-fl-XtL" secondAttribute="height" multiplier="0.5" id="GSB-XG-Ohx"/>
                             <constraint firstItem="IHt-hM-WCd" firstAttribute="leading" secondItem="fEu-5p-dPW" secondAttribute="leading" id="Sd3-xG-FTk"/>
                             <constraint firstItem="fEu-5p-dPW" firstAttribute="trailing" secondItem="IHt-hM-WCd" secondAttribute="trailing" id="Sdw-50-qlj"/>
-                            <constraint firstItem="NVJ-iK-C0i" firstAttribute="top" secondItem="hYx-fl-XtL" secondAttribute="top" id="XbA-df-ARv"/>
-                            <constraint firstItem="NVJ-iK-C0i" firstAttribute="bottom" secondItem="hmG-1M-6F9" secondAttribute="bottom" id="hTh-RW-IpM"/>
                             <constraint firstItem="IHt-hM-WCd" firstAttribute="top" secondItem="fEu-5p-dPW" secondAttribute="top" id="hwq-P8-2KI"/>
-                            <constraint firstItem="NVJ-iK-C0i" firstAttribute="trailing" secondItem="hmG-1M-6F9" secondAttribute="trailing" id="m8S-Is-Zvq"/>
-                            <constraint firstItem="NVJ-iK-C0i" firstAttribute="leading" secondItem="IHt-hM-WCd" secondAttribute="leading" id="rNe-hT-EI0"/>
                             <constraint firstItem="hmG-1M-6F9" firstAttribute="leading" secondItem="fEu-5p-dPW" secondAttribute="leading" id="ueX-EJ-erm"/>
                             <constraint firstItem="fEu-5p-dPW" firstAttribute="trailing" secondItem="hmG-1M-6F9" secondAttribute="trailing" id="vBM-Hv-RGm"/>
                             <constraint firstItem="fP4-ga-yuv" firstAttribute="centerX" secondItem="fEu-5p-dPW" secondAttribute="centerX" id="y0F-pS-tYJ"/>
@@ -155,8 +137,6 @@
                     <navigationItem key="navigationItem" id="ZR8-KQ-Wat"/>
                     <connections>
                         <outlet property="fbButton" destination="gVO-oM-RV3" id="OtV-jH-aBo"/>
-                        <outlet property="loadingIndicator" destination="4qE-2t-JUw" id="Cbk-TP-z84"/>
-                        <outlet property="loadingView" destination="NVJ-iK-C0i" id="maN-FR-woJ"/>
                         <outlet property="mailButton" destination="KjS-Lb-PFX" id="guh-bH-ckJ"/>
                         <outlet property="termsOfUseButton" destination="FoA-Or-0Fh" id="13C-22-CF9"/>
                         <outlet property="vkButton" destination="hY7-Mf-AwY" id="Hbf-AV-Qzb"/>
@@ -880,7 +860,7 @@
                                                 <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
-                                                <textInputTraits key="textInputTraits" autocapitalizationType="words" returnKeyType="done" textContentType="name"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="words" autocorrectionType="no" returnKeyType="next" textContentType="name"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
                                                         <color key="value" red="0.75294117650000003" green="0.25490196079999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -1021,7 +1001,7 @@
                     <connections>
                         <outlet property="birthDateTF" destination="yBf-rp-YP3" id="7o5-l8-SjK"/>
                         <outlet property="continueButton" destination="w9v-e6-q4A" id="Bnr-j9-wy3"/>
-                        <outlet property="first_nameTF" destination="3AT-It-RXL" id="kWp-nK-LwE"/>
+                        <outlet property="firstNameTF" destination="3AT-It-RXL" id="zJD-1Q-zgp"/>
                         <outlet property="genderTF" destination="7Il-rL-frc" id="dGY-rp-mai"/>
                         <outlet property="stackView" destination="eDe-sz-a9X" id="UJD-rS-rhq"/>
                         <outlet property="userImage" destination="0Va-ul-ayg" id="U1x-fA-R1T"/>
@@ -1039,4 +1019,5 @@
         <segue reference="INB-gA-bu8"/>
         <segue reference="bec-WO-31D"/>
     </inferredMetricsTieBreakers>
+    <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
 </document>

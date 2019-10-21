@@ -97,7 +97,7 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         }
         if (border != nil) {
             border!.layer.add(anim, forKey: nil)
-            border!.layer.backgroundColor = K_COLOR_RED.cgColor
+            border!.layer.backgroundColor = UIColor.lightGray.cgColor//K_COLOR_RED.cgColor
         }
     }
     
@@ -110,7 +110,7 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         frameView.layer.transform = CATransform3DMakeScale(0.5, 0.5, 1)
         frameView.layer.opacity = 1
         
-        UIView.animate(withDuration: 0.4, delay: 0, options: [.curveEaseInOut], animations: {
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
             //self.contentView.alpha = 1
             self.lightBlurView.alpha = 1
         }, completion: nil)
@@ -161,7 +161,7 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         
         scaleAnim.fromValue = 1.0
         scaleAnim.toValue   = 0.5
-        scaleAnim.duration  = 0.3
+        scaleAnim.duration  = 0.6
         scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         fadeAnim.fromValue  = 1
         fadeAnim.toValue    = 0
@@ -174,7 +174,7 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         frameView.layer.opacity = Float(0)
         frameView.layer.transform = CATransform3DMakeScale(0.5, 0.5, 1)
         
-        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut], animations: {
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
             //self.contentView.alpha = 0
             self.lightBlurView.alpha = 0
         }, completion: {
@@ -205,7 +205,7 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         
         
         func setupViews(_: AlertType) {
-            
+            frameView.borderWidth = 1.5
             var img = UIView()
             
             switch type {
@@ -251,17 +251,17 @@ class CustomAlertView: UIView, CAAnimationDelegate {
             
             for button in buttons! {
                 let borderView = BorderedView(frame: lowerView.frame)
-                borderView.borderColor = K_COLOR_RED//.white
+                borderView.borderColor = K_COLOR_GRAY//K_COLOR_RED//.white
                 borderView.bordered = true
                 borderView.translatesAutoresizingMaskIntoConstraints = false
                 borderView.rounded = false
-                borderView.borderWidth = 1
+                borderView.borderWidth = 1.5
                 borderView.alpha = 1
                 stackView.addArrangedSubview(borderView)
                 let label = UILabel(frame: borderView.frame)
                 label.text = button.key
-                label.textColor = K_COLOR_RED//.white
-                label.font = UIFont(name: "OpenSans-Bold", size: 17)
+                label.textColor = K_COLOR_GRAY//K_COLOR_RED//.white
+                label.font = UIFont(name: "OpenSans", size: 17)
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.textAlignment = .center
                 borderView.addSubview(label)

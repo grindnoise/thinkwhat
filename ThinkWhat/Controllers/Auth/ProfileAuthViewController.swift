@@ -8,12 +8,12 @@
 
 import UIKit
 
-class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
+class ProfileAuthViewController: UIViewController, UINavigationControllerDelegate, UITextFieldDelegate {
     
     @IBOutlet weak var userImage:       UIImageView!
     @IBOutlet weak var continueButton:  UIButton!
     @IBOutlet weak var stackView:       UIStackView!
-    @IBOutlet weak var first_nameTF:    UnderlinedTextField!
+    @IBOutlet weak var firstNameTF:    UnderlinedTextField!
 //    @IBOutlet weak var last_nameTF:     UnderlinedTextField!
     @IBOutlet weak var birthDateTF:     UnderlinedTextField!
     @IBOutlet weak var genderTF:        UnderlinedTextField!
@@ -38,7 +38,7 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
     }
     @IBAction func continueTapped(_ sender: UIButton) {
         var errorText = ""
-        if first_nameTF.text!.isEmpty {
+        if firstNameTF.text!.isEmpty {
             errorText += "- имя\n"
         }
         if birthDateTF.text!.isEmpty {
@@ -59,27 +59,48 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
             } else {
                 var userProfile = [String: Any]()
                 var owner       = [String: Any]()
-                if first_nameTF.text! != AppData.shared.user.firstName {
-                    owner[DjangoVariables.User.firstName] = first_nameTF.text!
+                
+                var lastName = ""
+                let separated = firstNameTF.text!.split(separator: " ")
+                separated.enumerated().map {
+                    (index, value) in
+                    if index == 0 {
+                        if String(value) != AppData.shared.user.firstName {
+                            owner[DjangoVariables.User.firstName] = String(value)
+                        }
+                    } else {
+                        lastName += lastName.isEmpty ? String(value) : " \(String(value))"
+                    }
                 }
+                
+                if lastName != AppData.shared.user.lastName {
+                    owner[DjangoVariables.User.lastName] = lastName
+                    
+                }
+                
                 if Date(dateString: birthDateTF.text!) != AppData.shared.userProfile.birthDate {
                     userProfile[DjangoVariables.UserProfile.birthDate] = birthDateTF.text!
                 }
-                if Gender(rawValue: genderTF.text!) != AppData.shared.userProfile.gender {
-                    userProfile[DjangoVariables.UserProfile.gender] = genderTF.text!
+                if Gender(rawValue: dataModel[genderTF.text!]!) != AppData.shared.userProfile.gender {
+                    userProfile[DjangoVariables.UserProfile.gender] = dataModel[genderTF.text!]//allKeys(forValue: genderTF.text!).first!
                 }
                 if !owner.isEmpty {
                     userProfile["owner"] = owner
                 }
-                print(userProfile)
-                apiManager.updateUserProfile(data: userProfile) {
-                    json, error in
-                    if error != nil {
-                        showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
-                    }
-                    if json != nil {
-                        AppData.shared.importUserData(json!)
-                        self.performSegue(withIdentifier: kSegueAppFromProfile, sender: nil)
+                if userProfile.isEmpty {
+                    performSegue(withIdentifier: kSegueAppFromProfile, sender: nil)
+                } else {
+                    showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+                    apiManager.updateUserProfile(data: userProfile) {
+                        json, error in
+                        if error != nil {
+                            showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
+                        }
+                        if json != nil {
+                            AppData.shared.importUserData(json!)
+                            hideAlert()
+                            self.performSegue(withIdentifier: kSegueAppFromProfile, sender: nil)
+                        }
                     }
                 }
             }
@@ -88,13 +109,7 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
     fileprivate var isImageChanged = false {
         didSet {
             if isImageChanged {
-                var fieldsFilled = true
-                for tf in textFields {
-                    if tf.text!.isEmpty {
-                        fieldsFilled = false
-                    }
-                }
-                if fieldsFilled {UIView.animate(withDuration: 0.2) {self.continueButton.backgroundColor = K_COLOR_RED}}
+                UIView.animate(withDuration: 0.2) {self.continueButton.backgroundColor = self.checkFieldsFilled()}
             }
         }
     }
@@ -124,31 +139,34 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
     private var textFields          = [UnderlinedTextField]()
     private var offsetY:            CGFloat                     = 0
     private let datePicker          = UIDatePicker()
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy"
-        return formatter
-    } ()
+    private let genderPicker        = UIPickerView()
+    private let dataModel = ["мужской": "Male", "женский": "Female"]
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Профиль"
+        setupDelegates()
         setupViews()
         setupGestures()
         NotificationCenter.default.addObserver(self, selector: #selector(ProfileAuthViewController.applicationWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: UIApplication.shared)
         NotificationCenter.default.addObserver(self, selector: #selector(ProfileAuthViewController.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ProfileAuthViewController.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        textFields = [first_nameTF, genderTF, birthDateTF]
-        for tf in textFields {
-            tf.delegate = self
-        }
+        
         self.navigationItem.setHidesBackButton(true, animated: false)
-        first_nameTF.text         = username
+        firstNameTF.text         = username
         
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    private func setupDelegates() {
+        textFields = [firstNameTF, genderTF, birthDateTF]
+        for tf in textFields {
+            tf.delegate = self
+        }
     }
     
     private func setupViews() {
@@ -163,7 +181,6 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
             self.navigationController?.isNavigationBarHidden         = false
             self.navigationController?.navigationBar.barTintColor    = .white
             //            self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-            self.continueButton.backgroundColor = self.username.count == 0 ? K_COLOR_GRAY : K_COLOR_RED
         }
     }
     
@@ -178,37 +195,46 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         if !isViewSetupCompleted {
             self.view.setNeedsLayout()
             self.view.layoutIfNeeded()
-            DispatchQueue.main.async {
-                if let imagePath = AppData.shared.userProfile.imagePath {
-                    if let image = loadImageFromPath(path: imagePath) {
-                        self.circularImage = image.circularImage(size: self.userImage.frame.size)
-                        self.userImage.image = self.circularImage
-                    }
-                } else {
-                    let pic = UIImage(named: "default_avatar")!
-                    self.circularImage = pic.circularImage(size: self.userImage.frame.size)
-                    self.userImage.image = self.circularImage
+            if let imagePath = AppData.shared.userProfile.imagePath {
+                if let image = loadImageFromPath(path: imagePath) {
+                    circularImage = image.circularImage(size: userImage.frame.size)
+                    userImage.image = circularImage
+                    isImageChanged = true
                 }
-                if let birthDate = AppData.shared.userProfile.birthDate {
-                    self.birthDateTF.text = self.dateFormatter.string(for: birthDate)
-                }
-                if let gender = AppData.shared.userProfile.gender {
-                    self.genderTF.text = gender.rawValue
-                }
+            } else {
+                let pic = UIImage(named: "default_avatar")!
+                circularImage = pic.circularImage(size: userImage.frame.size)
+                userImage.image = circularImage
+            }
+            if let firstName = AppData.shared.user.firstName {
+                firstNameTF.text = firstName
+            }
+            if let lastName = AppData.shared.user.lastName {
+                firstNameTF.text = "\(String(describing: firstNameTF.text!)) \(lastName)"
+            }
+            if let birthDate = AppData.shared.userProfile.birthDate {
+                let strDate = dateFormatter.string(for: birthDate)
+                birthDateTF.text = strDate == "01.01.0001" ? "" : strDate
+            }
+            if let gender = AppData.shared.userProfile.gender {
+                genderTF.text = dataModel.allKeys(forValue: gender.rawValue).first
             }
 //            let pic = UIImage(named: "default_avatar")!
 //            circularImage = pic.circularImage(size: self.userImage.frame.size)
 //            self.userImage.image = circularImage
-            self.isViewSetupCompleted = true
-            self.continueButton.layer.cornerRadius = self.continueButton.frame.height / 2
-            self.continueButton.backgroundColor = K_COLOR_GRAY
+            isViewSetupCompleted = true
+            continueButton.layer.cornerRadius = self.continueButton.frame.height / 2
         }
-        first_nameTF.text = AppData.shared.user.firstName
-        birthDateTF.text = dateFormatter.string(for: AppData.shared.userProfile.birthDate)
-        genderTF.text = AppData.shared.userProfile.gender.rawValue
+        continueButton.backgroundColor = self.checkFieldsFilled()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+//        UIView.animate(withDuration: 0.2) {self.continueButton.backgroundColor = self.checkFieldsFilled()}
     }
     
     override func viewDidLayoutSubviews() {
@@ -237,16 +263,16 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
                 }
                 datePicker.setValue(K_COLOR_GRAY, forKey: "textColor")
             }
-            let ageToolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 44))
-            ageToolBar.barStyle = .default
-            ageToolBar.tintColor = UIColor.black
-            ageToolBar.barTintColor = .white//"4A84BA".hexColor
-            ageToolBar.isTranslucent = false
+            let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 44))
+            toolBar.barStyle = .default
+            toolBar.tintColor = K_COLOR_RED//UIColor.black
+            toolBar.barTintColor = .white//"4A84BA".hexColor
+            toolBar.isTranslucent = false
             let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: nil, action: #selector(ProfileAuthViewController.handleDoneButtonTap))
             let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-            ageToolBar.items = [space, doneButton]
-            ageToolBar.barStyle = .default
-            birthDateTF.inputAccessoryView            = ageToolBar
+            toolBar.items = [space, doneButton]
+            toolBar.barStyle = .default
+            birthDateTF.inputAccessoryView            = toolBar
             datePicker.addTarget(self, action: #selector(ProfileAuthViewController.handleDateChange), for: .valueChanged)
             birthDateTF.inputView    = datePicker
             let today = Date()
@@ -255,7 +281,39 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
             let tenYearsAgo = Calendar.current.date(byAdding: tenYears, to: today)
             datePicker.maximumDate = tenYearsAgo
             
+            genderTF.inputView = genderPicker
+            genderTF.inputAccessoryView = toolBar
+            genderPicker.backgroundColor   = .white//"4A84BA".hexColor
+            genderPicker.setValue(K_COLOR_GRAY, forKeyPath: "textColor")
+            genderPicker.delegate   = self
+            genderPicker.dataSource = self 
         }
+    }
+    
+    @objc fileprivate func handleGenderTap(gesture: UITapGestureRecognizer) {
+        
+        if gesture.state == .ended {
+            let rowHeight = genderPicker.rowSize(forComponent: 0).height
+            let selectedRowFrame: CGRect = self.genderPicker.bounds.insetBy(dx: 0.0, dy: (self.genderPicker.frame.height - rowHeight) / 2.0 )
+            let userTappedOnSelectedRow = (selectedRowFrame.contains(gesture.location(in: genderPicker)))
+            
+            
+            if (userTappedOnSelectedRow) {
+                let selectedRow = genderPicker.selectedRow(inComponent: 0)
+                genderTF.text = Array(dataModel)[selectedRow].key
+                genderTF.resignFirstResponder()
+            }
+            
+        }
+    }
+    private func checkFieldsFilled() -> UIColor {
+        var color = K_COLOR_RED
+        for tf in textFields {
+            if tf.text!.isEmpty {
+                color = K_COLOR_GRAY
+            }
+        }
+        return color
     }
     
     @objc private func hideKeyboard() {
@@ -286,47 +344,14 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
         present(alert, animated: true, completion: nil)
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-//        self.dismiss(animated: false, completion: nil)
-//        if let image = info[.editedImage] as? UIImage {
-//            fullImage = image
-//        }
-        if let image = info[.editedImage] as? UIImage {
-            let imageData = image.jpegData(compressionQuality: 0.8)//UIImageJPEGRepresentation(image, 0.5)!//UIImagePNGRepresentation(image)!
-            let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-            let imageURL = docDir.appendingPathComponent("profileImage.jpeg")
-            try! imageData!.write(to: imageURL)
-
-            if UIImage(contentsOfFile: imageURL.path) != nil {
-                let imagePath = imageURL.path
-                
-                self.apiManager.updateUserProfile(data: ["image" : image]) {
-                    json, error in
-                    if error != nil {
-                        showAlert(type: .Ok, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Ошибка при загрузке изображения")
-                    }
-                    if json != nil {
-                        showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isImageChanged = true}]], text: "Загружено")
-                        AppData.shared.userProfile.imagePath = imageURL.absoluteString
-                        if let image = loadImageFromPath(path: AppData.shared.userProfile.imagePath) {
-                            self.circularImage = image.circularImage(size: self.userImage.frame.size)
-                            self.userImage.image = self.circularImage
-                        }
-                    }
-                }
-                
-                //NotificationCenter.default.post(name: updateUserImageNotification, object: nil)
-            } else {
-                let alert = UIAlertController(title: "Ошибка", message: "Изображение не может быть обработано, выберите другое", preferredStyle: UIAlertController.Style.actionSheet)
-                alert.addAction(UIAlertAction(title: "Ок", style: UIAlertAction.Style.destructive, handler: nil))
-                present(alert, animated: true, completion: nil)
-            }
-        }
-        dismiss(animated: true)
-    }
+    
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        if textField === firstNameTF {
+            birthDateTF.becomeFirstResponder()
+        }
+        
         return true
     }
     
@@ -404,7 +429,9 @@ class ProfileAuthViewController: UIViewController, UIImagePickerControllerDelega
         
         for tf in textFields {
             if tf.isFirstResponder {
-                if tf.inputView == datePicker {
+                if tf.inputView == genderPicker {
+                    genderTF.text = Array(dataModel)[genderPicker.selectedRow(inComponent: 0)].key
+                } else if tf.inputView == datePicker {
                     birthDateTF.text = dateFormatter.string(from: datePicker.date)
                 }
                 tf.resignFirstResponder()
@@ -438,4 +465,88 @@ extension ProfileAuthViewController: StorageInitializationProtocol {
     }
 }
 
+extension ProfileAuthViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        if pickerView == genderPicker {
+            return Array(dataModel)[row].key
+        }
+        else {
+            return "1"
+        }
+    }
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        if pickerView == genderPicker {
+            return 1
+        } else {
+            return 2
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        if pickerView == genderPicker {
+            return dataModel.count
+        } else {
+            return 10
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+        
+        if pickerView == genderPicker {
+            let string = Array(dataModel)[row].key
+            
+            return NSAttributedString(string: string, attributes: [NSAttributedString.Key.foregroundColor: K_COLOR_GRAY])
+        } else {
+            return nil
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        if pickerView == genderPicker {
+            genderTF.text = Array(dataModel)[row].key
+        }
+    }
+}
+
+extension ProfileAuthViewController: UIImagePickerControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        //        self.dismiss(animated: false, completion: nil)
+        //        if let image = info[.editedImage] as? UIImage {
+        //            fullImage = image
+        //        }
+        if let image = info[.editedImage] as? UIImage {
+            let imageData = image.jpegData(compressionQuality: 0.8)//UIImageJPEGRepresentation(image, 0.5)!//UIImagePNGRepresentation(image)!
+            let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            let imageURL = docDir.appendingPathComponent("profileImage.jpeg")
+            try! imageData!.write(to: imageURL)
+            
+            if UIImage(contentsOfFile: imageURL.path) != nil {
+//                let imagePath = imageURL.path
+                
+                self.apiManager.updateUserProfile(data: ["image" : image]) {
+                    json, error in
+                    if error != nil {
+                        showAlert(type: .Ok, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Ошибка при загрузке изображения")
+                    }
+                    if json != nil {
+                        showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isImageChanged = true}]], text: "Загружено")
+                        AppData.shared.userProfile.imagePath = imageURL.absoluteString
+                        if let path = AppData.shared.userProfile.imagePath, let image = loadImageFromPath(path: path) {
+                            self.circularImage = image.circularImage(size: self.userImage.frame.size)
+                            self.userImage.image = self.circularImage
+                        }
+                    }
+                }
+                
+                //NotificationCenter.default.post(name: updateUserImageNotification, object: nil)
+            } else {
+                let alert = UIAlertController(title: "Ошибка", message: "Изображение не может быть обработано, выберите другое", preferredStyle: UIAlertController.Style.actionSheet)
+                alert.addAction(UIAlertAction(title: "Ок", style: UIAlertAction.Style.destructive, handler: nil))
+                present(alert, animated: true, completion: nil)
+            }
+        }
+        dismiss(animated: true)
+    }
+}
 

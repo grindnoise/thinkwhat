@@ -9,6 +9,13 @@
 /* Begin PBXBuildFile section */
 		2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 		AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */; };
+		AB2AA1AE235605FD0086D16C /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1AD235605FD0086D16C /* InfoViewController.swift */; };
+		AB2AA1B0235613450086D16C /* InfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1AF235613450086D16C /* InfoTableViewController.swift */; };
+		AB2AA1B32359E9D30086D16C /* TopSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1B22359E9D30086D16C /* TopSurveysTableViewController.swift */; };
+		AB2AA1B52359EA8A0086D16C /* Survey.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1B42359EA8A0086D16C /* Survey.swift */; };
+		AB2AA1B8235D94DF0086D16C /* SurveyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */; };
+		AB2AA1B9235D94DF0086D16C /* SurveyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */; };
+		AB2AA1BB235DDC6F0086D16C /* TopSurveysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */; };
 		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
 		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
 		AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */; };
@@ -49,7 +56,7 @@
 		AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */; };
 		AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6858223FD74C00B57580 /* Reachability.swift */; };
 		AB3C685D223FD74E00B57580 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6859223FD74D00B57580 /* APIManager.swift */; };
-		AB3C685E223FD74E00B57580 /* FileStoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685A223FD74D00B57580 /* FileStoring.swift */; };
+		AB3C685E223FD74E00B57580 /* FileStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685A223FD74D00B57580 /* FileStorageManager.swift */; };
 		AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */; };
 		AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */; };
 		AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6864223FDC5200B57580 /* Root.storyboard */; };
@@ -106,6 +113,13 @@
 		10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthViewController.swift; sourceTree = "<group>"; };
+		AB2AA1AD235605FD0086D16C /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
+		AB2AA1AF235613450086D16C /* InfoTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoTableViewController.swift; sourceTree = "<group>"; };
+		AB2AA1B22359E9D30086D16C /* TopSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopSurveysTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB2AA1B42359EA8A0086D16C /* Survey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Survey.swift; sourceTree = "<group>"; };
+		AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTableViewCell.swift; sourceTree = "<group>"; };
+		AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyTableViewCell.xib; sourceTree = "<group>"; };
+		AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopSurveysViewController.swift; sourceTree = "<group>"; };
 		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AB3C67E3223FBB6400B57580 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -152,7 +166,7 @@
 		AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogoStyleKit.swift; sourceTree = "<group>"; };
 		AB3C6858223FD74C00B57580 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		AB3C6859223FD74D00B57580 /* APIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		AB3C685A223FD74D00B57580 /* FileStoring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileStoring.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB3C685A223FD74D00B57580 /* FileStorageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileStorageManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingTabBarUtils.swift; sourceTree = "<group>"; };
 		AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNotificationDelegate.swift; sourceTree = "<group>"; };
 		AB3C6864223FDC5200B57580 /* Root.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Root.storyboard; sourceTree = "<group>"; };
@@ -237,6 +251,26 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		AB2AA1AC235604A00086D16C /* InfoViewController */ = {
+			isa = PBXGroup;
+			children = (
+				AB2AA1AD235605FD0086D16C /* InfoViewController.swift */,
+				AB2AA1AF235613450086D16C /* InfoTableViewController.swift */,
+			);
+			path = InfoViewController;
+			sourceTree = "<group>";
+		};
+		AB2AA1B12359E98E0086D16C /* TopSurveysTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				AB2AA1B22359E9D30086D16C /* TopSurveysTableViewController.swift */,
+				AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */,
+				AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */,
+				AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */,
+			);
+			path = TopSurveysTableViewController;
+			sourceTree = "<group>";
+		};
 		AB3C67D2223FBB6400B57580 = {
 			isa = PBXGroup;
 			children = (
@@ -311,7 +345,6 @@
 				AB3C6817223FD04500B57580 /* Animations.swift */,
 				AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */,
 				AB3C681A223FD04500B57580 /* Extensions.swift */,
-				AB3C685A223FD74D00B57580 /* FileStoring.swift */,
 				AB3C6819223FD04500B57580 /* KeychainService.swift */,
 				AB3C6811223FC71600B57580 /* Main.swift */,
 				AB3C682C223FD3C300B57580 /* QC.swift */,
@@ -322,6 +355,7 @@
 				AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */,
 				ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */,
 				ABB46F362344B1F900AF212B /* Protocols.swift */,
+				AB2AA1B42359EA8A0086D16C /* Survey.swift */,
 			);
 			path = Algorithms;
 			sourceTree = "<group>";
@@ -346,6 +380,7 @@
 		AB3C6814223FCE2F00B57580 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				AB2AA1B12359E98E0086D16C /* TopSurveysTableViewController */,
 				ABB46F3F2347404C00AF212B /* ProfileViewController */,
 				ABB46F3D2346373700AF212B /* TabBarController.swift */,
 			);
@@ -454,6 +489,7 @@
 			children = (
 				ABF1F19E22C253A6008913C3 /* FBManager.swift */,
 				AB3C6859223FD74D00B57580 /* APIManager.swift */,
+				AB3C685A223FD74D00B57580 /* FileStorageManager.swift */,
 				ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */,
 			);
 			path = API;
@@ -462,6 +498,7 @@
 		ABB46F3F2347404C00AF212B /* ProfileViewController */ = {
 			isa = PBXGroup;
 			children = (
+				AB2AA1AC235604A00086D16C /* InfoViewController */,
 				ABB46F402347406F00AF212B /* ProfileViewController.swift */,
 				ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */,
 				ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */,
@@ -595,6 +632,7 @@
 				AB3C6867223FDD9600B57580 /* Auth.storyboard in Resources */,
 				AB3C6851223FD3EF00B57580 /* OpenSans-ExtraBoldItalic.ttf in Resources */,
 				AB3C684C223FD3EE00B57580 /* OpenSans-Italic.ttf in Resources */,
+				AB2AA1B9235D94DF0086D16C /* SurveyTableViewCell.xib in Resources */,
 				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
 				AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */,
 				AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */,
@@ -775,8 +813,10 @@
 				AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */,
 				AB6083C122410131002C0D7E /* ValidSign.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
+				AB2AA1B8235D94DF0086D16C /* SurveyTableViewCell.swift in Sources */,
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
 				AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */,
+				AB2AA1BB235DDC6F0086D16C /* TopSurveysViewController.swift in Sources */,
 				ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */,
 				AB3C685D223FD74E00B57580 /* APIManager.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
@@ -788,13 +828,17 @@
 				AB3C6848223FD3EE00B57580 /* ParentLoginButton.swift in Sources */,
 				AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */,
 				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
+				AB2AA1AE235605FD0086D16C /* InfoViewController.swift in Sources */,
+				AB2AA1B0235613450086D16C /* InfoTableViewController.swift in Sources */,
 				AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */,
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
+				AB2AA1B32359E9D30086D16C /* TopSurveysTableViewController.swift in Sources */,
 				AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */,
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
 				AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */,
-				AB3C685E223FD74E00B57580 /* FileStoring.swift in Sources */,
+				AB2AA1B52359EA8A0086D16C /* Survey.swift in Sources */,
+				AB3C685E223FD74E00B57580 /* FileStorageManager.swift in Sources */,
 				AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */,
 				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
 				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,

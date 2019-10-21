@@ -21,6 +21,7 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
         UITabBar.appearance().clipsToBounds = true
         delegate = sdelegate
         navigationController?.isNavigationBarHidden = true
+        NotificationCenter.default.addObserver(self, selector: #selector(TabBarController.handleTokenState), name: kNotificationTokenRevoked, object: nil)
         viewControllers?.forEach {
             if let navController = $0 as? UINavigationController {
                 navController.topViewController?.view
@@ -43,6 +44,12 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func handleTokenState() {
+        if tokenState == .Revoked {
+            performSegue(withIdentifier: kSegueAppBackToAuth, sender: nil)
+        }
     }
     
 //    private func initializeServerAPI() -> APIServerProtocol {

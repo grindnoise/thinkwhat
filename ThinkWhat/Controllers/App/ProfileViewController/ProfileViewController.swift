@@ -30,6 +30,7 @@ class ProfileViewController: UIViewController, UINavigationControllerDelegate {
     private var imagePicker         = UIImagePickerController()
     private var isKeyboardShown     = false
     
+    
     private let normalAttrs         = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Light", size: 17),
                                        NSAttributedString.Key.foregroundColor: K_COLOR_RED,
                                        NSAttributedString.Key.backgroundColor: UIColor.clear]
@@ -73,29 +74,25 @@ class ProfileViewController: UIViewController, UINavigationControllerDelegate {
         
         DispatchQueue.main.async {
             var image = UIImage()
-            if AppData.shared.userProfile.imagePath != nil {
-                if let imageFromAppData = loadImageFromPath(path: AppData.shared.userProfile.imagePath) {
+            if let path = AppData.shared.userProfile.imagePath  {
+                if let imageFromAppData = loadImageFromPath(path: path) {
                     image = imageFromAppData
                 }
             } else {
                 image = UIImage(named: "default_avatar")!
             }
             self.circularImage     = image.circularImage(size: self.userImage.frame.size)
-            self.usernameTF.text   = AppData.shared.user.username
+            self.usernameTF.text   = AppData.shared.user.firstName
 //            self.phoneTF.text      = appData.phone
         }
         
         DispatchQueue.main.async {
-            print(AppData.shared.user.firstName)
-            self.usernameTF.text = AppData.shared.user.firstName// + " \(AppData.shared.user.lastName)"
-            print(AppData.shared.userProfile.birthDate)
-            print(AppData.shared.userProfile.gender)
-            print(AppData.shared.user.firstName)
-            print(AppData.shared.user.ID)
-            self.genderTF.text = "\(yearsBetweenDate(startDate: AppData.shared.userProfile.birthDate, endDate: Date())), \(AppData.shared.userProfile.gender.rawValue)"
+            
+            assert(AppData.shared.user.firstName! != nil || AppData.shared.userProfile.birthDate! != nil || AppData.shared.userProfile.ID! != nil || AppData.shared.userProfile.gender! != nil, "ProfileViewController.setupViews error (AppData.shared.userProfile.ID == nil || AppData.shared.userProfile.gender == nil)")
+            self.usernameTF.text = ("\(AppData.shared.user.firstName!) " + (AppData.shared.user.lastName ?? "")).trimmingTrailingSpaces
+            self.genderTF.text = "\(yearsBetweenDate(startDate: AppData.shared.userProfile.birthDate!, endDate: Date())), \(AppData.shared.userProfile.gender!.rawValue)"
         }
 
-        
         DispatchQueue.main.async {
             self.addChild(self.settingsVC)
             self.settingsVC.view.frame = CGRect(x: 0, y: 0, width: self.container.frame.width, height: self.container.frame.height)
@@ -165,7 +162,7 @@ extension ProfileViewController: UIImagePickerControllerDelegate {
             
             if UIImage(contentsOfFile: imageURL.path) != nil {
                 AppData.shared.userProfile.imagePath = imageURL.path
-                if let image = loadImageFromPath(path: AppData.shared.userProfile.imagePath) {
+                if let path = AppData.shared.userProfile.imagePath, let image = loadImageFromPath(path: path) {
                     circularImage = image.circularImage(size: self.userImage.frame.size)
                     self.userImage.image = circularImage
                     //                    isImageChanged = true

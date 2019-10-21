@@ -28,25 +28,23 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
     @IBOutlet weak var stackViewHeightConstraint: NSLayoutConstraint!
     @IBAction func buttonTapped(_ sender: UIButton) {
         if sender.tag == 0 {
-            if launchApp || AppData.shared.userProfile.isEdited {
+            if launchApp, let _ = AppData.shared.userProfile.isEdited {
                 performSegue(withIdentifier: kSegueAppFromTerms, sender: nil)
             } else {
                 performSegue(withIdentifier: kSegueProfileFromConfirmation, sender: nil)
             }
         } else {
-            if let authVC = navigationController?.viewControllers[0] as? AuthViewController {
-//                self.dismiss(animated: true, completion: {})
-                if let token = KeychainService.loadAccessToken() as String? {
-                    if !token.isEmpty {
-                        apiManager.logout() {
-                            state in
-                            tokenState = state
-                        }
-                    }
+            //            if let authVC = navigationController?.viewControllers[0] as? AuthViewController {
+            //                self.dismiss(animated: true, completion: {})
+            if let token = KeychainService.loadAccessToken() as String?, !token.isEmpty {
+                apiManager.logout() {
+                    state in
+                    tokenState = state
                 }
-//                self.navigationController?.viewControllers = [authVC]
-                self.navigationController?.popViewController(animated: true)
             }
+            //                self.navigationController?.viewControllers = [authVC]
+            self.navigationController?.popViewController(animated: true)
+            //            }
         }
     }
     

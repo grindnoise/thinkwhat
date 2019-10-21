@@ -33,6 +33,10 @@ class VKManager {
             completionHandler(json, error!)
         })
     }
+    
+    public class func performLogout() {
+        VKSdk.forceLogout()
+    }
 }
 
 extension VKManager: UserDataPreparatory {
@@ -54,7 +58,7 @@ extension VKManager: UserDataPreparatory {
             } else if key == "image" {
                 userProfile[key] = value as! UIImage
             } else if key == "bdate" {
-                userProfile["birth_date"] = "1986-12-07"//Date(dateString: value as! String)
+                userProfile["birth_date"] = value as! String//Date(dateString: value as! String)//dateFormatter.string(for: Date(dateString: value as! String))
             } else if key == "sex" {
                 if value as! Int == 0 {
                     userProfile["gender"] = Gender.Unassigned.rawValue

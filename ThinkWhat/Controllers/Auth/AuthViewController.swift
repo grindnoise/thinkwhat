@@ -18,8 +18,6 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     @IBOutlet weak var vkButton:                    VKButtonView!
     @IBOutlet weak var mailButton:                  MailButtonView!
     @IBOutlet weak var fbButton:                    FacebookButtonView!
-    @IBOutlet weak var loadingView:         UIView!
-    @IBOutlet weak var loadingIndicator:    LoadingIndicator!
     private var buttons:                            [ParentLoginButton] = []
     private var selectedAuth:                       Int = 0
     private var fbLoggedIn                          = false
@@ -27,27 +25,6 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     private var vk_sdkInstance:                     VKSdk!
     private lazy var apiManager:   APIManagerProtocol = self.initializeServerAPI()
     private lazy var storeManager: FileStorageProtocol = self.initializeStorageManager()
-    
-    
-//    deinit {
-//        NotificationCenter.default.removeObserver(self)
-//    }
-    private var isLoadingViewVisible    = false {
-        didSet {
-            if oldValue != isLoadingViewVisible {
-                UIView.animate(withDuration: 0.2, animations: {
-                    let alpha: CGFloat = self.isLoadingViewVisible ? 0.9 : 0
-                    self.loadingView.alpha = alpha
-                }) { completed in
-                    if self.isLoadingViewVisible {
-                        self.loadingIndicator.addUntitled1Animation()
-                    } else {
-                        self.loadingIndicator.removeAllAnimations()
-                    }
-                }
-            }
-        }
-    }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -65,6 +42,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     private func setupViews() {
         DispatchQueue.main.async {
+            self.navigationItem.setHidesBackButton(true, animated: false)
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
             self.navigationController?.navigationBar.shadowImage     = UIImage()
             self.navigationController?.navigationBar.isTranslucent   = false
@@ -160,17 +138,21 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             let authCase = self.getAuthCase()
             switch authCase {
             case .Facebook:
-                self.isLoadingViewVisible = true
+//                self.isLoadingViewVisible = true
+//                showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
                 if AccessToken.current == nil {
                     FBManager.performLogin(viewController: self) {
                         (success) in
                         if success {
+                            delay(seconds: 0.2) {
+                                showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+                            }
                             self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {
                                 state in
                                 tokenState = state
                             }
                         } else {
-                            //TODO Error handling
+                            //showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Facebook login ERROR")
                             print("ERROR")
                         }
                     }
@@ -179,6 +161,9 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                         FBManager.performLogin(viewController: self) {
                             (success) in
                             if success {
+                                delay(seconds: 0.2) {
+                                    showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+                                }
                                 self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {
                                     state in
                                     tokenState = state
@@ -195,7 +180,6 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     }
                 }
             case .VK:
-                self.isLoadingViewVisible = true
                 let scope = ["email"]
                 VKSdk.wakeUpSession(scope) {
                     state, error in
@@ -206,6 +190,9 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     if state != VKAuthorizationState.authorized {
                         VKSdk.authorize(scope)
                     } else {
+                        delay(seconds: 0.2) {
+                            showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+                        }
                         self.apiManager.login(.VK, username: nil, password: nil, token: VKSdk.accessToken()?.accessToken) {
                             _tokenState in
                             tokenState = _tokenState
@@ -256,7 +243,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     @objc private func handleTokenState() {
         if tokenState == .Received {
-            var imagePath: URL?
+            var imagePath: String?
             apiManager.getUserData() {
                 json, error in
                 if error != nil {
@@ -264,7 +251,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                 } else if json != nil {
                     print(json!)
                     AppData.shared.userProfile.ID = String(describing: (json!.dictionaryObject  as! [String: Any])["id"] as! Int)
-                    assert(AppData.shared.userProfile.ID != nil || !AppData.shared.userProfile.ID.isEmpty)
+                    assert(AppData.shared.userProfile.ID! != nil, "AuthViewController.handleTokenState error (AppData.shared.userProfile.ID == nil)")
                     let auth = self.getAuthCase()
                     switch auth {
                     case .Facebook:
@@ -294,7 +281,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                                     self.apiManager.updateUserProfile(data: data) {
                                                                         json, error in
                                                                         if error != nil {
-                                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
+                                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: error!.localizedDescription)
                                                                         }
                                                                         if json != nil {
                                                                             AppData.shared.importUserData(json!, imagePath)
@@ -313,7 +300,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                             self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
                                                 json, error in
                                                 if error != nil {
-                                                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
+                                                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: error!.localizedDescription)
                                                 }
                                                 if json != nil {
                                                     AppData.shared.importUserData(json!)
@@ -356,13 +343,15 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                                     imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: imgData).fileFormat, surveyID: nil)
                                                                     vkData["image"] = image
                                                                     vkData.removeValue(forKey: pictureKey)
-                                                                    self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
+                                                                    let data = VKManager.prepareUserData(vkData)
+                                                                    self.apiManager.updateUserProfile(data: data) {
                                                                         response, error in
                                                                         if error != nil {
-                                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
+                                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: error!.localizedDescription)
                                                                         }
                                                                         if response != nil {
                                                                             AppData.shared.importUserData(response!, imagePath)
+                                                                            self.performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
                                                                         }
                                                                     }
                                                                 }
@@ -373,10 +362,11 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                     self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
                                                         response, error in
                                                         if error != nil {
-                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
+                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: error!.localizedDescription)
                                                         }
                                                         if response != nil {
                                                             AppData.shared.importUserData(response!)
+                                                            self.performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
                                                         }
                                                     }
                                                 }
@@ -392,16 +382,18 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                 }
             }
         } else if tokenState == .ConnectionError {
-            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; self.isLoadingViewVisible = false } }]], text: "Ошибка соединения с сервером, повторите позже")
+            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() } }]], text: "Ошибка соединения с сервером, повторите позже")
         } else if tokenState == .Error {
-            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: "Ошибка сервера, повторите позже")
+            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {hideAlert()}]], text: "Ошибка сервера, повторите позже")
         } else if tokenState == .ConnectionError && apiReachability == .Reachable {
             print("connection error")
         }
     }
     
         override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-            isLoadingViewVisible = false
+//            isLoadingViewVisible = false
+//            showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+            hideAlert()
             if segue.identifier == kSegueTermsFromStartScreen {
                 if let destinationVC = segue.destination as? TermsOfUseViewController {
                     destinationVC.isBackButtonHidden = false
@@ -454,10 +446,11 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     }
     
     func vkSdkShouldPresent(_ controller: UIViewController!) {
+//        showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
         if (self.presentedViewController != nil) {
             self.dismiss(animated: true, completion: {
-                self.present(controller, animated: true, completion: {
-                })
+                self.present(controller, animated: true) {
+                }
             })
         } else {
             self.present(controller, animated: true)
@@ -475,6 +468,10 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     
     func vkSdkAuthorizationStateUpdated(with result:VKAuthorizationResult) -> Void {
         //print(result.state.rawValue)
+    }
+    
+    func vkSdkDidDismiss(_ controller: UIViewController!) {
+        showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
     }
     
 }
