@@ -684,6 +684,12 @@ func yearsBetweenDate(startDate: Date, endDate: Date) -> Int {
     return components.year!
 }
 
+func daysBetweenDate(startDate: Date, endDate: Date) -> Int {
+    let calendar = Calendar.current
+    let components = calendar.dateComponents([.day], from: startDate, to: endDate)
+    return components.day!
+}
+
 func loadImageFromPath(path: String) -> UIImage? {
     if FileManager.default.fileExists(atPath: path) {
         print("FILE AVAILABLE")

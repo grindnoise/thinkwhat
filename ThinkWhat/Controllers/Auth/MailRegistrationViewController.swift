@@ -310,7 +310,7 @@ extension MailRegistrationViewController: UITextFieldDelegate {
                 isLoginFilled = false
             } else if sender.text!.count >= 4 {
                 //                    runTimer()
-                apiManager.checkUsernameEmailAvailability(email: "", username: sender.text!) {
+                apiManager.isUsernameEmailAvailable(email: "", username: sender.text!) {
                     exists, error in
                     if error != nil {
                         self.simpleAlert(error!.localizedDescription)
@@ -335,7 +335,7 @@ extension MailRegistrationViewController: UITextFieldDelegate {
                 mailTF.hideSign()
                 isMailFilled = false
             } else if isValidEmail(sender.text!) {
-                apiManager.checkUsernameEmailAvailability(email: sender.text!, username: "") {
+                apiManager.isUsernameEmailAvailable(email: sender.text!, username: "") {
                     exists, error in
                     if error != nil {
                         self.simpleAlert(error!.localizedDescription)

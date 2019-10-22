@@ -15,9 +15,9 @@ protocol APIManagerProtocol {
     func login(_ auth: AuthVariant, username: String?, password: String?, token: String?, completion: @escaping (TokenState) -> ())
     func logout(completion: @escaping (TokenState) -> ())
     func getUserData(completion: @escaping(JSON?, Error?)->())
-    func getProfileNeedsUpdate(completion: @escaping (Bool) -> ())
+    func profileNeedsUpdate(completion: @escaping (Bool? , Error?) -> ())
     func updateUserProfile(data: [String: Any], completion: @escaping(JSON?, Error?) -> ())
-    func checkUsernameEmailAvailability(email: String, username: String, completion: @escaping(Bool?, Error?)->())
+    func isUsernameEmailAvailable(email: String, username: String, completion: @escaping(Bool?, Error?)->())
     func getEmailConfirmationCode(completion: @escaping(JSON?, Error?)->())
     func getEmailVerified(completion: @escaping(Bool?, Error?)->())
     func signUp(email: String, password: String, username: String, completion: @escaping (Error?) -> ())
@@ -55,9 +55,10 @@ class APIManager: APIManagerProtocol {
         }
     }
     private var defaultSessionManager: Alamofire.SessionManager {
-        let config = Alamofire.SessionManager.default.session.configuration
-//        config.timeoutIntervalForRequest = 10
-        return Alamofire.SessionManager(configuration: config)
+        let configuration = Alamofire.SessionManager.default.session.configuration
+        configuration.timeoutIntervalForRequest = 10
+        configuration.timeoutIntervalForResource = 10
+        return Alamofire.SessionManager(configuration: configuration)
     }
     private var proxySessionManager: Alamofire.SessionManager {
         var proxyDictionary = [AnyHashable: Any]()
@@ -177,7 +178,14 @@ class APIManager: APIManagerProtocol {
         checkForReachability {
             reachable in
             if reachable == .Reachable {
-                performRequest()
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
             } else {
                 error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
                 completion(returnValue, error)
@@ -229,7 +237,14 @@ class APIManager: APIManagerProtocol {
         checkForReachability {
             reachable in
             if reachable == .Reachable {
-                performRequest()
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
             } else {
                 error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
                 completion(json, error)
@@ -395,6 +410,7 @@ class APIManager: APIManagerProtocol {
                 let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "token": token]
                 let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.TOKEN_REVOKE)
                 AppData.shared.eraseData()
+                Surveys.shared.eraseData()
                 FBManager.performLogout()
                 VKManager.performLogout()
                 sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON() {
@@ -483,14 +499,23 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func getProfileNeedsUpdate(completion: @escaping (Bool) -> ()) {
-        var needsUpdate = false
+    func profileNeedsUpdate(completion: @escaping(Bool?, Error?)->()) {
+        var needsUpdate: Bool?
+        var error: Error?
         checkForReachability {
             reachable in
             if reachable == .Reachable {
-                performRequest()
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
             } else {
-                completion(needsUpdate)
+                error = NSError(domain:"", code:523 , userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(needsUpdate, error)
             }
         }
         
@@ -532,20 +557,27 @@ class APIManager: APIManagerProtocol {
                             }
                         }
                     }
-                    completion(needsUpdate)
+                    completion(needsUpdate, error)
                 }
             }
         }
     }
     
-    func checkUsernameEmailAvailability(email: String, username: String, completion: @escaping(Bool?, Error?)->()) {
+    func isUsernameEmailAvailable(email: String, username: String, completion: @escaping(Bool?, Error?)->()) {
         var error: Error?
         var exists: Bool?
         
         checkForReachability {
             reachable in
             if reachable == .Reachable {
-                performRequest()
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
             } else {
                 error = NSError(domain:"", code:523 , userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
                 completion(exists, error)
@@ -605,7 +637,14 @@ class APIManager: APIManagerProtocol {
         checkForReachability {
             reachable in
             if reachable == .Reachable {
-                performRequest()
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
             } else {
                 error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
                 completion(nil, error!)
@@ -722,7 +761,14 @@ class APIManager: APIManagerProtocol {
         checkForReachability {
             reachable in
             if reachable == .Reachable {
-                performRequest()
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
             } else {
                 error = NSError(domain:"", code:523 , userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
                 completion(isEmailVerified, error)
@@ -776,7 +822,9 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func checkTokenExpiryDate() {
+    private func checkTokenExpired(completion: @escaping (Bool, Error?) -> ()) {
+        var success = true
+        var error: Error?
         if let expString = KeychainService.loadTokenExpireDateTime() as String? {
             let expiryDate = expString.toDateTime()
             if Date() >= expiryDate {
@@ -784,7 +832,14 @@ class APIManager: APIManagerProtocol {
                 refreshAccessToken(completion: {
                     _tokenState in
                     tokenState = _tokenState
+                    if _tokenState != TokenState.Received {
+                        success = false
+                        error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: "Error refreshing access token"]) as Error
+                    }
+                    completion(success, error)
                 })
+            } else {
+                completion(success, error)
             }
         }
     }
@@ -803,7 +858,7 @@ class APIManager: APIManagerProtocol {
             
             let refresh_token = KeychainService.loadRefreshToken()! as String
             let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refresh_token)"]
-            let url = URL(string: SERVER_URLS.TOKEN)!
+            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.TOKEN)
             sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
                 response in
                 var _tokenState = TokenState.Error
@@ -868,7 +923,14 @@ class APIManager: APIManagerProtocol {
         checkForReachability {
             reachable in
             if reachable == .Reachable {
-                performRequest()
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
             } else {
                 error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
                 completion(nil, error!)
@@ -928,7 +990,14 @@ class APIManager: APIManagerProtocol {
         checkForReachability {
             reachable in
             if reachable == .Reachable {
-                performRequest()
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
             } else {
                 error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
                 completion(nil, error!)
@@ -942,7 +1011,6 @@ class APIManager: APIManagerProtocol {
                 "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
                 "Content-Type": "application/json"
             ]
-            
             sessionManager.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON() {
                 response in
                 if response.result.isFailure {

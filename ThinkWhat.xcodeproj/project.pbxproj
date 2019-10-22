@@ -87,6 +87,8 @@
 		ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C622E9B33700DEA9FD /* Mail.swift */; };
 		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
+		ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC571235EE99B00E6A118 /* TagLabel.swift */; };
+		ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC573235F384600E6A118 /* ProgressCirle.swift */; };
 		ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1F19E22C253A6008913C3 /* FBManager.swift */; };
 		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
 /* End PBXBuildFile section */
@@ -197,6 +199,8 @@
 		ABC3E7C622E9B33700DEA9FD /* Mail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail.swift; sourceTree = "<group>"; };
 		ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSign.swift; sourceTree = "<group>"; };
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		ABCAC571235EE99B00E6A118 /* TagLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagLabel.swift; sourceTree = "<group>"; };
+		ABCAC573235F384600E6A118 /* ProgressCirle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCirle.swift; sourceTree = "<group>"; };
 		ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhat.entitlements; sourceTree = "<group>"; };
 		ABF1F19E22C253A6008913C3 /* FBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FBManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
@@ -398,6 +402,8 @@
 				AB3C6829223FD37200B57580 /* LoadingIndicator */,
 				AB3C6827223FD24A00B57580 /* BorderedView.swift */,
 				AB3C6820223FD1C000B57580 /* CustomAlertView */,
+				ABCAC571235EE99B00E6A118 /* TagLabel.swift */,
+				ABCAC573235F384600E6A118 /* ProgressCirle.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -792,6 +798,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */,
 				AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
 				ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */,
@@ -833,6 +840,7 @@
 				AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */,
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
 				AB2AA1B32359E9D30086D16C /* TopSurveysTableViewController.swift in Sources */,
+				ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */,
 				AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */,
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,

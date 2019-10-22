@@ -17,8 +17,8 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        UITabBar.appearance().layer.borderWidth = 0.0
-        UITabBar.appearance().clipsToBounds = true
+//        UITabBar.appearance().layer.borderWidth = 1.0
+//        UITabBar.appearance().clipsToBounds = true
         delegate = sdelegate
         navigationController?.isNavigationBarHidden = true
         NotificationCenter.default.addObserver(self, selector: #selector(TabBarController.handleTokenState), name: kNotificationTokenRevoked, object: nil)
@@ -29,6 +29,9 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
                 $0.view.description
             }
         }
+
+        UITabBar.appearance().backgroundImage = UIImage.colorForNavBar(color: .white)
+        UITabBar.appearance().shadowImage = UIImage.colorForNavBar(color: .lightGray)
     }
     
     override func viewDidAppear(_ animated: Bool) {

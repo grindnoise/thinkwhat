@@ -20,6 +20,9 @@ class TopSurveysViewController: UIViewController {
         return vc
     } ()
     
+    @IBAction func controlChanged(_ sender: UISegmentedControl) {
+        tableVC.tableView.reloadData()
+    }
     @IBOutlet weak var control: UISegmentedControl!
     @IBOutlet weak var container: UIView!
     override func viewDidLoad() {

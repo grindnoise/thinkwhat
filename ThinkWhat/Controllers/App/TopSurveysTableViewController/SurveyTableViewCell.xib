@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
+    <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -10,12 +10,6 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
-        <array key="OpenSans-Bold.ttf">
-            <string>OpenSans-Bold</string>
-        </array>
-        <array key="OpenSans-Light.ttf">
-            <string>OpenSans-Light</string>
-        </array>
         <array key="OpenSans-Regular.ttf">
             <string>OpenSans</string>
         </array>
@@ -27,51 +21,66 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="80"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="79.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="79.666666666666671"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="LabelLabelLabelLabelLabelLabel" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="sJ6-Fo-xHv">
-                        <rect key="frame" x="16" y="26" width="230" height="43"/>
-                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fFp-mV-jdJ">
-                        <rect key="frame" x="16" y="11" width="230" height="15"/>
-                        <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="11"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qy0-yb-sys">
-                        <rect key="frame" x="246" y="11" width="58" height="58"/>
+                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Fvt-AY-Abc">
+                        <rect key="frame" x="16" y="11" width="288" height="58"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fif-xL-b8z">
+                                <rect key="frame" x="0.0" y="0.0" width="288" height="17.333333333333332"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Iq4-kt-cp7">
+                                        <rect key="frame" x="0.0" y="0.0" width="247.33333333333334" height="17.333333333333332"/>
+                                    </view>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pes-4x-Qy0">
+                                        <rect key="frame" x="247.33333333333329" y="0.0" width="40.666666666666657" height="17.333333333333332"/>
+                                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="11"/>
+                                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QiW-pt-Pi4">
+                                <rect key="frame" x="0.0" y="17.333333333333332" width="288" height="40.666666666666671"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kOG-0O-rHh">
+                                        <rect key="frame" x="0.0" y="0.0" width="247.33333333333334" height="40.666666666666664"/>
+                                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fie-4K-3E1" customClass="ProgressCirle" customModule="ThinkWhat" customModuleProvider="target">
+                                        <rect key="frame" x="247.33333333333329" y="0.0" width="40.666666666666657" height="40.666666666666664"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="fie-4K-3E1" secondAttribute="height" multiplier="1:1" id="aAG-K9-ykf"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                            </stackView>
+                        </subviews>
                         <constraints>
-                            <constraint firstAttribute="width" secondItem="Qy0-yb-sys" secondAttribute="height" multiplier="1:1" id="LNk-oY-iVb"/>
+                            <constraint firstItem="QiW-pt-Pi4" firstAttribute="height" secondItem="Fvt-AY-Abc" secondAttribute="height" multiplier="0.7" id="IYH-2n-r0l"/>
+                            <constraint firstItem="fif-xL-b8z" firstAttribute="height" secondItem="Fvt-AY-Abc" secondAttribute="height" multiplier="0.3" id="IpU-qr-SLZ"/>
+                            <constraint firstItem="pes-4x-Qy0" firstAttribute="width" secondItem="fie-4K-3E1" secondAttribute="width" id="eip-gs-Yko"/>
                         </constraints>
-                        <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="15"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
+                    </stackView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="fFp-mV-jdJ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="4pv-Ty-5iD"/>
-                    <constraint firstItem="Qy0-yb-sys" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="4tX-sE-ARS"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="Qy0-yb-sys" secondAttribute="trailing" id="507-ab-1YB"/>
-                    <constraint firstItem="sJ6-Fo-xHv" firstAttribute="top" secondItem="fFp-mV-jdJ" secondAttribute="bottom" id="C8v-xT-yRQ"/>
-                    <constraint firstAttribute="bottomMargin" secondItem="Qy0-yb-sys" secondAttribute="bottom" id="E3j-av-4xo"/>
-                    <constraint firstItem="sJ6-Fo-xHv" firstAttribute="bottom" secondItem="H2p-sc-9uM" secondAttribute="bottomMargin" id="OFH-vt-KK8"/>
-                    <constraint firstItem="fFp-mV-jdJ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="V48-yo-MLq"/>
-                    <constraint firstItem="sJ6-Fo-xHv" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="W7o-OQ-xGe"/>
-                    <constraint firstItem="Qy0-yb-sys" firstAttribute="leading" secondItem="fFp-mV-jdJ" secondAttribute="trailing" id="e8T-sn-yKi"/>
-                    <constraint firstItem="Qy0-yb-sys" firstAttribute="leading" secondItem="sJ6-Fo-xHv" secondAttribute="trailing" id="wiR-e9-Vvf"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="Fvt-AY-Abc" secondAttribute="bottom" id="NXi-24-s4P"/>
+                    <constraint firstItem="Fvt-AY-Abc" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="cIi-T0-AVI"/>
+                    <constraint firstItem="Fvt-AY-Abc" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="vgy-NH-n54"/>
+                    <constraint firstItem="Fvt-AY-Abc" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailingMargin" id="xeA-bQ-nxq"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
-                <outlet property="category" destination="fFp-mV-jdJ" id="1ed-7b-XYw"/>
-                <outlet property="completionPercentage" destination="Qy0-yb-sys" id="OLo-Xk-aHi"/>
-                <outlet property="title" destination="sJ6-Fo-xHv" id="mbB-IW-jGX"/>
+                <outlet property="completionPercentage" destination="fie-4K-3E1" id="RXn-UI-8Pm"/>
+                <outlet property="duration" destination="pes-4x-Qy0" id="1ox-gU-HEH"/>
+                <outlet property="tags" destination="Iq4-kt-cp7" id="eIh-Cc-Xes"/>
+                <outlet property="title" destination="kOG-0O-rHh" id="dM8-fu-dik"/>
             </connections>
-            <point key="canvasLocation" x="108.8" y="48.575712143928037"/>
+            <point key="canvasLocation" x="108.69565217391305" y="48.097826086956523"/>
         </tableViewCell>
     </objects>
 </document>

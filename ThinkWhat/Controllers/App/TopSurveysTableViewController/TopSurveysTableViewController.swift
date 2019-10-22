@@ -13,6 +13,7 @@ class TopSurveysTableViewController: UITableViewController {
     private var vc: TopSurveysViewController!
     private var isViewSetupCompleted = false
     private var loadingIndicator: LoadingIndicator!
+    private var isInitialLoad = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,24 +71,29 @@ class TopSurveysTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as! SurveyTableViewCell
+        
         var dataSource: [SurveyLink]
         if vc.control.selectedSegmentIndex == 0 {
-            dataSource = Surveys.shared.topSurveys.count
+            dataSource = Surveys.shared.topSurveys
         } else {
-            dataSource = Surveys.shared.newSurveys.count
+            dataSource = Surveys.shared.newSurveys
         }
         cell.title.text = dataSource[indexPath.row].title
-        if let category = dataSource[indexPath.row].category {
-            if let parent = category.parent {
-                cell.category.text = parent.title + " - " + category.title
-            } else {
-                cell.category.text = category.title
-            }
+        for view in cell.tags.subviews {
+            view.removeFromSuperview()
         }
-//        cell.category.text = "\(Surveys.shared.surveys[indexPath.row].category)"
-        cell.completionPercentage.text = "\(dataSource[indexPath.row].completionPercentage)"
+        cell.completionPercentage.progress = CGFloat(dataSource[indexPath.row].completionPercentage) / CGFloat(100)
+//        if cell.tags.subviews.isEmpty {
+            if let subcategory = dataSource[indexPath.row].category, let category: SurveyCategory? = dataSource[indexPath.row].category?.parent {
+                let categoryTag = TagLabel(frame: cell.tags.frame, surveyCategory: category!)
+                cell.tags.addSubview(categoryTag)
+                cell.tags.addSubview(TagLabel(frame: CGRect(origin: CGPoint(x: categoryTag.frame.maxX + 2, y: 0), size: categoryTag.frame.size), surveyCategory: subcategory))
+                cell.duration.text = "\(daysBetweenDate(startDate: dataSource[indexPath.row].startDate, endDate: Date())) дн."
+            }
+//        }
         return cell
     }
+
 
 
     /*
@@ -150,31 +156,41 @@ extension TopSurveysTableViewController: ServerProtocol {
             if error != nil {
 //                showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
                 //Retry unless successfull
-                self.loadData()
+                if self.isInitialLoad {
+                    self.loadData()
+                }
             }
             if json != nil {
                 SurveyCategories.shared.importJson(json!)
-                self.updateTopSurveys()
+                self.updateAllSurveys()
             }
         }
     }
     
-    private func updateTopSurveys() {
-        self.apiManager.loadMainSurveys() {
+    private func updateAllSurveys() {
+        self.apiManager.loadMainSurveys(type: .All) {
             json, error in
             if error != nil {
-//                showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
                 //Retry unless successfull
-                self.updateTopSurveys()
+                if self.isInitialLoad {
+                    self.updateAllSurveys()
+                }
             }
             if json != nil {
-                Surveys.shared.importJson(json!)
+                for i in json! {
+                    if i.0 == "top" && !i.1.isEmpty {
+                        Surveys.shared.importTopSurveys(i.1)
+                    } else if i.0 == "new" && !i.1.isEmpty {
+                        Surveys.shared.importNewSurveys(i.1)
+                    }
+                }
                 self.tableView.isUserInteractionEnabled = true
                 UIView.animate(withDuration: 0.3, animations: {
                     self.loadingIndicator.alpha = 0
                 }) {
                     comleted in
                     self.loadingIndicator.removeAllAnimations()
+                    self.isInitialLoad = false
                 }
             }
         }

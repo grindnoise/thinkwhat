@@ -255,8 +255,10 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     let auth = self.getAuthCase()
                     switch auth {
                     case .Facebook:
-                        self.apiManager.getProfileNeedsUpdate() {
-                            if $0 {
+                        self.apiManager.profileNeedsUpdate() {
+                            if $1 != nil {
+                                showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: $1!.localizedDescription)
+                            } else if $0 == true {
                                 FBManager.getUserData() {
                                     response in
                                     if response != nil {
@@ -313,8 +315,10 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                             }
                         }
                     case .VK:
-                        self.apiManager.getProfileNeedsUpdate() {
-                            if $0 {
+                        self.apiManager.profileNeedsUpdate() {
+                            if $1 != nil {
+                                showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: $1!.localizedDescription)
+                            } else if $0 == true {
                                 VKManager.getUserData() {
                                     response, error in
                                     if error != nil {

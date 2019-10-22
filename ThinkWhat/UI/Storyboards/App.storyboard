@@ -32,7 +32,7 @@
             <objects>
                 <tabBarController id="QbT-Wq-N4G" customClass="TabBarController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <nil key="simulatedTopBarMetrics"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="jDh-ZW-0WE">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" barStyle="black" translucent="NO" id="jDh-ZW-0WE">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -87,7 +87,7 @@
             <objects>
                 <viewController title="Лента" id="fQp-Ce-S0Q" customClass="TopSurveysViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="aoa-nQ-2mI">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="519"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" segmentControlStyle="bordered" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="73F-nR-0Cw">
@@ -100,6 +100,9 @@
                                     <segment title="Новые"/>
                                 </segments>
                                 <color key="tintColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <connections>
+                                    <action selector="controlChanged:" destination="fQp-Ce-S0Q" eventType="valueChanged" id="hi8-Px-zca"/>
+                                </connections>
                             </segmentedControl>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Yc-Te-aTy">
                                 <rect key="frame" x="0.0" y="93" width="320" height="426"/>
@@ -132,16 +135,16 @@
         <scene sceneID="m1w-P1-7Kn">
             <objects>
                 <tableViewController storyboardIdentifier="TopSurveysTableViewController" title="Лента" id="jJ7-z1-jpn" customClass="TopSurveysTableViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="LwE-t7-9XQ">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="70" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="LwE-t7-9XQ">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="topSurveyCell" id="BeM-ib-aRG" customClass="SurveyTableViewCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="320" height="44"/>
+                                <rect key="frame" x="0.0" y="28" width="320" height="70"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="BeM-ib-aRG" id="zAe-0o-eXW">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="70"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -206,32 +209,32 @@
             <objects>
                 <viewController title="Профиль" id="k7b-lm-lsR" customClass="ProfileViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="1Cg-dB-KLc">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="519"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="F95-Bm-jrh">
-                                <rect key="frame" x="0.0" y="64" width="320" height="199"/>
+                                <rect key="frame" x="0.0" y="64" width="320" height="181.5"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" alignment="center" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="6Sj-eE-ye9">
-                                        <rect key="frame" x="0.0" y="10" width="320" height="179"/>
+                                        <rect key="frame" x="0.0" y="9" width="320" height="163.5"/>
                                         <subviews>
                                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="l5G-ph-ezo">
-                                                <rect key="frame" x="98.5" y="0.0" width="123" height="122.5"/>
+                                                <rect key="frame" x="101.5" y="0.0" width="117" height="117"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="l5G-ph-ezo" secondAttribute="height" multiplier="1:1" id="wc8-yw-uzc"/>
                                                 </constraints>
                                             </imageView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="F09-Ez-ImL">
-                                                <rect key="frame" x="107" y="127.5" width="106" height="51.5"/>
+                                                <rect key="frame" x="108.5" y="122" width="103" height="41.5"/>
                                                 <subviews>
                                                     <textField opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Alex Turner" textAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="QqS-fO-Rej">
-                                                        <rect key="frame" x="0.0" y="0.0" width="106" height="26"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="103" height="23"/>
                                                         <nil key="textColor"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
                                                         <textInputTraits key="textInputTraits"/>
                                                     </textField>
                                                     <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="мужчина, 32 года" textAlignment="center" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="TaN-q5-kik">
-                                                        <rect key="frame" x="0.0" y="34" width="106" height="17.5"/>
+                                                        <rect key="frame" x="0.0" y="31" width="103" height="10.5"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                                                         <textInputTraits key="textInputTraits"/>
@@ -250,7 +253,7 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nfP-l4-h8C">
-                                <rect key="frame" x="0.0" y="263" width="320" height="256"/>
+                                <rect key="frame" x="0.0" y="245.5" width="320" height="273.5"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                         </subviews>

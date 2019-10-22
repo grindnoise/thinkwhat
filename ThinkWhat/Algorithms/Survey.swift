@@ -33,11 +33,17 @@ class Surveys: ServerProtocol {
         }
         NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)
     }
+    
+    func eraseData() {
+        topSurveys.removeAll()
+        newSurveys.removeAll()
+    }
 }
 
 class SurveyLink {
     var ID: Int
     var title: String
+    var startDate: Date
     var category: SurveyCategory?
     var completionPercentage: Int
     
@@ -45,14 +51,20 @@ class SurveyLink {
         if  let _ID                     = json["id"].intValue as? Int,
             let _title                  = json["title"].stringValue as? String,
             let _category               = json["category"].intValue as? Int,
+            let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
             let _completionPercentage   = json["vote_capacity"].intValue as? Int {
                     ID                      = _ID
                     title                   = _title
                     category                = SurveyCategories.shared[_category]
                     completionPercentage    = _completionPercentage
+                    startDate               = _startDate
         } else {
             return nil
         }
+    }
+    
+    deinit {
+        print("deinit")
     }
 }
 

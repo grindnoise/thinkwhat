@@ -11,9 +11,11 @@ import UIKit
 class SurveyTableViewCell: UITableViewCell {
 
     @IBOutlet weak var title: UILabel!
-    @IBOutlet weak var category: UILabel!
-    @IBOutlet weak var completionPercentage: UILabel!
+    @IBOutlet weak var tags: UIView!
+    @IBOutlet weak var completionPercentage: ProgressCirle!
+    @IBOutlet weak var duration: UILabel!
     
+    var surveyLink: SurveyLink?
     
     override func awakeFromNib() {
         super.awakeFromNib()
