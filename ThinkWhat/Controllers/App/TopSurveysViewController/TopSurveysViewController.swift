@@ -21,6 +21,15 @@ class TopSurveysViewController: UIViewController {
     } ()
     
     @IBAction func controlChanged(_ sender: UISegmentedControl) {
+        if control.selectedSegmentIndex == 2 {
+            tableVC.needsAnimation = false
+            tableVC.refreshControl?.removeFromSuperview()
+            tableVC.tableView.bounces = false
+        } else {
+            tableVC.needsAnimation = true
+            tableVC.view.addSubview(tableVC.refreshControl!)
+            tableVC.tableView.bounces = true
+        }
         tableVC.tableView.reloadData()
     }
     @IBOutlet weak var control: UISegmentedControl!
@@ -49,14 +58,15 @@ class TopSurveysViewController: UIViewController {
         control.setTitleTextAttributes(attrs, for: .normal)
     }
     
-    /*
     // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == kSegueAppTopSurveysToCategory, let destinationVC = segue.destination as? CategoryTableViewController {
+            if let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SubcategoryTableViewCell {
+                destinationVC.category = cell.category
+                destinationVC.title = cell.category.title
+            }
+        } else if segue.identifier == kSegueAppTopSurveysToSurvey, let destinationVC = segue.destination as? SurveyViewController {
+            
+        }
     }
-    */
-
 }

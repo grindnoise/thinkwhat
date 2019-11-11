@@ -519,6 +519,7 @@ extension ProfileAuthViewController: UIImagePickerControllerDelegate {
             let imageData = image.jpegData(compressionQuality: 0.8)//UIImageJPEGRepresentation(image, 0.5)!//UIImagePNGRepresentation(image)!
             let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
             let imageURL = docDir.appendingPathComponent("profileImage.jpeg")
+            
             try! imageData!.write(to: imageURL)
             
             if UIImage(contentsOfFile: imageURL.path) != nil {
@@ -530,11 +531,13 @@ extension ProfileAuthViewController: UIImagePickerControllerDelegate {
                         showAlert(type: .Ok, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Ошибка при загрузке изображения")
                     }
                     if json != nil {
-                        showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isImageChanged = true}]], text: "Загружено")
-                        AppData.shared.userProfile.imagePath = imageURL.absoluteString
-                        if let path = AppData.shared.userProfile.imagePath, let image = loadImageFromPath(path: path) {
-                            self.circularImage = image.circularImage(size: self.userImage.frame.size)
-                            self.userImage.image = self.circularImage
+                        DispatchQueue.main.async {
+                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isImageChanged = true}]], text: "Загружено")
+                            AppData.shared.userProfile.imagePath = imageURL.absoluteString
+                            if let path = AppData.shared.userProfile.imagePath, let image = loadImageFromPath(path: path) {
+                                self.circularImage = image.circularImage(size: self.userImage.frame.size)
+                                self.userImage.image = self.circularImage
+                            }
                         }
                     }
                 }

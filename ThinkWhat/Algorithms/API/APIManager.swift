@@ -23,6 +23,8 @@ protocol APIManagerProtocol {
     func signUp(email: String, password: String, username: String, completion: @escaping (Error?) -> ())
     func loadSurveyCategories(completion: @escaping(JSON?, Error?)->())
     func loadMainSurveys(type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
+    func loadTotalSurveysCount(completion: @escaping(JSON?, Error?)->())
+    func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->())
     
 //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
 //    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
@@ -862,39 +864,9 @@ class APIManager: APIManagerProtocol {
             sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
                 response in
                 var _tokenState = TokenState.Error
-                if let error = response.result.error as? AFError {
-                    
-                    _tokenState = .Error
-                    
-                    switch error {
-                    case .invalidURL(let url):
-                        print("Invalid URL: \(url) - \(error.localizedDescription)")
-                    case .parameterEncodingFailed(let reason):
-                        print("Parameter encoding failed: \(error.localizedDescription)")
-                        print("Failure Reason: \(reason)")
-                    case .multipartEncodingFailed(let reason):
-                        print("Multipart encoding failed: \(error.localizedDescription)")
-                        print("Failure Reason: \(reason)")
-                    case .responseValidationFailed(let reason):
-                        print("Response validation failed: \(error.localizedDescription)")
-                        print("Failure Reason: \(reason)")
-                        
-                        switch reason {
-                        case .dataFileNil, .dataFileReadFailed:
-                            print("Downloaded file could not be read")
-                        case .missingContentType(let acceptableContentTypes):
-                            print("Content Type Missing: \(acceptableContentTypes)")
-                        case .unacceptableContentType(let acceptableContentTypes, let responseContentType):
-                            print("Response content type: \(responseContentType) was unacceptable: \(acceptableContentTypes)")
-                        case .unacceptableStatusCode(let code):
-                            print("Response status code was unacceptable: \(code)")
-                        }
-                        
-                    case .responseSerializationFailed(let reason):
-                        print("Response serialization failed: \(error.localizedDescription)")
-                        print("Failure Reason: \(reason)")
-                    }
-                    
+                if let _error = response.result.error as? AFError {
+                    let error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: self.parseAFError(_error)]) as Error
+                    print(error.localizedDescription)
                 } else {
                     let statusCode  = response.response?.statusCode
                     if 200...299 ~= statusCode! {
@@ -1037,6 +1009,86 @@ class APIManager: APIManagerProtocol {
                     }
                     completion(json, error)
                 }
+            }
+        }
+    }
+    
+    func loadTotalSurveysCount(completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_TOTAL_COUNT), httpMethod: .get, completion: completion)
+                        //performRequest()
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
+    func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_BY_CATEGORY), httpMethod: .get, parameters: ["category_id": categoryID], encoding: URLEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
+    private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(JSON?, Error?)->()) {
+        var json: JSON?
+        var error: Error?
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
+            "Content-Type": "application/json"
+        ]
+        
+        sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseJSON() {
+            response in
+            if response.result.isFailure {
+                print(response.result.debugDescription)
+            }
+            if let _error = response.result.error as? AFError {
+                error = self.parseAFError(_error)
+            } else {
+                if let statusCode  = response.response?.statusCode{
+                    if 200...299 ~= statusCode {
+                        do {
+                            json = try JSON(data: response.data!)
+                        } catch let _error {
+                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
+                        }
+                    } else if 400...499 ~= statusCode {
+                        do {
+                            let errorJSON = try JSON(data: response.data!)
+                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
+                        } catch let _error {
+                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
+                        }
+                    }
+                }
+                completion(json, error)
             }
         }
     }

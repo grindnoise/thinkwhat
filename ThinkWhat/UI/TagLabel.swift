@@ -23,19 +23,29 @@ class TagLabel: UILabel {
 //        self.commonInit()
 //    }
     
-    init(frame: CGRect, surveyCategory: SurveyCategory) {
+    init(frame: CGRect, surveyCategory: SurveyCategory?) {
         self.surveyCategory = surveyCategory
         super.init(frame: frame)
-        self.text = surveyCategory.title
+        if surveyCategory?.parent == nil {
+            self.text = surveyCategory?.title.uppercased()
+        } else {
+            self.text = surveyCategory?.title.lowercased()
+        }
         self.commonInit()
     }
     
     func commonInit(){
         self.layer.cornerRadius = self.bounds.height/2
-        self.layer.backgroundColor = UIColor(red: 0.624, green: 0.525, blue: 0.686, alpha: 1.000).cgColor
+        var tagColor: UIColor = UIColor.lightGray
+        if let color = surveyCategory?.tagColor {
+            tagColor = color
+        } else if let color = surveyCategory?.parent?.tagColor {
+            tagColor = color
+        }
+        self.layer.backgroundColor = tagColor.cgColor
         self.clipsToBounds = true
         self.textColor = UIColor.white
-        self.font = UIFont(name: "OpenSans-Semibold", size: 11)
+        self.font = UIFont(name: "OpenSans-Semibold", size: 10)
         self.textAlignment = .center
         self.frame.size.width = self.intrinsicContentSize.width + 10
     }
@@ -43,6 +53,10 @@ class TagLabel: UILabel {
     func setProperties(borderWidth: Float, borderColor: UIColor) {
         self.layer.borderWidth = CGFloat(borderWidth)
         self.layer.borderColor = borderColor.cgColor
+    }
+    
+    deinit {
+//        print("deinit Tag")
     }
 
 }

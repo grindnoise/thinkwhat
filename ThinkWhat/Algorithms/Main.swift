@@ -172,6 +172,8 @@ let kNotificationApiNotReachable                 = Notification.Name("smsNotific
 let kNotificationUserImageChanged                = Notification.Name("NotificationUserImageChanged")
 let kNotificationTopSurveysUpdated               = Notification.Name("NotificationTopSurveysUpdated")
 let kNotificationNewSurveysUpdated               = Notification.Name("NotificationNewSurveysUpdated")
+let kNotificationSurveysByCategoryUpdated        = Notification.Name("NotificationSurveysByCategoryUpdated")
+
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
 
@@ -198,6 +200,9 @@ let kSegueProfileFromAuth                        = "PROFILE_FROM_AUTH"
 let kSegueAppProfileSettingsSelection            = "PROFILE_SETINGS_SELECTION"
 let kSegueAppBackToAuth                          = "BACK_TO_AUTH"
 let kSegueAppProfileToInfo                       = "INFO"
+let kSegueAppTopSurveysToSurvey                  = "TOP_TO_SURVEY"
+let kSegueAppTopSurveysToCategory                = "TOP_TO_CATEGORY"
+
 
 //let segueBarberData                             = "segueBarberData"
 //let segueSignup                                 = "segueSignup"
@@ -567,6 +572,8 @@ struct SERVER_URLS {
     static let SURVEYS_TOP              = "api/surveys/top/"
     static let SURVEYS_NEW              = "api/surveys/new/"
     static let SURVEYS_ALL              = "api/surveys/all/"
+    static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
+    static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
     
     static let CATEGORIES               = "api/categories/"
     

@@ -10,11 +10,15 @@ import UIKit
 
 @IBDesignable class BorderedView: UIView {
     
-    open var closure: Closure? = nil
+    var closure: Closure?
     private var _rounded = false
     private var _bordered = false
+    private var _lowerBordered = false
     private var _borderColor = UIColor.clear
     private var _borderWidth: CGFloat = 0.0
+    private var _lowerBorderColor = UIColor.clear
+    private var _lowerBorderWidth: CGFloat = 0.0
+    private var shapeLayer          = CAShapeLayer()
 //    private var _shadowed = false
     
     @IBInspectable var rounded: Bool {
@@ -34,6 +38,16 @@ import UIKit
         }
         get {
             return self._bordered
+        }
+    }
+    
+    @IBInspectable var lowerBordered: Bool {
+        set {
+            _lowerBordered = newValue
+            makeLowerBorder()
+        }
+        get {
+            return self._lowerBordered
         }
     }
     
@@ -57,6 +71,27 @@ import UIKit
             return self._borderWidth
         }
     }
+    
+    @IBInspectable var lowerBorderColor: UIColor {
+        set {
+            _lowerBorderColor = newValue
+            //makeBorder()
+        }
+        get {
+            return self._borderColor
+        }
+    }
+    
+    @IBInspectable var lowerBorderWidth: CGFloat {
+        set {
+            _lowerBorderWidth = newValue
+            makeBorder()
+        }
+        get {
+            return self._borderWidth
+        }
+    }
+    
     
 //    @IBInspectable var shadowed: Bool {
 //        set {
@@ -96,6 +131,12 @@ import UIKit
             self.layer.borderWidth = 0.0
         }
     }
+    
+    private func makeLowerBorder() {
+        if self.bordered == true {
+            draw(frame)
+        }
+    }
 //
 //
 //    private func makeShadow() {
@@ -116,6 +157,22 @@ import UIKit
         makeBorder()
         //makeShadow()
         makeRounded()
-
+        makeLowerBorder()
+    }
+    
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        if _lowerBordered {
+            let startingPoint   = CGPoint(x: rect.minX, y: rect.maxY)
+            let endingPoint     = CGPoint(x: rect.maxX, y: rect.maxY)
+            let line = UIBezierPath()
+            line.move(to: startingPoint)
+            line.addLine(to: endingPoint)
+            line.lineWidth = _lowerBorderWidth / 2
+            line.lineCapStyle = .round
+            _borderColor.setStroke()
+            line.stroke()
+            shapeLayer.path = line.cgPath
+        }
     }
 }

@@ -68,6 +68,10 @@
 		AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */; };
 		AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */; };
 		AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */; };
+		AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5EB5FB2361DDEA000D4D96 /* CategoryTableViewCell.swift */; };
+		AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5EB5FC2361DDEA000D4D96 /* CategoryTableViewCell.xib */; };
+		AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5EB5FF23630AC0000D4D96 /* SubcategoryTableViewCell.swift */; };
+		AB5EB60223630AC0000D4D96 /* SubcategoryTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5EB60023630AC0000D4D96 /* SubcategoryTableViewCell.xib */; };
 		AB6083B72240E77B002C0D7E /* SocialAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083B62240E77B002C0D7E /* SocialAuthViewController.swift */; };
 		AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */; };
 		AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BA2240F761002C0D7E /* MailAuthViewController.swift */; };
@@ -89,6 +93,8 @@
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
 		ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC571235EE99B00E6A118 /* TagLabel.swift */; };
 		ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC573235F384600E6A118 /* ProgressCirle.swift */; };
+		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
+		ABDEE85B237023D0009B52F3 /* SurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */; };
 		ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1F19E22C253A6008913C3 /* FBManager.swift */; };
 		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
 /* End PBXBuildFile section */
@@ -180,6 +186,10 @@
 		AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailValidationViewController.swift; sourceTree = "<group>"; };
 		AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationCodeTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryUserCredentials.swift; sourceTree = "<group>"; };
+		AB5EB5FB2361DDEA000D4D96 /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
+		AB5EB5FC2361DDEA000D4D96 /* CategoryTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategoryTableViewCell.xib; sourceTree = "<group>"; };
+		AB5EB5FF23630AC0000D4D96 /* SubcategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubcategoryTableViewCell.swift; sourceTree = "<group>"; };
+		AB5EB60023630AC0000D4D96 /* SubcategoryTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SubcategoryTableViewCell.xib; sourceTree = "<group>"; };
 		AB6083B62240E77B002C0D7E /* SocialAuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialAuthViewController.swift; sourceTree = "<group>"; };
 		AB6083B82240EA4A002C0D7E /* TermsOfUseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TermsOfUseViewController.swift; sourceTree = "<group>"; };
 		AB6083BA2240F761002C0D7E /* MailAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAuthViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -201,6 +211,8 @@
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABCAC571235EE99B00E6A118 /* TagLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagLabel.swift; sourceTree = "<group>"; };
 		ABCAC573235F384600E6A118 /* ProgressCirle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCirle.swift; sourceTree = "<group>"; };
+		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
+		ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyViewController.swift; sourceTree = "<group>"; };
 		ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhat.entitlements; sourceTree = "<group>"; };
 		ABF1F19E22C253A6008913C3 /* FBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FBManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
@@ -264,15 +276,13 @@
 			path = InfoViewController;
 			sourceTree = "<group>";
 		};
-		AB2AA1B12359E98E0086D16C /* TopSurveysTableViewController */ = {
+		AB2AA1B12359E98E0086D16C /* TopSurveysViewController */ = {
 			isa = PBXGroup;
 			children = (
-				AB2AA1B22359E9D30086D16C /* TopSurveysTableViewController.swift */,
-				AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */,
-				AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */,
 				AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */,
+				ABDEE85C23702465009B52F3 /* TopSurveysTableViewController */,
 			);
-			path = TopSurveysTableViewController;
+			path = TopSurveysViewController;
 			sourceTree = "<group>";
 		};
 		AB3C67D2223FBB6400B57580 = {
@@ -384,7 +394,9 @@
 		AB3C6814223FCE2F00B57580 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				AB2AA1B12359E98E0086D16C /* TopSurveysTableViewController */,
+				ABDEE859237023B7009B52F3 /* SurveyViewController */,
+				ABDEE85523702324009B52F3 /* CategoryTableViewController */,
+				AB2AA1B12359E98E0086D16C /* TopSurveysViewController */,
 				ABB46F3F2347404C00AF212B /* ProfileViewController */,
 				ABB46F3D2346373700AF212B /* TabBarController.swift */,
 			);
@@ -510,6 +522,36 @@
 				ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */,
 			);
 			path = ProfileViewController;
+			sourceTree = "<group>";
+		};
+		ABDEE85523702324009B52F3 /* CategoryTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */,
+			);
+			path = CategoryTableViewController;
+			sourceTree = "<group>";
+		};
+		ABDEE859237023B7009B52F3 /* SurveyViewController */ = {
+			isa = PBXGroup;
+			children = (
+				ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */,
+			);
+			path = SurveyViewController;
+			sourceTree = "<group>";
+		};
+		ABDEE85C23702465009B52F3 /* TopSurveysTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				AB2AA1B22359E9D30086D16C /* TopSurveysTableViewController.swift */,
+				AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */,
+				AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */,
+				AB5EB5FB2361DDEA000D4D96 /* CategoryTableViewCell.swift */,
+				AB5EB5FC2361DDEA000D4D96 /* CategoryTableViewCell.xib */,
+				AB5EB5FF23630AC0000D4D96 /* SubcategoryTableViewCell.swift */,
+				AB5EB60023630AC0000D4D96 /* SubcategoryTableViewCell.xib */,
+			);
+			path = TopSurveysTableViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -639,8 +681,10 @@
 				AB3C6851223FD3EF00B57580 /* OpenSans-ExtraBoldItalic.ttf in Resources */,
 				AB3C684C223FD3EE00B57580 /* OpenSans-Italic.ttf in Resources */,
 				AB2AA1B9235D94DF0086D16C /* SurveyTableViewCell.xib in Resources */,
+				AB5EB60223630AC0000D4D96 /* SubcategoryTableViewCell.xib in Resources */,
 				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
 				AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */,
+				AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */,
 				AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */,
 				AB3C684E223FD3EE00B57580 /* OpenSans-LightItalic.ttf in Resources */,
 				AB3C6852223FD3EF00B57580 /* OpenSans-Regular.ttf in Resources */,
@@ -802,6 +846,7 @@
 				AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
 				ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */,
+				AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */,
 				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
 				AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */,
 				ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */,
@@ -824,6 +869,7 @@
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
 				AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */,
 				AB2AA1BB235DDC6F0086D16C /* TopSurveysViewController.swift in Sources */,
+				ABDEE85B237023D0009B52F3 /* SurveyViewController.swift in Sources */,
 				ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */,
 				AB3C685D223FD74E00B57580 /* APIManager.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
@@ -851,9 +897,11 @@
 				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
 				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
+				AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */,
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
+				ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */,
 				AB3C6812223FC71600B57580 /* Main.swift in Sources */,
 				AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */,
 				AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */,

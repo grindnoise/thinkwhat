@@ -14,24 +14,39 @@ class Surveys: ServerProtocol {
     private init() {}
     var topSurveys: [SurveyLink] = []
     var newSurveys: [SurveyLink] = []
+    var byCategory: [SurveyCategory: [SurveyLink]] = [:]
     
-    func importTopSurveys(_ json: JSON) {
-        topSurveys.removeAll()
+    func importSurveys(_ json: JSON) {
         for i in json {
-            if let survey = SurveyLink(i.1) {
-                topSurveys.append(survey)
+            if i.0 == "top" && !i.1.isEmpty {
+                topSurveys.removeAll()
+                for j in i.1 {
+                    if let survey = SurveyLink(j.1) {
+                        topSurveys.append(survey)
+                    }
+                }
+                NotificationCenter.default.post(name: kNotificationTopSurveysUpdated, object: nil)
+            } else if i.0 == "new" && !i.1.isEmpty {
+                newSurveys.removeAll()
+                for k in i.1 {
+                    if let survey = SurveyLink(k.1) {
+                        newSurveys.append(survey)
+                    }
+                }
+                NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)
+            }  else if i.0 == "by_category" && !i.1.isEmpty {
+                byCategory.removeAll()
+                for cat in i.1 {
+                    let category = SurveyCategories.shared[Int(cat.0)!]
+                    var data: [SurveyLink] = []
+                    for survey in cat.1 {
+                        data.append(SurveyLink(survey.1)!)
+                    }
+                    byCategory[category!] = data
+                }
+                NotificationCenter.default.post(name: kNotificationSurveysByCategoryUpdated, object: nil)
             }
         }
-        NotificationCenter.default.post(name: kNotificationTopSurveysUpdated, object: nil)
-    }
-    func importNewSurveys(_ json: JSON) {
-        newSurveys.removeAll()
-        for i in json {
-            if let survey = SurveyLink(i.1) {
-                newSurveys.append(survey)
-            }
-        }
-        NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)
     }
     
     func eraseData() {
@@ -72,18 +87,44 @@ class SurveyCategories: ServerProtocol {
     static let shared = SurveyCategories()
     private init() {}
     var categories: [SurveyCategory] = []
+    var tree: [[String: [SurveyCategory]]] = [[:]]
+    //var _categories: [SurveyCategory: [SurveyCategory?]] = [:]
     
     func importJson(_ json: JSON) {
         categories.removeAll()
+        tree.removeAll()
         for i in json {
             if let category = SurveyCategory(i.1) {
+                var array: [SurveyCategory] = []
                 categories.append(category)
                 if !i.1["children"].isEmpty {
                     let subcategories = i.1["children"]
                     for j in subcategories {
                         if let subCategory = SurveyCategory(j.1, category) {
                             categories.append(subCategory)
+                            array.append(subCategory)
                         }
+                    }
+                }
+                let entry:[String: [SurveyCategory]] = [category.title: array]
+                tree.append(entry)
+            }
+        }
+    }
+    
+    func updateCount(_ json: JSON) {
+        if let _categories = json["categories"] as? JSON {
+            if !_categories.isEmpty {
+                for cat in categories {
+                    cat.total = 0
+                    cat.active = 0
+                }
+                for cat in _categories {
+                    if let category = self[Int(cat.0)!] as? SurveyCategory, let total = cat.1["total"].intValue as? Int, let active = cat.1["active"].intValue as? Int {
+                        category.total = total
+                        category.active = active
+                        category.parent?.total += total
+                        category.parent?.active += active
                     }
                 }
             }
@@ -97,6 +138,14 @@ class SurveyCategories: ServerProtocol {
             return nil
         }
     }
+    
+    subscript (title: String) -> SurveyCategory? {
+        if let i = categories.first(where: {$0.title == title}) {
+            return i
+        } else {
+            return nil
+        }
+    }
 }
 
 class SurveyCategory {
@@ -105,20 +154,33 @@ class SurveyCategory {
     let dateCreated: Date
     var parent: SurveyCategory?
     var ageRestriction: Int?
+    var tagColor: UIColor?
+    var total: Int = 0
+    var active: Int = 0
+    var hashValue: Int {
+        return ObjectIdentifier(self).hashValue
+    }
     
     init?(_ json: JSON, _ _parent: SurveyCategory? = nil) {
         if  let _ID                     = json["id"].intValue as? Int,
             let _title                  = json["title"].stringValue as? String,
-            let _dateCreated            = json["created_at"] is NSNull ? nil : Date(dateTimeString: json["created_at"].stringValue as! String),
-            let _ageRestriction         = json["age_restriction"] is NSNull ? nil : json["age_restriction"].intValue as? Int {
+            let _tagColor               = json["tag_color"] is NSNull ? "" as? String: json["tag_color"].stringValue as? String,
+            var _dateCreated            = json["created_at"] is NSNull ? nil : Date(dateTimeString: json["created_at"].stringValue as! String),
+            var _ageRestriction         = json["age_restriction"] is NSNull ? nil : json["age_restriction"].intValue as? Int {
             ID                      = _ID
             title                   = _title
             dateCreated             = _dateCreated
             ageRestriction          = _ageRestriction
             parent                  = _parent
+            tagColor                = _tagColor.hexColor
         } else {
             return nil
-            
         }
+    }
+}
+
+extension SurveyCategory: Hashable {
+    static func == (lhs: SurveyCategory, rhs: SurveyCategory) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
 }

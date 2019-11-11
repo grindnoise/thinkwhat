@@ -120,7 +120,10 @@ extension UIView {
 }
 
 extension String {
-    var hexColor: UIColor {
+    var hexColor: UIColor? {
+        guard !isEmpty else {
+            return nil
+        }
         let hex = trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int = UInt32()
         Scanner(string: hex).scanHexInt32(&int)
@@ -438,7 +441,7 @@ extension NSData{
 
 extension UIImage {
     class func colorForNavBar(color: UIColor) -> UIImage {
-        let rect = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
+        let rect = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1)
         //    Or if you need a thinner border :
         //    let rect = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 0.5)
         UIGraphicsBeginImageContext(rect.size)
@@ -451,5 +454,20 @@ extension UIImage {
         UIGraphicsEndImageContext()
         
         return image!
+    }
+}
+
+extension Float {
+    var degreesToRadians : CGFloat {
+        return CGFloat(self) * CGFloat(M_PI) / 180.0
+    }
+}
+
+extension Int {
+    var stringValue: String? {
+        if self != nil {
+            return "\(self)"
+        }
+        return nil
     }
 }
