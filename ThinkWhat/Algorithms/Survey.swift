@@ -9,12 +9,15 @@
 import Foundation
 import SwiftyJSON
 
-class Surveys: ServerProtocol {
+class Surveys {
     static let shared = Surveys()
     private init() {}
-    var topSurveys: [SurveyLink] = []
-    var newSurveys: [SurveyLink] = []
-    var byCategory: [SurveyCategory: [SurveyLink]] = [:]
+    var topSurveys:         [SurveyLink] = []
+    var newSurveys:         [SurveyLink] = []
+    var byCategory:         [SurveyCategory: [SurveyLink]] = [:]
+    var ownSurveys:         [SurveyLink] = []
+    var favoriteSurveys:    [SurveyLink] = []
+    var downloadedSurveys:  [Survey] = []
     
     func importSurveys(_ json: JSON) {
         for i in json {
@@ -45,6 +48,22 @@ class Surveys: ServerProtocol {
                     byCategory[category!] = data
                 }
                 NotificationCenter.default.post(name: kNotificationSurveysByCategoryUpdated, object: nil)
+            } else if i.0 == "own" && !i.1.isEmpty {
+                ownSurveys.removeAll()
+                for k in i.1 {
+                    if let survey = SurveyLink(k.1) {
+                        ownSurveys.append(survey)
+                    }
+                }
+                NotificationCenter.default.post(name: kNotificationOwnSurveysUpdated, object: nil)
+            } else if i.0 == "favorite" && !i.1.isEmpty {
+                favoriteSurveys.removeAll()
+                for k in i.1 {
+                    if let survey = SurveyLink(k.1) {
+                        favoriteSurveys.append(survey)
+                    }
+                }
+                NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
             }
         }
     }
@@ -52,6 +71,18 @@ class Surveys: ServerProtocol {
     func eraseData() {
         topSurveys.removeAll()
         newSurveys.removeAll()
+        byCategory.removeAll()
+        ownSurveys.removeAll()
+        favoriteSurveys.removeAll()
+        downloadedSurveys.removeAll()
+    }
+    
+    subscript (ID: Int) -> Survey? {
+        if let i = downloadedSurveys.first(where: {$0.ID == ID}) {
+            return i
+        } else {
+            return nil
+        }
     }
 }
 
@@ -83,7 +114,7 @@ class SurveyLink {
     }
 }
 
-class SurveyCategories: ServerProtocol {
+class SurveyCategories {
     static let shared = SurveyCategories()
     private init() {}
     var categories: [SurveyCategory] = []
@@ -182,5 +213,17 @@ class SurveyCategory {
 extension SurveyCategory: Hashable {
     static func == (lhs: SurveyCategory, rhs: SurveyCategory) -> Bool {
         return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+}
+
+class Survey {
+    var ID: Int
+    
+    init?(_ json: JSON) {
+        if  let _ID                     = json["id"].intValue as? Int {
+            ID = _ID
+        } else {
+            return nil
+        }
     }
 }

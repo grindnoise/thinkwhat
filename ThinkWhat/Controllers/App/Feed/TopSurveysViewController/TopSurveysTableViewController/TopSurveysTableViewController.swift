@@ -123,6 +123,7 @@ class TopSurveysTableViewController: UITableViewController {
                 } else {
                     dataSource = Surveys.shared.topSurveys
                 }
+                cell.survey = dataSource[indexPath.row]
                 cell.title.text = dataSource[indexPath.row].title
                 for view in cell.tags.subviews {
                     view.removeFromSuperview()
@@ -251,7 +252,7 @@ extension TopSurveysTableViewController: ServerProtocol {
     }
     
     private func updateSurveys(type: APIManager.SurveyType) {
-        self.apiManager.loadMainSurveys(type: type) {
+        self.apiManager.loadSurveys(type: type) {
             json, error in
             if error != nil {
                 //Retry unless successfull

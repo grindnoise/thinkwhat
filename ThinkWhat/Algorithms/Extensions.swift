@@ -455,6 +455,19 @@ extension UIImage {
         
         return image!
     }
+    
+    var jpeg: Data? {
+        return jpegData(compressionQuality: 1)   // QUALITY min = 0 / max = 1
+    }
+    var png: Data? {
+        return pngData()
+    }
+    
+    func resized(to size: CGSize) -> UIImage {
+        return UIGraphicsImageRenderer(size: size).image { _ in
+            draw(in: CGRect(origin: .zero, size: size))
+        }
+    }
 }
 
 extension Float {

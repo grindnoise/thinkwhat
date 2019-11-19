@@ -1,0 +1,298 @@
+//
+//  HeartButton.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 19.11.2019.
+//  Copyright © 2019 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+
+@IBDesignable
+class HeartView: UIView, CAAnimationDelegate {
+    
+    enum State {
+        case enabled, disabled
+    }
+    
+    var state: HeartView.State = .disabled {
+        didSet {
+            if oldValue != state {
+                if state == .enabled {
+                    self.addEnableAnimation()
+                } else {
+                    self.addDisableAnimation()
+                }
+            }
+        }
+    }
+    var layers = [String: CALayer]()
+    var completionBlocks = [CAAnimation: (Bool) -> Void]()
+    var updateLayerValueForCompletedAnimation : Bool = false
+    
+    
+    
+    //MARK: - Life Cycle
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupProperties()
+        setupLayers()
+    }
+    
+    required init?(coder aDecoder: NSCoder)
+    {
+        super.init(coder: aDecoder)
+        setupProperties()
+        setupLayers()
+    }
+    
+    override var frame: CGRect{
+        didSet{
+            setupLayerFrames()
+        }
+    }
+    
+    override var bounds: CGRect{
+        didSet{
+            setupLayerFrames()
+        }
+    }
+    
+    func setupProperties(){
+        
+    }
+    
+    func setupLayers(){
+        self.backgroundColor = UIColor(red:1.00, green: 1.00, blue:1.00, alpha:0.0)
+        
+        let Group = CALayer()
+        self.layer.addSublayer(Group)
+        layers["Group"] = Group
+        let path2 = CAShapeLayer()
+        Group.addSublayer(path2)
+        layers["path2"] = path2
+        let path = CAShapeLayer()
+        Group.addSublayer(path)
+        layers["path"] = path
+        
+        resetLayerProperties(forLayerIdentifiers: nil)
+        setupLayerFrames()
+    }
+    
+    func resetLayerProperties(forLayerIdentifiers layerIds: [String]!){
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        
+        if layerIds == nil || layerIds.contains("path2"){
+            let path2 = layers["path2"] as! CAShapeLayer
+            path2.opacity     = 0
+            path2.fillRule    = .evenOdd
+            path2.fillColor   = UIColor(red:1.00, green: 0.51, blue:0.44, alpha:1.0).cgColor
+            path2.strokeColor = UIColor.black.cgColor
+            path2.lineWidth   = 0
+        }
+        if layerIds == nil || layerIds.contains("path"){
+            let path = layers["path"] as! CAShapeLayer
+            path.fillColor   = UIColor.black.cgColor
+            path.strokeColor = UIColor.black.cgColor
+            path.lineWidth   = 0
+        }
+        
+        CATransaction.commit()
+    }
+    
+    func setupLayerFrames(){
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        
+        if let Group = layers["Group"]{
+            Group.frame = CGRect(x: 0.0793 * Group.superlayer!.bounds.width, y: 0.1397 * Group.superlayer!.bounds.height, width: 0.8414 * Group.superlayer!.bounds.width, height: 0.72059 * Group.superlayer!.bounds.height)
+        }
+        
+        if let path2 = layers["path2"] as? CAShapeLayer{
+            path2.frame = CGRect(x: 0.02243 * path2.superlayer!.bounds.width, y: 0.02243 * path2.superlayer!.bounds.height, width: 0.95514 * path2.superlayer!.bounds.width, height: 0.95514 * path2.superlayer!.bounds.height)
+            path2.path  = path2Path(bounds: layers["path2"]!.bounds).cgPath
+        }
+        
+        if let path = layers["path"] as? CAShapeLayer{
+            path.frame = CGRect(x: 0, y: 0, width:  path.superlayer!.bounds.width, height:  path.superlayer!.bounds.height)
+            path.path  = pathPath(bounds: layers["path"]!.bounds).cgPath
+        }
+        
+        CATransaction.commit()
+    }
+    
+    //MARK: - Animation Setup
+    
+    func addEnableAnimation(completionBlock: ((_ finished: Bool) -> Void)? = nil){
+        if completionBlock != nil{
+            let completionAnim = CABasicAnimation(keyPath:"completionAnim")
+            completionAnim.duration = 0.15
+            completionAnim.delegate = self
+            completionAnim.setValue("enable", forKey:"animId")
+            completionAnim.setValue(false, forKey:"needEndAnim")
+            layer.add(completionAnim, forKey:"enable")
+            if let anim = layer.animation(forKey: "enable"){
+                completionBlocks[anim] = completionBlock
+            }
+        }
+        
+        let fillMode : CAMediaTimingFillMode = .forwards
+        
+        ////Path2 animation
+        let path2OpacityAnim      = CAKeyframeAnimation(keyPath:"opacity")
+        path2OpacityAnim.values   = [0, 1]
+        path2OpacityAnim.keyTimes = [0, 1]
+        path2OpacityAnim.duration = 0.15
+        
+        let path2EnableAnim : CAAnimationGroup = QCMethod.group(animations: [path2OpacityAnim], fillMode:fillMode)
+        layers["path2"]?.add(path2EnableAnim, forKey:"path2EnableAnim")
+    }
+    
+    func addDisableAnimation(completionBlock: ((_ finished: Bool) -> Void)? = nil){
+        if completionBlock != nil{
+            let completionAnim = CABasicAnimation(keyPath:"completionAnim")
+            completionAnim.duration = 0.15
+            completionAnim.delegate = self
+            completionAnim.setValue("disable", forKey:"animId")
+            completionAnim.setValue(false, forKey:"needEndAnim")
+            layer.add(completionAnim, forKey:"disable")
+            if let anim = layer.animation(forKey: "disable"){
+                completionBlocks[anim] = completionBlock
+            }
+        }
+        
+        let fillMode : CAMediaTimingFillMode = .forwards
+        
+        ////Path2 animation
+        let path2OpacityAnim      = CAKeyframeAnimation(keyPath:"opacity")
+        path2OpacityAnim.values   = [1, 0]
+        path2OpacityAnim.keyTimes = [0, 1]
+        path2OpacityAnim.duration = 0.15
+        
+        let path2DisableAnim : CAAnimationGroup = QCMethod.group(animations: [path2OpacityAnim], fillMode:fillMode)
+        layers["path2"]?.add(path2DisableAnim, forKey:"path2DisableAnim")
+    }
+    
+    //MARK: - Animation Cleanup
+    
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool){
+        if let completionBlock = completionBlocks[anim]{
+            completionBlocks.removeValue(forKey: anim)
+            if (flag && updateLayerValueForCompletedAnimation) || anim.value(forKey: "needEndAnim") as! Bool{
+                updateLayerValues(forAnimationId: anim.value(forKey: "animId") as! String)
+                removeAnimations(forAnimationId: anim.value(forKey: "animId") as! String)
+            }
+            completionBlock(flag)
+        }
+    }
+    
+    func updateLayerValues(forAnimationId identifier: String){
+        if identifier == "enable"{
+            QCMethod.updateValueFromPresentationLayer(forAnimation: layers["path2"]!.animation(forKey: "path2EnableAnim"), theLayer:layers["path2"]!)
+        }
+        else if identifier == "disable"{
+            QCMethod.updateValueFromPresentationLayer(forAnimation: layers["path2"]!.animation(forKey: "path2DisableAnim"), theLayer:layers["path2"]!)
+        }
+    }
+    
+    func removeAnimations(forAnimationId identifier: String){
+        if identifier == "enable"{
+            layers["path2"]?.removeAnimation(forKey: "path2EnableAnim")
+        }
+        else if identifier == "disable"{
+            layers["path2"]?.removeAnimation(forKey: "path2DisableAnim")
+        }
+    }
+    
+    func removeAllAnimations(){
+        for layer in layers.values{
+            layer.removeAllAnimations()
+        }
+    }
+    
+    //MARK: - Bezier Path
+    
+    func path2Path(bounds: CGRect) -> UIBezierPath{
+        let path2Path = UIBezierPath()
+        let minX = CGFloat(bounds.minX), minY = bounds.minY, w = bounds.width, h = bounds.height;
+        
+        path2Path.move(to: CGPoint(x:minX + 0.22948 * w, y: minY + 0.0017 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.0168 * w, y: minY + 0.18132 * h), controlPoint1:CGPoint(x:minX + 0.12555 * w, y: minY + 0.01255 * h), controlPoint2:CGPoint(x:minX + 0.04846 * w, y: minY + 0.07764 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.00046 * w, y: minY + 0.31895 * h), controlPoint1:CGPoint(x:minX + 0.00545 * w, y: minY + 0.21889 * h), controlPoint2:CGPoint(x:minX + -0.00195 * w, y: minY + 0.28158 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.05603 * w, y: minY + 0.49676 * h), controlPoint1:CGPoint(x:minX + 0.00441 * w, y: minY + 0.37741 * h), controlPoint2:CGPoint(x:minX + 0.02455 * w, y: minY + 0.44171 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.13501 * w, y: minY + 0.60546 * h), controlPoint1:CGPoint(x:minX + 0.07634 * w, y: minY + 0.53192 * h), controlPoint2:CGPoint(x:minX + 0.10783 * w, y: minY + 0.57532 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.31948 * w, y: minY + 0.81281 * h), controlPoint1:CGPoint(x:minX + 0.14809 * w, y: minY + 0.61992 * h), controlPoint2:CGPoint(x:minX + 0.23103 * w, y: minY + 0.71315 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.4857 * w, y: minY + 0.99705 * h), controlPoint1:CGPoint(x:minX + 0.40792 * w, y: minY + 0.91246 * h), controlPoint2:CGPoint(x:minX + 0.48277 * w, y: minY + 0.99524 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.51306 * w, y: minY + 0.99805 * h), controlPoint1:CGPoint(x:minX + 0.49206 * w, y: minY + 1.00046 * h), controlPoint2:CGPoint(x:minX + 0.50652 * w, y: minY + 1.00107 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.61045 * w, y: minY + 0.89257 * h), controlPoint1:CGPoint(x:minX + 0.51873 * w, y: minY + 0.99564 * h), controlPoint2:CGPoint(x:minX + 0.52596 * w, y: minY + 0.98761 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.77219 * w, y: minY + 0.71094 * h), controlPoint1:CGPoint(x:minX + 0.64882 * w, y: minY + 0.84957 * h), controlPoint2:CGPoint(x:minX + 0.72161 * w, y: minY + 0.7678 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.91278 * w, y: minY + 0.54599 * h), controlPoint1:CGPoint(x:minX + 0.87767 * w, y: minY + 0.5926 * h), controlPoint2:CGPoint(x:minX + 0.88817 * w, y: minY + 0.58034 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.99916 * w, y: minY + 0.32658 * h), controlPoint1:CGPoint(x:minX + 0.96509 * w, y: minY + 0.47305 * h), controlPoint2:CGPoint(x:minX + 0.99451 * w, y: minY + 0.39811 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.97266 * w, y: minY + 0.14997 * h), controlPoint1:CGPoint(x:minX + 1.00311 * w, y: minY + 0.2651 * h), controlPoint2:CGPoint(x:minX + 0.99296 * w, y: minY + 0.19739 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.90417 * w, y: minY + 0.05594 * h), controlPoint1:CGPoint(x:minX + 0.95786 * w, y: minY + 0.11562 * h), controlPoint2:CGPoint(x:minX + 0.93067 * w, y: minY + 0.07845 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.7395 * w, y: minY + 0.00069 * h), controlPoint1:CGPoint(x:minX + 0.86184 * w, y: minY + 0.01998 * h), controlPoint2:CGPoint(x:minX + 0.8054 * w, y: minY + 0.00089 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.62972 * w, y: minY + 0.02982 * h), controlPoint1:CGPoint(x:minX + 0.69666 * w, y: minY + 0.00049 * h), controlPoint2:CGPoint(x:minX + 0.66964 * w, y: minY + 0.00752 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.51202 * w, y: minY + 0.12767 * h), controlPoint1:CGPoint(x:minX + 0.59565 * w, y: minY + 0.04851 * h), controlPoint2:CGPoint(x:minX + 0.54403 * w, y: minY + 0.09151 * h))
+        path2Path.addLine(to: CGPoint(x:minX + 0.50049 * w, y: minY + 0.14073 * h))
+        path2Path.addLine(to: CGPoint(x:minX + 0.48604 * w, y: minY + 0.12486 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.37798 * w, y: minY + 0.03364 * h), controlPoint1:CGPoint(x:minX + 0.45799 * w, y: minY + 0.09392 * h), controlPoint2:CGPoint(x:minX + 0.40603 * w, y: minY + 0.04992 * h))
+        path2Path.addCurve(to: CGPoint(x:minX + 0.22948 * w, y: minY + 0.0017 * h), controlPoint1:CGPoint(x:minX + 0.32877 * w, y: minY + 0.00471 * h), controlPoint2:CGPoint(x:minX + 0.28747 * w, y: minY + -0.00413 * h))
+        path2Path.close()
+        path2Path.move(to: CGPoint(x:minX + 0.22948 * w, y: minY + 0.0017 * h))
+        
+        return path2Path
+    }
+    
+    func pathPath(bounds: CGRect) -> UIBezierPath{
+        let pathPath = UIBezierPath()
+        let minX = CGFloat(bounds.minX), minY = bounds.minY, w = bounds.width, h = bounds.height;
+        
+        pathPath.move(to: CGPoint(x:minX + 0.22948 * w, y: minY + 0.0017 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.0168 * w, y: minY + 0.18132 * h), controlPoint1:CGPoint(x:minX + 0.12555 * w, y: minY + 0.01255 * h), controlPoint2:CGPoint(x:minX + 0.04846 * w, y: minY + 0.07764 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.00046 * w, y: minY + 0.31895 * h), controlPoint1:CGPoint(x:minX + 0.00545 * w, y: minY + 0.21889 * h), controlPoint2:CGPoint(x:minX + -0.00195 * w, y: minY + 0.28158 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.05603 * w, y: minY + 0.49676 * h), controlPoint1:CGPoint(x:minX + 0.00441 * w, y: minY + 0.37741 * h), controlPoint2:CGPoint(x:minX + 0.02455 * w, y: minY + 0.44171 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.13501 * w, y: minY + 0.60546 * h), controlPoint1:CGPoint(x:minX + 0.07634 * w, y: minY + 0.53192 * h), controlPoint2:CGPoint(x:minX + 0.10783 * w, y: minY + 0.57532 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.31948 * w, y: minY + 0.81281 * h), controlPoint1:CGPoint(x:minX + 0.14809 * w, y: minY + 0.61992 * h), controlPoint2:CGPoint(x:minX + 0.23103 * w, y: minY + 0.71315 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.4857 * w, y: minY + 0.99705 * h), controlPoint1:CGPoint(x:minX + 0.40792 * w, y: minY + 0.91246 * h), controlPoint2:CGPoint(x:minX + 0.48277 * w, y: minY + 0.99524 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.51306 * w, y: minY + 0.99805 * h), controlPoint1:CGPoint(x:minX + 0.49206 * w, y: minY + 1.00046 * h), controlPoint2:CGPoint(x:minX + 0.50652 * w, y: minY + 1.00107 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.61045 * w, y: minY + 0.89257 * h), controlPoint1:CGPoint(x:minX + 0.51873 * w, y: minY + 0.99564 * h), controlPoint2:CGPoint(x:minX + 0.52596 * w, y: minY + 0.98761 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.77219 * w, y: minY + 0.71094 * h), controlPoint1:CGPoint(x:minX + 0.64882 * w, y: minY + 0.84957 * h), controlPoint2:CGPoint(x:minX + 0.72161 * w, y: minY + 0.7678 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.91278 * w, y: minY + 0.54599 * h), controlPoint1:CGPoint(x:minX + 0.87767 * w, y: minY + 0.5926 * h), controlPoint2:CGPoint(x:minX + 0.88817 * w, y: minY + 0.58034 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.99916 * w, y: minY + 0.32658 * h), controlPoint1:CGPoint(x:minX + 0.96509 * w, y: minY + 0.47305 * h), controlPoint2:CGPoint(x:minX + 0.99451 * w, y: minY + 0.39811 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.97266 * w, y: minY + 0.14997 * h), controlPoint1:CGPoint(x:minX + 1.00311 * w, y: minY + 0.2651 * h), controlPoint2:CGPoint(x:minX + 0.99296 * w, y: minY + 0.19739 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.90417 * w, y: minY + 0.05594 * h), controlPoint1:CGPoint(x:minX + 0.95786 * w, y: minY + 0.11562 * h), controlPoint2:CGPoint(x:minX + 0.93067 * w, y: minY + 0.07845 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.7395 * w, y: minY + 0.00069 * h), controlPoint1:CGPoint(x:minX + 0.86184 * w, y: minY + 0.01998 * h), controlPoint2:CGPoint(x:minX + 0.8054 * w, y: minY + 0.00089 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.62972 * w, y: minY + 0.02982 * h), controlPoint1:CGPoint(x:minX + 0.69666 * w, y: minY + 0.00049 * h), controlPoint2:CGPoint(x:minX + 0.66964 * w, y: minY + 0.00752 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.51202 * w, y: minY + 0.12767 * h), controlPoint1:CGPoint(x:minX + 0.59565 * w, y: minY + 0.04851 * h), controlPoint2:CGPoint(x:minX + 0.54403 * w, y: minY + 0.09151 * h))
+        pathPath.addLine(to: CGPoint(x:minX + 0.50049 * w, y: minY + 0.14073 * h))
+        pathPath.addLine(to: CGPoint(x:minX + 0.48604 * w, y: minY + 0.12486 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.37798 * w, y: minY + 0.03364 * h), controlPoint1:CGPoint(x:minX + 0.45799 * w, y: minY + 0.09392 * h), controlPoint2:CGPoint(x:minX + 0.40603 * w, y: minY + 0.04992 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.22948 * w, y: minY + 0.0017 * h), controlPoint1:CGPoint(x:minX + 0.32877 * w, y: minY + 0.00471 * h), controlPoint2:CGPoint(x:minX + 0.28747 * w, y: minY + -0.00413 * h))
+        pathPath.close()
+        pathPath.move(to: CGPoint(x:minX + 0.30588 * w, y: minY + 0.0899 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.46143 * w, y: minY + 0.21427 * h), controlPoint1:CGPoint(x:minX + 0.35441 * w, y: minY + 0.10678 * h), controlPoint2:CGPoint(x:minX + 0.40499 * w, y: minY + 0.14716 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.50032 * w, y: minY + 0.2426 * h), controlPoint1:CGPoint(x:minX + 0.48277 * w, y: minY + 0.23938 * h), controlPoint2:CGPoint(x:minX + 0.4869 * w, y: minY + 0.2426 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.54661 * w, y: minY + 0.20583 * h), controlPoint1:CGPoint(x:minX + 0.5134 * w, y: minY + 0.2426 * h), controlPoint2:CGPoint(x:minX + 0.51718 * w, y: minY + 0.23958 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.65467 * w, y: minY + 0.10919 * h), controlPoint1:CGPoint(x:minX + 0.58963 * w, y: minY + 0.1566 * h), controlPoint2:CGPoint(x:minX + 0.61991 * w, y: minY + 0.12948 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.74965 * w, y: minY + 0.08447 * h), controlPoint1:CGPoint(x:minX + 0.69184 * w, y: minY + 0.08749 * h), controlPoint2:CGPoint(x:minX + 0.71008 * w, y: minY + 0.08287 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.9114 * w, y: minY + 0.19518 * h), controlPoint1:CGPoint(x:minX + 0.8307 * w, y: minY + 0.08809 * h), controlPoint2:CGPoint(x:minX + 0.88697 * w, y: minY + 0.12647 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.92826 * w, y: minY + 0.31292 * h), controlPoint1:CGPoint(x:minX + 0.92379 * w, y: minY + 0.22994 * h), controlPoint2:CGPoint(x:minX + 0.92998 * w, y: minY + 0.27314 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.85049 * w, y: minY + 0.50359 * h), controlPoint1:CGPoint(x:minX + 0.92568 * w, y: minY + 0.3748 * h), controlPoint2:CGPoint(x:minX + 0.90108 * w, y: minY + 0.43528 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.5103 * w, y: minY + 0.88936 * h), controlPoint1:CGPoint(x:minX + 0.84102 * w, y: minY + 0.51665 * h), controlPoint2:CGPoint(x:minX + 0.5516 * w, y: minY + 0.84455 * h))
+        pathPath.addLine(to: CGPoint(x:minX + 0.50032 * w, y: minY + 0.90001 * h))
+        pathPath.addLine(to: CGPoint(x:minX + 0.49034 * w, y: minY + 0.88936 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.1505 * w, y: minY + 0.50419 * h), controlPoint1:CGPoint(x:minX + 0.45197 * w, y: minY + 0.84757 * h), controlPoint2:CGPoint(x:minX + 0.15979 * w, y: minY + 0.51685 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.07462 * w, y: minY + 0.25847 * h), controlPoint1:CGPoint(x:minX + 0.08615 * w, y: minY + 0.4178 * h), controlPoint2:CGPoint(x:minX + 0.06412 * w, y: minY + 0.34627 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.17717 * w, y: minY + 0.09995 * h), controlPoint1:CGPoint(x:minX + 0.08425 * w, y: minY + 0.1777 * h), controlPoint2:CGPoint(x:minX + 0.11815 * w, y: minY + 0.12526 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.26458 * w, y: minY + 0.08468 * h), controlPoint1:CGPoint(x:minX + 0.20625 * w, y: minY + 0.08769 * h), controlPoint2:CGPoint(x:minX + 0.22759 * w, y: minY + 0.08387 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.30588 * w, y: minY + 0.0899 * h), controlPoint1:CGPoint(x:minX + 0.28781 * w, y: minY + 0.08528 * h), controlPoint2:CGPoint(x:minX + 0.29539 * w, y: minY + 0.08628 * h))
+        pathPath.close()
+        pathPath.move(to: CGPoint(x:minX + 0.30588 * w, y: minY + 0.0899 * h))
+        
+        return pathPath
+    }
+    
+    
+}

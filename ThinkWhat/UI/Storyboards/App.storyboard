@@ -54,33 +54,127 @@
         <scene sceneID="y0h-Ii-Gnp">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="ukW-Vb-96l" customClass="NavigationControllerPreloaded" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Мои опросы" id="KKC-VH-rh2"/>
+                    <tabBarItem key="tabBarItem" title="Мои опросы" image="PieIcon" id="KKC-VH-rh2"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="b7o-Lg-l0F">
                         <rect key="frame" x="0.0" y="20" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <textAttributes key="titleTextAttributes">
+                            <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="19"/>
+                        </textAttributes>
                     </navigationBar>
                     <connections>
-                        <segue destination="9Jl-bu-iP2" kind="show" id="gPY-CT-JS9"/>
+                        <segue destination="0dL-D7-g1C" kind="relationship" relationship="rootViewController" id="ozi-4y-RvH"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NFC-Yn-Yzh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-354" y="-611"/>
+            <point key="canvasLocation" x="-354" y="-613"/>
         </scene>
-        <!--View Controller-->
-        <scene sceneID="kFd-sG-ccb">
+        <!--User Surveys Table View Controller-->
+        <scene sceneID="QC3-eS-QPU">
             <objects>
-                <viewController id="9Jl-bu-iP2" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="5Jh-Y0-KLm">
+                <tableViewController storyboardIdentifier="UserSurveysTableViewController" id="T19-iX-3Xw" customClass="UserSurveysTableViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="80" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="pgB-eP-l6c">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <viewLayoutGuide key="safeArea" id="Dro-gV-kYR"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="tML-JQ-Ztf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="surveyCell" id="O67-za-GUG">
+                                <rect key="frame" x="0.0" y="28" width="320" height="80"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="O67-za-GUG" id="wcN-Wl-6Oz">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="80"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="T19-iX-3Xw" id="6fh-sO-wfE"/>
+                            <outlet property="delegate" destination="T19-iX-3Xw" id="Paa-AV-mFo"/>
+                        </connections>
+                    </tableView>
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="dEh-C0-FfC">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </refreshControl>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="meZ-Tq-q1f" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="570" y="-612"/>
+            <point key="canvasLocation" x="1382" y="-616"/>
+        </scene>
+        <!--Мои опросы-->
+        <scene sceneID="qEJ-LM-2ul">
+            <objects>
+                <viewController id="0dL-D7-g1C" customClass="UserSurveysViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="g5o-IA-4MP">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="519"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WxV-Dm-mUF" customClass="BorderedView" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="64" width="320" height="36"/>
+                                <subviews>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" segmentControlStyle="bordered" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Gar-xl-W35">
+                                        <rect key="frame" x="16" y="0.0" width="288" height="29"/>
+                                        <segments>
+                                            <segment title="Мои"/>
+                                            <segment title="Избранное"/>
+                                            <segment title="Статистика"/>
+                                        </segments>
+                                        <color key="tintColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <action selector="controlChanged:" destination="0dL-D7-g1C" eventType="valueChanged" id="Ukb-OJ-VUp"/>
+                                        </connections>
+                                    </segmentedControl>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="Gar-xl-W35" firstAttribute="centerX" secondItem="WxV-Dm-mUF" secondAttribute="centerX" id="6A7-Rl-7bw"/>
+                                    <constraint firstItem="Gar-xl-W35" firstAttribute="top" secondItem="WxV-Dm-mUF" secondAttribute="top" id="7Jx-W5-HOe"/>
+                                    <constraint firstItem="Gar-xl-W35" firstAttribute="width" secondItem="WxV-Dm-mUF" secondAttribute="width" multiplier="0.9" id="C8v-qB-bQs"/>
+                                    <constraint firstAttribute="height" constant="36" id="fnb-nC-VZE"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="lowerBordered" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" red="0.57045853140000002" green="0.57047235969999999" blue="0.57046490910000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="lowerBorderWidth">
+                                        <real key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Azq-KQ-dQ2">
+                                <rect key="frame" x="0.0" y="100" width="320" height="419"/>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Azq-KQ-dQ2" firstAttribute="leading" secondItem="lx1-Gu-Ryv" secondAttribute="leading" id="2vL-dY-CBu"/>
+                            <constraint firstItem="WxV-Dm-mUF" firstAttribute="leading" secondItem="lx1-Gu-Ryv" secondAttribute="leading" id="H5r-Ze-8IZ"/>
+                            <constraint firstItem="WxV-Dm-mUF" firstAttribute="top" secondItem="lx1-Gu-Ryv" secondAttribute="top" id="Q2M-1Z-fmZ"/>
+                            <constraint firstItem="WxV-Dm-mUF" firstAttribute="trailing" secondItem="lx1-Gu-Ryv" secondAttribute="trailing" id="XmI-vf-doe"/>
+                            <constraint firstItem="Azq-KQ-dQ2" firstAttribute="top" secondItem="WxV-Dm-mUF" secondAttribute="bottom" id="Zv2-IG-KRk"/>
+                            <constraint firstItem="lx1-Gu-Ryv" firstAttribute="trailing" secondItem="Azq-KQ-dQ2" secondAttribute="trailing" id="i9V-HN-UTp"/>
+                            <constraint firstItem="lx1-Gu-Ryv" firstAttribute="bottom" secondItem="Azq-KQ-dQ2" secondAttribute="bottom" id="rX0-84-UNB"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="lx1-Gu-Ryv"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Мои опросы" id="QFJ-4u-yGe">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="s3v-Zi-ceH">
+                            <color key="tintColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="addSurvey:" destination="0dL-D7-g1C" id="ROj-ja-hdg"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="control" destination="Gar-xl-W35" id="ff1-B5-E6a"/>
+                        <outlet property="scrollView" destination="Azq-KQ-dQ2" id="ibT-yR-Unb"/>
+                        <segue destination="ja7-kY-SNp" kind="show" identifier="USER_SURVEYS_TO_SURVEY" id="1aX-n4-uZ8"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iiA-Yg-6N4" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="570" y="-615"/>
         </scene>
         <!--Лента-->
         <scene sceneID="raE-he-Uxm">
@@ -141,7 +235,9 @@
                         <viewLayoutGuide key="safeArea" id="1CD-uW-Rh9"/>
                     </view>
                     <navigationItem key="navigationItem" title="Лента" id="20t-7F-81g">
-                        <barButtonItem key="rightBarButtonItem" systemItem="search" id="JDd-0s-1BB"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="search" id="JDd-0s-1BB">
+                            <color key="tintColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="container" destination="0Yc-Te-aTy" id="W2F-TC-6S5"/>
@@ -152,7 +248,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="w0q-JQ-tvw" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="570" y="130.98591549295776"/>
+            <point key="canvasLocation" x="570" y="133"/>
         </scene>
         <!--Лента-->
         <scene sceneID="m1w-P1-7Kn">
@@ -194,7 +290,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6JI-EO-L4q" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1382" y="132"/>
+            <point key="canvasLocation" x="1382" y="133"/>
         </scene>
         <!--Survey View Controller-->
         <scene sceneID="frF-UQ-85z">
@@ -210,7 +306,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1Sg-i2-hcc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2184" y="-612"/>
+            <point key="canvasLocation" x="4290" y="133"/>
         </scene>
         <!--Title-->
         <scene sceneID="nrt-Vz-cHQ">
@@ -244,13 +340,13 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hID-Bo-sIj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2186" y="132"/>
+            <point key="canvasLocation" x="2186" y="133"/>
         </scene>
-        <!--Navigation Controller Preloaded-->
+        <!--Лента-->
         <scene sceneID="VLR-5i-bNI">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="vFh-iT-fQJ" customClass="NavigationControllerPreloaded" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" systemItem="favorites" id="vBU-7B-tcg">
+                    <tabBarItem key="tabBarItem" title="Лента" image="VoteList" id="vBU-7B-tcg">
                         <color key="badgeColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </tabBarItem>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="JOK-BO-1OU">
@@ -305,22 +401,22 @@
                                         <rect key="frame" x="0.0" y="9" width="320" height="163.5"/>
                                         <subviews>
                                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="l5G-ph-ezo">
-                                                <rect key="frame" x="105.5" y="0.0" width="109" height="109"/>
+                                                <rect key="frame" x="106" y="0.0" width="108" height="107.5"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="l5G-ph-ezo" secondAttribute="height" multiplier="1:1" id="wc8-yw-uzc"/>
                                                 </constraints>
                                             </imageView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="F09-Ez-ImL">
-                                                <rect key="frame" x="107" y="114" width="106" height="49.5"/>
+                                                <rect key="frame" x="107" y="112.5" width="106" height="51"/>
                                                 <subviews>
                                                     <textField opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Alex Turner" textAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="QqS-fO-Rej">
-                                                        <rect key="frame" x="0.0" y="0.0" width="106" height="24.5"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="106" height="26"/>
                                                         <nil key="textColor"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
                                                         <textInputTraits key="textInputTraits"/>
                                                     </textField>
                                                     <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="мужчина, 32 года" textAlignment="center" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="TaN-q5-kik">
-                                                        <rect key="frame" x="0.0" y="32.5" width="106" height="17"/>
+                                                        <rect key="frame" x="0.0" y="34" width="106" height="17"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                                                         <textInputTraits key="textInputTraits"/>
@@ -769,7 +865,12 @@
         </scene>
     </scenes>
     <resources>
+        <image name="PieIcon" width="32" height="32"/>
+        <image name="VoteList" width="32" height="32"/>
         <image name="ic_profile" width="20" height="21"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="1aX-n4-uZ8"/>
+    </inferredMetricsTieBreakers>
     <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
 </document>

@@ -24,8 +24,8 @@ class ProfileViewController: UIViewController, UINavigationControllerDelegate {
     } ()
 //    public var state: ClientSettingsMode!
     internal lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
+    private lazy var storeManager: FileStorageProtocol = self.initializeStorageManager()
     private var locale: String      = "en-US"
-    private lazy var serverAPI:     APIManagerProtocol = initializeServerAPI()
     private var selectedImage:      UIImage?
     private var imagePicker         = UIImagePickerController()
     private var isKeyboardShown     = false
@@ -150,38 +150,23 @@ class ProfileViewController: UIViewController, UINavigationControllerDelegate {
 
 extension ProfileViewController: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        //        self.dismiss(animated: false, completion: nil)
-        //        if let image = info[.editedImage] as? UIImage {
-        //            fullImage = image
-        //        }
-        if let image = info[.editedImage] as? UIImage {
-            let imageData = image.jpegData(compressionQuality: 0.8)//UIImageJPEGRepresentation(image, 0.5)!//UIImagePNGRepresentation(image)!
-            let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-            let imageURL = docDir.appendingPathComponent("profileImage.jpeg")
-            try! imageData!.write(to: imageURL)
+        if let origImage = info[.editedImage] as? UIImage {
+            let resizedImage = origImage.resized(to: CGSize(width: 200, height: 200))
+            let imageData = resizedImage.jpegData(compressionQuality: 0.4)
+            let image = UIImage(data: imageData!)
             
-            if UIImage(contentsOfFile: imageURL.path) != nil {
-                AppData.shared.userProfile.imagePath = imageURL.path
-                if let path = AppData.shared.userProfile.imagePath, let image = loadImageFromPath(path: path) {
-                    circularImage = image.circularImage(size: self.userImage.frame.size)
-                    self.userImage.image = circularImage
-                    //                    isImageChanged = true
+            self.apiManager.updateUserProfile(data: ["image" : image]) {
+                json, error in
+                if error != nil {
+                    showAlert(type: .Ok, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Ошибка при загрузке изображения: \(error!.localizedDescription)")
                 }
-                self.apiManager.updateUserProfile(data: ["image" : image]) {
-                    json, error in
-                    if error != nil {
-                        showAlert(type: .Ok, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Ошибка при загрузке изображения")
-                    }
-                    if json != nil {
-                        showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Загружено")
-                    }
+                if json != nil {
+                    AppData.shared.userProfile.imagePath = self.storeManager.storeImage(type: .Profile, image: image!, fileName: nil, fileFormat: NSData(data: image!.jpeg!).fileFormat, surveyID: nil)
+                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {
+                        self.circularImage = image!.circularImage(size: self.userImage.frame.size)
+                        animateImageChange(imageView: self.userImage, fromImage: self.userImage.image!, toImage: self.circularImage, duration: 0.2)
+                        }]], text: "Загружено")
                 }
-                
-                //NotificationCenter.default.post(name: updateUserImageNotification, object: nil)
-            } else {
-                let alert = UIAlertController(title: "Ошибка", message: "Изображение не может быть обработано, выберите другое", preferredStyle: UIAlertController.Style.actionSheet)
-                alert.addAction(UIAlertAction(title: "Ок", style: UIAlertAction.Style.destructive, handler: nil))
-                present(alert, animated: true, completion: nil)
             }
         }
         dismiss(animated: true)

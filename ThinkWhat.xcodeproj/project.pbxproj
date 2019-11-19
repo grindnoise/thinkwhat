@@ -88,6 +88,10 @@
 		ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F402347406F00AF212B /* ProfileViewController.swift */; };
 		ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */; };
 		ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */; };
+		ABBA73F12382896900540ECF /* UserSurveysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F02382896900540ECF /* UserSurveysViewController.swift */; };
+		ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F22382BCCC00540ECF /* StatisticsViewController.swift */; };
+		ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */; };
+		ABBA73F82383F74E00540ECF /* HeartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F72383F74E00540ECF /* HeartButton.swift */; };
 		ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C622E9B33700DEA9FD /* Mail.swift */; };
 		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
@@ -96,6 +100,7 @@
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDEE85B237023D0009B52F3 /* SurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */; };
 		ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1F19E22C253A6008913C3 /* FBManager.swift */; };
+		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
 		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
 /* End PBXBuildFile section */
 
@@ -206,6 +211,10 @@
 		ABB46F402347406F00AF212B /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsTableViewController.swift; sourceTree = "<group>"; };
 		ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsSelectionTableViewController.swift; sourceTree = "<group>"; };
+		ABBA73F02382896900540ECF /* UserSurveysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysViewController.swift; sourceTree = "<group>"; };
+		ABBA73F22382BCCC00540ECF /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
+		ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatisticsViewController.xib; sourceTree = "<group>"; };
+		ABBA73F72383F74E00540ECF /* HeartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartButton.swift; sourceTree = "<group>"; };
 		ABC3E7C622E9B33700DEA9FD /* Mail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail.swift; sourceTree = "<group>"; };
 		ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSign.swift; sourceTree = "<group>"; };
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -215,6 +224,7 @@
 		ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyViewController.swift; sourceTree = "<group>"; };
 		ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhat.entitlements; sourceTree = "<group>"; };
 		ABF1F19E22C253A6008913C3 /* FBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FBManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysTableViewController.swift; sourceTree = "<group>"; };
 		BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
 		C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
 		CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -394,10 +404,10 @@
 		AB3C6814223FCE2F00B57580 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				ABDEE859237023B7009B52F3 /* SurveyViewController */,
-				ABDEE85523702324009B52F3 /* CategoryTableViewController */,
-				AB2AA1B12359E98E0086D16C /* TopSurveysViewController */,
-				ABB46F3F2347404C00AF212B /* ProfileViewController */,
+				ABF51D27237EB2540053EB75 /* Own */,
+				ABF51D26237EB2260053EB75 /* Feed */,
+				ABDEE859237023B7009B52F3 /* Survey */,
+				ABB46F3F2347404C00AF212B /* Profile */,
 				ABB46F3D2346373700AF212B /* TabBarController.swift */,
 			);
 			path = App;
@@ -448,6 +458,7 @@
 				AB3C6833223FD3EE00B57580 /* ParentLoginButton.swift */,
 				AB3C6834223FD3EE00B57580 /* UpdateButton.swift */,
 				ABC3E7C622E9B33700DEA9FD /* Mail.swift */,
+				ABBA73F72383F74E00540ECF /* HeartButton.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -513,7 +524,7 @@
 			path = API;
 			sourceTree = "<group>";
 		};
-		ABB46F3F2347404C00AF212B /* ProfileViewController */ = {
+		ABB46F3F2347404C00AF212B /* Profile */ = {
 			isa = PBXGroup;
 			children = (
 				AB2AA1AC235604A00086D16C /* InfoViewController */,
@@ -521,7 +532,7 @@
 				ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */,
 				ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */,
 			);
-			path = ProfileViewController;
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		ABDEE85523702324009B52F3 /* CategoryTableViewController */ = {
@@ -532,12 +543,12 @@
 			path = CategoryTableViewController;
 			sourceTree = "<group>";
 		};
-		ABDEE859237023B7009B52F3 /* SurveyViewController */ = {
+		ABDEE859237023B7009B52F3 /* Survey */ = {
 			isa = PBXGroup;
 			children = (
 				ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */,
 			);
-			path = SurveyViewController;
+			path = Survey;
 			sourceTree = "<group>";
 		};
 		ABDEE85C23702465009B52F3 /* TopSurveysTableViewController */ = {
@@ -552,6 +563,26 @@
 				AB5EB60023630AC0000D4D96 /* SubcategoryTableViewCell.xib */,
 			);
 			path = TopSurveysTableViewController;
+			sourceTree = "<group>";
+		};
+		ABF51D26237EB2260053EB75 /* Feed */ = {
+			isa = PBXGroup;
+			children = (
+				ABDEE85523702324009B52F3 /* CategoryTableViewController */,
+				AB2AA1B12359E98E0086D16C /* TopSurveysViewController */,
+			);
+			path = Feed;
+			sourceTree = "<group>";
+		};
+		ABF51D27237EB2540053EB75 /* Own */ = {
+			isa = PBXGroup;
+			children = (
+				ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */,
+				ABBA73F02382896900540ECF /* UserSurveysViewController.swift */,
+				ABBA73F22382BCCC00540ECF /* StatisticsViewController.swift */,
+				ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */,
+			);
+			path = Own;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -684,6 +715,7 @@
 				AB5EB60223630AC0000D4D96 /* SubcategoryTableViewCell.xib in Resources */,
 				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
 				AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */,
+				ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */,
 				AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */,
 				AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */,
 				AB3C684E223FD3EE00B57580 /* OpenSans-LightItalic.ttf in Resources */,
@@ -862,6 +894,7 @@
 				AB3C6845223FD3EE00B57580 /* Facebook.swift in Sources */,
 				AB3C6849223FD3EE00B57580 /* UpdateButton.swift in Sources */,
 				AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */,
+				ABBA73F82383F74E00540ECF /* HeartButton.swift in Sources */,
 				AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */,
 				AB6083C122410131002C0D7E /* ValidSign.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
@@ -887,6 +920,7 @@
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
 				AB2AA1B32359E9D30086D16C /* TopSurveysTableViewController.swift in Sources */,
 				ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */,
+				ABBA73F12382896900540ECF /* UserSurveysViewController.swift in Sources */,
 				AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */,
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
@@ -899,7 +933,9 @@
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
 				AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */,
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
+				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
+				ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
 				ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */,
 				AB3C6812223FC71600B57580 /* Main.swift in Sources */,

@@ -65,8 +65,10 @@ class TopSurveysViewController: UIViewController {
                 destinationVC.category = cell.category
                 destinationVC.title = cell.category.title
             }
-        } else if segue.identifier == kSegueAppTopSurveysToSurvey, let destinationVC = segue.destination as? SurveyViewController {
-            
+        } else if segue.identifier == kSegueAppTopSurveysToSurvey, let destinationVC = segue.destination as? SurveyViewController, let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+            destinationVC.surveyLink = cell.survey
+        } else {
+            showAlert(type: .Ok, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Ошибка вызова сервера, пожалуйста, обновите список")
         }
     }
 }

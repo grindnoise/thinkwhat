@@ -15,6 +15,8 @@ class SurveyTableViewCell: UITableViewCell {
     @IBOutlet weak var completionPercentage: ProgressCirle!
     @IBOutlet weak var duration: UILabel!
     
+    var survey: SurveyLink?
+    
 //    var surveyLink: SurveyLink?
     
 //    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

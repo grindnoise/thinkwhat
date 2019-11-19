@@ -1,21 +1,21 @@
 //
-//  SurveyViewController.swift
+//  StatisticsViewController.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 04.11.2019.
+//  Created by Pavel Bukharov on 18.11.2019.
 //  Copyright © 2019 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 
-class SurveyViewController: UIViewController {
+class StatisticsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
     }
-    
+
 
     /*
     // MARK: - Navigation

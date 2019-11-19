@@ -3,16 +3,10 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "Surveys.importNewSurveys(_:):Survey.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in static FBManager.getUserData(completionHandler:):FBManager.swift">
+         contextName = "TopSurveysTableViewController.tableView(_:didSelectRowAt:):TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "json">
+               value = "currentCategory">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -25,73 +19,51 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "specialized static VKManager.prepareUserData(_:):VKManager.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "key as String">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "performRequest #1 () in APIManager.getEmailConfirmationCode(completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "CategoryTableViewCell.layoutSubviews():CategoryTableViewCell.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in ProfileAuthViewController.imagePickerController(_:didFinishPickingMediaWithInfo:):ProfileAuthViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "AppData.shared.userProfile.imagePath!">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "Surveys.importSurveys(_:):Survey.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "i.1.isEmpty">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in APIManager._performRequest(url:httpMethod:parameters:encoding:completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in TopSurveysTableViewController.updateAllSurveys():TopSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "i.1.count">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "APIManager._performRequest(url:httpMethod:parameters:completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "TagLabel.init(frame:text:):TagLabel.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
       </ContextState>
       <ContextState
-         contextName = "AppData.importUserData(_:):Main.swift">
+         contextName = "APIManager.logout(completion:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "dateString:userProfile[&quot;birth_date&quot;]">
+               value = "temporaryTokenToRevoke">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "AppData.UserProfile.eraseData():Main.swift">
+         contextName = "AppData.System.session.getter:Main.swift">
          <PersistentStrings>
             <PersistentString
-               value = "imagePath!">
+               value = "AppData">
+            </PersistentString>
+            <PersistentString
+               value = "AppData.shared.user">
+            </PersistentString>
+            <PersistentString
+               value = "String(KeychainService.loadAccessToken()!).isEmpty">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "image.size">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyLink.init(_:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "category">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "MailAuthViewController.formIsReady.setter [inlined]:MailAuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "isLoginFilled">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -104,44 +76,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "specialized ProfileAuthViewController.continueTapped(_:):ProfileAuthViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "nestedDict">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #2 in closure #2 in performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "isPushNotificationEnabled.getter:Main.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "UIApplication.shared.isRegisteredForRemoteNotifications">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "url">
-            </PersistentString>
-            <PersistentString
-               value = "response.data!">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysTableViewController.refreshTableView():TopSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "vc.control.selectedSegmentIndex">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIServer.swift">
          <PersistentStrings>
             <PersistentString
@@ -150,34 +84,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
+         contextName = "closure #1 in performRequest #1 () in APIManager.logout(completion:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "tokenState">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "EmailResponse.storeEmailResponse() [inlined]:EmailResponse.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "expiresIn">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "AppData.shared.userProfile.ID!">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ProfileSettingsTableViewController.viewWillAppear(_:):ProfileSettingsTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "isPushNotificationEnabled">
+               value = "error">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -193,73 +103,35 @@
          contextName = "closure #1 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
       </ContextState>
       <ContextState
-         contextName = "SurveyCategories.updateCount(_:):Survey.swift">
+         contextName = "TermsOfUseViewController.initializeServerAPI():TermsOfUseViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "categories[Int(cat.0)!]">
-            </PersistentString>
-            <PersistentString
-               value = "json[&quot;categories&quot;].count">
+               value = "navigationController">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
+         contextName = "APIManager._performRequest(url:httpMethod:parameters:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in APIManager._performRequest(url:httpMethod:parameters:encoding:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.0">
-            </PersistentString>
-            <PersistentString
-               value = "attr.1.stringValue">
+               value = "AppData.shared.userProfile.ID!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in performRequest #1 () in APIManager.logout(completion:):APIManager.swift">
+         contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
          <PersistentStrings>
             <PersistentString
-               value = "error">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "static VKManager.prepareUserData(_:):VKManager.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "value as! String">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "InfoViewController.viewDidLoad():InfoViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "Bundle.main.localizedInfoDictionary?[kCFBundleNameKey as String]">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #3 in ProfileViewController.setupViews():ProfileViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "AppData.shared.userProfile.gender!">
+               value = "url">
             </PersistentString>
             <PersistentString
-               value = "AppData.shared.userProfile.birthDate">
-            </PersistentString>
-            <PersistentString
-               value = "AppData.shared.userProfile.birthDate!">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysTableViewController.tableView(_:cellForRowAt:):TopSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "cell.completionPercentage">
-            </PersistentString>
-            <PersistentString
-               value = "indexPath.section">
+               value = "response.data!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -272,6 +144,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in static FBManager.getUserData(completionHandler:):FBManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "json">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "TopSurveysTableViewController.tableView(_:heightForHeaderInSection:):TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -280,10 +160,24 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "MailAuthViewController.formIsReady.setter [inlined]:MailAuthViewController.swift">
+         contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "isLoginFilled">
+               value = "attr.1.stringValue">
+            </PersistentString>
+            <PersistentString
+               value = "attr.0">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Surveys.importNewSurveys(_:):Survey.swift">
+      </ContextState>
+      <ContextState
+         contextName = "AppData.importUserData(_:):Main.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "dateString:userProfile[&quot;birth_date&quot;]">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -296,13 +190,18 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
-      </ContextState>
-      <ContextState
-         contextName = "SurveyLink.init(_:):Survey.swift">
+         contextName = "SurveyViewController.loadData():SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "category">
+               value = "loadingIndicator">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "specialized ProfileAuthViewController.continueTapped(_:):ProfileAuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "nestedDict">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -321,6 +220,194 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "CategoryTableViewCell.layoutSubviews():CategoryTableViewCell.swift">
+      </ContextState>
+      <ContextState
+         contextName = "isPushNotificationEnabled.getter:Main.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "UIApplication.shared.isRegisteredForRemoteNotifications">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "APIManager._performRequest(url:parameters:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "performRequest #1 () in APIManager.logout(completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in closure #2 in performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "SurveyViewController.viewDidLoad():SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "survey">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "specialized static VKManager.prepareUserData(_:):VKManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "key as String">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "InfoViewController.viewDidLoad():InfoViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Bundle.main.localizedInfoDictionary?[kCFBundleNameKey as String]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "performRequest #1 () in APIManager.getEmailConfirmationCode(completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysTableViewController.tableView(_:cellForRowAt:):TopSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "cell.completionPercentage">
+            </PersistentString>
+            <PersistentString
+               value = "indexPath.section">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TagLabel.init(frame:text:):TagLabel.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Surveys.importSurveys(_:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "i.0">
+            </PersistentString>
+            <PersistentString
+               value = "i.1.isEmpty">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #3 in ProfileViewController.setupViews():ProfileViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "AppData.shared.userProfile.gender!">
+            </PersistentString>
+            <PersistentString
+               value = "AppData.shared.userProfile.birthDate">
+            </PersistentString>
+            <PersistentString
+               value = "AppData.shared.userProfile.birthDate!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "UserSurveysTableViewController.tableView(_:numberOfRowsInSection:):UserSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Surveys.shared.ownSurveys.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AppData.UserProfile.eraseData():Main.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "imagePath!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ProgressCirle.setProgress():ProgressCirle.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.frame">
+            </PersistentString>
+            <PersistentString
+               value = "bounds">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyCategories.updateCount(_:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "categories[Int(cat.0)!]">
+            </PersistentString>
+            <PersistentString
+               value = "json[&quot;categories&quot;].count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "EmailResponse.storeEmailResponse() [inlined]:EmailResponse.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "expiresIn">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyViewController.survey.didset:SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Surveys.shared.downloadedSurveys">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ProfileViewController.imagePickerController(_:didFinishPickingMediaWithInfo:):ProfileViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "image.size">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ProfileSettingsTableViewController.viewWillAppear(_:):ProfileSettingsTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "isPushNotificationEnabled">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in closure #2 in closure #1 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "AppData.shared.userProfile.ID!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tokenState">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "static VKManager.prepareUserData(_:):VKManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "value as! String">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in ProfileAuthViewController.continueTapped(_:):ProfileAuthViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -332,13 +419,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "APIManager._performRequest(url:parameters:completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "TermsOfUseViewController.initializeServerAPI():TermsOfUseViewController.swift">
+         contextName = "closure #1 in TopSurveysTableViewController.updateAllSurveys():TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "navigationController">
+               value = "i.1.count">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -351,26 +435,23 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "TopSurveysTableViewController.tableView(_:didSelectRowAt:):TopSurveysTableViewController.swift">
+         contextName = "closure #3 in UserSurveysViewController.controlChanged(_:):UserSurveysViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "currentCategory">
+               value = "self.tableVC">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "AppData.System.session.getter:Main.swift">
+         contextName = "TopSurveysTableViewController.refreshTableView():TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "AppData">
-            </PersistentString>
-            <PersistentString
-               value = "AppData.shared.user">
-            </PersistentString>
-            <PersistentString
-               value = "String(KeychainService.loadAccessToken()!).isEmpty">
+               value = "vc.control.selectedSegmentIndex">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

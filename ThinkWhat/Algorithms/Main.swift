@@ -172,7 +172,9 @@ let kNotificationApiNotReachable                 = Notification.Name("smsNotific
 let kNotificationUserImageChanged                = Notification.Name("NotificationUserImageChanged")
 let kNotificationTopSurveysUpdated               = Notification.Name("NotificationTopSurveysUpdated")
 let kNotificationNewSurveysUpdated               = Notification.Name("NotificationNewSurveysUpdated")
+let kNotificationOwnSurveysUpdated               = Notification.Name("NotificationOwnSurveysUpdated")
 let kNotificationSurveysByCategoryUpdated        = Notification.Name("NotificationSurveysByCategoryUpdated")
+let kNotificationFavoriteSurveysUpdated         = Notification.Name("NotificationSurveysByCategoryUpdated")
 
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
@@ -196,11 +198,13 @@ let kSeguePwdRecovery                            = "PWD_RECOVERY"
 let kSegueProfileFromConfirmation                = "PROFILE_FROM_CONFIRMATION"
 let kSegueProfileFromAuth                        = "PROFILE_FROM_AUTH"
 
+
 //MARK: App
 let kSegueAppProfileSettingsSelection            = "PROFILE_SETINGS_SELECTION"
 let kSegueAppBackToAuth                          = "BACK_TO_AUTH"
 let kSegueAppProfileToInfo                       = "INFO"
 let kSegueAppTopSurveysToSurvey                  = "TOP_TO_SURVEY"
+let kSegueAppUserSurveysToSurvey                 = "USER_SURVEYS_TO_SURVEY"
 let kSegueAppTopSurveysToCategory                = "TOP_TO_CATEGORY"
 
 
@@ -572,6 +576,8 @@ struct SERVER_URLS {
     static let SURVEYS_TOP              = "api/surveys/top/"
     static let SURVEYS_NEW              = "api/surveys/new/"
     static let SURVEYS_ALL              = "api/surveys/all/"
+    static let SURVEYS_OWN              = "api/surveys/own/"
+    static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
     static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
     static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
     

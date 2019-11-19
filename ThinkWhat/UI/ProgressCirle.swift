@@ -18,7 +18,9 @@ class ProgressCirle: UIView {
     var progress: CGFloat {
         didSet {
             if progress != oldValue {
-                self.setProgress()
+                setNeedsLayout()
+                layoutIfNeeded()
+                setProgress()
             }
         }
     }
@@ -77,19 +79,22 @@ class ProgressCirle: UIView {
     }
     
     private func setProgress() {
-        setNeedsLayout()
-        layoutIfNeeded()
+                setNeedsLayout()
+                layoutIfNeeded()
         circlePathLayer?.frame = bounds
+        //        self.frame
         circlePathLayer?.path = circlePath().cgPath
-//        circlePathLayer.fillColor = color == nil ? UIColor.lightGray.cgColor : color!.cgColor
+        //        circlePathLayer.fillColor = color == nil ? UIColor.lightGray.cgColor : color!.cgColor
         innerCirclePathLayer?.frame = bounds
         innerCirclePathLayer?.path = innerCirclePath().cgPath
+//        label?.setNeedsLayout()
+//        label?.layoutCentered(in: self, multiplier: 0.4)
+
+        
         label?.text = "\(Int(progress))"
     }
     
-    deinit {
-//        print("deinit Circle")
-    }
+
 }
 
 //

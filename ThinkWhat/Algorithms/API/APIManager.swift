@@ -11,7 +11,7 @@ import Alamofire
 import SwiftyJSON
 
 protocol APIManagerProtocol {
-
+    
     func login(_ auth: AuthVariant, username: String?, password: String?, token: String?, completion: @escaping (TokenState) -> ())
     func logout(completion: @escaping (TokenState) -> ())
     func getUserData(completion: @escaping(JSON?, Error?)->())
@@ -22,18 +22,19 @@ protocol APIManagerProtocol {
     func getEmailVerified(completion: @escaping(Bool?, Error?)->())
     func signUp(email: String, password: String, username: String, completion: @escaping (Error?) -> ())
     func loadSurveyCategories(completion: @escaping(JSON?, Error?)->())
-    func loadMainSurveys(type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
+    func loadSurveys(type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
+    func loadSurvey(survey: SurveyLink, completion: @escaping(JSON?, Error?)->())
     func loadTotalSurveysCount(completion: @escaping(JSON?, Error?)->())
     func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->())
     
-//    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
-//    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
-//    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
-//    func makeOrder(_ order: Order, completion: @escaping (JSON) -> ())
-//    func requestSMSValidationCode(phoneNumber: String, completion: @escaping (JSON?) -> ())
-//    func userExists(phoneNumber: String, completion: @escaping (JSON?) -> ())
-//    func uploadUserImage(image: UIImage, completion: @escaping (JSON?) -> ())
-//    func recoverPassword(_ password: String, completion: @escaping (JSON?) -> ())
+    //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
+    //    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
+    //    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
+    //    func makeOrder(_ order: Order, completion: @escaping (JSON) -> ())
+    //    func requestSMSValidationCode(phoneNumber: String, completion: @escaping (JSON?) -> ())
+    //    func userExists(phoneNumber: String, completion: @escaping (JSON?) -> ())
+    //    func uploadUserImage(image: UIImage, completion: @escaping (JSON?) -> ())
+    //    func recoverPassword(_ password: String, completion: @escaping (JSON?) -> ())
 }
 
 protocol UserDataPreparatory: class {
@@ -42,8 +43,25 @@ protocol UserDataPreparatory: class {
 
 class APIManager: APIManagerProtocol {
     
-    public enum SurveyType {
-        case Top, New, All
+    
+    public enum SurveyType: String {
+        case Top,New,All,Own,Favorite
+        
+        func getURL() -> URL {
+            var url = URL(string: SERVER_URLS.BASE)!//.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE)
+            switch self {
+            case .Top:
+                return url.appendingPathComponent(SERVER_URLS.SURVEYS_TOP)
+            case .New:
+                return url.appendingPathComponent(SERVER_URLS.SURVEYS_NEW)
+            case .All:
+                return url.appendingPathComponent(SERVER_URLS.SURVEYS_ALL)
+            case .Own:
+                return url.appendingPathComponent(SERVER_URLS.SURVEYS_OWN)
+            case .Favorite:
+                return url.appendingPathComponent(SERVER_URLS.SURVEYS_FAVORITE)
+            }
+        }
     }
     private var isProxyEnabled: Bool? {
         didSet {
@@ -160,21 +178,20 @@ class APIManager: APIManagerProtocol {
         return TokenState.Error
     }
     
-//    private func setupProxyConfiguration() {
-//
-//        var proxyDictionary = [AnyHashable: Any]()
-//        proxyDictionary[kCFNetworkProxiesHTTPProxy as String] = "45.112.126.238"
-//        proxyDictionary[kCFNetworkProxiesHTTPPort as String] = 3128
-//        proxyDictionary[kCFNetworkProxiesHTTPEnable as String] = 1
-//        proxyDictionary[kCFStreamPropertyHTTPSProxyHost as String] = "45.112.126.238"
-//        proxyDictionary[kCFStreamPropertyHTTPSProxyPort as String] = 3128
-//        let proxyConfig = Alamofire.SessionManager.default.session.configuration
-//        proxyConfig.connectionProxyDictionary = proxyDictionary
-//        proxyConfig.timeoutIntervalForRequest = 10
-//        sessionManager = Alamofire.SessionManager(configuration: proxyConfig)
-//    }
+    //    private func setupProxyConfiguration() {
+    //
+    //        var proxyDictionary = [AnyHashable: Any]()
+    //        proxyDictionary[kCFNetworkProxiesHTTPProxy as String] = "45.112.126.238"
+    //        proxyDictionary[kCFNetworkProxiesHTTPPort as String] = 3128
+    //        proxyDictionary[kCFNetworkProxiesHTTPEnable as String] = 1
+    //        proxyDictionary[kCFStreamPropertyHTTPSProxyHost as String] = "45.112.126.238"
+    //        proxyDictionary[kCFStreamPropertyHTTPSProxyPort as String] = 3128
+    //        let proxyConfig = Alamofire.SessionManager.default.session.configuration
+    //        proxyConfig.connectionProxyDictionary = proxyDictionary
+    //        proxyConfig.timeoutIntervalForRequest = 10
+    //        sessionManager = Alamofire.SessionManager(configuration: proxyConfig)
+    //    }
     func getEmailConfirmationCode(completion: @escaping(JSON?, Error?)->()) {
-        var returnValue: JSON?
         var error: Error?
         
         checkForReachability {
@@ -185,55 +202,17 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error)
                     } else if success {
-                        performRequest()
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE), httpMethod: .get, parameters: nil, encoding: URLEncoding.default, completion: completion)
                     }
                 }
             } else {
                 error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
-                completion(returnValue, error)
-            }
-        }
-        
-        func performRequest() {
-            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE)
-            
-            let headers: HTTPHeaders = [
-                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-                "Content-Type": "application/json"
-            ]
-            
-            sessionManager.request(url, method: .get, parameters: nil, headers: headers).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    print(response.result.debugDescription)
-                }
-                if let _error = response.result.error as? AFError {
-                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: self.parseAFError(_error)]) as Error
-                } else {
-                    if let statusCode  = response.response?.statusCode{
-                        if 200...299 ~= statusCode {
-                            do {
-                                returnValue = try JSON(data: response.data!)
-                            } catch let _error {
-                                error = _error
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: json.rawString()!]) as Error
-                            } catch  let _error{
-                                error = _error
-                            }
-                        }
-                    }
-                }
-                completion(returnValue, error)
+                completion(nil, error)
             }
         }
     }
     
     func getUserData(completion: @escaping(JSON?, Error?)->()) {
-        var json: JSON?
         var error: Error?
         
         checkForReachability {
@@ -244,49 +223,12 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error)
                     } else if success {
-                        performRequest()
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.CURRENT_USER), httpMethod: .get, parameters: nil, encoding: URLEncoding.default, completion: completion)
                     }
                 }
             } else {
                 error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
-                completion(json, error)
-            }
-        }
-        
-        func performRequest() {
-            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.CURRENT_USER)
-            
-            let headers: HTTPHeaders = [
-                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-                "Content-Type": "application/json"
-            ]
-            
-            sessionManager.request(url, method: .get, parameters: nil, headers: headers).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    print(response.result.debugDescription)
-                }
-                if let _error = response.result.error as? AFError {
-                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: self.parseAFError(_error)]) as Error
-                } else {
-                    if let statusCode  = response.response?.statusCode{
-                        if 200...299 ~= statusCode {
-                            do {
-                                json = try JSON(data: response.data!)
-                            } catch let _error {
-                                error = _error
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: json.rawString()!]) as Error
-                            } catch  let _error{
-                                error = _error
-                            }
-                        }
-                    }
-                }
-                completion(json, error)
+                completion(nil, error)
             }
         }
     }
@@ -336,9 +278,9 @@ class APIManager: APIManagerProtocol {
                                 print(json)
                                 saveTokenInKeychain(json: json, tokenState: &_tokenState)
                                 _tokenState = .Received
-//                                DispatchQueue.main.async {
-//                                    self.getUserData()
-//                                }
+                                //                                DispatchQueue.main.async {
+                                //                                    self.getUserData()
+                                //                                }
                             } catch {
                                 print(error.localizedDescription)
                             }
@@ -374,9 +316,9 @@ class APIManager: APIManagerProtocol {
                                 saveTokenInKeychain(json: json, tokenState: &_tokenState)
                                 _tokenState = .Received
                             }
-//                            DispatchQueue.main.async {
-//                                self.getUserData()
-//                            }
+                            //                            DispatchQueue.main.async {
+                            //                                self.getUserData()
+                            //                            }
                         } else if 400...499 ~= statusCode {
                             do {
                                 let json = try JSON(data: response.data!)
@@ -396,6 +338,11 @@ class APIManager: APIManagerProtocol {
     func logout(completion: @escaping (TokenState) -> ()) {
         
         var _tokenState             = TokenState.Error
+        temporaryTokenToRevoke = KeychainService.loadAccessToken()! as String
+        AppData.shared.eraseData()
+        Surveys.shared.eraseData()
+        FBManager.performLogout()
+        VKManager.performLogout()
         
         checkForReachability {
             reachable in
@@ -407,19 +354,19 @@ class APIManager: APIManagerProtocol {
         }
         
         func performRequest() {
-            let token = (KeychainService.loadAccessToken()! as String).isEmpty ? temporaryTokenToRevoke : KeychainService.loadAccessToken()! as String
-            if !token.isEmpty {
-                let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "token": token]
+            if !temporaryTokenToRevoke.isEmpty {
+                let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "token": temporaryTokenToRevoke]
                 let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.TOKEN_REVOKE)
-                AppData.shared.eraseData()
-                Surveys.shared.eraseData()
-                FBManager.performLogout()
-                VKManager.performLogout()
+                //                AppData.shared.eraseData()
+                //                Surveys.shared.eraseData()
+                //                FBManager.performLogout()
+                //                VKManager.performLogout()
                 sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON() {
                     response in
                     if response.result.isFailure {
                         print(response.result.description)
-                        delay(seconds: 5) { performRequest() }
+                        //                        delay(seconds: 5) { performRequest() }
+                        temporaryTokenToRevoke = ""
                     }
                     if let error = response.result.error as? AFError {
                         self.parseAFError(error)
@@ -463,7 +410,7 @@ class APIManager: APIManagerProtocol {
             let url =  URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SIGNUP)
             sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON() {
                 response in
-//                var success = false
+                //                var success = false
                 if response.result.isFailure {
                     error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
                 }
@@ -474,19 +421,19 @@ class APIManager: APIManagerProtocol {
                     if 200...299 ~= statusCode! {
                         do {
                             let json = try JSON(data: response.data!)
-//                            TemporaryUserCredentials.shared.importJson(json)
+                            //                            TemporaryUserCredentials.shared.importJson(json)
                             self.login(.Username, username: username, password: password, token: nil, completion: { (state) in
                                 tokenState = state
                             })
                         } catch {
                             print(error.localizedDescription)
                         }
-//                        success = true
-//                        if login {
-//                            self.login(.Mail, username: username, password: password, token: nil, completion: { (state) in
-//                                tokenState = state
-//                            })
-//                        }
+                        //                        success = true
+                        //                        if login {
+                        //                            self.login(.Mail, username: username, password: password, token: nil, completion: { (state) in
+                        //                                tokenState = state
+                        //                            })
+                        //                        }
                     } else if 400...499 ~= statusCode! {
                         do {
                             let json = try JSON(data: response.data!)
@@ -502,8 +449,8 @@ class APIManager: APIManagerProtocol {
     }
     
     func profileNeedsUpdate(completion: @escaping(Bool?, Error?)->()) {
-        var needsUpdate: Bool?
         var error: Error?
+        
         checkForReachability {
             reachable in
             if reachable == .Reachable {
@@ -512,62 +459,18 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error)
                     } else if success {
-                        performRequest()
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.PROFILE_NEEDS_UPDATE), searchString: "needs_update", httpMethod: .get, completion: completion)
                     }
                 }
             } else {
                 error = NSError(domain:"", code:523 , userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
-                completion(needsUpdate, error)
-            }
-        }
-        
-        func performRequest() {
-            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.PROFILE_NEEDS_UPDATE)
-            
-            let headers: HTTPHeaders = [
-                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-                "Content-Type": "application/json"
-            ]
-
-            sessionManager.request(url, method: .get, parameters: nil, headers: headers).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    print(response.result.debugDescription)
-                }
-                if let error = response.result.error as? AFError {
-                    self.parseAFError(error)
-                } else {
-                    
-                    if let statusCode  = response.response?.statusCode{
-                        if 200...299 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                for attr in json {
-                                    if attr.0 ==  "needs_update" {
-                                        needsUpdate = attr.1.boolValue
-                                    }
-                                }
-                            } catch {
-                                print(error.localizedDescription)
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                print(json)
-                            } catch {
-                                print(error.localizedDescription)
-                            }
-                        }
-                    }
-                    completion(needsUpdate, error)
-                }
+                completion(nil, error)
             }
         }
     }
     
     func isUsernameEmailAvailable(email: String, username: String, completion: @escaping(Bool?, Error?)->()) {
         var error: Error?
-        var exists: Bool?
         
         checkForReachability {
             reachable in
@@ -577,59 +480,16 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error)
                     } else if success {
-                        performRequest()
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(email.isEmpty ? SERVER_URLS.USERNAME_EXISTS : SERVER_URLS.EMAIL_EXISTS), searchString: "exists", httpMethod: .get, completion: completion)
                     }
                 }
             } else {
                 error = NSError(domain:"", code:523 , userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
-                completion(exists, error)
-            }
-        }
-        
-        func performRequest() {
-            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(email.isEmpty ? SERVER_URLS.USERNAME_EXISTS : SERVER_URLS.EMAIL_EXISTS)
-            let parameters = ["email": email,
-                              "username": username]
-//            let headers: HTTPHeaders = [
-//                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-//                "Content-Type": "application/json"
-//            ]
-            
-            sessionManager.request(url, method: .get, parameters: parameters, headers: nil/*headers*/).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.description]) as Error
-                }
-                if let _error = response.result.error as? AFError {
-                    error = self.parseAFError(_error)
-                } else {
-                    if let statusCode  = response.response?.statusCode{
-                        if 200...299 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                for attr in json {
-                                    if attr.0 ==  "exists" {
-                                        exists = attr.1.boolValue
-                                    }
-                                }
-                            } catch let _error {
-                                error = _error
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: json.rawString()!]) as Error
-                            } catch let _error {
-                                error = _error
-                            }
-                        }
-                    }
-                }
-                completion(exists, error)
+                completion(nil, error)
             }
         }
     }
-
+    
     
     func updateUserProfile(data: [String: Any], completion: @escaping(JSON?, Error?) -> ()) {
         var dict = data
@@ -654,8 +514,6 @@ class APIManager: APIManagerProtocol {
         }
         
         func performRequest() {
-            
-            assert(AppData.shared.userProfile.ID! != nil, "updateUserProfile error (AppData.shared.userProfile.ID == nil)")
             
             let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.PROFILES + AppData.shared.userProfile.ID! + "/")
             let headers: HTTPHeaders = [
@@ -719,39 +577,7 @@ class APIManager: APIManagerProtocol {
                     }
                 }
             } else {
-//                let parameters: Parameters = [
-//                    "is_email_verified": true,
-//                    "owner": [
-//                        "email": "test@test.ru"
-//                    ]
-//                ]
-                sessionManager.request(url, method: .patch, parameters: data, encoding: JSONEncoding.default, headers: headers).responseJSON() {//.request(url, method: .patch, parameters: nil, headers: headers).responseJSON() {
-                    response in
-                    if response.result.isFailure {
-                        print(response.result.debugDescription)
-                    }
-                    if let error = response.result.error as? AFError {
-                        self.parseAFError(error)
-                    } else {
-                        if let statusCode  = response.response?.statusCode{
-                            if 200...299 ~= statusCode {
-                                do {
-                                    json = try JSON(data: response.data!)
-                                } catch {
-                                    print(error.localizedDescription)
-                                }
-                            } else if 400...499 ~= statusCode {
-                                do {
-                                    let errorJSON = try JSON(data: response.data!)
-                                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
-                                } catch {
-                                    print(error.localizedDescription)
-                                }
-                            }
-                        }
-                        completion(json, error)
-                    }
-                }
+                _performRequest(url: url, httpMethod: .patch, parameters: data, encoding: JSONEncoding.default, completion: completion)
             }
         }
     }
@@ -768,57 +594,11 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error)
                     } else if success {
-                        performRequest()
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.GET_EMAIL_VERIFIED), searchString: DjangoVariables.UserProfile.isEmailVerified, httpMethod: .get, completion: completion)
                     }
                 }
             } else {
                 error = NSError(domain:"", code:523 , userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
-                completion(isEmailVerified, error)
-            }
-        }
-        
-        func performRequest() {
-            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.GET_EMAIL_VERIFIED)
-            
-            let headers: HTTPHeaders = [
-                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-                "Content-Type": "application/json"
-            ]
-            print(headers)
-            print(url)
-            sessionManager.request(url, method: .get, parameters: nil, headers: headers).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.description]) as Error
-                }
-                if let _error = response.result.error as? AFError {
-                    error = self.parseAFError(_error)
-                } else {
-                    if let statusCode  = response.response?.statusCode{
-                        if 200...299 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                for attr in json {
-                                    if attr.0 ==  "is_email_verified" {
-                                        isEmailVerified = attr.1.boolValue
-                                    }
-                                    if attr.0 ==  "error" {
-                                        error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: attr.1.stringValue]) as Error
-                                    }
-                                }
-                            } catch let _error {
-                                error = _error
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: json.rawString()!]) as Error
-                            } catch let _error {
-                                error = _error
-                            }
-                        }
-                    }
-                }
                 completion(isEmailVerified, error)
             }
         }
@@ -888,8 +668,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func loadMainSurveys(type: SurveyType, completion: @escaping(JSON?, Error?)->()) {
-        var json: JSON?
+    func loadSurveys(type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->()) {
         var error: Error?
         
         checkForReachability {
@@ -900,7 +679,7 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error)
                     } else if success {
-                        performRequest()
+                        self._performRequest(url: type.getURL(), httpMethod: .get, parameters: nil, encoding: JSONEncoding.default, completion: completion)
                     }
                 }
             } else {
@@ -908,52 +687,8 @@ class APIManager: APIManagerProtocol {
                 completion(nil, error!)
             }
         }
-        
-        func performRequest() {
-            var path = ""
-            switch type {
-            case .New:
-                path = SERVER_URLS.SURVEYS_NEW
-            case .Top:
-                path = SERVER_URLS.SURVEYS_TOP
-            case .All:
-                path = SERVER_URLS.SURVEYS_ALL
-            }
-            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(path)
-            let headers: HTTPHeaders = [
-                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-                "Content-Type": "application/json"
-            ]
-            
-            sessionManager.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    print(response.result.debugDescription)
-                }
-                if let _error = response.result.error as? AFError {
-                    error = self.parseAFError(_error)
-                } else {
-                    if let statusCode  = response.response?.statusCode{
-                        if 200...299 ~= statusCode {
-                            do {
-                                json = try JSON(data: response.data!)
-                            } catch let _error {
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let errorJSON = try JSON(data: response.data!)
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
-                            } catch let _error {
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
-                            }
-                        }
-                    }
-                    completion(json, error)
-                }
-            }
-        }
     }
+   
     
     func loadSurveyCategories(completion: @escaping(JSON?, Error?)->()) {
         var json: JSON?
@@ -967,48 +702,12 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error)
                     } else if success {
-                        performRequest()
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.CATEGORIES), httpMethod: .get, parameters: nil, encoding: JSONEncoding.default, completion: completion)
                     }
                 }
             } else {
                 error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
                 completion(nil, error!)
-            }
-        }
-        
-        func performRequest() {
-            
-            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.CATEGORIES)
-            let headers: HTTPHeaders = [
-                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-                "Content-Type": "application/json"
-            ]
-            sessionManager.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    print(response.result.debugDescription)
-                }
-                if let _error = response.result.error as? AFError {
-                    error = self.parseAFError(_error)
-                } else {
-                    if let statusCode  = response.response?.statusCode{
-                        if 200...299 ~= statusCode {
-                            do {
-                                json = try JSON(data: response.data!)
-                            } catch let _error {
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let errorJSON = try JSON(data: response.data!)
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
-                            } catch let _error {
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
-                            }
-                        }
-                    }
-                    completion(json, error)
-                }
             }
         }
     }
@@ -1025,7 +724,6 @@ class APIManager: APIManagerProtocol {
                         completion(nil, error)
                     } else if success {
                         self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_TOTAL_COUNT), httpMethod: .get, completion: completion)
-                        //performRequest()
                     }
                 }
             } else {
@@ -1047,6 +745,27 @@ class APIManager: APIManagerProtocol {
                         completion(nil, error)
                     } else if success {
                         self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_BY_CATEGORY), httpMethod: .get, parameters: ["category_id": categoryID], encoding: URLEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
+    func loadSurvey(survey: SurveyLink, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS + "\(survey.ID)/"), httpMethod: .get, parameters: nil, encoding: URLEncoding.default, completion: completion)
                     }
                 }
             } else {
@@ -1088,8 +807,54 @@ class APIManager: APIManagerProtocol {
                         }
                     }
                 }
-                completion(json, error)
             }
+            completion(json, error)
+        }
+    }
+    
+    private func _performRequest(url: URL, searchString: String, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(Bool?, Error?)->()) {
+        var flag: Bool?
+        var error: Error?
+        let headers: HTTPHeaders = [
+            "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
+            "Content-Type": "application/json"
+        ]
+        
+        sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseJSON() {
+            response in
+            if response.result.isFailure {
+                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.description]) as Error
+            }
+            if let _error = response.result.error as? AFError {
+                error = self.parseAFError(_error)
+            } else {
+                if let statusCode  = response.response?.statusCode{
+                    if 200...299 ~= statusCode {
+                        do {
+                            let json = try JSON(data: response.data!)
+                            for attr in json {
+                                if attr.0 ==  searchString {
+                                    flag = attr.1.boolValue
+                                }
+                                if attr.0 ==  "error" {
+                                    error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: attr.1.stringValue]) as Error
+                                }
+                            }
+                        } catch let _error {
+                            error = _error
+                        }
+                    } else if 400...499 ~= statusCode {
+                        do {
+                            let json = try JSON(data: response.data!)
+                            error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: json.rawString()!]) as Error
+                        } catch let _error {
+                            error = _error
+                        }
+                    }
+                }
+            }
+            completion(flag, error)
         }
     }
 }
+
