@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 		AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */; };
+		AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2918C7238E5B4600EF488A /* CircularTransition.swift */; };
 		AB2AA1AE235605FD0086D16C /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1AD235605FD0086D16C /* InfoViewController.swift */; };
 		AB2AA1B0235613450086D16C /* InfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1AF235613450086D16C /* InfoTableViewController.swift */; };
 		AB2AA1B32359E9D30086D16C /* TopSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1B22359E9D30086D16C /* TopSurveysTableViewController.swift */; };
@@ -92,6 +93,10 @@
 		ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F22382BCCC00540ECF /* StatisticsViewController.swift */; };
 		ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */; };
 		ABBA73F82383F74E00540ECF /* HeartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F72383F74E00540ECF /* HeartButton.swift */; };
+		ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F92386EC7B00540ECF /* NewIcon.swift */; };
+		ABBA73FC2386ECC200540ECF /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73FB2386ECC200540ECF /* Icon.swift */; };
+		ABBA73FE2387C5A200540ECF /* FlameIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73FD2387C5A200540ECF /* FlameIcon.swift */; };
+		ABBA74002387E66F00540ECF /* CategoryIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */; };
 		ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C622E9B33700DEA9FD /* Mail.swift */; };
 		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
@@ -99,8 +104,10 @@
 		ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC573235F384600E6A118 /* ProgressCirle.swift */; };
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDEE85B237023D0009B52F3 /* SurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */; };
+		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
 		ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1F19E22C253A6008913C3 /* FBManager.swift */; };
 		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
+		ABFE1411239109FA0026D27C /* NewSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */; };
 		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
 /* End PBXBuildFile section */
 
@@ -126,6 +133,7 @@
 		10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthViewController.swift; sourceTree = "<group>"; };
+		AB2918C7238E5B4600EF488A /* CircularTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB2AA1AD235605FD0086D16C /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
 		AB2AA1AF235613450086D16C /* InfoTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoTableViewController.swift; sourceTree = "<group>"; };
 		AB2AA1B22359E9D30086D16C /* TopSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopSurveysTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -204,7 +212,7 @@
 		AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryViewController.swift; sourceTree = "<group>"; };
 		AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRegistrationViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidationViewController.swift; sourceTree = "<group>"; };
-		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; };
+		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABB46F362344B1F900AF212B /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
 		ABB46F382344B2C300AF212B /* AuthNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNavigationController.swift; sourceTree = "<group>"; };
 		ABB46F3D2346373700AF212B /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
@@ -215,6 +223,10 @@
 		ABBA73F22382BCCC00540ECF /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatisticsViewController.xib; sourceTree = "<group>"; };
 		ABBA73F72383F74E00540ECF /* HeartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartButton.swift; sourceTree = "<group>"; };
+		ABBA73F92386EC7B00540ECF /* NewIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewIcon.swift; sourceTree = "<group>"; };
+		ABBA73FB2386ECC200540ECF /* Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icon.swift; sourceTree = "<group>"; };
+		ABBA73FD2387C5A200540ECF /* FlameIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameIcon.swift; sourceTree = "<group>"; };
+		ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIcon.swift; sourceTree = "<group>"; };
 		ABC3E7C622E9B33700DEA9FD /* Mail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail.swift; sourceTree = "<group>"; };
 		ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSign.swift; sourceTree = "<group>"; };
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -222,9 +234,11 @@
 		ABCAC573235F384600E6A118 /* ProgressCirle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCirle.swift; sourceTree = "<group>"; };
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyViewController.swift; sourceTree = "<group>"; };
+		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
 		ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhat.entitlements; sourceTree = "<group>"; };
 		ABF1F19E22C253A6008913C3 /* FBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FBManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysTableViewController.swift; sourceTree = "<group>"; };
+		ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
 		C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
 		CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -289,7 +303,6 @@
 		AB2AA1B12359E98E0086D16C /* TopSurveysViewController */ = {
 			isa = PBXGroup;
 			children = (
-				AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */,
 				ABDEE85C23702465009B52F3 /* TopSurveysTableViewController */,
 			);
 			path = TopSurveysViewController;
@@ -416,6 +429,7 @@
 		AB3C681F223FD1B100B57580 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				AB2918C7238E5B4600EF488A /* CircularTransition.swift */,
 				ABA6E18922FC358500F8F39A /* TextFields */,
 				AB3C6857223FD6AB00B57580 /* Storyboards */,
 				AB3C682E223FD3EE00B57580 /* Buttons */,
@@ -451,6 +465,7 @@
 		AB3C682E223FD3EE00B57580 /* Buttons */ = {
 			isa = PBXGroup;
 			children = (
+				ABDFA748238C1B5C00321EE0 /* AddButton.swift */,
 				AB3C682F223FD3EE00B57580 /* Google.swift */,
 				AB3C6830223FD3EE00B57580 /* Facebook.swift */,
 				AB3C6831223FD3EE00B57580 /* VK.swift */,
@@ -459,6 +474,10 @@
 				AB3C6834223FD3EE00B57580 /* UpdateButton.swift */,
 				ABC3E7C622E9B33700DEA9FD /* Mail.swift */,
 				ABBA73F72383F74E00540ECF /* HeartButton.swift */,
+				ABBA73F92386EC7B00540ECF /* NewIcon.swift */,
+				ABBA73FB2386ECC200540ECF /* Icon.swift */,
+				ABBA73FD2387C5A200540ECF /* FlameIcon.swift */,
+				ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -547,6 +566,7 @@
 			isa = PBXGroup;
 			children = (
 				ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */,
+				ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */,
 			);
 			path = Survey;
 			sourceTree = "<group>";
@@ -568,6 +588,7 @@
 		ABF51D26237EB2260053EB75 /* Feed */ = {
 			isa = PBXGroup;
 			children = (
+				AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */,
 				ABDEE85523702324009B52F3 /* CategoryTableViewController */,
 				AB2AA1B12359E98E0086D16C /* TopSurveysViewController */,
 			);
@@ -877,6 +898,8 @@
 				ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */,
 				AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
+				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
+				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
 				ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */,
 				AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */,
 				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
@@ -887,6 +910,7 @@
 				AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */,
 				ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */,
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
+				ABFE1411239109FA0026D27C /* NewSurveyViewController.swift in Sources */,
 				ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */,
 				ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */,
 				ABB46F372344B1F900AF212B /* Protocols.swift in Sources */,
@@ -899,10 +923,12 @@
 				AB6083C122410131002C0D7E /* ValidSign.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
 				AB2AA1B8235D94DF0086D16C /* SurveyTableViewCell.swift in Sources */,
+				AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */,
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
 				AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */,
 				AB2AA1BB235DDC6F0086D16C /* TopSurveysViewController.swift in Sources */,
 				ABDEE85B237023D0009B52F3 /* SurveyViewController.swift in Sources */,
+				ABBA73FC2386ECC200540ECF /* Icon.swift in Sources */,
 				ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */,
 				AB3C685D223FD74E00B57580 /* APIManager.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
@@ -917,6 +943,7 @@
 				AB2AA1AE235605FD0086D16C /* InfoViewController.swift in Sources */,
 				AB2AA1B0235613450086D16C /* InfoTableViewController.swift in Sources */,
 				AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */,
+				ABBA73FE2387C5A200540ECF /* FlameIcon.swift in Sources */,
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
 				AB2AA1B32359E9D30086D16C /* TopSurveysTableViewController.swift in Sources */,
 				ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */,
@@ -933,6 +960,7 @@
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
 				AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */,
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
+				ABBA74002387E66F00540ECF /* CategoryIcon.swift in Sources */,
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */,

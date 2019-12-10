@@ -17,6 +17,7 @@ import VK_ios_sdk
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    let transitionCoordinator   = TransitionCoordinator()
     let container               = Container()
     let center                  = UNUserNotificationCenter.current()
     let notificationDelegate    = CustomNotificationDelegate()
@@ -32,6 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         _ = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.checkInternetConnection), userInfo: nil, repeats: true)
         
+        self.window?.backgroundColor = .white
         self.window!.makeKeyAndVisible()
         
         let statusBarFrame = UIView(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: (UIApplication.shared.keyWindow?.bounds.width)!, height: UIApplication.shared.statusBarFrame.height)))

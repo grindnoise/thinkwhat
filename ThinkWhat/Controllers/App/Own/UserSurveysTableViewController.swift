@@ -74,7 +74,7 @@ class UserSurveysTableViewController: UITableViewController {
             if vc.control.selectedSegmentIndex == 0 {
                 dataSource = Surveys.shared.ownSurveys
             } else {
-                dataSource = Surveys.shared.favoriteSurveys
+                dataSource = Array(Surveys.shared.favoriteSurveys.keys)
             }
             cell.survey = dataSource[indexPath.row]
             cell.title.text = dataSource[indexPath.row].title

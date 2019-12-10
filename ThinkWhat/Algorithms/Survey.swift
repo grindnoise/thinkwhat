@@ -16,7 +16,7 @@ class Surveys {
     var newSurveys:         [SurveyLink] = []
     var byCategory:         [SurveyCategory: [SurveyLink]] = [:]
     var ownSurveys:         [SurveyLink] = []
-    var favoriteSurveys:    [SurveyLink] = []
+    var favoriteSurveys:    [SurveyLink: Date] = [:]
     var downloadedSurveys:  [Survey] = []
     
     func importSurveys(_ json: JSON) {
@@ -48,19 +48,25 @@ class Surveys {
                     byCategory[category!] = data
                 }
                 NotificationCenter.default.post(name: kNotificationSurveysByCategoryUpdated, object: nil)
-            } else if i.0 == "own" && !i.1.isEmpty {
+            } else if i.0 == "own" {
                 ownSurveys.removeAll()
-                for k in i.1 {
-                    if let survey = SurveyLink(k.1) {
-                        ownSurveys.append(survey)
+                if !i.1.isEmpty {
+                    for k in i.1 {
+                        if let survey = SurveyLink(k.1) {
+                            ownSurveys.append(survey)
+                        }
                     }
                 }
                 NotificationCenter.default.post(name: kNotificationOwnSurveysUpdated, object: nil)
-            } else if i.0 == "favorite" && !i.1.isEmpty {
+            } else if i.0 == "favorite" {
                 favoriteSurveys.removeAll()
-                for k in i.1 {
-                    if let survey = SurveyLink(k.1) {
-                        favoriteSurveys.append(survey)
+                if !i.1.isEmpty {
+                    for k in i.1 {
+                        print(k)
+                        if let date = Date(dateTimeString: (k.1["added_at"].stringValue as? String)!) as? Date,
+                            let survey = SurveyLink(k.1["survey"]) {
+                            favoriteSurveys[survey] = date
+                        }
                     }
                 }
                 NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
@@ -92,6 +98,9 @@ class SurveyLink {
     var startDate: Date
     var category: SurveyCategory?
     var completionPercentage: Int
+    var hashValue: Int {
+        return ObjectIdentifier(self).hashValue
+    }
     
     init?(_ json: JSON) {
         if  let _ID                     = json["id"].intValue as? Int,
@@ -99,11 +108,11 @@ class SurveyLink {
             let _category               = json["category"].intValue as? Int,
             let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
             let _completionPercentage   = json["vote_capacity"].intValue as? Int {
-                    ID                      = _ID
-                    title                   = _title
-                    category                = SurveyCategories.shared[_category]
-                    completionPercentage    = _completionPercentage
-                    startDate               = _startDate
+            ID                      = _ID
+            title                   = _title
+            category                = SurveyCategories.shared[_category]
+            completionPercentage    = _completionPercentage
+            startDate               = _startDate
         } else {
             return nil
         }
@@ -111,6 +120,12 @@ class SurveyLink {
     
     deinit {
         print("deinit")
+    }
+}
+
+extension SurveyLink: Hashable {
+    static func == (lhs: SurveyLink, rhs: SurveyLink) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
 }
 

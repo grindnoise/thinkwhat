@@ -63,13 +63,14 @@ func animateFadeInOut(fromValue: CGFloat, toValue: CGFloat) -> CABasicAnimation 
     
 }
 
-func animateGroup(animations: [CAAnimation], duration: CFTimeInterval, timingFunction:CAMediaTimingFunction, repeatCount: Float) -> CAAnimationGroup {
+func makeGroupAnimation(animations: [CAAnimation], duration: CFTimeInterval, timingFunction:CAMediaTimingFunction, repeatCount: Float, delegate: CAAnimationDelegate) -> CAAnimationGroup {
     
     let anim = CAAnimationGroup()
     anim.animations = animations
     anim.duration = duration
     anim.timingFunction = timingFunction
     anim.repeatCount = repeatCount
+    anim.delegate = delegate
     
     return anim
     

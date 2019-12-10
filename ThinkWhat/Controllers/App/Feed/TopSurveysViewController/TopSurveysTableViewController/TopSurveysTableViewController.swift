@@ -14,7 +14,6 @@ import UIKit
 
 class TopSurveysTableViewController: UITableViewController {
     
-//    public var currentCategory: SurveyCategory?
     public var needsAnimation = true
     private var vc: TopSurveysViewController!
     private var isViewSetupCompleted = false
@@ -23,10 +22,8 @@ class TopSurveysTableViewController: UITableViewController {
     private var semiboldAttrs       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Semibold", size: 12),
                                        NSAttributedString.Key.foregroundColor: K_COLOR_RED,
                                        NSAttributedString.Key.backgroundColor: UIColor.clear]
+//    private var lastContentOffset: CGFloat = 0
     
-//    class var surveyNib: UINib {
-//        return UINib(nibName: "SurveyCell", bundle: nil)
-//    }
     class var surveyNib: UINib {
         return UINib(nibName: "SurveyTableViewCell", bundle: nil)
     }
@@ -82,24 +79,21 @@ class TopSurveysTableViewController: UITableViewController {
     }
     
     @objc private func updateTableView() {
-//        refreshControl?.attributedTitle = NSAttributedString(string: "Потяните для обновления..", attributes: semiboldAttrs)
         tableView.reloadData()
     }
 
     // MARK: - Table view data source
-
     override func numberOfSections(in tableView: UITableView) -> Int {
-        if vc.control.selectedSegmentIndex == 2 {
+        if vc.currentIcon == .Category {
             return SurveyCategories.shared.tree.count
         }
         return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        if vc.control.selectedSegmentIndex == 0 {
+        if vc.currentIcon == .New {
             return Surveys.shared.newSurveys.count
-        } else if vc.control.selectedSegmentIndex == 1 {
+        } else if vc.currentIcon == .Hot{
             return Surveys.shared.topSurveys.count
         } else {
             return SurveyCategories.shared.tree[section].first!.value.count
@@ -107,18 +101,18 @@ class TopSurveysTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if vc.control.selectedSegmentIndex == 2 {
+        if vc.currentIcon == .Category {
             return SurveyCategories.shared.tree[section].first?.key
         }
         return nil
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if vc.control.selectedSegmentIndex != 2 {
+        if vc.currentIcon != .Category {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell {
 
                 var dataSource: [SurveyLink]
-                if vc.control.selectedSegmentIndex == 0 {
+                if vc.currentIcon == .New {
                     dataSource = Surveys.shared.newSurveys
                 } else {
                     dataSource = Surveys.shared.topSurveys
@@ -163,7 +157,7 @@ class TopSurveysTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if vc.control.selectedSegmentIndex == 2, let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell") as? CategoryTableViewCell {
+        if vc.currentIcon == .Category, let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell") as? CategoryTableViewCell {
             cell.title.text = SurveyCategories.shared.categories.filter { $0.title == SurveyCategories.shared.tree[section].first?.key}.first?.title.uppercased()
             cell.backgroundColor = SurveyCategories.shared.categories.filter { $0.title == SurveyCategories.shared.tree[section].first?.key}.first?.tagColor ?? UIColor.gray
             cell.total.text = "всего " + (SurveyCategories.shared.categories.filter { $0.title == SurveyCategories.shared.tree[section].first?.key}.first?.total.stringValue!)!
@@ -174,19 +168,18 @@ class TopSurveysTableViewController: UITableViewController {
     }
     
     @objc private func refreshTableView() {
-//        refreshControl?.attributedTitle = NSAttributedString(string: "Обновление, подождите..", attributes: semiboldAttrs)
-        updateSurveys(type: vc.control.selectedSegmentIndex == 0 ? .New : .Top)
+        updateSurveys(type: vc.currentIcon == .New ? .New : .Top)
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if vc.control.selectedSegmentIndex == 2, let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell") as? CategoryTableViewCell {
+        if vc.currentIcon == .Category, let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell") as? CategoryTableViewCell {
             return cell.contentView.frame.height
         }
         return 0
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if vc.control.selectedSegmentIndex == 2 {
+        if vc.currentIcon == .Category {
             return 35
         } else {
             return 80
@@ -194,16 +187,26 @@ class TopSurveysTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if needsAnimation {
-            let animation = AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//AnimationFactory.makeFadeAnimation(duration: 0.25, delayFactor: 0.015)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
-            let animator = Animator(animation: animation)
-            animator.animate(cell: cell, at: indexPath, in: tableView)
-            needsAnimation = (tableView.visibleCells.count < (indexPath.row + 1))
+        if vc.currentIcon == .Category {
+            cell.alpha = 0
+            UIView.animate(withDuration: 0.1, delay: 0.05, options: [], animations: { cell.alpha = 1 })
+        } else {
+            if needsAnimation {
+                let animation = AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//AnimationFactory.makeFadeAnimation(duration: 0.25, delayFactor: 0.015)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
+                let animator = Animator(animation: animation)
+                animator.animate(cell: cell, at: indexPath, in: tableView)
+                needsAnimation = (tableView.visibleCells.count < (indexPath.row + 1))
+            }
         }
     }
     
+    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        view.alpha = 0
+        UIView.animate(withDuration: 0.15) { view.alpha = 1 }
+    }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if vc.control.selectedSegmentIndex == 2 {
+        if vc.currentIcon == .Category {
             vc.performSegue(withIdentifier: kSegueAppTopSurveysToCategory, sender: nil)
         } else {
             vc.performSegue(withIdentifier: kSegueAppTopSurveysToSurvey, sender: nil)
@@ -271,6 +274,7 @@ extension TopSurveysTableViewController: ServerProtocol {
                 self.refreshControl?.endRefreshing()
                 self.needsAnimation = true
                 if self.isInitialLoad {
+                    self.vc.animateNew()
                     self.tableView.isUserInteractionEnabled = true
                     UIView.animate(withDuration: 0.3, animations: {
                         self.loadingIndicator.alpha = 0
@@ -281,6 +285,19 @@ extension TopSurveysTableViewController: ServerProtocol {
                     }
                 }
             }
+        }
+    }
+    
+//    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        self.lastContentOffset = scrollView.contentOffset.y
+//    }
+//
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        if (self.lastContentOffset < scrollView.contentOffset.y) {
+        if scrollView.contentOffset.y > 80 {
+            vc.navigationController?.setNavigationBarHidden(true, animated: true)
+        } else if (scrollView.contentOffset.y < -80 ) {
+            vc.navigationController?.setNavigationBarHidden(false, animated: true)
         }
     }
 }

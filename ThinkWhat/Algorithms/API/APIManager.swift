@@ -26,6 +26,7 @@ protocol APIManagerProtocol {
     func loadSurvey(survey: SurveyLink, completion: @escaping(JSON?, Error?)->())
     func loadTotalSurveysCount(completion: @escaping(JSON?, Error?)->())
     func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->())
+    func markFavorite(mark: Bool, survey: SurveyLink, completion: @escaping(JSON?, Error?)->())
     
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
     //    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
@@ -775,6 +776,26 @@ class APIManager: APIManagerProtocol {
         }
     }
     
+    func markFavorite(mark: Bool, survey: SurveyLink, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error!)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(mark ? SERVER_URLS.SURVEYS_ADD_FAVORITE : SERVER_URLS.SURVEYS_REMOVE_FAVORITE), httpMethod: .get, parameters: ["survey_id": survey.ID], encoding: URLEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
     private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(JSON?, Error?)->()) {
         var json: JSON?
         var error: Error?
@@ -856,5 +877,35 @@ class APIManager: APIManagerProtocol {
             completion(flag, error)
         }
     }
+    
+//    private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(Error?)->()) {
+//        var error: Error?
+//        let headers: HTTPHeaders = [
+//            "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
+//            "Content-Type": "application/json"
+//        ]
+//
+//        sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).response() {
+//            response in
+//            if response.result.isFailure {
+//                print(response.result.debugDescription)
+//            }
+//            if let _error = response.result.error as? AFError {
+//                error = self.parseAFError(_error)
+//            } else {
+//                if let statusCode  = response.response?.statusCode{
+//                    if 400...499 ~= statusCode {
+//                        do {
+//                            let errorJSON = try JSON(data: response.data!)
+//                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
+//                        } catch let _error {
+//                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
+//                        }
+//                    }
+//                }
+//            }
+//            completion(error)
+//        }
+//    }
 }
 

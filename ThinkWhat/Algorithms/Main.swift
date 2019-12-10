@@ -554,8 +554,7 @@ struct VK_IDS {
 struct SERVER_URLS {
     static let BASE                     = "https://damp-oasis-64585.herokuapp.com/"//"http://127.0.0.1:8000/"//
     static let CLIENT_ID                = "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
-    static let CLIENT_SECRET            = "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO"//"IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
-    //
+    static let CLIENT_SECRET            = "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
     static let SIGNUP                   = "api/sign_up/"
     static let TOKEN                    = "api/social/token/"
     static let TOKEN_CONVERT            = "api/social/convert-token/"
@@ -580,6 +579,8 @@ struct SERVER_URLS {
     static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
     static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
     static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
+    static let SURVEYS_ADD_FAVORITE     = "api/surveys/add_favorite/"
+    static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
     
     static let CATEGORIES               = "api/categories/"
     

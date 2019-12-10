@@ -10,13 +10,17 @@ import UIKit
 
 class SurveyViewController: UIViewController {
     
+    private var isRequesting = false
     private lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     private let requestAttempts = 3
     private var loadingIndicator: LoadingIndicator!
-    private let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+    private let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
     var surveyLink: SurveyLink! {
         didSet {
+            likeButton.removeAllAnimations()
             title = "Опрос №\(surveyLink.ID)"
+            likeButton.state = Array(Surveys.shared.favoriteSurveys.keys).filter( {$0.ID == surveyLink.ID }).isEmpty ? .disabled : .enabled
+            //Surveys.shared.favoriteSurveys.filter( {$0 == surveyLink }).isEmpty ? likeButton.removeAllAnimations() : likeButton.addEnableAnimation()
         }
     }
     var survey: Survey? {
@@ -38,15 +42,21 @@ class SurveyViewController: UIViewController {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        //triggerView = cancel as UIView
+        //        navigationController?.setNavigationBarHidden(false, animated: true)
+        delay(seconds: 3) {
+            print("")
+        }
+    }
+    
     private func setupViews() {
-        DispatchQueue.main.async {
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
             self.navigationController?.navigationBar.shadowImage     = UIImage()
             self.navigationController?.navigationBar.isTranslucent   = false
             self.navigationController?.isNavigationBarHidden         = false
             self.navigationController?.navigationBar.barTintColor    = .white
             self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-        }
         
 //        DispatchQueue.main.async {
             self.loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)))
@@ -56,16 +66,33 @@ class SurveyViewController: UIViewController {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: likeButton)
         let gesture = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.likeTapped(gesture:)))
         likeButton.addGestureRecognizer(gesture)
-        
-        
     }
-
+    
     @objc fileprivate func likeTapped(gesture: UITapGestureRecognizer) {
-        if gesture.state == .ended {
-            if likeButton.state == .disabled {
-                likeButton.state = .enabled
-            } else {
-                likeButton.state = .disabled
+        if !isRequesting {
+            isRequesting = true
+            if gesture.state == .ended {
+                var mark = true
+                if likeButton.state == .disabled {
+                    likeButton.state = .enabled
+                    mark = true
+                    if Array(Surveys.shared.favoriteSurveys.keys).filter( {$0.ID == surveyLink.ID }).isEmpty { Surveys.shared.favoriteSurveys[self.surveyLink] = Date() }
+                } else {
+                    likeButton.state = .disabled
+                    mark = false
+                    if let key = Surveys.shared.favoriteSurveys.keys.filter({ $0.ID == surveyLink.ID }).first {
+                        Surveys.shared.favoriteSurveys.removeValue(forKey: key)
+                    }
+                    //                Surveys.shared.favoriteSurveys.removeValue(forKey: self.surveyLink)
+                    NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
+                }
+                apiManager.markFavorite(mark: mark, survey: surveyLink!) {
+                    _, error in
+                    self.isRequesting = false
+                    if error != nil {
+                        showAlert(type: CustomAlertView.AlertType.Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], title: "Ошибка", body: "Опрос не добавлен в любимые. \(error!.localizedDescription)")
+                    }
+                }
             }
         }
     }
@@ -99,6 +126,7 @@ extension SurveyViewController {
                 }) { _ in self.loadingIndicator.removeAllAnimations() } }]], text: "Ошибка: \(error!.localizedDescription)")
             }
             if json != nil {
+                
                 if let _survey = Survey(json!) {
                     Surveys.shared.downloadedSurveys.append(_survey)
                     self.survey = _survey

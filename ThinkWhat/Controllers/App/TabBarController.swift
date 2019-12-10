@@ -30,8 +30,8 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
             }
         }
 
-        UITabBar.appearance().backgroundImage = UIImage.colorForNavBar(color: .white)
-        UITabBar.appearance().shadowImage = UIImage.colorForNavBar(color: .lightGray)
+//        UITabBar.appearance().backgroundImage = UIImage.colorForNavBar(color: .white)
+//        UITabBar.appearance().shadowImage = UIImage.colorForNavBar(color: .lightGray)
     }
     
     override func viewDidAppear(_ animated: Bool) {
