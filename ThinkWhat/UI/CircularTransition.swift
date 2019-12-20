@@ -195,7 +195,6 @@ class CircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
 //            toVC.view.frame = CGRect(origin: CGPoint(x: containerView.frame.origin.x, y: containerView.frame.origin.y + 200) , size: CGSize(width: containerView.frame.size.width, height: containerView.frame.size.height - 49))
 //            toVC.view.frame = CGRect(origin: CGPoint(x: toVC.view.frame.origin.x, y: toVC.view.frame.origin.y + 49), size: toVC.view.frame.size)
 //            print(toVC.view.frame)
-            toVC.view.alpha = 0
             containerView.addSubview(toVC.view)
             
             animate(operation: operation, toView: toVC.view)
@@ -312,10 +311,6 @@ class CircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
 //        maskLayerAnimation.isRemovedOnCompletion = true
         maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         redLayer.add(maskColorLayerAnimation, forKey: "fillColor")
-        
-        UIView.animate(withDuration: duration) {
-            toView.alpha = 1
-        }
     }
 }
 

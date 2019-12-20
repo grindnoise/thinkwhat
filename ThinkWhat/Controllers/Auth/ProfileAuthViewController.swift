@@ -201,13 +201,13 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
             self.view.layoutIfNeeded()
             if let imagePath = AppData.shared.userProfile.imagePath {
                 if let image = loadImageFromPath(path: imagePath) {
-                    circularImage = image.circularImage(size: userImage.frame.size)
+                    circularImage = image.circularImage(size: userImage.frame.size, frameColor: K_COLOR_RED)
                     userImage.image = circularImage
                     isImageChanged = true
                 }
             } else {
                 let pic = UIImage(named: "default_avatar")!
-                circularImage = pic.circularImage(size: userImage.frame.size)
+                circularImage = pic.circularImage(size: userImage.frame.size, frameColor: K_COLOR_RED)
                 userImage.image = circularImage
             }
             if let firstName = AppData.shared.user.firstName {
@@ -525,7 +525,7 @@ extension ProfileAuthViewController: UIImagePickerControllerDelegate {
                     AppData.shared.userProfile.imagePath = self.storeManager.storeImage(type: .Profile, image: image!, fileName: nil, fileFormat: NSData(data: image!.jpeg!).fileFormat, surveyID: nil)
                     showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {
                         self.isImageChanged = true
-                        self.circularImage = image!.circularImage(size: self.userImage.frame.size)
+                        self.circularImage = image!.circularImage(size: self.userImage.frame.size, frameColor: K_COLOR_RED)
                         animateImageChange(imageView: self.userImage, fromImage: self.userImage.image!, toImage: self.circularImage, duration: 0.2)
                         }]], text: "Загружено")
                 }

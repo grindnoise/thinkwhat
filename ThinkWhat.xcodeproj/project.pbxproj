@@ -10,6 +10,13 @@
 		2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 		AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */; };
 		AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2918C7238E5B4600EF488A /* CircularTransition.swift */; };
+		AB2984FA23A79EA70086A92B /* PrivacySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */; };
+		AB2984FC23A7A2340086A92B /* AnonymitySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */; };
+		AB2984FE23A7A2860086A92B /* VotesSelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984FD23A7A2860086A92B /* VotesSelectionCell.swift */; };
+		AB29850023A7A7420086A92B /* QuestionCreationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984FF23A7A7420086A92B /* QuestionCreationCell.swift */; };
+		AB29850223AA2FFC0086A92B /* LinkAttachmentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB29850123AA2FFC0086A92B /* LinkAttachmentCell.swift */; };
+		AB29850423AA471B0086A92B /* ImageHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB29850323AA471B0086A92B /* ImageHeaderCell.swift */; };
+		AB29850623AA4B290086A92B /* ImageSelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB29850523AA4B290086A92B /* ImageSelectionCell.swift */; };
 		AB2AA1AE235605FD0086D16C /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1AD235605FD0086D16C /* InfoViewController.swift */; };
 		AB2AA1B0235613450086D16C /* InfoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1AF235613450086D16C /* InfoTableViewController.swift */; };
 		AB2AA1B32359E9D30086D16C /* TopSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1B22359E9D30086D16C /* TopSurveysTableViewController.swift */; };
@@ -81,6 +88,7 @@
 		AB6083C122410131002C0D7E /* ValidSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083C022410130002C0D7E /* ValidSign.swift */; };
 		AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */; };
 		AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */; };
+		AB7CE6FE23A36283006FDBD8 /* CategorySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7CE6FC23A36283006FDBD8 /* CategorySelectionCell.swift */; };
 		ABA6E18822FACAA200F8F39A /* ValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */; };
 		ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */; };
 		ABB46F372344B1F900AF212B /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F362344B1F900AF212B /* Protocols.swift */; };
@@ -134,6 +142,13 @@
 		A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthViewController.swift; sourceTree = "<group>"; };
 		AB2918C7238E5B4600EF488A /* CircularTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacySelectionCell.swift; sourceTree = "<group>"; };
+		AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymitySelectionCell.swift; sourceTree = "<group>"; };
+		AB2984FD23A7A2860086A92B /* VotesSelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotesSelectionCell.swift; sourceTree = "<group>"; };
+		AB2984FF23A7A7420086A92B /* QuestionCreationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionCreationCell.swift; sourceTree = "<group>"; };
+		AB29850123AA2FFC0086A92B /* LinkAttachmentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkAttachmentCell.swift; sourceTree = "<group>"; };
+		AB29850323AA471B0086A92B /* ImageHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageHeaderCell.swift; sourceTree = "<group>"; };
+		AB29850523AA4B290086A92B /* ImageSelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionCell.swift; sourceTree = "<group>"; };
 		AB2AA1AD235605FD0086D16C /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
 		AB2AA1AF235613450086D16C /* InfoTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoTableViewController.swift; sourceTree = "<group>"; };
 		AB2AA1B22359E9D30086D16C /* TopSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopSurveysTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -211,6 +226,7 @@
 		AB6083C022410130002C0D7E /* ValidSign.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidSign.swift; sourceTree = "<group>"; };
 		AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryViewController.swift; sourceTree = "<group>"; };
 		AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRegistrationViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB7CE6FC23A36283006FDBD8 /* CategorySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionCell.swift; sourceTree = "<group>"; };
 		ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidationViewController.swift; sourceTree = "<group>"; };
 		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABB46F362344B1F900AF212B /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
@@ -520,6 +536,38 @@
 			path = Storyboards;
 			sourceTree = "<group>";
 		};
+		AB7CE6F923A3610E006FDBD8 /* New */ = {
+			isa = PBXGroup;
+			children = (
+				AB7CE6FB23A36147006FDBD8 /* Cells */,
+				ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */,
+			);
+			path = New;
+			sourceTree = "<group>";
+		};
+		AB7CE6FA23A36123006FDBD8 /* Survey */ = {
+			isa = PBXGroup;
+			children = (
+				ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */,
+			);
+			path = Survey;
+			sourceTree = "<group>";
+		};
+		AB7CE6FB23A36147006FDBD8 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				AB7CE6FC23A36283006FDBD8 /* CategorySelectionCell.swift */,
+				AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */,
+				AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */,
+				AB2984FD23A7A2860086A92B /* VotesSelectionCell.swift */,
+				AB2984FF23A7A7420086A92B /* QuestionCreationCell.swift */,
+				AB29850123AA2FFC0086A92B /* LinkAttachmentCell.swift */,
+				AB29850323AA471B0086A92B /* ImageHeaderCell.swift */,
+				AB29850523AA4B290086A92B /* ImageSelectionCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
 		ABA6E18922FC358500F8F39A /* TextFields */ = {
 			isa = PBXGroup;
 			children = (
@@ -565,8 +613,8 @@
 		ABDEE859237023B7009B52F3 /* Survey */ = {
 			isa = PBXGroup;
 			children = (
-				ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */,
-				ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */,
+				AB7CE6FA23A36123006FDBD8 /* Survey */,
+				AB7CE6F923A3610E006FDBD8 /* New */,
 			);
 			path = Survey;
 			sourceTree = "<group>";
@@ -905,12 +953,14 @@
 				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
 				AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */,
 				ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */,
+				AB29850023A7A7420086A92B /* QuestionCreationCell.swift in Sources */,
 				AB3C6825223FD1E900B57580 /* CustomAlertView.swift in Sources */,
 				ABB46F3E2346373700AF212B /* TabBarController.swift in Sources */,
 				AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */,
 				ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */,
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
 				ABFE1411239109FA0026D27C /* NewSurveyViewController.swift in Sources */,
+				AB2984FA23A79EA70086A92B /* PrivacySelectionCell.swift in Sources */,
 				ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */,
 				ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */,
 				ABB46F372344B1F900AF212B /* Protocols.swift in Sources */,
@@ -931,6 +981,7 @@
 				ABBA73FC2386ECC200540ECF /* Icon.swift in Sources */,
 				ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */,
 				AB3C685D223FD74E00B57580 /* APIManager.swift in Sources */,
+				AB2984FC23A7A2340086A92B /* AnonymitySelectionCell.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
 				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
 				ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */,
@@ -949,6 +1000,7 @@
 				ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */,
 				ABBA73F12382896900540ECF /* UserSurveysViewController.swift in Sources */,
 				AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */,
+				AB2984FE23A7A2860086A92B /* VotesSelectionCell.swift in Sources */,
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
 				AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */,
@@ -962,6 +1014,8 @@
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
 				ABBA74002387E66F00540ECF /* CategoryIcon.swift in Sources */,
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
+				AB29850223AA2FFC0086A92B /* LinkAttachmentCell.swift in Sources */,
+				AB29850423AA471B0086A92B /* ImageHeaderCell.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
@@ -970,7 +1024,9 @@
 				AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */,
 				AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */,
 				ABA6E18822FACAA200F8F39A /* ValidationViewController.swift in Sources */,
+				AB29850623AA4B290086A92B /* ImageSelectionCell.swift in Sources */,
 				AB3C6847223FD3EE00B57580 /* Instagram.swift in Sources */,
+				AB7CE6FE23A36283006FDBD8 /* CategorySelectionCell.swift in Sources */,
 				AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

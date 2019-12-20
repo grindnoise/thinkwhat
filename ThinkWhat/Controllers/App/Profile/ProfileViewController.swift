@@ -81,7 +81,7 @@ class ProfileViewController: UIViewController, UINavigationControllerDelegate {
             } else {
                 image = UIImage(named: "default_avatar")!
             }
-            self.circularImage     = image.circularImage(size: self.userImage.frame.size)
+            self.circularImage     = image.circularImage(size: self.userImage.frame.size, frameColor: K_COLOR_RED)
             self.usernameTF.text   = AppData.shared.user.firstName
 //            self.phoneTF.text      = appData.phone
         }
@@ -163,7 +163,7 @@ extension ProfileViewController: UIImagePickerControllerDelegate {
                 if json != nil {
                     AppData.shared.userProfile.imagePath = self.storeManager.storeImage(type: .Profile, image: image!, fileName: nil, fileFormat: NSData(data: image!.jpeg!).fileFormat, surveyID: nil)
                     showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {
-                        self.circularImage = image!.circularImage(size: self.userImage.frame.size)
+                        self.circularImage = image!.circularImage(size: self.userImage.frame.size, frameColor: K_COLOR_RED)
                         animateImageChange(imageView: self.userImage, fromImage: self.userImage.image!, toImage: self.circularImage, duration: 0.2)
                         }]], text: "Загружено")
                 }

@@ -292,7 +292,7 @@ extension UIViewController {
 
 extension UIImage {
     
-    func circularImage(size: CGSize?) -> UIImage {
+    func circularImage(size: CGSize?, frameColor: UIColor) -> UIImage {
         let newSize = size ?? self.size
         
         let minEdge = min(newSize.height, newSize.width)
@@ -305,9 +305,10 @@ extension UIImage {
         
         let offset = size.height * 0.03
         
+        if frameColor != .clear {
         let outerPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint.zero, size: size))
         outerPath.lineWidth = offset * 2
-        K_COLOR_RED.setStroke()
+        frameColor.setStroke()
         outerPath.stroke()
         
         let innerFrame = CGRect(origin: CGPoint(x: CGPoint.zero.x + offset, y: CGPoint.zero.y + offset), size: CGSize(width: size.width - offset * 2, height: size.height - offset * 2))
@@ -315,6 +316,7 @@ extension UIImage {
         innerPath.lineWidth = offset
         UIColor.white.setStroke()
         innerPath.stroke()
+        }
         
         context!.setBlendMode(.copy)
         context!.setFillColor(UIColor.clear.cgColor)
@@ -584,5 +586,34 @@ extension UITabBarController {
     
     func tabBarIsVisible() ->Bool {
         return orgFrameView == nil
+    }
+}
+
+extension UITextField {
+    func addDoneCancelToolbar(onDone: (target: Any, action: Selector)? = nil, onCancel: (target: Any, action: Selector)? = nil) {
+        let onCancel = onCancel ?? (target: self, action: #selector(cancelButtonTapped))
+        let onDone = onDone ?? (target: self, action: #selector(doneButtonTapped))
+        
+        let toolbar: UIToolbar = UIToolbar()
+        toolbar.barStyle = .default
+        toolbar.items = [
+            UIBarButtonItem(title: "Cancel", style: .plain, target: onCancel.target, action: onCancel.action),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil),
+            UIBarButtonItem(title: "Done", style: .done, target: onDone.target, action: onDone.action)
+        ]
+        toolbar.sizeToFit()
+        
+        self.inputAccessoryView = toolbar
+    }
+    
+    // Default actions:
+    @objc func doneButtonTapped() { self.resignFirstResponder() }
+    @objc func cancelButtonTapped() { self.resignFirstResponder() }
+}
+
+extension RangeReplaceableCollection where Indices: Equatable {
+    mutating func rearrange(from: Index, to: Index) {
+        precondition(from != to && indices.contains(from) && indices.contains(to), "invalid indices")
+        insert(remove(at: from), at: to)
     }
 }
