@@ -10,20 +10,20 @@ import UIKit
 
 class NewSurveyViewController: UIViewController, UINavigationControllerDelegate {
     
-    class var categorySelectionCell: UINib {
-        return UINib(nibName: "CategorySelectionCell", bundle: nil)
-    }
-    class var privacySelectionCell: UINib {
-        return UINib(nibName: "PrivacySelectionCell", bundle: nil)
-    }
-    class var anonymitySelectionCell: UINib {
-        return UINib(nibName: "AnonymitySelectionCell", bundle: nil)
-    }
-    class var votesSelectionCell: UINib {
-        return UINib(nibName: "VotesSelectionCell", bundle: nil)
-    }
-    class var questionEditingCell: UINib {
-        return UINib(nibName: "QuestionEditingCell", bundle: nil)
+//    class var categorySelectionCell: UINib {
+//        return UINib(nibName: "CategorySelectionCell", bundle: nil)
+//    }
+//    class var privacySelectionCell: UINib {
+//        return UINib(nibName: "PrivacySelectionCell", bundle: nil)
+//    }
+//    class var anonymitySelectionCell: UINib {
+//        return UINib(nibName: "AnonymitySelectionCell", bundle: nil)
+//    }
+//    class var votesSelectionCell: UINib {
+//        return UINib(nibName: "VotesSelectionCell", bundle: nil)
+//    }
+    class var newSurveyHeaderCell: UINib {
+        return UINib(nibName: "NewSurveyHeaderCell", bundle: nil)
     }
     
     @IBOutlet weak var createButton: UIButton!
@@ -38,13 +38,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     @IBOutlet weak var privacySwitch: UISwitch!
     @IBOutlet weak var votesQuantity: UITextField!
     @IBOutlet weak var questionTextView: UITextView!
-    @IBAction func addImageTapped(_ sender: UIButton) {
-        selectImage()
-//        images.append(1)
-//        tableView.beginUpdates()
-//        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 11)], with: .top)
-//        tableView.endUpdates()
-    }
+    
     fileprivate var isRearranging = false
     fileprivate var isViewSetupCompleted = false
     fileprivate var leftEdgeInset: CGFloat = 0
@@ -53,7 +47,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     fileprivate var currentTV: UITextView? {
         didSet {
             if oldValue != nil, let cell = oldValue?.superview?.superview as? QuestionCreationCell{//}.isKind(of: QuestionCreationCell.self) {
-                checkQuestionText(beganEditing: false, textView: oldValue as! UITextView, placeholder: cell.questionPlaceholder)
+                checkQuestionText(beganEditing: false, textView: oldValue!, placeholder: cell.questionPlaceholder)
             }
         }
     }
@@ -65,23 +59,54 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
                 if images.count > oldValue.count {
                     if #available(iOS 11.0, *) {
                         tableView.performBatchUpdates({
-                            tableView.insertRows(at: [IndexPath(row: images.count-1, section: 11)], with: .top)
-                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
-                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-                            }
+                            tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
+//                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
+//                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+//                            }
                         }) {
                             _ in
-                            //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
+                            if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
+                                self.configureHeader(header: header, forSection: 2)
+                                //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
+                            }
                         }
                     } else {
                         tableView.beginUpdates()
-                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 11)], with: .top)
+                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
                         tableView.endUpdates()
                     }
                 }
             }
         }
     }
+    fileprivate var answers: [String] = [] {
+        didSet {
+            if !isRearranging {
+                if answers.count > oldValue.count {
+                    if #available(iOS 11.0, *) {
+                        tableView.performBatchUpdates({
+                            tableView.insertRows(at: [IndexPath(row: answers.count-1, section: 5)], with: .top)
+//                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
+//                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+//                            }
+                        }) {
+                            _ in
+                            if let header = self.tableView.headerView(forSection: 4) as? NewSurveyHeaderCell {
+                                self.configureHeader(header: header, forSection: 4)
+                                //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
+                            }
+                        }
+                    } else {
+                        tableView.beginUpdates()
+                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 5)], with: .top)
+                        tableView.endUpdates()
+                    }
+                }
+            }
+        }
+    }
+    fileprivate let sections = ["ПАРАМЕТРЫ", "ВОПРОС", "ИЗОБРАЖЕНИЯ", "", "ОТВЕТЫ", ""]
+    fileprivate var questionRowHeight: CGFloat = 0
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         print("seg")
     }
@@ -96,6 +121,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
         imagePicker.delegate = self
         tableView.delegate = self as UITableViewDelegate
         tableView.dataSource = self
+        tableView.register(NewSurveyViewController.newSurveyHeaderCell, forHeaderFooterViewReuseIdentifier: "header")
         if #available(iOS 11.0, *) {
             tableView.dragInteractionEnabled = true
             tableView.dragDelegate = self
@@ -114,12 +140,13 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
             self.navigationItem.setHidesBackButton(true, animated: false)
             self.navigationController?.setNavigationBarHidden(true, animated: false)
         }
-//
+    }
+    
+//    fileprivate func setupGestures() {
 //        let touch = UITapGestureRecognizer(target:self, action:#selector(NewSurveyViewController.hideKeyboard))
 //        touch.cancelsTouchesInView = false
 //        view.addGestureRecognizer(touch)
-    }
-    
+//    }
     
     override func viewWillAppear(_ animated: Bool) {
         if !isViewSetupCompleted {
@@ -147,66 +174,69 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     //        self.lastContentOffset = scrollView.contentOffset.y
     //    }
     
+
+    
     @objc private func hideKeyboard() {
         view.endEditing(true)
     }
-    
 }
 
 extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 11 {//Images
+        if section == 0 { //PArams
+            return 4
+        } else if section == 1 {//Question
+            return 2
+        } else if section == 2 || section == 4 {//Image add, Answer add
+            return 1
+        } else if section == 3 {//Images
             return images.count
+        } else if section == 5 {//Answer
+            return answers.count
         }
         return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = UITableViewCell()
-        if indexPath.section == 0 || indexPath.section == 5 || indexPath.section == 7 || indexPath.section == 9 || indexPath.section == 12{
-            cell.selectionStyle = .none
-            cell.accessoryType = .none
-            cell.backgroundColor = tableView.backgroundColor
-            //            cell.separatorInset = .zero//UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: 0)
-        } else if indexPath.section == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "category", for: indexPath) as? CategorySelectionCell {
-            if leftEdgeInset == 0 {
-                for v in _cell.contentView.subviews {
-                    if v.isKind(of: UILabel.self) {
-                        leftEdgeInset = v.frame.origin.x
-                        break
+        if indexPath.section == 0 { //Params
+            if indexPath.row == 0, let _cell = tableView.dequeueReusableCell(withIdentifier: "category", for: indexPath) as? CategorySelectionCell {
+                if leftEdgeInset == 0 {
+                    for v in _cell.contentView.subviews {
+                        if v.isKind(of: UILabel.self) {
+                            leftEdgeInset = v.frame.origin.x
+                            break
+                        }
                     }
                 }
+                _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)//.greatestFiniteMagnitude)
+                cell = _cell
+            } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "privacy", for: indexPath) as? PrivacySelectionCell {
+                _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)
+                cell = _cell
+            } else if indexPath.row == 2, let _cell = tableView.dequeueReusableCell(withIdentifier: "anonymity", for: indexPath) as? AnonymitySelectionCell {
+                _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)
+                cell = _cell
+            } else if indexPath.row == 3, let _cell = tableView.dequeueReusableCell(withIdentifier: "votes", for: indexPath) as? VotesSelectionCell {
+                cell = _cell
+                cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
             }
-            _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)//.greatestFiniteMagnitude)
-//            return _cell
+        } else if indexPath.section == 1 { //Question, link
+            if indexPath.row == 0, let _cell = tableView.dequeueReusableCell(withIdentifier: "question", for: indexPath) as? QuestionCreationCell {
+                _cell.question.delegate = self
+                cell = _cell
+                cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
+            } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "link", for: indexPath) as? LinkAttachmentCell {
+                _cell.link.delegate = self
+                cell = _cell
+                cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
+                //            cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
+            }
+        } else if indexPath.section == 2, let _cell = tableView.dequeueReusableCell(withIdentifier: "imageHeader", for: indexPath) as? ImageHeaderCell {
+            _cell.delegate = self
             cell = _cell
-        } else if indexPath.section == 2, let _cell = tableView.dequeueReusableCell(withIdentifier: "privacy", for: indexPath) as? PrivacySelectionCell {
-            _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)
-            //            return _cell
-            cell = _cell
-        } else if indexPath.section == 3, let _cell = tableView.dequeueReusableCell(withIdentifier: "anonymity", for: indexPath) as? AnonymitySelectionCell {
-            _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)
-            //            return _cell
-            cell = _cell
-        } else if indexPath.section == 4, let _cell = tableView.dequeueReusableCell(withIdentifier: "votes", for: indexPath) as? VotesSelectionCell {
-            _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)
-            //            return _cell
-            cell = _cell
-        } else if indexPath.section == 6, let _cell = tableView.dequeueReusableCell(withIdentifier: "question", for: indexPath) as? QuestionCreationCell {
-            _cell.question.delegate = self
-            //            return _cell
-            cell = _cell
-        } else if indexPath.section == 8, let _cell = tableView.dequeueReusableCell(withIdentifier: "link", for: indexPath) as? LinkAttachmentCell {
-            _cell.link.delegate = self
-            //            return _cell
-            cell = _cell
-        } else if indexPath.section == 10, let _cell = tableView.dequeueReusableCell(withIdentifier: "imageHeader", for: indexPath) as? ImageHeaderCell {
-            cell = _cell
-        } else if indexPath.section == 11, let _cell = tableView.dequeueReusableCell(withIdentifier: "image", for: indexPath) as? ImageSelectionCell {
-//            if let image = images[indexPath.row].circularImage(size: _cell.pictureView.frame.size, frameColor: .clear) as? UIImage {
-//                _cell.pictureView.image = image
-//                _cell.pictureView.contentMode = UIView.ContentMode.scaleAspectFill
-//            }
+            cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
+        } else if indexPath.section == 3, let _cell = tableView.dequeueReusableCell(withIdentifier: "image", for: indexPath) as? ImageSelectionCell {
             _cell.setNeedsLayout()
             _cell.layoutIfNeeded()
             _cell.pictureView.image = images[indexPath.row]
@@ -224,38 +254,46 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                     }
                 }
             }
+        } else if indexPath.section == 4, let _cell = tableView.dequeueReusableCell(withIdentifier: "answerHeader", for: indexPath) as? AnswerCreationHeaderCell {
+            _cell.delegate = self
+            cell = _cell
+            cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
         }
         return cell
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 13
+        return sections.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 || indexPath.section == 5 || indexPath.section == 7 || indexPath.section == 9 || indexPath.section == 12 {
-            return 10
-        } else if (1...5).contains(indexPath.section) {//Settings
-            return 50
-        } else if indexPath.section == 6 {//Question
-            if let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
-                var yLength: CGFloat = 0
-                for v in cell.contentView.subviews {
-                    if v.isKind(of: UILabel.self) {
-                        yLength = v.frame.origin.y + v.frame.size.height
+        if indexPath.section == 0 || indexPath.section == 2 || indexPath.section == 4 {//Params, Image add, Answer add
+                return 50
+        } else if indexPath.section == 1 {//Question
+            if indexPath.row == 0 {
+                if let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
+                    var yLength: CGFloat = 0
+                    for v in cell.contentView.subviews {
+                        if v.isKind(of: UILabel.self) {
+                            yLength = v.frame.origin.y + v.frame.size.height
+                        }
                     }
+                    let sizeThatFitsTextView = cell.question.sizeThatFits(CGSize(width: cell.question.frame.size.width, height: CGFloat(MAXFLOAT)))
+                    questionRowHeight = yLength + sizeThatFitsTextView.height + 10
+                    return questionRowHeight
                 }
-                let sizeThatFitsTextView = cell.question.sizeThatFits(CGSize(width: cell.question.frame.size.width, height: CGFloat(MAXFLOAT)))
-                return yLength + sizeThatFitsTextView.height + 25
+                else {
+                    return questionRowHeight
+                }
             }
-        } else if indexPath.section == 10 || indexPath.section == 11 {//Images section
+        } else if indexPath.section == 3 {//Image
             return 80
         }
         return UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        if indexPath.section == 11 {
+        if indexPath.section == 3 || indexPath.section == 5 {
             return true
         }
         return false
@@ -266,50 +304,66 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             if #available(iOS 11.0, *) {
                 tableView.performBatchUpdates({
                     images.remove(at: indexPath.row)
-                    tableView.deleteRows(at: [indexPath], with: .bottom)
+                    tableView.deleteRows(at: [indexPath], with: .none)
                 }) {
                     _ in
                     tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .none)
-                    if tableView.numberOfRows(inSection: 11) == 0, let header = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
-                        header.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+                    if indexPath.section == 2 {
+                        if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
+                            self.configureHeader(header: header, forSection: 2)
+                        }
+                        if tableView.numberOfRows(inSection: 3) > 0, let header = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) {
+                            header.separatorInset = UIEdgeInsets(top: 0, left: header.frame.width/9, bottom: 0, right: header.frame.width/9)
+                        }
+                    } else if indexPath.section == 4 {
+                        if let header = self.tableView.headerView(forSection: 4) as? NewSurveyHeaderCell {
+                            self.configureHeader(header: header, forSection: 4)
+                        }
                     }
                 }
             } else {
                 tableView.beginUpdates()
-                if indexPath.section == 11 {
+                if indexPath.section == 3 {
                     images.remove(at: indexPath.row)
-                    if let header = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
-                        if tableView.numberOfRows(inSection: 11) == 0 {
-                            header.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-                        } else {
-                            header.separatorInset = UIEdgeInsets(top: 0, left: header.frame.width/9, bottom: 0, right: header.frame.width/9)
-                        }
-                    }
+//                    if let header = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
+//                        if tableView.numberOfRows(inSection: 11) == 0 {
+//                            header.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+//                        } else {
+//                            header.separatorInset = UIEdgeInsets(top: 0, left: header.frame.width/9, bottom: 0, right: header.frame.width/9)
+//                        }
+//                    }
                 }
                 tableView.deleteRows(at: [indexPath], with: .bottom)
                 tableView.endUpdates()
-//                tableView.reloadSections(IndexSet(arrayLiteral: 11), with: .none)
+                tableView.reloadSections(IndexSet(arrayLiteral: 3), with: .none)
             }
         }
     }
-    
-    
     
     @available(iOS 11.0, *)
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: "", handler: { (action, view, success) in
             tableView.performBatchUpdates({
-                self.images.remove(at: indexPath.row)
-                tableView.deleteRows(at: [indexPath], with: .bottom)
-            }) {
-                _ in
-                tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .none)
-                if tableView.numberOfRows(inSection: 11) == 0, let header = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
-                    header.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+                if indexPath.section == 3 {
+                    self.images.remove(at: indexPath.row)
+                } else if indexPath.section == 5 {
+                    self.answers.remove(at: indexPath.row)
                 }
-            }
-            //self.tableView.dataSource?.tableView!(self.tableView, commit: .delete, forRowAt: indexPath)
-            //return
+                tableView.deleteRows(at: [indexPath], with: .bottom)
+                tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
+                if indexPath.section == 3 {
+                    if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
+                        self.configureHeader(header: header, forSection: 2)
+                    }
+                    if tableView.numberOfRows(inSection: 3) > 0, let header = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) {
+                        header.separatorInset = UIEdgeInsets(top: 0, left: header.frame.width/9, bottom: 0, right: header.frame.width/9)
+                    }
+                } else if indexPath.section == 5 {
+                    if let header = self.tableView.headerView(forSection: 4) as? NewSurveyHeaderCell {
+                        self.configureHeader(header: header, forSection: 4)
+                    }
+                }
+            })
         })
         deleteAction.image = UIImage(named: "trash_icon")?.resized(to: CGSize(width: 25, height: 25))
         deleteAction.backgroundColor = .red
@@ -347,7 +401,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 4, let cell = tableView.cellForRow(at: indexPath) as? VotesSelectionCell {
+        if indexPath.section == 0, let cell = tableView.cellForRow(at: indexPath) as? VotesSelectionCell {
             if currentTV != nil {
                 currentTV?.isUserInteractionEnabled = false
                 view.endEditing(true)
@@ -361,7 +415,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             }
             cell.count.isUserInteractionEnabled = true
             currentTF = cell.count
-        } else if indexPath.section == 8, let cell = tableView.cellForRow(at: indexPath) as? LinkAttachmentCell {
+        } else if indexPath.section == 1, let cell = tableView.cellForRow(at: indexPath) as? LinkAttachmentCell {
             cell.link.becomeFirstResponder()
             if !cell.link.isFirstResponder {
                 delay(seconds: 0.01) {
@@ -370,10 +424,12 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             }
             cell.link.isUserInteractionEnabled = true
             currentTF = cell.link
-        } else if indexPath.section == 6, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
-            cell.question.becomeFirstResponder()
-            cell.question.isUserInteractionEnabled = true
-            currentTV = cell.question
+        } else if indexPath.section == 1 {
+            if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
+                cell.question.becomeFirstResponder()
+                cell.question.isUserInteractionEnabled = true
+                currentTV = cell.question
+            }
         } else {
             if currentTV != nil {
                 currentTV?.resignFirstResponder()
@@ -391,22 +447,51 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        //Reorder DataSource
-        if sourceIndexPath.section == 11 {
-            isRearranging = true
+        //Reorder datasource
+        isRearranging = true
+        if sourceIndexPath.section == 3 {
             images.rearrange(from: sourceIndexPath.row, to: destinationIndexPath.row)
-            isRearranging = false
+        } else if sourceIndexPath.section == 5 {
+            answers.rearrange(from: sourceIndexPath.row, to: destinationIndexPath.row)
         }
+        isRearranging = false
     }
 
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        if indexPath.section == 11 && tableView.numberOfRows(inSection: 11) > 1 {
+        if indexPath.section == 3 && tableView.numberOfRows(inSection: 3) > 1 {
             return true
         }
         return false
     }
     
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 || section == 1 || section == 2 || section == 4 {
+            return 30
+        }
+        return 0
+    }
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "header") as? NewSurveyHeaderCell {
+            var count = ""
+            if section == 2 { count = " (\(images.count)/3)"} else if section == 4 { count = " (\(answers.count))"}
+            header.title.text = sections[section] + count
+            return header
+        }
+        return nil
+    }
     
+    fileprivate func configureHeader(header: NewSurveyHeaderCell, forSection section: Int) {
+        tableView.headerView(forSection: 2)
+        var title = sections[section]
+        if section == 2 {
+            title += " (\(images.count)/3)"
+        } else if section == 4 {
+            title += " (\(answers.count))"
+        }
+        tableView.beginUpdates()
+        header.title.text = title
+        tableView.endUpdates()
+    }
 }
 
 extension NewSurveyViewController: UITextViewDelegate {
@@ -470,29 +555,11 @@ extension NewSurveyViewController: UIImagePickerControllerDelegate {
         dismiss(animated: true)
     }
     
-    fileprivate func selectImage() {
+    fileprivate func selectImage(_ source: UIImagePickerController.SourceType) {
         imagePicker.allowsEditing = true
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertController.Style.actionSheet)//UIAlertController(title: "Выберите источник", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
-        
-        //let titleAttrString = NSMutableAttributedString(string: "Выберите источник", attributes: semiboldAttrs)
-        //alert.setValue(titleAttrString, forKey: "attributedTitle")
-        let photo = UIAlertAction(title: "Фотоальбом", style: UIAlertAction.Style.default, handler: {
-            (action: UIAlertAction) in
-            self.imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
-            self.present(self.imagePicker, animated: true, completion: nil)
-        })
-        photo.setValue(UIColor.black, forKey: "titleTextColor")
-        alert.addAction(photo)
-        let camera = UIAlertAction(title: "Камера", style: UIAlertAction.Style.default, handler: {
-            (action: UIAlertAction) in
-            self.imagePicker.sourceType = UIImagePickerController.SourceType.camera
-            self.present(self.imagePicker, animated: true, completion: nil)
-        })
-        camera.setValue(UIColor.black, forKey: "titleTextColor")
-        alert.addAction(camera)
-        let cancel = UIAlertAction(title: "Отмена", style: UIAlertAction.Style.destructive, handler: nil)
-        alert.addAction(cancel)
-        present(alert, animated: true, completion: nil)
+        imagePicker.sourceType = source
+        imagePicker.navigationBar.topItem?.rightBarButtonItem?.tintColor = .black
+        present(imagePicker, animated: true)
     }
 }
 
@@ -554,10 +621,22 @@ extension NewSurveyViewController: UITableViewDropDelegate {
     }
 
     func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
-        if let destinationPath = coordinator.destinationIndexPath, let sourcePath = coordinator.items.first?.dragItem.localObject as? IndexPath {
-            if (destinationPath.section == sourcePath.section) {
-                print("")
-            }
+//        if let destinationPath = coordinator.destinationIndexPath, let sourcePath = coordinator.items.first?.dragItem.localObject as? IndexPath {
+//            if (destinationPath.section == sourcePath.section) {
+//                print("")
+//            }
+//        }
+    }
+}
+
+extension NewSurveyViewController: CellButtonDelegate {
+    func cellSubviewTapped(_ sender: AnyObject) {
+        if sender is CameraIcon {
+            selectImage(.camera)
+        } else if sender is GalleryIcon {
+            selectImage(.photoLibrary)
+        } else if sender is PlusIcon {
+            answers.append("")
         }
     }
 }

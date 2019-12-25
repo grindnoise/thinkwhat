@@ -110,6 +110,11 @@
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
 		ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC571235EE99B00E6A118 /* TagLabel.swift */; };
 		ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC573235F384600E6A118 /* ProgressCirle.swift */; };
+		ABDA424F23B0D60500BAC3A5 /* NewAnswerIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA424E23B0D60500BAC3A5 /* NewAnswerIcons.swift */; };
+		ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA425023B0D7BF00BAC3A5 /* WebIcon.swift */; };
+		ABDA425423B1036400BAC3A5 /* NewSurveyHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA425223B1036400BAC3A5 /* NewSurveyHeaderCell.swift */; };
+		ABDA425523B1036400BAC3A5 /* NewSurveyHeaderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */; };
+		ABDA425923B3475400BAC3A5 /* AnswerCreationHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */; };
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDEE85B237023D0009B52F3 /* SurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */; };
 		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
@@ -248,6 +253,11 @@
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABCAC571235EE99B00E6A118 /* TagLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagLabel.swift; sourceTree = "<group>"; };
 		ABCAC573235F384600E6A118 /* ProgressCirle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCirle.swift; sourceTree = "<group>"; };
+		ABDA424E23B0D60500BAC3A5 /* NewAnswerIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAnswerIcons.swift; sourceTree = "<group>"; };
+		ABDA425023B0D7BF00BAC3A5 /* WebIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebIcon.swift; sourceTree = "<group>"; };
+		ABDA425223B1036400BAC3A5 /* NewSurveyHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyHeaderCell.swift; sourceTree = "<group>"; };
+		ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewSurveyHeaderCell.xib; sourceTree = "<group>"; };
+		ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCreationHeaderCell.swift; sourceTree = "<group>"; };
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyViewController.swift; sourceTree = "<group>"; };
 		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
@@ -494,6 +504,8 @@
 				ABBA73FB2386ECC200540ECF /* Icon.swift */,
 				ABBA73FD2387C5A200540ECF /* FlameIcon.swift */,
 				ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */,
+				ABDA424E23B0D60500BAC3A5 /* NewAnswerIcons.swift */,
+				ABDA425023B0D7BF00BAC3A5 /* WebIcon.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -564,6 +576,9 @@
 				AB29850123AA2FFC0086A92B /* LinkAttachmentCell.swift */,
 				AB29850323AA471B0086A92B /* ImageHeaderCell.swift */,
 				AB29850523AA4B290086A92B /* ImageSelectionCell.swift */,
+				ABDA425223B1036400BAC3A5 /* NewSurveyHeaderCell.swift */,
+				ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */,
+				ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -772,6 +787,7 @@
 				AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */,
 				AB3C684B223FD3EE00B57580 /* OpenSans-Light.ttf in Resources */,
 				AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */,
+				ABDA425523B1036400BAC3A5 /* NewSurveyHeaderCell.xib in Resources */,
 				AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */,
 				AB3C684D223FD3EE00B57580 /* OpenSans-ExtraBold.ttf in Resources */,
 				AB3C6826223FD1E900B57580 /* CustomAlertView.xib in Resources */,
@@ -946,6 +962,7 @@
 				ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */,
 				AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
+				ABDA425923B3475400BAC3A5 /* AnswerCreationHeaderCell.swift in Sources */,
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
 				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
 				ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */,
@@ -1004,6 +1021,7 @@
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
 				AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */,
+				ABDA425423B1036400BAC3A5 /* NewSurveyHeaderCell.swift in Sources */,
 				AB2AA1B52359EA8A0086D16C /* Survey.swift in Sources */,
 				AB3C685E223FD74E00B57580 /* FileStorageManager.swift in Sources */,
 				AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */,
@@ -1014,6 +1032,7 @@
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
 				ABBA74002387E66F00540ECF /* CategoryIcon.swift in Sources */,
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
+				ABDA424F23B0D60500BAC3A5 /* NewAnswerIcons.swift in Sources */,
 				AB29850223AA2FFC0086A92B /* LinkAttachmentCell.swift in Sources */,
 				AB29850423AA471B0086A92B /* ImageHeaderCell.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
@@ -1025,6 +1044,7 @@
 				AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */,
 				ABA6E18822FACAA200F8F39A /* ValidationViewController.swift in Sources */,
 				AB29850623AA4B290086A92B /* ImageSelectionCell.swift in Sources */,
+				ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */,
 				AB3C6847223FD3EE00B57580 /* Instagram.swift in Sources */,
 				AB7CE6FE23A36283006FDBD8 /* CategorySelectionCell.swift in Sources */,
 				AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */,

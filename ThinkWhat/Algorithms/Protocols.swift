@@ -39,3 +39,8 @@ protocol ServerInitializationProtocol {
 protocol StorageInitializationProtocol {
     func initializeStorageManager() -> FileStorageProtocol
 }
+
+import UIKit
+protocol CellButtonDelegate: class {
+    func cellSubviewTapped(_ sender: AnyObject)
+}
