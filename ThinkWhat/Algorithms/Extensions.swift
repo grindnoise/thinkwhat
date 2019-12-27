@@ -613,7 +613,9 @@ extension UITextField {
 
 extension RangeReplaceableCollection where Indices: Equatable {
     mutating func rearrange(from: Index, to: Index) {
-        precondition(from != to && indices.contains(from) && indices.contains(to), "invalid indices")
-        insert(remove(at: from), at: to)
+//        if from != to {
+            precondition(from != to && indices.contains(from) && indices.contains(to), "invalid indices")
+            insert(remove(at: from), at: to)
+//        }
     }
 }

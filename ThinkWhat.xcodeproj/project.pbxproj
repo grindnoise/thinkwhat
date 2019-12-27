@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 		AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */; };
+		AB215DE623B39E6C0073F0CA /* AnswerCreationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB215DE523B39E6C0073F0CA /* AnswerCreationCell.swift */; };
 		AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2918C7238E5B4600EF488A /* CircularTransition.swift */; };
 		AB2984FA23A79EA70086A92B /* PrivacySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */; };
 		AB2984FC23A7A2340086A92B /* AnonymitySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */; };
@@ -24,6 +25,8 @@
 		AB2AA1B8235D94DF0086D16C /* SurveyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */; };
 		AB2AA1B9235D94DF0086D16C /* SurveyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */; };
 		AB2AA1BB235DDC6F0086D16C /* TopSurveysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */; };
+		AB2D7CCF23B6308F00BFFDC1 /* YoutubeIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D7CCE23B6308F00BFFDC1 /* YoutubeIcon.swift */; };
+		AB2D7CD123B6338500BFFDC1 /* WikiIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D7CD023B6338500BFFDC1 /* WikiIcon.swift */; };
 		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
 		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
 		AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */; };
@@ -146,6 +149,7 @@
 		10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthViewController.swift; sourceTree = "<group>"; };
+		AB215DE523B39E6C0073F0CA /* AnswerCreationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCreationCell.swift; sourceTree = "<group>"; };
 		AB2918C7238E5B4600EF488A /* CircularTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacySelectionCell.swift; sourceTree = "<group>"; };
 		AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymitySelectionCell.swift; sourceTree = "<group>"; };
@@ -161,6 +165,8 @@
 		AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTableViewCell.swift; sourceTree = "<group>"; };
 		AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyTableViewCell.xib; sourceTree = "<group>"; };
 		AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopSurveysViewController.swift; sourceTree = "<group>"; };
+		AB2D7CCE23B6308F00BFFDC1 /* YoutubeIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeIcon.swift; sourceTree = "<group>"; };
+		AB2D7CD023B6338500BFFDC1 /* WikiIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiIcon.swift; sourceTree = "<group>"; };
 		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AB3C67E3223FBB6400B57580 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -506,6 +512,8 @@
 				ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */,
 				ABDA424E23B0D60500BAC3A5 /* NewAnswerIcons.swift */,
 				ABDA425023B0D7BF00BAC3A5 /* WebIcon.swift */,
+				AB2D7CCE23B6308F00BFFDC1 /* YoutubeIcon.swift */,
+				AB2D7CD023B6338500BFFDC1 /* WikiIcon.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -579,6 +587,7 @@
 				ABDA425223B1036400BAC3A5 /* NewSurveyHeaderCell.swift */,
 				ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */,
 				ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */,
+				AB215DE523B39E6C0073F0CA /* AnswerCreationCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -1001,6 +1010,7 @@
 				AB2984FC23A7A2340086A92B /* AnonymitySelectionCell.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
 				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
+				AB2D7CD123B6338500BFFDC1 /* WikiIcon.swift in Sources */,
 				ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */,
 				ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */,
 				AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */,
@@ -1034,9 +1044,11 @@
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				ABDA424F23B0D60500BAC3A5 /* NewAnswerIcons.swift in Sources */,
 				AB29850223AA2FFC0086A92B /* LinkAttachmentCell.swift in Sources */,
+				AB2D7CCF23B6308F00BFFDC1 /* YoutubeIcon.swift in Sources */,
 				AB29850423AA471B0086A92B /* ImageHeaderCell.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */,
+				AB215DE623B39E6C0073F0CA /* AnswerCreationCell.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
 				ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */,
 				AB3C6812223FC71600B57580 /* Main.swift in Sources */,
