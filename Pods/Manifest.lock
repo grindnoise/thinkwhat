@@ -13,6 +13,7 @@ PODS:
   - SwiftyJSON (5.0.0)
   - Swinject (2.6.2)
   - VK-ios-sdk (1.4.6)
+  - youtube-ios-player-helper (0.1.6)
 
 DEPENDENCIES:
   - Alamofire
@@ -22,6 +23,7 @@ DEPENDENCIES:
   - SwiftyJSON
   - Swinject
   - VK-ios-sdk
+  - youtube-ios-player-helper (~> 0.1.4)
 
 SPEC CHECKSUMS:
   Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
@@ -32,7 +34,8 @@ SPEC CHECKSUMS:
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
   Swinject: cf7458774b1b00323080a9c67e47a1ee7f9d2af1
   VK-ios-sdk: 7fd48bc5aaa6b96c3197c1987eb6593f2ea67331
+  youtube-ios-player-helper: 21ab92db027c7ff86cb17a3843a3f6eafc8158d2
 
-PODFILE CHECKSUM: dc85d555e3a632db26d4fa6377e000fc37fcdd88
+PODFILE CHECKSUM: b61138f49572744c81ecd65302f19c47e287d9b3
 
 COCOAPODS: 1.4.0

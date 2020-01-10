@@ -47,13 +47,13 @@
          contextName = "NewSurveyViewController.tableView(_:heightForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "questionRowHeight">
+               value = "questionRowHeight &gt; _questionRowHeight">
             </PersistentString>
             <PersistentString
                value = "indexPath.row">
             </PersistentString>
             <PersistentString
-               value = "questionRowHeight &gt; _questionRowHeight">
+               value = "questionRowHeight">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -130,6 +130,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "NewSurveyViewController.tableView(_:didSelectRowAt:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.contentOffset">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "CategoryTableViewCell.layoutSubviews():CategoryTableViewCell.swift">
       </ContextState>
       <ContextState
@@ -179,10 +187,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -416,10 +424,13 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in NewSurveyViewController.tableView(_:commit:forRowAt:):NewSurveyViewController.swift">
+         contextName = "NewSurveyViewController.moveTextField(_:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "tableView.numberOfRows(inSection: 11)">
+               value = "offsetY">
+            </PersistentString>
+            <PersistentString
+               value = "currentOffsetY">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -428,6 +439,14 @@
          <PersistentStrings>
             <PersistentString
                value = "sender.isKind(of: UIButton.self)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in NewSurveyViewController.tableView(_:commit:forRowAt:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.numberOfRows(inSection: 11)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -461,6 +480,9 @@
       <ContextState
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
+            <PersistentString
+               value = " currentTV != nil">
+            </PersistentString>
             <PersistentString
                value = "currentOffsetY">
             </PersistentString>
@@ -496,6 +518,29 @@
          <PersistentStrings>
             <PersistentString
                value = "cell.contentView.frame.height">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.textViewIsAboveKeyBoard(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "view.frame.height">
+            </PersistentString>
+            <PersistentString
+               value = "activeTextView!.bounds.maxY">
+            </PersistentString>
+            <PersistentString
+               value = "convertedPoint.y">
+            </PersistentString>
+            <PersistentString
+               value = "view.frame.height - kbHeight">
+            </PersistentString>
+            <PersistentString
+               value = "-(view.frame.height - kbHeight - convertedPoint.y)">
+            </PersistentString>
+            <PersistentString
+               value = "tabBarController?.tabBar.bounds">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -614,7 +659,26 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "oldValue">
+            </PersistentString>
+            <PersistentString
+               value = "self.currentOffsetY">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #2 in closure #2 in performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysTableViewController.scrollViewDidScroll(_:):TopSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.contentOffset.y">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "ProgressCirle.setProgress():ProgressCirle.swift">
@@ -624,14 +688,6 @@
             </PersistentString>
             <PersistentString
                value = "bounds">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysTableViewController.scrollViewDidScroll(_:):TopSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "scrollView.contentOffset.y">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -647,10 +703,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
+         contextName = "closure #1 in NewSurveyViewController.currentTF.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.currentOffsetY">
+               value = "images">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -747,6 +803,38 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "NewSurveyViewController.questionRowHeight.didset:NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "view.bounds">
+            </PersistentString>
+            <PersistentString
+               value = "!_isMovedUp">
+            </PersistentString>
+            <PersistentString
+               value = "view.superview?.bounds">
+            </PersistentString>
+            <PersistentString
+               value = "convertedPoint.y">
+            </PersistentString>
+            <PersistentString
+               value = "kbHeight">
+            </PersistentString>
+            <PersistentString
+               value = "currentTV">
+            </PersistentString>
+            <PersistentString
+               value = "convertedPoint.y - 60">
+            </PersistentString>
+            <PersistentString
+               value = "tableView.convert(tfPoint, from: currentTV?.superview)">
+            </PersistentString>
+            <PersistentString
+               value = "-(view.frame.height - kbHeight - (convertedPoint.y - 60))">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "static VKManager.prepareUserData(_:):VKManager.swift">
          <PersistentStrings>
             <PersistentString
@@ -761,13 +849,13 @@
                value = "answers[indexPath.row]!">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
             <PersistentString
                value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

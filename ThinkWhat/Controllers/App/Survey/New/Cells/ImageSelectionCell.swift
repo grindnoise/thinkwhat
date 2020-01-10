@@ -15,6 +15,7 @@ class ImageSelectionCell: UITableViewCell {
             pictureView.layer.cornerRadius = pictureView.frame.height / 2
         }
     }
+    @IBOutlet weak var textField: UITextField!
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

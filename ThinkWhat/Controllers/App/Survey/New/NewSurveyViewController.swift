@@ -10,18 +10,6 @@ import UIKit
 
 class NewSurveyViewController: UIViewController, UINavigationControllerDelegate {
     
-//    class var categorySelectionCell: UINib {
-//        return UINib(nibName: "CategorySelectionCell", bundle: nil)
-//    }
-//    class var privacySelectionCell: UINib {
-//        return UINib(nibName: "PrivacySelectionCell", bundle: nil)
-//    }
-//    class var anonymitySelectionCell: UINib {
-//        return UINib(nibName: "AnonymitySelectionCell", bundle: nil)
-//    }
-//    class var votesSelectionCell: UINib {
-//        return UINib(nibName: "VotesSelectionCell", bundle: nil)
-//    }
     class var newSurveyHeaderCell: UINib {
         return UINib(nibName: "NewSurveyHeaderCell", bundle: nil)
     }
@@ -39,11 +27,98 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     @IBOutlet weak var votesQuantity: UITextField!
     @IBOutlet weak var questionTextView: UITextView!
     
+    //Survey data
+    //Necessary
+    fileprivate var category:       SurveyCategory?
+    fileprivate var privacy:        Bool = false
+    fileprivate var anonymity:      [SurveyAnonymity] = []
+    fileprivate var votesCapacity:  Int = 100
+    fileprivate var question:       String = ""
+    fileprivate var answers:        [String] = [] {
+        didSet {
+            if !isRearranging {
+                if answers.count > oldValue.count {
+                    if #available(iOS 11.0, *) {
+                        tableView.performBatchUpdates({
+                            tableView.insertRows(at: [IndexPath(row: answers.count-1, section: 5)], with: .top)
+                            //                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
+                            //                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+                            //                            }
+                            if let header = self.tableView.headerView(forSection: 4) as? NewSurveyHeaderCell {
+                                self.configureHeader(header: header, forSection: 4)
+                                //                                if let headerCell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 4)) {
+                                //                                    self.tableView.beginUpdates()
+                                //                                    headerCell.separatorInset = UIEdgeInsets(top: 0, left: headerCell.frame.width/9, bottom: 0, right: headerCell.frame.width/9)
+                                //                                    self.tableView.endUpdates()
+                                //                                }
+                                //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
+                            }
+                        })
+                    } else {
+                        tableView.beginUpdates()
+                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 5)], with: .top)
+                        tableView.endUpdates()
+                    }
+                }
+            }
+        }
+    }
+    //Unnecessary
+    fileprivate var url:            String = ""
+    fileprivate var images:         [[UIImage: String]] = [] {//[Int] = [] {//
+        didSet {
+            if !isRearranging {
+                if images.count > oldValue.count {
+                    if #available(iOS 11.0, *) {
+                        tableView.performBatchUpdates({
+                            tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
+                            //                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
+                            //                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+                            //                            }
+                            if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
+                                self.configureHeader(header: header, forSection: 2)
+                                //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
+                            }
+                        })
+                    } else {
+                        tableView.beginUpdates()
+                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
+                        tableView.endUpdates()
+                    }
+                }
+            }
+        }
+    }
+    
     
     fileprivate var isRearranging = false
     fileprivate var isViewSetupCompleted = false
     fileprivate var leftEdgeInset: CGFloat = 0
-    fileprivate var currentTF: UITextField?
+    fileprivate var currentTF: UITextField? {
+        didSet {
+            UIView.animate(withDuration: 0.2) {
+                if self.currentTF != nil {
+                    self.currentTF?.backgroundColor = .groupTableViewBackground
+                    self.tableView.isScrollEnabled  = false
+                } else if oldValue != nil {
+                    oldValue!.backgroundColor = .clear
+                    self.tableView.isScrollEnabled  = true
+                    //Save description
+                    if let imageCell = oldValue?.superview?.superview as? ImageSelectionCell, let indexPath = self.tableView.indexPath(for: imageCell) {
+                        for subview in imageCell.contentView.subviews {
+                            if subview is UIImageView {
+                                if let imageView = subview as? UIImageView, let image = imageView.image {
+                                    self.images[indexPath.row][image] = oldValue!.text
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fileprivate var scrollCompletion: Closure?
     fileprivate var imagePicker         = UIImagePickerController()
     fileprivate var currentTV: UITextView? {
         didSet {
@@ -67,19 +142,12 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     }
     fileprivate var currentOffsetY:     CGFloat                     = 0 {
         didSet {
+            offsetY += currentOffsetY
             if isMovedUp ?? false {
-            UIView.animate(withDuration: 0.2, animations: {
-                self.view.frame.origin.y += -self.currentOffsetY
-            })
+                UIView.animate(withDuration: 0.2, animations: {
+                    self.view.frame.origin.y += -self.currentOffsetY
+                })
             }
-//            if oldValue != currentOffsetY {
-//                if isMovedUp ?? false {
-//                    let movement = abs(oldValue - currentOffsetY)
-//                    UIView.animate(withDuration: 0.2, animations: {
-//                        self.view.frame.origin.y += movement
-//                    })
-//                }
-//            }
         }
     }
     fileprivate var offsetY:            CGFloat                     = 0
@@ -87,63 +155,45 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     fileprivate var isMovedUp:          Bool?
 //    fileprivate var isReplacingImage = false
     fileprivate var questionTextChanged = false
-    fileprivate var images: [UIImage] = [] {//[Int] = [] {//
-        didSet {
-            if !isRearranging {
-                if images.count > oldValue.count {
-                    if #available(iOS 11.0, *) {
-                        tableView.performBatchUpdates({
-                            tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
-//                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
-//                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-//                            }
-                            if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
-                                self.configureHeader(header: header, forSection: 2)
-                                //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
-                            }
-                        })
-                    } else {
-                        tableView.beginUpdates()
-                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
-                        tableView.endUpdates()
-                    }
-                }
-            }
-        }
-    }
-    fileprivate var answers: [String] = [] {
-        didSet {
-            if !isRearranging {
-                if answers.count > oldValue.count {
-                    if #available(iOS 11.0, *) {
-                        tableView.performBatchUpdates({
-                            tableView.insertRows(at: [IndexPath(row: answers.count-1, section: 5)], with: .top)
-//                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
-//                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-//                            }
-                            if let header = self.tableView.headerView(forSection: 4) as? NewSurveyHeaderCell {
-                                self.configureHeader(header: header, forSection: 4)
-//                                if let headerCell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 4)) {
-//                                    self.tableView.beginUpdates()
-//                                    headerCell.separatorInset = UIEdgeInsets(top: 0, left: headerCell.frame.width/9, bottom: 0, right: headerCell.frame.width/9)
-//                                    self.tableView.endUpdates()
-//                                }
-                                //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
-                            }
-                        })
-                    } else {
-                        tableView.beginUpdates()
-                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 5)], with: .top)
-                        tableView.endUpdates()
-                    }
-                }
-            }
-        }
-    }
+
     fileprivate let sections = ["ПАРАМЕТРЫ", "ВОПРОС", "ИЗОБРАЖЕНИЯ", "", "ОТВЕТЫ", "", ""]
-    fileprivate var questionRowHeight: CGFloat = 0
+    fileprivate var questionRowHeight: CGFloat = 0 {
+        didSet {
+//            if oldValue != 0, oldValue != questionRowHeight {
+//                if isMovedUp == nil, currentTV != nil {
+//                    let tfPoint = CGPoint(x: currentTV!.frame.minX, y: questionRowHeight)// * 1.5)
+//                    let convertedPoint = view.superview!.convert(tfPoint, from: currentTV?.superview)
+////                    tableView.convert(<#T##point: CGPoint##CGPoint#>, to: <#T##UICoordinateSpace#>)
+////                    view.snapshotView(afterScreenUpdates: false)
+////                    UIApplication.shared.windows[0].convert(tfPoint, to: UIApplication.shared.windows[0])
+//                    //TODO point convert
+//                    if convertedPoint.y - 60 <= (view.frame.height - kbHeight) {
+//                        print("tv is not below keyboard")
+//                    } else {
+//                        offsetY = -(view.frame.height - kbHeight - (convertedPoint.y - 60))// + 15 //+ (activeTextField?.bounds.height)! / 2
+//                        //                currentOffsetY = offsetY
+//                    }
+//                } else if !isMovedUp!, currentTV != nil {
+//                    let a = textViewIsAboveKeyBoard(currentTV!)
+//                    let tfPoint = CGPoint(x: currentTV!.frame.minX, y: questionRowHeight)// * 1.5)
+//                    let convertedPoint = view.convert(tfPoint, from: currentTV?.superview)
+//                    //print(view.convert(CGPoint(x: currentTV!.frame.minX, y: currentTF!.frame.maxY), from: currentTV?.superview))
+//                    //                    view.snapshotView(afterScreenUpdates: false)
+//                    //                    UIApplication.shared.windows[0].convert(tfPoint, to: UIApplication.shared.windows[0])
+//                    //TODO point convert
+//                    if convertedPoint.y - 60 <= (view.frame.height - kbHeight) {
+//                        print("tv is not below keyboard")
+//                    } else {
+//                        offsetY = -(view.frame.height - kbHeight - convertedPoint.y)// + 15 //+ (activeTextField?.bounds.height)! / 2
+//                        //                currentOffsetY = offsetY
+//                    }
+//                }
+//            }
+        }
+    }
     fileprivate var answersRowHeight: [Int: CGFloat] = [:]
     fileprivate var textViews: [UITextView] = []
+    fileprivate var textFields: [UITextField] = []
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         print("seg")
     }
@@ -244,6 +294,8 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                 _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)
                 cell = _cell
             } else if indexPath.row == 3, let _cell = tableView.dequeueReusableCell(withIdentifier: "votes", for: indexPath) as? VotesSelectionCell {
+                _cell.count.delegate = self
+                addTextField(_cell.count)
                 cell = _cell
                 cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
             }
@@ -255,6 +307,8 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
             } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "link", for: indexPath) as? LinkAttachmentCell {
                 _cell.link.delegate = self
+                _cell.delegate = self
+                addTextField(_cell.link)
                 cell = _cell
                 cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
                 //            cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
@@ -266,9 +320,12 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
         } else if indexPath.section == 3, let _cell = tableView.dequeueReusableCell(withIdentifier: "image", for: indexPath) as? ImageSelectionCell {
             _cell.setNeedsLayout()
             _cell.layoutIfNeeded()
-            _cell.pictureView.image = images[indexPath.row]
+            _cell.pictureView.image = images[indexPath.row].keys.first
             _cell.pictureView.contentMode = UIView.ContentMode.scaleAspectFill
             _cell.pictureView.layer.cornerRadius = _cell.pictureView.frame.height / 2
+            _cell.textField.text = images[indexPath.row].values.first
+            _cell.textField.delegate = self
+            addTextField(_cell.textField)
             cell = _cell
 //            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
 //                c.separatorInset = UIEdgeInsets(top: 0, left: c.frame.width/9, bottom: 0, right: c.frame.width/9)
@@ -350,7 +407,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                     return questionRowHeight
                 }
             } else {
-                return 100
+                return 110
             }
         } else if indexPath.section == 3 {//Image
             return 80
@@ -364,10 +421,10 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                 }
                 let sizeThatFitsTextView = cell.textView.sizeThatFits(CGSize(width: cell.textView.frame.size.width, height: CGFloat(MAXFLOAT)))
                 answersRowHeight[indexPath.row] = yLength + sizeThatFitsTextView.height + 10
-                return answersRowHeight[indexPath.row] ?? 100
+                return answersRowHeight[indexPath.row] ?? 110
             }
             else {
-                return answersRowHeight[indexPath.row] ?? 100
+                return answersRowHeight[indexPath.row] ?? 110
             }
         }
         return UITableView.automaticDimension
@@ -486,39 +543,46 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0, let cell = tableView.cellForRow(at: indexPath) as? VotesSelectionCell {
-            if currentTV != nil {
-                currentTV?.isUserInteractionEnabled = false
-                view.endEditing(true)
-                currentTV = nil
-            }
-            cell.count.becomeFirstResponder()
-            if !cell.count.isFirstResponder {
-                delay(seconds: 0.01) {
-                    cell.count.becomeFirstResponder()
-                }
-            }
-            cell.count.isUserInteractionEnabled = true
-            currentTF = cell.count
+//            if currentTV != nil {
+//                currentTV?.isUserInteractionEnabled = false
+//                view.endEditing(true)
+//                currentTV = nil
+//            }
+//            cell.count.becomeFirstResponder()
+//            if !cell.count.isFirstResponder {
+//                delay(seconds: 0.01) {
+//                    cell.count.becomeFirstResponder()
+//                }
+//            }
+//            cell.count.isUserInteractionEnabled = true
+//            currentTF = cell.count
         } else if indexPath.section == 1, let cell = tableView.cellForRow(at: indexPath) as? LinkAttachmentCell {
-            cell.link.becomeFirstResponder()
-            if !cell.link.isFirstResponder {
-                delay(seconds: 0.01) {
-                    cell.link.becomeFirstResponder()
-                }
-            }
-            cell.link.isUserInteractionEnabled = true
-            currentTF = cell.link
+//            cell.link.becomeFirstResponder()
+//            if !cell.link.isFirstResponder {
+//                delay(seconds: 0.01) {
+//                    cell.link.becomeFirstResponder()
+//                }
+//            }
+//            cell.link.isUserInteractionEnabled = true
+//            currentTF = cell.link
         } else if indexPath.section == 1 {
             if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
                 currentTV = cell.textView
-                cell.textView.becomeFirstResponder()
-                cell.textView.isUserInteractionEnabled = true
+                if tableView.contentOffset != .zero {
+                    tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+                    scrollCompletion = { cell.textView.becomeFirstResponder(); cell.textView.isUserInteractionEnabled = true }
+                } else {
+                    cell.textView.becomeFirstResponder()
+                    cell.textView.isUserInteractionEnabled = true
+                }
             }
         } else if indexPath.section == 5 {
             if let cell = tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
                 currentTV = cell.textView
-                cell.textView.becomeFirstResponder()
-                cell.textView.isUserInteractionEnabled = true
+                tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+                scrollCompletion = { cell.textView.becomeFirstResponder(); cell.textView.isUserInteractionEnabled = true }
+//                cell.textView.becomeFirstResponder()
+//                cell.textView.isUserInteractionEnabled = true
             }
         } else {
             if currentTV != nil {
@@ -590,6 +654,15 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
+extension NewSurveyViewController: UIScrollViewDelegate {
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        if scrollCompletion != nil {
+            scrollCompletion!()
+            scrollCompletion = nil
+        }
+    }
+}
+
 extension NewSurveyViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         tableView.beginUpdates()
@@ -619,6 +692,7 @@ extension NewSurveyViewController: UITextViewDelegate {
 //    }
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        currentTF = nil
         if let cell = tableView.cellForRow(at: tableView.indexPathForSelectedRow!) as? QuestionCreationCell {
             checkTextViewEdited(beganEditing: true, textView: textView, placeholder: cell.placeholder)
         } else if let cell = tableView.cellForRow(at: tableView.indexPathForSelectedRow!) as? AnswerCreationCell {
@@ -641,10 +715,19 @@ extension NewSurveyViewController: UITextViewDelegate {
         }
     }
     
-    fileprivate func findFirstResponder() -> UITextView? {
+    fileprivate func findFirstResponderTextView() -> UITextView? {
         for textView in textViews {
             if textView.isFirstResponder {
                 return textView
+            }
+        }
+        return nil
+    }
+    
+    fileprivate func findFirstResponderTextField() -> UITextField? {
+        for textField in textFields {
+            if textField.isFirstResponder {
+                return textField
             }
         }
         return nil
@@ -656,31 +739,50 @@ extension NewSurveyViewController: UITextViewDelegate {
         }
     }
     
+    fileprivate func addTextField(_ textField: UITextField) {
+        if !textFields.contains(textField) {
+            textFields.append(textField)
+        }
+    }
+    
     func textViewIsAboveKeyBoard(_ textView: UITextView?) -> Bool {
-        
         var activeTextView: UITextView?
         if textView != nil {
             activeTextView = textView
         } else {
-            activeTextView = findFirstResponder()
+            activeTextView = findFirstResponderTextView()
         }
         
         if (activeTextView != nil) {
-            
             let tfPoint = CGPoint(x: activeTextView!.frame.minX, y: activeTextView!.frame.maxY)// * 1.5)
             let convertedPoint = view.convert(tfPoint, from: activeTextView?.superview)
-            
-            
             if convertedPoint.y <= (view.frame.height - kbHeight) {
                 return true
             } else {
                 offsetY = -(view.frame.height - kbHeight - convertedPoint.y)// + 15 //+ (activeTextField?.bounds.height)! / 2
-                currentOffsetY = offsetY
             }
         }
-        
         return false
+    }
+    
+    func textFieldIsAboveKeyBoard(_ textField: UITextField?) -> Bool {
+        var activeTextField: UITextField?
+        if textField != nil {
+            activeTextField = textField
+        } else {
+            activeTextField = findFirstResponderTextField()
+        }
         
+        if (activeTextField != nil) {
+            let tfPoint = CGPoint(x: activeTextField!.frame.minX, y: activeTextField!.frame.maxY)// * 1.5)
+            let convertedPoint = view.convert(tfPoint, from: activeTextField?.superview)
+            if convertedPoint.y <= (view.frame.height - kbHeight) {
+                return true
+            } else {
+                offsetY = -(view.frame.height - kbHeight - convertedPoint.y)// + 15 //+ (activeTextField?.bounds.height)! / 2
+            }
+        }
+        return false
     }
     
     @objc func keyboardWillShow(_ notification: Notification) {
@@ -688,8 +790,12 @@ extension NewSurveyViewController: UITextViewDelegate {
             if let keyboardSize =  (userInfo[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
                 if (isMovedUp == nil) || isMovedUp == false {
                     kbHeight = keyboardSize.height
-                    if !textViewIsAboveKeyBoard(nil) {
+                    if currentTF != nil, !textFieldIsAboveKeyBoard(nil) {
                         self.moveTextField(true)
+                    } else {
+                        if !textViewIsAboveKeyBoard(nil) {
+                            self.moveTextField(true)
+                        }
                     }
                 }
             }
@@ -700,14 +806,16 @@ extension NewSurveyViewController: UITextViewDelegate {
         if isMovedUp != nil {
             if isMovedUp! {
                 self.moveTextField(false)
+                currentTF = nil
             }
         }
     }
     
     private func moveTextField(_ up: Bool) {
-        let movement = (up ? -offsetY : offsetY)
+        var distance: CGFloat = 0
+        distance = (up ? -offsetY : offsetY)
         UIView.animate(withDuration: 0.2, animations: {
-            self.view.frame.origin.y += movement
+            self.view.frame.origin.y += distance
             if up {
                 self.isMovedUp = true
             } else {
@@ -718,9 +826,19 @@ extension NewSurveyViewController: UITextViewDelegate {
 }
 
 extension NewSurveyViewController: UITextFieldDelegate {
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        currentTF = nil
+        currentTF = textField
+        if currentTV != nil {
+            currentTV?.isUserInteractionEnabled = false
+            view.endEditing(true)
+            currentTV = nil
+        }
+        return true
+    }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        textField.isUserInteractionEnabled = false
+        currentTF = nil
         return true
     }
 }
@@ -730,7 +848,7 @@ extension NewSurveyViewController: UIImagePickerControllerDelegate {
         if let origImage = info[.editedImage] as? UIImage {
             let imageData = origImage.jpegData(compressionQuality: 0.6)
             let image = UIImage(data: imageData!)
-            images.append(image!)
+            images.append([image!: ""])
         }
         dismiss(animated: true)
     }
@@ -748,7 +866,6 @@ extension NewSurveyViewController: UITableViewDragDelegate {
     func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
         if (indexPath.section == 3 && tableView.numberOfRows(inSection: 3) > 1) || (indexPath.section == 5 && tableView.numberOfRows(inSection: 5) > 1) {
             let dragItem = UIDragItem(itemProvider: NSItemProvider())
-//            dragItem.itemProvider.setValue(indexPath, forUndefinedKey: "indexPath")
             dragItem.localObject = indexPath
             return [dragItem]
         }
@@ -758,27 +875,6 @@ extension NewSurveyViewController: UITableViewDragDelegate {
     func tableView(_ tableView: UITableView, dragSessionIsRestrictedToDraggingApplication session: UIDragSession) -> Bool {
         return true
     }
-
-//    func dragItems(for indexPath: IndexPath) -> [UIDragItem] {
-//        let image = images[indexPath.row]
-//
-//        let data = image
-//        let itemProvider = NSItemProvider()
-//
-//        itemProvider.registerDataRepresentation(forTypeIdentifier: kUTTypePlainText as String, visibility: .all) { completion in
-//            completion(data, nil)
-//            return nil
-//        }
-//
-//        return [
-//            UIDragItem(itemProvider: itemProvider)
-//        ]
-//    }
-
-//    func tableView(_ tableView: UITableView, dragSessionAllowsMoveOperation session: UIDragSession) -> Bool {
-////        print(session.items[0].itemProvider.)
-//        return true
-//    }
 }
 
 @available(iOS 11.0, *)
@@ -817,6 +913,31 @@ extension NewSurveyViewController: CellButtonDelegate {
             selectImage(.photoLibrary)
         } else if sender is PlusIcon {
             answers.append("")
+            tableView.scrollToBottom()
+        } else if sender is YoutubeIcon {
+            if let url = URL(string: "https://www.youtube.com"),
+                UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:])
+            }
+        } else if sender is WikiIcon {
+            if let url = URL(string: "https://ru.m.wikipedia.org"),
+                UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:])
+            }
         }
+    }
+}
+
+//Logic
+extension NewSurveyViewController {
+    fileprivate func checkNecessaryFields() {
+        //1. Category
+        //2. Privacy
+        //3. Anonymity
+        //4. Votes capacity
+        //5. Question
+        //6. URL
+        //7. Images
+        //8. Answers
     }
 }

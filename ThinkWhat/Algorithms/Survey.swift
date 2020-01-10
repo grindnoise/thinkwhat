@@ -242,3 +242,9 @@ class Survey {
         }
     }
 }
+
+enum SurveyAnonymity: String {
+    case Full       = "full"
+    case Host       = "host"
+    case Responder  = "responder"
+}
