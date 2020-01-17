@@ -47,13 +47,13 @@
          contextName = "NewSurveyViewController.tableView(_:heightForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "questionRowHeight &gt; _questionRowHeight">
+               value = "answersRowHeight[indexPath.row]">
             </PersistentString>
             <PersistentString
-               value = "indexPath.row">
+               value = "tableView.contentOffset">
             </PersistentString>
             <PersistentString
-               value = "questionRowHeight">
+               value = "(answersRowHeight[indexPath.row]! - oldValue) + tableView.contentOffset.y">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -62,6 +62,14 @@
          <PersistentStrings>
             <PersistentString
                value = "loadingIndicator">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.textViewShouldBeginEditing(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.indexPathForSelectedRow">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -133,7 +141,7 @@
          contextName = "NewSurveyViewController.tableView(_:didSelectRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "tableView.contentOffset">
+               value = "kSegueAppNewSurveyToAnonymity">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -171,15 +179,15 @@
          contextName = "closure #1 in NewSurveyViewController.currentTV.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.currentTV == nil">
+               value = "self.tableView.indexPathForSelectedRow!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "NewSurveyViewController.tableView(_:viewForHeaderInSection:):NewSurveyViewController.swift">
+         contextName = "mach_msg_trap:(null)">
          <PersistentStrings>
             <PersistentString
-               value = "tableView.headerView(forSection: 1)">
+               value = "tableView">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -187,10 +195,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -199,6 +207,14 @@
          <PersistentStrings>
             <PersistentString
                value = "dateString:userProfile[&quot;birth_date&quot;]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.tableView(_:viewForHeaderInSection:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.headerView(forSection: 1)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -234,6 +250,20 @@
          <PersistentStrings>
             <PersistentString
                value = "imagePath!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in NewSurveyViewController.tableView(_:trailingSwipeActionsConfigurationForRowAt:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "answers">
+            </PersistentString>
+            <PersistentString
+               value = "tableView.indexPathForSelectedRow">
+            </PersistentString>
+            <PersistentString
+               value = "tableView.isUserInteractionEnabled">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -335,6 +365,9 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in UITableView.scrollToBottom():Extensions.swift">
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.viewWillLayoutSubviews():NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -361,6 +394,14 @@
          <PersistentStrings>
             <PersistentString
                value = "header">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.textFieldShouldBeginEditing(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "currentTV">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -438,7 +479,16 @@
          contextName = "NewSurveyViewController.cellSubviewTapped(_:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "sender.isKind(of: UIButton.self)">
+               value = "tableView.indexPathForSelectedRow">
+            </PersistentString>
+            <PersistentString
+               value = "answers">
+            </PersistentString>
+            <PersistentString
+               value = "tableView.allowsSelection">
+            </PersistentString>
+            <PersistentString
+               value = "(sender as! AnonymitySettingsTableViewController).anonymity">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -462,6 +512,25 @@
          contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
       </ContextState>
       <ContextState
+         contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "anonymity">
+            </PersistentString>
+            <PersistentString
+               value = "segue.destination as? AnonymitySettingsTableViewController">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AnonymitySettingsTableViewController.tableView(_:didSelectRowAt:):AnonymitySettingsTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "anonymity">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "AnswerCreationHeaderCell.addTapped(_:):AnswerCreationHeaderCell.swift">
          <PersistentStrings>
             <PersistentString
@@ -481,10 +550,10 @@
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = " currentTV != nil">
+               value = "currentOffsetY">
             </PersistentString>
             <PersistentString
-               value = "currentOffsetY">
+               value = " currentTV != nil">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -525,22 +594,16 @@
          contextName = "NewSurveyViewController.textViewIsAboveKeyBoard(_:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "view.frame.height">
+               value = "convertedPoint.y">
             </PersistentString>
             <PersistentString
                value = "activeTextView!.bounds.maxY">
             </PersistentString>
             <PersistentString
-               value = "convertedPoint.y">
-            </PersistentString>
-            <PersistentString
-               value = "view.frame.height - kbHeight">
+               value = "kbHeight">
             </PersistentString>
             <PersistentString
                value = "-(view.frame.height - kbHeight - convertedPoint.y)">
-            </PersistentString>
-            <PersistentString
-               value = "tabBarController?.tabBar.bounds">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -711,6 +774,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "AnonymitySettingsTableViewController.tableView(_:numberOfRowsInSection:):AnonymitySettingsTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "SurveyAnonymity.allCases.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in closure #1 in AuthViewController.handleTokenStateReceived():AuthViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -772,6 +843,14 @@
          <PersistentStrings>
             <PersistentString
                value = "vc.control.selectedSegmentIndex">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.keyboardWillShow(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "keyboardSize.height">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -846,16 +925,19 @@
          contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "answers[indexPath.row]!">
+               value = " _cell.textView.text!">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
+            </PersistentString>
+            <PersistentString
+               value = "indexPath.row">
             </PersistentString>
             <PersistentString
                value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

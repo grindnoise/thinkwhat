@@ -243,8 +243,9 @@ class Survey {
     }
 }
 
-enum SurveyAnonymity: String {
-    case Full       = "full"
-    case Host       = "host"
-    case Responder  = "responder"
+enum SurveyAnonymity: Int, CaseIterable {
+    case Full
+    case Host
+    case Responder
+    case AllowAnonymousVoting
 }

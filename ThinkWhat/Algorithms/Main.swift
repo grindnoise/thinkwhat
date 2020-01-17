@@ -206,6 +206,9 @@ let kSegueAppProfileToInfo                       = "INFO"
 let kSegueAppTopSurveysToSurvey                  = "TOP_TO_SURVEY"
 let kSegueAppUserSurveysToSurvey                 = "USER_SURVEYS_TO_SURVEY"
 let kSegueAppTopSurveysToCategory                = "TOP_TO_CATEGORY"
+let kSegueAppNewSurveyToAnonymity                = "NEW_TO_ANONYMITY"
+let kSegueAppNewSurveyToCategory                 = "NEW_TO_CATEGORY"
+
 
 
 //let segueBarberData                             = "segueBarberData"

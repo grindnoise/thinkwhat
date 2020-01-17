@@ -109,6 +109,7 @@
 		ABBA73FC2386ECC200540ECF /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73FB2386ECC200540ECF /* Icon.swift */; };
 		ABBA73FE2387C5A200540ECF /* FlameIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73FD2387C5A200540ECF /* FlameIcon.swift */; };
 		ABBA74002387E66F00540ECF /* CategoryIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */; };
+		ABBF848923CDB97400059BF0 /* AnonymitySettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBF848823CDB97400059BF0 /* AnonymitySettingsTableViewController.swift */; };
 		ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C622E9B33700DEA9FD /* Mail.swift */; };
 		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
@@ -256,6 +257,7 @@
 		ABBA73FB2386ECC200540ECF /* Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icon.swift; sourceTree = "<group>"; };
 		ABBA73FD2387C5A200540ECF /* FlameIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameIcon.swift; sourceTree = "<group>"; };
 		ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIcon.swift; sourceTree = "<group>"; };
+		ABBF848823CDB97400059BF0 /* AnonymitySettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymitySettingsTableViewController.swift; sourceTree = "<group>"; };
 		ABC3E7C622E9B33700DEA9FD /* Mail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail.swift; sourceTree = "<group>"; };
 		ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSign.swift; sourceTree = "<group>"; };
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -564,6 +566,7 @@
 			children = (
 				AB7CE6FB23A36147006FDBD8 /* Cells */,
 				ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */,
+				ABBF848823CDB97400059BF0 /* AnonymitySettingsTableViewController.swift */,
 			);
 			path = New;
 			sourceTree = "<group>";
@@ -1024,6 +1027,7 @@
 				AB8DAB5423BA2A790089E25F /* PlainIcons.swift in Sources */,
 				AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */,
 				AB3C6848223FD3EE00B57580 /* ParentLoginButton.swift in Sources */,
+				ABBF848923CDB97400059BF0 /* AnonymitySettingsTableViewController.swift in Sources */,
 				AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */,
 				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
 				AB2AA1AE235605FD0086D16C /* InfoViewController.swift in Sources */,
@@ -1254,7 +1258,10 @@
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1274,7 +1281,10 @@
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1292,7 +1302,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhatTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
@@ -1310,7 +1324,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhatTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
@@ -1326,7 +1344,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhatUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
@@ -1342,7 +1364,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhatUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;

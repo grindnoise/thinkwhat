@@ -10,7 +10,10 @@ import UIKit
 
 class PrivacySelectionCell: UITableViewCell {
 
-    @IBOutlet weak var isOn: UISwitch!
+    @IBAction func privacySwitched(_ sender: Any) {
+        delegate?.cellSubviewTapped(sender as AnyObject)
+    }
+    var delegate: CellButtonDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

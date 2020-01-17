@@ -608,7 +608,7 @@ extension UITextField {
     }
     
     // Default actions:
-    @objc func doneButtonTapped() { self.resignFirstResponder() }
+    @objc func doneButtonTapped() { delegate?.textFieldShouldReturn!(self) }
     @objc func cancelButtonTapped() { self.resignFirstResponder() }
 }
 
@@ -650,7 +650,7 @@ extension UITableView {
             // exception here
             guard self.indexPathIsValid(indexPath) else { return }
             
-            self.scrollToRow(at: indexPath, at: .bottom, animated: true)
+            self.scrollToRow(at: indexPath/*IndexPath(row: 0, section: self.numberOfSections - 1)*/, at: .bottom, animated: true)
         }
     }
     
