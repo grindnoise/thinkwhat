@@ -138,6 +138,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "TextEditingView.dismiss():TextEditingView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "delegate">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.tableView(_:didSelectRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -195,10 +203,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -307,6 +315,14 @@
          <PersistentStrings>
             <PersistentString
                value = "UIApplication.shared.isRegisteredForRemoteNotifications">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TextEditingView.keyboardHeight.didset:TextEditingView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "keyboardHeight">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -512,19 +528,19 @@
          contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
       </ContextState>
       <ContextState
-         contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
+         contextName = "AnonymitySettingsTableViewController.tableView(_:didSelectRowAt:):AnonymitySettingsTableViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "anonymity">
             </PersistentString>
-            <PersistentString
-               value = "segue.destination as? AnonymitySettingsTableViewController">
-            </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "AnonymitySettingsTableViewController.tableView(_:didSelectRowAt:):AnonymitySettingsTableViewController.swift">
+         contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
          <PersistentStrings>
+            <PersistentString
+               value = "segue.destination as? AnonymitySettingsTableViewController">
+            </PersistentString>
             <PersistentString
                value = "anonymity">
             </PersistentString>
@@ -550,10 +566,10 @@
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "currentOffsetY">
+               value = " currentTV != nil">
             </PersistentString>
             <PersistentString
-               value = " currentTV != nil">
+               value = "currentOffsetY">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -925,19 +941,19 @@
          contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = " _cell.textView.text!">
+               value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
             <PersistentString
                value = "indexPath.row">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.frame">
+               value = " _cell.textView.text!">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

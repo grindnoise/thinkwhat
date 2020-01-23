@@ -22,6 +22,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     @IBAction func createTapped(_ sender: Any) {
         print("create")
     }
+    fileprivate var textEditingView: TextEditingView!
     @IBOutlet weak var tableView: UITableView!
 //    @IBOutlet weak var privacySwitch: UISwitch!
     @IBOutlet weak var votesQuantity: UITextField!
@@ -250,6 +251,9 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
         navigationController?.setNavigationBarHidden(false, animated: true)
         if (navigationController as! NavigationControllerPreloaded).delegate == nil {
             (navigationController as! NavigationControllerPreloaded).delegate = appDelegate.transitionCoordinator
+        }
+        DispatchQueue.main.async {
+            self.textEditingView = TextEditingView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
         }
     }
     
@@ -578,27 +582,30 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
 //            currentTF = cell.link
         } else if indexPath.section == 1 {
             if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
-                currentTV = cell.textView
-                if tableView.contentOffset != .zero {
-                    tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
-                    scrollCompletion = { cell.textView.becomeFirstResponder(); cell.textView.isUserInteractionEnabled = true }
-                } else {
-                    cell.textView.becomeFirstResponder()
-                    cell.textView.isUserInteractionEnabled = true
-                }
+//                isStatusBarHidden = true
+                textEditingView.present(title: "Вопрос", textView: cell.textView, closure: {self.tableView.deselectRow(at: indexPath, animated: true); self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)})
+//                currentTV = cell.textView
+//                if tableView.contentOffset != .zero {
+//                    tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                    scrollCompletion = { cell.textView.becomeFirstResponder(); cell.textView.isUserInteractionEnabled = true }
+//                } else {
+//                    cell.textView.becomeFirstResponder()
+//                    cell.textView.isUserInteractionEnabled = true
+//                }
             }
         } else if indexPath.section == 5 {
             if let cell = tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
-                currentTV = cell.textView
-                if tableView.contentOffset.y != verticalContentOffset {
-                    tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
-                    scrollCompletion = { cell.textView.becomeFirstResponder(); cell.textView.isUserInteractionEnabled = true }
-                } else {
-                    cell.textView.becomeFirstResponder()
-                    cell.textView.isUserInteractionEnabled = true
-                }
-//                cell.textView.becomeFirstResponder()
-//                cell.textView.isUserInteractionEnabled = true
+                textEditingView.present(title: cell.titleLabel.text!, textView: cell.textView, closure: {self.tableView.deselectRow(at: indexPath, animated: true); self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)})
+//                currentTV = cell.textView
+//                if tableView.contentOffset.y != verticalContentOffset {
+//                    tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                    scrollCompletion = { cell.textView.becomeFirstResponder(); cell.textView.isUserInteractionEnabled = true }
+//                } else {
+//                    cell.textView.becomeFirstResponder()
+//                    cell.textView.isUserInteractionEnabled = true
+//                }
+////                cell.textView.becomeFirstResponder()
+////                cell.textView.isUserInteractionEnabled = true
             }
         } else {
             if currentTV != nil {

@@ -1,0 +1,194 @@
+//
+//  TextEditingView.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 22.01.2020.
+//  Copyright © 2020 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+
+class TextEditingView: UIView, CAAnimationDelegate {
+
+    @IBOutlet var contentView: UIView!
+    @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var frameView: BorderedView!
+    @IBOutlet      var lightBlurView: UIVisualEffectView!
+    @IBOutlet weak var text: UITextView!
+    @IBOutlet weak var stackView: UIStackView!
+    @IBOutlet weak var hideKBIcon: HideKeyboardIcon!
+    @IBOutlet weak var frameHeight: NSLayoutConstraint!
+    @IBOutlet weak var frameToStackHeight: NSLayoutConstraint!
+    @IBAction func okTapped(_ sender: Any) {
+        dismiss()
+    }
+    @IBAction func cancelTapped(_ sender: Any) {
+        dismiss()
+    }
+    var delegate: UIViewController?
+    var textView: UITextView?
+    fileprivate var firstAppearance = true
+    fileprivate var closure: Closure?
+    fileprivate var keyboardHeight: CGFloat = 0 {
+        didSet {
+            if !firstAppearance {
+                hideKBIcon.transform = hideKBIcon.transform.isIdentity ? CGAffineTransform(rotationAngle: .pi) : CGAffineTransform.identity
+            }
+            if oldValue != keyboardHeight {
+                let height = self.frame.height - keyboardHeight - label.frame.height - frameToStackHeight.constant - stackView.frame.height
+                UIView.animate(withDuration: 0.2) {
+                    self.setNeedsLayout()
+                    self.frameHeight.constant = height
+                    self.layoutIfNeeded()
+                }
+            }
+        }
+    }
+    
+    init(frame: CGRect, delegate: UIViewController?) {
+        super.init(frame: frame)
+        self.commonInit()
+        self.delegate = delegate
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.commonInit()
+    }
+    
+    
+    private func commonInit() {
+        Bundle.main.loadNibNamed("TextEditingView", owner: self, options: nil)
+        guard let content = contentView else {
+            return
+        }
+        frameView.backgroundColor = .white
+        frameView.borderWidth = 1.5
+        frameView.borderColor = K_COLOR_GRAY
+        content.frame = self.bounds
+        content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        NotificationCenter.default.addObserver(self, selector: #selector(TextEditingView.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(TextEditingView.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        let touch = UITapGestureRecognizer(target:self, action: #selector(TextEditingView.toggleKeyboard))
+        hideKBIcon.addGestureRecognizer(touch)
+        self.addSubview(content)
+    }
+
+    public func present(title: String, textView _textView: UITextView?, closure _closure: Closure?) {
+        if _textView != nil {
+            text.text = _textView!.text
+            textView = _textView
+        }
+        label.text = title
+        closure = _closure
+        firstAppearance = true
+        hideKBIcon.transform = .identity
+        layer.zPosition = 100
+        let window = UIApplication.shared.keyWindow
+        window?.addSubview(self)
+        window?.windowLevel = UIWindow.Level.statusBar + 1
+        //UIApplication.shared.keyWindow?.addSubview(self)
+        contentView.alpha = 1
+        lightBlurView.alpha = 0
+        frameView.layer.transform = CATransform3DMakeScale(0.7, 0.7, 1)
+        frameView.layer.opacity = 1
+        
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+            //self.contentView.alpha = 1
+            self.lightBlurView.alpha = 1
+        }, completion: nil)
+        
+        let scaleAnim       = CASpringAnimation(keyPath: "transform.scale")//CABasicAnimation(keyPath: "transform.scale")
+        let fadeAnim        = CABasicAnimation(keyPath: "opacity")
+        let groupAnim       = CAAnimationGroup()
+        groupAnim.delegate = self
+        
+        scaleAnim.fromValue = 0.7
+        scaleAnim.toValue   = 1.0
+        scaleAnim.duration  = 0.9
+        scaleAnim.damping   = 11
+        scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+        fadeAnim.fromValue  = 0
+        fadeAnim.toValue    = 1
+        
+        //groupAnim.beginTime        += CACurrentMediaTime() + 0.2
+        groupAnim.animations        = [scaleAnim, fadeAnim]
+        groupAnim.duration          = 1.3
+        groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+        
+        //frameView.layer.add(groupAnim, forKey: nil)
+        frameView.layer.add(scaleAnim, forKey: nil)
+        frameView.layer.opacity = Float(1)
+        frameView.layer.transform = CATransform3DMakeScale(1, 1, 1)
+        text.becomeFirstResponder()
+    }
+    
+    public func dismiss() {
+        if textView != nil, let tableView = (delegate as? NewSurveyViewController)?.tableView {
+            DispatchQueue.main.async {
+                tableView.beginUpdates()
+                self.textView?.text = self.text.text
+                tableView.endUpdates()
+            }
+        }
+        endEditing(true)
+        let scaleAnim       = CABasicAnimation(keyPath: "transform.scale")
+        let fadeAnim        = CABasicAnimation(keyPath: "opacity")
+        let groupAnim       = CAAnimationGroup()
+        
+        scaleAnim.fromValue = 1.0
+        scaleAnim.toValue   = 0.7
+        scaleAnim.duration  = 0.6
+        scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+        fadeAnim.fromValue  = 1
+        fadeAnim.toValue    = 0
+        
+        groupAnim.animations        = [scaleAnim, fadeAnim]
+        groupAnim.duration          = 0.3
+        groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+        
+        frameView.layer.add(groupAnim, forKey: nil)
+        frameView.layer.opacity = Float(0)
+        frameView.layer.transform = CATransform3DMakeScale(0.7, 0.7, 1)
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
+            self.lightBlurView.alpha = 0
+            if self.closure != nil {
+                self.closure!()
+            }
+        }, completion: {
+            _ in
+            self.removeFromSuperview()
+            self.contentView.alpha = 0
+            UIApplication.shared.keyWindow?.windowLevel = UIWindow.Level.statusBar - 1
+        })
+    }
+    
+    @objc func toggleKeyboard() {
+        if text.isFirstResponder {
+            endEditing(true)
+        } else {
+            text.becomeFirstResponder()
+        }
+    }
+    
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if let userInfo = notification.userInfo {
+            if let keyboardSize =  (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                keyboardHeight = keyboardSize.height
+                if firstAppearance {
+                    firstAppearance = false
+                }
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(_ notification: Notification) {
+        UIView.animate(withDuration: 0.2) {
+            self.setNeedsLayout()
+            self.frameHeight.constant += self.keyboardHeight
+            self.layoutIfNeeded()
+            self.keyboardHeight = 0
+        }
+    }
+}

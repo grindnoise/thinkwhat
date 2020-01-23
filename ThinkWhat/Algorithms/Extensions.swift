@@ -23,8 +23,8 @@ extension UIView {
     func rotate180Degrees(duration: CFTimeInterval = 1.0, completionDelegate: AnyObject? = nil) {
         
         let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation")
-        rotationAnimation.fromValue = (180.0 * CGFloat(Double.pi)) / 180.0 * -1.0
-        rotationAnimation.toValue = 0.0
+        rotationAnimation.fromValue = 0.0
+        rotationAnimation.toValue = M_PI
         rotationAnimation.duration = duration
         
         if let delegate: AnyObject = completionDelegate {

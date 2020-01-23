@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Bold.ttf">
+            <string>OpenSans-Bold</string>
+        </array>
+        <array key="OpenSans-Light.ttf">
+            <string>OpenSans-Light</string>
+        </array>
+        <array key="OpenSans-Regular.ttf">
+            <string>OpenSans</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="TextEditingView" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="contentView" destination="iN0-l3-epB" id="2UR-wE-FDc"/>
+                <outlet property="frameHeight" destination="8oi-dF-Xgy" id="B4z-at-yvG"/>
+                <outlet property="frameToStackHeight" destination="twH-ng-OUV" id="Kam-HT-Fy9"/>
+                <outlet property="frameView" destination="col-Zl-QjR" id="8Xd-mz-D1i"/>
+                <outlet property="hideKBIcon" destination="7dq-Sg-y5S" id="c9y-Oj-4k3"/>
+                <outlet property="label" destination="KfI-PJ-IZG" id="JqT-2R-4Jw"/>
+                <outlet property="lightBlurView" destination="bHG-0c-DJ0" id="emI-99-9bb"/>
+                <outlet property="stackView" destination="LC8-FM-QcW" id="B74-jJ-e5G"/>
+                <outlet property="text" destination="xaz-FR-Vj9" id="MHX-ts-vbn"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bHG-0c-DJ0">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                    <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="yN0-NU-Lg6">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="col-Zl-QjR" customClass="BorderedView" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="20" y="70" width="335" height="200"/>
+                                <subviews>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="xaz-FR-Vj9">
+                                        <rect key="frame" x="10" y="10" width="315" height="180"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                        <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="8oi-dF-Xgy"/>
+                                    <constraint firstItem="xaz-FR-Vj9" firstAttribute="top" secondItem="col-Zl-QjR" secondAttribute="top" constant="10" id="BVt-4y-pUt"/>
+                                    <constraint firstItem="xaz-FR-Vj9" firstAttribute="leading" secondItem="col-Zl-QjR" secondAttribute="leading" constant="10" id="BtT-o1-9oK"/>
+                                    <constraint firstAttribute="trailing" secondItem="xaz-FR-Vj9" secondAttribute="trailing" constant="10" id="qAO-QN-yLc"/>
+                                    <constraint firstAttribute="bottom" secondItem="xaz-FR-Vj9" secondAttribute="bottom" constant="10" id="w6r-UA-Z2w"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="rounded" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="bordered" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Вопрос" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KfI-PJ-IZG">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="70"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="70" id="UGz-TM-5lQ"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="19"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="LC8-FM-QcW">
+                                <rect key="frame" x="20" y="270" width="335" height="50"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ek4-pD-kBU">
+                                        <rect key="frame" x="0.0" y="0.0" width="92.5" height="50"/>
+                                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
+                                        <state key="normal" title="Отмена">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="cancelTapped:" destination="-1" eventType="touchUpInside" id="u1B-LO-cAB"/>
+                                        </connections>
+                                    </button>
+                                    <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7dq-Sg-y5S" customClass="HideKeyboardIcon" customModule="ThinkWhat" customModuleProvider="target">
+                                        <rect key="frame" x="142.5" y="0.0" width="50" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="7dq-Sg-y5S" secondAttribute="height" multiplier="1:1" id="OAX-zK-fXj"/>
+                                        </constraints>
+                                    </view>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5dS-r1-Mj9">
+                                        <rect key="frame" x="242.5" y="0.0" width="92.5" height="50"/>
+                                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
+                                        <state key="normal" title="Ок">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="okTapped:" destination="-1" eventType="touchUpInside" id="VGy-Sy-ixh"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="Bn2-ep-riX"/>
+                                    <constraint firstItem="5dS-r1-Mj9" firstAttribute="width" secondItem="ek4-pD-kBU" secondAttribute="width" id="Gu3-bF-0hf"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="KfI-PJ-IZG" firstAttribute="top" secondItem="yN0-NU-Lg6" secondAttribute="top" id="3up-Sp-rrR"/>
+                            <constraint firstItem="KfI-PJ-IZG" firstAttribute="leading" secondItem="yN0-NU-Lg6" secondAttribute="leading" id="69S-TW-qGH"/>
+                            <constraint firstAttribute="trailing" secondItem="KfI-PJ-IZG" secondAttribute="trailing" id="NoU-mi-kVZ"/>
+                            <constraint firstItem="col-Zl-QjR" firstAttribute="leading" secondItem="yN0-NU-Lg6" secondAttribute="leading" constant="20" id="WbL-Ci-Mwv"/>
+                            <constraint firstAttribute="trailing" secondItem="col-Zl-QjR" secondAttribute="trailing" constant="20" id="YnU-bk-hYt"/>
+                            <constraint firstItem="LC8-FM-QcW" firstAttribute="width" secondItem="col-Zl-QjR" secondAttribute="width" id="oF8-Qm-Lgv"/>
+                            <constraint firstItem="LC8-FM-QcW" firstAttribute="centerX" secondItem="col-Zl-QjR" secondAttribute="centerX" id="s2d-KB-dV8"/>
+                            <constraint firstItem="LC8-FM-QcW" firstAttribute="top" secondItem="col-Zl-QjR" secondAttribute="bottom" id="twH-ng-OUV"/>
+                            <constraint firstItem="col-Zl-QjR" firstAttribute="top" secondItem="KfI-PJ-IZG" secondAttribute="bottom" id="xA6-hJ-n38"/>
+                        </constraints>
+                    </view>
+                    <blurEffect style="light"/>
+                </visualEffectView>
+            </subviews>
+            <constraints>
+                <constraint firstItem="bHG-0c-DJ0" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="FLn-kL-xlA"/>
+                <constraint firstItem="bHG-0c-DJ0" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="JDp-LA-SDA"/>
+                <constraint firstItem="bHG-0c-DJ0" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="bMb-Yl-Fla"/>
+                <constraint firstItem="bHG-0c-DJ0" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="iAA-tf-BXc"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <point key="canvasLocation" x="55.200000000000003" y="48.125937031484263"/>
+        </view>
+    </objects>
+</document>
