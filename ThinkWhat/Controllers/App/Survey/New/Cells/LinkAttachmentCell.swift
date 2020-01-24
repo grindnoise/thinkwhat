@@ -11,18 +11,25 @@ import UIKit
 class LinkAttachmentCell: UITableViewCell {
 
     @IBOutlet weak var link: UITextField!
-    @IBOutlet weak var youtube: YoutubeIcon! {
+    @IBOutlet weak var youtube: YoutubeLogo! {
         didSet {
             let touch = UITapGestureRecognizer(target:self, action:#selector(LinkAttachmentCell.buttonTapped))
             touch.cancelsTouchesInView = false
             youtube.addGestureRecognizer(touch)
         }
     }
-    @IBOutlet weak var wiki: WikiIcon! {
+    @IBOutlet weak var ig: InstagramLogo! {
         didSet {
             let touch = UITapGestureRecognizer(target:self, action:#selector(LinkAttachmentCell.buttonTapped))
             touch.cancelsTouchesInView = false
-            wiki.addGestureRecognizer(touch)
+            ig.addGestureRecognizer(touch)
+        }
+    }
+    @IBOutlet weak var wiki: WikiLogo! {
+        didSet {
+            let touch = UITapGestureRecognizer(target:self, action:#selector(LinkAttachmentCell.buttonTapped))
+            touch.cancelsTouchesInView = false
+            ig.addGestureRecognizer(touch)
         }
     }
     var delegate: CellButtonDelegate?

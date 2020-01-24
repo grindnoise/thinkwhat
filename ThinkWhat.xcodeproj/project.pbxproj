@@ -25,8 +25,6 @@
 		AB2AA1B8235D94DF0086D16C /* SurveyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */; };
 		AB2AA1B9235D94DF0086D16C /* SurveyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */; };
 		AB2AA1BB235DDC6F0086D16C /* TopSurveysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */; };
-		AB2D7CCF23B6308F00BFFDC1 /* YoutubeIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D7CCE23B6308F00BFFDC1 /* YoutubeIcon.swift */; };
-		AB2D7CD123B6338500BFFDC1 /* WikiIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2D7CD023B6338500BFFDC1 /* WikiIcon.swift */; };
 		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
 		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
 		AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */; };
@@ -170,8 +168,6 @@
 		AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTableViewCell.swift; sourceTree = "<group>"; };
 		AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyTableViewCell.xib; sourceTree = "<group>"; };
 		AB2AA1BA235DDC6F0086D16C /* TopSurveysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopSurveysViewController.swift; sourceTree = "<group>"; };
-		AB2D7CCE23B6308F00BFFDC1 /* YoutubeIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeIcon.swift; sourceTree = "<group>"; };
-		AB2D7CD023B6338500BFFDC1 /* WikiIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikiIcon.swift; sourceTree = "<group>"; };
 		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AB3C67E3223FBB6400B57580 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -522,8 +518,6 @@
 				ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */,
 				ABDA424E23B0D60500BAC3A5 /* NewAnswerIcons.swift */,
 				ABDA425023B0D7BF00BAC3A5 /* WebIcon.swift */,
-				AB2D7CCE23B6308F00BFFDC1 /* YoutubeIcon.swift */,
-				AB2D7CD023B6338500BFFDC1 /* WikiIcon.swift */,
 				AB8DAB5323BA2A790089E25F /* PlainIcons.swift */,
 				AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */,
 			);
@@ -1039,7 +1033,6 @@
 				AB2984FC23A7A2340086A92B /* AnonymitySelectionCell.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
 				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
-				AB2D7CD123B6338500BFFDC1 /* WikiIcon.swift in Sources */,
 				ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */,
 				ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */,
 				AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */,
@@ -1076,7 +1069,6 @@
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				ABDA424F23B0D60500BAC3A5 /* NewAnswerIcons.swift in Sources */,
 				AB29850223AA2FFC0086A92B /* LinkAttachmentCell.swift in Sources */,
-				AB2D7CCF23B6308F00BFFDC1 /* YoutubeIcon.swift in Sources */,
 				AB29850423AA471B0086A92B /* ImageHeaderCell.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */,
