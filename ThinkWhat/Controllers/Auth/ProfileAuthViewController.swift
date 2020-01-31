@@ -49,13 +49,13 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
         }
         if !isImageChanged {
             if !errorText.isEmpty {
-                showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Выберите изображение и заполните поля:\n\(errorText)")
+                showAlert(type: .WrongCredentials, buttons: [["Ясно": [CustomAlertView.ButtonType.Ok: nil]]], text: "Выберите изображение и заполните поля:\n\(errorText)")
             } else {
-                showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Выберите изображение")
+                showAlert(type: .WrongCredentials, buttons: [["Ясно": [CustomAlertView.ButtonType.Ok: nil]]], text: "Выберите изображение")
             }
         } else {
             if !errorText.isEmpty {
-                showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Не заполнены поля:\n\(errorText)")
+                showAlert(type: .WrongCredentials, buttons: [["Ясно": [CustomAlertView.ButtonType.Ok: nil]]], text: "Не заполнены поля:\n\(errorText)")
             } else {
                 var userProfile = [String: Any]()
                 var owner       = [String: Any]()
@@ -90,11 +90,11 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
                 if userProfile.isEmpty {
                     performSegue(withIdentifier: kSegueAppFromProfile, sender: nil)
                 } else {
-                    showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+                    showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
                     apiManager.updateUserProfile(data: userProfile) {
                         json, error in
                         if error != nil {
-                            showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
+                            showAlert(type: .WrongCredentials, buttons: [["Хорошо": [CustomAlertView.ButtonType.Ok: nil]]], text: error!.localizedDescription)
                         }
                         if json != nil {
                             AppData.shared.importUserData(json!)
@@ -519,15 +519,15 @@ extension ProfileAuthViewController: UIImagePickerControllerDelegate {
             self.apiManager.updateUserProfile(data: ["image" : image]) {
                 json, error in
                 if error != nil {
-                    showAlert(type: .Ok, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Ошибка при загрузке изображения: \(error!.localizedDescription)")
+                    showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка при загрузке изображения: \(error!.localizedDescription)")
                 }
                 if json != nil {
                     AppData.shared.userProfile.imagePath = self.storeManager.storeImage(type: .Profile, image: image!, fileName: nil, fileFormat: NSData(data: image!.jpeg!).fileFormat, surveyID: nil)
-                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {
+                    showAlert(type: .Warning, buttons: [["Готово": [CustomAlertView.ButtonType.Ok: {
                         self.isImageChanged = true
                         self.circularImage = image!.circularImage(size: self.userImage.frame.size, frameColor: K_COLOR_RED)
                         animateImageChange(imageView: self.userImage, fromImage: self.userImage.image!, toImage: self.circularImage, duration: 0.2)
-                        }]], text: "Загружено")
+                        }]]], text: "Загружено")
                 }
             }
         }

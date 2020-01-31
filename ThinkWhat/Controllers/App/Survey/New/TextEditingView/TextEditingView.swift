@@ -20,13 +20,21 @@ class TextEditingView: UIView, CAAnimationDelegate {
     @IBOutlet weak var frameHeight: NSLayoutConstraint!
     @IBOutlet weak var frameToStackHeight: NSLayoutConstraint!
     @IBAction func okTapped(_ sender: Any) {
-        dismiss()
+        if text.text.isEmpty {
+            UIView.animate(withDuration: 0, animations: {self.endEditing(true)}, completion: {
+                _ in
+                showAlert(type: .Warning, buttons: [["Отмена": [.Cancel: {self.dismiss(save: false)}]], ["Ввести текст": [.Ok: {self.text.becomeFirstResponder()}]]], text: "Введите текст или нажмите Отмена")
+            })
+        } else {
+            dismiss(save: true)
+        }
     }
     @IBAction func cancelTapped(_ sender: Any) {
-        dismiss()
+        dismiss(save: false)
     }
-    var delegate: UIViewController?
-    var textView: UITextView?
+    fileprivate var delegate: UIViewController?
+    fileprivate var textView: UITextView?
+    fileprivate var placeholder = ""
     fileprivate var firstAppearance = true
     fileprivate var closure: Closure?
     fileprivate var keyboardHeight: CGFloat = 0 {
@@ -74,13 +82,15 @@ class TextEditingView: UIView, CAAnimationDelegate {
         self.addSubview(content)
     }
 
-    public func present(title: String, textView _textView: UITextView?, closure _closure: Closure?) {
+    public func present(title: String, textView _textView: UITextView?, placeholder _placeholder: String, closure _closure: Closure?) {
         if _textView != nil {
             text.text = _textView!.text
             textView = _textView
         }
+        text.delegate = self
         label.text = title
         closure = _closure
+        placeholder = _placeholder
         firstAppearance = true
         hideKBIcon.transform = .identity
         layer.zPosition = 100
@@ -123,12 +133,14 @@ class TextEditingView: UIView, CAAnimationDelegate {
         text.becomeFirstResponder()
     }
     
-    public func dismiss() {
+    public func dismiss(save: Bool) {
         if textView != nil, let tableView = (delegate as? NewSurveyViewController)?.tableView {
-            DispatchQueue.main.async {
-                tableView.beginUpdates()
-                self.textView?.text = self.text.text
-                tableView.endUpdates()
+            if save {
+                DispatchQueue.main.async {
+                    tableView.beginUpdates()
+                    self.textView?.text = self.text.text
+                    tableView.endUpdates()
+                }
             }
         }
         endEditing(true)
@@ -189,6 +201,27 @@ class TextEditingView: UIView, CAAnimationDelegate {
             self.frameHeight.constant += self.keyboardHeight
             self.layoutIfNeeded()
             self.keyboardHeight = 0
+        }
+    }
+}
+
+extension TextEditingView: UITextViewDelegate {
+    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        checkTextViewEdited(beganEditing: true, textView: text, placeholder: placeholder)
+        return true
+    }
+    
+    fileprivate func checkTextViewEdited(beganEditing: Bool, textView: UITextView, placeholder: String) {
+        if beganEditing {
+            if textView.text == placeholder {
+                textView.text = ""
+                textView.textAlignment = .natural
+            }
+        } else {
+            if textView.text.isEmpty {
+                textView.text = placeholder
+                textView.textAlignment = .center
+            }
         }
     }
 }

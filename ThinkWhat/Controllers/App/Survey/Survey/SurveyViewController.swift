@@ -90,7 +90,7 @@ class SurveyViewController: UIViewController {
                     _, error in
                     self.isRequesting = false
                     if error != nil {
-                        showAlert(type: CustomAlertView.AlertType.Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], title: "Ошибка", body: "Опрос не добавлен в любимые. \(error!.localizedDescription)")
+                        showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Опрос не добавлен в любимые. \(error!.localizedDescription)")
                     }
                 }
             }
@@ -121,9 +121,9 @@ extension SurveyViewController {
         apiManager.loadSurvey(survey: surveyLink) {
             json, error in
             if error != nil {
-                showAlert(type: .Ok, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { UIView.animate(withDuration: 0.3, animations: {
+                showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { UIView.animate(withDuration: 0.3, animations: {
                     self.loadingIndicator.alpha = 0
-                }) { _ in self.loadingIndicator.removeAllAnimations() } }]], text: "Ошибка: \(error!.localizedDescription)")
+                }) { _ in self.loadingIndicator.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
             }
             if json != nil {
                 

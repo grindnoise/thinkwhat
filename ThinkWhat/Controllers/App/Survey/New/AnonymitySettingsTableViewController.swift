@@ -11,7 +11,7 @@ import UIKit
 class AnonymitySettingsTableViewController: UITableViewController {
 
     fileprivate var selectedIndex: IndexPath!
-    var anonymity:      [SurveyAnonymity] = []
+    var anonymity: SurveyAnonymity?      //[SurveyAnonymity] = []
     var delegate: CellButtonDelegate?
     
     override func viewDidLoad() {
@@ -43,10 +43,10 @@ class AnonymitySettingsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "case", for: indexPath) as? AnonymitySettingsTableViewCell {
             var text = ""
-            var isSelected = false
+//            var isSelected = false
             if let option = SurveyAnonymity(rawValue: indexPath.row) {
                 cell.option = option
-                isSelected = anonymity.contains(option)
+//                isSelected = anonymity.contains(option)
                 switch option {
                 case .AllowAnonymousVoting:
                     text = "Возможность анонимного голоса"
@@ -56,10 +56,16 @@ class AnonymitySettingsTableViewController: UITableViewController {
                     text = "Скрыт автор"
                 case .Responder:
                     text = "Скрыт респондент"
+                case .Disabled:
+                    text = "Виден автор и респондент"
                 }
             }
             cell.sign.alpha = 0
-            cell.isMarked = isSelected 
+            if anonymity == nil || anonymity! != cell.option {
+                cell.isMarked = false
+            } else {
+                cell.isMarked = true
+            }
             cell.label.text = text
             return cell
         }
@@ -71,19 +77,27 @@ class AnonymitySettingsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            if let cell = tableView.cellForRow(at: indexPath) as? AnonymitySettingsTableViewCell {
-                cell.isMarked = !cell.isMarked
-                if cell.isMarked {
-                    anonymity.append(cell.option)
-                } else {
-                    for (index, opt) in anonymity.enumerated() {
-                        if opt == cell.option {
-                            anonymity.remove(at: index)
-                        }
+        if let cell = tableView.cellForRow(at: indexPath) as? AnonymitySettingsTableViewCell {
+            if !cell.isMarked {
+                cell.isMarked = true
+                anonymity = cell.option
+                for c in tableView.visibleCells {
+                    if let _cell = c as? AnonymitySettingsTableViewCell, _cell.isMarked, _cell != cell {
+                        _cell.isMarked = false
                     }
-                    anonymity.remove(object: cell.option)
                 }
             }
+            //                if cell.isMarked {
+            //                    anonymity.append(cell.option)
+            //                } else {
+            //                    for (index, opt) in anonymity.enumerated() {
+            //                        if opt == cell.option {
+            //                            anonymity.remove(at: index)
+            //                        }
+            //                    }
+            //                    anonymity.remove(object: cell.option)
+            //                }
+        }
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }

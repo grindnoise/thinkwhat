@@ -20,7 +20,9 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
         navigationController?.popViewController(animated: true)
     }
     @IBAction func createTapped(_ sender: Any) {
-        print("create")
+        if checkNecessaryFields() {
+            
+        }
     }
     fileprivate var textEditingView: TextEditingView!
     @IBOutlet weak var tableView: UITableView!
@@ -30,9 +32,10 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     
     //Survey data
     //Necessary
+//    fileprivate var survey:         Survey!
     fileprivate var category:       SurveyCategory?
     fileprivate var privacy:        Bool = false
-    fileprivate var anonymity:      [SurveyAnonymity] = []
+    fileprivate var anonymity:      SurveyAnonymity?
     fileprivate var votesCapacity:  Int = 100
     fileprivate var question:       String = ""
     fileprivate var answers:        [String] = [] {
@@ -227,6 +230,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
             self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
             self.navigationItem.setHidesBackButton(true, animated: false)
             self.navigationController?.setNavigationBarHidden(true, animated: false)
+            self.createButton.backgroundColor = K_COLOR_GRAY
         }
 
     }
@@ -583,7 +587,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
         } else if indexPath.section == 1 {
             if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
 //                isStatusBarHidden = true
-                textEditingView.present(title: "Вопрос", textView: cell.textView, closure: {self.tableView.deselectRow(at: indexPath, animated: true); self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)})
+                textEditingView.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder, closure: {self.tableView.deselectRow(at: indexPath, animated: true); self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)})
 //                currentTV = cell.textView
 //                if tableView.contentOffset != .zero {
 //                    tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
@@ -595,7 +599,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             }
         } else if indexPath.section == 5 {
             if let cell = tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
-                textEditingView.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, closure: {self.tableView.deselectRow(at: indexPath, animated: true); self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)})
+                textEditingView.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder, closure: {self.tableView.deselectRow(at: indexPath, animated: true); self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)})
 //                currentTV = cell.textView
 //                if tableView.contentOffset.y != verticalContentOffset {
 //                    tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
@@ -889,10 +893,14 @@ extension NewSurveyViewController: UIImagePickerControllerDelegate {
     }
     
     fileprivate func selectImage(_ source: UIImagePickerController.SourceType) {
+        if images.count < 3 {
         imagePicker.allowsEditing = true
         imagePicker.sourceType = source
         imagePicker.navigationBar.topItem?.rightBarButtonItem?.tintColor = .black
         present(imagePicker, animated: true)
+        } else {
+            showAlert(type: .Warning, buttons: [["Закрыть": [.Ok: nil]]], text: "Достигнуто максимальное количество изображений")
+        }
     }
 }
 
@@ -979,15 +987,51 @@ extension NewSurveyViewController: CellButtonDelegate {
 
 //Logic
 extension NewSurveyViewController {
-    fileprivate func checkNecessaryFields() {
+//    public func initNewSurvey() {
+//
+//    }
+    //True if all fields are filled
+    fileprivate func checkNecessaryFields() -> Bool {
+        var errors: [String] = []
         //1. Category
-        //2. Privacy
-        //3. Anonymity
-        //4. Votes capacity
-        //5. Question
-        //6. URL
-        //7. Images
-        //8. Answers
+        if category == nil {
+            errors.append("категория")
+        }
+        //2. Anonymity
+        if anonymity == nil {
+            errors.append("анонимность")
+        }
+        //3. Votes capacity
+        if votesCapacity == 0 {
+            errors.append("количество мнений")
+        }
+        //4. Question
+        if question.isEmpty {
+            errors.append("текст опроса")
+        }
+        //5. Answers
+        if answers.isEmpty {
+            errors.append("варианты ответов")
+        } else if answers.count < 2 {
+            errors.append("недостаточно вариантов ответов")
+        } else {
+            for answer in answers{
+                if answer.isEmpty {
+                    errors.append("текст ответов")
+                    break
+                }
+            }
+        }
+        
+        if !errors.isEmpty {
+            var errorText = "Не заполнены поля:\n"
+            for error in errors {
+                errorText += "-\(error)\n"
+            }
+            showAlert(type: .Warning, buttons: [["Закрыть": [.Ok: nil]]], text: errorText)
+        }
+        
+        return errors.isEmpty
     }
 }
 

@@ -21,7 +21,7 @@ class MailAuthViewController: UIViewController {
             isLoadingViewVisible = true
             performSignin()
         } else {
-            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: "Введите логип/пароль")
+            showAlert(type: .Warning, buttons: [["Хорошо": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: "Введите логип/пароль")
         }
     }
     @IBAction func editingChanged(_ sender: UITextField) {
@@ -181,14 +181,14 @@ class MailAuthViewController: UIViewController {
     
     @objc fileprivate func handleTokenState() {
         if tokenState == .WrongCredentials {
-            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: "Неверный логип/пароль")
+            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: "Неверный логип/пароль")
 //            self.simpleAlert("Wrong credentials")
         } else {
             apiManager.getUserData() {
                 json, error in
                 if error != nil {
                     print(error!.localizedDescription)
-                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: error!.localizedDescription)
+                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error!.localizedDescription)
 //                    self.simpleAlert(error!.localizedDescription)
                 }
                 if json != nil {
@@ -202,7 +202,7 @@ class MailAuthViewController: UIViewController {
                         self.apiManager.getEmailConfirmationCode() {
                             json, error in
                             if error != nil {
-                                showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: error!.localizedDescription)
+                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error!.localizedDescription)
 //                                self.simpleAlert(error!.localizedDescription)
                             }
                             if json != nil {

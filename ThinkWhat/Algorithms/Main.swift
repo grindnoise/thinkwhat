@@ -201,13 +201,15 @@ let kSegueProfileFromAuth                        = "PROFILE_FROM_AUTH"
 
 //MARK: App
 let kSegueAppProfileSettingsSelection            = "PROFILE_SETINGS_SELECTION"
-let kSegueAppBackToAuth                          = "BACK_TO_AUTH"
+let kSegueAppLogout                              = "BACK_TO_AUTH"
 let kSegueAppProfileToInfo                       = "INFO"
-let kSegueAppTopSurveysToSurvey                  = "TOP_TO_SURVEY"
+let kSegueAppFeedToSurvey                        = "TOP_TO_SURVEY"
+let kSegueAppFeedToNewSurvey                     = "FEED_TO_NEW_SURVEY"
 let kSegueAppUserSurveysToSurvey                 = "USER_SURVEYS_TO_SURVEY"
 let kSegueAppTopSurveysToCategory                = "TOP_TO_CATEGORY"
 let kSegueAppNewSurveyToAnonymity                = "NEW_TO_ANONYMITY"
 let kSegueAppNewSurveyToCategory                 = "NEW_TO_CATEGORY"
+
 
 
 
@@ -228,7 +230,7 @@ let kSegueAppNewSurveyToCategory                 = "NEW_TO_CATEGORY"
 //let segueClientSettingsPicker                   = "segueClientSettingsPicker"
 let alert                                       = CustomAlertView(frame: (UIApplication.shared.keyWindow?.frame)!)
 let K_COLOR_RED                                 = UIColor(red:0.805, green: 0.342, blue:0.339, alpha:1)
-let K_COLOR_GRAY                                = UIColor(red: 0.149, green: 0.149, blue: 0.149, alpha: 1.000)
+let K_COLOR_GRAY                                = UIColor(red:0.574, green: 0.574, blue:0.574, alpha:1)
 let options: UNAuthorizationOptions             = [.alert, .sound, .badge]
 
 //MARK: - Structs
@@ -637,7 +639,7 @@ func saveTokenInKeychain(json: JSON, tokenState: inout TokenState) {
     }
 }
 
-func showAlert(type: CustomAlertView.AlertType, buttons: [String : [CustomAlertView.ButtonType : Closure?]]?, title: String?, body: String?) {
+func showAlert(type: CustomAlertView.AlertType, buttons: [[String : [CustomAlertView.ButtonType : Closure?]]?], title: String?, body: String?) {
     DispatchQueue.main.async() {
         let singleLineAlert = body == ""
         alert.setupView(singleLineAlert, type: type, buttons: buttons, title: title, body: body)
@@ -647,7 +649,7 @@ func showAlert(type: CustomAlertView.AlertType, buttons: [String : [CustomAlertV
     }
 }
 
-func showAlert(type: CustomAlertView.AlertType, buttons: [String : [CustomAlertView.ButtonType : Closure?]]?, text: String?) {
+func showAlert(type: CustomAlertView.AlertType, buttons: [[String : [CustomAlertView.ButtonType : Closure?]]?], text: String?) {
     DispatchQueue.main.async() {
         alert.setupView(true, type: type, buttons: buttons, title: text, body: "")
         if (!alertIsActive()) {

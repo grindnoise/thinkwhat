@@ -145,7 +145,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                         (success) in
                         if success {
                             delay(seconds: 0.2) {
-                                showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+                                showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
                             }
                             self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {
                                 state in
@@ -162,7 +162,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                             (success) in
                             if success {
                                 delay(seconds: 0.2) {
-                                    showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+                                    showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
                                 }
                                 self.apiManager.login(.Facebook, username: nil, password: nil, token: AccessToken.current?.tokenString) {
                                     state in
@@ -191,7 +191,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                         VKSdk.authorize(scope)
                     } else {
                         delay(seconds: 0.2) {
-                            showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+                            showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
                         }
                         self.apiManager.login(.VK, username: nil, password: nil, token: VKSdk.accessToken()?.accessToken) {
                             _tokenState in
@@ -247,7 +247,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             apiManager.getUserData() {
                 json, error in
                 if error != nil {
-                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
+                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error!.localizedDescription)
                 } else if json != nil {
                     print(json!)
                     AppData.shared.userProfile.ID = String(describing: (json!.dictionaryObject  as! [String: Any])["id"] as! Int)
@@ -257,7 +257,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     case .Facebook:
                         self.apiManager.profileNeedsUpdate() {
                             if $1 != nil {
-                                showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: $1!.localizedDescription)
+                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: $1!.localizedDescription)
                             } else if $0 == true {
                                 FBManager.getUserData() {
                                     response in
@@ -283,7 +283,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                                     self.apiManager.updateUserProfile(data: data) {
                                                                         json, error in
                                                                         if error != nil {
-                                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: error!.localizedDescription)
+                                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
                                                                         }
                                                                         if json != nil {
                                                                             AppData.shared.importUserData(json!, imagePath)
@@ -302,7 +302,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                             self.apiManager.updateUserProfile(data: FBManager.prepareUserData(fbData)) {
                                                 json, error in
                                                 if error != nil {
-                                                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: error!.localizedDescription)
+                                                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
                                                 }
                                                 if json != nil {
                                                     AppData.shared.importUserData(json!)
@@ -317,7 +317,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     case .VK:
                         self.apiManager.profileNeedsUpdate() {
                             if $1 != nil {
-                                showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: $1!.localizedDescription)
+                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: $1!.localizedDescription)
                             } else if $0 == true {
                                 VKManager.getUserData() {
                                     response, error in
@@ -351,7 +351,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                                     self.apiManager.updateUserProfile(data: data) {
                                                                         response, error in
                                                                         if error != nil {
-                                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: error!.localizedDescription)
+                                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
                                                                         }
                                                                         if response != nil {
                                                                             AppData.shared.importUserData(response!, imagePath)
@@ -366,7 +366,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                     self.apiManager.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
                                                         response, error in
                                                         if error != nil {
-                                                            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]], text: error!.localizedDescription)
+                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
                                                         }
                                                         if response != nil {
                                                             AppData.shared.importUserData(response!)
@@ -386,9 +386,9 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                 }
             }
         } else if tokenState == .ConnectionError {
-            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() } }]], text: "Ошибка соединения с сервером, повторите позже")
+            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() } }]]], text: "Ошибка соединения с сервером, повторите позже")
         } else if tokenState == .Error {
-            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {hideAlert()}]], text: "Ошибка сервера, повторите позже")
+            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {hideAlert()}]]], text: "Ошибка сервера, повторите позже")
         } else if tokenState == .ConnectionError && apiReachability == .Reachable {
             print("connection error")
         }
@@ -421,7 +421,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     
     func vkSdkAccessAuthorizationFinished(with result: VKAuthorizationResult!) {
         if let error = result.error {
-            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error.localizedDescription)
+            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
             return
         }
         
@@ -432,7 +432,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
                 tokenState = _tokenState
             }
         } else {
-            showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "******VK Auth Failed State = \(result.state.rawValue)********")
+            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "******VK Auth Failed State = \(result.state.rawValue)********")
         }
 //        switch result.state {
 //        case .authorized:
@@ -446,7 +446,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     }
     
     func vkSdkUserAuthorizationFailed() {
-        showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "vkSdkUserAuthorizationFailed")
+        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "vkSdkUserAuthorizationFailed")
     }
     
     func vkSdkShouldPresent(_ controller: UIViewController!) {
@@ -475,7 +475,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     }
     
     func vkSdkDidDismiss(_ controller: UIViewController!) {
-        showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
+        showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
     }
     
 }

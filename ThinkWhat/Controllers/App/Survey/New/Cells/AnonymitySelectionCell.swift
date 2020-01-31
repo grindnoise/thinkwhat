@@ -11,7 +11,7 @@ import UIKit
 class AnonymitySelectionCell: UITableViewCell {
 
     @IBOutlet weak var label: UILabel!
-    var anonymity:      [SurveyAnonymity] = []
+    var anonymity:      SurveyAnonymity?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

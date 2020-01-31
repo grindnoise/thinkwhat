@@ -16,7 +16,7 @@ class ProfileSettingsTableViewController: UITableViewController {
 //    @IBOutlet weak var deleteAccountButton: UIButton!
     
     @IBAction func logoutButtonTapped(_ sender: Any) {
-        showAlert(type: .Warning, buttons: ["Да": [CustomAlertView.ButtonType.Ok: { (self.parent as? ProfileViewController)?.apiManager.logout() { _tokenState in print(tokenState)/*tokenState = _tokenState*/}; tokenState = .Revoked }], "Отмена": [CustomAlertView.ButtonType.Ok: nil]], text: "Выйти из учетной записи?")
+        showAlert(type: .Warning, buttons: [["Отмена": [CustomAlertView.ButtonType.Cancel: nil]], ["Выйти": [CustomAlertView.ButtonType.Ok: { (self.parent as? ProfileViewController)?.apiManager.logout() { _tokenState in print(tokenState)/*tokenState = _tokenState*/}; tokenState = .Revoked }]]], text: "Выйти из учетной записи?")
     }
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -51,14 +51,14 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         self.commonInit()
     }
     
-    init(frame: CGRect, type: AlertType, buttons: [String : [ButtonType : Closure?]], title: String, body: String, caller: UIViewController!) {
+    init(frame: CGRect, type: AlertType, buttons: [[String : [ButtonType : Closure?]]], title: String, body: String, caller: UIViewController!) {
         super.init(frame: frame)
         self.commonInit()
         self.caller = caller
         setupView(false, type: type, buttons: buttons, title: title, body: body)
     }
     
-    init(frame: CGRect, type: AlertType, buttons: [String : [ButtonType : Closure?]], text: String, caller: UIViewController!) {
+    init(frame: CGRect, type: AlertType, buttons: [[String : [ButtonType : Closure?]]], text: String, caller: UIViewController!) {
         super.init(frame: frame)
         self.commonInit()
         self.caller = caller
@@ -187,7 +187,7 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         
     }
     
-    public func setupView(_ singleLabel: Bool, type:AlertType, buttons: [String : [ButtonType : Closure?]]?, title: String?, body: String?) {
+    public func setupView(_ singleLabel: Bool, type:AlertType, buttons: [[String : [ButtonType : Closure?]]?], title: String?, body: String?) {
         
         upperView.layer.opacity     = 0
         middleView.layer.opacity    = 0
@@ -249,37 +249,39 @@ class CustomAlertView: UIView, CAAnimationDelegate {
             let stackView = UIStackView(frame: lowerView.frame)
             stackView.translatesAutoresizingMaskIntoConstraints = false
             
-            for button in buttons! {
-                let borderView = BorderedView(frame: lowerView.frame)
-                borderView.borderColor = K_COLOR_GRAY//K_COLOR_RED//.white
-                borderView.bordered = true
-                borderView.translatesAutoresizingMaskIntoConstraints = false
-                borderView.rounded = false
-                borderView.borderWidth = 1.5
-                borderView.alpha = 1
-                stackView.addArrangedSubview(borderView)
-                let label = UILabel(frame: borderView.frame)
-                label.text = button.key
-                label.textColor = K_COLOR_GRAY//K_COLOR_RED//.white
-                label.font = UIFont(name: "OpenSans", size: 17)
-                label.translatesAutoresizingMaskIntoConstraints = false
-                label.textAlignment = .center
-                borderView.addSubview(label)
-                label.addEquallyTo(to: borderView)
-                
-                let buttonAlertType = button.value.first?.key
-                let closure: Closure? = button.value.first?.value
-                borderView.closure = closure
-                
-                switch buttonAlertType! {
-                case .Ok:
+            for element in buttons {
+                for button in element! {
+                    let borderView = BorderedView(frame: lowerView.frame)
+                    borderView.borderColor = .black//K_COLOR_GRAY//K_COLOR_RED//.white
+                    borderView.bordered = true
+                    borderView.translatesAutoresizingMaskIntoConstraints = false
+                    borderView.rounded = false
+                    borderView.borderWidth = 1.5
+                    borderView.alpha = 1
+                    stackView.addArrangedSubview(borderView)
+                    let label = UILabel(frame: borderView.frame)
+                    label.text = button.key
+                    label.textColor = button.value.keys.first == .Cancel ? K_COLOR_RED : .black//K_COLOR_RED//.white
+                    label.font = UIFont(name: "OpenSans", size: 17)
+                    label.translatesAutoresizingMaskIntoConstraints = false
+                    label.textAlignment = .center
+                    borderView.addSubview(label)
+                    label.addEquallyTo(to: borderView)
+                    
+                    let buttonAlertType = button.value.first?.key
+                    let closure: Closure? = button.value.first?.value
+                    borderView.closure = closure
+                    
+                    //                switch buttonAlertType! {
+                    //                case .Ok:
                     let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleOkTap(gesture:)))
                     gesture.numberOfTapsRequired = 1
                     borderView.addGestureRecognizer(gesture)
-                    //case Cancel:
-                    
-                default:
-                    continue
+                    //                    //case Cancel:
+                    //
+                    //                default:
+                    //                    continue
+                    //                }
                 }
             }
             stackView.spacing = -1

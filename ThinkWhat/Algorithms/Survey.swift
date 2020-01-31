@@ -117,10 +117,6 @@ class SurveyLink {
             return nil
         }
     }
-    
-    deinit {
-        print("deinit")
-    }
 }
 
 extension SurveyLink: Hashable {
@@ -232,7 +228,13 @@ extension SurveyCategory: Hashable {
 }
 
 class Survey {
-    var ID: Int
+    var ID: Int?
+    var category: SurveyCategory?
+    var title: String?
+    var link: String?
+    var voteCapacity: Int?
+    var isPrivate: Bool?
+    var completionPercentage: Int?
     
     init?(_ json: JSON) {
         if  let _ID                     = json["id"].intValue as? Int {
@@ -248,4 +250,5 @@ enum SurveyAnonymity: Int, CaseIterable {
     case Host
     case Responder
     case AllowAnonymousVoting
+    case Disabled
 }

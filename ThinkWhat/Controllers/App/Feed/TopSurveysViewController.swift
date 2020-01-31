@@ -154,17 +154,11 @@ class TopSurveysViewController: UIViewController/*, CircleTransitionable*/ {
                 destinationVC.category = cell.category
                 destinationVC.title = cell.category.title
             }
-        } else if segue.identifier == kSegueAppTopSurveysToSurvey, let destinationVC = segue.destination as? SurveyViewController, let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+        } else if segue.identifier == kSegueAppFeedToSurvey, let destinationVC = segue.destination as? SurveyViewController, let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
             destinationVC.surveyLink = cell.survey
-        } else {
-            print(tabBarController?.view.frame)
-            print(navigationController?.tabBarController?.view.frame)
-            print(navigationController?.view.frame)
+        } else if segue.identifier == kSegueAppFeedToNewSurvey { //New survey
             navigationController?.setNavigationBarHidden(true, animated: false)
             tabBarController?.setTabBarVisible(visible: false, animated: false)
-            print(tabBarController?.view.frame)
-            print(navigationController?.tabBarController?.view.frame)
-            print(navigationController?.view.frame)
             (navigationController as? NavigationControllerPreloaded)?.startingPoint = startingPoint
 //            (navigationController as? NavigationControllerPreloaded)?.snapshotParent = tabBarController!.view.snapshotView(afterScreenUpdates: false)
         }

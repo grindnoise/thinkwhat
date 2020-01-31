@@ -158,14 +158,14 @@ extension ProfileViewController: UIImagePickerControllerDelegate {
             self.apiManager.updateUserProfile(data: ["image" : image]) {
                 json, error in
                 if error != nil {
-                    showAlert(type: .Ok, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Ошибка при загрузке изображения: \(error!.localizedDescription)")
+                    showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка при загрузке изображения: \(error!.localizedDescription)")
                 }
                 if json != nil {
                     AppData.shared.userProfile.imagePath = self.storeManager.storeImage(type: .Profile, image: image!, fileName: nil, fileFormat: NSData(data: image!.jpeg!).fileFormat, surveyID: nil)
-                    showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {
+                    showAlert(type: .Warning, buttons: [["Готово": [CustomAlertView.ButtonType.Ok: {
                         self.circularImage = image!.circularImage(size: self.userImage.frame.size, frameColor: K_COLOR_RED)
                         animateImageChange(imageView: self.userImage, fromImage: self.userImage.image!, toImage: self.circularImage, duration: 0.2)
-                        }]], text: "Загружено")
+                        }]]], text: "Загружено")
                 }
             }
         }

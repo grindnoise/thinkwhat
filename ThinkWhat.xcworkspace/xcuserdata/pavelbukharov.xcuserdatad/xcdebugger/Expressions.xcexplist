@@ -11,6 +11,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "setupViews #1 (_:) in CustomAlertView.setupView(_:type:buttons:title:body:):CustomAlertView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "button.key">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
       </ContextState>
       <ContextState
@@ -82,10 +90,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "NewSurveyViewController.viewDidAppear(_:):NewSurveyViewController.swift">
+         contextName = "TextEditingView.dismiss():TextEditingView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.tabBarController?.tabBar.layer.zPosition">
+               value = "delegate">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -114,10 +122,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "TopSurveysViewController.addSurvey(_:):TopSurveysViewController.swift">
+         contextName = "NewSurveyViewController.viewDidAppear(_:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "newSurveyVC">
+               value = "self.tabBarController?.tabBar.layer.zPosition">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -138,10 +146,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "TextEditingView.dismiss():TextEditingView.swift">
+         contextName = "TopSurveysViewController.addSurvey(_:):TopSurveysViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "delegate">
+               value = "newSurveyVC">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -203,10 +211,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -539,10 +547,10 @@
          contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "segue.destination as? AnonymitySettingsTableViewController">
+               value = "anonymity">
             </PersistentString>
             <PersistentString
-               value = "anonymity">
+               value = "segue.destination as? AnonymitySettingsTableViewController">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -566,10 +574,10 @@
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = " currentTV != nil">
+               value = "currentOffsetY">
             </PersistentString>
             <PersistentString
-               value = "currentOffsetY">
+               value = " currentTV != nil">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -941,19 +949,19 @@
          contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "_cell.pictureView.frame">
+               value = " _cell.textView.text!">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
             </PersistentString>
             <PersistentString
                value = "indexPath.row">
             </PersistentString>
             <PersistentString
-               value = " _cell.textView.text!">
+               value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

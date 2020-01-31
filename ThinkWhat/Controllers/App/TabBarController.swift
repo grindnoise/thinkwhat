@@ -51,7 +51,7 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
     
     @objc private func handleTokenState() {
         if tokenState == .Revoked {
-            performSegue(withIdentifier: kSegueAppBackToAuth, sender: nil)
+            performSegue(withIdentifier: kSegueAppLogout, sender: nil)
         }
     }
     

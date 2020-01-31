@@ -209,7 +209,7 @@ class TopSurveysTableViewController: UITableViewController {
         if vc.currentIcon == .Category {
             vc.performSegue(withIdentifier: kSegueAppTopSurveysToCategory, sender: nil)
         } else {
-            vc.performSegue(withIdentifier: kSegueAppTopSurveysToSurvey, sender: nil)
+            vc.performSegue(withIdentifier: kSegueAppFeedToSurvey, sender: nil)
         }
     }
 }
