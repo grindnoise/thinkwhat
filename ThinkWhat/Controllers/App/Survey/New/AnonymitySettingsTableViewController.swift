@@ -11,7 +11,7 @@ import UIKit
 class AnonymitySettingsTableViewController: UITableViewController {
 
     fileprivate var selectedIndex: IndexPath!
-    var anonymity: SurveyAnonymity?      //[SurveyAnonymity] = []
+    var anonymity: SurveyAnonymity!      //[SurveyAnonymity] = []
     var delegate: CellButtonDelegate?
     
     override func viewDidLoad() {
@@ -110,7 +110,7 @@ class AnonymitySettingsTableViewCell: UITableViewCell {
     var isMarked = false {
         didSet {
             if isMarked != oldValue {
-                UIView.animate(withDuration: 0.1) {
+                UIView.animate(withDuration: 0.05) {
                     self.sign.alpha             = self.isMarked ? 1 : 0
                 }
             }

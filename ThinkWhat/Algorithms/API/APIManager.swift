@@ -27,6 +27,7 @@ protocol APIManagerProtocol {
     func loadTotalSurveysCount(completion: @escaping(JSON?, Error?)->())
     func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->())
     func markFavorite(mark: Bool, survey: SurveyLink, completion: @escaping(JSON?, Error?)->())
+    func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
     
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
     //    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
@@ -793,6 +794,94 @@ class APIManager: APIManagerProtocol {
                 error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
                 completion(nil, error!)
             }
+        }
+    }
+    
+    func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error!)
+                    } else if success {
+                        performRequest()
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+        
+        func performRequest() {
+            
+//            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.PROFILES + AppData.shared.userProfile.ID! + "/")
+//            let headers: HTTPHeaders = [
+//                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
+//                "Content-Type": "application/json"
+//            ]
+//            if let image = data["image"] as? UIImage {
+//                dict.removeValue(forKey: "image")
+//                Alamofire.upload(multipartFormData: { multipartFormData in
+//                    var imgExt: FileFormat = .Unknown
+//                    var imageData: Data?
+//                    if let data = image.jpegData(compressionQuality: 1) {
+//                        imageData = data
+//                        imgExt = .JPEG
+//                    } else if let data = image.pngData() {
+//                        imageData = data
+//                        imgExt = .PNG
+//                    }
+//                    multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
+//                    for (key, value) in dict {
+//                        if value is String || value is Int {
+//                            multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
+//                        }
+//                    }
+//                }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .patch, headers: headers) {
+//                    result in
+//                    switch result {
+//                    case .failure(let _error):
+//                        error = _error
+//                        completion(json, error)
+//                    case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
+//                        upload.uploadProgress(closure: { (progress) in
+//                            print("Upload Progress: \(progress.fractionCompleted)")
+//                        })
+//                        upload.responseJSON(completionHandler: { (response) in
+//                            if response.result.isFailure {
+//                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
+//                            }
+//                            if let _error = response.result.error as? AFError {
+//                                error = self.parseAFError(_error)
+//                            } else {
+//                                if let statusCode  = response.response?.statusCode{
+//                                    if 200...299 ~= statusCode {
+//                                        do {
+//                                            json = try JSON(data: response.data!)
+//                                        } catch let _error {
+//                                            error = _error
+//                                        }
+//                                    } else if 400...499 ~= statusCode {
+//                                        do {
+//                                            let errorJSON = try JSON(data: response.data!)
+//                                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()]) as Error
+//                                        } catch let _error {
+//                                            error = _error
+//                                        }
+//                                    }
+//                                }
+//                                completion(json, error)
+//                            }
+//                        })
+//                    }
+//                }
+//            } else {
+//                _performRequest(url: url, httpMethod: .patch, parameters: data, encoding: JSONEncoding.default, completion: completion)
+//            }
         }
     }
     

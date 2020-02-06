@@ -179,7 +179,6 @@ let kNotificationFavoriteSurveysUpdated         = Notification.Name("Notificatio
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
 
-
 //MARK: - Segues
 //MARK: Auth
 let kSegueApp                                    = "APP"
@@ -198,7 +197,6 @@ let kSeguePwdRecovery                            = "PWD_RECOVERY"
 let kSegueProfileFromConfirmation                = "PROFILE_FROM_CONFIRMATION"
 let kSegueProfileFromAuth                        = "PROFILE_FROM_AUTH"
 
-
 //MARK: App
 let kSegueAppProfileSettingsSelection            = "PROFILE_SETINGS_SELECTION"
 let kSegueAppLogout                              = "BACK_TO_AUTH"
@@ -208,7 +206,7 @@ let kSegueAppFeedToNewSurvey                     = "FEED_TO_NEW_SURVEY"
 let kSegueAppUserSurveysToSurvey                 = "USER_SURVEYS_TO_SURVEY"
 let kSegueAppTopSurveysToCategory                = "TOP_TO_CATEGORY"
 let kSegueAppNewSurveyToAnonymity                = "NEW_TO_ANONYMITY"
-let kSegueAppNewSurveyToCategory                 = "NEW_TO_CATEGORY"
+let kSegueAppNewSurveyToCategorySelection        = "NEW_TO_CATEGORY_SELECTION"
 
 
 

@@ -11,6 +11,7 @@ import UIKit
 class CategorySelectionCell: UITableViewCell {
 
     @IBOutlet weak var categoryLabel: UILabel!
+    @IBOutlet weak var categoryTitle: UILabel!
     var category: SurveyCategory?
     override func awakeFromNib() {
         super.awakeFromNib()

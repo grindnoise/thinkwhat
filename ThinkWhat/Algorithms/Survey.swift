@@ -229,19 +229,103 @@ extension SurveyCategory: Hashable {
 
 class Survey {
     var ID: Int?
+    var title: String
+    var startDate: Date
+    var endDate: Date?
+    var modified: Date
     var category: SurveyCategory?
-    var title: String?
+    var description: String
+    var images: [[UIImage: String]]?
+    var answers: [String] = []
+    var owner: String
     var link: String?
-    var voteCapacity: Int?
-    var isPrivate: Bool?
-    var completionPercentage: Int?
+    var voteCapacity: Int
+    var isPrivate: Bool
     
-    init?(_ json: JSON) {
-        if  let _ID                     = json["id"].intValue as? Int {
-            ID = _ID
+    var hashValue: Int {
+        return ObjectIdentifier(self).hashValue
+    }
+    var dict: JSON {
+        return JSON()
+    }
+    
+    init?(new dict: [String: Any]) {
+        if let _title                  = dict["title"] as? String,
+            //            var _endDate               = json["end_date"] is NSNull ? nil : Date(dateTimeString: json["end_date"].stringValue as! String),
+            let _category               = dict["category"] as? SurveyCategory,
+            let _description            = dict["description"] as? String,
+            let _link                   = dict["hlink"] as? String,
+            let _voteCapacity           = dict["voteCapacity"] as? Int,
+            let _isPrivate              = dict["is_private"] as? Bool,
+            let _answers                = dict["answers"] as? [String],
+            let _images                 = dict["images"] as? [UIImage: String] {
+            title = _title
+            startDate = Date()
+            //            endDate = _endDate
+            modified = Date()
+            category = _category
+            owner = AppData.shared.userProfile.ID!
+            description = _description
+            link = _link
+            voteCapacity = _voteCapacity
+            isPrivate = _isPrivate
+            for answer in _answers {
+                answers.append(answer)
+            }
+            for _image in _images {
+                //                if let image = _image["id"].stringValue as? String {
+                //                    answers.append(answer)
+                //                }
+            }
         } else {
             return nil
         }
+    }
+    
+    init?(_ json: JSON) {
+        if let _ID                     = json["id"].intValue as? Int,
+            let _title                  = json["title"].stringValue as? String,
+            let _startDate              = Date(dateTimeString: json["start_date"].stringValue as! String) as? Date,
+            var _endDate               = json["end_date"] is NSNull ? nil : Date(dateTimeString: json["end_date"].stringValue as! String),
+            var _modified               = Date(dateTimeString: json["modified_at"].stringValue as! String) as? Date,
+            let _category               = json["category"].intValue as? Int,
+            let _owner                  = json["owner"].stringValue as? String,
+            let _description            = json["description"].stringValue as? String,
+            let _link                   = json["hlink"].stringValue as? String,
+            let _voteCapacity           = json["voteCapacity"].intValue as? Int,
+            let _isPrivate              = json["is_private"].boolValue as? Bool,
+            let _answers                = json["answers"].arrayValue as? [JSON],
+            let _images                 = json["mediafiles"].arrayValue as? [JSON] {
+            ID = _ID
+            title = _title
+            startDate = _startDate
+            endDate = _endDate
+            modified = _modified
+            category = SurveyCategories.shared[_category]
+            description = _description
+            owner = _owner
+            link = _link
+            voteCapacity = _voteCapacity
+            isPrivate = _isPrivate
+            for _answer in _answers {
+                if let answer = _answer["id"].stringValue as? String {
+                    answers.append(answer)
+                }
+            }
+            for _image in _images {
+//                if let image = _image["id"].stringValue as? String {
+//                    answers.append(answer)
+//                }
+            }
+        } else {
+            return nil
+        }
+    }
+}
+
+extension Survey: Hashable {
+    static func == (lhs: Survey, rhs: Survey) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
 }
 
