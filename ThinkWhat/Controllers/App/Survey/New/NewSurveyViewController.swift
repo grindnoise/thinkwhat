@@ -20,11 +20,13 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
         navigationController?.popViewController(animated: true)
     }
     @IBAction func createTapped(_ sender: Any) {
+        isCreateTapped = true
         if checkNecessaryFields() {
-            
+            confirmationView.present()
         }
     }
     fileprivate var textEditingView: TextEditingView!
+    fileprivate var confirmationView: ConfirmationView!
     @IBOutlet weak var tableView: UITableView!
 //    @IBOutlet weak var privacySwitch: UISwitch!
     @IBOutlet weak var votesQuantity: UITextField!
@@ -104,6 +106,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
         }
     }
     
+    fileprivate var isCreateTapped = false
     fileprivate var verticalContentOffset: CGFloat = 0
     fileprivate var isRearranging = false
     fileprivate var isViewSetupCompleted = false
@@ -236,6 +239,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
         }
         DispatchQueue.main.async {
             self.textEditingView = TextEditingView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
+            self.confirmationView = ConfirmationView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
         }
     }
     
@@ -281,6 +285,11 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                     }
                 }
                 _cell.categoryTitle.text = category?.title ?? "Выбрать"
+                if isCreateTapped, category == nil {
+                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                } else {
+                    _cell.backgroundColor = .white
+                }
                 _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)//.greatestFiniteMagnitude)
                 cell = _cell
             } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "privacy", for: indexPath) as? PrivacySelectionCell {
@@ -291,6 +300,11 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                 cell = _cell
             } else if indexPath.row == 3, let _cell = tableView.dequeueReusableCell(withIdentifier: "votes", for: indexPath) as? VotesSelectionCell {
                 _cell.count.delegate = self
+                if isCreateTapped, votesCapacity == 0 {
+                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                } else {
+                    _cell.backgroundColor = .white
+                }
                 addTextField(_cell.count)
                 cell = _cell
                 cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
@@ -299,11 +313,21 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             if indexPath.row == 0, let _cell = tableView.dequeueReusableCell(withIdentifier: "questionTitle", for: indexPath) as? QuestionTitleCreationCell {
                 //                _cell.textView.delegate = self
                 //                addTextView(_cell.textView)
+                if isCreateTapped, questionTitle.isEmpty {
+                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                } else {
+                    _cell.backgroundColor = .white
+                }
                 cell = _cell
                 cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
             } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "question", for: indexPath) as? QuestionCreationCell {
 //                _cell.textView.delegate = self
 //                addTextView(_cell.textView)
+                if isCreateTapped, question.isEmpty {
+                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                } else {
+                    _cell.backgroundColor = .white
+                }
                 cell = _cell
                 cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
             } else if indexPath.row == 2, let _cell = tableView.dequeueReusableCell(withIdentifier: "link", for: indexPath) as? LinkAttachmentCell {
@@ -353,6 +377,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             _cell.layoutIfNeeded()
 //            _cell.textView.delegate = self
             _cell.titleLabel!.text = "#\(indexPath.row + 1)"
+            _cell.backgroundColor = .white
 //            addTextView(_cell.textView)
             if let text = answers[indexPath.row] as? String{
                 if !text.isEmpty {
@@ -361,6 +386,9 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                 } else {
                     _cell.textView.text = _cell.placeholder
                     _cell.textView.textAlignment = .center
+                    if isCreateTapped {
+                        _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                    }
                 }
             }
             cell = _cell
@@ -563,30 +591,36 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
-            if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? CategorySelectionCell {
+            if indexPath.row == 0, let _ = tableView.cellForRow(at: indexPath) as? CategorySelectionCell {
                 performSegue(withIdentifier: kSegueAppNewSurveyToCategorySelection, sender: nil)
-            } else if indexPath.row == 2, let cell = tableView.cellForRow(at: indexPath) as? AnonymitySelectionCell {
+            } else if indexPath.row == 2, let _ = tableView.cellForRow(at: indexPath) as? AnonymitySelectionCell {
                 performSegue(withIdentifier: kSegueAppNewSurveyToAnonymity, sender: nil)
             }
         } else if indexPath.section == 1 {
             if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionTitleCreationCell {
-                textEditingView.present(title: "Титул", textView: cell.textView, placeholder: cell.placeholder, closure: {self.tableView.deselectRow(at: indexPath, animated: true); self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)})
+                textEditingView.present(title: "Титул", textView: cell.textView, placeholder: cell.placeholder) {
+                    text in
+                    self.tableView.deselectRow(at: indexPath, animated: true)
+                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+                    self.questionTitle = text
+                }
             } else if indexPath.row == 1, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
-                textEditingView.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder, closure: {self.tableView.deselectRow(at: indexPath, animated: true); self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)})
+                textEditingView.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder) {
+                    text in
+                    self.tableView.deselectRow(at: indexPath, animated: true)
+                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+                    self.question = text
+                }
             }
         } else if indexPath.section == 5 {
             if let cell = tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
-                textEditingView.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder, closure: {self.tableView.deselectRow(at: indexPath, animated: true); self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)})
-//                currentTV = cell.textView
-//                if tableView.contentOffset.y != verticalContentOffset {
-//                    tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
-//                    scrollCompletion = { cell.textView.becomeFirstResponder(); cell.textView.isUserInteractionEnabled = true }
-//                } else {
-//                    cell.textView.becomeFirstResponder()
-//                    cell.textView.isUserInteractionEnabled = true
-//                }
-////                cell.textView.becomeFirstResponder()
-////                cell.textView.isUserInteractionEnabled = true
+                textEditingView.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder)
+                {
+                    text in
+                    self.tableView.deselectRow(at: indexPath, animated: true)
+                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+                    self.answers[indexPath.row] = text
+                }
             }
         } else {
 //            if currentTV != nil {
@@ -676,6 +710,17 @@ extension NewSurveyViewController: UITextFieldDelegate {
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        if #available(iOS 11.0, *) {
+            if let cell = tableView.cellForRow(at: IndexPath(row: 3, section: 0)), cell.contentView.contains(textField) {
+                votesCapacity = textField.text!.isEmpty ? 0 : Int(textField.text!) ?? 0
+            }
+        } else {
+            if let cell = tableView.cellForRow(at: IndexPath(row: 3, section: 0)) {
+                if !cell.contentView.subviews.filter({ $0 == textField }).isEmpty {
+                    votesCapacity = textField.text!.isEmpty ? 0 : Int(textField.text!) ?? 0
+                }
+            }
+        }
         currentTF = nil
         return true
     }
@@ -863,14 +908,34 @@ extension NewSurveyViewController {
         var fiedsFilled = true
         if category == nil {
             fiedsFilled = false
+        } else {
+            if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) {
+                cell.backgroundColor = .white
+            }
         }
         //2. Votes capacity
         if fiedsFilled, votesCapacity == 0 {
             fiedsFilled = false
+        } else if votesCapacity > 0 {
+            if let cell = tableView.cellForRow(at: IndexPath(row: 3, section: 0)) {
+                cell.backgroundColor = .white
+            }
+        }
+        //4. Question
+        if fiedsFilled, questionTitle.isEmpty {
+            fiedsFilled = false
+        } else if !questionTitle.isEmpty {
+            if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) {
+                cell.backgroundColor = .white
+            }
         }
         //4. Question
         if fiedsFilled, question.isEmpty {
             fiedsFilled = false
+        } else if !question.isEmpty {
+            if let cell = tableView.cellForRow(at: IndexPath(row: 1, section: 1)) {
+                cell.backgroundColor = .white
+            }
         }
         //5. Answers
         if fiedsFilled, answers.isEmpty {
@@ -878,10 +943,13 @@ extension NewSurveyViewController {
         } else if answers.count < 2 {
             fiedsFilled = false
         } else {
-            for answer in answers{
+            for (index, answer) in answers.enumerated(){
                 if answer.isEmpty {
                     fiedsFilled = false
-                    break
+                } else {
+                    if let cell = tableView.cellForRow(at: IndexPath(row: index, section: 5)) {
+                        cell.backgroundColor = .white
+                    }
                 }
             }
         }
@@ -899,14 +967,38 @@ extension NewSurveyViewController {
         //1. Category
         if category == nil {
             errors.append("категория")
+            if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) {
+                UIView.animate(withDuration: 0.2) {
+                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                }
+            }
         }
         //2. Votes capacity
         if votesCapacity == 0 {
             errors.append("количество мнений")
+            if let cell = tableView.cellForRow(at: IndexPath(row: 3, section: 0)) {
+                UIView.animate(withDuration: 0.2) {
+                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                }
+            }
+        }
+        //3. Question title
+        if questionTitle.isEmpty {
+            errors.append("название опроса")
+            if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) {
+                UIView.animate(withDuration: 0.2) {
+                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                }
+            }
         }
         //4. Question
         if question.isEmpty {
             errors.append("текст опроса")
+            if let cell = tableView.cellForRow(at: IndexPath(row: 1, section: 1)) {
+                UIView.animate(withDuration: 0.2) {
+                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                }
+            }
         }
         //5. Answers
         if answers.isEmpty {
@@ -914,10 +1006,14 @@ extension NewSurveyViewController {
         } else if answers.count < 2 {
             errors.append("недостаточно вариантов ответов")
         } else {
-            for answer in answers{
+            for (index, answer) in answers.enumerated() {
                 if answer.isEmpty {
-                    errors.append("текст ответов")
-                    break
+                    errors.append("ответ #\(index)")
+                    if let cell = tableView.cellForRow(at: IndexPath(row: index, section: 5)) {
+                        UIView.animate(withDuration: 0.2) {
+                            cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+                        }
+                    }
                 }
             }
         }

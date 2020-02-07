@@ -93,6 +93,8 @@
 		AB868A6A23EB04A3008DEB84 /* CategorySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB868A6923EB04A3008DEB84 /* CategorySelectionViewController.swift */; };
 		AB868A6F23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB868A6D23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift */; };
 		AB868A7023EC0294008DEB84 /* SubcategorySelectionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB868A6E23EC0294008DEB84 /* SubcategorySelectionTableViewCell.xib */; };
+		AB868A7323ED8F28008DEB84 /* ConfirmationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB868A7223ED8F28008DEB84 /* ConfirmationView.xib */; };
+		AB868A7523ED900D008DEB84 /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB868A7423ED900D008DEB84 /* ConfirmationView.swift */; };
 		AB8DAB5423BA2A790089E25F /* PlainIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DAB5323BA2A790089E25F /* PlainIcons.swift */; };
 		AB99675D23D85E180037CD6C /* TextEditingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99675C23D85E180037CD6C /* TextEditingView.swift */; };
 		AB99675F23D85E6A0037CD6C /* TextEditingView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB99675E23D85E6A0037CD6C /* TextEditingView.xib */; };
@@ -245,6 +247,8 @@
 		AB868A6923EB04A3008DEB84 /* CategorySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionViewController.swift; sourceTree = "<group>"; };
 		AB868A6D23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubcategorySelectionTableViewCell.swift; sourceTree = "<group>"; };
 		AB868A6E23EC0294008DEB84 /* SubcategorySelectionTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SubcategorySelectionTableViewCell.xib; sourceTree = "<group>"; };
+		AB868A7223ED8F28008DEB84 /* ConfirmationView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfirmationView.xib; sourceTree = "<group>"; };
+		AB868A7423ED900D008DEB84 /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
 		AB8DAB5323BA2A790089E25F /* PlainIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainIcons.swift; sourceTree = "<group>"; };
 		AB99675C23D85E180037CD6C /* TextEditingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditingView.swift; sourceTree = "<group>"; };
 		AB99675E23D85E6A0037CD6C /* TextEditingView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextEditingView.xib; sourceTree = "<group>"; };
@@ -571,6 +575,7 @@
 		AB7CE6F923A3610E006FDBD8 /* New */ = {
 			isa = PBXGroup;
 			children = (
+				AB868A7123ED8EC5008DEB84 /* ConfirmationView */,
 				AB99675B23D85D0F0037CD6C /* TextEditingView */,
 				AB7CE6FB23A36147006FDBD8 /* Cells */,
 				ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */,
@@ -607,6 +612,15 @@
 				AB868A6E23EC0294008DEB84 /* SubcategorySelectionTableViewCell.xib */,
 			);
 			path = Cells;
+			sourceTree = "<group>";
+		};
+		AB868A7123ED8EC5008DEB84 /* ConfirmationView */ = {
+			isa = PBXGroup;
+			children = (
+				AB868A7223ED8F28008DEB84 /* ConfirmationView.xib */,
+				AB868A7423ED900D008DEB84 /* ConfirmationView.swift */,
+			);
+			path = ConfirmationView;
 			sourceTree = "<group>";
 		};
 		AB99675B23D85D0F0037CD6C /* TextEditingView */ = {
@@ -837,6 +851,7 @@
 				AB868A7023EC0294008DEB84 /* SubcategorySelectionTableViewCell.xib in Resources */,
 				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
 				AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */,
+				AB868A7323ED8F28008DEB84 /* ConfirmationView.xib in Resources */,
 				ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */,
 				AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */,
 				AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */,
@@ -1024,6 +1039,7 @@
 				ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */,
 				ABB46F372344B1F900AF212B /* Protocols.swift in Sources */,
 				AB6083B72240E77B002C0D7E /* SocialAuthViewController.swift in Sources */,
+				AB868A7523ED900D008DEB84 /* ConfirmationView.swift in Sources */,
 				AB3C6845223FD3EE00B57580 /* Facebook.swift in Sources */,
 				AB3C6849223FD3EE00B57580 /* UpdateButton.swift in Sources */,
 				AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */,

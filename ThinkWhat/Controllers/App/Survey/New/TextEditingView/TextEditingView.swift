@@ -32,11 +32,12 @@ class TextEditingView: UIView, CAAnimationDelegate {
     @IBAction func cancelTapped(_ sender: Any) {
         dismiss(save: false)
     }
+//    fileprivate var _stringVariablePointer: AnyObject?//UnsafeMutablePointer<String>?
     fileprivate var delegate: UIViewController?
     fileprivate var textView: UITextView?
     fileprivate var placeholder = ""
     fileprivate var firstAppearance = true
-    fileprivate var closure: Closure?
+    fileprivate var closure: ((String) -> ())?
     fileprivate var keyboardHeight: CGFloat = 0 {
         didSet {
             if !firstAppearance {
@@ -82,11 +83,12 @@ class TextEditingView: UIView, CAAnimationDelegate {
         self.addSubview(content)
     }
 
-    public func present(title: String, textView _textView: UITextView?, placeholder _placeholder: String, closure _closure: Closure?) {
+    public func present(title: String, textView _textView: UITextView?, placeholder _placeholder: String, closure _closure: @escaping(String) -> ()/*, stringVariablePointer: AnyObjectUnsafeMutablePointer<String>?*/) {
         if _textView != nil {
             text.text = _textView!.text
             textView = _textView
         }
+//        _stringVariablePointer = stringVariablePointer
         text.delegate = self
         label.text = title
         closure = _closure
@@ -134,12 +136,21 @@ class TextEditingView: UIView, CAAnimationDelegate {
     }
     
     public func dismiss(save: Bool) {
+        
         if textView != nil, let tableView = (delegate as? NewSurveyViewController)?.tableView {
             if save {
                 DispatchQueue.main.async {
                     tableView.beginUpdates()
                     self.textView?.text = self.text.text
                     tableView.endUpdates()
+//                    if self._stringVariablePointer is String {
+//                        _stringVariablePointer as! String = "ХУЙ"
+//                    }
+//                    if self._stringVariablePointer != nil {
+//                        print(self._stringVariablePointer!.pointee)
+//                        self._stringVariablePointer!.pointee = "ХУЙ"//self.text.text
+//                        print(self._stringVariablePointer!.pointee)
+//                    }
                 }
             }
         }
@@ -166,7 +177,7 @@ class TextEditingView: UIView, CAAnimationDelegate {
         UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
             self.lightBlurView.alpha = 0
             if self.closure != nil {
-                self.closure!()
+                self.closure!(self.text.text)
             }
         }, completion: {
             _ in

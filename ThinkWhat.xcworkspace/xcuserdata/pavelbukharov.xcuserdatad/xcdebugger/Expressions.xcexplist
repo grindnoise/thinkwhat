@@ -3,507 +3,10 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "closure #1 in NewSurveyViewController.answers.didset:NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "answers.count">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "setupViews #1 (_:) in CustomAlertView.setupView(_:type:buttons:title:body:):CustomAlertView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "button.key">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "Surveys.importNewSurveys(_:):Survey.swift">
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.tableView(_:itemsForBeginning:at:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "tableView.numberOfRows(inSection: 11) &gt; 1">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NavigationControllerPreloaded.startingPoint.didset:NavigationControllerPreloaded.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "startingPoint">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.viewWillAppear(_:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "tabBarController?.tabBar.isHidden ">
-            </PersistentString>
-            <PersistentString
-               value = "self.tabBarController?.tabBar.layer.zPosition">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.tableView(_:heightForRowAt:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "answersRowHeight[indexPath.row]">
-            </PersistentString>
-            <PersistentString
-               value = "tableView.contentOffset">
-            </PersistentString>
-            <PersistentString
-               value = "(answersRowHeight[indexPath.row]! - oldValue) + tableView.contentOffset.y">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "SurveyViewController.loadData():SurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "loadingIndicator">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.textViewShouldBeginEditing(_:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "tableView.indexPathForSelectedRow">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "SurveyViewController.likeTapped(gesture:):SurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "isRequesting">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TextEditingView.dismiss():TextEditingView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "delegate">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ProfileViewController.imagePickerController(_:didFinishPickingMediaWithInfo:):ProfileViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "image.size">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TagLabel.commonInit():TagLabel.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "self.frame.size">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "CircularTransition.animateTransition(using:):CircularTransition.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "startingPoint">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.viewDidAppear(_:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "self.tabBarController?.tabBar.layer.zPosition">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #2 in NewSurveyViewController.answers.didset:NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "headerCell.frame.width">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "EmailResponse.storeEmailResponse() [inlined]:EmailResponse.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "expiresIn">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysViewController.addSurvey(_:):TopSurveysViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "newSurveyVC">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.tableView(_:didSelectRowAt:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "kSegueAppNewSurveyToAnonymity">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "CategoryTableViewCell.layoutSubviews():CategoryTableViewCell.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "url">
-            </PersistentString>
-            <PersistentString
-               value = "response.data!">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "SurveyViewController.survey.didset:SurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "Surveys.shared.downloadedSurveys">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysTableViewController.refreshTableView():TopSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "vc.control.selectedSegmentIndex">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in NewSurveyViewController.currentTV.didset:NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "self.tableView.indexPathForSelectedRow!">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "mach_msg_trap:(null)">
-         <PersistentStrings>
-            <PersistentString
-               value = "tableView">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "attr.1.stringValue">
-            </PersistentString>
-            <PersistentString
-               value = "attr.0">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "AppData.importUserData(_:):Main.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "dateString:userProfile[&quot;birth_date&quot;]">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.tableView(_:viewForHeaderInSection:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "tableView.headerView(forSection: 1)">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "performRequest #1 () in APIManager.logout(completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "CircularTransition.animate(operation:toView:):CircularTransition.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "operation == .push">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "InfoViewController.viewDidLoad():InfoViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "Bundle.main.localizedInfoDictionary?[kCFBundleNameKey as String]">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in CategorySelectionViewController.category.didset:CategorySelectionViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "self.selectButton">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in static FBManager.getUserData(completionHandler:):FBManager.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "json">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "AppData.UserProfile.eraseData():Main.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "imagePath!">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in closure #1 in NewSurveyViewController.tableView(_:trailingSwipeActionsConfigurationForRowAt:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "answers">
-            </PersistentString>
-            <PersistentString
-               value = "tableView.indexPathForSelectedRow">
-            </PersistentString>
-            <PersistentString
-               value = "tableView.isUserInteractionEnabled">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysTableViewController.tableView(_:cellForRowAt:):TopSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "cell.completionPercentage">
-            </PersistentString>
-            <PersistentString
-               value = "indexPath.section">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in performRequest #1 () in APIManager.logout(completion:):APIManager.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "error">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.textView(_:shouldChangeTextIn:replacementText:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "tableView.indexPathForSelectedRow?.section">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "APIManager.logout(completion:):APIManager.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "temporaryTokenToRevoke">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "isPushNotificationEnabled.getter:Main.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "UIApplication.shared.isRegisteredForRemoteNotifications">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TextEditingView.keyboardHeight.didset:TextEditingView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "keyboardHeight">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "RangeReplaceableCollection&lt;&gt;.rearrange(from:to:):Extensions.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "from == to">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIServer.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "(AppData.shared.userProfile.ID as! String)">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ProfileAuthViewController.continueTapped(_:):ProfileAuthViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "genderTF.text!">
-            </PersistentString>
-            <PersistentString
-               value = "userProfile">
-            </PersistentString>
-            <PersistentString
-               value = "AppData.shared.user.lastName!">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysTableViewController.tableView(_:didSelectRowAt:):TopSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "currentCategory">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "image.size">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in TopSurveysTableViewController.updateAllSurveys():TopSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "i.1.count">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in UITableView.scrollToBottom():Extensions.swift">
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.viewWillLayoutSubviews():NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "cancel">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "AppData.System.session.getter:Main.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "AppData">
-            </PersistentString>
-            <PersistentString
-               value = "AppData.shared.user">
-            </PersistentString>
-            <PersistentString
-               value = "String(KeychainService.loadAccessToken()!).isEmpty">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.configureHeader(header:forSection:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "header">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.textFieldShouldBeginEditing(_:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "currentTV">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "AppData.shared.userProfile.ID!">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TermsOfUseViewController.initializeServerAPI():TermsOfUseViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "navigationController">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysViewController.animationController(forPresented:presenting:source:):TopSurveysViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "startingPoint">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysViewController.viewDidAppear(_:):TopSurveysViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "navigationItem.rightBarButtonItem?.value(forKey: &quot;view&quot;) as? UIView">
-            </PersistentString>
-            <PersistentString
-               value = "rbtn.center">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "UserSurveysTableViewController.tableView(_:numberOfRowsInSection:):UserSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "Surveys.shared.ownSurveys.count">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "MailAuthViewController.formIsReady.setter [inlined]:MailAuthViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "isLoginFilled">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysViewController.prepare(for:sender:):TopSurveysViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "cell.category">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.moveTextField(_:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "offsetY">
-            </PersistentString>
-            <PersistentString
-               value = "currentOffsetY">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -525,29 +28,81 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in NewSurveyViewController.tableView(_:commit:forRowAt:):NewSurveyViewController.swift">
+         contextName = "isPushNotificationEnabled.getter:Main.swift">
          <PersistentStrings>
             <PersistentString
-               value = "tableView.numberOfRows(inSection: 11)">
+               value = "UIApplication.shared.isRegisteredForRemoteNotifications">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #2 in closure #1 in NewSurveyViewController.tableView(_:trailingSwipeActionsConfigurationForRowAt:):NewSurveyViewController.swift">
+         contextName = "closure #1 in closure #1 in AuthViewController.handleTokenStateReceived():AuthViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "indexPath.section">
+               value = "fbData">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
-      </ContextState>
-      <ContextState
-         contextName = "AnonymitySettingsTableViewController.tableView(_:didSelectRowAt:):AnonymitySettingsTableViewController.swift">
+         contextName = "closure #1 in performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
          <PersistentStrings>
             <PersistentString
-               value = "anonymity">
+               value = "url">
+            </PersistentString>
+            <PersistentString
+               value = "response.data!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ProgressCirle.setProgress():ProgressCirle.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.frame">
+            </PersistentString>
+            <PersistentString
+               value = "bounds">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TermsOfUseViewController.initializeServerAPI():TermsOfUseViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "navigationController">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in NewSurveyViewController.answers.didset:NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "answers.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.tableView(_:dropSessionDidUpdate:withDestinationIndexPath:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.hasActiveDrag">
+            </PersistentString>
+            <PersistentString
+               value = "tableView.indexPathForSelectedRow?.section">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AppData.System.session.getter:Main.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "AppData">
+            </PersistentString>
+            <PersistentString
+               value = "AppData.shared.user">
+            </PersistentString>
+            <PersistentString
+               value = "String(KeychainService.loadAccessToken()!).isEmpty">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -558,31 +113,58 @@
                value = "segue.destination as? AnonymitySettingsTableViewController">
             </PersistentString>
             <PersistentString
-               value = "category">
+               value = "anonymity">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "AnswerCreationHeaderCell.addTapped(_:):AnswerCreationHeaderCell.swift">
+         contextName = "UserSurveysTableViewController.tableView(_:cellForRowAt:):UserSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "delegate">
+               value = "vc.control.selectedSegmentIndex">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "TagLabel.init(frame:text:):TagLabel.swift">
+         contextName = "NewSurveyViewController.viewWillLayoutSubviews():NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "">
+               value = "cancel">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
+         contextName = "SurveyLink.init(_:):Survey.swift">
          <PersistentStrings>
             <PersistentString
-               value = " currentTV != nil">
+               value = "(json[&quot;start_date&quot;].stringValue as? String)!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in closure #2 in closure #1 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "AppData.shared.userProfile.ID!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in performRequest #1 () in APIManager.logout(completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "error">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in closure #2 in performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.moveTextField(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "offsetY">
             </PersistentString>
             <PersistentString
                value = "currentOffsetY">
@@ -590,24 +172,48 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "SurveyViewController.viewDidLoad():SurveyViewController.swift">
+         contextName = "TopSurveysTableViewController.tableView(_:cellForRowAt:):TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "survey">
+               value = "cell.completionPercentage">
+            </PersistentString>
+            <PersistentString
+               value = "indexPath.section">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "SurveyViewController.surveyLink.didset:SurveyViewController.swift">
+         contextName = "NewSurveyViewController.tableView(_:didSelectRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "Array(Surveys.shared.favoriteSurveys.keys).filter( {$0 == surveyLink }).isEmpty">
+               value = "questionTitle">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "specialized ProfileAuthViewController.continueTapped(_:):ProfileAuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "nestedDict">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.textViewShouldBeginEditing(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.indexPathForSelectedRow">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.viewWillAppear(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tabBarController?.tabBar.isHidden ">
             </PersistentString>
             <PersistentString
-               value = "surveyLink">
+               value = "self.tabBarController?.tabBar.layer.zPosition">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -615,10 +221,203 @@
          contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
       </ContextState>
       <ContextState
+         contextName = "Surveys.importNewSurveys(_:):Survey.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in NewSurveyViewController.answers.didset:NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "headerCell.frame.width">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "InfoViewController.viewDidLoad():InfoViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Bundle.main.localizedInfoDictionary?[kCFBundleNameKey as String]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
+      </ContextState>
+      <ContextState
          contextName = "TopSurveysTableViewController.tableView(_:heightForRowAt:):TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "cell.contentView.frame.height">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysTableViewController.tableView(_:heightForHeaderInSection:):TopSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "cell.contentView.frame.height">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in NewSurveyViewController.tableView(_:trailingSwipeActionsConfigurationForRowAt:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "answers">
+            </PersistentString>
+            <PersistentString
+               value = "tableView.indexPathForSelectedRow">
+            </PersistentString>
+            <PersistentString
+               value = "tableView.isUserInteractionEnabled">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.tableView(_:heightForRowAt:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "answersRowHeight[indexPath.row]">
+            </PersistentString>
+            <PersistentString
+               value = "tableView.contentOffset">
+            </PersistentString>
+            <PersistentString
+               value = "(answersRowHeight[indexPath.row]! - oldValue) + tableView.contentOffset.y">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Date.init(dateTimeString:):Extensions.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "json[&quot;start_date&quot;].stringValue">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyViewController.likeTapped(gesture:):SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "isRequesting">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #3 in UserSurveysViewController.controlChanged(_:):UserSurveysViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.tableVC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ProfileAuthViewController.continueTapped(_:):ProfileAuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "genderTF.text!">
+            </PersistentString>
+            <PersistentString
+               value = "userProfile">
+            </PersistentString>
+            <PersistentString
+               value = "AppData.shared.user.lastName!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in SurveyViewController.surveyLink.didset:SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Array(Surveys.shared.favoriteSurveys.keys).filter( {$0 == surveyLink }).isEmpty">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.textView(_:shouldChangeTextIn:replacementText:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.indexPathForSelectedRow?.section">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in NewSurveyViewController.tableView(_:commit:forRowAt:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.numberOfRows(inSection: 11)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.viewDidLoad():NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "cancel">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysTableViewController.scrollViewDidScroll(_:):TopSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.contentOffset.y">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "CategoryTableViewCell.layoutSubviews():CategoryTableViewCell.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "oldValue">
+            </PersistentString>
+            <PersistentString
+               value = "self.currentOffsetY">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.tableView(_:viewForHeaderInSection:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.headerView(forSection: 1)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "specialized static VKManager.prepareUserData(_:):VKManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "key as String">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysViewController.addSurvey(_:):TopSurveysViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "newSurveyVC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NavigationControllerPreloaded.startingPoint.didset:NavigationControllerPreloaded.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "startingPoint">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Surveys.importSurveys(_:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "k.1">
+            </PersistentString>
+            <PersistentString
+               value = "k.1[&quot;added_at&quot;].stringValue">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -640,37 +439,65 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "CategorySelectionViewController.selectTapped(_:):CategorySelectionViewController.swift">
+         contextName = "closure #1 in NewSurveyViewController.currentTV.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "navigationController?.parent as? NewSurveyViewController">
+               value = "self.tableView.indexPathForSelectedRow!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "TopSurveysTableViewController.tableView(_:heightForHeaderInSection:):TopSurveysTableViewController.swift">
+         contextName = "static VKManager.prepareUserData(_:):VKManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "cell.contentView.frame.height">
+               value = "value as! String">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "NewSurveyViewController.viewDidLoad():NewSurveyViewController.swift">
+         contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "cancel">
+               value = "attr.1.stringValue">
+            </PersistentString>
+            <PersistentString
+               value = "attr.0">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "SurveyCategories.updateCount(_:):Survey.swift">
+         contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "categories[Int(cat.0)!]">
+               value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "json[&quot;categories&quot;].count">
+               value = "answers[indexPath.row] != _cell.placeholder">
+            </PersistentString>
+            <PersistentString
+               value = "indexPath.row">
+            </PersistentString>
+            <PersistentString
+               value = " _cell.textView.text!">
+            </PersistentString>
+            <PersistentString
+               value = "_cell.pictureView.layer.cornerRadius">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.textFieldShouldBeginEditing(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "currentTV">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysViewController.animationController(forPresented:presenting:source:):TopSurveysViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "startingPoint">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -678,119 +505,88 @@
          contextName = "APIManager._performRequest(url:httpMethod:parameters:encoding:completion:):APIManager.swift">
       </ContextState>
       <ContextState
-         contextName = "TopSurveysTableViewController.tableView(_:numberOfRowsInSection:):TopSurveysTableViewController.swift">
+         contextName = "TagLabel.commonInit():TagLabel.swift">
          <PersistentStrings>
             <PersistentString
-               value = "return SurveyCategories.shared.tree[section].first!.value.count">
+               value = "self.frame.size">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "performRequest #1 () in APIManager.getEmailConfirmationCode(completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "APIManager._performRequest(url:httpMethod:parameters:completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "CircularTransition.animationDidStop(_:finished:):CircularTransition.swift">
+         contextName = "TopSurveysTableViewController.refreshTableView():TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "context?.viewController(forKey: .to) as? TopSurveysViewController">
+               value = "vc.control.selectedSegmentIndex">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #3 in UserSurveysViewController.controlChanged(_:):UserSurveysViewController.swift">
+         contextName = "AppData.importUserData(_:):Main.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.tableVC">
+               value = "dateString:userProfile[&quot;birth_date&quot;]">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "NewSurveyViewController.tableView(_:dropSessionDidUpdate:withDestinationIndexPath:):NewSurveyViewController.swift">
+         contextName = "CircularTransition.animateTransition(using:):CircularTransition.swift">
          <PersistentStrings>
             <PersistentString
-               value = "tableView.hasActiveDrag">
-            </PersistentString>
-            <PersistentString
-               value = "tableView.indexPathForSelectedRow?.section">
+               value = "startingPoint">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in SurveyViewController.surveyLink.didset:SurveyViewController.swift">
+         contextName = "SurveyViewController.surveyLink.didset:SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "Array(Surveys.shared.favoriteSurveys.keys).filter( {$0 == surveyLink }).isEmpty">
             </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "specialized static VKManager.prepareUserData(_:):VKManager.swift">
-         <PersistentStrings>
             <PersistentString
-               value = "key as String">
+               value = "surveyLink">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "APIManager._performRequest(url:parameters:completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "ProfileSettingsTableViewController.viewWillAppear(_:):ProfileSettingsTableViewController.swift">
+         contextName = "TopSurveysTableViewController.tableView(_:didSelectRowAt:):TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "isPushNotificationEnabled">
+               value = "currentCategory">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "NewSurveyViewController.images.didset:NewSurveyViewController.swift">
+         contextName = "closure #1 in TextEditingView.dismiss(save:):TextEditingView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "images">
+               value = "self.text.text!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "SurveyLink.init(_:):Survey.swift">
+         contextName = "performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "(json[&quot;start_date&quot;].stringValue as? String)!">
+               value = "AppData.shared.userProfile.ID!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
+         contextName = "NewSurveyViewController.highlightContinueButton():NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "oldValue">
-            </PersistentString>
-            <PersistentString
-               value = "self.currentOffsetY">
+               value = "questionTitle">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #2 in closure #2 in performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysTableViewController.scrollViewDidScroll(_:):TopSurveysTableViewController.swift">
+         contextName = "TopSurveysViewController.viewDidAppear(_:):TopSurveysViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "scrollView.contentOffset.y">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ProgressCirle.setProgress():ProgressCirle.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "self.frame">
+               value = "navigationItem.rightBarButtonItem?.value(forKey: &quot;view&quot;) as? UIView">
             </PersistentString>
             <PersistentString
-               value = "bounds">
+               value = "rbtn.center">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -806,118 +602,64 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in NewSurveyViewController.currentTF.didset:NewSurveyViewController.swift">
+         contextName = "AnswerCreationHeaderCell.addTapped(_:):AnswerCreationHeaderCell.swift">
          <PersistentStrings>
             <PersistentString
-               value = "images">
+               value = "delegate">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "AnonymitySettingsTableViewController.tableView(_:numberOfRowsInSection:):AnonymitySettingsTableViewController.swift">
+         contextName = "CircularTransition.animate(operation:toView:):CircularTransition.swift">
          <PersistentStrings>
             <PersistentString
-               value = "SurveyAnonymity.allCases.count">
+               value = "operation == .push">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in closure #1 in AuthViewController.handleTokenStateReceived():AuthViewController.swift">
+         contextName = "closure #2 in closure #1 in NewSurveyViewController.tableView(_:trailingSwipeActionsConfigurationForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "fbData">
+               value = "indexPath.section">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in APIManager._performRequest(url:httpMethod:parameters:encoding:completion:):APIManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "Date.init(dateTimeString:):Extensions.swift">
+         contextName = "TopSurveysTableViewController.tableView(_:numberOfRowsInSection:):TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "json[&quot;start_date&quot;].stringValue">
+               value = "return SurveyCategories.shared.tree[section].first!.value.count">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #3 in ProfileViewController.setupViews():ProfileViewController.swift">
+         contextName = "EmailResponse.storeEmailResponse() [inlined]:EmailResponse.swift">
          <PersistentStrings>
             <PersistentString
-               value = "AppData.shared.userProfile.gender!">
-            </PersistentString>
-            <PersistentString
-               value = "AppData.shared.userProfile.birthDate">
-            </PersistentString>
-            <PersistentString
-               value = "AppData.shared.userProfile.birthDate!">
+               value = "expiresIn">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in closure #1 in closure #2 in closure #1 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
+         contextName = "closure #1 in UITableView.scrollToBottom():Extensions.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ProfileSettingsTableViewController.viewWillAppear(_:):ProfileSettingsTableViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "AppData.shared.userProfile.ID!">
+               value = "isPushNotificationEnabled">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
+         contextName = "TextEditingView.present(title:textView:placeholder:closure:stringVariablePointer:):TextEditingView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "tokenState">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "specialized ProfileAuthViewController.continueTapped(_:):ProfileAuthViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "nestedDict">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "UserSurveysTableViewController.tableView(_:cellForRowAt:):UserSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "vc.control.selectedSegmentIndex">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.keyboardWillShow(_:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "keyboardSize.height">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "specialized AppData.System.emailResponseConfirmationCode.didset:Main.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "emailResponseConfirmationCode">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "NewSurveyViewController.tableView(_:dragSessionAllowsMoveOperation:):NewSurveyViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "session.items[0]">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "Surveys.importSurveys(_:):Survey.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "k.1">
+               value = "stringVariablePointer!.pointee">
             </PersistentString>
             <PersistentString
-               value = "k.1[&quot;added_at&quot;].stringValue">
+               value = "_stringVariablePointer">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -954,32 +696,331 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "static VKManager.prepareUserData(_:):VKManager.swift">
+         contextName = "mach_msg_trap:(null)">
          <PersistentStrings>
             <PersistentString
-               value = "value as! String">
+               value = "tableView">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
+         contextName = "NewSurveyViewController.configureHeader(header:forSection:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "_cell.pictureView.frame">
-            </PersistentString>
-            <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
-            </PersistentString>
-            <PersistentString
-               value = "indexPath.row">
-            </PersistentString>
-            <PersistentString
-               value = " _cell.textView.text!">
-            </PersistentString>
-            <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "header">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.tableView(_:itemsForBeginning:at:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tableView.numberOfRows(inSection: 11) &gt; 1">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyViewController.survey.didset:SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Surveys.shared.downloadedSurveys">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.keyboardWillShow(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "keyboardSize.height">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "APIManager.logout(completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "temporaryTokenToRevoke">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.images.didset:NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "images">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in TopSurveysTableViewController.updateAllSurveys():TopSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "i.1.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyViewController.viewDidLoad():SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "survey">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.tableView(_:dragSessionAllowsMoveOperation:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "session.items[0]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.textFieldShouldReturn(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "votesCapacity">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in static FBManager.getUserData(completionHandler:):FBManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "json">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AppData.UserProfile.eraseData():Main.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "imagePath!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "image.size">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "performRequest #1 () in APIManager.logout(completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = " currentTV != nil">
+            </PersistentString>
+            <PersistentString
+               value = "currentOffsetY">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in NewSurveyViewController.currentTF.didset:NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "images">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "performRequest #1 () in APIManager.getEmailConfirmationCode(completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "AnonymitySettingsTableViewController.tableView(_:numberOfRowsInSection:):AnonymitySettingsTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "SurveyAnonymity.allCases.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "specialized AppData.System.emailResponseConfirmationCode.didset:Main.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "emailResponseConfirmationCode">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TagLabel.init(frame:text:):TagLabel.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "RangeReplaceableCollection&lt;&gt;.rearrange(from:to:):Extensions.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "from == to">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyCategories.updateCount(_:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "categories[Int(cat.0)!]">
+            </PersistentString>
+            <PersistentString
+               value = "json[&quot;categories&quot;].count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TextEditingView.dismiss(save:):TextEditingView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.textView!.text!">
+            </PersistentString>
+            <PersistentString
+               value = "self._stringVariablePointer!.pointee">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyViewController.loadData():SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "loadingIndicator">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TextEditingView.keyboardHeight.didset:TextEditingView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "keyboardHeight">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TextEditingView.dismiss():TextEditingView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "delegate">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tokenState">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIServer.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "(AppData.shared.userProfile.ID as! String)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #3 in TextEditingView.dismiss(save:):TextEditingView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.textView!.text!">
+            </PersistentString>
+            <PersistentString
+               value = "self._stringVariablePointer!.pointee">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "NewSurveyViewController.viewDidAppear(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.tabBarController?.tabBar.layer.zPosition">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
+      </ContextState>
+      <ContextState
+         contextName = "APIManager._performRequest(url:parameters:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ProfileViewController.imagePickerController(_:didFinishPickingMediaWithInfo:):ProfileViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "image.size">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysViewController.prepare(for:sender:):TopSurveysViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "cell.category">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #3 in ProfileViewController.setupViews():ProfileViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "AppData.shared.userProfile.gender!">
+            </PersistentString>
+            <PersistentString
+               value = "AppData.shared.userProfile.birthDate">
+            </PersistentString>
+            <PersistentString
+               value = "AppData.shared.userProfile.birthDate!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "setupViews #1 (_:) in CustomAlertView.setupView(_:type:buttons:title:body:):CustomAlertView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "button.key">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "CircularTransition.animationDidStop(_:finished:):CircularTransition.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "context?.viewController(forKey: .to) as? TopSurveysViewController">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "UserSurveysTableViewController.tableView(_:numberOfRowsInSection:):UserSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Surveys.shared.ownSurveys.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AnonymitySettingsTableViewController.tableView(_:didSelectRowAt:):AnonymitySettingsTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "anonymity">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in APIManager._performRequest(url:httpMethod:parameters:encoding:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "APIManager._performRequest(url:httpMethod:parameters:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>
