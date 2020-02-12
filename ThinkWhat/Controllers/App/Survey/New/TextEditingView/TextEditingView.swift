@@ -118,7 +118,7 @@ class TextEditingView: UIView, CAAnimationDelegate {
         scaleAnim.fromValue = 0.7
         scaleAnim.toValue   = 1.0
         scaleAnim.duration  = 0.9
-        scaleAnim.damping   = 11
+        scaleAnim.damping   = 14
         scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         fadeAnim.fromValue  = 0
         fadeAnim.toValue    = 1
@@ -176,14 +176,16 @@ class TextEditingView: UIView, CAAnimationDelegate {
         
         UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
             self.lightBlurView.alpha = 0
+            self.contentView.alpha = 0
             if self.closure != nil {
                 self.closure!(self.text.text)
             }
+            UIApplication.shared.keyWindow?.windowLevel = UIWindow.Level.statusBar - 1
         }, completion: {
             _ in
             self.removeFromSuperview()
-            self.contentView.alpha = 0
-            UIApplication.shared.keyWindow?.windowLevel = UIWindow.Level.statusBar - 1
+            
+//            UIApplication.shared.keyWindow?.windowLevel = UIWindow.Level.statusBar - 1
         })
     }
     

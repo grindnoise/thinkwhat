@@ -135,6 +135,7 @@
                     <blurEffect style="light"/>
                 </visualEffectView>
             </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="bHG-0c-DJ0" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="FLn-kL-xlA"/>
                 <constraint firstItem="bHG-0c-DJ0" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="JDp-LA-SDA"/>

@@ -107,7 +107,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     }
     
     fileprivate var isCreateTapped = false
-    fileprivate var verticalContentOffset: CGFloat = 0
+//    fileprivate var verticalContentOffset: CGFloat = 0
     fileprivate var isRearranging = false
     fileprivate var isViewSetupCompleted = false
     fileprivate var leftEdgeInset: CGFloat = 0
@@ -135,31 +135,8 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
             }
         }
     }
-    fileprivate var scrollCompletion: Closure?
+//    fileprivate var scrollCompletion: Closure?
     fileprivate var imagePicker         = UIImagePickerController ()
-//    fileprivate var currentTV: UITextView? {
-//        didSet {
-//            UIView.animate(withDuration: 0.2) {
-//                if self.currentTV != nil {
-//                    self.currentTV?.backgroundColor = .groupTableViewBackground
-//                    self.tableView.isScrollEnabled  = false
-//                } else if oldValue != nil {
-//                    oldValue!.backgroundColor = .clear
-//                    self.tableView.isScrollEnabled  = true
-//                    if let selectedIndex = self.tableView.indexPathForSelectedRow {
-//                        self.tableView.deselectRow(at: selectedIndex, animated: false)
-//                    }
-//                }
-//            }
-//            if oldValue != nil {
-//                if let cell = oldValue?.superview?.superview as? QuestionCreationCell {//}.isKind(of: QuestionCreationCell.self) {
-//                    checkTextViewEdited(beganEditing: false, textView: oldValue!, placeholder: cell.placeholder)
-//                } else if let cell = oldValue?.superview?.superview as? AnswerCreationCell {//}.isKind(of: QuestionCreationCell.self) {
-//                    checkTextViewEdited(beganEditing: false, textView: oldValue!, placeholder: cell.placeholder)
-//                }
-//            }
-//        }
-//    }
     fileprivate var currentOffsetY:     CGFloat                     = 0 {
         didSet {
             offsetY += currentOffsetY
@@ -600,27 +577,33 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionTitleCreationCell {
                 textEditingView.present(title: "Титул", textView: cell.textView, placeholder: cell.placeholder) {
                     text in
-                    self.tableView.deselectRow(at: indexPath, animated: true)
-                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                    self.tableView.deselectRow(at: indexPath, animated: true)
                     self.questionTitle = text
                 }
+//                self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                self.tableView.deselectRow(at: indexPath, animated: true)
             } else if indexPath.row == 1, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
                 textEditingView.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder) {
                     text in
-                    self.tableView.deselectRow(at: indexPath, animated: true)
-                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                    self.tableView.deselectRow(at: indexPath, animated: true)
                     self.question = text
                 }
+//                self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                self.tableView.deselectRow(at: indexPath, animated: true)
             }
         } else if indexPath.section == 5 {
             if let cell = tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
                 textEditingView.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder)
                 {
                     text in
-                    self.tableView.deselectRow(at: indexPath, animated: true)
-                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                    self.tableView.deselectRow(at: indexPath, animated: true)
                     self.answers[indexPath.row] = text
                 }
+//                self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+//                self.tableView.deselectRow(at: indexPath, animated: true)
             }
         } else {
 //            if currentTV != nil {
@@ -691,16 +674,16 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
         header.title.text = title
     }
 }
-
-extension NewSurveyViewController: UIScrollViewDelegate {
-    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        verticalContentOffset = tableView.contentOffset.y
-        if scrollCompletion != nil {
-            scrollCompletion!()
-            scrollCompletion = nil
-        }
-    }
-}
+//
+//extension NewSurveyViewController: UIScrollViewDelegate {
+//    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+//        verticalContentOffset = tableView.contentOffset.y
+////        if scrollCompletion != nil {
+////            scrollCompletion!()
+////            scrollCompletion = nil
+////        }
+//    }
+//}
 
 extension NewSurveyViewController: UITextFieldDelegate {
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
@@ -873,10 +856,10 @@ extension NewSurveyViewController: CellButtonDelegate {
             selectImage(.photoLibrary)
         } else if sender is PlusIcon {
             answers.append("")
-            tableView.scrollToBottom()
-            delay(seconds: 0.3) {
+//            tableView.scrollToBottom()
+            delay(seconds: 0.05) {
                 let indexPath = IndexPath(row: self.answers.count - 1, section: 5)
-                self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+                self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .bottom)
                 self.tableView(self.tableView, didSelectRowAt: indexPath)
             }
         } else if sender is YoutubeLogo {

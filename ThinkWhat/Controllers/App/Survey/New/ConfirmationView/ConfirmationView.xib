@@ -38,6 +38,46 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2ZZ-Sv-w43">
+                                <rect key="frame" x="0.0" y="567" width="375" height="100"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="F2g-IF-qzP">
+                                        <rect key="frame" x="94" y="12.5" width="187.5" height="75"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iVa-ok-sMe">
+                                                <rect key="frame" x="0.0" y="0.0" width="187.5" height="37"/>
+                                                <color key="backgroundColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <viewLayoutGuide key="safeArea" id="ax0-lk-r9P"/>
+                                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="18"/>
+                                                <state key="normal" title="СОЗДАТЬ">
+                                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="createTapped:" destination="-1" eventType="touchUpInside" id="CAg-lz-t0B"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Snd-1r-ZL8">
+                                                <rect key="frame" x="0.0" y="45" width="187.5" height="30"/>
+                                                <viewLayoutGuide key="safeArea" id="xss-OL-mN6"/>
+                                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="13"/>
+                                                <state key="normal" title="ОТМЕНА">
+                                                    <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="cancelTapped:" destination="-1" eventType="touchUpInside" id="0CK-3D-8HO"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="F2g-IF-qzP" firstAttribute="centerY" secondItem="2ZZ-Sv-w43" secondAttribute="centerY" id="LW4-bd-gm1"/>
+                                    <constraint firstAttribute="height" constant="100" id="orQ-DG-Id3"/>
+                                    <constraint firstItem="F2g-IF-qzP" firstAttribute="width" secondItem="2ZZ-Sv-w43" secondAttribute="width" multiplier="0.5" id="sMn-Kf-z1g"/>
+                                    <constraint firstItem="F2g-IF-qzP" firstAttribute="centerX" secondItem="2ZZ-Sv-w43" secondAttribute="centerX" id="sqb-WM-UkV"/>
+                                </constraints>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ro9-s3-zqc" customClass="BorderedView" customModule="ThinkWhat" customModuleProvider="target">
                                 <rect key="frame" x="20" y="70" width="335" height="497"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -61,47 +101,6 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2ZZ-Sv-w43">
-                                <rect key="frame" x="0.0" y="567" width="375" height="100"/>
-                                <subviews>
-                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="F2g-IF-qzP">
-                                        <rect key="frame" x="94" y="9" width="187.5" height="82"/>
-                                        <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Snd-1r-ZL8">
-                                                <rect key="frame" x="0.0" y="0.0" width="187.5" height="37"/>
-                                                <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                <viewLayoutGuide key="safeArea" id="xss-OL-mN6"/>
-                                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="18"/>
-                                                <state key="normal" title="ОТМЕНА">
-                                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="cancelTapped:" destination="-1" eventType="touchUpInside" id="0CK-3D-8HO"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iVa-ok-sMe">
-                                                <rect key="frame" x="0.0" y="45" width="187.5" height="37"/>
-                                                <color key="backgroundColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                <viewLayoutGuide key="safeArea" id="ax0-lk-r9P"/>
-                                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="18"/>
-                                                <state key="normal" title="СОЗДАТЬ">
-                                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="createTapped:" destination="-1" eventType="touchUpInside" id="CAg-lz-t0B"/>
-                                                </connections>
-                                            </button>
-                                        </subviews>
-                                    </stackView>
-                                </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstItem="F2g-IF-qzP" firstAttribute="centerY" secondItem="2ZZ-Sv-w43" secondAttribute="centerY" id="LW4-bd-gm1"/>
-                                    <constraint firstAttribute="height" constant="100" id="orQ-DG-Id3"/>
-                                    <constraint firstItem="F2g-IF-qzP" firstAttribute="width" secondItem="2ZZ-Sv-w43" secondAttribute="width" multiplier="0.5" id="sMn-Kf-z1g"/>
-                                    <constraint firstItem="F2g-IF-qzP" firstAttribute="centerX" secondItem="2ZZ-Sv-w43" secondAttribute="centerX" id="sqb-WM-UkV"/>
-                                </constraints>
-                            </view>
                         </subviews>
                         <constraints>
                             <constraint firstItem="dlI-wu-ffL" firstAttribute="leading" secondItem="Bv7-To-B5T" secondAttribute="leading" id="7tk-cm-Ynb"/>
