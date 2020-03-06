@@ -9,7 +9,7 @@
 import UIKit
 
 @IBDesignable
-class VKButtonView: ParentLoginButton, CAAnimationDelegate {
+class VKButtonView: LoginButton, CAAnimationDelegate {
     
     var layers = [String: CALayer]()
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
@@ -21,7 +21,7 @@ class VKButtonView: ParentLoginButton, CAAnimationDelegate {
     var color2 : UIColor!
     
     //MARK: - Life Cycle
-    override var state: ParentLoginButton.State {
+    override var state: State {
         didSet {
             if oldValue != state {
                 if state == .enabled {

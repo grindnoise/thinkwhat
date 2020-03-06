@@ -22,7 +22,10 @@ class CategorySelectionViewController: UIViewController {
     @IBAction func selectTapped(_ sender: Any) {
         if delegate != nil {
             delegate!.category = category
-            delegate?.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .none)
+            if let cell = delegate?.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? CategorySelectionCell {
+                cell.categoryTitle.text = category?.title
+            }
+            //delegate?.tableView.reloadSections(IndexSet(arrayLiteral: 0), with: .none)//reloadRows(at: [IndexPath(row: 0, section: 0)], with: .none)
             navigationController?.popViewController(animated: true)
         }
     }

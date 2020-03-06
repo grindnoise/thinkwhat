@@ -18,7 +18,13 @@ class TopSurveysTableViewController: UITableViewController {
     private var vc: TopSurveysViewController!
     private var isViewSetupCompleted = false
     private var loadingIndicator: LoadingIndicator!
-    private var isInitialLoad = true
+    private var isInitialLoad = true {
+        didSet {
+            if !isInitialLoad {
+                vc.addButton.isEnabled = true
+            }
+        }
+    }
     private var semiboldAttrs       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Semibold", size: 12),
                                        NSAttributedString.Key.foregroundColor: K_COLOR_RED,
                                        NSAttributedString.Key.backgroundColor: UIColor.clear]
@@ -51,6 +57,9 @@ class TopSurveysTableViewController: UITableViewController {
         refreshControl?.attributedTitle = NSAttributedString(string: "")
         refreshControl?.addTarget(self, action: #selector(TopSurveysTableViewController.refreshTableView), for: .valueChanged)
         refreshControl?.tintColor = K_COLOR_RED
+        if isInitialLoad {
+            vc.addButton.isEnabled = false
+        }
     }
     
     private func setupViews() {
@@ -71,8 +80,8 @@ class TopSurveysTableViewController: UITableViewController {
         tableView.layoutIfNeeded()
         if !isViewSetupCompleted {
             tableView.isUserInteractionEnabled = false
-            loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: tableView.frame.width, height: tableView.frame.width)))
-            loadingIndicator.layoutCentered(in: tableView,multiplier: 0.7)//addEquallyTo(to: tableView)
+            loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: tableView.frame.width, height: tableView.frame.height)))
+            loadingIndicator.layoutCentered(in: tableView,multiplier: 1)//addEquallyTo(to: tableView)
             isViewSetupCompleted = true
             loadingIndicator.addUntitled1Animation()
         }
@@ -186,19 +195,19 @@ class TopSurveysTableViewController: UITableViewController {
         }
     }
     
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if vc.currentIcon == .Category {
-            cell.alpha = 0
-            UIView.animate(withDuration: 0.1, delay: 0.05, options: [], animations: { cell.alpha = 1 })
-        } else {
-            if needsAnimation {
-                let animation = AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//AnimationFactory.makeFadeAnimation(duration: 0.25, delayFactor: 0.015)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
-                let animator = Animator(animation: animation)
-                animator.animate(cell: cell, at: indexPath, in: tableView)
-                needsAnimation = (tableView.visibleCells.count < (indexPath.row + 1))
-            }
-        }
-    }
+//    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        if vc.currentIcon == .Category {
+//            cell.alpha = 0
+//            UIView.animate(withDuration: 0.1, delay: 0.05, options: [], animations: { cell.alpha = 1 })
+//        } else {
+//            if needsAnimation {
+//                let animation = AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//AnimationFactory.makeFadeAnimation(duration: 0.25, delayFactor: 0.015)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
+//                let animator = Animator(animation: animation)
+//                animator.animate(cell: cell, at: indexPath, in: tableView)
+//                needsAnimation = (tableView.visibleCells.count < (indexPath.row + 1))
+//            }
+//        }
+//    }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         view.alpha = 0

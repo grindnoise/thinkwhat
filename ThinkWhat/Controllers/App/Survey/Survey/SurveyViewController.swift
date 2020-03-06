@@ -10,44 +10,33 @@ import UIKit
 
 class SurveyViewController: UIViewController {
     
+    @IBOutlet weak var surveyTitle: UILabel!
+    fileprivate var requestAttempt = 0 {
+        didSet {
+            if oldValue != requestAttempt {
+                if requestAttempt > MAX_REQUEST_ATTEMPTS {
+                    requestAttempt = 0
+                }
+            }
+        }
+    }
     private var isRequesting = false
     private lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     private let requestAttempts = 3
-    private var loadingIndicator: LoadingIndicator!
+    private var loadingIndicator: LoadingTextIndicator!
     private let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
     var surveyLink: SurveyLink! {
         didSet {
             likeButton.removeAllAnimations()
-            title = "Опрос №\(surveyLink.ID)"
+            title = surveyLink.category!.title//"Опрос №\(surveyLink.ID)"
             likeButton.state = Array(Surveys.shared.favoriteSurveys.keys).filter( {$0.ID == surveyLink.ID }).isEmpty ? .disabled : .enabled
-            //Surveys.shared.favoriteSurveys.filter( {$0 == surveyLink }).isEmpty ? likeButton.removeAllAnimations() : likeButton.addEnableAnimation()
         }
     }
-    var survey: Survey? {
-        didSet {
-            if survey != nil {
-                print("Survey loaded")
-            }
-        }
-    }
+    var survey: Survey?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        
-        if let _survey = Surveys.shared[surveyLink.ID] {
-            survey = _survey
-        } else {
-            loadData()
-        }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        //triggerView = cancel as UIView
-        //        navigationController?.setNavigationBarHidden(false, animated: true)
-        delay(seconds: 3) {
-            print("")
-        }
     }
     
     private func setupViews() {
@@ -59,13 +48,36 @@ class SurveyViewController: UIViewController {
             self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         
 //        DispatchQueue.main.async {
-            self.loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)))
-            self.loadingIndicator.layoutCentered(in: self.view, multiplier: 0.7)
+            self.loadingIndicator = LoadingTextIndicator(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)))
+            self.loadingIndicator.layoutCentered(in: self.view, multiplier: 0.8)
 //        }
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: likeButton)
         let gesture = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.likeTapped(gesture:)))
         likeButton.addGestureRecognizer(gesture)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        surveyTitle.text = surveyLink.title
+        if let _survey = Surveys.shared[surveyLink.ID] {
+            survey = _survey
+            loadingIndicator.alpha = 0
+            for subview in view.subviews {
+                if !(subview is LoadingTextIndicator) {
+                    subview.alpha = 1
+                }
+            }
+        } else {
+            for subview in view.subviews {
+                if !(subview is LoadingTextIndicator) {
+                    subview.alpha = 0
+                }
+            }
+            loadingIndicator.alpha = 1
+            loadingIndicator.addEnableAnimation()
+            loadData()
+        }
     }
     
     @objc fileprivate func likeTapped(gesture: UITapGestureRecognizer) {
@@ -116,23 +128,37 @@ extension SurveyViewController: ServerInitializationProtocol {
 
 extension SurveyViewController {
     public func loadData() {
-        loadingIndicator.alpha = 1
-        loadingIndicator.addUntitled1Animation()
+        
+        requestAttempt += 1
         apiManager.loadSurvey(survey: surveyLink) {
             json, error in
             if error != nil {
+                if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
                 showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { UIView.animate(withDuration: 0.3, animations: {
                     self.loadingIndicator.alpha = 0
                 }) { _ in self.loadingIndicator.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
+                } else {
+                    //Retry
+                    self.loadData()
+                }
             }
             if json != nil {
                 
                 if let _survey = Survey(json!) {
                     Surveys.shared.downloadedSurveys.append(_survey)
                     self.survey = _survey
+                    self.requestAttempt = 0
                 }
                 UIView.animate(withDuration: 0.3, animations: {
-                    self.loadingIndicator.alpha = 0
+                    for subview in self.view.subviews {
+                        if subview is LoadingTextIndicator {
+                            subview.alpha = 0
+                        } else {
+                            UIView.animate(withDuration: 0.6, delay: 0.3, options: [.curveEaseIn], animations: {
+                                subview.alpha = 1
+                            })
+                        }
+                    }
                 }) { _ in self.loadingIndicator.removeAllAnimations() }
             }
         }

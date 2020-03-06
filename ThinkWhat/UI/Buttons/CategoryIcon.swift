@@ -61,11 +61,13 @@ class CategoryIcon: Icon, CAAnimationDelegate {
     }
     
     func setupProperties(){
+//        self.active = UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)
+//        self.active1 = UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1)
         self.inactive = UIColor(red:0.663, green: 0.663, blue:0.663, alpha:1)
-        self.violet = UIColor(red:0.84, green: 0.51, blue:1.00, alpha:1.0)
-        self.blue = UIColor(red:0.00, green: 0.59, blue:1.00, alpha:1.0)
-        self.cyan = UIColor(red:0, green: 0.569, blue:0.576, alpha:1)
-        self.greeen = UIColor(red:0, green: 0.565, blue:0.318, alpha:1)
+        self.violet = K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0.84, green: 0.51, blue:1.00, alpha:1.0)
+        self.blue = K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0.00, green: 0.59, blue:1.00, alpha:1.0)
+        self.cyan = K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0, green: 0.569, blue:0.576, alpha:1)
+        self.greeen = K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0, green: 0.565, blue:0.318, alpha:1)
     }
     
     func setupLayers(){

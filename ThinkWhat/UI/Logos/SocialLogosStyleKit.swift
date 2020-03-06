@@ -14,6 +14,13 @@
 import UIKit
 
 @IBDesignable
+class SafariLogo: UIView {
+    override func draw(_ rect: CGRect) {
+        SocialLogosStyleKit.drawSafari(frame: rect, resizing: .aspectFit)
+    }
+}
+
+@IBDesignable
 class GoogleLogo: UIView {
     override func draw(_ rect: CGRect) {
         SocialLogosStyleKit.drawGoogle(frame: rect, resizing: .aspectFit)
@@ -472,6 +479,169 @@ public class SocialLogosStyleKit : NSObject {
         
     }
     
+    @objc dynamic class func drawSafari(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 287, height: 287), resizing: ResizingBehavior = .aspectFit) {
+        //// General Declarations
+        let context = UIGraphicsGetCurrentContext()!
+        
+        //// Resize to Target Frame
+        context.saveGState()
+        let resizedFrame: CGRect = resizing.apply(rect: CGRect(x: 0, y: 0, width: 287, height: 287), target: targetFrame)
+        context.translateBy(x: resizedFrame.minX, y: resizedFrame.minY)
+        context.scaleBy(x: resizedFrame.width / 287, y: resizedFrame.height / 287)
+        
+        
+        //// Color Declarations
+        let fillColor3 = UIColor(red: 0.987, green: 0.217, blue: 0.249, alpha: 1.000)
+        let fillColor4 = UIColor(red: 0.931, green: 0.931, blue: 0.931, alpha: 1.000)
+        let gradientColor = UIColor(red: 0.474, green: 0.741, blue: 0.996, alpha: 1.000)
+        let gradientColor2 = UIColor(red: 0.147, green: 0.298, blue: 0.659, alpha: 1.000)
+        
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [gradientColor.cgColor, gradientColor.blended(withFraction: 0.5, of: gradientColor2).cgColor, gradientColor2.cgColor] as CFArray, locations: [0, 0.46, 1])!
+        
+        //// Group 4
+        //// Group 3
+        //// Oval Drawing
+        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 29, y: 31, width: 229, height: 228))
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 143.5, y: 31), end: CGPoint(x: 143.5, y: 259), options: [])
+        context.restoreGState()
+        
+        
+        
+        
+        //// Group 2
+        //// Oval 2 Drawing
+        let oval2Path = UIBezierPath()
+        oval2Path.move(to: CGPoint(x: 240.5, y: 144))
+        oval2Path.addCurve(to: CGPoint(x: 143, y: 241.5), controlPoint1: CGPoint(x: 240.5, y: 197.85), controlPoint2: CGPoint(x: 196.85, y: 241.5))
+        oval2Path.addCurve(to: CGPoint(x: 45.5, y: 144), controlPoint1: CGPoint(x: 89.15, y: 241.5), controlPoint2: CGPoint(x: 45.5, y: 197.85))
+        oval2Path.addCurve(to: CGPoint(x: 143, y: 46.5), controlPoint1: CGPoint(x: 45.5, y: 90.15), controlPoint2: CGPoint(x: 89.15, y: 46.5))
+        oval2Path.addCurve(to: CGPoint(x: 240.5, y: 144), controlPoint1: CGPoint(x: 196.85, y: 46.5), controlPoint2: CGPoint(x: 240.5, y: 90.15))
+        oval2Path.close()
+        UIColor.white.setStroke()
+        oval2Path.lineWidth = 20
+        context.saveGState()
+        context.setLineDash(phase: 0, lengths: [2, 15])
+        oval2Path.stroke()
+        context.restoreGState()
+        
+        
+        //// Oval 3 Drawing
+        context.saveGState()
+        context.translateBy(x: 143.25, y: 143.75)
+        
+        let oval3Path = UIBezierPath(ovalIn: CGRect(x: -97.75, y: -97.25, width: 195.5, height: 194.5))
+        UIColor.white.setStroke()
+        oval3Path.lineWidth = 8
+        oval3Path.lineJoinStyle = .round
+        context.saveGState()
+        context.setLineDash(phase: 8, lengths: [2, 15])
+        oval3Path.stroke()
+        context.restoreGState()
+        
+        context.restoreGState()
+        
+        
+        
+        
+        //// Bezier Drawing
+        let bezierPath = UIBezierPath()
+        bezierPath.move(to: CGPoint(x: 143.5, y: 43.88))
+        bezierPath.addCurve(to: CGPoint(x: 108.01, y: 50.28), controlPoint1: CGPoint(x: 131.01, y: 43.88), controlPoint2: CGPoint(x: 119.05, y: 46.14))
+        bezierPath.addCurve(to: CGPoint(x: 42.88, y: 144), controlPoint1: CGPoint(x: 69.95, y: 64.56), controlPoint2: CGPoint(x: 42.88, y: 101.14))
+        bezierPath.addCurve(to: CGPoint(x: 143.5, y: 244.12), controlPoint1: CGPoint(x: 42.88, y: 199.3), controlPoint2: CGPoint(x: 87.93, y: 244.12))
+        bezierPath.addCurve(to: CGPoint(x: 244.12, y: 144), controlPoint1: CGPoint(x: 199.07, y: 244.12), controlPoint2: CGPoint(x: 244.12, y: 199.3))
+        bezierPath.addCurve(to: CGPoint(x: 143.5, y: 43.88), controlPoint1: CGPoint(x: 244.12, y: 88.7), controlPoint2: CGPoint(x: 199.07, y: 43.88))
+        bezierPath.close()
+        bezierPath.move(to: CGPoint(x: 258, y: 144))
+        bezierPath.addCurve(to: CGPoint(x: 143.5, y: 258), controlPoint1: CGPoint(x: 258, y: 206.96), controlPoint2: CGPoint(x: 206.74, y: 258))
+        bezierPath.addCurve(to: CGPoint(x: 29, y: 144), controlPoint1: CGPoint(x: 80.26, y: 258), controlPoint2: CGPoint(x: 29, y: 206.96))
+        bezierPath.addCurve(to: CGPoint(x: 99.33, y: 38.79), controlPoint1: CGPoint(x: 29, y: 96.63), controlPoint2: CGPoint(x: 58.02, y: 56))
+        bezierPath.addCurve(to: CGPoint(x: 143.5, y: 30), controlPoint1: CGPoint(x: 112.92, y: 33.13), controlPoint2: CGPoint(x: 127.85, y: 30))
+        bezierPath.addCurve(to: CGPoint(x: 258, y: 144), controlPoint1: CGPoint(x: 206.74, y: 30), controlPoint2: CGPoint(x: 258, y: 81.04))
+        bezierPath.close()
+        context.saveGState()
+        bezierPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 143.5, y: 30), end: CGPoint(x: 143.5, y: 258), options: [])
+        context.restoreGState()
+        
+        
+        //// Group
+        //// path2096 Drawing
+        let path2096Path = UIBezierPath()
+        path2096Path.move(to: CGPoint(x: 155.35, y: 157.67))
+        path2096Path.addLine(to: CGPoint(x: 130.73, y: 131.54))
+        path2096Path.addLine(to: CGPoint(x: 218.07, y: 72.01))
+        path2096Path.addLine(to: CGPoint(x: 155.35, y: 157.67))
+        path2096Path.close()
+        fillColor3.setFill()
+        path2096Path.fill()
+        
+        
+        //// path2099 Drawing
+        let path2099Path = UIBezierPath()
+        path2099Path.move(to: CGPoint(x: 155.35, y: 157.67))
+        path2099Path.addLine(to: CGPoint(x: 130.73, y: 131.54))
+        path2099Path.addLine(to: CGPoint(x: 68.01, y: 217.21))
+        path2099Path.addLine(to: CGPoint(x: 155.35, y: 157.67))
+        path2099Path.close()
+        fillColor4.setFill()
+        path2099Path.fill()
+        
+        context.restoreGState()
+        
+    }
+    
+    
+    @objc public enum ResizingBehavior: Int {
+        case aspectFit /// The content is proportionally resized to fit into the target rectangle.
+        case aspectFill /// The content is proportionally resized to completely fill the target rectangle.
+        case stretch /// The content is stretched to match the entire target rectangle.
+        case center /// The content is centered in the target rectangle, but it is NOT resized.
+        
+        public func apply(rect: CGRect, target: CGRect) -> CGRect {
+            if rect == target || target == CGRect.zero {
+                return rect
+            }
+            
+            var scales = CGSize.zero
+            scales.width = abs(target.width / rect.width)
+            scales.height = abs(target.height / rect.height)
+            
+            switch self {
+            case .aspectFit:
+                scales.width = min(scales.width, scales.height)
+                scales.height = scales.width
+            case .aspectFill:
+                scales.width = max(scales.width, scales.height)
+                scales.height = scales.width
+            case .stretch:
+                break
+            case .center:
+                scales.width = 1
+                scales.height = 1
+            }
+            
+            var result = rect.standardized
+            result.size.width *= scales.width
+            result.size.height *= scales.height
+            result.origin.x = target.minX + (target.width - result.width) / 2
+            result.origin.y = target.minY + (target.height - result.height) / 2
+            return result
+        }
+    }
+}
+
+import UIKit
+
+public class SafariKitName : NSObject {
+    
+    //// Drawing Methods
+    
+    
+    
     
     
     
@@ -513,3 +683,7 @@ public class SocialLogosStyleKit : NSObject {
         }
     }
 }
+
+
+
+

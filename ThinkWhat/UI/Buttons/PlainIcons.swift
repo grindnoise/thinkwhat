@@ -52,11 +52,7 @@ public class PlainIconsStyleKit : NSObject {
         
         
         //// Color Declarations
-        let violet = UIColor(red: 0.780, green: 0.412, blue: 1.000, alpha: 1.000)
-        let blue = UIColor(red: 0.090, green: 0.514, blue: 0.996, alpha: 1.000)
-        let cyan = UIColor(red: 0.110, green: 0.502, blue: 0.506, alpha: 1.000)
-        let green = UIColor(red: 0.114, green: 0.502, blue: 0.239, alpha: 1.000)
-        let color4 = UIColor(red: 0.889, green: 0.889, blue: 0.889, alpha: 1.000)
+        let color4 = K_COLOR_RED//UIColor(red: 0.678, green: 0.161, blue: 0.208, alpha: 1.000)
         
         //// Rectangle 2 Drawing
         let rectangle2Path = UIBezierPath(roundedRect: CGRect(x: 0, y: -1, width: 553, height: 553), cornerRadius: 120)
@@ -79,7 +75,7 @@ public class PlainIconsStyleKit : NSObject {
         bezierPath.addCurve(to: CGPoint(x: 229.65, y: 113.08), controlPoint1: CGPoint(x: 264.53, y: 131.04), controlPoint2: CGPoint(x: 248.38, y: 116.07))
         bezierPath.addCurve(to: CGPoint(x: 150.84, y: 113.61), controlPoint1: CGPoint(x: 219.64, y: 111.47), controlPoint2: CGPoint(x: 158.91, y: 111.9))
         bezierPath.close()
-        blue.setFill()
+        UIColor.white.setFill()
         bezierPath.fill()
         
         
@@ -95,7 +91,7 @@ public class PlainIconsStyleKit : NSObject {
         bezier2Path.addCurve(to: CGPoint(x: 231.48, y: 282.17), controlPoint1: CGPoint(x: 266.04, y: 301.96), controlPoint2: CGPoint(x: 250, y: 286.02))
         bezier2Path.addCurve(to: CGPoint(x: 149.98, y: 282.49), controlPoint1: CGPoint(x: 223.4, y: 280.46), controlPoint2: CGPoint(x: 157.08, y: 280.78))
         bezier2Path.close()
-        cyan.setFill()
+        UIColor.white.setFill()
         bezier2Path.fill()
         
         
@@ -114,7 +110,7 @@ public class PlainIconsStyleKit : NSObject {
         bezier3Path.addCurve(to: CGPoint(x: 401.59, y: 282.17), controlPoint1: CGPoint(x: 436.47, y: 302.49), controlPoint2: CGPoint(x: 420.43, y: 286.13))
         bezier3Path.addCurve(to: CGPoint(x: 320.62, y: 282.17), controlPoint1: CGPoint(x: 394.81, y: 280.78), controlPoint2: CGPoint(x: 327.95, y: 280.78))
         bezier3Path.close()
-        green.setFill()
+        UIColor.white.setFill()
         bezier3Path.fill()
         
         
@@ -133,7 +129,7 @@ public class PlainIconsStyleKit : NSObject {
         bezier4Path.addCurve(to: CGPoint(x: 401.59, y: 112.47), controlPoint1: CGPoint(x: 436.47, y: 132.79), controlPoint2: CGPoint(x: 420.43, y: 116.43))
         bezier4Path.addCurve(to: CGPoint(x: 320.62, y: 112.47), controlPoint1: CGPoint(x: 394.81, y: 111.08), controlPoint2: CGPoint(x: 327.95, y: 111.08))
         bezier4Path.close()
-        violet.setFill()
+        UIColor.white.setFill()
         bezier4Path.fill()
         
         context.restoreGState()
@@ -152,8 +148,7 @@ public class PlainIconsStyleKit : NSObject {
         
         
         //// Color Declarations
-        let color = UIColor(red: 0.863, green: 0.732, blue: 0.191, alpha: 1.000)
-        let color4 = UIColor(red: 0.889, green: 0.889, blue: 0.889, alpha: 1.000)
+        let color4 = K_COLOR_RED//UIColor(red: 0.678, green: 0.161, blue: 0.208, alpha: 1.000)
         
         //// Rectangle 2 Drawing
         let rectangle2Path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: 553, height: 553), cornerRadius: 120)
@@ -190,13 +185,13 @@ public class PlainIconsStyleKit : NSObject {
         bezierPath.addCurve(to: CGPoint(x: 295.91, y: 97.58), controlPoint1: CGPoint(x: 380.79, y: 140.95), controlPoint2: CGPoint(x: 343.31, y: 105.3))
         bezierPath.addCurve(to: CGPoint(x: 257.59, y: 97.58), controlPoint1: CGPoint(x: 286.75, y: 96.07), controlPoint2: CGPoint(x: 266.5, y: 96.07))
         bezierPath.close()
-        UIColor.gray.setFill()
+        UIColor.white.setFill()
         bezierPath.fill()
         
         
         //// Rectangle Drawing
         let rectanglePath = UIBezierPath(roundedRect: CGRect(x: 113, y: 229, width: 328, height: 228), cornerRadius: 40)
-        color.setFill()
+        UIColor.white.setFill()
         rectanglePath.fill()
         
         
@@ -217,7 +212,7 @@ public class PlainIconsStyleKit : NSObject {
         bezier2Path.addCurve(to: CGPoint(x: 283.6, y: 289.14), controlPoint1: CGPoint(x: 295.61, y: 293.45), controlPoint2: CGPoint(x: 290.28, y: 290.56))
         bezier2Path.addCurve(to: CGPoint(x: 269.79, y: 289.21), controlPoint1: CGPoint(x: 278.14, y: 287.98), controlPoint2: CGPoint(x: 275.25, y: 287.98))
         bezier2Path.close()
-        UIColor.darkGray.setFill()
+        color4.setFill()
         bezier2Path.fill()
         
         context.restoreGState()
@@ -236,8 +231,7 @@ public class PlainIconsStyleKit : NSObject {
         
         
         //// Color Declarations
-        let fillColor = UIColor(red: 0.000, green: 0.000, blue: 0.000, alpha: 1.000)
-        let color4 = UIColor(red: 0.889, green: 0.889, blue: 0.889, alpha: 1.000)
+        let color4 = K_COLOR_RED//UIColor(red: 0.678, green: 0.161, blue: 0.208, alpha: 1.000)
         
         //// Rectangle 2 Drawing
         let rectangle2Path = UIBezierPath(roundedRect: CGRect(x: 0, y: -1, width: 553, height: 553), cornerRadius: 120)
@@ -271,7 +265,7 @@ public class PlainIconsStyleKit : NSObject {
         bezierPath.addCurve(to: CGPoint(x: 237.35, y: 136.27), controlPoint1: CGPoint(x: 287.81, y: 143.71), controlPoint2: CGPoint(x: 265.9, y: 143.71))
         bezierPath.addCurve(to: CGPoint(x: 192.95, y: 134.62), controlPoint1: CGPoint(x: 212.32, y: 129.66), controlPoint2: CGPoint(x: 202.15, y: 129.24))
         bezierPath.close()
-        fillColor.setFill()
+        UIColor.white.setFill()
         bezierPath.fill()
         
         
@@ -306,7 +300,7 @@ public class PlainIconsStyleKit : NSObject {
         bezier2Path.addCurve(to: CGPoint(x: 313.23, y: 356.76), controlPoint1: CGPoint(x: 307.56, y: 367.09), controlPoint2: CGPoint(x: 305.8, y: 363.16))
         bezier2Path.addCurve(to: CGPoint(x: 362.71, y: 351.59), controlPoint1: CGPoint(x: 326.73, y: 345.18), controlPoint2: CGPoint(x: 346.87, y: 343.12))
         bezier2Path.close()
-        fillColor.setFill()
+        UIColor.white.setFill()
         bezier2Path.fill()
         
         context.restoreGState()
@@ -325,12 +319,7 @@ public class PlainIconsStyleKit : NSObject {
         
         
         //// Color Declarations
-        let gradientColor = UIColor(red: 0.717, green: 0.139, blue: 0.139, alpha: 1.000)
-        let gradientColor2 = UIColor(red: 1.000, green: 0.844, blue: 0.204, alpha: 1.000)
-        let color4 = UIColor(red: 0.889, green: 0.889, blue: 0.889, alpha: 1.000)
-        
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [gradientColor2.cgColor, gradientColor2.blended(withFraction: 0.5, of: gradientColor).cgColor, gradientColor.cgColor] as CFArray, locations: [0, 0, 1])!
+        let color4 = K_COLOR_RED//UIColor(red: 0.678, green: 0.161, blue: 0.208, alpha: 1.000)
         
         //// Rectangle 2 Drawing
         let rectangle2Path = UIBezierPath(roundedRect: CGRect(x: 0, y: -1, width: 553, height: 553), cornerRadius: 120)
@@ -429,13 +418,8 @@ public class PlainIconsStyleKit : NSObject {
         bezierPath.addCurve(to: CGPoint(x: 299.8, y: 115), controlPoint1: CGPoint(x: 323.37, y: 119.31), controlPoint2: CGPoint(x: 311, y: 116.51))
         bezierPath.addCurve(to: CGPoint(x: 268.38, y: 113.53), controlPoint1: CGPoint(x: 289.92, y: 113.72), controlPoint2: CGPoint(x: 274.47, y: 113))
         bezierPath.close()
-        context.saveGState()
-        bezierPath.addClip()
-        context.drawRadialGradient(gradient,
-                                   startCenter: CGPoint(x: 274.98, y: 301.89), startRadius: 219.13,
-                                   endCenter: CGPoint(x: 276.69, y: 298.51), endRadius: 137.9,
-                                   options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
-        context.restoreGState()
+        UIColor.white.setFill()
+        bezierPath.fill()
         
         
         //// Bezier 2 Drawing
@@ -462,7 +446,7 @@ public class PlainIconsStyleKit : NSObject {
         bezier2Path.addCurve(to: CGPoint(x: 267.66, y: 291.63), controlPoint1: CGPoint(x: 264.14, y: 306.3), controlPoint2: CGPoint(x: 262.44, y: 297.53))
         bezier2Path.addCurve(to: CGPoint(x: 280.87, y: 287.85), controlPoint1: CGPoint(x: 271.18, y: 287.62), controlPoint2: CGPoint(x: 275.95, y: 286.26))
         bezier2Path.close()
-        gradientColor.setFill()
+        UIColor.white.setFill()
         bezier2Path.fill()
         
         context.restoreGState()

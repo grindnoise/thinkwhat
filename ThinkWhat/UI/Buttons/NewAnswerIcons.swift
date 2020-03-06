@@ -8,24 +8,24 @@
 
 import UIKit
 
-@IBDesignable
-class CameraIcon: UIView {
-    override func draw(_ rect: CGRect) {
-        CameraGalleryStyleKit.drawCamera(frame: rect, resizing: .aspectFit)
-    }
-}
+//@IBDesignable
+//class CameraIcon: UIView {
+//    override func draw(_ rect: CGRect) {
+//        CameraGalleryStyleKit.drawCamera(frame: rect, resizing: .aspectFit)
+//    }
+//}
 
-class GalleryIcon: UIView {
-    override func draw(_ rect: CGRect) {
-        CameraGalleryStyleKit.drawGallery(frame: rect, resizing: .aspectFit)
-    }
-}
+//class GalleryIcon: UIView {
+//    override func draw(_ rect: CGRect) {
+//        CameraGalleryStyleKit.drawGallery(frame: rect, resizing: .aspectFit)
+//    }
+//}
 
-class PlusIcon: UIView {
-    override func draw(_ rect: CGRect) {
-        CameraGalleryStyleKit.drawPlus(frame: rect, resizing: .aspectFit)
-    }
-}
+//class PlusIcon: UIView {
+//    override func draw(_ rect: CGRect) {
+//        CameraGalleryStyleKit.drawPlus(frame: rect, resizing: .aspectFit)
+//    }
+//}
 
 public class CameraGalleryStyleKit : NSObject {
     

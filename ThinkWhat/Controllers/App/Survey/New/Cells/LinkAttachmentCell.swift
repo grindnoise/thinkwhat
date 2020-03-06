@@ -10,7 +10,7 @@ import UIKit
 
 class LinkAttachmentCell: UITableViewCell {
 
-    @IBOutlet weak var link: UITextField!
+    @IBOutlet weak var link: CopyPasteTextField!
     @IBOutlet weak var youtube: YoutubeLogo! {
         didSet {
             let touch = UITapGestureRecognizer(target:self, action:#selector(LinkAttachmentCell.buttonTapped))
@@ -29,10 +29,18 @@ class LinkAttachmentCell: UITableViewCell {
         didSet {
             let touch = UITapGestureRecognizer(target:self, action:#selector(LinkAttachmentCell.buttonTapped))
             touch.cancelsTouchesInView = false
-            ig.addGestureRecognizer(touch)
+            wiki.addGestureRecognizer(touch)
         }
     }
-    var delegate: CellButtonDelegate?
+    @IBOutlet weak var safariLogo: SafariLogo! {
+        didSet {
+            let touch = UITapGestureRecognizer(target:self, action:#selector(LinkAttachmentCell.buttonTapped))
+            touch.cancelsTouchesInView = false
+            safariLogo.addGestureRecognizer(touch)
+        }
+    }
+    
+    weak var delegate: CellButtonDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

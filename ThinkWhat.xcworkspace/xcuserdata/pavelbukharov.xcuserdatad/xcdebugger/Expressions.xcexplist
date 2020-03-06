@@ -55,6 +55,25 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #2 in closure #2 in closure #1 in performRequest #1 () in APIManager.postSurvey(survey:completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "errorJSON.rawString()!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in performRequest #1 () in APIManager.postSurvey(survey:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "TermsOfUseViewController.initializeServerAPI():TermsOfUseViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "navigationController">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "ProgressCirle.setProgress():ProgressCirle.swift">
          <PersistentStrings>
             <PersistentString
@@ -62,14 +81,6 @@
             </PersistentString>
             <PersistentString
                value = "bounds">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "TermsOfUseViewController.initializeServerAPI():TermsOfUseViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "navigationController">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -110,10 +121,10 @@
          contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "anonymity">
+               value = "segue.destination as? AnonymitySettingsTableViewController">
             </PersistentString>
             <PersistentString
-               value = "segue.destination as? AnonymitySettingsTableViewController">
+               value = "anonymity">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -126,10 +137,26 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in NewSurveyViewController.viewDidAppear(_:):NewSurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.confirmationView">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.viewWillLayoutSubviews():NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "cancel">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Survey.init(new:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "dict[DjangoVariables.Survey.answers] ">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -195,6 +222,14 @@
          <PersistentStrings>
             <PersistentString
                value = "nestedDict">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "CopyPasteTextField.layoutSubviews():CopyPasteTextField.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "frame">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -357,15 +392,18 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "performRequest #1 () in APIManager.postSurvey(survey:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "CategoryTableViewCell.layoutSubviews():CategoryTableViewCell.swift">
+      </ContextState>
+      <ContextState
          contextName = "TopSurveysTableViewController.scrollViewDidScroll(_:):TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "scrollView.contentOffset.y">
             </PersistentString>
          </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "CategoryTableViewCell.layoutSubviews():CategoryTableViewCell.swift">
       </ContextState>
       <ContextState
          contextName = "closure #1 in NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
@@ -458,10 +496,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -469,19 +507,19 @@
          contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = " _cell.textView.text!">
+               value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
             <PersistentString
                value = "indexPath.row">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.frame">
+               value = " _cell.textView.text!">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -541,6 +579,9 @@
          <PersistentStrings>
             <PersistentString
                value = "Array(Surveys.shared.favoriteSurveys.keys).filter( {$0 == surveyLink }).isEmpty">
+            </PersistentString>
+            <PersistentString
+               value = "surveyTitle">
             </PersistentString>
             <PersistentString
                value = "surveyLink">
@@ -720,6 +761,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in closure #1 in performRequest #1 () in APIManager.postSurvey(survey:completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "image.values.first!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "SurveyViewController.survey.didset:SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -748,6 +797,9 @@
          <PersistentStrings>
             <PersistentString
                value = "images">
+            </PersistentString>
+            <PersistentString
+               value = "tableView.cellForRow(at: IndexPath(row: images.count-1, section: 3)) as? ImageSelectionCell">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -814,10 +866,10 @@
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "currentOffsetY">
+               value = " currentTV != nil">
             </PersistentString>
             <PersistentString
-               value = " currentTV != nil">
+               value = "currentOffsetY">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1015,6 +1067,11 @@
       </ContextState>
       <ContextState
          contextName = "closure #1 in APIManager._performRequest(url:httpMethod:parameters:encoding:completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "errorJSON.rawString()!">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "APIManager._performRequest(url:httpMethod:parameters:completion:):APIManager.swift">

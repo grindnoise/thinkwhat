@@ -8,7 +8,7 @@
 import UIKit
 
 @IBDesignable
-class MailButtonView: ParentLoginButton, CAAnimationDelegate {
+class MailButtonView: LoginButton, CAAnimationDelegate {
     
     var layers = [String: CALayer]()
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
@@ -21,7 +21,7 @@ class MailButtonView: ParentLoginButton, CAAnimationDelegate {
     var color3 : UIColor!
     
     //MARK: - Life Cycle
-    override var state: ParentLoginButton.State {
+    override var state: State {
         didSet {
             if oldValue != state {
                 if state == .enabled {

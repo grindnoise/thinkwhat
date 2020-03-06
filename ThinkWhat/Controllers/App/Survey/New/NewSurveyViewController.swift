@@ -10,6 +10,12 @@ import UIKit
 
 class NewSurveyViewController: UIViewController, UINavigationControllerDelegate {
     
+    
+    deinit {
+        print("")
+        print("NewSurveyViewController deinit \(self)")
+        print("")
+    }
     class var newSurveyHeaderCell: UINib {
         return UINib(nibName: "NewSurveyHeaderCell", bundle: nil)
     }
@@ -22,11 +28,11 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     @IBAction func createTapped(_ sender: Any) {
         isCreateTapped = true
         if checkNecessaryFields() {
-            confirmationView.present()
+            confirmationView?.present()
         }
     }
-    fileprivate var textEditingView: TextEditingView!
-    fileprivate var confirmationView: ConfirmationView!
+    fileprivate var textEditingView: TextEditingView?
+    fileprivate var confirmationView: ConfirmationView?
     @IBOutlet weak var tableView: UITableView!
 //    @IBOutlet weak var privacySwitch: UISwitch!
     @IBOutlet weak var votesQuantity: UITextField!
@@ -62,19 +68,37 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
         didSet {
             highlightContinueButton()
             if !isRearranging {
-                if answers.count > oldValue.count {
-                    if #available(iOS 11.0, *) {
-                        tableView.performBatchUpdates({
-                            tableView.insertRows(at: [IndexPath(row: answers.count-1, section: 5)], with: .top)
-                            if let header = self.tableView.headerView(forSection: 4) as? NewSurveyHeaderCell {
-                                self.configureHeader(header: header, forSection: 4)
-                            }
-                        })
-                    } else {
-                        tableView.beginUpdates()
-                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 5)], with: .top)
-                        tableView.endUpdates()
+                if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 4)) as? AnswerCreationHeaderCell {
+                    delay(seconds: 0.5) {
+                        cell.addButton.state = self.answers.count < self.MAX_ANSWERS_COUNT ? .enabled : .disabled
                     }
+                }
+                if answers.count > oldValue.count {
+                    tableView.insertRows(at: [IndexPath(row: answers.count-1, section: 5)], with: .none)
+                    self.tableView.selectRow(at: IndexPath(row: answers.count-1, section: 5), animated: false, scrollPosition: .bottom)
+                    if let header = self.tableView.headerView(forSection: 4) as? NewSurveyHeaderCell {
+                        self.configureHeader(header: header, forSection: 4)
+                    }
+                    
+//                    delay(seconds: 0.1) {
+                        if let indexPath = IndexPath(row: self.answers.count - 1, section: 5) as? IndexPath, let _ = self.tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
+//                            self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .bottom)
+                            self.tableView(self.tableView, didSelectRowAt: indexPath)
+                        }
+//                    }
+                    
+//                    if #available(iOS 11.0, *) {
+////                        tableView.performBatchUpdates({
+//                            tableView.insertRows(at: [IndexPath(row: answers.count-1, section: 5)], with: .top)
+//                            if let header = self.tableView.headerView(forSection: 4) as? NewSurveyHeaderCell {
+//                                self.configureHeader(header: header, forSection: 4)
+//                            }
+////                        })
+//                    } else {
+//                        tableView.beginUpdates()
+//                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 5)], with: .top)
+//                        tableView.endUpdates()
+//                    }
                 }
             }
         }
@@ -84,23 +108,47 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     fileprivate var images:         [[UIImage: String]] = [] {//[Int] = [] {//
         didSet {
             if !isRearranging {
-                if images.count > oldValue.count {
-                    if #available(iOS 11.0, *) {
-                        tableView.performBatchUpdates({
-                            tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
-                            //                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
-                            //                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-                            //                            }
-                            if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
-                                self.configureHeader(header: header, forSection: 2)
-                                //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
-                            }
-                        })
-                    } else {
-                        tableView.beginUpdates()
-                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
-                        tableView.endUpdates()
+                if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) as? ImageHeaderCell {
+                    delay(seconds: 0.5) {
+                        cell.cameraIcon.state = self.images.count < self.MAX_IMAGES_COUNT ? .enabled : .disabled
+                        cell.galleryIcon.state = self.images.count < self.MAX_IMAGES_COUNT ? .enabled : .disabled
                     }
+                }
+                if images.count > oldValue.count {
+                    tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
+                    delay(seconds: 0.2) {
+                        self.tableView.selectRow(at: IndexPath(row: self.images.count-1, section: 3), animated: true, scrollPosition: .bottom)
+                    }
+//                    if let cell = tableView.cellForRow(at: IndexPath(row: images.count-1, section: 3)) as? ImageSelectionCell {
+//                        cell.textField.becomeFirstResponder()
+//                    }
+                    if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
+                        self.configureHeader(header: header, forSection: 2)
+                    }
+//                    if #available(iOS 11.0, *) {
+//                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
+//                        //                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
+//                        //                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+//                        //                            }
+//                        if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
+//                            self.configureHeader(header: header, forSection: 2)
+//                            //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
+//                        }
+////                        tableView.performBatchUpdates({
+////                            tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
+////                            //                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
+////                            //                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+////                            //                            }
+////                            if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
+////                                self.configureHeader(header: header, forSection: 2)
+////                                //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
+////                            }
+////                        })
+//                    } else {
+//                        tableView.beginUpdates()
+//                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
+//                        tableView.endUpdates()
+//                    }
                 }
             }
         }
@@ -152,13 +200,35 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     fileprivate var isMovedUp:          Bool?
 //    fileprivate var isReplacingImage = false
     fileprivate var questionTextChanged = false
-
+    fileprivate let MAX_IMAGES_COUNT = 3
+    fileprivate let MAX_ANSWERS_COUNT = 6
     fileprivate let sections = ["ПАРАМЕТРЫ", "ВОПРОС", "ИЗОБРАЖЕНИЯ", "", "ОТВЕТЫ", "", ""]
     fileprivate var questionTitleRowHeight: CGFloat = 0
     fileprivate var questionRowHeight: CGFloat = 0
     fileprivate var answersRowHeight: [Int: CGFloat] = [:]
     fileprivate var textViews: [UITextView] = []
     fileprivate var textFields: [UITextField] = []
+    
+    var statusBarHidden = false {
+        didSet {
+            UIView.animate(withDuration: 0.3) {
+                self.setNeedsStatusBarAppearanceUpdate()
+            }
+        }
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
+    }
+    
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return .fade
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return statusBarHidden
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -212,11 +282,15 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     override func viewDidAppear(_ animated: Bool) {
         navigationController?.setNavigationBarHidden(false, animated: true)
         if (navigationController as! NavigationControllerPreloaded).delegate == nil {
-            (navigationController as! NavigationControllerPreloaded).delegate = appDelegate.transitionCoordinator
+            (navigationController as! NavigationControllerPreloaded).delegate = appDelegate.transitionCoordinator//TransitionCoordinator()
         }
         DispatchQueue.main.async {
-            self.textEditingView = TextEditingView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
-            self.confirmationView = ConfirmationView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
+            if self.textEditingView == nil {
+                self.textEditingView = TextEditingView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
+            }
+            if self.confirmationView == nil {
+                self.confirmationView = ConfirmationView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
+            }
         }
     }
     
@@ -224,6 +298,8 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
         if let selectedRow = tableView.indexPathForSelectedRow {
             tableView.deselectRow(at: selectedRow, animated: false)
         }
+        textEditingView = nil
+        confirmationView = nil
     }
     
     @objc private func hideKeyboard() {
@@ -575,7 +651,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             }
         } else if indexPath.section == 1 {
             if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionTitleCreationCell {
-                textEditingView.present(title: "Титул", textView: cell.textView, placeholder: cell.placeholder) {
+                textEditingView?.present(title: "Титул", textView: cell.textView, placeholder: cell.placeholder) {
                     text in
 //                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
 //                    self.tableView.deselectRow(at: indexPath, animated: true)
@@ -584,7 +660,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
 //                self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
 //                self.tableView.deselectRow(at: indexPath, animated: true)
             } else if indexPath.row == 1, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
-                textEditingView.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder) {
+                textEditingView?.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder) {
                     text in
 //                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
 //                    self.tableView.deselectRow(at: indexPath, animated: true)
@@ -595,7 +671,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             }
         } else if indexPath.section == 5 {
             if let cell = tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
-                textEditingView.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder)
+                textEditingView?.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder)
                 {
                     text in
 //                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
@@ -656,9 +732,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
     }
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "header") as? NewSurveyHeaderCell {
-            var count = ""
-            if section == 2 { count = " (\(images.count)/3)"} else if section == 4 { count = " (\(answers.count))"}
-            header.title.text = sections[section] + count
+            configureHeader(header: header, forSection: section)
             return header
         }
         return nil
@@ -667,9 +741,9 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
     fileprivate func configureHeader(header: NewSurveyHeaderCell, forSection section: Int) {
         var title = sections[section]
         if section == 2 {
-            title += " (\(images.count)/3)"
+            title += " (\(images.count)/\(MAX_IMAGES_COUNT))"
         } else if section == 4 {
-            title += " (\(answers.count))"
+            title += " (\(answers.count)/\(MAX_ANSWERS_COUNT))"
         }
         header.title.text = title
     }
@@ -696,11 +770,17 @@ extension NewSurveyViewController: UITextFieldDelegate {
         if #available(iOS 11.0, *) {
             if let cell = tableView.cellForRow(at: IndexPath(row: 3, section: 0)), cell.contentView.contains(textField) {
                 votesCapacity = textField.text!.isEmpty ? 0 : Int(textField.text!) ?? 0
+            } else if let cell = tableView.cellForRow(at: IndexPath(row: 2, section: 1)), cell.contentView.contains(textField) {
+                url = textField.text!
             }
         } else {
             if let cell = tableView.cellForRow(at: IndexPath(row: 3, section: 0)) {
                 if !cell.contentView.subviews.filter({ $0 == textField }).isEmpty {
                     votesCapacity = textField.text!.isEmpty ? 0 : Int(textField.text!) ?? 0
+                }
+            } else if let cell = tableView.cellForRow(at: IndexPath(row: 2, section: 1)) {
+                if !cell.contentView.subviews.filter({ $0 == textField }).isEmpty {
+                    url = textField.text!
                 }
             }
         }
@@ -793,7 +873,7 @@ extension NewSurveyViewController: UIImagePickerControllerDelegate {
     }
     
     fileprivate func selectImage(_ source: UIImagePickerController.SourceType) {
-        if images.count < 3 {
+        if images.count < MAX_IMAGES_COUNT {
         imagePicker.allowsEditing = true
         imagePicker.sourceType = source
         imagePicker.navigationBar.topItem?.rightBarButtonItem?.tintColor = .black
@@ -855,27 +935,36 @@ extension NewSurveyViewController: CellButtonDelegate {
         } else if sender is GalleryIcon {
             selectImage(.photoLibrary)
         } else if sender is PlusIcon {
-            answers.append("")
-//            tableView.scrollToBottom()
-            delay(seconds: 0.05) {
-                let indexPath = IndexPath(row: self.answers.count - 1, section: 5)
-                self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .bottom)
-                self.tableView(self.tableView, didSelectRowAt: indexPath)
+            if answers.count < MAX_ANSWERS_COUNT {
+                answers.append("")
+            } else {
+                showAlert(type: .Warning, buttons: [["Закрыть": [.Ok: nil]]], text: "Достигнуто максимальное количество ответов")
             }
+//            tableView.scrollToBottom()
+//            delay(seconds: 0.05) {
+//                let indexPath = IndexPath(row: self.answers.count - 1, section: 5)
+//                self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .bottom)
+//                self.tableView(self.tableView, didSelectRowAt: indexPath)
+//            }
         } else if sender is YoutubeLogo {
-            if let url = URL(string: "https://www.youtube.com"),
-                UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:])
+            if let _url = URL(string: "https://www.youtube.com"),
+                UIApplication.shared.canOpenURL(_url) {
+                UIApplication.shared.open(_url, options: [:])
             }
         } else if sender is WikiLogo {
-            if let url = URL(string: "https://ru.m.wikipedia.org"),
-                UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:])
+            if let _url = URL(string: "https://ru.m.wikipedia.org"),
+                UIApplication.shared.canOpenURL(_url) {
+                UIApplication.shared.open(_url, options: [:])
             }
         } else if sender is InstagramLogo {
-            if let url = URL(string: "https://instagram.com"),
-                UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:])
+            if let _url = URL(string: "https://instagram.com"),
+                UIApplication.shared.canOpenURL(_url) {
+                UIApplication.shared.open(_url, options: [:])
+            }
+        } else if sender is SafariLogo {
+            if let _url = URL(string: "https://google.com"),
+                UIApplication.shared.canOpenURL(_url) {
+                UIApplication.shared.open(_url, options: [:])
             }
         } else if sender is UISwitch {
             privacy = (sender as! UISwitch).isOn
@@ -1022,6 +1111,75 @@ extension NewSurveyViewController {
         } else if segue.identifier == kSegueAppNewSurveyToCategorySelection, let destinationVC = segue.destination as? CategorySelectionViewController {
             destinationVC.delegate = self
             destinationVC.category = category
+        }
+    }
+    
+    fileprivate func prepareSurveyDict() -> [String: Any] {
+        var dict: [String: Any] = [:]
+        
+        dict[DjangoVariables.Survey.category]     = category!
+        dict[DjangoVariables.Survey.title]        = questionTitle
+        dict[DjangoVariables.Survey.description]  = question
+        dict[DjangoVariables.Survey.isPrivate]    = privacy
+        dict[DjangoVariables.Survey.voteCapacity] = votesCapacity
+        dict[DjangoVariables.Survey.answers] = answers//answersArray
+        
+        if !images.isEmpty {
+//            var imagesArray: [[UIImage: String]] = []
+//            for element in images {
+//                var imageDict: [UIImage: String] = [:]
+//                imageDict[element.keys.first!] = element.values.first!
+//                imagesArray.append(imageDict)
+//            }
+            dict[DjangoVariables.Survey.images] = images//Array
+        }
+        if !url.isEmpty {
+            dict[DjangoVariables.Survey.hlink] = url
+        }
+        return dict
+    }
+}
+
+extension NewSurveyViewController: ServerProtocol {
+    func postSurvey() {
+        
+        //Prepare new Survey w/o ID
+        if let survey = Survey(new: prepareSurveyDict()) {
+            apiManager.postSurvey(survey: survey) {
+                json, error in
+                if error != nil {
+                    print(error!.localizedDescription)
+                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { self.navigationController?.popViewController(animated: false); self.confirmationView?.dismiss() }]],
+                                                        ["Повторить": [CustomAlertView.ButtonType.Ok: { self.postSurvey() }]]], title: "Ошибка", body: "Повторить попытку?")
+                } else if json != nil {
+                    
+                    //Attach ID to survey and append to existing array
+                    if let _ID = json!["id"].intValue as? Int {
+                        survey.ID = _ID
+                        Surveys.shared.downloadedSurveys.append(survey)
+                        
+                        //Create SurveyLink & append to own & new arrays
+                        if let surveyLink = survey.createSurveyLink() {
+                            Surveys.shared.byCategory[self.category!]?.append(surveyLink)
+                            Surveys.shared.ownSurveys.append(surveyLink)
+                            Surveys.shared.newSurveys.append(surveyLink)
+                            
+                            //Send notification
+                            NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)
+                            NotificationCenter.default.post(name: kNotificationSurveysByCategoryUpdated, object: nil)
+                            NotificationCenter.default.post(name: kNotificationOwnSurveysUpdated, object: nil)
+                        }
+                    }
+                    self.confirmationView?.showReadySign()
+                }
+            }
+        } else {
+            //Print error
+            showAlert(type: .Warning, buttons:
+                [["Закрыть": [CustomAlertView.ButtonType.Ok: { self.navigationController?.popViewController(animated: false); self.confirmationView?.dismiss() }]],
+                 ["К опросу": [CustomAlertView.ButtonType.Ok: { self.confirmationView?.dismiss() }]]],
+                      title: "Ошибка",
+                      body: "Вернуться к созданию опроса?")
         }
     }
 }

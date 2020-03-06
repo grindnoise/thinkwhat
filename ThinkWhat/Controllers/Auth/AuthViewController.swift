@@ -18,7 +18,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     @IBOutlet weak var vkButton:                    VKButtonView!
     @IBOutlet weak var mailButton:                  MailButtonView!
     @IBOutlet weak var fbButton:                    FacebookButtonView!
-    private var buttons:                            [ParentLoginButton] = []
+    private var buttons:                            [LoginButton] = []
     private var selectedAuth:                       Int = 0
     private var fbLoggedIn                          = false
     private var isViewSetupCompleted                = false

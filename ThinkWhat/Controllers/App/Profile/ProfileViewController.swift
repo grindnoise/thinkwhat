@@ -17,11 +17,12 @@ class ProfileViewController: UIViewController, UINavigationControllerDelegate {
     
     private var circularImage: UIImage!
     private var isViewSetupCompleted = false
-    private let settingsVC: ProfileSettingsTableViewController = {
-        let storyboard = UIStoryboard(name: "App", bundle: nil)
-        let vc = storyboard.instantiateViewController(withIdentifier: "ProfileSettingsTableViewController") as! ProfileSettingsTableViewController
-        return vc
-    } ()
+//    private let settingsVC: ProfileSettingsTableViewController = {
+//        let storyboard = UIStoryboard(name: "App", bundle: nil)
+//        let vc = storyboard.instantiateViewController(withIdentifier: "ProfileSettingsTableViewController") as! ProfileSettingsTableViewController
+//        return vc
+//    } ()
+    fileprivate lazy var settingsVC: ProfileSettingsTableViewController = self.initializeSettingsVC()
 //    public var state: ClientSettingsMode!
     internal lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     private lazy var storeManager: FileStorageProtocol = self.initializeStorageManager()
@@ -189,4 +190,12 @@ extension ProfileViewController: StorageInitializationProtocol {
     }
 }
 
+
+extension ProfileViewController {
+    fileprivate func initializeSettingsVC() -> ProfileSettingsTableViewController {
+        let storyboard = UIStoryboard(name: "App", bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: "ProfileSettingsTableViewController") as! ProfileSettingsTableViewController
+        return vc
+    }
+}
 

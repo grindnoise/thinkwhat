@@ -16,15 +16,24 @@
         <array key="OpenSans-Regular.ttf">
             <string>OpenSans</string>
         </array>
+        <array key="OpenSans-Semibold.ttf">
+            <string>OpenSans-Semibold</string>
+        </array>
     </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ConfirmationView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
+                <outlet property="buttonsHeight" destination="orQ-DG-Id3" id="oF4-2v-ncl"/>
+                <outlet property="buttonsView" destination="2ZZ-Sv-w43" id="9iw-kL-icu"/>
                 <outlet property="cancelButton" destination="Snd-1r-ZL8" id="t6V-ro-cvW"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="2hG-nq-3mm"/>
                 <outlet property="createButton" destination="iVa-ok-sMe" id="vXB-Oe-oXb"/>
                 <outlet property="frameView" destination="ro9-s3-zqc" id="rxm-Yc-UV0"/>
                 <outlet property="lightBlurView" destination="q8v-fL-kQo" id="9fO-Jl-5mR"/>
+                <outlet property="loadingIdicator" destination="Rcs-mA-BPL" id="qty-89-NKc"/>
+                <outlet property="loadingView" destination="etk-DZ-f4v" id="exq-o0-0OI"/>
+                <outlet property="readySign" destination="Wc9-qh-RaF" id="nhy-O3-61q"/>
+                <outlet property="title" destination="dlI-wu-ffL" id="t1R-Jg-kaa"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -80,7 +89,46 @@
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ro9-s3-zqc" customClass="BorderedView" customModule="ThinkWhat" customModuleProvider="target">
                                 <rect key="frame" x="20" y="70" width="335" height="497"/>
+                                <subviews>
+                                    <stackView opaque="NO" alpha="0.0" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="etk-DZ-f4v">
+                                        <rect key="frame" x="33.5" y="99" width="268" height="299"/>
+                                        <subviews>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rcs-mA-BPL" customClass="LoadingIndicator" customModule="ThinkWhat" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="268" height="268"/>
+                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" secondItem="Rcs-mA-BPL" secondAttribute="height" multiplier="1:1" id="ICL-qF-KdK"/>
+                                                </constraints>
+                                            </view>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Публикация..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="169-A8-P5P">
+                                                <rect key="frame" x="0.0" y="268" width="268" height="31"/>
+                                                <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="17"/>
+                                                <color key="textColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="etk-DZ-f4v" secondAttribute="height" multiplier="200:223" id="ygB-ns-EKS"/>
+                                        </constraints>
+                                    </stackView>
+                                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wc9-qh-RaF" customClass="ReadySign" customModule="ThinkWhat" customModuleProvider="target">
+                                        <rect key="frame" x="56" y="137" width="223" height="223"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="Wc9-qh-RaF" secondAttribute="height" multiplier="1:1" id="WU2-43-c5X"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="etk-DZ-f4v" firstAttribute="width" secondItem="ro9-s3-zqc" secondAttribute="width" multiplier="0.8" id="02B-Si-K0R"/>
+                                    <constraint firstItem="Wc9-qh-RaF" firstAttribute="centerY" secondItem="ro9-s3-zqc" secondAttribute="centerY" id="TxC-qI-mFR"/>
+                                    <constraint firstItem="etk-DZ-f4v" firstAttribute="centerY" secondItem="ro9-s3-zqc" secondAttribute="centerY" id="Uw8-HT-LcW"/>
+                                    <constraint firstItem="Wc9-qh-RaF" firstAttribute="width" secondItem="ro9-s3-zqc" secondAttribute="width" multiplier="200:300" id="ith-6z-YMn"/>
+                                    <constraint firstItem="etk-DZ-f4v" firstAttribute="centerX" secondItem="ro9-s3-zqc" secondAttribute="centerX" id="ycX-qp-3Gr"/>
+                                    <constraint firstItem="Wc9-qh-RaF" firstAttribute="centerX" secondItem="ro9-s3-zqc" secondAttribute="centerX" id="zfu-gd-QsE"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="rounded" value="YES"/>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="bordered" value="YES"/>

@@ -693,7 +693,7 @@ class APIManager: APIManagerProtocol {
    
     
     func loadSurveyCategories(completion: @escaping(JSON?, Error?)->()) {
-        var json: JSON?
+//        var json: JSON?
         var error: Error?
         
         checkForReachability {
@@ -798,7 +798,10 @@ class APIManager: APIManagerProtocol {
     }
     
     func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->()) {
+        var dict = survey.dict
+        var json: JSON?
         var error: Error?
+        
         checkForReachability {
             reachable in
             if reachable == .Reachable {
@@ -817,25 +820,110 @@ class APIManager: APIManagerProtocol {
         }
         
         func performRequest() {
+            var url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS)
+            let images = dict.removeValue(forKey: "media") as? [[UIImage: String]]
             
-//            let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.PROFILES + AppData.shared.userProfile.ID! + "/")
-//            let headers: HTTPHeaders = [
-//                "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-//                "Content-Type": "application/json"
-//            ]
-//            if let image = data["image"] as? UIImage {
-//                dict.removeValue(forKey: "image")
+            _performRequest(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default) {
+                _json, _error in
+                if _error != nil {
+                    error = _error
+                    completion(json, error)
+                }
+                json = _json
+                
+                if images != nil, images?.count != 0 {
+                    //Upload images
+                    let surveyID = json!["id"].intValue
+                    let headers: HTTPHeaders = [
+                        "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
+                        "Content-Type": "application/json"
+                    ]
+                    url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_MEDIA)
+                    var uploadError: Error?
+                    for image in images! {
+                        Alamofire.upload(multipartFormData: { multipartFormData in
+                            //                            for image in images! {
+                            var imgExt: FileFormat = .Unknown
+                            var imageData: Data?
+                            if let data = image.keys.first!.jpegData(compressionQuality: 1) {
+                                imageData = data
+                                imgExt = .JPEG
+                            } else if let data = image.keys.first!.pngData() {
+                                imageData = data
+                                imgExt = .PNG
+                            }
+                            multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
+                            multipartFormData.append("\(surveyID)".data(using: .utf8)!, withName: "survey")
+                            if !(image.values.first?.isEmpty)! {
+                                multipartFormData.append(image.values.first!.data(using: .utf8)!, withName: "title")
+                            }
+                        }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .post, headers: headers) {
+                            result in
+                            switch result {
+                            case .failure(let _error):
+                                uploadError = _error
+//                                completion(json, error)
+                            case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
+                                upload.uploadProgress(closure: { (progress) in
+                                    print("Upload Progress: \(progress.fractionCompleted)")
+                                })
+                                upload.responseJSON(completionHandler: { (response) in
+                                    if response.result.isFailure {
+                                        uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
+                                    }
+                                    if let _error = response.result.error as? AFError {
+                                        uploadError = self.parseAFError(_error)
+                                    } else {
+                                        if let statusCode  = response.response?.statusCode{
+                                            if 200...299 ~= statusCode {
+                                                do {
+                                                    json = try JSON(data: response.data!)
+                                                } catch let _error {
+                                                    uploadError = _error
+                                                }
+                                            } else if 400...499 ~= statusCode {
+                                                do {
+                                                    let errorJSON = try JSON(data: response.data!)
+                                                    uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
+                                                    print(uploadError!)
+                                                } catch let _error {
+                                                    uploadError = _error
+                                                }
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    }
+                    error = uploadError
+                    completion(json, error)
+                } else {
+                    completion(json, error)
+                }
+            }
+
+
+
+//
+//
+//            if let images = dict["media"] as? [[UIImage: String]], images.count != 0 {
+//                dict.removeValue(forKey: "images")
 //                Alamofire.upload(multipartFormData: { multipartFormData in
-//                    var imgExt: FileFormat = .Unknown
-//                    var imageData: Data?
-//                    if let data = image.jpegData(compressionQuality: 1) {
-//                        imageData = data
-//                        imgExt = .JPEG
-//                    } else if let data = image.pngData() {
-//                        imageData = data
-//                        imgExt = .PNG
+//                    for image in images {
+//                        var imgExt: FileFormat = .Unknown
+//                        var imageData: Data?
+//                        if let data = image.keys.first!.jpegData(compressionQuality: 1) {
+//                            imageData = data
+//                            imgExt = .JPEG
+//                        } else if let data = image.keys.first!.pngData() {
+//                            imageData = data
+//                            imgExt = .PNG
+//                        }
+//                        multipartFormData.append(imageData!, withName: "media.image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
+//                        multipartFormData.append("\(image.values.first!)".data(using: .utf8)!, withName: "media.title")
 //                    }
-//                    multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
+//
 //                    for (key, value) in dict {
 //                        if value is String || value is Int {
 //                            multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
@@ -880,7 +968,7 @@ class APIManager: APIManagerProtocol {
 //                    }
 //                }
 //            } else {
-//                _performRequest(url: url, httpMethod: .patch, parameters: data, encoding: JSONEncoding.default, completion: completion)
+//                _performRequest(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default, completion: completion)
 //            }
         }
     }
@@ -912,6 +1000,7 @@ class APIManager: APIManagerProtocol {
                         do {
                             let errorJSON = try JSON(data: response.data!)
                             error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
+                            print(error!.localizedDescription)
                         } catch let _error {
                             error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
                         }

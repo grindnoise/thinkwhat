@@ -73,11 +73,9 @@ class TopSurveysViewController: UIViewController/*, CircleTransitionable*/ {
     @IBOutlet weak var newIcon: NewIcon!
     @IBOutlet weak var hotIcon: FlameIcon!
     @IBOutlet weak var categoryIcon: CategoryIcon!
-    private var icons: [Icon] = []
+    fileprivate var icons: [Icon] = []
     @IBOutlet weak var container: UIView!
-    @IBAction func addSurvey(_ sender: UIBarButtonItem) {
-//        present(newSurveyVC, animated: true, completion: nil)
-    }
+    @IBOutlet weak var addButton: UIBarButtonItem!
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
@@ -121,6 +119,7 @@ class TopSurveysViewController: UIViewController/*, CircleTransitionable*/ {
                 let tap = UITapGestureRecognizer(target: self, action: #selector(TopSurveysViewController.handleTap(gesture:)))
                 icon.addGestureRecognizer(tap)
             }
+            self.addButton.isEnabled = false
         }
         DispatchQueue.main.async {
             self.addChild(self.tableVC)

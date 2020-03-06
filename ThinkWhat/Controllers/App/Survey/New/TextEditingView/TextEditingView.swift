@@ -33,7 +33,7 @@ class TextEditingView: UIView, CAAnimationDelegate {
         dismiss(save: false)
     }
 //    fileprivate var _stringVariablePointer: AnyObject?//UnsafeMutablePointer<String>?
-    fileprivate var delegate: UIViewController?
+    var delegate: NewSurveyViewController?
     fileprivate var textView: UITextView?
     fileprivate var placeholder = ""
     fileprivate var firstAppearance = true
@@ -54,7 +54,7 @@ class TextEditingView: UIView, CAAnimationDelegate {
         }
     }
     
-    init(frame: CGRect, delegate: UIViewController?) {
+    init(frame: CGRect, delegate: NewSurveyViewController?) {
         super.init(frame: frame)
         self.commonInit()
         self.delegate = delegate
@@ -88,7 +88,6 @@ class TextEditingView: UIView, CAAnimationDelegate {
             text.text = _textView!.text
             textView = _textView
         }
-//        _stringVariablePointer = stringVariablePointer
         text.delegate = self
         label.text = title
         closure = _closure
@@ -98,15 +97,15 @@ class TextEditingView: UIView, CAAnimationDelegate {
         layer.zPosition = 100
         let window = UIApplication.shared.keyWindow
         window?.addSubview(self)
-        window?.windowLevel = UIWindow.Level.statusBar + 1
-        //UIApplication.shared.keyWindow?.addSubview(self)
+
         contentView.alpha = 1
+        stackView.alpha = 1
         lightBlurView.alpha = 0
         frameView.layer.transform = CATransform3DMakeScale(0.7, 0.7, 1)
         frameView.layer.opacity = 1
         
+        delegate?.statusBarHidden = true
         UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
-            //self.contentView.alpha = 1
             self.lightBlurView.alpha = 1
         }, completion: nil)
         
@@ -115,6 +114,7 @@ class TextEditingView: UIView, CAAnimationDelegate {
         let groupAnim       = CAAnimationGroup()
         groupAnim.delegate = self
         
+        //Slight scale/fade animation
         scaleAnim.fromValue = 0.7
         scaleAnim.toValue   = 1.0
         scaleAnim.duration  = 0.9
@@ -123,12 +123,10 @@ class TextEditingView: UIView, CAAnimationDelegate {
         fadeAnim.fromValue  = 0
         fadeAnim.toValue    = 1
         
-        //groupAnim.beginTime        += CACurrentMediaTime() + 0.2
         groupAnim.animations        = [scaleAnim, fadeAnim]
         groupAnim.duration          = 1.3
         groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         
-        //frameView.layer.add(groupAnim, forKey: nil)
         frameView.layer.add(scaleAnim, forKey: nil)
         frameView.layer.opacity = Float(1)
         frameView.layer.transform = CATransform3DMakeScale(1, 1, 1)
@@ -136,56 +134,47 @@ class TextEditingView: UIView, CAAnimationDelegate {
     }
     
     public func dismiss(save: Bool) {
-        
-        if textView != nil, let tableView = (delegate as? NewSurveyViewController)?.tableView {
+        if textView != nil, let tableView = delegate?.tableView {
             if save {
                 DispatchQueue.main.async {
                     tableView.beginUpdates()
                     self.textView?.text = self.text.text
                     tableView.endUpdates()
-//                    if self._stringVariablePointer is String {
-//                        _stringVariablePointer as! String = "ХУЙ"
-//                    }
-//                    if self._stringVariablePointer != nil {
-//                        print(self._stringVariablePointer!.pointee)
-//                        self._stringVariablePointer!.pointee = "ХУЙ"//self.text.text
-//                        print(self._stringVariablePointer!.pointee)
-//                    }
                 }
             }
         }
+        
         endEditing(true)
+        
+        //Slight scale/fade animation
         let scaleAnim       = CABasicAnimation(keyPath: "transform.scale")
         let fadeAnim        = CABasicAnimation(keyPath: "opacity")
         let groupAnim       = CAAnimationGroup()
         
         scaleAnim.fromValue = 1.0
         scaleAnim.toValue   = 0.7
-        scaleAnim.duration  = 0.6
         scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         fadeAnim.fromValue  = 1
         fadeAnim.toValue    = 0
         
         groupAnim.animations        = [scaleAnim, fadeAnim]
-        groupAnim.duration          = 0.3
+        groupAnim.duration          = 0.4
         groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         
         frameView.layer.add(groupAnim, forKey: nil)
         frameView.layer.opacity = Float(0)
         frameView.layer.transform = CATransform3DMakeScale(0.7, 0.7, 1)
         
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
+        delegate?.statusBarHidden = false
+        UIView.animate(withDuration: 0.4, delay: 0.1, options: [.curveEaseOut], animations: {
+            self.stackView.alpha = 0
             self.lightBlurView.alpha = 0
-            self.contentView.alpha = 0
             if self.closure != nil {
                 self.closure!(self.text.text)
             }
-            UIApplication.shared.keyWindow?.windowLevel = UIWindow.Level.statusBar - 1
         }, completion: {
             _ in
             self.removeFromSuperview()
-            
-//            UIApplication.shared.keyWindow?.windowLevel = UIWindow.Level.statusBar - 1
         })
     }
     
@@ -209,12 +198,16 @@ class TextEditingView: UIView, CAAnimationDelegate {
     }
     
     @objc func keyboardWillHide(_ notification: Notification) {
-        UIView.animate(withDuration: 0.2) {
+        UIView.animate(withDuration: 0.4) {
             self.setNeedsLayout()
             self.frameHeight.constant += self.keyboardHeight
             self.layoutIfNeeded()
             self.keyboardHeight = 0
         }
+    }
+    
+    deinit {
+        print("TextEditingView deinit")
     }
 }
 

@@ -10,7 +10,7 @@ import UIKit
 
 class ImageHeaderCell: UITableViewCell {
 
-    var delegate: CellButtonDelegate?
+    weak var delegate: CellButtonDelegate?
     @IBOutlet weak var cameraIcon: CameraIcon! {
         didSet {
             let touch = UITapGestureRecognizer(target:self, action:#selector(ImageHeaderCell.addImage))

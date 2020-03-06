@@ -9,30 +9,8 @@
 import UIKit
 
 @IBDesignable
-class ParentLoginButton: UIView, AnimationsRemover {
-    
-    public enum State {
-        case enabled, disabled
-    }
-    
-    var state: State = .disabled
+class LoginButton: StateButton {
     var authVariant: AuthVariant!
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        //setup()
-    }
-    
-    func removeAllAnimations() {
-        
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        //fatalError("init(coder:) has not been implemented")
-        super.init(coder: aDecoder)
-        //setup()
-    }
-    
 }
 
 protocol AnimationsRemover {

@@ -9,7 +9,7 @@
 import UIKit
 
 @IBDesignable
-class GoogleButtonView: ParentLoginButton, CAAnimationDelegate {
+class GoogleButtonView: LoginButton, CAAnimationDelegate {
     
     var layers = [String: CALayer]()
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
@@ -22,7 +22,7 @@ class GoogleButtonView: ParentLoginButton, CAAnimationDelegate {
     var color3 : UIColor!
     
     //MARK: - Life Cycle
-    override var state: ParentLoginButton.State {
+    override var state: State {
         didSet {
             if oldValue != state {
                 if state == .enabled {

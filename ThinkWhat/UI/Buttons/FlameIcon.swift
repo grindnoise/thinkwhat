@@ -58,7 +58,7 @@ class FlameIcon: Icon, CAAnimationDelegate {
     }
     
     func setupProperties(){
-        self.active = UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
+        self.active = K_COLOR_RED//UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
         self.inactive = UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1)
     }
     
@@ -104,7 +104,7 @@ class FlameIcon: Icon, CAAnimationDelegate {
     func addEnableAnimation(completionBlock: ((_ finished: Bool) -> Void)? = nil){
         if completionBlock != nil{
             let completionAnim = CABasicAnimation(keyPath:"completionAnim")
-            completionAnim.duration = 0.267
+            completionAnim.duration = 0.15
             completionAnim.delegate = self
             completionAnim.setValue("enable", forKey:"animId")
             completionAnim.setValue(false, forKey:"needEndAnim")
@@ -121,29 +121,19 @@ class FlameIcon: Icon, CAAnimationDelegate {
         ////Path animation
         let pathTransformAnim            = CAKeyframeAnimation(keyPath:"transform")
         pathTransformAnim.values         = [NSValue(caTransform3D: CATransform3DIdentity),
-                                            NSValue(caTransform3D: CATransform3DMakeScale(1.1, 1.1, 1))]
+                                            NSValue(caTransform3D: CATransform3DMakeScale(1.3, 1.3, 1))]
         pathTransformAnim.keyTimes       = [0, 1]
         pathTransformAnim.duration       = 0.15
         pathTransformAnim.timingFunction = CAMediaTimingFunction(name:.easeInEaseOut)
         
         let pathFillColorAnim            = CAKeyframeAnimation(keyPath:"fillColor")
         pathFillColorAnim.values         = [self.inactive.cgColor,
-                                            self.active.cgColor]
+                                            UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1).cgColor]
         pathFillColorAnim.keyTimes       = [0, 1]
         pathFillColorAnim.duration       = 0.15
         pathFillColorAnim.timingFunction = CAMediaTimingFunction(name:.easeInEaseOut)
         
-        let pathShadowColorAnim              = CAKeyframeAnimation(keyPath:"shadowColor")
-        pathShadowColorAnim.values           = [UIColor(red:1.00, green: 0.58, blue:0.00, alpha:1.0).cgColor,
-                                                UIColor(red:1.00, green: 0.58, blue:0.00, alpha:1.0).cgColor]
-        pathShadowColorAnim.duration         = 0.267
-        pathShadowColorAnim.timingFunction   = CAMediaTimingFunction(name:.easeInEaseOut)
-        let pathShadowOpacityAnim            = CAKeyframeAnimation(keyPath:"shadowOpacity")
-        pathShadowOpacityAnim.values         = [0, 0.64]
-        pathShadowOpacityAnim.duration       = 0.267
-        pathShadowOpacityAnim.timingFunction = CAMediaTimingFunction(name:.easeInEaseOut)
-        
-        let pathEnableAnim : CAAnimationGroup = QCMethod.group(animations: [pathTransformAnim, pathFillColorAnim, pathShadowColorAnim, pathShadowOpacityAnim], fillMode:fillMode)
+        let pathEnableAnim : CAAnimationGroup = QCMethod.group(animations: [pathTransformAnim, pathFillColorAnim], fillMode:fillMode)
         path.add(pathEnableAnim, forKey:"pathEnableAnim")
     }
     
@@ -166,30 +156,20 @@ class FlameIcon: Icon, CAAnimationDelegate {
         
         ////Path animation
         let pathTransformAnim            = CAKeyframeAnimation(keyPath:"transform")
-        pathTransformAnim.values         = [NSValue(caTransform3D: CATransform3DMakeScale(1.1, 1.1, 1)),
+        pathTransformAnim.values         = [NSValue(caTransform3D: CATransform3DMakeScale(1.3, 1.3, 1)),
                                             NSValue(caTransform3D: CATransform3DIdentity)]
         pathTransformAnim.keyTimes       = [0, 1]
         pathTransformAnim.duration       = 0.2
         pathTransformAnim.timingFunction = CAMediaTimingFunction(name:.easeOut)
         
         let pathFillColorAnim            = CAKeyframeAnimation(keyPath:"fillColor")
-        pathFillColorAnim.values         = [UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0).cgColor,
+        pathFillColorAnim.values         = [UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1).cgColor,
                                             UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1).cgColor]
         pathFillColorAnim.keyTimes       = [0, 1]
         pathFillColorAnim.duration       = 0.2
         pathFillColorAnim.timingFunction = CAMediaTimingFunction(name:.easeOut)
         
-        let pathShadowColorAnim              = CAKeyframeAnimation(keyPath:"shadowColor")
-        pathShadowColorAnim.values           = [UIColor(red:1.00, green: 0.58, blue:0.00, alpha:1.0).cgColor,
-                                                UIColor(red:1.00, green: 0.57, blue:0.00, alpha:1.0).cgColor]
-        pathShadowColorAnim.duration         = 0.2
-        pathShadowColorAnim.timingFunction   = CAMediaTimingFunction(name:.easeOut)
-        let pathShadowOpacityAnim            = CAKeyframeAnimation(keyPath:"shadowOpacity")
-        pathShadowOpacityAnim.values         = [0.64, 0]
-        pathShadowOpacityAnim.duration       = 0.2
-        pathShadowOpacityAnim.timingFunction = CAMediaTimingFunction(name:.easeOut)
-        
-        let pathDisableAnim : CAAnimationGroup = QCMethod.group(animations: [pathTransformAnim, pathFillColorAnim, pathShadowColorAnim, pathShadowOpacityAnim], fillMode:fillMode)
+        let pathDisableAnim : CAAnimationGroup = QCMethod.group(animations: [pathTransformAnim, pathFillColorAnim], fillMode:fillMode)
         path.add(pathDisableAnim, forKey:"pathDisableAnim")
     }
     

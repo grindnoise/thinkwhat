@@ -57,8 +57,8 @@ class NewIcon: Icon, CAAnimationDelegate {
     }
     
     func setupProperties(){
-        self.active = UIColor(red:0, green: 0.56, blue:0, alpha:1)
-        self.active1 = UIColor(red:0, green: 0.56, blue:0, alpha:1)
+        self.active = K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)
+        self.active1 = UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1)
     }
     
     func setupLayers(){
@@ -163,7 +163,7 @@ class NewIcon: Icon, CAAnimationDelegate {
         pathTransformAnim.timingFunction = CAMediaTimingFunction(name:.easeOut)
         
         let pathFillColorAnim            = CAKeyframeAnimation(keyPath:"fillColor")
-        pathFillColorAnim.values         = [UIColor(red:0, green: 0.56, blue:0, alpha:1).cgColor,
+        pathFillColorAnim.values         = [active.cgColor,
                                             UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1).cgColor]
         pathFillColorAnim.keyTimes       = [0, 1]
         pathFillColorAnim.duration       = 0.2

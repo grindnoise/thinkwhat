@@ -49,6 +49,10 @@ enum FileFormat: String {
     case Unknown    = "Unknown"
 }
 
+enum State {
+    case enabled, disabled
+}
+
 enum TokenState {
     case Received
     case Error
@@ -227,9 +231,12 @@ let kSegueAppNewSurveyToCategorySelection        = "NEW_TO_CATEGORY_SELECTION"
 //let segueWelcomeBarber                          = "segueWelcomeBarber"
 //let segueClientSettingsPicker                   = "segueClientSettingsPicker"
 let alert                                       = CustomAlertView(frame: (UIApplication.shared.keyWindow?.frame)!)
-let K_COLOR_RED                                 = UIColor(red:0.805, green: 0.342, blue:0.339, alpha:1)
+let K_COLOR_RED                                 = UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)//UIColor(red:0.805, green: 0.342, blue:0.339, alpha:1)
 let K_COLOR_GRAY                                = UIColor(red:0.574, green: 0.574, blue:0.574, alpha:1)
 let options: UNAuthorizationOptions             = [.alert, .sound, .badge]
+
+//HTTP request attempts before assertion
+let MAX_REQUEST_ATTEMPTS                        = 3
 
 //MARK: - Structs
 struct ImageHeaderData{
@@ -575,6 +582,7 @@ struct SERVER_URLS {
 
     //Surveys
     static let SURVEYS                  = "api/surveys/"
+    static let SURVEYS_MEDIA            = "api/media/"
     static let SURVEYS_TOP              = "api/surveys/top/"
     static let SURVEYS_NEW              = "api/surveys/new/"
     static let SURVEYS_ALL              = "api/surveys/all/"
@@ -610,6 +618,19 @@ struct DjangoVariables {
         static let vkID                     = "vk_ID"
         static let isEdited                 = "is_edited"
         static let isEmailVerified          = "is_email_verified"
+    }
+    struct Survey {
+        static let category                 = "category"
+        static let owner                    = "owner"
+        static let title                    = "title"
+        static let description              = "description"
+        static let hlink                    = "hlink"
+        static let voteCapacity             = "vote_capacity"
+        static let isPrivate                = "is_private"
+        static let answers                  = "answers"
+        static let images                   = "media"
+        static let startDate                = "start_date"
+        static let endDate                  = "end_date"
     }
 }
 

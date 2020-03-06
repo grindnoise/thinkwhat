@@ -9,7 +9,7 @@
 import UIKit
 
 @IBDesignable
-class InstagramButtonView: ParentLoginButton, CAAnimationDelegate {
+class InstagramButtonView: LoginButton, CAAnimationDelegate {
     
     var layers = [String: CALayer]()
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
@@ -22,7 +22,7 @@ class InstagramButtonView: ParentLoginButton, CAAnimationDelegate {
     var color3 : UIColor!
     
     //MARK: - Life Cycle
-    override var state: ParentLoginButton.State {
+    override var state: State {
         didSet {
             if oldValue != state {
                 if state == .enabled {
