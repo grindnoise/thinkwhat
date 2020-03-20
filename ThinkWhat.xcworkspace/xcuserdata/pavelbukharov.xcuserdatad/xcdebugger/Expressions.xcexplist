@@ -121,10 +121,10 @@
          contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "segue.destination as? AnonymitySettingsTableViewController">
+               value = "anonymity">
             </PersistentString>
             <PersistentString
-               value = "anonymity">
+               value = "segue.destination as? AnonymitySettingsTableViewController">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -253,7 +253,12 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
+         contextName = "SurveyViewController.isYoutubeLink(checkString:):SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "youtubeCheckResult.evaluate(with: checkString)">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "Surveys.importNewSurveys(_:):Survey.swift">
@@ -278,15 +283,10 @@
          contextName = "closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
       </ContextState>
       <ContextState
-         contextName = "TopSurveysTableViewController.tableView(_:heightForRowAt:):TopSurveysTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "cell.contentView.frame.height">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
       </ContextState>
       <ContextState
-         contextName = "TopSurveysTableViewController.tableView(_:heightForHeaderInSection:):TopSurveysTableViewController.swift">
+         contextName = "TopSurveysTableViewController.tableView(_:heightForRowAt:):TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "cell.contentView.frame.height">
@@ -304,6 +304,14 @@
             </PersistentString>
             <PersistentString
                value = "tableView.isUserInteractionEnabled">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysTableViewController.tableView(_:heightForHeaderInSection:):TopSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "cell.contentView.frame.height">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -384,6 +392,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "Survey.init(_:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "_imageURL[&quot;title&quot;].stringValue">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.viewDidLoad():NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -398,10 +414,10 @@
          contextName = "CategoryTableViewCell.layoutSubviews():CategoryTableViewCell.swift">
       </ContextState>
       <ContextState
-         contextName = "TopSurveysTableViewController.scrollViewDidScroll(_:):TopSurveysTableViewController.swift">
+         contextName = "SurveyViewController.tableView(_:heightForRowAt:):SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "scrollView.contentOffset.y">
+               value = "tableView.cellForRow(at: indexPath) as? SurveyQuestionCell">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -413,6 +429,14 @@
             </PersistentString>
             <PersistentString
                value = "self.currentOffsetY">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysTableViewController.scrollViewDidScroll(_:):TopSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.contentOffset.y">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -496,10 +520,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -507,19 +531,19 @@
          contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "_cell.pictureView.frame">
+               value = " _cell.textView.text!">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
             </PersistentString>
             <PersistentString
                value = "indexPath.row">
             </PersistentString>
             <PersistentString
-               value = " _cell.textView.text!">
+               value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -551,10 +575,26 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "SurveyImageCell.setupSlides(slidesCount:):SurveyImageCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.contentSize">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "TopSurveysTableViewController.refreshTableView():TopSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "vc.control.selectedSegmentIndex">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyViewController.viewWillAppear(_:):SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "survey">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -774,6 +814,26 @@
             <PersistentString
                value = "Surveys.shared.downloadedSurveys">
             </PersistentString>
+            <PersistentString
+               value = "isInitialLoading">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyViewController.tableView(_:cellForRowAt:):SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "isInitialLoading">
+            </PersistentString>
+            <PersistentString
+               value = "cell.contentView.alpha">
+            </PersistentString>
+            <PersistentString
+               value = "_cell.contentView.alpha">
+            </PersistentString>
+            <PersistentString
+               value = "_cell.isVisible">
+            </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
@@ -866,10 +926,10 @@
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = " currentTV != nil">
+               value = "currentOffsetY">
             </PersistentString>
             <PersistentString
-               value = "currentOffsetY">
+               value = " currentTV != nil">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

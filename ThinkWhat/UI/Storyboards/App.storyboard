@@ -11,9 +11,6 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
-        <array key="OpenSans-Light.ttf">
-            <string>OpenSans-Light</string>
-        </array>
         <array key="OpenSans-Regular.ttf">
             <string>OpenSans</string>
         </array>
@@ -933,12 +930,12 @@
                     <connections>
                         <outlet property="control" destination="Gar-xl-W35" id="ff1-B5-E6a"/>
                         <outlet property="scrollView" destination="Azq-KQ-dQ2" id="ibT-yR-Unb"/>
-                        <segue destination="ja7-kY-SNp" kind="show" identifier="USER_SURVEYS_TO_SURVEY" id="1aX-n4-uZ8"/>
+                        <segue destination="0vW-6a-SEh" kind="show" identifier="USER_SURVEYS_TO_SURVEY" id="MH9-VE-OZE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iiA-Yg-6N4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="570" y="-615"/>
+            <point key="canvasLocation" x="570" y="-617"/>
         </scene>
         <!--Лента-->
         <scene sceneID="raE-he-Uxm">
@@ -1026,8 +1023,8 @@
                         <outlet property="container" destination="0Yc-Te-aTy" id="W2F-TC-6S5"/>
                         <outlet property="hotIcon" destination="pRP-ir-OLK" id="H9C-1Q-jOz"/>
                         <outlet property="newIcon" destination="wSS-w5-vdP" id="aMV-jW-pGI"/>
-                        <segue destination="ja7-kY-SNp" kind="show" identifier="TOP_TO_SURVEY" id="KEe-Xx-TjV"/>
                         <segue destination="0xn-mg-P9J" kind="show" identifier="TOP_TO_CATEGORY" id="VhV-81-Vwo"/>
+                        <segue destination="0vW-6a-SEh" kind="show" identifier="TOP_TO_SURVEY" id="YSd-24-xqI"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="w0q-JQ-tvw" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1077,53 +1074,165 @@
             <point key="canvasLocation" x="1382" y="133"/>
         </scene>
         <!--Survey View Controller-->
-        <scene sceneID="frF-UQ-85z">
+        <scene sceneID="TF6-fp-aMA">
             <objects>
-                <viewController hidesBottomBarWhenPushed="YES" id="ja7-kY-SNp" customClass="SurveyViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="kFa-UF-c3f">
+                <tableViewController id="0vW-6a-SEh" customClass="SurveyViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Nw3-e1-Uqg">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="1000"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MhL-n8-NVE">
-                                <rect key="frame" x="0.0" y="64" width="320" height="120"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="120" id="E0m-CM-K6M"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="27"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" canCancelContentTouches="NO" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="KgK-Xg-jzw">
-                                <rect key="frame" x="16" y="184" width="288" height="301"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="301" id="Sof-le-7dy"/>
-                                </constraints>
-                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
-                                <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="17"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstItem="MhL-n8-NVE" firstAttribute="leading" secondItem="GG1-Gx-iyI" secondAttribute="leading" id="OUE-sb-ZdB"/>
-                            <constraint firstItem="KgK-Xg-jzw" firstAttribute="leading" secondItem="GG1-Gx-iyI" secondAttribute="leading" constant="16" id="Vwc-Ht-GDj"/>
-                            <constraint firstItem="KgK-Xg-jzw" firstAttribute="top" secondItem="MhL-n8-NVE" secondAttribute="bottom" id="cs1-K2-NSA"/>
-                            <constraint firstItem="GG1-Gx-iyI" firstAttribute="trailing" secondItem="KgK-Xg-jzw" secondAttribute="trailing" constant="16" id="jIz-f6-6lS"/>
-                            <constraint firstItem="MhL-n8-NVE" firstAttribute="top" secondItem="GG1-Gx-iyI" secondAttribute="top" id="uVU-YK-uNa"/>
-                            <constraint firstItem="GG1-Gx-iyI" firstAttribute="trailing" secondItem="MhL-n8-NVE" secondAttribute="trailing" id="zTx-Sy-Jdu"/>
-                        </constraints>
-                        <viewLayoutGuide key="safeArea" id="GG1-Gx-iyI"/>
-                    </view>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="title" rowHeight="120" id="tWb-Q5-udO" customClass="SurveyTitleCell" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="28" width="320" height="120"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tWb-Q5-udO" id="JeA-Fc-0IW">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="120"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EzX-J1-x0C">
+                                            <rect key="frame" x="16" y="11" width="288" height="98"/>
+                                            <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="25"/>
+                                            <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottomMargin" secondItem="EzX-J1-x0C" secondAttribute="bottom" id="6LW-Ro-F3o"/>
+                                        <constraint firstItem="EzX-J1-x0C" firstAttribute="leading" secondItem="JeA-Fc-0IW" secondAttribute="leadingMargin" id="7ov-QY-x5b"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="EzX-J1-x0C" secondAttribute="trailing" id="MRX-rD-EWw"/>
+                                        <constraint firstItem="EzX-J1-x0C" firstAttribute="top" secondItem="JeA-Fc-0IW" secondAttribute="topMargin" id="yV0-0Q-eHw"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="label" destination="EzX-J1-x0C" id="lzi-bN-53m"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="question" rowHeight="200" id="j8p-8S-FWk" customClass="SurveyQuestionCell" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="148" width="320" height="200"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="j8p-8S-FWk" id="neN-Cp-aQb">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="200"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="G2t-jI-wC8">
+                                            <rect key="frame" x="16" y="11" width="288" height="178"/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                            <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        </textView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottomMargin" secondItem="G2t-jI-wC8" secondAttribute="bottom" id="7f8-AU-LN4"/>
+                                        <constraint firstItem="G2t-jI-wC8" firstAttribute="top" secondItem="neN-Cp-aQb" secondAttribute="topMargin" id="BTS-X4-qbz"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="G2t-jI-wC8" secondAttribute="trailing" id="pCY-A5-zRX"/>
+                                        <constraint firstItem="G2t-jI-wC8" firstAttribute="leading" secondItem="neN-Cp-aQb" secondAttribute="leadingMargin" id="tyh-Pw-StH"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <outlet property="textView" destination="G2t-jI-wC8" id="3M9-Eu-qcM"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="link" id="aDj-Wx-Bmf" customClass="SurveyLinkCell" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="348" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="aDj-Wx-Bmf" id="h2X-rv-wW9">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b2w-uO-lLH">
+                                            <rect key="frame" x="88" y="11" width="144" height="22"/>
+                                            <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="17"/>
+                                            <state key="normal" title="УЗНАТЬ БОЛЬШЕ">
+                                                <color key="titleColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="linkTapped:" destination="aDj-Wx-Bmf" eventType="touchUpInside" id="FhO-YZ-RTI"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottomMargin" secondItem="b2w-uO-lLH" secondAttribute="bottom" id="623-OE-aqh"/>
+                                        <constraint firstItem="b2w-uO-lLH" firstAttribute="centerY" secondItem="h2X-rv-wW9" secondAttribute="centerY" id="8Zd-1i-CDN"/>
+                                        <constraint firstItem="b2w-uO-lLH" firstAttribute="top" secondItem="h2X-rv-wW9" secondAttribute="topMargin" id="cVG-Zc-9jL"/>
+                                        <constraint firstItem="b2w-uO-lLH" firstAttribute="centerX" secondItem="h2X-rv-wW9" secondAttribute="centerX" id="iGi-Wb-WDY"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="linkButton" destination="b2w-uO-lLH" id="kVE-qO-k61"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="youtube" rowHeight="150" id="O2D-U8-6wr" customClass="SurveyYoutubeCell" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="392" width="320" height="150"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="O2D-U8-6wr" id="XwP-gy-S3z">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="150"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aG6-tu-KXV" customClass="WKYTPlayerView">
+                                            <rect key="frame" x="16" y="-6" width="288" height="162"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" secondItem="aG6-tu-KXV" secondAttribute="height" multiplier="16:9" id="9Pi-Rm-wXA"/>
+                                            </constraints>
+                                        </view>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstItem="aG6-tu-KXV" firstAttribute="centerY" secondItem="XwP-gy-S3z" secondAttribute="centerY" id="fBW-9a-3Zw"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="aG6-tu-KXV" secondAttribute="trailing" id="huN-WM-Z8Z"/>
+                                        <constraint firstItem="aG6-tu-KXV" firstAttribute="leading" secondItem="XwP-gy-S3z" secondAttribute="leadingMargin" id="kQx-MQ-kys"/>
+                                        <constraint firstItem="aG6-tu-KXV" firstAttribute="centerX" secondItem="XwP-gy-S3z" secondAttribute="centerX" id="v1n-lY-ba2"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="playerView" destination="aG6-tu-KXV" id="32v-NE-OoR"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="image" rowHeight="200" id="jBu-HM-dJU" customClass="SurveyImageCell" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="542" width="320" height="200"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jBu-HM-dJU" id="C3s-nC-Eov">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="200"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="arf-oP-RoR">
+                                            <rect key="frame" x="16" y="11" width="288" height="178"/>
+                                        </scrollView>
+                                        <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="ula-AB-gih">
+                                            <rect key="frame" x="140.5" y="152" width="39" height="37"/>
+                                            <color key="currentPageIndicatorTintColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </pageControl>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstItem="ula-AB-gih" firstAttribute="centerX" secondItem="C3s-nC-Eov" secondAttribute="centerX" id="02O-yy-yWq"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="arf-oP-RoR" secondAttribute="trailing" id="HSd-Dz-3cl"/>
+                                        <constraint firstItem="arf-oP-RoR" firstAttribute="top" secondItem="C3s-nC-Eov" secondAttribute="topMargin" id="Kav-s0-MfB"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="arf-oP-RoR" secondAttribute="bottom" id="Uyj-ZT-anT"/>
+                                        <constraint firstItem="arf-oP-RoR" firstAttribute="leading" secondItem="C3s-nC-Eov" secondAttribute="leadingMargin" id="YsN-HD-hV9"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="ula-AB-gih" secondAttribute="bottom" id="jZY-3P-1yb"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <outlet property="pageControl" destination="ula-AB-gih" id="YLW-j6-36R"/>
+                                    <outlet property="scrollView" destination="arf-oP-RoR" id="08r-uM-tMD"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="0vW-6a-SEh" id="R9v-Ya-6F1"/>
+                            <outlet property="delegate" destination="0vW-6a-SEh" id="cKv-A5-iaB"/>
+                        </connections>
+                    </tableView>
                     <nil key="simulatedBottomBarMetrics"/>
                     <size key="freeformSize" width="320" height="1000"/>
-                    <connections>
-                        <outlet property="surveyTitle" destination="MhL-n8-NVE" id="eij-40-pKG"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="1Sg-i2-hcc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4Ku-mw-1S0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4290" y="132.04225352112675"/>
+            <point key="canvasLocation" x="2990.625" y="132.04225352112675"/>
         </scene>
         <!--Title-->
         <scene sceneID="nrt-Vz-cHQ">
@@ -1220,13 +1329,13 @@
                                         <rect key="frame" x="0.0" y="9" width="320" height="163.5"/>
                                         <subviews>
                                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="l5G-ph-ezo">
-                                                <rect key="frame" x="104" y="0.0" width="112" height="112"/>
+                                                <rect key="frame" x="104" y="0.0" width="112" height="112.5"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="l5G-ph-ezo" secondAttribute="height" multiplier="1:1" id="wc8-yw-uzc"/>
                                                 </constraints>
                                             </imageView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="F09-Ez-ImL">
-                                                <rect key="frame" x="108.5" y="117" width="103" height="46.5"/>
+                                                <rect key="frame" x="108.5" y="117.5" width="103" height="46"/>
                                                 <subviews>
                                                     <textField opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Alex Turner" textAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="QqS-fO-Rej">
                                                         <rect key="frame" x="0.0" y="0.0" width="103" height="23"/>
@@ -1235,7 +1344,7 @@
                                                         <textInputTraits key="textInputTraits"/>
                                                     </textField>
                                                     <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="мужчина, 32 года" textAlignment="center" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="TaN-q5-kik">
-                                                        <rect key="frame" x="0.0" y="31" width="103" height="15.5"/>
+                                                        <rect key="frame" x="0.0" y="31" width="103" height="15"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                                                         <textInputTraits key="textInputTraits"/>
@@ -1689,7 +1798,7 @@
         <image name="ic_profile" width="20" height="21"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="1aX-n4-uZ8"/>
+        <segue reference="YSd-24-xqI"/>
         <segue reference="ImY-qI-VhW"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

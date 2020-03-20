@@ -154,6 +154,7 @@ class TopSurveysViewController: UIViewController/*, CircleTransitionable*/ {
                 destinationVC.title = cell.category.title
             }
         } else if segue.identifier == kSegueAppFeedToSurvey, let destinationVC = segue.destination as? SurveyViewController, let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+            tabBarController?.setTabBarVisible(visible: false, animated: true)
             destinationVC.surveyLink = cell.survey
         } else if segue.identifier == kSegueAppFeedToNewSurvey { //New survey
             navigationController?.setNavigationBarHidden(true, animated: false)

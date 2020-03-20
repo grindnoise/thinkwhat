@@ -9,6 +9,14 @@
 import Foundation
 import SwiftyJSON
 
+enum SurveyAnonymity: Int, CaseIterable {
+    case Full
+    case Host
+    case Responder
+    case AllowAnonymousVoting
+    case Disabled
+}
+
 class Surveys {
     static let shared = Surveys()
     private init() {}
@@ -250,7 +258,8 @@ class Survey {
     var modified: Date
     var category: SurveyCategory
     var description: String
-    var images: [[UIImage: String]]?
+    var images: [[UIImage: String]]?//Already downloaded -> Download should begin interactively, then store data here
+    var imagesURLs: [[String: String]]?//URL - key, Title - value
     var answers: [String] = []
     var owner: String
     var link: String?
@@ -334,7 +343,7 @@ class Survey {
             let _voteCapacity           = json["voteCapacity"].intValue as? Int,
             let _isPrivate              = json["is_private"].boolValue as? Bool,
             let _answers                = json["answers"].arrayValue as? [JSON],
-            let _images                 = json["mediafiles"].arrayValue as? [JSON] {
+            let _imageURLs              = json["mediafiles"].arrayValue as? [JSON] {
             ID = _ID
             title = _title
             startDate = _startDate
@@ -351,10 +360,13 @@ class Survey {
                     answers.append(answer)
                 }
             }
-            for _image in _images {
-//                if let image = _image["id"].stringValue as? String {
-//                    answers.append(answer)
-//                }
+            if _imageURLs != nil, !_imageURLs.isEmpty {
+                imagesURLs = []
+                for _imageURL in _imageURLs {
+                    if let _url = _imageURL["image"].stringValue as? String, let _imageTitle = _imageURL["title"].stringValue as? String {
+                        imagesURLs?.append([_url: _imageTitle])
+                    }
+                }
             }
         } else {
             return nil
@@ -375,10 +387,4 @@ extension Survey: Hashable {
     }
 }
 
-enum SurveyAnonymity: Int, CaseIterable {
-    case Full
-    case Host
-    case Responder
-    case AllowAnonymousVoting
-    case Disabled
-}
+

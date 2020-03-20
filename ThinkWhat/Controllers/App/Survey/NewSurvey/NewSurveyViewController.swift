@@ -327,7 +327,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = UITableViewCell()
-        if indexPath.section == 0 { //Params
+        if indexPath.section == 0 { //Paramsv
             if indexPath.row == 0, let _cell = tableView.dequeueReusableCell(withIdentifier: "category", for: indexPath) as? CategorySelectionCell {
                 if leftEdgeInset == 0 {
                     for v in _cell.contentView.subviews {

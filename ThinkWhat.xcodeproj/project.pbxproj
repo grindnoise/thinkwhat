@@ -10,6 +10,7 @@
 		2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 		AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */; };
 		AB215DE623B39E6C0073F0CA /* AnswerCreationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB215DE523B39E6C0073F0CA /* AnswerCreationCell.swift */; };
+		AB219CA22420D0400074CF9F /* SurveyYoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB219CA12420D0400074CF9F /* SurveyYoutubeCell.swift */; };
 		AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2918C7238E5B4600EF488A /* CircularTransition.swift */; };
 		AB2984FA23A79EA70086A92B /* PrivacySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */; };
 		AB2984FC23A7A2340086A92B /* AnonymitySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */; };
@@ -89,6 +90,9 @@
 		AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */; };
 		AB6083C122410131002C0D7E /* ValidSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083C022410130002C0D7E /* ValidSign.swift */; };
 		AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */; };
+		AB72A8442418D05E005B58F1 /* SurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72A8432418D05E005B58F1 /* SurveyViewController.swift */; };
+		AB735C092418EABD00776248 /* SurveyTitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB735C082418EABD00776248 /* SurveyTitleCell.swift */; };
+		AB735C0B241902E600776248 /* SurveyQuestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB735C0A241902E600776248 /* SurveyQuestionCell.swift */; };
 		AB7528DA23FED5A7005D765A /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7528D923FED5A7005D765A /* TestViewController.swift */; };
 		AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */; };
 		AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */; };
@@ -101,6 +105,7 @@
 		AB889816240FA60C0087E5AD /* CopyPasteSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB889815240FA60C0087E5AD /* CopyPasteSign.swift */; };
 		AB889818240FA65B0087E5AD /* CopyPasteTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB889817240FA65B0087E5AD /* CopyPasteTextField.swift */; };
 		AB8DAB5423BA2A790089E25F /* PlainIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DAB5323BA2A790089E25F /* PlainIcons.swift */; };
+		AB8FD485241F761F00BB74EF /* SurveyLinkCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8FD484241F761F00BB74EF /* SurveyLinkCell.swift */; };
 		AB99675D23D85E180037CD6C /* TextEditingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99675C23D85E180037CD6C /* TextEditingView.swift */; };
 		AB99675F23D85E6A0037CD6C /* TextEditingView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB99675E23D85E6A0037CD6C /* TextEditingView.xib */; };
 		AB99676123D9AA210037CD6C /* HideKeyboardIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */; };
@@ -113,6 +118,9 @@
 		ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F402347406F00AF212B /* ProfileViewController.swift */; };
 		ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */; };
 		ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */; };
+		ABB8B18F2423C9DE00E8DFF3 /* SurveyImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB8B18E2423C9DE00E8DFF3 /* SurveyImageCell.swift */; };
+		ABB8B1912423D11600E8DFF3 /* Slide.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB8B1902423D11600E8DFF3 /* Slide.swift */; };
+		ABB8B1932423D13900E8DFF3 /* Slide.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABB8B1922423D13900E8DFF3 /* Slide.xib */; };
 		ABBA73F12382896900540ECF /* UserSurveysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F02382896900540ECF /* UserSurveysViewController.swift */; };
 		ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F22382BCCC00540ECF /* StatisticsViewController.swift */; };
 		ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */; };
@@ -133,7 +141,6 @@
 		ABDA425523B1036400BAC3A5 /* NewSurveyHeaderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */; };
 		ABDA425923B3475400BAC3A5 /* AnswerCreationHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */; };
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
-		ABDEE85B237023D0009B52F3 /* SurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */; };
 		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
 		ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1F19E22C253A6008913C3 /* FBManager.swift */; };
 		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
@@ -164,6 +171,7 @@
 		A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthViewController.swift; sourceTree = "<group>"; };
 		AB215DE523B39E6C0073F0CA /* AnswerCreationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCreationCell.swift; sourceTree = "<group>"; };
+		AB219CA12420D0400074CF9F /* SurveyYoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyYoutubeCell.swift; sourceTree = "<group>"; };
 		AB2918C7238E5B4600EF488A /* CircularTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacySelectionCell.swift; sourceTree = "<group>"; };
 		AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymitySelectionCell.swift; sourceTree = "<group>"; };
@@ -249,6 +257,9 @@
 		AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderlinedSignTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB6083C022410130002C0D7E /* ValidSign.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidSign.swift; sourceTree = "<group>"; };
 		AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyIcons.swift; sourceTree = "<group>"; };
+		AB72A8432418D05E005B58F1 /* SurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyViewController.swift; sourceTree = "<group>"; };
+		AB735C082418EABD00776248 /* SurveyTitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTitleCell.swift; sourceTree = "<group>"; };
+		AB735C0A241902E600776248 /* SurveyQuestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyQuestionCell.swift; sourceTree = "<group>"; };
 		AB7528D923FED5A7005D765A /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryViewController.swift; sourceTree = "<group>"; };
 		AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRegistrationViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -261,6 +272,7 @@
 		AB889815240FA60C0087E5AD /* CopyPasteSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyPasteSign.swift; sourceTree = "<group>"; };
 		AB889817240FA65B0087E5AD /* CopyPasteTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyPasteTextField.swift; sourceTree = "<group>"; };
 		AB8DAB5323BA2A790089E25F /* PlainIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainIcons.swift; sourceTree = "<group>"; };
+		AB8FD484241F761F00BB74EF /* SurveyLinkCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyLinkCell.swift; sourceTree = "<group>"; };
 		AB99675C23D85E180037CD6C /* TextEditingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditingView.swift; sourceTree = "<group>"; };
 		AB99675E23D85E6A0037CD6C /* TextEditingView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextEditingView.xib; sourceTree = "<group>"; };
 		AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideKeyboardIcon.swift; sourceTree = "<group>"; };
@@ -273,6 +285,9 @@
 		ABB46F402347406F00AF212B /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsTableViewController.swift; sourceTree = "<group>"; };
 		ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsSelectionTableViewController.swift; sourceTree = "<group>"; };
+		ABB8B18E2423C9DE00E8DFF3 /* SurveyImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyImageCell.swift; sourceTree = "<group>"; };
+		ABB8B1902423D11600E8DFF3 /* Slide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slide.swift; sourceTree = "<group>"; };
+		ABB8B1922423D13900E8DFF3 /* Slide.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Slide.xib; sourceTree = "<group>"; };
 		ABBA73F02382896900540ECF /* UserSurveysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysViewController.swift; sourceTree = "<group>"; };
 		ABBA73F22382BCCC00540ECF /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatisticsViewController.xib; sourceTree = "<group>"; };
@@ -293,7 +308,6 @@
 		ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewSurveyHeaderCell.xib; sourceTree = "<group>"; };
 		ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCreationHeaderCell.swift; sourceTree = "<group>"; };
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
-		ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyViewController.swift; sourceTree = "<group>"; };
 		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
 		ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhat.entitlements; sourceTree = "<group>"; };
 		ABF1F19E22C253A6008913C3 /* FBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FBManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -596,7 +610,21 @@
 			path = Animated;
 			sourceTree = "<group>";
 		};
-		AB7CE6F923A3610E006FDBD8 /* New */ = {
+		AB72A8422418CF2D005B58F1 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				AB735C082418EABD00776248 /* SurveyTitleCell.swift */,
+				AB735C0A241902E600776248 /* SurveyQuestionCell.swift */,
+				AB8FD484241F761F00BB74EF /* SurveyLinkCell.swift */,
+				AB219CA12420D0400074CF9F /* SurveyYoutubeCell.swift */,
+				ABB8B18E2423C9DE00E8DFF3 /* SurveyImageCell.swift */,
+				ABB8B1902423D11600E8DFF3 /* Slide.swift */,
+				ABB8B1922423D13900E8DFF3 /* Slide.xib */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		AB7CE6F923A3610E006FDBD8 /* NewSurvey */ = {
 			isa = PBXGroup;
 			children = (
 				AB868A7123ED8EC5008DEB84 /* ConfirmationView */,
@@ -606,13 +634,14 @@
 				ABBF848823CDB97400059BF0 /* AnonymitySettingsTableViewController.swift */,
 				AB868A6923EB04A3008DEB84 /* CategorySelectionViewController.swift */,
 			);
-			path = New;
+			path = NewSurvey;
 			sourceTree = "<group>";
 		};
 		AB7CE6FA23A36123006FDBD8 /* Survey */ = {
 			isa = PBXGroup;
 			children = (
-				ABDEE85A237023D0009B52F3 /* SurveyViewController.swift */,
+				AB72A8422418CF2D005B58F1 /* Cells */,
+				AB72A8432418D05E005B58F1 /* SurveyViewController.swift */,
 			);
 			path = Survey;
 			sourceTree = "<group>";
@@ -720,7 +749,7 @@
 			isa = PBXGroup;
 			children = (
 				AB7CE6FA23A36123006FDBD8 /* Survey */,
-				AB7CE6F923A3610E006FDBD8 /* New */,
+				AB7CE6F923A3610E006FDBD8 /* NewSurvey */,
 			);
 			path = Survey;
 			sourceTree = "<group>";
@@ -894,6 +923,7 @@
 				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
 				AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */,
 				AB868A7323ED8F28008DEB84 /* ConfirmationView.xib in Resources */,
+				ABB8B1932423D13900E8DFF3 /* Slide.xib in Resources */,
 				ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */,
 				AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */,
 				AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */,
@@ -999,7 +1029,7 @@
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/VK-ios-sdk/VK_ios_sdk.framework",
-				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper/youtube_ios_player_helper.framework",
+				"${BUILT_PRODUCTS_DIR}/YoutubePlayer-in-WKWebView/YoutubePlayer_in_WKWebView.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -1009,7 +1039,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VK_ios_sdk.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/YoutubePlayer_in_WKWebView.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1029,7 +1059,7 @@
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/VK-ios-sdk/VK_ios_sdk.framework",
-				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper/youtube_ios_player_helper.framework",
+				"${BUILT_PRODUCTS_DIR}/YoutubePlayer-in-WKWebView/YoutubePlayer_in_WKWebView.framework",
 				"${BUILT_PRODUCTS_DIR}/Nimble/Nimble.framework",
 				"${BUILT_PRODUCTS_DIR}/Quick/Quick.framework",
 			);
@@ -1041,7 +1071,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VK_ios_sdk.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/YoutubePlayer_in_WKWebView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nimble.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Quick.framework",
 			);
@@ -1095,7 +1125,6 @@
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
 				AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */,
 				AB2AA1BB235DDC6F0086D16C /* TopSurveysViewController.swift in Sources */,
-				ABDEE85B237023D0009B52F3 /* SurveyViewController.swift in Sources */,
 				ABBA73FC2386ECC200540ECF /* Icon.swift in Sources */,
 				AB99676123D9AA210037CD6C /* HideKeyboardIcon.swift in Sources */,
 				ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */,
@@ -1110,6 +1139,7 @@
 				AB8DAB5423BA2A790089E25F /* PlainIcons.swift in Sources */,
 				AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */,
 				AB3C6848223FD3EE00B57580 /* Buttons.swift in Sources */,
+				AB219CA22420D0400074CF9F /* SurveyYoutubeCell.swift in Sources */,
 				AB99675D23D85E180037CD6C /* TextEditingView.swift in Sources */,
 				AB52B734240E5D4B006DBDA8 /* ReadySign.swift in Sources */,
 				ABBF848923CDB97400059BF0 /* AnonymitySettingsTableViewController.swift in Sources */,
@@ -1120,13 +1150,17 @@
 				AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */,
 				ABBA73FE2387C5A200540ECF /* FlameIcon.swift in Sources */,
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
+				AB72A8442418D05E005B58F1 /* SurveyViewController.swift in Sources */,
 				AB2AA1B32359E9D30086D16C /* TopSurveysTableViewController.swift in Sources */,
+				AB735C092418EABD00776248 /* SurveyTitleCell.swift in Sources */,
 				ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */,
 				ABBA73F12382896900540ECF /* UserSurveysViewController.swift in Sources */,
 				AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */,
 				AB2984FE23A7A2860086A92B /* VotesSelectionCell.swift in Sources */,
+				AB8FD485241F761F00BB74EF /* SurveyLinkCell.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteSign.swift in Sources */,
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
+				ABB8B18F2423C9DE00E8DFF3 /* SurveyImageCell.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
 				AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */,
 				ABDA425423B1036400BAC3A5 /* NewSurveyHeaderCell.swift in Sources */,
@@ -1153,7 +1187,9 @@
 				ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */,
 				AB3C6812223FC71600B57580 /* Main.swift in Sources */,
 				AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */,
+				ABB8B1912423D11600E8DFF3 /* Slide.swift in Sources */,
 				AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */,
+				AB735C0B241902E600776248 /* SurveyQuestionCell.swift in Sources */,
 				ABA6E18822FACAA200F8F39A /* ValidationViewController.swift in Sources */,
 				AB29850623AA4B290086A92B /* ImageSelectionCell.swift in Sources */,
 				ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */,

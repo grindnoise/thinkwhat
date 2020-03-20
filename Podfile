@@ -8,7 +8,7 @@ target 'ThinkWhat' do
     pod 'SwiftyJSON'
     pod 'FBSDKLoginKit'
     pod 'VK-ios-sdk'
-    pod "youtube-ios-player-helper", "~> 0.1.4"
+    pod "YoutubePlayer-in-WKWebView", "~> 0.3.0"
     target 'ThinkWhatTests' do
 	pod 'Quick'
 	pod 'Nimble'
