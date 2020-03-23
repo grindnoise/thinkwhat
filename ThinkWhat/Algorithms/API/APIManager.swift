@@ -15,7 +15,7 @@ protocol APIManagerProtocol {
     func login(_ auth: AuthVariant, username: String?, password: String?, token: String?, completion: @escaping (TokenState) -> ())
     func logout(completion: @escaping (TokenState) -> ())
     func getUserData(completion: @escaping(JSON?, Error?)->())
-    func profileNeedsUpdate(completion: @escaping (Bool? , Error?) -> ())
+    func profileNeedsUpdate(completion: @escaping (Bool? , Error?) -> ())//If Profile was manualy edited -> true
     func updateUserProfile(data: [String: Any], completion: @escaping(JSON?, Error?) -> ())
     func isUsernameEmailAvailable(email: String, username: String, completion: @escaping(Bool?, Error?)->())
     func getEmailConfirmationCode(completion: @escaping(JSON?, Error?)->())
@@ -30,7 +30,7 @@ protocol APIManagerProtocol {
     func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
     
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
-    //    func downloadImage(url: URL, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage) -> ())
+    func downloadImage(url: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
     //    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
     //    func makeOrder(_ order: Order, completion: @escaping (JSON) -> ())
     //    func requestSMSValidationCode(phoneNumber: String, completion: @escaping (JSON?) -> ())
@@ -1053,6 +1053,57 @@ class APIManager: APIManagerProtocol {
                 }
             }
             completion(flag, error)
+        }
+    }
+    
+    func downloadImage(url urlString: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ()) {
+        
+        var error: Error?
+        var url: URL!
+        if let _url = URL(string: urlString) {
+            url = _url
+        } else {
+            error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Incorrect URL provided"]) as Error
+            completion(nil, error!)
+        }
+        
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+        
+        func performRequest() {
+            sessionManager.request(url).downloadProgress(closure: {
+                progress in
+                let prog = CGFloat(progress.fractionCompleted)
+                percentageClosure(prog)
+            }).response(completionHandler: {
+                response in
+                if let data = response.data { response.request?.url
+                    if let image = UIImage(data: data) {
+                        completion(image, nil)
+                    } else {
+                        //Image init failure
+                        error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image initialization failure"]) as Error
+                        completion(nil, error)
+                    }
+                } else {
+                    error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image data error during download"]) as Error
+                    completion(nil, error)
+                }
+            })
         }
     }
     

@@ -15,11 +15,25 @@
         <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="Slide" customModule="ThinkWhat" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="160" height="90"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-            <color key="backgroundColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9ba-FQ-uKV" customClass="CircularIndicatorImageView" customModule="ThinkWhat" customModuleProvider="target">
+                    <rect key="frame" x="0.0" y="0.0" width="160" height="90"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </imageView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="9ba-FQ-uKV" secondAttribute="bottom" id="Mgs-lx-Coi"/>
+                <constraint firstItem="9ba-FQ-uKV" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="TuB-Xo-ysI"/>
+                <constraint firstItem="9ba-FQ-uKV" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="izQ-k1-zOK"/>
+                <constraint firstAttribute="trailing" secondItem="9ba-FQ-uKV" secondAttribute="trailing" id="xHZ-ey-sXs"/>
+            </constraints>
             <nil key="simulatedTopBarMetrics"/>
             <nil key="simulatedBottomBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <connections>
+                <outlet property="imageView" destination="9ba-FQ-uKV" id="Cey-aT-XJM"/>
+            </connections>
             <point key="canvasLocation" x="52.799999999999997" y="48.575712143928037"/>
         </view>
     </objects>

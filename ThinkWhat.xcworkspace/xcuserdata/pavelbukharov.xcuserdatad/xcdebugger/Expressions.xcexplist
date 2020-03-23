@@ -121,10 +121,10 @@
          contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "anonymity">
+               value = "segue.destination as? AnonymitySettingsTableViewController">
             </PersistentString>
             <PersistentString
-               value = "segue.destination as? AnonymitySettingsTableViewController">
+               value = "anonymity">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -441,6 +441,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "SurveyViewController.tableView(_:numberOfRowsInSection:):SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "survey!.answers.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.tableView(_:viewForHeaderInSection:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -520,10 +528,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -531,19 +539,19 @@
          contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = " _cell.textView.text!">
+               value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
             <PersistentString
                value = "indexPath.row">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.frame">
+               value = " _cell.textView.text!">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -564,7 +572,12 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "APIManager._performRequest(url:httpMethod:parameters:encoding:completion:):APIManager.swift">
+         contextName = "SurveyImageCell.setupSlides(slidesCount:):SurveyImageCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "scrollView.contentSize">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "TagLabel.commonInit():TagLabel.swift">
@@ -575,12 +588,7 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "SurveyImageCell.setupSlides(slidesCount:):SurveyImageCell.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "scrollView.contentSize">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "APIManager._performRequest(url:httpMethod:parameters:encoding:completion:):APIManager.swift">
       </ContextState>
       <ContextState
          contextName = "TopSurveysTableViewController.refreshTableView():TopSurveysTableViewController.swift">
@@ -809,6 +817,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #2 in performRequest #1 () in APIManager.downloadImage(url:percentageClosure:completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "response.request?.url">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "SurveyViewController.survey.didset:SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -926,10 +942,10 @@
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "currentOffsetY">
+               value = " currentTV != nil">
             </PersistentString>
             <PersistentString
-               value = " currentTV != nil">
+               value = "currentOffsetY">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1090,6 +1106,14 @@
             </PersistentString>
             <PersistentString
                value = "AppData.shared.userProfile.birthDate!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in SurveyViewController.tableView(_:cellForRowAt:):SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "imageURL">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

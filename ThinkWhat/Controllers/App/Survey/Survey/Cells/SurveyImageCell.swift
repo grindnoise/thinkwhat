@@ -20,7 +20,7 @@ class SurveyImageCell: UITableViewCell {
     }
     @IBOutlet weak var scrollView: UIScrollView! {
         didSet {
-            //scrollView.isUserInteractionEnabled = isSetupCompleted ? true : false
+            scrollView.isUserInteractionEnabled = isSetupCompleted ? true : false
         }
     }
     @IBOutlet weak var pageControl: UIPageControl!
@@ -35,7 +35,7 @@ class SurveyImageCell: UITableViewCell {
         // Configure the view for the selected state
     }
 
-    func setupSlides(count: Int) {
+    func createSlides(count: Int) {
         if !isSetupCompleted {
             //scrollView.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
             scrollView.contentSize = CGSize(width: scrollView.frame.width * CGFloat(count), height: scrollView.frame.height)
@@ -44,12 +44,14 @@ class SurveyImageCell: UITableViewCell {
             
             for i in 0..<count {
                 let slide  = Bundle.main.loadNibNamed("Slide", owner: self, options: nil)?.first as! Slide
-                slide.backgroundColor = i == 0 ? UIColor.black : UIColor.red//.withAlphaComponent(0.3 * CGFloat(i))
+                //slide.backgroundColor = .white//i == 0 ? UIColor.black : UIColor.red//.withAlphaComponent(0.3 * CGFloat(i))
                 slide.frame = CGRect(x: scrollView.frame.width * CGFloat(i), y: 0, width: scrollView.frame.width, height: scrollView.frame.height)
+                slide.imageView.backgroundColor = .lightGray
                 scrollView.addSubview(slide)
                 slides.append(slide)
 //                slide.imageView.image = UIImage(named: "ic_onboarding_1")
             }
+            pageControl.numberOfPages = count
             isSetupCompleted = true
         }
     }

@@ -54,12 +54,24 @@ class TopSurveysTableViewController: UITableViewController {
                                                selector: #selector(TopSurveysTableViewController.updateTableView),
                                                name: kNotificationNewSurveysUpdated,
                                                object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(TopSurveysTableViewController.applicationDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(TopSurveysTableViewController.applicationDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         refreshControl?.attributedTitle = NSAttributedString(string: "")
         refreshControl?.addTarget(self, action: #selector(TopSurveysTableViewController.refreshTableView), for: .valueChanged)
         refreshControl?.tintColor = K_COLOR_RED
         if isInitialLoad {
             vc.addButton.isEnabled = false
         }
+    }
+    
+    @objc fileprivate func applicationDidBecomeActive() {
+        if Surveys.shared.topSurveys.isEmpty {
+            loadData()
+        }
+    }
+    
+    @objc fileprivate func applicationDidEnterBackground() {
+        //Cancel requests?
     }
     
     private func setupViews() {

@@ -112,6 +112,8 @@ class SurveyViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {//ОСНОВНОЕ
             return 5
+        } else if section == 1, survey != nil {
+            return survey!.answers.count
         }
         return 0
     }
@@ -147,9 +149,14 @@ class SurveyViewController: UITableViewController {
                     _cell.loadVideo(url: survey!.link!)
                 }
                 if isInitialLoading {
-                    _cell.contentView.alpha = 0
-                    _cell.playerView.layer.add(animateFadeInOut(layer: _cell.playerView.layer, fromValue: 0, toValue: 1, duration: 0.45, timingFunction: CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeIn)), forKey: nil)
+//                    _cell.contentView.alpha = 0
+//                    _cell.playerView.layer.add(animateFadeInOut(layer: _cell.playerView.layer, fromValue: 0, toValue: 1, duration: 0.75, timingFunction: CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeIn)), forKey: nil)
                     _cell.contentView.alpha = 1
+                    for v in _cell.contentView.subviews {
+                        if v is FilmIcon {
+                            v.alpha = 0
+                        }
+                    }
                     let isYoutube = self.isYoutubeLink(checkString: self.survey!.link!)
                     //                _cell.isVisible = isYoutube ? true : false
                     if isYoutube {
@@ -158,13 +165,33 @@ class SurveyViewController: UITableViewController {
                 }
                 cell = _cell
             } else if indexPath.row == 4, survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty, let _cell = tableView.dequeueReusableCell(withIdentifier: "image", for: indexPath) as? SurveyImageCell {
+                _cell.createSlides(count: survey!.imagesURLs!.count)
                 for (i, imageURL) in survey!.imagesURLs!.enumerated() {
-                    
+                    apiManager.downloadImage(url: imageURL.keys.first!, percentageClosure: {
+                        percent in
+                        _cell.slides[i].imageView.progressIndicatorView.progress = percent
+                    }) {
+                        image, error in
+                        if error != nil {
+                            showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Изображение не было загружено. \(error!.localizedDescription)")
+                        }
+                        
+                        if image != nil {
+                            _cell.slides[i].imageView.image = image
+                            _cell.slides[i].imageView.progressIndicatorView.reveal()
+                        }
+                    }
                 }
-                _cell.setupSlides(count: survey!.imagesURLs!.count)
                 if isInitialLoading {
                     _cell.contentView.alpha = 0
                 }
+                cell = _cell
+            }
+        } else if indexPath.section == 1 {
+            if let _cell = tableView.dequeueReusableCell(withIdentifier: "answer", for: indexPath) as? SurveyAnswerCell {
+//                _cell.label.text = surveyLink.title
+                if isInitialLoading {
+                                    }
                 cell = _cell
             }
         }
@@ -176,18 +203,18 @@ class SurveyViewController: UITableViewController {
             if indexPath.row == 0 {//Title
                 return 120
             } else if indexPath.row == 2 {
-                if survey!.link! != nil, !survey!.link!.isEmpty, !isYoutubeLink(checkString: survey!.link!), let _ = URL(string: survey!.link!) {
+                if survey!.link != nil, !survey!.link!.isEmpty, !isYoutubeLink(checkString: survey!.link!), let _ = URL(string: survey!.link!) {
                     return UITableView.automaticDimension
                 }
                 return 0
             } else if indexPath.row == 3 {
                 if survey!.link != nil, !survey!.link!.isEmpty, isYoutubeLink(checkString: survey!.link!) {
-                    return 180
+                    return 220
                 }
                 return 0
             } else if indexPath.row == 4 {
                 if survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty {
-                    return 200
+                    return 220
                 }
                 return 0
             }
@@ -308,7 +335,13 @@ extension SurveyViewController {
 //                    if isYoutube {
 //                        cell.loadVideo(url: self.survey!.link!)
 //                    }
-
+                    for v in cell.contentView.subviews {
+                        if v is FilmIcon {
+                            UIView.animate(withDuration: 0.45, animations: {
+                                v.alpha = 1
+                            })
+                        }
+                    }
                 }
                 if let cell = self.tableView.cellForRow(at: IndexPath(row: 4, section: 0)) as? SurveyImageCell {
                     UIView.animate(withDuration: 0.45, animations: {
