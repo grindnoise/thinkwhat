@@ -66,21 +66,18 @@
          contextName = "closure #1 in performRequest #1 () in APIManager.postSurvey(survey:completion:):APIManager.swift">
       </ContextState>
       <ContextState
-         contextName = "TermsOfUseViewController.initializeServerAPI():TermsOfUseViewController.swift">
+         contextName = "closure #2 in closure #1 in SurveyViewController.presentSurvey():SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "navigationController">
+               value = "self.survey!.answers.count">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "ProgressCirle.setProgress():ProgressCirle.swift">
+         contextName = "TermsOfUseViewController.initializeServerAPI():TermsOfUseViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.frame">
-            </PersistentString>
-            <PersistentString
-               value = "bounds">
+               value = "navigationController">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -100,6 +97,17 @@
             </PersistentString>
             <PersistentString
                value = "tableView.indexPathForSelectedRow?.section">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ProgressCirle.setProgress():ProgressCirle.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.frame">
+            </PersistentString>
+            <PersistentString
+               value = "bounds">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -395,7 +403,7 @@
          contextName = "Survey.init(_:):Survey.swift">
          <PersistentStrings>
             <PersistentString
-               value = "_imageURL[&quot;title&quot;].stringValue">
+               value = "_answer[&quot;text&quot;].stringValue as? String">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -444,7 +452,7 @@
          contextName = "SurveyViewController.tableView(_:numberOfRowsInSection:):SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "survey!.answers.count">
+               value = "survey!.answersWithID.count">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -839,9 +847,6 @@
          contextName = "SurveyViewController.tableView(_:cellForRowAt:):SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "isInitialLoading">
-            </PersistentString>
-            <PersistentString
                value = "cell.contentView.alpha">
             </PersistentString>
             <PersistentString
@@ -849,6 +854,9 @@
             </PersistentString>
             <PersistentString
                value = "_cell.isVisible">
+            </PersistentString>
+            <PersistentString
+               value = "survey!.images">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

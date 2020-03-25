@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SurveyImageCell: UITableViewCell {
+class SurveyImageCell: UITableViewCell, UIScrollViewDelegate {
 
     var slides: [Slide] = []
     var isSetupCompleted = false {
@@ -21,6 +21,7 @@ class SurveyImageCell: UITableViewCell {
     @IBOutlet weak var scrollView: UIScrollView! {
         didSet {
             scrollView.isUserInteractionEnabled = isSetupCompleted ? true : false
+            scrollView.delegate = self
         }
     }
     @IBOutlet weak var pageControl: UIPageControl!
@@ -54,5 +55,10 @@ class SurveyImageCell: UITableViewCell {
             pageControl.numberOfPages = count
             isSetupCompleted = true
         }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let pageIndex = round(scrollView.contentOffset.x/contentView.frame.width)
+        pageControl.currentPage = Int(pageIndex)
     }
 }

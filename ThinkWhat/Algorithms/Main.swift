@@ -593,6 +593,8 @@ struct SERVER_URLS {
     static let SURVEYS_ADD_FAVORITE     = "api/surveys/add_favorite/"
     static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
     
+    static let SURVEYS_RESULTS          = "api/survey_results/"
+    
     static let CATEGORIES               = "api/categories/"
     
     

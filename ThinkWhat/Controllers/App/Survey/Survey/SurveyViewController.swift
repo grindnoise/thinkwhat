@@ -12,6 +12,10 @@ import SafariServices
 
 class SurveyViewController: UITableViewController {
     
+    class var answerHeaderCell: UINib {
+        return UINib(nibName: "AnswerHeaderCell", bundle: nil)
+    }
+    
     fileprivate var requestAttempt = 0 {
         didSet {
             if oldValue != requestAttempt {
@@ -21,13 +25,33 @@ class SurveyViewController: UITableViewController {
             }
         }
     }
-    fileprivate let sections = ["ОСНОВНОЕ", "ОТВЕТЫ"]
+    fileprivate let sections = ["ОСНОВНОЕ", "ОТВЕТЫ", "ДЕЙСТВИЕ"]
     fileprivate var isRequesting = false
     fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     fileprivate let requestAttempts = 3
     fileprivate var loadingIndicator: LoadingIndicator!
     fileprivate let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
     fileprivate var isInitialLoading = true
+    fileprivate var selectedAnswerID = 0 {
+        didSet {
+            if oldValue != selectedAnswerID {
+                //UI update
+                if tableView.numberOfRows(inSection: 2) == 0 {
+                    tableView.insertRows(at: [IndexPath(row: 0, section: 2)], with: .bottom)
+                }
+                delay(seconds: 0.15) {
+                    self.tableView.scrollToBottom()
+                }
+//                tableView.reloadRows(at: [IndexPath(row: 0, section: 2)], with: .bottom)
+                for cell in answersCells {
+                    if cell.answer?.keys.first! != selectedAnswerID {
+                        cell.isChecked = false
+                    }
+                }
+            }
+        }
+    }
+    fileprivate var answersCells: [SurveyAnswerCell] = []
     var surveyLink: SurveyLink! {
         didSet {
             likeButton.removeAllAnimations()
@@ -57,6 +81,7 @@ class SurveyViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
+        tableView.register(SurveyViewController.answerHeaderCell, forHeaderFooterViewReuseIdentifier: "answerHeader")
     }
     
     private func setupViews() {
@@ -113,7 +138,9 @@ class SurveyViewController: UITableViewController {
         if section == 0 {//ОСНОВНОЕ
             return 5
         } else if section == 1, survey != nil {
-            return survey!.answers.count
+            return survey!.answersWithID.count
+        } else if section == 2, selectedAnswerID != 0 {
+            return 1
         }
         return 0
     }
@@ -150,11 +177,14 @@ class SurveyViewController: UITableViewController {
                 }
                 if isInitialLoading {
 //                    _cell.contentView.alpha = 0
-//                    _cell.playerView.layer.add(animateFadeInOut(layer: _cell.playerView.layer, fromValue: 0, toValue: 1, duration: 0.75, timingFunction: CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeIn)), forKey: nil)
+                    //                    _cell.playerView.layer.add(animateFadeInOut(layer: _cell.playerView.layer, fromValue: 0, toValue: 1, duration: 0.75, timingFunction: CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeIn)), forKey: nil)
                     _cell.contentView.alpha = 1
                     for v in _cell.contentView.subviews {
-                        if v is FilmIcon {
-                            v.alpha = 0
+                        for _v in v.subviews {
+                            if _v is FilmIcon {
+                                _v.alpha = 0
+                                break
+                            }
                         }
                     }
                     let isYoutube = self.isYoutubeLink(checkString: self.survey!.link!)
@@ -165,33 +195,64 @@ class SurveyViewController: UITableViewController {
                 }
                 cell = _cell
             } else if indexPath.row == 4, survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty, let _cell = tableView.dequeueReusableCell(withIdentifier: "image", for: indexPath) as? SurveyImageCell {
+                //?????
                 _cell.createSlides(count: survey!.imagesURLs!.count)
-                for (i, imageURL) in survey!.imagesURLs!.enumerated() {
-                    apiManager.downloadImage(url: imageURL.keys.first!, percentageClosure: {
-                        percent in
-                        _cell.slides[i].imageView.progressIndicatorView.progress = percent
-                    }) {
-                        image, error in
-                        if error != nil {
-                            showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Изображение не было загружено. \(error!.localizedDescription)")
-                        }
-                        
-                        if image != nil {
-                            _cell.slides[i].imageView.image = image
-                            _cell.slides[i].imageView.progressIndicatorView.reveal()
+                //?????
+                if isInitialLoading {
+                    for (i, imageURL) in survey!.imagesURLs!.enumerated() {
+                        apiManager.downloadImage(url: imageURL.keys.first!, percentageClosure: {
+                            percent in
+                            _cell.slides[i].imageView.progressIndicatorView.progress = percent
+                        }) {
+                            image, error in
+                            if error != nil {
+                                showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Изображение не было загружено. \(error!.localizedDescription)")
+                            }
+                            
+                            if image != nil {
+                                if self.survey!.images == nil {
+                                    self.survey!.images = []
+                                }
+                                self.survey!.images!.append([image!: imageURL.values.first!])
+                                _cell.slides[i].imageView.image = image
+                                _cell.slides[i].imageView.progressIndicatorView.reveal()
+                            }
                         }
                     }
-                }
-                if isInitialLoading {
-                    _cell.contentView.alpha = 0
+
+                    //                }
+                    if let visibleRows = tableView.indexPathsForVisibleRows, visibleRows.contains(indexPath) {
+                        _cell.contentView.alpha = 0
+                        UIView.animate(withDuration: 0.45, animations: {
+                            cell.contentView.alpha = 1
+                        })
+                    }
+                } else if survey!.images != nil, !survey!.images!.isEmpty {
+                    for (i, dict) in survey!.images!.enumerated() {
+                        _cell.slides[i].imageView.image = dict.keys.first!
+                        _cell.slides[i].imageView.progressIndicatorView.alpha = 0
+                    }
                 }
                 cell = _cell
             }
         } else if indexPath.section == 1 {
             if let _cell = tableView.dequeueReusableCell(withIdentifier: "answer", for: indexPath) as? SurveyAnswerCell {
-//                _cell.label.text = surveyLink.title
+                _cell.answer = survey!.answersWithID[indexPath.row]
                 if isInitialLoading {
-                                    }
+//                    _cell.answer = survey!.answersWithID[indexPath.row]
+                    _cell.contentView.alpha = 0
+                    UIView.animate(withDuration: 0.45, animations: {
+                        _cell.contentView.alpha = 1
+                    })
+                }
+                cell = _cell
+                if !answersCells.contains(_cell) {
+                    answersCells.append(_cell)
+                }
+            }
+        } else if indexPath.section == 2 {
+            if let _cell = tableView.dequeueReusableCell(withIdentifier: "vote", for: indexPath) as? SurveyVoteCell {
+                _cell.delegate = self
                 cell = _cell
             }
         }
@@ -209,19 +270,49 @@ class SurveyViewController: UITableViewController {
                 return 0
             } else if indexPath.row == 3 {
                 if survey!.link != nil, !survey!.link!.isEmpty, isYoutubeLink(checkString: survey!.link!) {
-                    return 220
+                    return 270
                 }
                 return 0
             } else if indexPath.row == 4 {
                 if survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty {
-                    return 220
+                    return 270
                 }
                 return 0
             }
+        } else if indexPath.section == 1 {
+            return max(100, UITableView.automaticDimension)
+        } else if indexPath.section == 2 {//POST
+            return 100
         }
         return UITableView.automaticDimension
     }
     
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 1 {
+            return 100
+        }
+        return 0
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if section == 1 {
+            if let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "answerHeader") as? AnswerHeaderCell {
+                return header
+            }
+        }
+        return nil
+    }
+    
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == 1 {
+            if let cell = tableView.cellForRow(at: indexPath) as? SurveyAnswerCell {
+                cell.isChecked = true
+                //Uncheck others
+                selectedAnswerID = cell.answer!.keys.first!
+            }
+        }
+    }
     /*
      // MARK: - Navigation
      
@@ -303,7 +394,19 @@ extension SurveyViewController {
     
     //POST request post answer
     fileprivate func postAnswer() {
-        //TODO
+        let result = ["survey": survey!.ID!, "answer": selectedAnswerID]
+        apiManager.postResult(result: result) {
+            json, error in
+            if error != nil {
+                showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { UIView.animate(withDuration: 0.3, animations: {
+                    self.loadingIndicator.alpha = 0
+                }) { _ in self.loadingIndicator.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
+            }
+            if json != nil {
+                print(json!)
+                //TODO: Store result?
+            }
+        }
     }
 }
 
@@ -333,21 +436,31 @@ extension SurveyViewController {
 //                    let isYoutube = self.isYoutubeLink(checkString: self.survey!.link!)
 //                    //                _cell.isVisible = isYoutube ? true : false
 //                    if isYoutube {
-//                        cell.loadVideo(url: self.survey!.link!)
-//                    }
+                    //                        cell.loadVideo(url: self.survey!.link!)
+                    //                    }
                     for v in cell.contentView.subviews {
-                        if v is FilmIcon {
-                            UIView.animate(withDuration: 0.45, animations: {
-                                v.alpha = 1
-                            })
+                        for _v in v.subviews {
+                            if _v is FilmIcon {
+                                UIView.animate(withDuration: 0.45) {
+                                    _v.alpha = 1
+                                }
+                                break
+                            }
                         }
                     }
                 }
                 if let cell = self.tableView.cellForRow(at: IndexPath(row: 4, section: 0)) as? SurveyImageCell {
-                    UIView.animate(withDuration: 0.45, animations: {
-                        cell.contentView.alpha = 1
-                    })
+//                    UIView.animate(withDuration: 0.45, animations: {
+//                        cell.contentView.alpha = 1
+//                    })
                 }
+//                for i in 0..<self.survey!.answers.count {
+//                    if let cell = self.tableView.cellForRow(at: IndexPath(row: i, section: 1)) as? SurveyAnswerCell {
+//                        UIView.animate(withDuration: 0.45, animations: {
+//                            cell.contentView.alpha = 1
+//                        })
+//                    }
+//                }
             }
         }) {
             _ in
@@ -433,6 +546,8 @@ extension SurveyViewController: CellButtonDelegate {
                 }
                 present(vc, animated: true)
             }
+        } else if sender is SurveyVoteCell {
+            postAnswer()
         }
     }
 }

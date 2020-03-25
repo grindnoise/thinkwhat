@@ -14,6 +14,15 @@ import UIKit
 
 class TopSurveysTableViewController: UITableViewController {
     
+    fileprivate var requestAttempt = 0 {
+        didSet {
+            if oldValue != requestAttempt {
+                if requestAttempt > MAX_REQUEST_ATTEMPTS {
+                    requestAttempt = 0
+                }
+            }
+        }
+    }
     public var needsAnimation = true
     private var vc: TopSurveysViewController!
     private var isViewSetupCompleted = false
@@ -243,19 +252,25 @@ extension TopSurveysTableViewController: ServerInitializationProtocol {
 
 extension TopSurveysTableViewController: ServerProtocol {
     private func loadData() {
+        requestAttempt += 1
         apiManager.loadSurveyCategories() {
             json, error in
             if error != nil {
-//                showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: error!.localizedDescription)
-                //Retry unless successfull
-                if self.isInitialLoad {
-                    self.loadData()
+                if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
+                    showAlert(type: .Warning, buttons: [["Повторить": [CustomAlertView.ButtonType.Ok: {self.requestAttempt = 0; self.loadData()}]],
+                                                        ["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка соединения с сервером\(error!.localizedDescription). Повторить?")
+                } else {
+                    //Retry unless successfull
+                    if self.isInitialLoad {
+                        self.loadData()
+                    }
                 }
             }
             if json != nil {
                 SurveyCategories.shared.importJson(json!)
                 self.updateSurveysTotalCount()
                 self.updateSurveys(type: .All)
+                self.requestAttempt = 0
             }
         }
     }

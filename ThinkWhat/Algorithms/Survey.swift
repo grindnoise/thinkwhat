@@ -261,6 +261,7 @@ class Survey {
     var images: [[UIImage: String]]?//Already downloaded -> Download should begin interactively, then store data here
     var imagesURLs: [[String: String]]?//URL - key, Title - value
     var answers: [String] = []
+    var answersWithID: [[Int: String]] = []
     var owner: String
     var link: String?
     var voteCapacity: Int
@@ -356,8 +357,8 @@ class Survey {
             voteCapacity = _voteCapacity
             isPrivate = _isPrivate
             for _answer in _answers {
-                if let answer = _answer["id"].stringValue as? String {
-                    answers.append(answer)
+                if let text = _answer["text"].stringValue as? String, let ID = _answer["id"].intValue as? Int {
+                    answersWithID.append([ID: text])
                 }
             }
             if _imageURLs != nil, !_imageURLs.isEmpty {

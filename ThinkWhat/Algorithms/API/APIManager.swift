@@ -28,6 +28,7 @@ protocol APIManagerProtocol {
     func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->())
     func markFavorite(mark: Bool, survey: SurveyLink, completion: @escaping(JSON?, Error?)->())
     func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
+    func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->())
     
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
     func downloadImage(url: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
@@ -970,6 +971,26 @@ class APIManager: APIManagerProtocol {
 //            } else {
 //                _performRequest(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default, completion: completion)
 //            }
+        }
+    }
+    
+    func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error!)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_RESULTS), httpMethod: .post, parameters: result, encoding: JSONEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
         }
     }
     

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftyJSON
 
 class NewSurveyViewController: UIViewController, UINavigationControllerDelegate {
     
@@ -1154,8 +1155,13 @@ extension NewSurveyViewController: ServerProtocol {
                 } else if json != nil {
                     
                     //Attach ID to survey and append to existing array
-                    if let _ID = json!["id"].intValue as? Int {
+                    if let _ID = json!["id"].intValue as? Int, let _answersWithID = json!["answers"].arrayValue as? [JSON] {
                         survey.ID = _ID
+                        for _answer in _answersWithID {
+                            if let text = _answer["text"].stringValue as? String, let ID = _answer["id"].stringValue as? Int {
+                                survey.answersWithID.append([ID: text])
+                            }
+                        }
                         Surveys.shared.downloadedSurveys.append(survey)
                         
                         //Create SurveyLink & append to own & new arrays
