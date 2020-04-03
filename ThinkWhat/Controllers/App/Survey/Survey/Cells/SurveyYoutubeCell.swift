@@ -13,6 +13,18 @@ class SurveyYoutubeCell: UITableViewCell {
 
     fileprivate var isVideoLoaded = false
     @IBOutlet weak var playerView: WKYTPlayerView!
+    @IBOutlet weak var icon: FilmIcon! {
+        didSet {
+            let touch = UITapGestureRecognizer(target:self, action:#selector(self.callback))
+            touch.cancelsTouchesInView = false
+            icon.addGestureRecognizer(touch)
+        }
+    }
+    
+    @objc fileprivate func callback() {
+        delegate?.cellSubviewTapped(self)
+    }
+    weak var delegate: CellButtonDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

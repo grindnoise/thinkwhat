@@ -10,12 +10,21 @@ import UIKit
 
 class AnswerHeaderCell: UITableViewHeaderFooterView {
 
-    @IBOutlet weak var icon: ManTalikngIcon!
+    weak var delegate: CellButtonDelegate?
+    @IBOutlet weak var icon: ManTalikngIcon! {
+        didSet {
+            let touch = UITapGestureRecognizer(target:self, action:#selector(self.callback))
+            touch.cancelsTouchesInView = false
+            icon.addGestureRecognizer(touch)
+        }
+    }
+    
+    @objc fileprivate func callback() {
+        delegate?.cellSubviewTapped(self)
+    }
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
     }
-
-    
-    
 }

@@ -12,6 +12,7 @@ import SwiftyJSON
 
 protocol APIManagerProtocol {
     
+    func cancelAllRequests()
     func login(_ auth: AuthVariant, username: String?, password: String?, token: String?, completion: @escaping (TokenState) -> ())
     func logout(completion: @escaping (TokenState) -> ())
     func getUserData(completion: @escaping(JSON?, Error?)->())
@@ -45,7 +46,6 @@ protocol UserDataPreparatory: class {
 }
 
 class APIManager: APIManagerProtocol {
-    
     
     public enum SurveyType: String {
         case Top,New,All,Own,Favorite
@@ -829,78 +829,81 @@ class APIManager: APIManagerProtocol {
                 if _error != nil {
                     error = _error
                     completion(json, error)
-                }
-                json = _json
-                
-                if images != nil, images?.count != 0 {
-                    //Upload images
-                    let surveyID = json!["id"].intValue
-                    let headers: HTTPHeaders = [
-                        "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-                        "Content-Type": "application/json"
-                    ]
-                    url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_MEDIA)
-                    var uploadError: Error?
-                    for image in images! {
-                        Alamofire.upload(multipartFormData: { multipartFormData in
-                            //                            for image in images! {
-                            var imgExt: FileFormat = .Unknown
-                            var imageData: Data?
-                            if let data = image.keys.first!.jpegData(compressionQuality: 1) {
-                                imageData = data
-                                imgExt = .JPEG
-                            } else if let data = image.keys.first!.pngData() {
-                                imageData = data
-                                imgExt = .PNG
-                            }
-                            multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
-                            multipartFormData.append("\(surveyID)".data(using: .utf8)!, withName: "survey")
-                            if !(image.values.first?.isEmpty)! {
-                                multipartFormData.append(image.values.first!.data(using: .utf8)!, withName: "title")
-                            }
-                        }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .post, headers: headers) {
-                            result in
-                            switch result {
-                            case .failure(let _error):
-                                uploadError = _error
-//                                completion(json, error)
-                            case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
-                                upload.uploadProgress(closure: { (progress) in
-                                    print("Upload Progress: \(progress.fractionCompleted)")
-                                })
-                                upload.responseJSON(completionHandler: { (response) in
-                                    if response.result.isFailure {
-                                        uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
-                                    }
-                                    if let _error = response.result.error as? AFError {
-                                        uploadError = self.parseAFError(_error)
-                                    } else {
-                                        if let statusCode  = response.response?.statusCode{
-                                            if 200...299 ~= statusCode {
-                                                do {
-                                                    json = try JSON(data: response.data!)
-                                                } catch let _error {
-                                                    uploadError = _error
-                                                }
-                                            } else if 400...499 ~= statusCode {
-                                                do {
-                                                    let errorJSON = try JSON(data: response.data!)
-                                                    uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
-                                                    print(uploadError!)
-                                                } catch let _error {
-                                                    uploadError = _error
+                } else if _json != nil {
+                    json = _json
+                    
+                    if images != nil, images?.count != 0 {
+                        //Upload images
+                        let surveyID = json!["id"].intValue
+                        let headers: HTTPHeaders = [
+                            "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
+                            "Content-Type": "application/json"
+                        ]
+                        url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_MEDIA)
+                        var uploadError: Error?
+                        for image in images! {
+                            Alamofire.upload(multipartFormData: { multipartFormData in
+                                //                            for image in images! {
+                                var imgExt: FileFormat = .Unknown
+                                var imageData: Data?
+                                if let data = image.keys.first!.jpegData(compressionQuality: 1) {
+                                    imageData = data
+                                    imgExt = .JPEG
+                                } else if let data = image.keys.first!.pngData() {
+                                    imageData = data
+                                    imgExt = .PNG
+                                }
+                                multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
+                                multipartFormData.append("\(surveyID)".data(using: .utf8)!, withName: "survey")
+                                if !(image.values.first?.isEmpty)! {
+                                    multipartFormData.append(image.values.first!.data(using: .utf8)!, withName: "title")
+                                }
+                            }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .post, headers: headers) {
+                                result in
+                                switch result {
+                                case .failure(let _error):
+                                    uploadError = _error
+                                //                                completion(json, error)
+                                case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
+                                    upload.uploadProgress(closure: { (progress) in
+                                        print("Upload Progress: \(progress.fractionCompleted)")
+                                    })
+                                    upload.responseJSON(completionHandler: { (response) in
+                                        if response.result.isFailure {
+                                            uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
+                                        }
+                                        if let _error = response.result.error as? AFError {
+                                            uploadError = self.parseAFError(_error)
+                                        } else {
+                                            if let statusCode  = response.response?.statusCode{
+                                                if 200...299 ~= statusCode {
+                                                    do {
+                                                        json = try JSON(data: response.data!)
+                                                    } catch let _error {
+                                                        uploadError = _error
+                                                    }
+                                                    
+                                                    //TODO save local
+                                                } else if 400...499 ~= statusCode {
+                                                    do {
+                                                        let errorJSON = try JSON(data: response.data!)
+                                                        uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
+                                                        print(uploadError!)
+                                                    } catch let _error {
+                                                        uploadError = _error
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                })
+                                    })
+                                }
                             }
                         }
+                        error = uploadError
+                        completion(json, error)
+                    } else {
+                        completion(json, error)
                     }
-                    error = uploadError
-                    completion(json, error)
-                } else {
-                    completion(json, error)
                 }
             }
 
@@ -1039,7 +1042,7 @@ class APIManager: APIManagerProtocol {
             "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
             "Content-Type": "application/json"
         ]
-        
+    
         sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseJSON() {
             response in
             if response.result.isFailure {
@@ -1157,5 +1160,14 @@ class APIManager: APIManagerProtocol {
 //            completion(error)
 //        }
 //    }
+    
+    func cancelAllRequests() {
+        self.sessionManager.session.getTasksWithCompletionHandler {
+            (sessionDataTask, uploadData, downloadData) in
+            sessionDataTask.forEach { $0.cancel() }
+            uploadData.forEach { $0.cancel() }
+            downloadData.forEach { $0.cancel() }
+        }
+    }
 }
 

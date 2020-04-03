@@ -610,6 +610,7 @@ extension UITextField {
     // Default actions:
     @objc func doneButtonTapped() { delegate?.textFieldShouldReturn!(self) }
     @objc func cancelButtonTapped() { self.resignFirstResponder() }
+    
 }
 
 extension RangeReplaceableCollection where Indices: Equatable {

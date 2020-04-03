@@ -20,14 +20,15 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PLG-kE-DgH" customClass="ManTalikngIcon" customModule="ThinkWhat" customModuleProvider="target">
-                        <rect key="frame" x="139" y="29" width="42" height="42"/>
+                        <rect key="frame" x="135" y="25" width="50" height="50"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="PLG-kE-DgH" secondAttribute="height" multiplier="1:1" id="eV4-dJ-Ivx"/>
-                            <constraint firstAttribute="height" constant="42" id="spq-ab-jHc"/>
+                            <constraint firstAttribute="height" constant="50" id="spq-ab-jHc"/>
                         </constraints>
                     </view>
                 </subviews>
+                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="PLG-kE-DgH" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="7zf-W6-SiB"/>
                     <constraint firstItem="PLG-kE-DgH" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="z07-kR-UQd"/>

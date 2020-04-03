@@ -64,6 +64,11 @@
       </ContextState>
       <ContextState
          contextName = "closure #1 in performRequest #1 () in APIManager.postSurvey(survey:completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "dict">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "closure #2 in closure #1 in SurveyViewController.presentSurvey():SurveyViewController.swift">
@@ -129,10 +134,10 @@
          contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "segue.destination as? AnonymitySettingsTableViewController">
+               value = "anonymity">
             </PersistentString>
             <PersistentString
-               value = "anonymity">
+               value = "segue.destination as? AnonymitySettingsTableViewController">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -291,15 +296,21 @@
          contextName = "closure #2 in closure #1 in closure #2 in closure #1 in AuthViewController.handleTokenState():AuthViewController.swift">
       </ContextState>
       <ContextState
-         contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
-      </ContextState>
-      <ContextState
-         contextName = "TopSurveysTableViewController.tableView(_:heightForRowAt:):TopSurveysTableViewController.swift">
+         contextName = "PercentageLabel.configureLine():PercentageLabel.swift">
          <PersistentStrings>
             <PersistentString
-               value = "cell.contentView.frame.height">
+               value = "percent">
+            </PersistentString>
+            <PersistentString
+               value = "isSelected">
+            </PersistentString>
+            <PersistentString
+               value = "frame.width * percent">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "performRequest #1 () in APIServer.getFacebookID(completion:):APIServer.swift">
       </ContextState>
       <ContextState
          contextName = "closure #1 in closure #1 in NewSurveyViewController.tableView(_:trailingSwipeActionsConfigurationForRowAt:):NewSurveyViewController.swift">
@@ -312,6 +323,14 @@
             </PersistentString>
             <PersistentString
                value = "tableView.isUserInteractionEnabled">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "TopSurveysTableViewController.tableView(_:heightForRowAt:):TopSurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "cell.contentView.frame.height">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -388,6 +407,14 @@
          <PersistentStrings>
             <PersistentString
                value = "tableView.indexPathForSelectedRow?.section">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "PercentageLabel.isSelected.didset:PercentageLabel.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "isSelected">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -489,6 +516,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "Survey.getAnswerVotePercentage(_:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Int((Double(answerVotesCount) * Double(100) / Double(totalVotes)).rounded())">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "Surveys.importSurveys(_:):Survey.swift">
          <PersistentStrings>
             <PersistentString
@@ -536,10 +571,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -547,19 +582,19 @@
          contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "_cell.pictureView.frame">
+               value = " _cell.textView.text!">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
             </PersistentString>
             <PersistentString
                value = "indexPath.row">
             </PersistentString>
             <PersistentString
-               value = " _cell.textView.text!">
+               value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -619,6 +654,14 @@
          <PersistentStrings>
             <PersistentString
                value = "dateString:userProfile[&quot;birth_date&quot;]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveyAnswerCell.answer.didset:SurveyAnswerCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "textView">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -841,6 +884,9 @@
             <PersistentString
                value = "isInitialLoading">
             </PersistentString>
+            <PersistentString
+               value = "survey">
+            </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
@@ -856,7 +902,10 @@
                value = "_cell.isVisible">
             </PersistentString>
             <PersistentString
-               value = "survey!.images">
+               value = "(Double(survey!.answers[indexPath.row].totalVotes) * Double(100) / Double(survey!.totalVotes)).rounded()">
+            </PersistentString>
+            <PersistentString
+               value = "answer.ID">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -950,10 +999,10 @@
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = " currentTV != nil">
+               value = "currentOffsetY">
             </PersistentString>
             <PersistentString
-               value = "currentOffsetY">
+               value = " currentTV != nil">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1023,6 +1072,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in SurveyViewController.postAnswer():SurveyViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.survey!.answers">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "SurveyViewController.loadData():SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -1083,6 +1140,14 @@
       </ContextState>
       <ContextState
          contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
+      </ContextState>
+      <ContextState
+         contextName = "SurveyResultCell.value.didset:SurveyResultCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "value">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "APIManager._performRequest(url:parameters:completion:):APIManager.swift">

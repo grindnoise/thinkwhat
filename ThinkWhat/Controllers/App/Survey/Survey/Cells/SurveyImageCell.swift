@@ -25,6 +25,18 @@ class SurveyImageCell: UITableViewCell, UIScrollViewDelegate {
         }
     }
     @IBOutlet weak var pageControl: UIPageControl!
+    @IBOutlet weak var icon: GalleryIcon! {
+        didSet {
+            let touch = UITapGestureRecognizer(target:self, action:#selector(self.callback))
+            touch.cancelsTouchesInView = false
+            icon.addGestureRecognizer(touch)
+        }
+    }
+    
+    @objc fileprivate func callback() {
+        delegate?.cellSubviewTapped(self)
+    }
+    weak var delegate: CellButtonDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

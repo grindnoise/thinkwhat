@@ -10,19 +10,35 @@ import UIKit
 
 class SurveyAnswerCell: UITableViewCell {
 
-    @IBOutlet weak var textView: UITextView! {
-        didSet {
-            if answer != nil {
-                textView.text = answer?.values.first!
-            }
-        }
-    }
+//    @IBOutlet weak var textView: UITextView! {
+//        didSet {
+//            if answer != nil {
+//                textView.text = answer.text
+//            }
+//        }
+//    }
+    
+    
+    
+    @IBOutlet weak var label: UILabel!
+    
+    
     @IBOutlet weak var checkBox: CheckBox!
-    var answer: [Int: String]? {
+//    var answer: [Int: String]? {
+//        didSet {
+//            if answer != nil, textView != nil, textView.text.isEmpty {
+//                textView.text = answer?.values.first!
+//            }
+//        }
+//    }
+    var answer: SurveyAnswer! {
         didSet {
-            if answer != nil, textView != nil, textView.text.isEmpty {
-                textView.text = answer?.values.first!
+            if textLabel != nil {
+                label.text = answer.text
             }
+//            if textView != nil {
+//                textView.text = answer.text
+//            }
         }
     }
     var isChecked = false {

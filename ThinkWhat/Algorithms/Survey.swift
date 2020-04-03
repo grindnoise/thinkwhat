@@ -33,6 +33,7 @@ class Surveys {
     var ownSurveys:         [SurveyLink] = []
     var favoriteSurveys:    [SurveyLink: Date] = [:]
     var downloadedSurveys:  [Survey] = []
+    var completedSurveyIDs: [Int] = []//Completed surveys IDs
     
     func importSurveys(_ json: JSON) {
         for i in json {
@@ -85,6 +86,13 @@ class Surveys {
                     }
                 }
                 NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
+            }  else if i.0 == "user_results" {
+                completedSurveyIDs.removeAll()
+                for k in i.1 {
+                    if let id = k.1["survey"].intValue as? Int {
+                        completedSurveyIDs.append(id)
+                    }
+                }
             }
         }
     }
@@ -260,17 +268,20 @@ class Survey {
     var description: String
     var images: [[UIImage: String]]?//Already downloaded -> Download should begin interactively, then store data here
     var imagesURLs: [[String: String]]?//URL - key, Title - value
-    var answers: [String] = []
-    var answersWithID: [[Int: String]] = []
+    var answersWithoutID: [String] = []//Array
+    var answers: [SurveyAnswer] = []
     var owner: String
     var link: String?
     var voteCapacity: Int
     var isPrivate: Bool
+    var totalVotes: Int = 0
+    var watchers: Int = 0
+    var result: [Int: Date]?
     
     var hashValue: Int {
         return ObjectIdentifier(self).hashValue
     }
-    var dict: [String: Any] {
+    var dict: [String: Any] {//Dict to create new survey
         var _dict: [String: Any] = [:]
         //Necessary data
         _dict[DjangoVariables.Survey.title] = title
@@ -280,7 +291,7 @@ class Survey {
         _dict[DjangoVariables.Survey.isPrivate] = isPrivate
         _dict[DjangoVariables.Survey.startDate] = startDate.toDateTimeString()
         var _answers: [[String: String]] = []
-        for answer in answers {
+        for answer in answersWithoutID {
             _answers.append(["text" : answer])
         }
         _dict[DjangoVariables.Survey.answers] = _answers
@@ -306,15 +317,15 @@ class Survey {
             let _isPrivate              = dict[DjangoVariables.Survey.isPrivate] as? Bool,
             let _answers                = dict[DjangoVariables.Survey.answers] as? [String] {
             
-            title = _title
-            startDate = Date()
-            modified = Date()
-            category = _category
-            owner = AppData.shared.userProfile.ID!
-            description = _description
-            voteCapacity = _voteCapacity
-            isPrivate = _isPrivate
-            answers = _answers
+            title               = _title
+            startDate           = Date()
+            modified            = Date()
+            category            = _category
+            owner               = AppData.shared.userProfile.ID!
+            description         = _description
+            voteCapacity        = _voteCapacity
+            isPrivate           = _isPrivate
+            answersWithoutID    = _answers
             
             //Optional fields
             if let _images                 = dict[DjangoVariables.Survey.images] as? [[UIImage: String]] {
@@ -344,7 +355,10 @@ class Survey {
             let _voteCapacity           = json["voteCapacity"].intValue as? Int,
             let _isPrivate              = json["is_private"].boolValue as? Bool,
             let _answers                = json["answers"].arrayValue as? [JSON],
-            let _imageURLs              = json["mediafiles"].arrayValue as? [JSON] {
+            let _imageURLs              = json["mediafiles"].arrayValue as? [JSON],
+            let _watchers               = json["watchers"].intValue as? Int,
+            let _totalVotes             = json["total_votes"].intValue as? Int,
+            let _result                 = json["result"].arrayValue as? [JSON] {
             ID = _ID
             title = _title
             startDate = _startDate
@@ -356,9 +370,14 @@ class Survey {
             link = _link
             voteCapacity = _voteCapacity
             isPrivate = _isPrivate
+            totalVotes = _totalVotes
+            watchers = _watchers
+            
             for _answer in _answers {
-                if let text = _answer["text"].stringValue as? String, let ID = _answer["id"].intValue as? Int {
-                    answersWithID.append([ID: text])
+                if let answer = SurveyAnswer(json: _answer) {
+                    answers.append(answer)
+                } else {
+                    return nil
                 }
             }
             if _imageURLs != nil, !_imageURLs.isEmpty {
@@ -366,6 +385,13 @@ class Survey {
                 for _imageURL in _imageURLs {
                     if let _url = _imageURL["image"].stringValue as? String, let _imageTitle = _imageURL["title"].stringValue as? String {
                         imagesURLs?.append([_url: _imageTitle])
+                    }
+                }
+            }
+            if !_result.isEmpty {
+                for _res in _result {
+                    if let _answerID = _res["answer"].intValue as? Int, let _timestamp = Date(dateTimeString: _res["timestamp"].stringValue as! String) as? Date {
+                        result = [_answerID: _timestamp]
                     }
                 }
             }
@@ -380,6 +406,10 @@ class Survey {
         }
         return nil
     }
+    
+    func getAnswerVotePercentage(_ answerVotesCount: Int) -> Int {
+        return Int((Double(answerVotesCount) * Double(100) / Double(totalVotes)).rounded())
+    }
 }
 
 extension Survey: Hashable {
@@ -388,4 +418,21 @@ extension Survey: Hashable {
     }
 }
 
-
+class SurveyAnswer {
+    let ID: Int
+    var text: String
+    var totalVotes: Int
+    
+    init?(json: JSON) {
+        if let _text = json["text"].stringValue as? String,
+            let _ID = json["id"].intValue as? Int,
+            let _totalVotes = json["votes_count"].intValue as? Int {
+            ID = _ID
+            text = _text
+            totalVotes = _totalVotes
+        } else {
+            print("JSON parse error")
+            return nil
+        }
+    }
+}

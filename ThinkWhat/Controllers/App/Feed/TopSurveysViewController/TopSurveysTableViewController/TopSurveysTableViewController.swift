@@ -24,7 +24,7 @@ class TopSurveysTableViewController: UITableViewController {
         }
     }
     public var needsAnimation = true
-    private var vc: TopSurveysViewController!
+    private var vc: SurveysViewController!
     private var isViewSetupCompleted = false
     private var loadingIndicator: LoadingIndicator!
     private var isInitialLoad = true {
@@ -52,7 +52,7 @@ class TopSurveysTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        vc = parent! as! TopSurveysViewController
+        vc = parent! as! SurveysViewController
         loadData()
         setupViews()
         NotificationCenter.default.addObserver(self,
@@ -80,7 +80,8 @@ class TopSurveysTableViewController: UITableViewController {
     }
     
     @objc fileprivate func applicationDidEnterBackground() {
-        //Cancel requests?
+        //TODD: Cancel requests?
+        apiManager
     }
     
     private func setupViews() {
@@ -310,14 +311,16 @@ extension TopSurveysTableViewController: ServerProtocol {
                 self.refreshControl?.endRefreshing()
                 self.needsAnimation = true
                 if self.isInitialLoad {
-                    self.vc.animateNew()
+                    
                     self.tableView.isUserInteractionEnabled = true
+                    self.vc.isDataLoaded = true
                     UIView.animate(withDuration: 0.3, animations: {
                         self.loadingIndicator.alpha = 0
                     }) {
                         comleted in
                         self.loadingIndicator.removeAllAnimations()
                         self.isInitialLoad = false
+                        self.vc.animateNew()
                     }
                 }
             }

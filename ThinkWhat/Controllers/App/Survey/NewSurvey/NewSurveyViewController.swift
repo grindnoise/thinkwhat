@@ -1155,13 +1155,22 @@ extension NewSurveyViewController: ServerProtocol {
                 } else if json != nil {
                     
                     //Attach ID to survey and append to existing array
-                    if let _ID = json!["id"].intValue as? Int, let _answersWithID = json!["answers"].arrayValue as? [JSON] {
+                    if let _ID = json!["id"].intValue as? Int, let _answers = json!["answers"].arrayValue as? [JSON] {
                         survey.ID = _ID
-                        for _answer in _answersWithID {
-                            if let text = _answer["text"].stringValue as? String, let ID = _answer["id"].stringValue as? Int {
-                                survey.answersWithID.append([ID: text])
+                        for _answer in _answers {
+                            if let answer = SurveyAnswer(json: _answer) {
+                                survey.answers.append(answer)
                             }
                         }
+                        if !self.images.isEmpty {
+                            survey.images = self.images
+                        }
+                        
+//                        for _answer in _answersWithID {
+//                            if let text = _answer["text"].stringValue as? String, let ID = _answer["id"].stringValue as? Int {
+//                                survey.answersWithID.append([ID: text])
+//                            }
+//                        }
                         Surveys.shared.downloadedSurveys.append(survey)
                         
                         //Create SurveyLink & append to own & new arrays
@@ -1175,8 +1184,10 @@ extension NewSurveyViewController: ServerProtocol {
                             NotificationCenter.default.post(name: kNotificationSurveysByCategoryUpdated, object: nil)
                             NotificationCenter.default.post(name: kNotificationOwnSurveysUpdated, object: nil)
                         }
+                        self.confirmationView?.showReadySign()
+                    } else {
+                        //TODO confirmation view error handling
                     }
-                    self.confirmationView?.showReadySign()
                 }
             }
         } else {

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TopSurveysViewController: UIViewController/*, CircleTransitionable*/ {
+class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     
 //    var triggerView: UIView = UIView()
 //    var mainView: UIView {
@@ -69,7 +69,22 @@ class TopSurveysViewController: UIViewController/*, CircleTransitionable*/ {
         return vc
     } ()
 //    lazy private var newSurveyVC: NewSurveyViewController = initializeNewSurveyVC()
+    var isDataLoaded = false {
+        didSet {
+            if isDataLoaded {
+                tabBarController?.setTabBarVisible(visible: true, animated: true)
+                UIView.animate(withDuration: 0.3) {
+                    self.view.setNeedsLayout()
+                    self.iconsHeightConstraint.constant = 50
+                    self.view.layoutIfNeeded()
+                }
+                title = "Новые"
+//                navigationController?.setNavigationBarHidden(false, animated: true)
+            }
+        }
+    }
     
+    @IBOutlet weak var iconsHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var newIcon: NewIcon!
     @IBOutlet weak var hotIcon: FlameIcon!
     @IBOutlet weak var categoryIcon: CategoryIcon!
@@ -79,6 +94,7 @@ class TopSurveysViewController: UIViewController/*, CircleTransitionable*/ {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
+        tabBarController?.setTabBarVisible(visible: false, animated: false)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -96,12 +112,14 @@ class TopSurveysViewController: UIViewController/*, CircleTransitionable*/ {
     
     override func viewWillAppear(_ animated: Bool) {
 //        tabBarController!.setTabBarVisible(visible: true, duration: 0, animated: false)
-//        navigationController?.setNavigationBarHidden(false, animated: true)
-        tabBarController?.setTabBarVisible(visible: true, animated: true)
+//        navigationController?.setNavigationBarHidden(true, animated: false)
+        if isDataLoaded {
+            tabBarController?.setTabBarVisible(visible: true, animated: true)
+        }
     }
 //
     private func setupViews() {
-        title = "Новые"
+        title = "Соединение"
         tabBarController?.tabBar.items?[0].title = "Лента"
 //        let btn = AddButton(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
 //        btn.layer.isOpaque = true
@@ -116,7 +134,7 @@ class TopSurveysViewController: UIViewController/*, CircleTransitionable*/ {
             self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
             self.icons = [self.newIcon, self.hotIcon, self.categoryIcon]
             for icon in self.icons {
-                let tap = UITapGestureRecognizer(target: self, action: #selector(TopSurveysViewController.handleTap(gesture:)))
+                let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleTap(gesture:)))
                 icon.addGestureRecognizer(tap)
             }
             self.addButton.isEnabled = false

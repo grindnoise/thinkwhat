@@ -9,6 +9,7 @@
 import UIKit
 import YoutubePlayer_in_WKWebView
 import SafariServices
+import SwiftyJSON
 
 class SurveyViewController: UITableViewController {
     
@@ -16,6 +17,14 @@ class SurveyViewController: UITableViewController {
         return UINib(nibName: "AnswerHeaderCell", bundle: nil)
     }
     
+    fileprivate var isReadOnly = false {//false - user hasn't answered this survey
+        didSet {
+            if isReadOnly {
+                //View mode
+                print("View mode")
+            }
+        }
+    }
     fileprivate var requestAttempt = 0 {
         didSet {
             if oldValue != requestAttempt {
@@ -25,7 +34,7 @@ class SurveyViewController: UITableViewController {
             }
         }
     }
-    fileprivate let sections = ["ОСНОВНОЕ", "ОТВЕТЫ", "ДЕЙСТВИЕ"]
+    fileprivate let sections = ["ОСНОВНОЕ", "ОТВЕТЫ", "КНОПКА ГОЛОСОВАНИЯ"]
     fileprivate var isRequesting = false
     fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     fileprivate let requestAttempts = 3
@@ -42,10 +51,18 @@ class SurveyViewController: UITableViewController {
                 delay(seconds: 0.15) {
                     self.tableView.scrollToBottom()
                 }
-//                tableView.reloadRows(at: [IndexPath(row: 0, section: 2)], with: .bottom)
                 for cell in answersCells {
-                    if cell.answer?.keys.first! != selectedAnswerID {
+                    if cell.answer!.ID != selectedAnswerID {
                         cell.isChecked = false
+                        let scaleAnim       = CABasicAnimation(keyPath: "transform.scale")
+                        scaleAnim.fromValue = 1.002
+                        scaleAnim.toValue   = 1
+                        scaleAnim.duration  = 0.15
+                        cell.label.layer.add(scaleAnim, forKey: nil)
+                        cell.label.transform = CGAffineTransform.identity//CATransform3DMakeScale(1.01, 1.01, 1.01)
+                        UIView.transition(with: cell.label, duration: 0.15, options: .transitionCrossDissolve, animations: {
+                            cell.label.textColor = UIColor.gray
+                        })
                     }
                 }
             }
@@ -82,6 +99,10 @@ class SurveyViewController: UITableViewController {
         super.viewDidLoad()
         setupViews()
         tableView.register(SurveyViewController.answerHeaderCell, forHeaderFooterViewReuseIdentifier: "answerHeader")
+        //Check if user has laready answered
+        if Surveys.shared.completedSurveyIDs.contains(surveyLink.ID) {
+            isReadOnly = true
+        }
     }
     
     private func setupViews() {
@@ -137,10 +158,14 @@ class SurveyViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {//ОСНОВНОЕ
             return 5
-        } else if section == 1, survey != nil {
-            return survey!.answersWithID.count
-        } else if section == 2, selectedAnswerID != 0 {
-            return 1
+        } else if section == 1, survey != nil {//ОТВЕТЫ
+            return survey!.answers.count
+        } else if section == 2 {//ПОСЛЕДНЯЯ СЕКЦИЯ
+            if isReadOnly {
+                return 1
+            } else if selectedAnswerID != 0 {
+                return 1
+            }
         }
         return 0
     }
@@ -167,11 +192,13 @@ class SurveyViewController: UITableViewController {
                 if isInitialLoading {
                     _cell.linkButton.alpha = 0
                 }
+                _cell.delegate = self
                 cell = _cell
             } else if indexPath.row == 3, survey!.link != nil, !survey!.link!.isEmpty, let _cell = tableView.dequeueReusableCell(withIdentifier: "youtube", for: indexPath) as? SurveyYoutubeCell {
                 let isYoutube = isYoutubeLink(checkString: survey!.link!)
 //                _cell.isVisible = isYoutube ? true : false
                 _cell.playerView.delegate = self
+                _cell.delegate = self
                 if isYoutube {
                     _cell.loadVideo(url: survey!.link!)
                 }
@@ -224,7 +251,7 @@ class SurveyViewController: UITableViewController {
                     if let visibleRows = tableView.indexPathsForVisibleRows, visibleRows.contains(indexPath) {
                         _cell.contentView.alpha = 0
                         UIView.animate(withDuration: 0.45, animations: {
-                            cell.contentView.alpha = 1
+                            _cell.contentView.alpha = 1
                         })
                     }
                 } else if survey!.images != nil, !survey!.images!.isEmpty {
@@ -233,25 +260,44 @@ class SurveyViewController: UITableViewController {
                         _cell.slides[i].imageView.progressIndicatorView.alpha = 0
                     }
                 }
+                _cell.delegate = self
                 cell = _cell
             }
         } else if indexPath.section == 1 {
-            if let _cell = tableView.dequeueReusableCell(withIdentifier: "answer", for: indexPath) as? SurveyAnswerCell {
-                _cell.answer = survey!.answersWithID[indexPath.row]
-                if isInitialLoading {
-//                    _cell.answer = survey!.answersWithID[indexPath.row]
-                    _cell.contentView.alpha = 0
-                    UIView.animate(withDuration: 0.45, animations: {
-                        _cell.contentView.alpha = 1
-                    })
+            if isReadOnly {
+                if let _cell = tableView.dequeueReusableCell(withIdentifier: "result", for: indexPath) as? SurveyResultCell, let answer = survey!.answers[indexPath.row] as? SurveyAnswer {
+                    //Highlight user's answer
+                    if let answerID = survey?.result?.keys.first, answerID == answer.ID {
+                        _cell.label.isSelected = true
+                    } else {
+                        _cell.label.isSelected = false
+                    }
+                    _cell.label.text = answer.text
+                    _cell.percent = survey!.getAnswerVotePercentage(answer.totalVotes)
+                    cell = _cell
                 }
-                cell = _cell
-                if !answersCells.contains(_cell) {
-                    answersCells.append(_cell)
+            } else {
+                if let _cell = tableView.dequeueReusableCell(withIdentifier: "answer", for: indexPath) as? SurveyAnswerCell {
+                    _cell.answer = survey!.answers[indexPath.row]
+                    if isInitialLoading {
+                        _cell.contentView.alpha = 0
+                        UIView.animate(withDuration: 0.45, animations: {
+                            _cell.contentView.alpha = 1
+                        })
+                    }
+                    cell = _cell
+                    if !answersCells.contains(_cell) {
+                        answersCells.append(_cell)
+                    }
                 }
             }
         } else if indexPath.section == 2 {
-            if let _cell = tableView.dequeueReusableCell(withIdentifier: "vote", for: indexPath) as? SurveyVoteCell {
+            if isReadOnly {
+                if let _cell = tableView.dequeueReusableCell(withIdentifier: "total", for: indexPath) as? SurveyTotalCell {
+                    _cell.label.text = "Голосов: \(survey!.totalVotes)"
+                    cell = _cell
+                }
+            } else if let _cell = tableView.dequeueReusableCell(withIdentifier: "vote", for: indexPath) as? SurveyVoteCell {
                 _cell.delegate = self
                 cell = _cell
             }
@@ -281,8 +327,12 @@ class SurveyViewController: UITableViewController {
             }
         } else if indexPath.section == 1 {
             return max(100, UITableView.automaticDimension)
-        } else if indexPath.section == 2 {//POST
-            return 100
+        } else if indexPath.section == 2 {
+            if isReadOnly {
+                return 50
+            } else {
+                return 100
+            }
         }
         return UITableView.automaticDimension
     }
@@ -297,6 +347,7 @@ class SurveyViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 1 {
             if let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "answerHeader") as? AnswerHeaderCell {
+                header.delegate = self
                 return header
             }
         }
@@ -308,8 +359,17 @@ class SurveyViewController: UITableViewController {
         if indexPath.section == 1 {
             if let cell = tableView.cellForRow(at: indexPath) as? SurveyAnswerCell {
                 cell.isChecked = true
+                let scaleAnim       = CABasicAnimation(keyPath: "transform.scale")
+                scaleAnim.fromValue = 1
+                scaleAnim.toValue   = 1.002
+                scaleAnim.duration  = 0.15
+                cell.label.layer.add(scaleAnim, forKey: nil)
+                cell.label.layer.transform = CATransform3DMakeScale(1.002, 1.002, 1.002)
+                UIView.transition(with: cell.label, duration: 0.15, options: .transitionCrossDissolve, animations: {
+                    cell.label.textColor = UIColor.black
+                })
                 //Uncheck others
-                selectedAnswerID = cell.answer!.keys.first!
+                selectedAnswerID = cell.answer!.ID
             }
         }
     }
@@ -404,7 +464,24 @@ extension SurveyViewController {
             }
             if json != nil {
                 print(json!)
-                //TODO: Store result?
+                //Update answer votes count, survey total votes & survey result
+                if let response = json!.arrayValue as? [JSON] {
+                    for entity in response {
+                        if let _answer = entity["answer"].intValue as? Int, let _timestamp = Date(dateTimeString: entity["timestamp"].stringValue as! String) as? Date {
+                            self.survey!.result = [_answer: _timestamp]
+                            self.survey!.totalVotes += 1
+                            for var answer in self.survey!.answers {
+                                if answer.ID == _answer {
+                                    answer.totalVotes += 1
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+                self.isReadOnly = true
+                self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .fade)
+                self.tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .fade)
             }
         }
     }
@@ -548,252 +625,12 @@ extension SurveyViewController: CellButtonDelegate {
             }
         } else if sender is SurveyVoteCell {
             postAnswer()
+        } else if sender is SurveyImageCell {
+            tableView.scrollToRow(at: IndexPath(row: 4, section: 0), at: .top, animated: true)
+        } else if sender is SurveyYoutubeCell {
+            tableView.scrollToRow(at: IndexPath(row: 3, section: 0), at: .top, animated: true)
+        } else if sender is AnswerHeaderCell {
+            tableView.scrollToRow(at: IndexPath(row: 0, section: 1), at: .top, animated: true)
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-////
-////  _SurveyViewController.swift
-////  ThinkWhat
-////
-////  Created by Pavel Bukharov on 04.11.2019.
-////  Copyright © 2019 Pavel Bukharov. All rights reserved.
-////
-//
-//import UIKit
-//
-//class _SurveyViewController: UIViewController {
-//
-//    @IBOutlet weak var surveyTitle: UILabel!
-//    @IBOutlet weak var surveyQuestion: UITextView!
-//    @IBOutlet weak var surveyQuestionHeight: NSLayoutConstraint!
-//    fileprivate var requestAttempt = 0 {
-//        didSet {
-//            if oldValue != requestAttempt {
-//                if requestAttempt > MAX_REQUEST_ATTEMPTS {
-//                    requestAttempt = 0
-//                }
-//            }
-//        }
-//    }
-//    private var isRequesting = false
-//    private lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
-//    private let requestAttempts = 3
-//    private var loadingIndicator: LoadingTextIndicator!
-//    private let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
-//    var surveyLink: SurveyLink! {
-//        didSet {
-//            likeButton.removeAllAnimations()
-//            title = surveyLink.category!.title//"Опрос №\(surveyLink.ID)"
-//            likeButton.state = Array(Surveys.shared.favoriteSurveys.keys).filter( {$0.ID == surveyLink.ID }).isEmpty ? .disabled : .enabled
-//        }
-//    }
-//    var survey: Survey? {
-//        didSet {
-//            if survey != nil {
-//                surveyQuestion.text = "     \(survey!.description)"
-//                let sizeThatFitsTextView = surveyQuestion.sizeThatFits(CGSize(width: surveyQuestion.frame.size.width, height: CGFloat(MAXFLOAT)))
-//                print(sizeThatFitsTextView)
-//                view.setNeedsLayout()
-//                surveyQuestionHeight.constant = sizeThatFitsTextView.height
-//                view.layoutIfNeeded()
-//                //TODO: answers
-//            }
-//        }
-//    }
-//
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        setupViews()
-//    }
-//
-//    private func setupViews() {
-//        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
-//        self.navigationController?.navigationBar.shadowImage     = UIImage()
-//        self.navigationController?.navigationBar.isTranslucent   = false
-//        self.navigationController?.isNavigationBarHidden         = false
-//        self.navigationController?.navigationBar.barTintColor    = .white
-//        self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-//
-//        //        DispatchQueue.main.async {
-//        self.loadingIndicator = LoadingTextIndicator(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)))
-//        self.loadingIndicator.layoutCentered(in: self.view, multiplier: 0.8)
-//        //        }
-//
-//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: likeButton)
-//        let gesture = UITapGestureRecognizer(target: self, action: #selector(_SurveyViewController.likeTapped(gesture:)))
-//        likeButton.addGestureRecognizer(gesture)
-//    }
-//
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        surveyTitle.text = surveyLink.title
-//        if let _survey = Surveys.shared[surveyLink.ID] {
-//            survey = _survey
-//            loadingIndicator.alpha = 0
-//            for subview in view.subviews {
-//                if !(subview is LoadingTextIndicator) {
-//                    subview.alpha = 1
-//                }
-//            }
-//        } else {
-//            for subview in view.subviews {
-//                if !(subview is LoadingTextIndicator) {
-//                    subview.alpha = 0
-//                }
-//                if subview is UILabel {
-//                    subview.layer.transform = CATransform3DMakeScale(0.3, 0.3, 1)
-//                }
-//            }
-//            loadingIndicator.alpha = 1
-//            loadingIndicator.addEnableAnimation()
-//            loadData()
-//        }
-//    }
-//
-//
-//    /*
-//     // MARK: - Navigation
-//
-//     // In a storyboard-based application, you will often want to do a little preparation before navigation
-//     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//     // Get the new view controller using segue.destination.
-//     // Pass the selected object to the new view controller.
-//     }
-//     */
-//
-//}
-//
-//extension _SurveyViewController: ServerInitializationProtocol {
-//    func initializeServerAPI() -> APIManagerProtocol {
-//        return ((self.navigationController as! NavigationControllerPreloaded).parent as! TabBarController).apiManager
-//    }
-//}
-//
-////API calling
-//extension _SurveyViewController {
-//    //GET request SurveySerializer
-//    public func loadData() {
-//
-//        requestAttempt += 1
-//        apiManager.loadSurvey(survey: surveyLink) {
-//            json, error in
-//            if error != nil {
-//                if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
-//                    showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { UIView.animate(withDuration: 0.3, animations: {
-//                        self.loadingIndicator.alpha = 0
-//                    }) { _ in self.loadingIndicator.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
-//                } else {
-//                    //Retry
-//                    self.loadData()
-//                }
-//            }
-//            if json != nil {
-//                print(json!)
-//                if let _survey = Survey(json!) {
-//                    Surveys.shared.downloadedSurveys.append(_survey)
-//                    self.survey = _survey
-//                    self.requestAttempt = 0
-//                }
-//                self.presentSurvey()
-//            }
-//        }
-//    }
-//
-//    //POST request FavoriteSurvey model
-//    @objc fileprivate func likeTapped(gesture: UITapGestureRecognizer) {
-//        if !isRequesting {
-//            isRequesting = true
-//            if gesture.state == .ended {
-//                var mark = true
-//                if likeButton.state == .disabled {
-//                    likeButton.state = .enabled
-//                    mark = true
-//                    if Array(Surveys.shared.favoriteSurveys.keys).filter( {$0.ID == surveyLink.ID }).isEmpty { Surveys.shared.favoriteSurveys[self.surveyLink] = Date() }
-//                } else {
-//                    likeButton.state = .disabled
-//                    mark = false
-//                    if let key = Surveys.shared.favoriteSurveys.keys.filter({ $0.ID == surveyLink.ID }).first {
-//                        Surveys.shared.favoriteSurveys.removeValue(forKey: key)
-//                    }
-//                    //                Surveys.shared.favoriteSurveys.removeValue(forKey: self.surveyLink)
-//                    NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
-//                }
-//                apiManager.markFavorite(mark: mark, survey: surveyLink!) {
-//                    _, error in
-//                    self.isRequesting = false
-//                    if error != nil {
-//                        showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Опрос не добавлен в любимые. \(error!.localizedDescription)")
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    //POST request post answer
-//    fileprivate func postAnswer() {
-//        //TODO
-//    }
-//}
-//
-////UI, animations
-//extension _SurveyViewController {
-//    fileprivate func presentSurvey() {
-//        UIView.animate(withDuration: 0.3, animations: {
-//            for subview in self.view.subviews {
-//                if subview is LoadingTextIndicator {
-//                    subview.alpha = 0
-//                }/* else if subview is UITextView {
-//                     self.animateScaleFade(scaleFactor: 0.3, duration: 1, view: subview)
-//                 } */else if subview is UILabel {
-//                    self.animateScaleFade(scaleFactor: 0.3, duration: 1, view: subview)
-//                    //                    let label = subview as! UILabel
-//                    //                    label.alpha = 1
-//                    //                    label.setTextWithTypeAnimation(typedText: label.text!, characterDelay: 6.6)
-//                } else {
-//                    UIView.animate(withDuration: 0.9, delay: 0.3, options: [.curveEaseIn], animations: {
-//                        subview.alpha = 1
-//                    })
-//                }
-//            }
-//        }) { _ in self.loadingIndicator.removeAllAnimations() }
-//    }
-//
-//    fileprivate func animateScaleFade(scaleFactor: CGFloat, duration: CFTimeInterval, view _view: UIView) {
-//        //Light scale/fade animation
-//        let scaleAnim       = CABasicAnimation(keyPath: "transform.scale")
-//        let fadeAnim        = CABasicAnimation(keyPath: "opacity")
-//        let groupAnim       = CAAnimationGroup()
-//
-//        scaleAnim.fromValue = scaleFactor
-//        scaleAnim.toValue   = 1.0
-//        fadeAnim.fromValue  = 0
-//        fadeAnim.toValue    = 1
-//
-//        groupAnim.animations        = [scaleAnim, fadeAnim]
-//        groupAnim.duration          = duration
-//        groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-//
-//        _view.layer.add(scaleAnim, forKey: nil)
-//        _view.layer.opacity = Float(1)
-//        _view.layer.transform = CATransform3DMakeScale(1, 1, 1)
-//    }
-//}
