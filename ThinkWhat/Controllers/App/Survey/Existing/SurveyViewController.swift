@@ -11,10 +11,30 @@ import YoutubePlayer_in_WKWebView
 import SafariServices
 import SwiftyJSON
 
-class SurveyViewController: UITableViewController {
+class SurveyViewController: UITableViewController, UINavigationControllerDelegate {
     
     class var answerHeaderCell: UINib {
         return UINib(nibName: "AnswerHeaderCell", bundle: nil)
+    }
+    
+    var statusBarHidden = false {
+        didSet {
+            UIView.animate(withDuration: 0.3) {
+                self.setNeedsStatusBarAppearanceUpdate()
+            }
+        }
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
+    }
+    
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return .fade
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return statusBarHidden
     }
     
     fileprivate var isReadOnly = false {//false - user hasn't answered this survey
@@ -34,6 +54,7 @@ class SurveyViewController: UITableViewController {
             }
         }
     }
+    fileprivate var voteCompletionView: VoteCompletionView?
     fileprivate let sections = ["ОСНОВНОЕ", "ОТВЕТЫ", "КНОПКА ГОЛОСОВАНИЯ"]
     fileprivate var isRequesting = false
     fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
@@ -146,6 +167,16 @@ class SurveyViewController: UITableViewController {
             loadingIndicator.alpha = 1
             loadingIndicator.addUntitled1Animation()
             loadData()
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if !self.isReadOnly {
+            DispatchQueue.main.async {
+                if self.voteCompletionView == nil {
+                    self.voteCompletionView = VoteCompletionView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
+                }
+            }
         }
     }
     
@@ -464,17 +495,20 @@ extension SurveyViewController {
             }
             if json != nil {
                 print(json!)
-                //Update answer votes count, survey total votes & survey result
+                //Update answer votes count, survey total votes, user's survey result & add to completed
                 if let response = json!.arrayValue as? [JSON] {
                     for entity in response {
                         if let _answer = entity["answer"].intValue as? Int, let _timestamp = Date(dateTimeString: entity["timestamp"].stringValue as! String) as? Date {
                             self.survey!.result = [_answer: _timestamp]
                             self.survey!.totalVotes += 1
-                            for var answer in self.survey!.answers {
+                            for answer in self.survey!.answers {
                                 if answer.ID == _answer {
                                     answer.totalVotes += 1
                                     break
                                 }
+                            }
+                            if !Surveys.shared.completedSurveyIDs.contains(self.survey!.ID!) {
+                                Surveys.shared.completedSurveyIDs.append(self.survey!.ID!)
                             }
                         }
                     }
@@ -624,7 +658,8 @@ extension SurveyViewController: CellButtonDelegate {
                 present(vc, animated: true)
             }
         } else if sender is SurveyVoteCell {
-            postAnswer()
+            voteCompletionView?.present()
+            //postAnswer()
         } else if sender is SurveyImageCell {
             tableView.scrollToRow(at: IndexPath(row: 4, section: 0), at: .top, animated: true)
         } else if sender is SurveyYoutubeCell {
