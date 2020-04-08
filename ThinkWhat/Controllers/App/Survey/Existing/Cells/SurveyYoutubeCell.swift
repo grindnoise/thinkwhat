@@ -40,7 +40,6 @@ class SurveyYoutubeCell: UITableViewCell {
         if !isVideoLoaded {
             isVideoLoaded = true
             playerView.load(withVideoId: "LSebnSTh3Ks")
-            
                 //self.playerView.load(withVideoId: "LSebnSTh3Ks", playerVars: ["playsinline" : 1])
         }
     }

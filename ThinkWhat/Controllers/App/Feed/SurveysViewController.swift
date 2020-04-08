@@ -106,6 +106,9 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                 startingPoint = rbtn.convert(rbtn.center, to: tabBarController?.view)
             }
         }
+        if isDataLoaded {
+            tabBarController?.setTabBarVisible(visible: true, animated: true)
+        }
 //        navigationController?.setNavigationBarHidden(false, animated: true)
     }
 
@@ -113,9 +116,9 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     override func viewWillAppear(_ animated: Bool) {
 //        tabBarController!.setTabBarVisible(visible: true, duration: 0, animated: false)
 //        navigationController?.setNavigationBarHidden(true, animated: false)
-        if isDataLoaded {
-            tabBarController?.setTabBarVisible(visible: true, animated: true)
-        }
+//        if isDataLoaded {
+//            tabBarController?.setTabBarVisible(visible: true, animated: true)
+//        }
     }
 //
     private func setupViews() {

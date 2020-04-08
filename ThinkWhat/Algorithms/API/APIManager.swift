@@ -79,7 +79,7 @@ class APIManager: APIManagerProtocol {
     }
     private var defaultSessionManager: Alamofire.SessionManager {
         let configuration = Alamofire.SessionManager.default.session.configuration
-        configuration.timeoutIntervalForRequest = 10
+        configuration.timeoutIntervalForRequest = 15
         configuration.timeoutIntervalForResource = 10
         return Alamofire.SessionManager(configuration: configuration)
     }
@@ -105,12 +105,16 @@ class APIManager: APIManagerProtocol {
         let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.TOKEN)
         Alamofire.SessionManager.default.request(url, method: .get, parameters: [:], encoding: URLEncoding(), headers: nil).responseJSON(completionHandler: {
             response in
-            var reachable = ApiReachabilityState.None
-            if response.response != nil {
-                reachable = .Reachable
+            var state = ApiReachabilityState.None
+            if let _error = response.result.error as? AFError {
+                if _error.responseCode == NSURLErrorTimedOut {
+                    print(_error.responseCode!)
+                }
+            } else if response.response != nil {
+                state = .Reachable
             }
-            apiReachability = reachable
-            completion(reachable)
+            apiReachability = state
+            completion(state)
         })
     }
     

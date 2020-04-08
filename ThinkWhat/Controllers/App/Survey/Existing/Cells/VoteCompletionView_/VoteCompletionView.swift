@@ -102,17 +102,19 @@ class VoteCompletionView: UIView {
         fadeAnim.toValue    = 0
         
         groupAnim.animations        = [scaleAnim, fadeAnim]
-        groupAnim.duration          = 0.4
+        groupAnim.duration          = 0.6
         groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         
         frameView.layer.add(groupAnim, forKey: nil)
         frameView.layer.opacity = Float(0)
         frameView.layer.transform = CATransform3DMakeScale(0.7, 0.7, 1)
         
-        delegate?.statusBarHidden = false
-        UIView.animate(withDuration: 0.4, delay: 1, options: [.curveEaseOut], animations: {
+        UIView.animate(withDuration: 0.8, delay: 0.1, options: [.curveEaseOut], animations: {
             self.lightBlurView.alpha = 0
             self.contentView.alpha = 0
+            delay(seconds: 0.1) {
+                self.delegate?.statusBarHidden = false
+            }
         }, completion: {
             _ in
             self.voteAnimation.removeAllAnimations()
