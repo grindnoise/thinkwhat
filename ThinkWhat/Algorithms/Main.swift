@@ -381,6 +381,7 @@ class AppData {
                 }
             }
         }
+        var balance: Int = 0
         
         init() {
             getData()
