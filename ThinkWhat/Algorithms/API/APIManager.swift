@@ -1013,24 +1013,26 @@ class APIManager: APIManagerProtocol {
             response in
             if response.result.isFailure {
                 print(response.result.debugDescription)
-            }
-            if let _error = response.result.error as? AFError {
-                error = self.parseAFError(_error)
+                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
             } else {
-                if let statusCode  = response.response?.statusCode{
-                    if 200...299 ~= statusCode {
-                        do {
-                            json = try JSON(data: response.data!)
-                        } catch let _error {
-                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
-                        }
-                    } else if 400...499 ~= statusCode {
-                        do {
-                            let errorJSON = try JSON(data: response.data!)
-                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
-                            print(error!.localizedDescription)
-                        } catch let _error {
-                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
+                if let _error = response.result.error as? AFError {
+                    error = self.parseAFError(_error)
+                } else {
+                    if let statusCode  = response.response?.statusCode{
+                        if 200...299 ~= statusCode {
+                            do {
+                                json = try JSON(data: response.data!)
+                            } catch let _error {
+                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
+                            }
+                        } else if 400...499 ~= statusCode {
+                            do {
+                                let errorJSON = try JSON(data: response.data!)
+                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
+                                print(error!.localizedDescription)
+                            } catch let _error {
+                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
+                            }
                         }
                     }
                 }
@@ -1051,31 +1053,32 @@ class APIManager: APIManagerProtocol {
             response in
             if response.result.isFailure {
                 error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.description]) as Error
-            }
-            if let _error = response.result.error as? AFError {
-                error = self.parseAFError(_error)
             } else {
-                if let statusCode  = response.response?.statusCode{
-                    if 200...299 ~= statusCode {
-                        do {
-                            let json = try JSON(data: response.data!)
-                            for attr in json {
-                                if attr.0 ==  searchString {
-                                    flag = attr.1.boolValue
+                if let _error = response.result.error as? AFError {
+                    error = self.parseAFError(_error)
+                } else {
+                    if let statusCode  = response.response?.statusCode{
+                        if 200...299 ~= statusCode {
+                            do {
+                                let json = try JSON(data: response.data!)
+                                for attr in json {
+                                    if attr.0 ==  searchString {
+                                        flag = attr.1.boolValue
+                                    }
+                                    if attr.0 ==  "error" {
+                                        error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: attr.1.stringValue]) as Error
+                                    }
                                 }
-                                if attr.0 ==  "error" {
-                                    error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: attr.1.stringValue]) as Error
-                                }
+                            } catch let _error {
+                                error = _error
                             }
-                        } catch let _error {
-                            error = _error
-                        }
-                    } else if 400...499 ~= statusCode {
-                        do {
-                            let json = try JSON(data: response.data!)
-                            error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: json.rawString()!]) as Error
-                        } catch let _error {
-                            error = _error
+                        } else if 400...499 ~= statusCode {
+                            do {
+                                let json = try JSON(data: response.data!)
+                                error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: json.rawString()!]) as Error
+                            } catch let _error {
+                                error = _error
+                            }
                         }
                     }
                 }

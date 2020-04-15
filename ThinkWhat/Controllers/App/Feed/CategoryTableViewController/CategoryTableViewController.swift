@@ -63,7 +63,7 @@ class CategoryTableViewController: UITableViewController {
             loadingIndicator.layoutCentered(in: tableView,multiplier: 0.7)
             isViewSetupCompleted = true
             if tableView.numberOfRows(inSection: 0) == 0 {
-                loadingIndicator.addUntitled1Animation()
+                loadingIndicator.addEnableAnimation()
                 tableView.isUserInteractionEnabled = false
             }
         }

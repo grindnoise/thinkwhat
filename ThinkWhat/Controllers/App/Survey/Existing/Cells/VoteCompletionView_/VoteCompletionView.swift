@@ -70,19 +70,19 @@ class VoteCompletionView: UIView {
         fadeAnim.toValue    = 1
         
         groupAnim.animations        = [scaleAnim, fadeAnim]
-        groupAnim.duration          = 1.3
+        groupAnim.duration          = 1
         groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         
         frameView.layer.add(scaleAnim, forKey: nil)
         frameView.layer.opacity = Float(1)
         frameView.layer.transform = CATransform3DMakeScale(1, 1, 1)
-        delay(seconds: 0.2) {
-            UIView.animate(withDuration: 0.5, animations: {
+        delay(seconds: 0.1) {
+            UIView.animate(withDuration: 0.3, animations: {
                 self.voteAnimation.alpha = 1
             }) {
                 _ in
                 self.voteAnimation.addEnableAnimation()
-                delay(seconds: 2) {
+                delay(seconds: 1) {
                     self.dismiss()
                 }
             }
@@ -102,24 +102,26 @@ class VoteCompletionView: UIView {
         fadeAnim.toValue    = 0
         
         groupAnim.animations        = [scaleAnim, fadeAnim]
-        groupAnim.duration          = 0.6
+        groupAnim.duration          = 0.2
         groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         
         frameView.layer.add(groupAnim, forKey: nil)
         frameView.layer.opacity = Float(0)
         frameView.layer.transform = CATransform3DMakeScale(0.7, 0.7, 1)
-        
-        UIView.animate(withDuration: 0.8, delay: 0.1, options: [.curveEaseOut], animations: {
+        delay(seconds: 0.2) {
+            self.delegate?.statusBarHidden = false
+        UIView.animate(withDuration: 0.4, delay: 0, options: [.curveEaseOut], animations: {
             self.lightBlurView.alpha = 0
             self.contentView.alpha = 0
-            delay(seconds: 0.1) {
-                self.delegate?.statusBarHidden = false
-            }
+//            delay(seconds: 0.2) {
+//                self.delegate?.statusBarHidden = false
+//            }
         }, completion: {
             _ in
             self.voteAnimation.removeAllAnimations()
             self.removeFromSuperview()
         })
+        }
     }
 
 }

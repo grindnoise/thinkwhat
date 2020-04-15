@@ -28,6 +28,9 @@
 		AB2AA1B8235D94DF0086D16C /* SurveyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */; };
 		AB2AA1B9235D94DF0086D16C /* SurveyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */; };
 		AB2AA1BB235DDC6F0086D16C /* SurveysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1BA235DDC6F0086D16C /* SurveysViewController.swift */; };
+		AB2C03CE24407C5D001BFD75 /* LostConnectionAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2C03CD24407C5D001BFD75 /* LostConnectionAnimation.swift */; };
+		AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2C03D02440A611001BFD75 /* LostConnectionView.swift */; };
+		AB2C03D32440A61C001BFD75 /* LostConnectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB2C03D22440A61C001BFD75 /* LostConnectionView.xib */; };
 		AB2FBD02242A433000344DCC /* CheckBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2FBD01242A433000344DCC /* CheckBox.swift */; };
 		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
 		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
@@ -155,6 +158,8 @@
 		ABDA425423B1036400BAC3A5 /* NewSurveyHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA425223B1036400BAC3A5 /* NewSurveyHeaderCell.swift */; };
 		ABDA425523B1036400BAC3A5 /* NewSurveyHeaderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */; };
 		ABDA425923B3475400BAC3A5 /* AnswerCreationHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */; };
+		ABDE30212441DBE2001D7747 /* AddBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDE30202441DBE2001D7747 /* AddBarButton.swift */; };
+		ABDE30232441DC22001D7747 /* AddBarButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABDE30222441DC22001D7747 /* AddBarButton.xib */; };
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
 		ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1F19E22C253A6008913C3 /* FBManager.swift */; };
@@ -204,6 +209,9 @@
 		AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTableViewCell.swift; sourceTree = "<group>"; };
 		AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyTableViewCell.xib; sourceTree = "<group>"; };
 		AB2AA1BA235DDC6F0086D16C /* SurveysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveysViewController.swift; sourceTree = "<group>"; };
+		AB2C03CD24407C5D001BFD75 /* LostConnectionAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LostConnectionAnimation.swift; sourceTree = "<group>"; };
+		AB2C03D02440A611001BFD75 /* LostConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LostConnectionView.swift; sourceTree = "<group>"; };
+		AB2C03D22440A61C001BFD75 /* LostConnectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LostConnectionView.xib; sourceTree = "<group>"; };
 		AB2FBD01242A433000344DCC /* CheckBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBox.swift; sourceTree = "<group>"; };
 		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -337,6 +345,8 @@
 		ABDA425223B1036400BAC3A5 /* NewSurveyHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyHeaderCell.swift; sourceTree = "<group>"; };
 		ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewSurveyHeaderCell.xib; sourceTree = "<group>"; };
 		ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCreationHeaderCell.swift; sourceTree = "<group>"; };
+		ABDE30202441DBE2001D7747 /* AddBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBarButton.swift; sourceTree = "<group>"; };
+		ABDE30222441DC22001D7747 /* AddBarButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddBarButton.xib; sourceTree = "<group>"; };
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
 		ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhat.entitlements; sourceTree = "<group>"; };
@@ -410,6 +420,16 @@
 				ABDEE85C23702465009B52F3 /* TopSurveysTableViewController */,
 			);
 			path = TopSurveysViewController;
+			sourceTree = "<group>";
+		};
+		AB2C03CF2440A5BE001BFD75 /* LostConnectionView */ = {
+			isa = PBXGroup;
+			children = (
+				AB2C03D02440A611001BFD75 /* LostConnectionView.swift */,
+				AB2C03D22440A61C001BFD75 /* LostConnectionView.xib */,
+				AB2C03CD24407C5D001BFD75 /* LostConnectionAnimation.swift */,
+			);
+			path = LostConnectionView;
 			sourceTree = "<group>";
 		};
 		AB2FBD00242A431A00344DCC /* Answer */ = {
@@ -848,9 +868,12 @@
 		ABF51D26237EB2260053EB75 /* Feed */ = {
 			isa = PBXGroup;
 			children = (
+				AB2C03CF2440A5BE001BFD75 /* LostConnectionView */,
 				AB2AA1BA235DDC6F0086D16C /* SurveysViewController.swift */,
 				ABDEE85523702324009B52F3 /* CategoryTableViewController */,
 				AB2AA1B12359E98E0086D16C /* TopSurveysViewController */,
+				ABDE30202441DBE2001D7747 /* AddBarButton.swift */,
+				ABDE30222441DC22001D7747 /* AddBarButton.xib */,
 			);
 			path = Feed;
 			sourceTree = "<group>";
@@ -990,8 +1013,10 @@
 				ABDA425523B1036400BAC3A5 /* NewSurveyHeaderCell.xib in Resources */,
 				AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */,
 				AB3C684D223FD3EE00B57580 /* OpenSans-ExtraBold.ttf in Resources */,
+				ABDE30232441DC22001D7747 /* AddBarButton.xib in Resources */,
 				AB3C6826223FD1E900B57580 /* CustomAlertView.xib in Resources */,
 				AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */,
+				AB2C03D32440A61C001BFD75 /* LostConnectionView.xib in Resources */,
 				AB3C684A223FD3EE00B57580 /* OpenSans-Semibold.ttf in Resources */,
 				AB3C6867223FDD9600B57580 /* Auth.storyboard in Resources */,
 				AB3C6851223FD3EF00B57580 /* OpenSans-ExtraBoldItalic.ttf in Resources */,
@@ -1175,6 +1200,7 @@
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
 				AB7478C724290D8600317EB6 /* SurveyAnswerCell.swift in Sources */,
 				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
+				AB2C03CE24407C5D001BFD75 /* LostConnectionAnimation.swift in Sources */,
 				ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */,
 				AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */,
 				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
@@ -1189,6 +1215,7 @@
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
 				AB19B6412432222300999917 /* SurveyResultCell.swift in Sources */,
 				ABBA1988242B430100F11E0D /* AnswerHeaderCell.swift in Sources */,
+				AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */,
 				ABBCF4142431F1F300BFEAB9 /* VerticallyCenteredTextView.swift in Sources */,
 				ABFE1411239109FA0026D27C /* NewSurveyViewController.swift in Sources */,
 				AB2984FA23A79EA70086A92B /* PrivacySelectionCell.swift in Sources */,
@@ -1231,6 +1258,7 @@
 				ABBF848923CDB97400059BF0 /* AnonymitySettingsTableViewController.swift in Sources */,
 				AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */,
 				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
+				ABDE30212441DBE2001D7747 /* AddBarButton.swift in Sources */,
 				AB2AA1AE235605FD0086D16C /* InfoViewController.swift in Sources */,
 				AB2AA1B0235613450086D16C /* InfoTableViewController.swift in Sources */,
 				AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */,

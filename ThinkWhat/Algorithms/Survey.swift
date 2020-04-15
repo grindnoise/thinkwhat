@@ -17,6 +17,13 @@ enum SurveyAnonymity: Int, CaseIterable {
     case Disabled
 }
 
+enum SurveyPoints: Int {
+    case Vote               = 1
+    case VoteX2             = 2
+    case SurveyBaseCost     = 100
+    case SurveyHighlighting = 50
+}
+
 class Surveys {
     static let shared = Surveys()
     private init() {}
@@ -78,7 +85,7 @@ class Surveys {
                 favoriteSurveys.removeAll()
                 if !i.1.isEmpty {
                     for k in i.1 {
-                        print(k)
+//                        print(k)
                         if let date = Date(dateTimeString: (k.1["added_at"].stringValue as? String)!) as? Date,
                             let survey = SurveyLink(k.1["survey"]) {
                             favoriteSurveys[survey] = date
@@ -358,7 +365,8 @@ class Survey {
             let _imageURLs              = json["mediafiles"].arrayValue as? [JSON],
             let _watchers               = json["watchers"].intValue as? Int,
             let _totalVotes             = json["total_votes"].intValue as? Int,
-            let _result                 = json["result"].arrayValue as? [JSON] {
+            let _result                 = json["result"].arrayValue as? [JSON],
+            let _balance                = json["balance"].intValue as? Int {
             ID = _ID
             title = _title
             startDate = _startDate
@@ -372,6 +380,7 @@ class Survey {
             isPrivate = _isPrivate
             totalVotes = _totalVotes
             watchers = _watchers
+            AppData.shared.userProfile.balance = _balance
             
             for _answer in _answers {
                 if let answer = SurveyAnswer(json: _answer) {

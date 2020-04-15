@@ -104,6 +104,8 @@ enum DjangoError: String {
 enum ClientSettingsMode {
     case Reminder, Language
 }
+
+
 //var isPushNotificationEnabled: Bool {
 //    guard let settings = UIApplication.shared.currentUserNotificationSettings
 //        else {

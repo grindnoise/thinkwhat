@@ -39,7 +39,9 @@ class SurveyYoutubeCell: UITableViewCell {
     func loadVideo(url: String) {
         if !isVideoLoaded {
             isVideoLoaded = true
-            playerView.load(withVideoId: "LSebnSTh3Ks")
+            if let id = url.youtubeID {
+                playerView.load(withVideoId: id)
+            }
                 //self.playerView.load(withVideoId: "LSebnSTh3Ks", playerVars: ["playsinline" : 1])
         }
     }

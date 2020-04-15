@@ -25,8 +25,8 @@ class TopSurveysTableViewController: UITableViewController {
     }
     public var needsAnimation = true
     private var vc: SurveysViewController!
-    private var isViewSetupCompleted = false
-    private var loadingIndicator: LoadingIndicator!
+//    private var isViewSetupCompleted = false
+//    private var loadingIndicator: LoadingIndicator!
     private var isInitialLoad = true {
         didSet {
             if !isInitialLoad {
@@ -68,9 +68,6 @@ class TopSurveysTableViewController: UITableViewController {
         refreshControl?.attributedTitle = NSAttributedString(string: "")
         refreshControl?.addTarget(self, action: #selector(TopSurveysTableViewController.refreshTableView), for: .valueChanged)
         refreshControl?.tintColor = K_COLOR_RED
-        if isInitialLoad {
-            vc.addButton.isEnabled = false
-        }
     }
     
     @objc fileprivate func applicationDidBecomeActive() {
@@ -100,13 +97,10 @@ class TopSurveysTableViewController: UITableViewController {
 
     override func viewDidLayoutSubviews() {
         tableView.layoutIfNeeded()
-        if !isViewSetupCompleted {
-            tableView.isUserInteractionEnabled = false
-            loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: tableView.frame.width, height: tableView.frame.height)))
-            loadingIndicator.layoutCentered(in: tableView,multiplier: 1)//addEquallyTo(to: tableView)
-            isViewSetupCompleted = true
-            loadingIndicator.addUntitled1Animation()
-        }
+//        if !isViewSetupCompleted {
+//            tableView.isUserInteractionEnabled = false
+//
+//        }
     }
     
     @objc private func updateTableView() {
@@ -252,14 +246,18 @@ extension TopSurveysTableViewController: ServerInitializationProtocol {
 }
 
 extension TopSurveysTableViewController: ServerProtocol {
-    private func loadData() {
+    func loadData() {
         requestAttempt += 1
+//        delay(seconds: 3) {
+//            self.vc.presentLostConnectionView()
+//        }
         apiManager.loadSurveyCategories() {
             json, error in
             if error != nil {
                 if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
-                    showAlert(type: .Warning, buttons: [["Повторить": [CustomAlertView.ButtonType.Ok: {self.requestAttempt = 0; self.loadData()}]],
-                                                        ["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка соединения с сервером\(error!.localizedDescription). Повторить?")
+                    self.vc.presentLostConnectionView()
+//                    showAlert(type: .Warning, buttons: [["Повторить": [CustomAlertView.ButtonType.Ok: {self.requestAttempt = 0; self.loadData()}]],
+//                                                        ["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка соединения с сервером\(error!.localizedDescription). Повторить?")
                 } else {
                     //Retry unless successfull
                     if self.isInitialLoad {
@@ -314,14 +312,14 @@ extension TopSurveysTableViewController: ServerProtocol {
                     
                     self.tableView.isUserInteractionEnabled = true
                     self.vc.isDataLoaded = true
-                    UIView.animate(withDuration: 0.3, animations: {
-                        self.loadingIndicator.alpha = 0
-                    }) {
-                        comleted in
-                        self.loadingIndicator.removeAllAnimations()
-                        self.isInitialLoad = false
-                        self.vc.animateNew()
-                    }
+//                    UIView.animate(withDuration: 0.3, animations: {
+//                        self.loadingIndicator.alpha = 0
+//                    }) {
+//                        comleted in
+//                        self.loadingIndicator.removeAllAnimations()
+//                        self.isInitialLoad = false
+//                        self.vc.animateNew()
+//                    }
                 }
             }
         }

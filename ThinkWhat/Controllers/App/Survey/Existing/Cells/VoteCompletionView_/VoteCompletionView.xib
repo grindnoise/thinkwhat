@@ -30,10 +30,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aKt-5D-97b" customClass="BorderedView" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="37.5" y="173.5" width="300" height="300"/>
+                                <rect key="frame" x="87.5" y="223.5" width="200" height="200"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vhx-et-mE6" customClass="VoteAnimationView" customModule="ThinkWhat" customModuleProvider="target">
-                                        <rect key="frame" x="50" y="50" width="200" height="200"/>
+                                        <rect key="frame" x="33.5" y="33.5" width="133" height="133"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="vhx-et-mE6" secondAttribute="height" multiplier="1:1" id="s05-iC-lH4"/>
@@ -62,7 +62,7 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="aKt-5D-97b" firstAttribute="centerX" secondItem="C8U-GT-CUn" secondAttribute="centerX" id="aTd-Nv-2QE"/>
-                            <constraint firstItem="aKt-5D-97b" firstAttribute="width" secondItem="C8U-GT-CUn" secondAttribute="height" multiplier="300:647" id="kdY-HS-PUe"/>
+                            <constraint firstItem="aKt-5D-97b" firstAttribute="width" secondItem="C8U-GT-CUn" secondAttribute="height" multiplier="200:647" id="kdY-HS-PUe"/>
                             <constraint firstItem="aKt-5D-97b" firstAttribute="centerY" secondItem="C8U-GT-CUn" secondAttribute="centerY" id="wDw-tM-iLn"/>
                         </constraints>
                     </view>

@@ -31,7 +31,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
                     self.loadingView.alpha = alpha
                 }) { completed in
                     if self.isLoadingViewVisible {
-                        self.loadingIndicator.addUntitled1Animation()
+                        self.loadingIndicator.addEnableAnimation()
                     } else {
                         self.loadingIndicator.removeAllAnimations()
                     }

@@ -10,12 +10,6 @@ import UIKit
 
 class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     
-//    var triggerView: UIView = UIView()
-//    var mainView: UIView {
-//        return view
-//    }
-    
-    
     enum CurrentIcon {
         case New, Hot, Category
         
@@ -35,20 +29,20 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         return _currentIcon
     }
     public var startingPoint: CGPoint = CGPoint.zero
-//    private let transition = CircularTransition()
+    fileprivate var lostConnectionView: LostConnectionView?
     private var _currentIcon: CurrentIcon = .New {
         didSet {
             if _currentIcon != oldValue {
                 if _currentIcon == .Category {
-                    title = "Разделы"
+                    setTitle("Разделы")
                     tableVC.needsAnimation = false
                     tableVC.refreshControl?.removeFromSuperview()
                     tableVC.tableView.bounces = false
                 } else {
                     if _currentIcon == .New {
-                        title = "Новые"
+                        setTitle("Новые")
                     } else {
-                        title = "Популярные"
+                        setTitle("Популярные")
                     }
                     tableVC.needsAnimation = true
                     tableVC.view.addSubview(tableVC.refreshControl!)
@@ -59,35 +53,84 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             }
         }
     }
-    private let attrs     = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Light", size: 13)]//,
-//                                   NSAttributedString.Key.foregroundColor: K_COLOR_RED,
-//                                   NSAttributedString.Key.backgroundColor: UIColor.clear]
     private var isViewSetupCompleted = false
     private let tableVC: TopSurveysTableViewController = {
         let storyboard = UIStoryboard(name: "App", bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: "TopSurveysTableViewController") as! TopSurveysTableViewController
         return vc
     } ()
-//    lazy private var newSurveyVC: NewSurveyViewController = initializeNewSurveyVC()
     var isDataLoaded = false {
         didSet {
-            if isDataLoaded {
+            if oldValue != isDataLoaded {
                 tabBarController?.setTabBarVisible(visible: true, animated: true)
-                UIView.animate(withDuration: 0.3) {
-                    self.view.setNeedsLayout()
-                    self.iconsHeightConstraint.constant = 50
-                    self.view.layoutIfNeeded()
+                
+                UIView.animate(withDuration: 0.3, animations: {
+                    self.loadingIndicator.alpha = 0
+                }) {
+                    _ in
+                    for (index, icon) in self.icons.enumerated() {
+                        delay(seconds: Double(index) * 0.1) {
+                            UIView.animate(withDuration: 0.6) {
+                                icon.alpha = 1
+                            }
+                        }
+                    }
+                    self.loadingIndicator.removeFromSuperview()
+                    UIView.animate(withDuration: 0.3, animations: {
+                        self.tableVC.view.alpha = 1
+                        self.newIcon.state = .enabled
+                        self.setTitle("Новые")
+                    }) {
+                        _ in
+                        self.lostConnectionView = nil
+                        if let btn = self.navigationItem.rightBarButtonItem as? UIBarButtonItem {
+                            let v = PlusIcon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
+                            let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleAddTap))
+                            v.addGestureRecognizer(tap)
+                            btn.customView = v
+                            let scaleAnim       = CASpringAnimation(keyPath: "transform.scale")//CABasicAnimation(keyPath: "transform.scale")
+                            let fadeAnim        = CABasicAnimation(keyPath: "opacity")
+                            let groupAnim       = CAAnimationGroup()
+                            
+                            scaleAnim.fromValue = 0.7
+                            scaleAnim.toValue   = 1.0
+                            scaleAnim.damping   = 10
+                            scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+                            fadeAnim.fromValue  = 0
+                            fadeAnim.toValue    = 1
+                            
+                            groupAnim.animations        = [scaleAnim, fadeAnim]
+                            groupAnim.duration          = 0.3
+                            groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+                            btn.customView?.layer.add(groupAnim, forKey: nil)
+
+                            self.navigationController?.navigationBar.setNeedsLayout()
+
+                        }
+                    }
                 }
-                title = "Новые"
-//                navigationController?.setNavigationBarHidden(false, animated: true)
             }
         }
     }
-    
-    @IBOutlet weak var iconsHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var newIcon: NewIcon!
-    @IBOutlet weak var hotIcon: FlameIcon!
-    @IBOutlet weak var categoryIcon: CategoryIcon!
+    private var loadingIndicator: LoadingIndicator!
+    @IBOutlet weak var newIcon: NewIcon! {
+        didSet {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleTap(gesture:)))
+            newIcon.addGestureRecognizer(tap)
+        }
+    }
+    @IBOutlet weak var hotIcon: FlameIcon! {
+        didSet {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleTap(gesture:)))
+            hotIcon.addGestureRecognizer(tap)
+        }
+    }
+    @IBOutlet weak var categoryIcon: CategoryIcon! {
+        didSet {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleTap(gesture:)))
+            categoryIcon.addGestureRecognizer(tap)
+        }
+    }
     fileprivate var icons: [Icon] = []
     @IBOutlet weak var container: UIView!
     @IBOutlet weak var addButton: UIBarButtonItem!
@@ -98,73 +141,59 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        print("viewDidAppear")
-        
         super.viewDidAppear(animated)
-        if startingPoint == .zero {
-            if let rbtn = navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
+        if startingPoint == .zero, let rbtn = navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
                 startingPoint = rbtn.convert(rbtn.center, to: tabBarController?.view)
-            }
         }
         if isDataLoaded {
             tabBarController?.setTabBarVisible(visible: true, animated: true)
         }
-//        navigationController?.setNavigationBarHidden(false, animated: true)
+        UIView.animate(withDuration: 0.2) {
+            self.navigationItem.titleView?.alpha = 1
+        }
     }
-
     
-    override func viewWillAppear(_ animated: Bool) {
-//        tabBarController!.setTabBarVisible(visible: true, duration: 0, animated: false)
-//        navigationController?.setNavigationBarHidden(true, animated: false)
-//        if isDataLoaded {
-//            tabBarController?.setTabBarVisible(visible: true, animated: true)
-//        }
+    override func viewDidLayoutSubviews() {
+        if !isViewSetupCompleted {
+            loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: container.frame.width, height: container.frame.height)))
+            loadingIndicator.alpha = 0
+            loadingIndicator.layoutCentered(in: container, multiplier: 0.6)//addEquallyTo(to: tableView)
+            isViewSetupCompleted = true
+            delay(seconds: 0.5) {
+                UIView.animate(withDuration: 0.5, animations: {
+                    self.loadingIndicator.alpha = 1
+                }) {
+                    _ in
+                    self.loadingIndicator.addEnableAnimation()
+                }
+            }
+        }
     }
-//
+    
     private func setupViews() {
-        title = "Соединение"
-        tabBarController?.tabBar.items?[0].title = "Лента"
-//        let btn = AddButton(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
-//        btn.layer.isOpaque = true
-//        btn.backgroundColor = .clear
-//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: btn)
+        let titleView = UIAnimatedTitleView(frame: CGRect(x: 0, y: 0, width: 200, height: 40), title: "Соединение")
+        self.navigationItem.titleView = titleView
+        self.navigationItem.titleView?.alpha = 0
+        setTitle("Соединение")
+        self.tabBarController?.tabBar.items?[0].title = "Лента"
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+        self.navigationController?.navigationBar.shadowImage     = UIImage()
         DispatchQueue.main.async {
-            self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
-            self.navigationController?.navigationBar.shadowImage     = UIImage()
             self.navigationController?.navigationBar.isTranslucent   = false
             self.navigationController?.isNavigationBarHidden         = false
             self.navigationController?.navigationBar.barTintColor    = .white
             self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
             self.icons = [self.newIcon, self.hotIcon, self.categoryIcon]
-            for icon in self.icons {
-                let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleTap(gesture:)))
-                icon.addGestureRecognizer(tap)
-            }
-            self.addButton.isEnabled = false
+            self.addButton.isEnabled = true
         }
         DispatchQueue.main.async {
             self.addChild(self.tableVC)
+            self.tableVC.view.alpha = 0
             self.tableVC.view.frame = CGRect(x: 0, y: 0, width: self.container.frame.width, height: self.container.frame.height)
             self.tableVC.view.addEquallyTo(to: self.container)
             self.tableVC.didMove(toParent: self)
         }
-        DispatchQueue.main.async {
-//            if let rbtn = self.navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
-//                self.triggerView = rbtn
-//            }
-        }
-//        DispatchQueue.main.async {
-//            self.newSurveyVC
-//        }
     }
-    
-//    override func viewDidAppear(_ animated: Bool) {
-//        if let rbtn = self.navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
-//            self.triggerView = rbtn
-//        }
-//    }
-    
-    
     
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -198,19 +227,63 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         }
     }
     
-    func animateNew() {
-        newIcon.state = .enabled
+    @objc private func handleAddTap() {
+        performSegue(withIdentifier: kSegueAppFeedToNewSurvey, sender: self)
     }
     
-//    private func initializeNewSurveyVC() -> NewSurveyViewController {
-//            let vc = NewSurveyViewController()
-//            vc.transitioningDelegate     = self
-//            vc.modalPresentationStyle    = .custom
-//            vc.view.frame                = tabBarController!.view.frame
-//            vc.view.backgroundColor      = .white
-//            vc.parentVC                  = self
-//            return vc
-//    }
+    fileprivate func setTitle(_ _title: String) {
+        guard let titleView = navigationItem.titleView as? UIAnimatedTitleView else { return }
+
+        let fadeTextAnimation = CATransition()
+        fadeTextAnimation.duration = 0.1
+        fadeTextAnimation.type = .fade
+
+        titleView.layer.add(fadeTextAnimation, forKey: "pushText")
+        titleView.text = _title
+//                let fadeTextAnimation = CATransition()
+//        fadeTextAnimation.duration = 0.1
+//        fadeTextAnimation.type = .fade
+//
+//        navigationController?.navigationBar.layer.add(fadeTextAnimation, forKey: nil)
+//        navigationItem.title = _title
+    }
+    
+    func presentLostConnectionView() {
+        if lostConnectionView == nil {
+            self.lostConnectionView = LostConnectionView(frame: CGRect(origin: .zero, size: CGSize(width: self.container.frame.width, height: self.container.frame.height)))
+            self.lostConnectionView!.delegate = self
+            self.lostConnectionView!.alpha = 0
+            self.lostConnectionView!.layoutCentered(in: self.container, multiplier: 0.65)
+        }
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loadingIndicator.alpha = 0
+        }) {
+            _ in
+            self.setTitle("Ошибка соединения")
+            self.lostConnectionView!.retryButton.layer.cornerRadius = self.lostConnectionView!.retryButton.frame.height / 2
+            self.lostConnectionView?.animationView.addEnableAnimation()
+            UIView.animate(withDuration: 0.3) {
+                self.lostConnectionView?.alpha = 1
+            }
+        }
+    }
+}
+
+extension SurveysViewController: CellButtonDelegate {
+    func cellSubviewTapped(_ sender: AnyObject) {
+        if sender is LostConnectionView {
+            tableVC.loadData()
+            UIView.animate(withDuration: 0.3, animations: {
+                self.lostConnectionView?.alpha = 0
+            }) {
+                _ in
+                UIView.animate(withDuration: 0.3) {
+                self.setTitle("Соединение")
+                self.loadingIndicator.alpha = 1
+                }
+            }
+        }
+    }
 }
 
 //extension TopSurveysViewController: UIViewControllerTransitioningDelegate {
@@ -242,3 +315,33 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
 //
 //        }
 //}
+
+class UIAnimatedTitleView: UIView {
+    private var label = UILabel()
+    
+    var text: String = "" {
+        didSet {
+            label.text = text
+            label.textColor = UIColor.black
+            label.textAlignment = .center
+            label.font = UIFont(name: "OpenSans-Bold", size: 19)
+            setNeedsLayout()
+        }
+    }
+    
+    // MARK: Initializers
+    init(frame: CGRect, title: String) {
+        super.init(frame: frame)
+        
+        label.frame = self.frame
+        text = title
+        addSubview(label)
+        clipsToBounds = true
+        isUserInteractionEnabled = false
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+}

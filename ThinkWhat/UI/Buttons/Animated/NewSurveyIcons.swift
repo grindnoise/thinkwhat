@@ -661,3 +661,9 @@ class CameraIcon: StateButton, CAAnimationDelegate {
     
     
 }
+
+class PlusIconPassThrough: PlusIcon {
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return false
+    }
+}

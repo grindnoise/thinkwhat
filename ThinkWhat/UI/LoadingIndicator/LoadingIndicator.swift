@@ -105,7 +105,7 @@ class LoadingIndicator: UIView, CAAnimationDelegate {
     
     //MARK: - Animation Setup
     
-    func addUntitled1Animation(){
+    func addEnableAnimation(){
         let fillMode : String = CAMediaTimingFillMode.forwards.rawValue
         
         ////An infinity animation

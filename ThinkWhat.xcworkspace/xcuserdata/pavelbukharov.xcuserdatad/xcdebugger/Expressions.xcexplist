@@ -11,6 +11,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "SurveysViewController.createAddButton():SurveysViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "navigationItem.rightBarButtonItem!.customView!">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.cellSubviewTapped(_:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -117,6 +125,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #2 in closure #3 in SurveysViewController.isDataLoaded.didset:SurveysViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "btn.width">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "AppData.System.session.getter:Main.swift">
          <PersistentStrings>
             <PersistentString
@@ -134,10 +150,10 @@
          contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "segue.destination as? AnonymitySettingsTableViewController">
+               value = "anonymity">
             </PersistentString>
             <PersistentString
-               value = "anonymity">
+               value = "segue.destination as? AnonymitySettingsTableViewController">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -435,6 +451,17 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "SurveysViewController.viewDidLayoutSubviews():SurveysViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "navigationItem.rightBarButtonItem?.customView!.frame">
+            </PersistentString>
+            <PersistentString
+               value = "navigationItem.rightBarButtonItem!.customView!.convert(navigationItem.rightBarButtonItem!.customView!.center, to: tabBarController?.view)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.viewDidLoad():NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -571,10 +598,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -582,19 +609,19 @@
          contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "_cell.pictureView.frame">
+               value = " _cell.textView.text!">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
             </PersistentString>
             <PersistentString
                value = "indexPath.row">
             </PersistentString>
             <PersistentString
-               value = " _cell.textView.text!">
+               value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -893,9 +920,6 @@
          contextName = "SurveyViewController.tableView(_:cellForRowAt:):SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "survey!.imagesURLs">
-            </PersistentString>
-            <PersistentString
                value = "_cell.contentView.alpha">
             </PersistentString>
             <PersistentString
@@ -906,6 +930,9 @@
             </PersistentString>
             <PersistentString
                value = "_cell.slides">
+            </PersistentString>
+            <PersistentString
+               value = "survey!.result!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -999,10 +1026,10 @@
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = " currentTV != nil">
+               value = "currentOffsetY">
             </PersistentString>
             <PersistentString
-               value = "currentOffsetY">
+               value = " currentTV != nil">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1076,6 +1103,17 @@
          <PersistentStrings>
             <PersistentString
                value = "self.survey!.answers">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "AddBarButton.commonInit():AddBarButton.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "content">
+            </PersistentString>
+            <PersistentString
+               value = "content.frame">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1186,7 +1224,7 @@
          contextName = "closure #2 in SurveyViewController.tableView(_:cellForRowAt:):SurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "imageURL">
+               value = "survey!.imagesURLs!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

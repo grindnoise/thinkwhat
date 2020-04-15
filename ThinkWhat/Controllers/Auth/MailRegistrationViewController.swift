@@ -39,7 +39,7 @@ class MailRegistrationViewController: UIViewController {
                     self.loadingView.alpha = alpha
                 }) { completed in
                     if self.isLoadingViewVisible {
-                        self.loadingIndicator.addUntitled1Animation()
+                        self.loadingIndicator.addEnableAnimation()
                     } else {
                         self.loadingIndicator.removeAllAnimations()
                     }

@@ -34,7 +34,13 @@ class TextEditingView: UIView, CAAnimationDelegate {
     }
 //    fileprivate var _stringVariablePointer: AnyObject?//UnsafeMutablePointer<String>?
     var delegate: NewSurveyViewController?
-    fileprivate var textView: UITextView?
+    fileprivate var charactersLimit = 0
+    fileprivate var textView: UITextView? {
+        didSet {
+            text.text = textView!.text
+        }
+    }
+    fileprivate var title = ""
     fileprivate var placeholder = ""
     fileprivate var firstAppearance = true
     fileprivate var closure: ((String) -> ())?
@@ -83,13 +89,18 @@ class TextEditingView: UIView, CAAnimationDelegate {
         self.addSubview(content)
     }
 
-    public func present(title: String, textView _textView: UITextView?, placeholder _placeholder: String, closure _closure: @escaping(String) -> ()/*, stringVariablePointer: AnyObjectUnsafeMutablePointer<String>?*/) {
-        if _textView != nil {
-            text.text = _textView!.text
-            textView = _textView
-        }
+    public func present(title _title: String, textView _textView: UITextView, placeholder _placeholder: String, closure _closure: @escaping(String) -> (), charactersLimit _charactersLimit: Int) {
+//        if _textView != nil {
+//            text.text = _textView!.text
+//            textView = _textView
+//        }
+        charactersLimit = _charactersLimit
+        title = _title
+        textView = _textView
         text.delegate = self
-        label.text = title
+        text.delegate = self
+//        label.text = title
+//        title = _title
         closure = _closure
         placeholder = _placeholder
         firstAppearance = true
@@ -229,5 +240,9 @@ extension TextEditingView: UITextViewDelegate {
                 textView.textAlignment = .center
             }
         }
+    }
+    
+    fileprivate func setTitle() {
+        
     }
 }

@@ -173,7 +173,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
 //            }
             isInitialLoading = true
             loadingIndicator.alpha = 1
-            loadingIndicator.addUntitled1Animation()
+            loadingIndicator.addEnableAnimation()
             loadData()
         }
     }
@@ -244,7 +244,9 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 //?????
 //                if isInitialLoading {
                 if survey != nil, survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty, (survey!.images == nil), isLoadingImages {
+                    self.isLoadingImages = false
                     for (i, imageURL) in survey!.imagesURLs!.enumerated() {
+                        print("***************DOWNLOADING***************")
                         apiManager.downloadImage(url: imageURL.keys.first!, percentageClosure: {
                             percent in
                             _cell.slides[i].imageView.progressIndicatorView.progress = percent
@@ -262,7 +264,6 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                                 _cell.slides[i].imageView.image = image
                                 _cell.slides[i].imageView.progressIndicatorView.reveal()
                             }
-                            self.isLoadingImages = false
                         }
                     }
                 } else if survey!.images != nil, !survey!.images!.isEmpty {
@@ -382,14 +383,14 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-            let animation = AnimationFactory.makeFadeAnimation(duration: 0.25, delayFactor: 0.015)//AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
+            let animation = AnimationFactory.makeFadeAnimation(duration: 0.18, delayFactor: 0.015)//AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
             let animator = Animator(animation: animation)
             animator.animate(cell: cell, at: indexPath, in: tableView)
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
             view.alpha = 0
-            UIView.animate(withDuration: 0.25) {
+            UIView.animate(withDuration: 0.18) {
                 view.alpha = 1
             }
     }
@@ -473,6 +474,7 @@ extension SurveyViewController {
                 }) { _ in self.loadingIndicator.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
             }
             if json != nil {
+                self.voteCompletionView?.present()
                 print(json!)
                 //Update answer votes count, survey total votes, user's survey result & add to completed
                 if let response = json!.arrayValue as? [JSON] {
@@ -489,6 +491,9 @@ extension SurveyViewController {
                             if !Surveys.shared.completedSurveyIDs.contains(self.survey!.ID!) {
                                 Surveys.shared.completedSurveyIDs.append(self.survey!.ID!)
                             }
+                            //Increase user's balance
+                            //TODO Detect, whether it's an ordinary survey
+                            AppData.shared.userProfile.balance += SurveyPoints.Vote.rawValue
                         }
                     }
                 }
@@ -571,8 +576,7 @@ extension SurveyViewController: CellButtonDelegate {
                 present(vc, animated: true)
             }
         } else if sender is SurveyVoteCell {
-            voteCompletionView?.present()
-//            postResult()
+            postResult()
         } else if sender is SurveyImageCell {
             tableView.scrollToRow(at: IndexPath(row: 4, section: 0), at: .top, animated: true)
         } else if sender is SurveyYoutubeCell {

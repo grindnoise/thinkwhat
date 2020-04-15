@@ -347,7 +347,7 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         case .Loading:
             loadingIndicator.layer.transform = CATransform3DMakeScale(1, 1, 1)
             loadingIndicator.alpha = 0
-            loadingIndicator.addUntitled1Animation()
+            loadingIndicator.addEnableAnimation()
             delay(seconds: 0.3, completion: {
                 UIView.animate(withDuration: 0.2, animations: {
                     self.loadingIndicator.alpha = 1

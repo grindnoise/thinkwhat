@@ -56,7 +56,7 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
         self.navigationItem.setHidesBackButton(isBackButtonHidden, animated: false)
         webView.delegate                                                = self
 //        performURLRequest()
-        spinner.addUntitled1Animation()
+        spinner.addEnableAnimation()
     }
     
     private func setupViews() {

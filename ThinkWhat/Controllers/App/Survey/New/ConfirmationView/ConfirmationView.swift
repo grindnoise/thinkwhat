@@ -25,7 +25,7 @@ class ConfirmationView: UIView {
     
     @IBAction func createTapped(_ sender: Any) {
         UIView.animate(withDuration: 0.2) {
-            self.loadingIdicator.addUntitled1Animation()
+            self.loadingIdicator.addEnableAnimation()
             self.loadingView.alpha = 1
             self.buttonsView.alpha = 0
             self.title.alpha = 0

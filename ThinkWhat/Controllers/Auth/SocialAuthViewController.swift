@@ -33,7 +33,7 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        spinner.addUntitled1Animation()
+        spinner.addEnableAnimation()
 //        if authVariant == .Instagram {
 //            navTitle                                            = InstagramLogo(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 30, height: 30)))
 //            navTitle.isOpaque                                   = false

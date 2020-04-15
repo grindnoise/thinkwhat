@@ -185,12 +185,25 @@ extension String {
         return URL(fileURLWithPath: self).pathExtension
     }
     
-        var trimmingTrailingSpaces: String {
-            if let range = rangeOfCharacter(from: .whitespacesAndNewlines, options: [.anchored, .backwards]) {
-                return String(self[..<range.lowerBound]).trimmingTrailingSpaces
-            }
-            return self
+    var trimmingTrailingSpaces: String {
+        if let range = rangeOfCharacter(from: .whitespacesAndNewlines, options: [.anchored, .backwards]) {
+            return String(self[..<range.lowerBound]).trimmingTrailingSpaces
         }
+        return self
+    }
+    
+    var youtubeID: String? {
+        let pattern = "((?<=(v|V)/)|(?<=be/)|(?<=(\\?|\\&)v=)|(?<=embed/))([\\w-]++)"
+        
+        let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        let range = NSRange(location: 0, length: count)
+        
+        guard let result = regex?.firstMatch(in: self, range: range) else {
+            return nil
+        }
+        
+        return (self as NSString).substring(with: result.range)
+    }
 }
 
 extension CLLocationCoordinate2D: Hashable {
