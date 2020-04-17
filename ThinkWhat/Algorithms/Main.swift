@@ -637,6 +637,11 @@ struct DjangoVariables {
         static let startDate                = "start_date"
         static let endDate                  = "end_date"
     }
+    struct FieldRestrictions {
+        static let surveyTitleLength        = 30
+        static let surveyQuestionLength     = 10000
+        static let surveyAnswerLength       = 100
+    }
 }
 
 

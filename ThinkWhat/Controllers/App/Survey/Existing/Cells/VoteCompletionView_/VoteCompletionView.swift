@@ -110,17 +110,17 @@ class VoteCompletionView: UIView {
         frameView.layer.transform = CATransform3DMakeScale(0.7, 0.7, 1)
         delay(seconds: 0.2) {
             self.delegate?.statusBarHidden = false
-        UIView.animate(withDuration: 0.4, delay: 0, options: [.curveEaseOut], animations: {
-            self.lightBlurView.alpha = 0
-            self.contentView.alpha = 0
-//            delay(seconds: 0.2) {
-//                self.delegate?.statusBarHidden = false
-//            }
-        }, completion: {
-            _ in
-            self.voteAnimation.removeAllAnimations()
-            self.removeFromSuperview()
-        })
+            UIView.animate(withDuration: 0.4, delay: 0, options: [.curveEaseOut], animations: {
+                self.lightBlurView.alpha = 0
+                self.contentView.alpha = 0
+                //            delay(seconds: 0.2) {
+                //                self.delegate?.statusBarHidden = false
+                //            }
+            }, completion: {
+                _ in
+                self.voteAnimation.removeAllAnimations()
+                self.removeFromSuperview()
+            })
         }
     }
 

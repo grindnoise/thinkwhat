@@ -24,20 +24,20 @@ class TopSurveysTableViewController: UITableViewController {
         }
     }
     public var needsAnimation = true
-    private var vc: SurveysViewController!
+    fileprivate var vc: SurveysViewController!
 //    private var isViewSetupCompleted = false
 //    private var loadingIndicator: LoadingIndicator!
-    private var isInitialLoad = true {
+    fileprivate var isInitialLoad = true {
         didSet {
             if !isInitialLoad {
                 vc.addButton.isEnabled = true
             }
         }
     }
-    private var semiboldAttrs       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Semibold", size: 12),
+    fileprivate var semiboldAttrs       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Semibold", size: 12),
                                        NSAttributedString.Key.foregroundColor: K_COLOR_RED,
                                        NSAttributedString.Key.backgroundColor: UIColor.clear]
-//    private var lastContentOffset: CGFloat = 0
+    fileprivate var lastContentOffset: CGFloat = 0
     
     class var surveyNib: UINib {
         return UINib(nibName: "SurveyTableViewCell", bundle: nil)
@@ -325,15 +325,15 @@ extension TopSurveysTableViewController: ServerProtocol {
         }
     }
     
-//    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//        self.lastContentOffset = scrollView.contentOffset.y
-//    }
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.lastContentOffset = scrollView.contentOffset.y
+    }
 //
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        if (self.lastContentOffset < scrollView.contentOffset.y) {
-        if scrollView.contentOffset.y > 80 {
+        if self.lastContentOffset < scrollView.contentOffset.y {
+//        if scrollView.contentOffset.y > 0 {
             vc.navigationController?.setNavigationBarHidden(true, animated: true)
-        } else if (scrollView.contentOffset.y < -80 ) {
+        } else /*if (scrollView.contentOffset.y < 0 )*/ {
             vc.navigationController?.setNavigationBarHidden(false, animated: true)
         }
     }

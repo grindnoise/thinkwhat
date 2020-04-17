@@ -339,11 +339,11 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                     }
                 }
                 _cell.categoryTitle.text = category?.title ?? "Выбрать"
-                if isCreateTapped, category == nil {
-                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                } else {
-                    _cell.backgroundColor = .white
-                }
+//                if isCreateTapped, category == nil {
+//                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                } else {
+//                    _cell.backgroundColor = .white
+//                }
                 _cell.separatorInset = UIEdgeInsets(top: 0, left: leftEdgeInset, bottom: 0, right: 0)//.greatestFiniteMagnitude)
                 cell = _cell
             } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "privacy", for: indexPath) as? PrivacySelectionCell {
@@ -354,11 +354,11 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                 cell = _cell
             } else if indexPath.row == 3, let _cell = tableView.dequeueReusableCell(withIdentifier: "votes", for: indexPath) as? VotesSelectionCell {
                 _cell.count.delegate = self
-                if isCreateTapped, votesCapacity == 0 {
-                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                } else {
-                    _cell.backgroundColor = .white
-                }
+//                if isCreateTapped, votesCapacity == 0 {
+//                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                } else {
+//                    _cell.backgroundColor = .white
+//                }
                 addTextField(_cell.count)
                 cell = _cell
                 cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
@@ -367,21 +367,21 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             if indexPath.row == 0, let _cell = tableView.dequeueReusableCell(withIdentifier: "questionTitle", for: indexPath) as? QuestionTitleCreationCell {
                 //                _cell.textView.delegate = self
                 //                addTextView(_cell.textView)
-                if isCreateTapped, questionTitle.isEmpty {
-                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                } else {
-                    _cell.backgroundColor = .white
-                }
+//                if isCreateTapped, questionTitle.isEmpty {
+//                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                } else {
+//                    _cell.backgroundColor = .white
+//                }
                 cell = _cell
                 cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
             } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "question", for: indexPath) as? QuestionCreationCell {
 //                _cell.textView.delegate = self
 //                addTextView(_cell.textView)
-                if isCreateTapped, question.isEmpty {
-                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                } else {
-                    _cell.backgroundColor = .white
-                }
+//                if isCreateTapped, question.isEmpty {
+//                    _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                } else {
+//                    _cell.backgroundColor = .white
+//                }
                 cell = _cell
                 cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width/9, bottom: 0, right: cell.frame.width/9)
             } else if indexPath.row == 2, let _cell = tableView.dequeueReusableCell(withIdentifier: "link", for: indexPath) as? LinkAttachmentCell {
@@ -440,9 +440,9 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
                 } else {
                     _cell.textView.text = _cell.placeholder
                     _cell.textView.textAlignment = .center
-                    if isCreateTapped {
-                        _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                    }
+//                    if isCreateTapped {
+//                        _cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                    }
                 }
             }
             cell = _cell
@@ -652,7 +652,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             }
         } else if indexPath.section == 1 {
             if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionTitleCreationCell {
-                textEditingView?.present(title: "Титул", textView: cell.textView, placeholder: cell.placeholder) {
+                textEditingView?.present(title: "Титул", textView: cell.textView, placeholder: cell.placeholder, charactersLimit: DjangoVariables.FieldRestrictions.surveyTitleLength) {
                     text in
 //                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
 //                    self.tableView.deselectRow(at: indexPath, animated: true)
@@ -661,7 +661,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
 //                self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
 //                self.tableView.deselectRow(at: indexPath, animated: true)
             } else if indexPath.row == 1, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
-                textEditingView?.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder) {
+                textEditingView?.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder, charactersLimit: DjangoVariables.FieldRestrictions.surveyQuestionLength) {
                     text in
 //                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
 //                    self.tableView.deselectRow(at: indexPath, animated: true)
@@ -672,7 +672,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             }
         } else if indexPath.section == 5 {
             if let cell = tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
-                textEditingView?.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder)
+                textEditingView?.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder, charactersLimit: DjangoVariables.FieldRestrictions.surveyAnswerLength)
                 {
                     text in
 //                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
@@ -1040,38 +1040,38 @@ extension NewSurveyViewController {
         //1. Category
         if category == nil {
             errors.append("категория")
-            if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) {
-                UIView.animate(withDuration: 0.2) {
-                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                }
-            }
+//            if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) {
+//                UIView.animate(withDuration: 0.2) {
+//                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                }
+//            }
         }
         //2. Votes capacity
         if votesCapacity == 0 {
             errors.append("количество мнений")
-            if let cell = tableView.cellForRow(at: IndexPath(row: 3, section: 0)) {
-                UIView.animate(withDuration: 0.2) {
-                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                }
-            }
+//            if let cell = tableView.cellForRow(at: IndexPath(row: 3, section: 0)) {
+//                UIView.animate(withDuration: 0.2) {
+//                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                }
+//            }
         }
         //3. Question title
         if questionTitle.isEmpty {
             errors.append("название опроса")
-            if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) {
-                UIView.animate(withDuration: 0.2) {
-                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                }
-            }
+//            if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 1)) {
+//                UIView.animate(withDuration: 0.2) {
+//                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                }
+//            }
         }
         //4. Question
         if question.isEmpty {
             errors.append("текст опроса")
-            if let cell = tableView.cellForRow(at: IndexPath(row: 1, section: 1)) {
-                UIView.animate(withDuration: 0.2) {
-                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                }
-            }
+//            if let cell = tableView.cellForRow(at: IndexPath(row: 1, section: 1)) {
+//                UIView.animate(withDuration: 0.2) {
+//                    cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                }
+//            }
         }
         //5. Answers
         if answers.isEmpty {
@@ -1082,11 +1082,11 @@ extension NewSurveyViewController {
             for (index, answer) in answers.enumerated() {
                 if answer.isEmpty {
                     errors.append("ответ #\(index)")
-                    if let cell = tableView.cellForRow(at: IndexPath(row: index, section: 5)) {
-                        UIView.animate(withDuration: 0.2) {
-                            cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
-                        }
-                    }
+//                    if let cell = tableView.cellForRow(at: IndexPath(row: index, section: 5)) {
+//                        UIView.animate(withDuration: 0.2) {
+//                            cell.backgroundColor = UIColor.red.withAlphaComponent(0.05)
+//                        }
+//                    }
                 }
             }
         }

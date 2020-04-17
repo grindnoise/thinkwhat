@@ -67,12 +67,24 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         didSet {
             if oldValue != selectedAnswerID {
                 //UI update
-                if tableView.numberOfRows(inSection: 2) == 0 {
-                    tableView.insertRows(at: [IndexPath(row: 0, section: 2)], with: .bottom)
+//                if tableView.numberOfRows(inSection: 2) == 0 {
+                //                    tableView.insertRows(at: [IndexPath(row: 0, section: 2)], with: .fade)
+                //                }
+                //                tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .none)
+//                tableView.beginUpdates()
+                if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) {
+                    UIView.animate(withDuration: 0.3) {
+                        cell.contentView.alpha = 1
+                    }
                 }
-                delay(seconds: 0.15) {
-                    self.tableView.scrollToBottom()
-                }
+//                                delay(seconds: 0.15) {
+                                    self.tableView.scrollToBottom()
+//                                }
+//                self.tableView.scrollToBottom()
+//                tableView.endUpdates()
+//                delay(seconds: 1.15) {
+//                    self.tableView.scrollToBottom()
+//                }
                 for cell in answersCells {
                     if cell.answer!.ID != selectedAnswerID {
                         cell.isChecked = false
@@ -201,11 +213,12 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         } else if section == 1, survey != nil {//ОТВЕТЫ
             return survey!.answers.count
         } else if section == 2 {//ПОСЛЕДНЯЯ СЕКЦИЯ
-            if isReadOnly {
-                return 1
-            } else if selectedAnswerID != 0 {
-                return 1
-            }
+//            if isReadOnly {
+//                return 1
+//            } else if selectedAnswerID != 0 {
+//                return 1
+//            }
+            return 1
         }
         return 0
     }
@@ -308,6 +321,11 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             } else if let _cell = tableView.dequeueReusableCell(withIdentifier: "vote", for: indexPath) as? SurveyVoteCell {
                 _cell.delegate = self
                 cell = _cell
+                if selectedAnswerID != 0 {
+                    cell.contentView.alpha = 1
+                } else {
+                    cell.contentView.alpha = 0
+                }
             }
         }
         return cell
@@ -341,6 +359,11 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             } else {
                 return 100
             }
+//            } else if selectedAnswerID != 0 {
+//                return 100
+//            } else if selectedAnswerID == 0 {
+//                return 0
+//            }
         }
         return UITableView.automaticDimension
     }
