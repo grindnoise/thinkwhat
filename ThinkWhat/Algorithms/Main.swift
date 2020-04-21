@@ -207,14 +207,21 @@ let kSegueProfileFromAuth                        = "PROFILE_FROM_AUTH"
 let kSegueAppProfileSettingsSelection            = "PROFILE_SETINGS_SELECTION"
 let kSegueAppLogout                              = "BACK_TO_AUTH"
 let kSegueAppProfileToInfo                       = "INFO"
-let kSegueAppFeedToSurvey                        = "TOP_TO_SURVEY"
+let kSegueAppFeedToSurvey                        = "FEED_TO_SURVEY"
 let kSegueAppFeedToNewSurvey                     = "FEED_TO_NEW_SURVEY"
+let kSegueAppFeedSurveysToCategory               = "FEED_TO_CATEGORY"
 let kSegueAppUserSurveysToSurvey                 = "USER_SURVEYS_TO_SURVEY"
-let kSegueAppTopSurveysToCategory                = "TOP_TO_CATEGORY"
 let kSegueAppNewSurveyToAnonymity                = "NEW_TO_ANONYMITY"
 let kSegueAppNewSurveyToCategorySelection        = "NEW_TO_CATEGORY_SELECTION"
 
 
+//MARK: Storyboards
+struct Storyboards {
+    static let controllers  = UIStoryboard(name: "Controllers", bundle: nil)
+    static let app          = UIStoryboard(name: "App", bundle: nil)
+    static let auth         = UIStoryboard(name: "Auth", bundle: nil)
+    static let root         = UIStoryboard(name: "Root", bundle: nil)
+}
 
 
 //let segueBarberData                             = "segueBarberData"
@@ -754,3 +761,7 @@ func loadImageFromPath(path: String) -> UIImage? {
 @objc protocol ApiReachability {
     @objc func handleReachabilitySignal()
 }
+
+let semiboldAttrs_red_12       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Semibold", size: 12),
+                                  NSAttributedString.Key.foregroundColor: K_COLOR_RED,
+                                  NSAttributedString.Key.backgroundColor: UIColor.clear]

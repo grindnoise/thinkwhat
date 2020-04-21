@@ -1,26 +1,18 @@
 //
-//  TestViewController.swift
+//  SurveyStackViewController.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 20.02.2020.
+//  Created by Pavel Bukharov on 21.04.2020.
 //  Copyright © 2020 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 
-class TestViewController: UIViewController {
+class SurveyStackViewController: UIViewController {
 
-    deinit {
-        print("")
-        print("TestViewController deinit \(self)")
-        print("")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("")
-        print("TestViewController init \(self)")
-        print("")
+
         // Do any additional setup after loading the view.
     }
     

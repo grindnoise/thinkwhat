@@ -39,7 +39,7 @@ class UserSurveysTableViewController: UITableViewController {
     }
     
     private func setupViews() {
-        tableView.register(TopSurveysTableViewController.surveyNib, forCellReuseIdentifier: "topSurveyCell")
+        tableView.register(SurveysTableViewController.surveyNib, forCellReuseIdentifier: "topSurveyCell")
         DispatchQueue.main.async {
             self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
             self.navigationController?.navigationBar.shadowImage     = UIImage()
