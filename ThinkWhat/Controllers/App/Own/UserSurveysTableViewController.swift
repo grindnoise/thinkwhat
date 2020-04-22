@@ -115,7 +115,7 @@ class UserSurveysTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        vc.performSegue(withIdentifier: kSegueAppUserSurveysToSurvey, sender: nil)
+        vc.performSegue(withIdentifier: Segues.App.UserSurveysToSurvey, sender: nil)
     }
 }
 

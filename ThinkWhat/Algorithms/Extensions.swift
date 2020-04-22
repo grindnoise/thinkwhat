@@ -241,9 +241,15 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    func toDateTimeStringWithoutSeconds() -> String {
+    func toDateTimeStringWithoutSecondsLiteral() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd MMMM, HH:mm"
+        return formatter.string(from: self)
+    }
+    
+    func toDateTimeStringWithoutSeconds() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
         return formatter.string(from: self)
     }
     

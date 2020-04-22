@@ -241,7 +241,7 @@ class SurveysTableViewController: UITableViewController {
 //        } else {
 //            vc.performSegue(withIdentifier: kSegueAppFeedToSurvey, sender: nil)
 //        }
-        delegate.performSegue(withIdentifier: kSegueAppFeedToSurvey, sender: nil)
+        delegate.performSegue(withIdentifier: Segues.App.FeedToSurvey, sender: nil)
     }
     
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {

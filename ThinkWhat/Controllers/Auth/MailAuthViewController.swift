@@ -195,9 +195,9 @@ class MailAuthViewController: UIViewController {
                     AppData.shared.importUserData(json!)
                     assert(AppData.shared.userProfile.isEmailVerified! != nil ||  AppData.shared.userProfile.isEdited! != nil, "MailAuthViewController.handleTokenState error (AppData.shared.userProfile.isEmailVerified == nil || AppData.shared.userProfile.isEdited == nil)")
                     if AppData.shared.userProfile.isEmailVerified! && AppData.shared.userProfile.isEdited! {
-                        self.performSegue(withIdentifier: kSegueAppFromMailSignin, sender: nil)
+                        self.performSegue(withIdentifier: Segues.Auth.AppFromMailSignin, sender: nil)
                     } else if AppData.shared.userProfile.isEmailVerified! && !AppData.shared.userProfile.isEdited! {
-                            self.performSegue(withIdentifier: kSegueProfileFromAuth, sender: nil)
+                            self.performSegue(withIdentifier: Segues.Auth.ProfileFromAuth, sender: nil)
                     } else {
                         self.apiManager.getEmailConfirmationCode() {
                             json, error in
@@ -207,7 +207,7 @@ class MailAuthViewController: UIViewController {
                             }
                             if json != nil {
                                 EmailResponse.shared.importJson(json!)
-                                self.performSegue(withIdentifier: kSegueMailValidationFromSignin, sender: nil)
+                                self.performSegue(withIdentifier: Segues.Auth.MailValidationFromSignin, sender: nil)
                             }
                         }
                     }

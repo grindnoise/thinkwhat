@@ -88,7 +88,7 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
                     userProfile["owner"] = owner
                 }
                 if userProfile.isEmpty {
-                    performSegue(withIdentifier: kSegueAppFromProfile, sender: nil)
+                    performSegue(withIdentifier: Segues.Auth.AppFromProfile, sender: nil)
                 } else {
                     showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
                     apiManager.updateUserProfile(data: userProfile) {
@@ -99,7 +99,7 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
                         if json != nil {
                             AppData.shared.importUserData(json!)
                             hideAlert()
-                            self.performSegue(withIdentifier: kSegueAppFromProfile, sender: nil)
+                            self.performSegue(withIdentifier: Segues.Auth.AppFromProfile, sender: nil)
                         }
                     }
                 }

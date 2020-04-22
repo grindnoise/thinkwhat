@@ -53,7 +53,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
                             if error != nil {
                                 self.simpleAlert(error!.localizedDescription)
                             } else {
-                                self.performSegue(withIdentifier: kSegueTermsFromValidation, sender: nil)
+                                self.performSegue(withIdentifier: Segues.Auth.TermsFromValidation, sender: nil)
                             }
                         }
                     } else {
@@ -152,7 +152,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == kSegueTermsFromValidation {
+        if segue.identifier == Segues.Auth.TermsFromValidation {
             if let destinationVC = segue.destination as? TermsOfUseViewController {
                 destinationVC.isBackButtonHidden    = true
                 destinationVC.isStackViewHidden     = false

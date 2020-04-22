@@ -150,10 +150,10 @@
          contextName = "NewSurveyViewController.prepare(for:sender:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "anonymity">
+               value = "segue.destination as? AnonymitySettingsTableViewController">
             </PersistentString>
             <PersistentString
-               value = "segue.destination as? AnonymitySettingsTableViewController">
+               value = "anonymity">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -446,7 +446,7 @@
          contextName = "Survey.init(_:):Survey.swift">
          <PersistentStrings>
             <PersistentString
-               value = "_answer[&quot;text&quot;].stringValue as? String">
+               value = "UserProfiles.shared.container">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -598,10 +598,10 @@
          contextName = "APIManager.parseDjangoError(_:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "attr.0">
+               value = "attr.1.stringValue">
             </PersistentString>
             <PersistentString
-               value = "attr.1.stringValue">
+               value = "attr.0">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -609,19 +609,19 @@
          contextName = "NewSurveyViewController.tableView(_:cellForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = " _cell.textView.text!">
+               value = "_cell.pictureView.frame">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.layer.cornerRadius">
+               value = "answers[indexPath.row] != _cell.placeholder">
             </PersistentString>
             <PersistentString
                value = "indexPath.row">
             </PersistentString>
             <PersistentString
-               value = "_cell.pictureView.frame">
+               value = " _cell.textView.text!">
             </PersistentString>
             <PersistentString
-               value = "answers[indexPath.row] != _cell.placeholder">
+               value = "_cell.pictureView.layer.cornerRadius">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1026,10 +1026,10 @@
          contextName = "NewSurveyViewController.currentOffsetY.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "currentOffsetY">
+               value = " currentTV != nil">
             </PersistentString>
             <PersistentString
-               value = " currentTV != nil">
+               value = "currentOffsetY">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1137,13 +1137,13 @@
          contextName = "FeedSurveysTableViewController.scrollViewDidScroll(_:):FeedSurveysTableViewController.swift">
          <PersistentStrings>
             <PersistentString
+               value = "lastContentOffset">
+            </PersistentString>
+            <PersistentString
                value = "lastContentOffset - scrollView.contentOffset.y">
             </PersistentString>
             <PersistentString
                value = "scrollView.contentOffset.y">
-            </PersistentString>
-            <PersistentString
-               value = "lastContentOffset">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

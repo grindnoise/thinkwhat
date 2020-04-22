@@ -103,7 +103,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     @objc private func showTermsOfUse(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended {
-            performSegue(withIdentifier: kSegueTerms, sender: nil)
+            performSegue(withIdentifier: Segues.Auth.Terms, sender: nil)
         }
     }
     
@@ -200,7 +200,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                     }
                 }
             case .Mail:
-                self.performSegue(withIdentifier: kSegueMailAuth, sender: nil)
+                self.performSegue(withIdentifier: Segues.Auth.MailAuth, sender: nil)
                 
                 
 //                DispatchQueue.main.async {
@@ -287,7 +287,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                                         }
                                                                         if json != nil {
                                                                             AppData.shared.importUserData(json!, imagePath)
-                                                                            self.performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
+                                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
                                                                         }
                                                                     }
                                                                 }
@@ -306,7 +306,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                 }
                                                 if json != nil {
                                                     AppData.shared.importUserData(json!)
-                                                    self.performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
+                                                    self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
                                                 }
                                             }
                                         }
@@ -355,7 +355,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                                         }
                                                                         if response != nil {
                                                                             AppData.shared.importUserData(response!, imagePath)
-                                                                            self.performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
+                                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
                                                                         }
                                                                     }
                                                                 }
@@ -370,7 +370,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                         }
                                                         if response != nil {
                                                             AppData.shared.importUserData(response!)
-                                                            self.performSegue(withIdentifier: kSegueTermsFromStartScreen, sender: nil)
+                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
                                                         }
                                                     }
                                                 }
@@ -398,7 +398,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
 //            isLoadingViewVisible = false
 //            showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
             hideAlert()
-            if segue.identifier == kSegueTermsFromStartScreen {
+            if segue.identifier == Segues.Auth.TermsFromStartScreen {
                 if let destinationVC = segue.destination as? TermsOfUseViewController {
                     destinationVC.isBackButtonHidden = false
                     destinationVC.isStackViewHidden  = false
@@ -407,7 +407,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                         destinationVC.isBackButtonHidden = true
                     }
                 }
-            } else if segue.identifier == kSegueTerms {
+            } else if segue.identifier == Segues.Auth.Terms {
                 if let destinationVC = segue.destination as? TermsOfUseViewController {
                     destinationVC.isBackButtonHidden = false
                     destinationVC.isStackViewHidden  = true

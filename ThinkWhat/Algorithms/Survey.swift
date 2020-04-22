@@ -284,6 +284,7 @@ class Survey {
     var totalVotes: Int = 0
     var watchers: Int = 0
     var result: [Int: Date]?
+    var userProfile: UserProfile?
     
     var hashValue: Int {
         return ObjectIdentifier(self).hashValue
@@ -333,6 +334,7 @@ class Survey {
             voteCapacity        = _voteCapacity
             isPrivate           = _isPrivate
             answersWithoutID    = _answers
+//            userProfile         = AppData.shared.userProfile
             
             //Optional fields
             if let _images                 = dict[DjangoVariables.Survey.images] as? [[UIImage: String]] {
@@ -366,7 +368,8 @@ class Survey {
             let _watchers               = json["watchers"].intValue as? Int,
             let _totalVotes             = json["total_votes"].intValue as? Int,
             let _result                 = json["result"].arrayValue as? [JSON],
-            let _balance                = json["balance"].intValue as? Int {
+            let _balance                = json["balance"].intValue as? Int,
+            let _userProfileDict        = json["userprofile"] as? JSON {
             ID = _ID
             title = _title
             startDate = _startDate
@@ -403,6 +406,11 @@ class Survey {
                         result = [_answerID: _timestamp]
                     }
                 }
+            }
+            if let _userProfile = UserProfile(_userProfileDict) {
+                //TODO find else add
+                UserProfiles.shared.append(_userProfile)
+                userProfile = _userProfile
             }
         } else {
             return nil

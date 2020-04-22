@@ -186,33 +186,67 @@ let kNotificationFavoriteSurveysUpdated         = Notification.Name("Notificatio
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
 
 //MARK: - Segues
-//MARK: Auth
-let kSegueApp                                    = "APP"
-let kSegueAppFromMailSignin                      = "APP_FROM_MAIL_SIGNIN"
-let kSegueAppFromTerms                           = "APP_FROM_TERMS"
-let kSegueAppFromProfile                         = "APP_FROM_PROFILE"
-let kSegueAuth                                   = "AUTH"
-let kSegueSocialAuth                             = "SOCIAL"
-let kSegueMailValidationFromSignup               = "MAIL_VALID_SIGNUP"
-let kSegueMailValidationFromSignin               = "MAIL_VALID_SIGNIN"
-let kSegueTerms                                  = "TERMS"
-let kSegueTermsFromValidation                    = "TERMS_VALID"
-let kSegueTermsFromStartScreen                   = "TERMS_START_SCREEN"
-let kSegueMailAuth                               = "MAILAUTH"
-let kSeguePwdRecovery                            = "PWD_RECOVERY"
-let kSegueProfileFromConfirmation                = "PROFILE_FROM_CONFIRMATION"
-let kSegueProfileFromAuth                        = "PROFILE_FROM_AUTH"
-
-//MARK: App
-let kSegueAppProfileSettingsSelection            = "PROFILE_SETINGS_SELECTION"
-let kSegueAppLogout                              = "BACK_TO_AUTH"
-let kSegueAppProfileToInfo                       = "INFO"
-let kSegueAppFeedToSurvey                        = "FEED_TO_SURVEY"
-let kSegueAppFeedToNewSurvey                     = "FEED_TO_NEW_SURVEY"
-let kSegueAppFeedSurveysToCategory               = "FEED_TO_CATEGORY"
-let kSegueAppUserSurveysToSurvey                 = "USER_SURVEYS_TO_SURVEY"
-let kSegueAppNewSurveyToAnonymity                = "NEW_TO_ANONYMITY"
-let kSegueAppNewSurveyToCategorySelection        = "NEW_TO_CATEGORY_SELECTION"
+struct Segues {
+    struct Launch {
+        static let App                      = "APP"
+        static let Auth                     = "AUTH"
+    }
+    
+    struct Auth {
+        static let AppFromMailSignin        = "APP_FROM_MAIL_SIGNIN"
+        static let AppFromTerms             = "APP_FROM_TERMS"
+        static let AppFromProfile           = "APP_FROM_PROFILE"
+        static let SocialAuth               = "SOCIAL"
+        static let MailValidationFromSignup = "MAIL_VALID_SIGNUP"
+        static let MailValidationFromSignin = "MAIL_VALID_SIGNIN"
+        static let Terms                    = "TERMS"
+        static let TermsFromValidation      = "TERMS_VALID"
+        static let TermsFromStartScreen     = "TERMS_START_SCREEN"
+        static let MailAuth                 = "MAILAUTH"
+        static let PasswordRecovery         = "PWD_RECOVERY"
+        static let ProfileFromConfirmation  = "PROFILE_FROM_CONFIRMATION"
+        static let ProfileFromAuth          = "PROFILE_FROM_AUTH"
+    }
+    
+    struct App {
+        static let ProfileSettingsSelection = "PROFILE_SETINGS_SELECTION"
+        static let Logout                   = "BACK_TO_AUTH"
+        static let ProfileToInfo            = "INFO"
+        static let FeedToSurvey             = "FEED_TO_SURVEY"
+        static let FeedToNewSurvey          = "FEED_TO_NEW_SURVEY"
+        static let FeedSurveysToCategory    = "FEED_TO_CATEGORY"
+        static let UserSurveysToSurvey      = "USER_SURVEYS_TO_SURVEY"
+        static let NewSurveyToAnonymity     = "NEW_TO_ANONYMITY"
+        static let NewSurveyToCategorySelection = "NEW_TO_CATEGORY_SELECTION"
+    }
+}
+////MARK: Auth
+//let kSegueApp                                    = "APP"
+//let kSegueAppFromMailSignin                      = "APP_FROM_MAIL_SIGNIN"
+//let kSegueAppFromTerms                           = "APP_FROM_TERMS"
+//let kSegueAppFromProfile                         = "APP_FROM_PROFILE"
+//let kSegueAuth                                   = "AUTH"
+//let kSegueSocialAuth                             = "SOCIAL"
+//let kSegueMailValidationFromSignup               = "MAIL_VALID_SIGNUP"
+//let kSegueMailValidationFromSignin               = "MAIL_VALID_SIGNIN"
+//let kSegueTerms                                  = "TERMS"
+//let kSegueTermsFromValidation                    = "TERMS_VALID"
+//let kSegueTermsFromStartScreen                   = "TERMS_START_SCREEN"
+//let kSegueMailAuth                               = "MAILAUTH"
+//let kSeguePwdRecovery                            = "PWD_RECOVERY"
+//let kSegueProfileFromConfirmation                = "PROFILE_FROM_CONFIRMATION"
+//let kSegueProfileFromAuth                        = "PROFILE_FROM_AUTH"
+//
+////MARK: App
+//let kSegueAppProfileSettingsSelection            = "PROFILE_SETINGS_SELECTION"
+//let kSegueAppLogout                              = "BACK_TO_AUTH"
+//let kSegueAppProfileToInfo                       = "INFO"
+//let kSegueAppFeedToSurvey                        = "FEED_TO_SURVEY"
+//let kSegueAppFeedToNewSurvey                     = "FEED_TO_NEW_SURVEY"
+//let kSegueAppFeedSurveysToCategory               = "FEED_TO_CATEGORY"
+//let kSegueAppUserSurveysToSurvey                 = "USER_SURVEYS_TO_SURVEY"
+//let kSegueAppNewSurveyToAnonymity                = "NEW_TO_ANONYMITY"
+//let kSegueAppNewSurveyToCategorySelection        = "NEW_TO_CATEGORY_SELECTION"
 
 
 //MARK: Storyboards

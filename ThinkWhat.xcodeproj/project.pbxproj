@@ -163,6 +163,8 @@
 		ABDA425923B3475400BAC3A5 /* AnswerCreationHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */; };
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
+		ABEDC4E32450168D00FA9128 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEDC4E22450168D00FA9128 /* UserProfile.swift */; };
+		ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEDC4E42450608700FA9128 /* SurveyInfoCell.swift */; };
 		ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1F19E22C253A6008913C3 /* FBManager.swift */; };
 		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
 		ABFE1411239109FA0026D27C /* NewSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */; };
@@ -351,6 +353,8 @@
 		ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCreationHeaderCell.swift; sourceTree = "<group>"; };
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
+		ABEDC4E22450168D00FA9128 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		ABEDC4E42450608700FA9128 /* SurveyInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyInfoCell.swift; sourceTree = "<group>"; };
 		ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhat.entitlements; sourceTree = "<group>"; };
 		ABF1F19E22C253A6008913C3 /* FBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FBManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysTableViewController.swift; sourceTree = "<group>"; };
@@ -549,6 +553,7 @@
 				ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */,
 				ABB46F362344B1F900AF212B /* Protocols.swift */,
 				AB2AA1B42359EA8A0086D16C /* Survey.swift */,
+				ABEDC4E22450168D00FA9128 /* UserProfile.swift */,
 			);
 			path = Algorithms;
 			sourceTree = "<group>";
@@ -712,6 +717,7 @@
 				ABB8B1902423D11600E8DFF3 /* Slide.swift */,
 				ABB8B1922423D13900E8DFF3 /* Slide.xib */,
 				AB19B6402432222300999917 /* SurveyResultCell.swift */,
+				ABEDC4E42450608700FA9128 /* SurveyInfoCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -1219,6 +1225,7 @@
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
 				AB7478C724290D8600317EB6 /* SurveyAnswerCell.swift in Sources */,
 				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
+				ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */,
 				AB2C03CE24407C5D001BFD75 /* LostConnectionAnimation.swift in Sources */,
 				ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */,
 				AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */,
@@ -1307,6 +1314,7 @@
 				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
 				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
+				ABEDC4E32450168D00FA9128 /* UserProfile.swift in Sources */,
 				AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */,
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
 				ABBA74002387E66F00540ECF /* CategoryIcon.swift in Sources */,

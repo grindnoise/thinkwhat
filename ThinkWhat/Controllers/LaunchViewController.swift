@@ -21,9 +21,9 @@ class LaunchViewController: UIViewController {
             self.logo.addUntitled1Animation() { (completed) in
                 //TODO: переделать на проверку наличия токена и его срока годности, обновить данные с сервера
                 if AppData.shared.system.session == .unauthorized {
-                    self.performSegue(withIdentifier: kSegueAuth, sender: nil)
+                    self.performSegue(withIdentifier: Segues.Launch.Auth, sender: nil)
                 } else {
-                    self.performSegue(withIdentifier: kSegueApp, sender: nil)
+                    self.performSegue(withIdentifier: Segues.Launch.App, sender: nil)
                 }
 //                self.performSegue(withIdentifier: kSegueApp, sender: nil)
             }

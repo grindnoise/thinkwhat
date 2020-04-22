@@ -54,9 +54,9 @@ class ProfileSettingsTableViewController: UITableViewController {
         if let cell = tableView.cellForRow(at: indexPath) {
             if let vc = (parent as? ProfileViewController) {
                 if cell.reuseIdentifier == "credit" {
-                    vc.performSegue(withIdentifier: kSegueAppProfileSettingsSelection, sender: nil)
+                    vc.performSegue(withIdentifier: Segues.App.ProfileSettingsSelection, sender: nil)
                 } else if cell.reuseIdentifier == "info" {
-                    vc.performSegue(withIdentifier: kSegueAppProfileToInfo, sender: nil)
+                    vc.performSegue(withIdentifier: Segues.App.ProfileToInfo, sender: nil)
                 }
             }
         }

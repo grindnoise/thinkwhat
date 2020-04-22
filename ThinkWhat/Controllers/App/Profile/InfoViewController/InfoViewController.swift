@@ -13,9 +13,7 @@ class InfoViewController: UIViewController {
     @IBOutlet weak var container: UIView!
     
     private let tableVC: InfoTableViewController = {
-        let storyboard = UIStoryboard(name: "App", bundle: nil)
-        let vc = storyboard.instantiateViewController(withIdentifier: "InfoTableViewController") as! InfoTableViewController
-        return vc
+        return Storyboards.controllers.instantiateViewController(withIdentifier: "InfoTableViewController") as! InfoTableViewController
     } ()
     
     override func viewDidLoad() {

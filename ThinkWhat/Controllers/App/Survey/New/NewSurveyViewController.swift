@@ -646,9 +646,9 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
             if indexPath.row == 0, let _ = tableView.cellForRow(at: indexPath) as? CategorySelectionCell {
-                performSegue(withIdentifier: kSegueAppNewSurveyToCategorySelection, sender: nil)
+                performSegue(withIdentifier: Segues.App.NewSurveyToCategorySelection, sender: nil)
             } else if indexPath.row == 2, let _ = tableView.cellForRow(at: indexPath) as? AnonymitySelectionCell {
-                performSegue(withIdentifier: kSegueAppNewSurveyToAnonymity, sender: nil)
+                performSegue(withIdentifier: Segues.App.NewSurveyToAnonymity, sender: nil)
             }
         } else if indexPath.section == 1 {
             if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionTitleCreationCell {
@@ -1106,10 +1106,10 @@ extension NewSurveyViewController {
 extension NewSurveyViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         (navigationController as! NavigationControllerPreloaded).delegate = nil
-        if segue.identifier == kSegueAppNewSurveyToAnonymity, let destinationVC = segue.destination as? AnonymitySettingsTableViewController {
+        if segue.identifier == Segues.App.NewSurveyToAnonymity, let destinationVC = segue.destination as? AnonymitySettingsTableViewController {
             destinationVC.delegate = self
             destinationVC.anonymity = anonymity
-        } else if segue.identifier == kSegueAppNewSurveyToCategorySelection, let destinationVC = segue.destination as? CategorySelectionViewController {
+        } else if segue.identifier == Segues.App.NewSurveyToCategorySelection, let destinationVC = segue.destination as? CategorySelectionViewController {
             destinationVC.delegate = self
             destinationVC.category = category
         }

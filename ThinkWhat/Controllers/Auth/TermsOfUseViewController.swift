@@ -29,9 +29,9 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
     @IBAction func buttonTapped(_ sender: UIButton) {
         if sender.tag == 0 {
             if launchApp, let _ = AppData.shared.userProfile.isEdited {
-                performSegue(withIdentifier: kSegueAppFromTerms, sender: nil)
+                performSegue(withIdentifier: Segues.Auth.AppFromTerms, sender: nil)
             } else {
-                performSegue(withIdentifier: kSegueProfileFromConfirmation, sender: nil)
+                performSegue(withIdentifier: Segues.Auth.ProfileFromConfirmation, sender: nil)
             }
         } else {
             //            if let authVC = navigationController?.viewControllers[0] as? AuthViewController {

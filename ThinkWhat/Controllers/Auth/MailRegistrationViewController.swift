@@ -168,7 +168,7 @@ class MailRegistrationViewController: UIViewController {
                     }
                     if json != nil {
                         EmailResponse.shared.importJson(json!)
-                        self.performSegue(withIdentifier: kSegueMailValidationFromSignup, sender: nil)
+                        self.performSegue(withIdentifier: Segues.Auth.MailValidationFromSignup, sender: nil)
                     }
                 }
             }

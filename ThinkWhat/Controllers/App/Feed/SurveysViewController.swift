@@ -44,6 +44,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     fileprivate var currentIcon: CurrentIcon = .Hot {
         didSet {
             if currentIcon != oldValue {
+                presentSubview()
                 switch currentIcon {
                 case .Category:
                     setTitle("Разделы")
@@ -225,23 +226,34 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         }
         
         addChild(self.newTableVC)
-        newTableVC.view.alpha = 0
+//        newTableVC.view.alpha = 0
         newTableVC.delegate = self
         newTableVC.didMove(toParent: self)
+        addChild(self.topTableVC)
+        //        newTableVC.view.alpha = 0
+        topTableVC.delegate = self
+        topTableVC.didMove(toParent: self)
     }
     
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         (navigationController as? NavigationControllerPreloaded)?.delegate = nil
-        if segue.identifier == kSegueAppFeedSurveysToCategory, let destinationVC = segue.destination as? CategoryTableViewController {
+        if segue.identifier == Segues.App.FeedSurveysToCategory, let destinationVC = segue.destination as? CategoryTableViewController {
             if let cell = newTableVC.tableView.cellForRow(at: newTableVC.tableView.indexPathForSelectedRow!) as? SubcategoryTableViewCell {
                 destinationVC.category = cell.category
                 destinationVC.title = cell.category.title
             }
-        } else if segue.identifier == kSegueAppFeedToSurvey, let destinationVC = segue.destination as? SurveyViewController, let cell = newTableVC.tableView.cellForRow(at: newTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? SurveyViewController {
+            var cell: SurveyTableViewCell!
+            switch currentIcon {
+            case .New:
+                cell = newTableVC.tableView.cellForRow(at: newTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell
+            default:
+                cell = topTableVC.tableView.cellForRow(at: topTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell
+            }
             tabBarController?.setTabBarVisible(visible: false, animated: true)
             destinationVC.surveyLink = cell.survey
-        } else if segue.identifier == kSegueAppFeedToNewSurvey { //New survey
+        } else if segue.identifier == Segues.App.FeedToNewSurvey { //New survey
             navigationController?.setNavigationBarHidden(true, animated: false)
             tabBarController?.setTabBarVisible(visible: false, animated: false)
             (navigationController as? NavigationControllerPreloaded)?.startingPoint = startingPoint
@@ -271,12 +283,11 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
 
             navigationController?.setNavigationBarHidden(false, animated: true)
             currentIcon = CurrentIcon.getCurrentIconByTag(tag: icon.tag)
-            presentSubview()
         }
     }
     
     @objc private func handleAddTap() {
-        performSegue(withIdentifier: kSegueAppFeedToNewSurvey, sender: self)
+        performSegue(withIdentifier: Segues.App.FeedToNewSurvey, sender: self)
     }
     
     fileprivate func setTitle(_ _title: String) {
@@ -332,7 +343,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             self.loadingIndicator.alpha = 0
         }) {
             _ in
-            self.setTitle("Ошибка соединения")
+            self.setTitle("Ошибка")
             self.lostConnectionView!.retryButton.layer.cornerRadius = self.lostConnectionView!.retryButton.frame.height / 2
             self.lostConnectionView?.animationView.addEnableAnimation()
             UIView.animate(withDuration: 0.3) {
@@ -362,10 +373,10 @@ extension SurveysViewController: CellButtonDelegate {
 
 extension SurveysViewController: ServerProtocol {
     func loadData() {
-        requestAttempt += 1
-        //        delay(seconds: 3) {
-        //            self.vc.presentLostConnectionView()
-        //        }
+//        requestAttempt += 1
+//                delay(seconds: 3) {
+//                    self.presentLostConnectionView()
+//                }
         apiManager.loadSurveyCategories() {
             json, error in
             if error != nil {

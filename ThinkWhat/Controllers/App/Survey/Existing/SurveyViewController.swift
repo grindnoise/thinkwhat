@@ -72,12 +72,14 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 //                }
                 //                tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .none)
 //                tableView.beginUpdates()
-                if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) {
+                if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) as? SurveyVoteCell {
                     UIView.animate(withDuration: 0.3) {
-                        cell.contentView.alpha = 1
+                        //cell.contentView.alpha = 1
+                        cell.btn.backgroundColor = K_COLOR_RED
                     }
                 }
 //                                delay(seconds: 0.15) {
+                tableView.scrollToRow(at: IndexPath(row: <#T##Int#>, section: <#T##Int#>), at: <#T##UITableView.ScrollPosition#>, animated: <#T##Bool#>)
                                     self.tableView.scrollToBottom()
 //                                }
 //                self.tableView.scrollToBottom()
@@ -218,7 +220,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
 //            } else if selectedAnswerID != 0 {
 //                return 1
 //            }
-            return 1
+            return 2
         }
         return 0
     }
@@ -313,19 +315,46 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 }
             }
         } else if indexPath.section == 2 {
-            if isReadOnly {
-                if let _cell = tableView.dequeueReusableCell(withIdentifier: "total", for: indexPath) as? SurveyTotalCell {
-                    _cell.label.text = "Голосов: \(survey!.totalVotes)"
+            if indexPath.row == 0 {
+                if isReadOnly {
+                    if let _cell = tableView.dequeueReusableCell(withIdentifier: "total", for: indexPath) as? SurveyTotalCell {
+                        _cell.label.text = "Голосов: \(survey!.totalVotes)"
+                        cell = _cell
+                    }
+                } else if let _cell = tableView.dequeueReusableCell(withIdentifier: "vote", for: indexPath) as? SurveyVoteCell {
+                    _cell.delegate = self
+                    if selectedAnswerID != 0 {
+                        _cell.btn.backgroundColor = K_COLOR_RED
+                        //cell.contentView.alpha = 1
+                    } else {
+                        _cell.btn.backgroundColor = K_COLOR_GRAY
+                        //                    cell.contentView.alpha = 0
+                    }
                     cell = _cell
                 }
-            } else if let _cell = tableView.dequeueReusableCell(withIdentifier: "vote", for: indexPath) as? SurveyVoteCell {
-                _cell.delegate = self
-                cell = _cell
-                if selectedAnswerID != 0 {
-                    cell.contentView.alpha = 1
-                } else {
-                    cell.contentView.alpha = 0
+            } else if let _cell = tableView.dequeueReusableCell(withIdentifier: "info", for: indexPath) as? SurveyInfoCell {
+                _cell.dateLabel.text = survey?.modified.toDateTimeStringWithoutSeconds()
+                if let userProfile = survey?.userProfile {
+                    _cell.userLabel.text = userProfile.name
+                    if userProfile.image != nil {
+                        _cell.userImage.image = userProfile.image!.circularImage(size: _cell.userImage.frame.size, frameColor: K_COLOR_RED)
+                    } else {
+                        apiManager.downloadImage(url: userProfile.imageURL, percentageClosure: {
+                            percent in
+                            //                            _cell.slides[i].imageView.progressIndicatorView.progress = percent
+                        }) {
+                            image, error in
+                            if error != nil {
+                                showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Изображение не было загружено. \(error!.localizedDescription)")
+                            }
+                            if image != nil {
+                                userProfile.image = image!
+                                _cell.userImage.image = userProfile.image!.circularImage(size: _cell.userImage.frame.size, frameColor: K_COLOR_RED)
+                            }
+                        }
+                    }
                 }
+                cell = _cell
             }
         }
         return cell
@@ -334,7 +363,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
             if indexPath.row == 0 {//Title
-                return 120
+                return 140
             } else if indexPath.row == 2 {
                 if survey!.link != nil, !survey!.link!.isEmpty, !isYoutubeLink(checkString: survey!.link!), let _ = URL(string: survey!.link!) {
                     return UITableView.automaticDimension
@@ -354,10 +383,14 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         } else if indexPath.section == 1 {
             return max(100, UITableView.automaticDimension)
         } else if indexPath.section == 2 {
-            if isReadOnly {
-                return 50
+            if indexPath.row == 0 {
+                if isReadOnly {
+                    return 50
+                } else {
+                    return 100
+                }
             } else {
-                return 100
+                return 50
             }
 //            } else if selectedAnswerID != 0 {
 //                return 100
@@ -599,7 +632,11 @@ extension SurveyViewController: CellButtonDelegate {
                 present(vc, animated: true)
             }
         } else if sender is SurveyVoteCell {
-            postResult()
+            if selectedAnswerID != 0 {
+                postResult()
+            } else {
+                showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Хорошо": [CustomAlertView.ButtonType.Ok: nil]]], text: "Выберите вариант ответа")
+            }
         } else if sender is SurveyImageCell {
             tableView.scrollToRow(at: IndexPath(row: 4, section: 0), at: .top, animated: true)
         } else if sender is SurveyYoutubeCell {

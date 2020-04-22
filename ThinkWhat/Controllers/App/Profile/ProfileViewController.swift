@@ -193,9 +193,7 @@ extension ProfileViewController: StorageInitializationProtocol {
 
 extension ProfileViewController {
     fileprivate func initializeSettingsVC() -> ProfileSettingsTableViewController {
-        let storyboard = UIStoryboard(name: "App", bundle: nil)
-        let vc = storyboard.instantiateViewController(withIdentifier: "ProfileSettingsTableViewController") as! ProfileSettingsTableViewController
-        return vc
+        return Storyboards.controllers.instantiateViewController(withIdentifier: "ProfileSettingsTableViewController") as! ProfileSettingsTableViewController
     }
 }
 
