@@ -41,6 +41,7 @@ class Surveys {
     var favoriteSurveys:    [SurveyLink: Date] = [:]
     var downloadedSurveys:  [Survey] = []
     var completedSurveyIDs: [Int] = []//Completed surveys IDs
+    var stack:              [Survey] = []//Stack of hot surveys
     
     func importSurveys(_ json: JSON) {
         for i in json {
@@ -409,8 +410,16 @@ class Survey {
             }
             if let _userProfile = UserProfile(_userProfileDict) {
                 //TODO find else add
-                UserProfiles.shared.append(_userProfile)
-                userProfile = _userProfile
+                var isFound = false
+                isFound = !UserProfiles.shared.container.map({
+                    if $0 == _userProfile {
+                        userProfile = $0
+                }}).isEmpty
+                
+                if !isFound {
+                    UserProfiles.shared.container.append(_userProfile)
+                    userProfile = _userProfile
+                }
             }
         } else {
             return nil

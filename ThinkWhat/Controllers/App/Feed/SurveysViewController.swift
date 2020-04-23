@@ -226,11 +226,9 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         }
         
         addChild(self.newTableVC)
-//        newTableVC.view.alpha = 0
         newTableVC.delegate = self
         newTableVC.didMove(toParent: self)
         addChild(self.topTableVC)
-        //        newTableVC.view.alpha = 0
         topTableVC.delegate = self
         topTableVC.didMove(toParent: self)
     }
@@ -280,7 +278,6 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                     i.state = .disabled
                 }
             }
-
             navigationController?.setNavigationBarHidden(false, animated: true)
             currentIcon = CurrentIcon.getCurrentIconByTag(tag: icon.tag)
         }

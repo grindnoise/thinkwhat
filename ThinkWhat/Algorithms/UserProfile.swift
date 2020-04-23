@@ -62,7 +62,7 @@ class UserProfile {
     
     static func == (lhs: UserProfile, rhs: UserProfile) -> Bool {
         if lhs.ID == rhs.ID,
-            lhs.age == rhs.ID,
+            lhs.age == rhs.age,
             lhs.gender == rhs.gender,
             lhs.name == rhs.name,
             lhs.imageURL == rhs.imageURL {

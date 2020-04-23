@@ -631,6 +631,7 @@ struct SERVER_URLS {
     static let SURVEYS_NEW              = "api/surveys/new/"
     static let SURVEYS_ALL              = "api/surveys/all/"
     static let SURVEYS_OWN              = "api/surveys/own/"
+    static let SURVEYS_HOT              = "api/surveys/hot/"
     static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
     static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
     static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"

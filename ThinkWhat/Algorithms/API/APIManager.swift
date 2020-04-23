@@ -1139,57 +1139,50 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func downloadImage(url: String, completion: @escaping (UIImage?, Error?) -> ()) {
-//        var error: Error?
-//        var url: URL!
-//        if let _url = URL(string: url) {
-//            url = _url
-//        } else {
-//            error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Incorrect URL provided"]) as Error
-//            completion(nil, error!)
-//        }
-//        
-//        checkForReachability {
-//            reachable in
-//            if reachable == .Reachable {
-//                self.checkTokenExpired() {
-//                    success, error in
-//                    if error != nil {
-//                        completion(nil, error)
-//                    } else if success {
-//                        performRequest()
-//                    }
-//                }
-//            } else {
-//                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
-//                completion(nil, error!)
-//            }
-//        }
-//        
-//        func performRequest() {
-////            sessionManager.download(url).responseData { (<#DownloadResponse<Data>#>) in
-////                <#code#>
-////            }
-////            sessionManager.request(url).downloadProgress(closure: {
-////                progress in
-////                let prog = CGFloat(progress.fractionCompleted)
-////                percentageClosure(prog)
-////            }).response(completionHandler: {
-////                response in
-////                if let data = response.data { response.request?.url
-////                    if let image = UIImage(data: data) {
-////                        completion(image, nil)
-////                    } else {
-////                        //Image init failure
-////                        error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image initialization failure"]) as Error
-////                        completion(nil, error)
-////                    }
-////                } else {
-////                    error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image data error during download"]) as Error
-////                    completion(nil, error)
-////                }
-////            })
-//        }
+    func downloadImage(url urlString: String, completion: @escaping (UIImage?, Error?) -> ()) {
+        var error: Error?
+        var url: URL!
+        if let _url = URL(string: urlString) {
+            url = _url
+        } else {
+            error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Incorrect URL provided"]) as Error
+            completion(nil, error!)
+        }
+        
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        performRequest()
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+        
+        func performRequest() {
+            sessionManager.request(url).response(completionHandler: {
+                response in
+                if let data = response.data { response.request?.url
+                    if let image = UIImage(data: data) {
+                        completion(image, nil)
+                    } else {
+                        //Image init failure
+                        error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image initialization failure"]) as Error
+                        completion(nil, error)
+                    }
+                } else {
+                    error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image data error during download"]) as Error
+                    completion(nil, error)
+                }
+            })
+        }
     }
     
 //    private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(Error?)->()) {

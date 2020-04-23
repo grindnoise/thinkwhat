@@ -13,6 +13,10 @@ import SwiftyJSON
 
 class SurveyViewController: UITableViewController, UINavigationControllerDelegate {
     
+    deinit {
+        print("deinit")
+    }
+    
     class var answerHeaderCell: UINib {
         return UINib(nibName: "AnswerHeaderCell", bundle: nil)
     }
@@ -54,39 +58,33 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             }
         }
     }
-    fileprivate var voteCompletionView: VoteCompletionView?
+    fileprivate lazy var voteCompletionView: VoteCompletionView? = {
+        return VoteCompletionView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
+    } ()
     fileprivate let sections = ["ОСНОВНОЕ", "ОТВЕТЫ", "КНОПКА ГОЛОСОВАНИЯ"]
     fileprivate var isRequesting = false
     fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     fileprivate let requestAttempts = 3
     fileprivate var loadingIndicator: LoadingIndicator!
     fileprivate let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
-    fileprivate var isInitialLoading = true
+    fileprivate var isInitialLoading = true {
+        didSet {
+            if tableView != nil {
+                tableView.isUserInteractionEnabled = !isInitialLoading
+            }
+        }
+    }
     fileprivate var isLoadingImages  = true
     fileprivate var selectedAnswerID = 0 {
         didSet {
             if oldValue != selectedAnswerID {
                 //UI update
-//                if tableView.numberOfRows(inSection: 2) == 0 {
-                //                    tableView.insertRows(at: [IndexPath(row: 0, section: 2)], with: .fade)
-                //                }
-                //                tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .none)
-//                tableView.beginUpdates()
                 if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) as? SurveyVoteCell {
                     UIView.animate(withDuration: 0.3) {
-                        //cell.contentView.alpha = 1
                         cell.btn.backgroundColor = K_COLOR_RED
                     }
                 }
-//                                delay(seconds: 0.15) {
-                tableView.scrollToRow(at: IndexPath(row: <#T##Int#>, section: <#T##Int#>), at: <#T##UITableView.ScrollPosition#>, animated: <#T##Bool#>)
-                                    self.tableView.scrollToBottom()
-//                                }
-//                self.tableView.scrollToBottom()
-//                tableView.endUpdates()
-//                delay(seconds: 1.15) {
-//                    self.tableView.scrollToBottom()
-//                }
+                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 2), at: .bottom, animated: true)
                 for cell in answersCells {
                     if cell.answer!.ID != selectedAnswerID {
                         cell.isChecked = false
@@ -95,7 +93,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                         scaleAnim.toValue   = 1
                         scaleAnim.duration  = 0.15
                         cell.label.layer.add(scaleAnim, forKey: nil)
-                        cell.label.transform = CGAffineTransform.identity//CATransform3DMakeScale(1.01, 1.01, 1.01)
+                        cell.label.transform = CGAffineTransform.identity
                         UIView.transition(with: cell.label, duration: 0.15, options: .transitionCrossDissolve, animations: {
                             cell.label.textColor = UIColor.gray
                         })
@@ -119,17 +117,9 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     var survey: Survey? {
         didSet {
             if survey != nil, isInitialLoading {
-//                tableView.reloadData()
-                delay(seconds: 0.01) {
+//                delay(seconds: 0.01) {
                     self.presentSurvey()
-                }
-                //                surveyQuestion.text = "     \(survey!.description)"
-                //                let sizeThatFitsTextView = surveyQuestion.sizeThatFits(CGSize(width: surveyQuestion.frame.size.width, height: CGFloat(MAXFLOAT)))
-                //                print(sizeThatFitsTextView)
-                //                view.setNeedsLayout()
-                //                surveyQuestionHeight.constant = sizeThatFitsTextView.height
-                //                view.layoutIfNeeded()
-                //TODO: answers
+//                }
             }
         }
     }
@@ -138,10 +128,8 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         super.viewDidLoad()
         setupViews()
         tableView.register(SurveyViewController.answerHeaderCell, forHeaderFooterViewReuseIdentifier: "answerHeader")
-        //Check if user has laready answered
-        if Surveys.shared.completedSurveyIDs.contains(surveyLink.ID) {
-            isReadOnly = true
-        }
+        //Check if user has already answered
+        isReadOnly = Surveys.shared.completedSurveyIDs.contains(surveyLink.ID)
     }
     
     private func setupViews() {
@@ -169,22 +157,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             if survey!.images != nil {
                 isLoadingImages = false
             }
-//            for subview in view.subviews {
-//                if !(subview is LoadingTextIndicator) {
-//                    subview.alpha = 1
-//                }
-//            }
         } else {
-//            self.view.alpha = 0
-//            tableView.alpha = 0
-//            for subview in view.subviews {
-//                if !(subview is LoadingTextIndicator) {
-//                    subview.alpha = 0
-//                }
-//                if subview is UILabel {
-//                    subview.layer.transform = CATransform3DMakeScale(0.3, 0.3, 1)
-//                }
-//            }
             isInitialLoading = true
             loadingIndicator.alpha = 1
             loadingIndicator.addEnableAnimation()
@@ -193,14 +166,18 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if !self.isReadOnly {
-            DispatchQueue.main.async {
-                if self.voteCompletionView == nil {
-                    self.voteCompletionView = VoteCompletionView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
-                }
-            }
-        }
+//        if !self.isReadOnly {
+//            DispatchQueue.main.async {
+//                if self.voteCompletionView == nil {
+//                    self.voteCompletionView = VoteCompletionView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
+//                }
+//            }
+//        }
         tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        voteCompletionView = nil
     }
     
     // MARK: - Table view data source
@@ -339,17 +316,20 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                     if userProfile.image != nil {
                         _cell.userImage.image = userProfile.image!.circularImage(size: _cell.userImage.frame.size, frameColor: K_COLOR_RED)
                     } else {
-                        apiManager.downloadImage(url: userProfile.imageURL, percentageClosure: {
-                            percent in
-                            //                            _cell.slides[i].imageView.progressIndicatorView.progress = percent
-                        }) {
+                        apiManager.downloadImage(url: userProfile.imageURL) {
                             image, error in
                             if error != nil {
                                 showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Изображение не было загружено. \(error!.localizedDescription)")
                             }
                             if image != nil {
                                 userProfile.image = image!
+                                _cell.userImage.alpha = 0
                                 _cell.userImage.image = userProfile.image!.circularImage(size: _cell.userImage.frame.size, frameColor: K_COLOR_RED)
+                                _cell.userImage.transform = _cell.userImage.transform.scaledBy(x: 0.75, y: 0.75)
+                                UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+                                    _cell.userImage.alpha = 1
+                                    _cell.userImage.transform = .identity
+                                })
                             }
                         }
                     }
@@ -570,32 +550,8 @@ extension SurveyViewController {
             _ in
             self.tableView.reloadData()
             self.loadingIndicator.removeAllAnimations()
-            delay(seconds: 1) {
-                self.isInitialLoading = false
-            }
+            self.isInitialLoading = false
         }
-    }
-    
-    fileprivate func animateScaleFade(scaleFactor: CGFloat, duration: CFTimeInterval, view _view: UIView) {
-        //Light scale/fade animation
-        let scaleAnim       = CABasicAnimation(keyPath: "transform.scale")
-        let fadeAnim        = CABasicAnimation(keyPath: "opacity")
-        let groupAnim       = CAAnimationGroup()
-        
-        scaleAnim.fromValue = scaleFactor
-        scaleAnim.toValue   = 1.0
-//        scaleAnim.duration  = duration
-        fadeAnim.fromValue  = 0
-        fadeAnim.toValue    = 1
-//        fadeAnim.duration   = duration
-        
-        groupAnim.animations        = [scaleAnim, fadeAnim]
-        groupAnim.duration          = duration
-        groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-        
-        _view.layer.add(groupAnim, forKey: nil)
-        _view.layer.opacity = Float(1)
-        _view.layer.transform = CATransform3DMakeScale(1, 1, 1)
     }
 }
 
