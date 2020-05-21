@@ -41,6 +41,6 @@ protocol StorageInitializationProtocol {
 }
 
 import UIKit
-protocol CellButtonDelegate: class {
-    func cellSubviewTapped(_ sender: AnyObject)
+protocol ButtonDelegate: class {
+    func signalReceived(_ sender: AnyObject)
 }

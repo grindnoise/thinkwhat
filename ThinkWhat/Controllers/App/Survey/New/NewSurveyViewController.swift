@@ -929,8 +929,8 @@ extension NewSurveyViewController: UITableViewDropDelegate {
     }
 }
 
-extension NewSurveyViewController: CellButtonDelegate {
-    func cellSubviewTapped(_ sender: AnyObject) {
+extension NewSurveyViewController: ButtonDelegate {
+    func signalReceived(_ sender: AnyObject) {
         if sender is CameraIcon {
             selectImage(.camera)
         } else if sender is GalleryIcon {
@@ -1145,7 +1145,7 @@ extension NewSurveyViewController: ServerProtocol {
     func postSurvey() {
         
         //Prepare new Survey w/o ID
-        if let survey = Survey(new: prepareSurveyDict()) {
+        if let survey = FullSurvey(new: prepareSurveyDict()) {
             apiManager.postSurvey(survey: survey) {
                 json, error in
                 if error != nil {
@@ -1171,13 +1171,13 @@ extension NewSurveyViewController: ServerProtocol {
 //                                survey.answersWithID.append([ID: text])
 //                            }
 //                        }
-                        Surveys.shared.downloadedSurveys.append(survey)
+                        Surveys.shared.append(object: survey, type: .Downloaded)
                         
                         //Create SurveyLink & append to own & new arrays
                         if let surveyLink = survey.createSurveyLink() {
-                            Surveys.shared.byCategory[self.category!]?.append(surveyLink)
-                            Surveys.shared.ownSurveys.append(surveyLink)
-                            Surveys.shared.newSurveys.append(surveyLink)
+                            Surveys.shared.categorizedLinks[self.category!]?.append(surveyLink)
+                            Surveys.shared.append(object: surveyLink, type: .Own)
+                            Surveys.shared.append(object: surveyLink, type: .New)
                             
                             //Send notification
                             NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)

@@ -40,7 +40,7 @@ class LinkAttachmentCell: UITableViewCell {
         }
     }
     
-    weak var delegate: CellButtonDelegate?
+    weak var delegate: ButtonDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -54,7 +54,7 @@ class LinkAttachmentCell: UITableViewCell {
     
     @objc fileprivate func buttonTapped(recognizer: UITapGestureRecognizer) {
         if recognizer.state == .ended, recognizer.view != nil {
-            delegate?.cellSubviewTapped(recognizer.view!)
+            delegate?.signalReceived(recognizer.view!)
         }
     }
 

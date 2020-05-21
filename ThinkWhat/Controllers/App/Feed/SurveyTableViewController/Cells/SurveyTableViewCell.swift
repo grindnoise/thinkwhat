@@ -15,7 +15,7 @@ class SurveyTableViewCell: UITableViewCell {
     @IBOutlet weak var completionPercentage: ProgressCirle!
     @IBOutlet weak var duration: UILabel!
     
-    var survey: SurveyLink?
+    var survey: ShortSurvey?
     
 //    var surveyLink: SurveyLink?
     

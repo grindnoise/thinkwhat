@@ -60,9 +60,9 @@ class UserSurveysTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if vc.control.selectedSegmentIndex == 0 {
-            return Surveys.shared.ownSurveys.count
+            return Surveys.shared.ownLinks.count
         } else if vc.control.selectedSegmentIndex == 1 {
-            return Surveys.shared.favoriteSurveys.count
+            return Surveys.shared.favoriteLinks.count
         }
         return 0
     }
@@ -70,11 +70,11 @@ class UserSurveysTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell {
             
-            var dataSource: [SurveyLink]
+            var dataSource: [ShortSurvey]
             if vc.control.selectedSegmentIndex == 0 {
-                dataSource = Surveys.shared.ownSurveys
+                dataSource = Surveys.shared.ownLinks
             } else {
-                dataSource = Array(Surveys.shared.favoriteSurveys.keys)
+                dataSource = Array(Surveys.shared.favoriteLinks.keys)
             }
             cell.survey = dataSource[indexPath.row]
             cell.title.text = dataSource[indexPath.row].title

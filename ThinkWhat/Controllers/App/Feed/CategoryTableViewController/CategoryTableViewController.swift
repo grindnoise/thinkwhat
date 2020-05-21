@@ -85,11 +85,11 @@ class CategoryTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return Surveys.shared.byCategory[category]?.count ?? 0
+        return Surveys.shared.categorizedLinks[category]?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell, let dataSource = Surveys.shared.byCategory[category] {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell, let dataSource = Surveys.shared.categorizedLinks[category] {
                 cell.title.text = dataSource[indexPath.row].title
                 for view in cell.tags.subviews {
                     view.removeFromSuperview()

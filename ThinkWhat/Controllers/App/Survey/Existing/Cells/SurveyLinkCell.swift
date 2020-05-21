@@ -11,10 +11,10 @@ import UIKit
 class SurveyLinkCell: UITableViewCell {
     
     @IBAction func linkTapped(_ sender: Any) {
-        delegate?.cellSubviewTapped(sender as AnyObject)
+        delegate?.signalReceived(sender as AnyObject)
     }
     @IBOutlet weak var linkButton: UIButton!
-    weak var delegate: CellButtonDelegate?
+    weak var delegate: ButtonDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

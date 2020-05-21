@@ -82,11 +82,13 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     var isDataLoaded = false {
         didSet {
             if oldValue != isDataLoaded {
-                tabBarController?.setTabBarVisible(visible: true, animated: true)
                 UIView.animate(withDuration: 0.3, animations: {
                     self.loadingIndicator.alpha = 0
+                    self.navigationItem.titleView?.alpha = 1
+                    self.tabBarController?.tabBar.tintColor = K_COLOR_TABBAR
                 }) {
                     _ in
+                    self.tabBarController?.tabBar.isUserInteractionEnabled = true
                     for (index, icon) in self.icons.enumerated() {
                         delay(seconds: Double(index) * 0.1) {
                             UIView.animate(withDuration: 0.6) {
@@ -166,19 +168,53 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         super.viewDidLoad()
         setupViews()
         loadData()
-        tabBarController?.setTabBarVisible(visible: false, animated: false)
+        tabBarController?.tabBar.isUserInteractionEnabled = false
+        tabBarController?.tabBar.tintColor = .lightGray
+//        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: K_COLOR_RED], for: .selected)
     }
     
+//    override func viewWillDisappear(_ animated: Bool) {
+//        UIView.animate(withDuration: 0.2) {
+//            self.navigationItem.titleView?.alpha = 0
+//        }
+//    }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if startingPoint == .zero, let rbtn = navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
                 startingPoint = rbtn.convert(rbtn.center, to: tabBarController?.view)
         }
-        if isDataLoaded {
-            tabBarController?.setTabBarVisible(visible: true, animated: true)
-        }
-        UIView.animate(withDuration: 0.2) {
+        
+        UIView.animate(withDuration: 0.2, animations: {
             self.navigationItem.titleView?.alpha = 1
+        }) {
+            _ in
+//            if self.isDataLoaded {
+//                if let rbtn = self.navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
+//                    rbtn.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+//                    UIView.animate(withDuration: 0.3) {
+//                        rbtn.transform = .identity
+//                        rbtn.alpha = 1
+//                    }
+//                }
+//            }
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if self.isDataLoaded {
+            if let rbtn = self.navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
+                rbtn.alpha = 0
+                rbtn.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+                UIView.animate(withDuration: 0.3, delay: 0.25, options: .curveEaseInOut, animations: {
+                    rbtn.transform = .identity
+                    rbtn.alpha = 1
+                })
+            }
+        }
+        if isDataLoaded {
+            tabBarController?.tabBar.isUserInteractionEnabled = true
+            tabBarController?.setTabBarVisible(visible: true, animated: true)
         }
     }
     
@@ -231,26 +267,38 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         addChild(self.topTableVC)
         topTableVC.delegate = self
         topTableVC.didMove(toParent: self)
+        addChild(self.surveyStackVC)
+        surveyStackVC.delegate = self
+        surveyStackVC.didMove(toParent: self)
     }
     
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         (navigationController as? NavigationControllerPreloaded)?.delegate = nil
-        if segue.identifier == Segues.App.FeedSurveysToCategory, let destinationVC = segue.destination as? CategoryTableViewController {
+        if segue.identifier == Segues.App.FeedToCategory, let destinationVC = segue.destination as? CategoryTableViewController {
             if let cell = newTableVC.tableView.cellForRow(at: newTableVC.tableView.indexPathForSelectedRow!) as? SubcategoryTableViewCell {
                 destinationVC.category = cell.category
                 destinationVC.title = cell.category.title
             }
         } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? SurveyViewController {
-            var cell: SurveyTableViewCell!
+//            var cell: SurveyTableViewCell!
             switch currentIcon {
             case .New:
-                cell = newTableVC.tableView.cellForRow(at: newTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell
-            default:
-                cell = topTableVC.tableView.cellForRow(at: topTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell
+                if let cell = newTableVC.tableView.cellForRow(at: newTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+                    destinationVC.surveyLink = cell.survey
+                }
+            case.Top:
+                if let cell = topTableVC.tableView.cellForRow(at: topTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+                    destinationVC.surveyLink = cell.survey
+                }
+            default: //Hot
+                if let sender = sender as? SurveyStackViewController {
+                    destinationVC.apiManager = apiManager
+                    destinationVC.survey = sender.surveyPreview.survey
+                }
             }
             tabBarController?.setTabBarVisible(visible: false, animated: true)
-            destinationVC.surveyLink = cell.survey
+            
         } else if segue.identifier == Segues.App.FeedToNewSurvey { //New survey
             navigationController?.setNavigationBarHidden(true, animated: false)
             tabBarController?.setTabBarVisible(visible: false, animated: false)
@@ -259,7 +307,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     }
     
     @objc fileprivate func applicationDidBecomeActive() {
-        if Surveys.shared.topSurveys.isEmpty {
+        if Surveys.shared.topLinks.isEmpty {
             loadData()
         }
     }
@@ -350,8 +398,8 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     }
 }
 
-extension SurveysViewController: CellButtonDelegate {
-    func cellSubviewTapped(_ sender: AnyObject) {
+extension SurveysViewController: ButtonDelegate {
+    func signalReceived(_ sender: AnyObject) {
         if sender is LostConnectionView {
             loadData()
             UIView.animate(withDuration: 0.3, animations: {
@@ -370,7 +418,7 @@ extension SurveysViewController: CellButtonDelegate {
 
 extension SurveysViewController: ServerProtocol {
     func loadData() {
-//        requestAttempt += 1
+        
 //                delay(seconds: 3) {
 //                    self.presentLostConnectionView()
 //                }
@@ -381,6 +429,7 @@ extension SurveysViewController: ServerProtocol {
                     self.presentLostConnectionView()
                 } else {
                     //Retry unless successfull
+                    self.requestAttempt += 1
                     if self.isInitialLoad {
                         self.loadData()
                     }

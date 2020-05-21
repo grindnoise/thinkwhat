@@ -12,14 +12,14 @@ class AnonymitySettingsTableViewController: UITableViewController {
 
     fileprivate var selectedIndex: IndexPath!
     var anonymity: SurveyAnonymity!      //[SurveyAnonymity] = []
-    weak var delegate: CellButtonDelegate?
+    weak var delegate: ButtonDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        delegate?.cellSubviewTapped(self)
+        delegate?.signalReceived(self)
     }
     
     private func setupViews() {

@@ -14,18 +14,18 @@ class UserProfiles {
     private init() {}
     var container: [UserProfile] = []
     
-    func append(_ userProfile: UserProfile) {
-        var contains = false
-        for i in container {
-            if i == userProfile {
-                contains = true
-                break
-            }
-        }
-        if !contains {
-            container.append(userProfile)
-        }
-    }
+//    func append(_ userProfile: UserProfile) {
+//        var contains = false
+//        for i in container {
+//            if i == userProfile {
+//                contains = true
+//                break
+//            }
+//        }
+//        if !contains {
+//            container.append(userProfile)
+//        }
+//    }
 }
 
 class UserProfile {

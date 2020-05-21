@@ -178,6 +178,8 @@ let kNotificationApiNotReachable                 = Notification.Name("smsNotific
 let kNotificationUserImageChanged                = Notification.Name("NotificationUserImageChanged")
 let kNotificationTopSurveysUpdated               = Notification.Name("NotificationTopSurveysUpdated")
 let kNotificationNewSurveysUpdated               = Notification.Name("NotificationNewSurveysUpdated")
+let kNotificationSurveysStackReceived            = Notification.Name("NotificationSurveysStackReceived")
+let kNotificationSurveysStackUpdated             = Notification.Name("NotificationSurveysStackUpdated")
 let kNotificationOwnSurveysUpdated               = Notification.Name("NotificationOwnSurveysUpdated")
 let kNotificationSurveysByCategoryUpdated        = Notification.Name("NotificationSurveysByCategoryUpdated")
 let kNotificationFavoriteSurveysUpdated         = Notification.Name("NotificationSurveysByCategoryUpdated")
@@ -209,15 +211,17 @@ struct Segues {
     }
     
     struct App {
-        static let ProfileSettingsSelection = "PROFILE_SETINGS_SELECTION"
-        static let Logout                   = "BACK_TO_AUTH"
+        static let ProfileToSettingsSelection = "PROFILE_SETINGS_SELECTION"
         static let ProfileToInfo            = "INFO"
+        static let Logout                   = "BACK_TO_AUTH"
         static let FeedToSurvey             = "FEED_TO_SURVEY"
         static let FeedToNewSurvey          = "FEED_TO_NEW_SURVEY"
-        static let FeedSurveysToCategory    = "FEED_TO_CATEGORY"
+        static let FeedToUser               = "FEED_TO_USER"
+        static let FeedToCategory           = "FEED_TO_CATEGORY"
         static let UserSurveysToSurvey      = "USER_SURVEYS_TO_SURVEY"
         static let NewSurveyToAnonymity     = "NEW_TO_ANONYMITY"
         static let NewSurveyToCategorySelection = "NEW_TO_CATEGORY_SELECTION"
+        static let SurveyToUser             = "SURVEY_TO_USER"
     }
 }
 ////MARK: Auth
@@ -276,6 +280,8 @@ struct Storyboards {
 let alert                                       = CustomAlertView(frame: (UIApplication.shared.keyWindow?.frame)!)
 let K_COLOR_RED                                 = UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)//UIColor(red:0.805, green: 0.342, blue:0.339, alpha:1)
 let K_COLOR_GRAY                                = UIColor(red:0.574, green: 0.574, blue:0.574, alpha:1)
+let K_COLOR_TABBAR                              = UIColor(red:0.592, green: 0.46, blue:0.574, alpha:1)
+//let K_COLOR_TABBAR_INACTIVE                     = UIColor(red:0.636, green: 0.636, blue:0.636, alpha:1)
 let options: UNAuthorizationOptions             = [.alert, .sound, .badge]
 
 //HTTP request attempts before assertion
@@ -637,6 +643,7 @@ struct SERVER_URLS {
     static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
     static let SURVEYS_ADD_FAVORITE     = "api/surveys/add_favorite/"
     static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
+    static let SURVEYS_REJECT           = "api/surveys/reject/"
     
     static let SURVEYS_RESULTS          = "api/survey_results/"
     

@@ -19,6 +19,11 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
         super.viewDidLoad()
 //        UITabBar.appearance().layer.borderWidth = 1.0
 //        UITabBar.appearance().clipsToBounds = true
+        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "OpenSans-Semibold", size: 11)!], for: .normal)
+        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "OpenSans-Light", size: 11)!], for: .selected)
+//        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "OpenSans-Bold", size: 12)!], for: .focused)
+//        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "OpenSans-Bold", size: 12)!], for: .highlighted)
+
         delegate = sdelegate
         navigationController?.isNavigationBarHidden = true
         NotificationCenter.default.addObserver(self, selector: #selector(TabBarController.handleTokenState), name: kNotificationTokenRevoked, object: nil)

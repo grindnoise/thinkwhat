@@ -109,9 +109,9 @@ class SurveysTableViewController: UITableViewController {
 //        if vc.currentIcon == .New {
         switch type {
         case .New:
-            return Surveys.shared.newSurveys.count
+            return Surveys.shared.newLinks.count
         default:
-            return Surveys.shared.topSurveys.count
+            return Surveys.shared.topLinks.count
         }
         
 //        } else if vc.currentIcon == .Hot{
@@ -132,7 +132,7 @@ class SurveysTableViewController: UITableViewController {
 //        if vc.currentIcon != .Category {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell {
 
-                var dataSource: [SurveyLink]
+                var dataSource: [ShortSurvey]
 //                if vc.currentIcon == .New {
 //                    dataSource = Surveys.shared.newSurveys
 //                } else {
@@ -140,9 +140,9 @@ class SurveysTableViewController: UITableViewController {
 //                }
                 switch type {
                 case .New:
-                    dataSource = Surveys.shared.newSurveys
+                    dataSource = Surveys.shared.newLinks
                 default:
-                    dataSource = Surveys.shared.topSurveys
+                    dataSource = Surveys.shared.topLinks
                 }
                 cell.survey = dataSource[indexPath.row]
                 cell.title.text = dataSource[indexPath.row].title

@@ -63,9 +63,10 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     } ()
     fileprivate let sections = ["ОСНОВНОЕ", "ОТВЕТЫ", "КНОПКА ГОЛОСОВАНИЯ"]
     fileprivate var isRequesting = false
-    fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
+//    fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
+    var apiManager: APIManagerProtocol!
     fileprivate let requestAttempts = 3
-    fileprivate var loadingIndicator: LoadingIndicator!
+    fileprivate var loadingIndicator: LoadingIndicator?
     fileprivate let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
     fileprivate var isInitialLoading = true {
         didSet {
@@ -106,15 +107,15 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     fileprivate var needsAnimation                      = true
     fileprivate var headerNeedsAnimation                = true
     
-    var surveyLink: SurveyLink! {
+    var surveyLink: ShortSurvey! {
         didSet {
             likeButton.removeAllAnimations()
             title = surveyLink.category!.title//"Опрос №\(surveyLink.ID)"
-            likeButton.state = Array(Surveys.shared.favoriteSurveys.keys).filter( {$0.ID == surveyLink.ID }).isEmpty ? .disabled : .enabled
+            likeButton.state = Array(Surveys.shared.favoriteLinks.keys).filter( {$0.ID == surveyLink.ID }).isEmpty ? .disabled : .enabled
         }
     }
     
-    var survey: Survey? {
+    var survey: FullSurvey? {
         didSet {
             if survey != nil, isInitialLoading {
 //                delay(seconds: 0.01) {
@@ -129,7 +130,9 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         setupViews()
         tableView.register(SurveyViewController.answerHeaderCell, forHeaderFooterViewReuseIdentifier: "answerHeader")
         //Check if user has already answered
-        isReadOnly = Surveys.shared.completedSurveyIDs.contains(surveyLink.ID)
+        if survey == nil {
+            isReadOnly = Surveys.shared.completedSurveyIDs.contains(surveyLink.ID)
+        }
     }
     
     private func setupViews() {
@@ -139,45 +142,59 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         self.navigationController?.isNavigationBarHidden         = false
         self.navigationController?.navigationBar.barTintColor    = .white
         self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
+        self.navigationItem.backBarButtonItem?.tintColor         = .black
         self.navigationItem.rightBarButtonItem                   = UIBarButtonItem(customView: likeButton)
         self.loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)))
-        self.loadingIndicator.layoutCentered(in: self.view, multiplier: 0.8)
-        self.loadingIndicator.layer.zPosition = 1
+        self.loadingIndicator!.layoutCentered(in: self.view, multiplier: 0.8)
+        self.loadingIndicator!.layer.zPosition = 1
         let gesture = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.likeTapped(gesture:)))
         likeButton.addGestureRecognizer(gesture)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationItem.setHidesBackButton(true, animated: false)
         //surveyTitle.text = surveyLink.title
-        if let _survey = Surveys.shared[surveyLink.ID] {
+        if survey != nil {
+            isInitialLoading = false
+            loadingIndicator?.alpha = 0
+            if survey!.images != nil {
+                isLoadingImages = false
+            }
+        } else if let _survey = Surveys.shared[surveyLink.ID] {
             isInitialLoading = false
             survey = _survey
-            loadingIndicator.alpha = 0
+            loadingIndicator?.alpha = 0
             if survey!.images != nil {
                 isLoadingImages = false
             }
         } else {
             isInitialLoading = true
-            loadingIndicator.alpha = 1
-            loadingIndicator.addEnableAnimation()
+            loadingIndicator?.alpha = 1
+            loadingIndicator?.addEnableAnimation()
             loadData()
         }
+        if let likeBtn = navigationItem.rightBarButtonItem?.customView {
+            likeBtn.alpha = 0
+            likeBtn.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+                likeBtn.transform = .identity
+                likeBtn.alpha = 1
+                
+//                self.navigationController?.navigationBar.layoutIfNeeded()
+            })
+        }
+        self.navigationItem.setHidesBackButton(false, animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
-//        if !self.isReadOnly {
-//            DispatchQueue.main.async {
-//                if self.voteCompletionView == nil {
-//                    self.voteCompletionView = VoteCompletionView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
-//                }
-//            }
-//        }
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         voteCompletionView = nil
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     // MARK: - Table view data source
@@ -206,7 +223,11 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         var cell = UITableViewCell()
         if indexPath.section == 0 { //Params
             if indexPath.row == 0, let _cell = tableView.dequeueReusableCell(withIdentifier: "title", for: indexPath) as? SurveyTitleCell {
-                _cell.label.text = surveyLink.title
+                if survey != nil {
+                    _cell.label.text = survey!.title
+                } else {
+                    _cell.label.text = surveyLink.title
+                }
                 cell = _cell
             } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "question", for: indexPath) as? SurveyQuestionCell {
                 _cell.textView.text = survey!.description
@@ -238,7 +259,6 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 if survey != nil, survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty, (survey!.images == nil), isLoadingImages {
                     self.isLoadingImages = false
                     for (i, imageURL) in survey!.imagesURLs!.enumerated() {
-                        print("***************DOWNLOADING***************")
                         apiManager.downloadImage(url: imageURL.keys.first!, percentageClosure: {
                             percent in
                             _cell.slides[i].imageView.progressIndicatorView.progress = percent
@@ -252,12 +272,23 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                                 if self.survey!.images == nil {
                                     self.survey!.images = []
                                 }
-                                self.survey!.images!.append([image!: imageURL.values.first!])
-                                _cell.slides[i].imageView.image = image
-                                _cell.slides[i].imageView.progressIndicatorView.reveal()
+                                
+                                if !self.survey!.images!.isEmpty {
+                                    self.survey!.images!.map() {
+                                        if let _image = $0.keys.first, !_image.isEqualToImage(image: image!) {
+                                            self.survey!.images!.append([image!: imageURL.values.first!])
+                                            _cell.slides[i].imageView.image = image
+                                            _cell.slides[i].imageView.progressIndicatorView.reveal()
+                                        }
+                                    }
+                                    } else {
+                                        self.survey!.images!.append([image!: imageURL.values.first!])
+                                        _cell.slides[i].imageView.image = image
+                                        _cell.slides[i].imageView.progressIndicatorView.reveal()
+                                    }
+                                }
                             }
                         }
-                    }
                 } else if survey!.images != nil, !survey!.images!.isEmpty {
                     for (i, dict) in survey!.images!.enumerated() {
                         if let image = dict.keys.first as? UIImage {
@@ -450,8 +481,8 @@ extension SurveyViewController {
             if error != nil {
                 if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
                     showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { UIView.animate(withDuration: 0.3, animations: {
-                        self.loadingIndicator.alpha = 0
-                    }) { _ in self.loadingIndicator.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
+                        self.loadingIndicator?.alpha = 0
+                    }) { _ in self.loadingIndicator?.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
                 } else {
                     //Retry
                     self.loadData()
@@ -459,8 +490,8 @@ extension SurveyViewController {
             }
             if json != nil {
                 print(json!)
-                if let _survey = Survey(json!) {
-                    Surveys.shared.downloadedSurveys.append(_survey)
+                if let _survey = FullSurvey(json!) {
+                    Surveys.shared.append(object: _survey, type: .Downloaded)
                     self.survey = _survey
                     self.requestAttempt = 0
                 }
@@ -478,12 +509,12 @@ extension SurveyViewController {
                 if likeButton.state == .disabled {
                     likeButton.state = .enabled
                     mark = true
-                    if Array(Surveys.shared.favoriteSurveys.keys).filter( {$0.ID == surveyLink.ID }).isEmpty { Surveys.shared.favoriteSurveys[self.surveyLink] = Date() }
+                    if Array(Surveys.shared.favoriteLinks.keys).filter( {$0.ID == surveyLink.ID }).isEmpty { Surveys.shared.favoriteLinks[self.surveyLink] = Date() }
                 } else {
                     likeButton.state = .disabled
                     mark = false
-                    if let key = Surveys.shared.favoriteSurveys.keys.filter({ $0.ID == surveyLink.ID }).first {
-                        Surveys.shared.favoriteSurveys.removeValue(forKey: key)
+                    if let key = Surveys.shared.favoriteLinks.keys.filter({ $0.ID == surveyLink.ID }).first {
+                        Surveys.shared.favoriteLinks.removeValue(forKey: key)
                     }
                     //                Surveys.shared.favoriteSurveys.removeValue(forKey: self.surveyLink)
                     NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
@@ -506,8 +537,8 @@ extension SurveyViewController {
             json, error in
             if error != nil {
                 showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { UIView.animate(withDuration: 0.3, animations: {
-                    self.loadingIndicator.alpha = 0
-                }) { _ in self.loadingIndicator.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
+                    self.loadingIndicator?.alpha = 0
+                }) { _ in self.loadingIndicator?.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
             }
             if json != nil {
                 self.voteCompletionView?.present()
@@ -545,11 +576,11 @@ extension SurveyViewController {
 extension SurveyViewController {
     fileprivate func presentSurvey() {
         UIView.animate(withDuration: 0.5, animations: {
-            self.loadingIndicator.alpha = 0
+            self.loadingIndicator?.alpha = 0
         }) {
             _ in
             self.tableView.reloadData()
-            self.loadingIndicator.removeAllAnimations()
+            self.loadingIndicator?.removeAllAnimations()
             self.isInitialLoading = false
         }
     }
@@ -573,8 +604,8 @@ extension SurveyViewController: WKYTPlayerViewDelegate {
     }
 }
 
-extension SurveyViewController: CellButtonDelegate {
-    func cellSubviewTapped(_ sender: AnyObject) {
+extension SurveyViewController: ButtonDelegate {
+    func signalReceived(_ sender: AnyObject) {
         if sender is UIButton {
             if let url = URL(string: survey!.link!) {
                 var vc: SFSafariViewController!

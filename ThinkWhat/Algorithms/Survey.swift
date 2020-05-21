@@ -24,98 +24,227 @@ enum SurveyPoints: Int {
     case SurveyHighlighting = 50
 }
 
+
 class Surveys {
+    enum SurveyContainerType {
+        case Top, New, Categorized, Own, Favorite, Downloaded, Completed, Stack
+    }
     static let shared = Surveys()
     private init() {}
-    var topSurveys:         [SurveyLink] = []
-    var newSurveys:         [SurveyLink] = [] {
+    
+    var topLinks:           [ShortSurvey] = []
+    var newLinks:           [ShortSurvey] = [] {
         didSet {
-            if oldValue.count != newSurveys.count {
-                let sorted = newSurveys.sorted { $0.startDate > $1.startDate }
-                newSurveys = sorted
+            if oldValue.count != newLinks.count {
+                let sorted = newLinks.sorted { $0.startDate > $1.startDate }
+                newLinks = sorted
             }
         }
     }
-    var byCategory:         [SurveyCategory: [SurveyLink]] = [:]
-    var ownSurveys:         [SurveyLink] = []
-    var favoriteSurveys:    [SurveyLink: Date] = [:]
-    var downloadedSurveys:  [Survey] = []
+    var categorizedLinks:   [SurveyCategory: [ShortSurvey]] = [:]
+    var ownLinks:           [ShortSurvey] = []
+    var favoriteLinks:      [ShortSurvey: Date] = [:]
+    var downloadedObjects:  [FullSurvey] = []
     var completedSurveyIDs: [Int] = []//Completed surveys IDs
-    var stack:              [Survey] = []//Stack of hot surveys
+    var stackObjects:       [FullSurvey] = []//Stack of hot surveys
     
     func importSurveys(_ json: JSON) {
         for i in json {
             if i.0 == "top" && !i.1.isEmpty {
-                topSurveys.removeAll()
+                topLinks.removeAll()
                 for j in i.1 {
-                    if let survey = SurveyLink(j.1) {
-                        topSurveys.append(survey)
+                    if let survey = ShortSurvey(j.1) {
+                        topLinks.append(survey)
                     }
                 }
                 NotificationCenter.default.post(name: kNotificationTopSurveysUpdated, object: nil)
             } else if i.0 == "new" && !i.1.isEmpty {
-                newSurveys.removeAll()
+                newLinks.removeAll()
                 for k in i.1 {
-                    if let survey = SurveyLink(k.1) {
-                        newSurveys.append(survey)
+                    if let survey = ShortSurvey(k.1) {
+                        newLinks.append(survey)
                     }
                 }
                 NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)
             }  else if i.0 == "by_category" && !i.1.isEmpty {
-                byCategory.removeAll()
+                categorizedLinks.removeAll()
                 for cat in i.1 {
                     let category = SurveyCategories.shared[Int(cat.0)!]
-                    var data: [SurveyLink] = []
+                    var data: [ShortSurvey] = []
                     for survey in cat.1 {
-                        data.append(SurveyLink(survey.1)!)
+                        data.append(ShortSurvey(survey.1)!)
                     }
-                    byCategory[category!] = data
+                    categorizedLinks[category!] = data
                 }
                 NotificationCenter.default.post(name: kNotificationSurveysByCategoryUpdated, object: nil)
             } else if i.0 == "own" {
-                ownSurveys.removeAll()
+                ownLinks.removeAll()
                 if !i.1.isEmpty {
                     for k in i.1 {
-                        if let survey = SurveyLink(k.1) {
-                            ownSurveys.append(survey)
+                        if let survey = ShortSurvey(k.1) {
+                            ownLinks.append(survey)
                         }
                     }
                 }
                 NotificationCenter.default.post(name: kNotificationOwnSurveysUpdated, object: nil)
             } else if i.0 == "favorite" {
-                favoriteSurveys.removeAll()
+                favoriteLinks.removeAll()
                 if !i.1.isEmpty {
                     for k in i.1 {
 //                        print(k)
                         if let date = Date(dateTimeString: (k.1["added_at"].stringValue as? String)!) as? Date,
-                            let survey = SurveyLink(k.1["survey"]) {
-                            favoriteSurveys[survey] = date
+                            let survey = ShortSurvey(k.1["survey"]) {
+                            favoriteLinks[survey] = date
                         }
                     }
                 }
                 NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
-            }  else if i.0 == "user_results" {
+            } else if i.0 == "user_results" {
                 completedSurveyIDs.removeAll()
                 for k in i.1 {
                     if let id = k.1["survey"].intValue as? Int {
                         completedSurveyIDs.append(id)
                     }
                 }
+            } else if i.0 == "hot" {
+                if !i.1.isEmpty {
+                    for k in i.1 {
+                        if let survey = FullSurvey(k.1) {
+                            append(object: survey, type: .Stack)
+                        }
+                    }
+                    NotificationCenter.default.post(name: kNotificationSurveysStackReceived, object: nil)
+                }
             }
         }
     }
     
-    func eraseData() {
-        topSurveys.removeAll()
-        newSurveys.removeAll()
-        byCategory.removeAll()
-        ownSurveys.removeAll()
-        favoriteSurveys.removeAll()
-        downloadedSurveys.removeAll()
+    func append(object: AnyObject, type: SurveyContainerType) {
+        switch type {
+        case .Stack:
+            if let _object = object as? FullSurvey {
+                if let _foundObject = downloadedObjects.filter({ $0.hashValue == _object.hashValue}).first {
+                    if stackObjects.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
+                        stackObjects.append(_foundObject)
+                    }
+                } else {
+                    if stackObjects.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+                        stackObjects.append(_object)
+                    }
+                }
+                append(object: _object, type: .Downloaded)
+            }
+        case .Downloaded:
+            if let _object = object as? FullSurvey {
+                if downloadedObjects.isEmpty {
+                    downloadedObjects.append(_object)
+                } else {
+                    if downloadedObjects.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+                        downloadedObjects.append(_object)
+                    }
+                }
+            }
+        case .New:
+            if let _object = object as? ShortSurvey {
+                if newLinks.isEmpty {
+                    newLinks.append(_object)
+                } else {
+                    newLinks.map() {
+                        if $0.hashValue != _object.hashValue {
+                            newLinks.append(_object)
+                        }
+                    }
+                }
+            }
+        case .Top:
+            if let _object = object as? ShortSurvey {
+                if topLinks.isEmpty {
+                    topLinks.append(_object)
+                } else {
+                    topLinks.map() {
+                        if $0.hashValue != _object.hashValue {
+                            topLinks.append(_object)
+                        }
+                    }
+                }
+            }
+        case .Own:
+            if let _object = object as? ShortSurvey {
+                if ownLinks.isEmpty {
+                    ownLinks.append(_object)
+                } else {
+                    ownLinks.map() {
+                        if $0.hashValue != _object.hashValue {
+                            ownLinks.append(_object)
+                        }
+                    }
+                }
+            }
+        default:
+            print("")
+        }
     }
     
-    subscript (ID: Int) -> Survey? {
-        if let i = downloadedSurveys.first(where: {$0.ID == ID}) {
+    func contains(object: AnyObject, type: SurveyContainerType) -> Bool {
+        switch type {
+        case .Stack:
+            if let _object = object as? FullSurvey {
+                if stackObjects.isEmpty {
+                    return false
+                } else {
+                    return !stackObjects.map() { $0.hashValue == _object.hashValue }.isEmpty
+                }
+            }
+        case .Downloaded:
+            if let _object = object as? FullSurvey {
+                if downloadedObjects.isEmpty {
+                    return false
+                } else {
+                    return !downloadedObjects.map() { $0.hashValue == _object.hashValue }.isEmpty
+                }
+            }
+        case .New:
+            if let _object = object as? ShortSurvey {
+                if newLinks.isEmpty {
+                    return false
+                } else {
+                    return !newLinks.map() { $0.hashValue == _object.hashValue }.isEmpty
+                }
+            }
+        case .Top:
+            if let _object = object as? ShortSurvey {
+                if topLinks.isEmpty {
+                    return false
+                } else {
+                    return !topLinks.map() { $0.hashValue == _object.hashValue }.isEmpty
+                }
+            }
+        case .Own:
+            if let _object = object as? ShortSurvey {
+                if ownLinks.isEmpty {
+                    return false
+                } else {
+                    return !ownLinks.map() { $0.hashValue == _object.hashValue }.isEmpty
+                }
+            }
+        default:
+            return false
+        }
+        return false
+    }
+    
+    func eraseData() {
+        topLinks.removeAll()
+        newLinks.removeAll()
+        categorizedLinks.removeAll()
+        ownLinks.removeAll()
+        favoriteLinks.removeAll()
+        downloadedObjects.removeAll()
+        stackObjects.removeAll()
+    }
+    
+    subscript (ID: Int) -> FullSurvey? {
+        if let i = downloadedObjects.first(where: {$0.ID == ID}) {
             return i
         } else {
             return nil
@@ -123,15 +252,15 @@ class Surveys {
     }
 }
 
-class SurveyLink {
+class ShortSurvey {
     var ID: Int
     var title: String
     var startDate: Date
     var category: SurveyCategory?
     var completionPercentage: Int
-    var hashValue: Int {
-        return ObjectIdentifier(self).hashValue
-    }
+//    var hashValue: Int {
+//        return ObjectIdentifier(self).hashValue
+//    }
     
     init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int) {
         ID                      = _id
@@ -158,9 +287,15 @@ class SurveyLink {
     }
 }
 
-extension SurveyLink: Hashable {
-    static func == (lhs: SurveyLink, rhs: SurveyLink) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+extension ShortSurvey: Hashable {
+    static func == (lhs: ShortSurvey, rhs: ShortSurvey) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+        //        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(title)
+        hasher.combine(ID)
     }
 }
 
@@ -266,7 +401,7 @@ extension SurveyCategory: Hashable {
     }
 }
 
-class Survey {
+class FullSurvey {
     var ID: Int?
     var title: String
     var startDate: Date
@@ -287,9 +422,10 @@ class Survey {
     var result: [Int: Date]?
     var userProfile: UserProfile?
     
-    var hashValue: Int {
-        return ObjectIdentifier(self).hashValue
-    }
+//    var hashValue: Int {
+//        return ObjectIdentifier(self).hashValue
+//    }
+//    var hashValue: Int
     var dict: [String: Any] {//Dict to create new survey
         var _dict: [String: Any] = [:]
         //Necessary data
@@ -355,7 +491,7 @@ class Survey {
     init?(_ json: JSON) {
         if let _ID                      = json["id"].intValue as? Int,
             let _title                  = json["title"].stringValue as? String,
-            let _startDate              = json["start_date"] is NSNull ? nil : Date(dateTimeString: json["end_date"].stringValue as! String),
+            let _startDate              = json["start_date"] is NSNull ? nil : Date(dateTimeString: json["start_date"].stringValue as! String),
             var _endDate                = json["end_date"] is NSNull ? nil : Date(dateTimeString: json["end_date"].stringValue as! String),
             var _modified               = Date(dateTimeString: json["modified_at"].stringValue as! String) as? Date,
             let _category               = json["category"].intValue as? Int,
@@ -409,25 +545,32 @@ class Survey {
                 }
             }
             if let _userProfile = UserProfile(_userProfileDict) {
-                //TODO find else add
-                var isFound = false
-                isFound = !UserProfiles.shared.container.map({
-                    if $0 == _userProfile {
-                        userProfile = $0
-                }}).isEmpty
+//                //TODO find else add
+//                var isFound = false
+//                isFound = !UserProfiles.shared.container.filter(){
+//                    if $0 == _userProfile {
+//                        userProfile = $0
+//                }}.isEmpty
                 
-                if !isFound {
+                if let user = UserProfiles.shared.container.filter({ $0 == _userProfile }).first {
+                    userProfile = user
+                } else {
                     UserProfiles.shared.container.append(_userProfile)
                     userProfile = _userProfile
                 }
+                
+//                if !isFound {
+//                    UserProfiles.shared.container.append(_userProfile)
+//                    userProfile = _userProfile
+//                }
             }
         } else {
             return nil
         }
     }
     
-    func createSurveyLink() -> SurveyLink? {
-        if ID != nil, let surveyLink = SurveyLink(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0) as? SurveyLink {
+    func createSurveyLink() -> ShortSurvey? {
+        if ID != nil, let surveyLink = ShortSurvey(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0) as? ShortSurvey {
             return surveyLink
         }
         return nil
@@ -438,9 +581,17 @@ class Survey {
     }
 }
 
-extension Survey: Hashable {
-    static func == (lhs: Survey, rhs: Survey) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+extension FullSurvey: Hashable {
+    static func == (lhs: FullSurvey, rhs: FullSurvey) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+//        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(title)
+        hasher.combine(ID)
+        hasher.combine(owner)
+        hasher.combine(description)
     }
 }
 

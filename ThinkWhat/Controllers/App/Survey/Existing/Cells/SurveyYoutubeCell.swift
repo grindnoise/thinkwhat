@@ -22,9 +22,9 @@ class SurveyYoutubeCell: UITableViewCell {
     }
     
     @objc fileprivate func callback() {
-        delegate?.cellSubviewTapped(self)
+        delegate?.signalReceived(self)
     }
-    weak var delegate: CellButtonDelegate?
+    weak var delegate: ButtonDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

@@ -18,9 +18,9 @@ class LostConnectionView: UIView {
         }
     }
     @IBAction func retryTapped(_ sender: Any) {
-        delegate?.cellSubviewTapped(self)
+        delegate?.signalReceived(self)
     }
-    weak var delegate: CellButtonDelegate?
+    weak var delegate: ButtonDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
