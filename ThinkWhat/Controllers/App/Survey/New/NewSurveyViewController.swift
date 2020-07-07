@@ -929,8 +929,8 @@ extension NewSurveyViewController: UITableViewDropDelegate {
     }
 }
 
-extension NewSurveyViewController: ButtonDelegate {
-    func signalReceived(_ sender: AnyObject) {
+extension NewSurveyViewController: CallbackDelegate {
+    func callbackReceived(_ sender: AnyObject) {
         if sender is CameraIcon {
             selectImage(.camera)
         } else if sender is GalleryIcon {

@@ -61,13 +61,13 @@ class SegueFromTop: UIStoryboardSegue {
             }
             src.navigationItem.titleView?.alpha = 0
         }
-        UIView.animate(withDuration: 0.38,
+        UIView.animate(withDuration: 0.33,
                        delay: 0.0,
                        options: .curveEaseIn,
                        animations: {
                         foregroundView.alpha = 0
         })
-        UIView.animate(withDuration: 0.38,
+        UIView.animate(withDuration: 0.33,
                        delay: 0.0,
                        options: .curveEaseInOut,
                        animations: {
@@ -83,3 +83,5 @@ class SegueFromTop: UIStoryboardSegue {
         })
     }
 }
+
+

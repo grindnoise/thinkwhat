@@ -18,7 +18,7 @@ class AnswerCreationHeaderCell: UITableViewCell {
             addButton.addGestureRecognizer(touch)
         }
     }
-    weak var delegate: ButtonDelegate?
+    weak var delegate: CallbackDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -32,7 +32,7 @@ class AnswerCreationHeaderCell: UITableViewCell {
     
     @objc fileprivate func addTapped(recognizer: UITapGestureRecognizer) {
         if recognizer.state == .ended, recognizer.view != nil {
-            delegate?.signalReceived(recognizer.view!)
+            delegate?.callbackReceived(recognizer.view!)
         }
     }
 }

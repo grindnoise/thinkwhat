@@ -48,9 +48,6 @@
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WRk-Lj-7xI">
                             <rect key="frame" x="0.0" y="0.0" width="225" height="54.5"/>
                             <color key="backgroundColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            <constraints>
-                                <constraint firstAttribute="width" secondItem="WRk-Lj-7xI" secondAttribute="height" multiplier="29:7" id="wF7-Ph-eu7"/>
-                            </constraints>
                             <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="17"/>
                             <state key="normal" title="ГОЛОСОВАТЬ">
                                 <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -95,7 +92,7 @@
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
-            <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+            <color key="backgroundColor" red="1" green="0.77329978490267293" blue="0.7763718124591531" alpha="0.13" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="FYy-Of-xyz" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.6" id="4kx-Mf-bvP"/>
                 <constraint firstItem="0yw-II-DdQ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="808-nR-Jbf"/>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Regular.ttf">
+            <string>OpenSans</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SurveyClaimView" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="contentView" destination="iN0-l3-epB" id="Vh2-FZ-jrc"/>
+                <outlet property="tableView" destination="wqr-Ll-BPE" id="dPl-kg-Uxn"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view tag="10" contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j02-9m-zoN">
+                    <rect key="frame" x="155.5" y="611" width="64" height="36"/>
+                    <accessibility key="accessibilityConfiguration" identifier="Cancel"/>
+                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
+                    <state key="normal" title="Отмена">
+                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </state>
+                    <connections>
+                        <action selector="cancelTapped:" destination="-1" eventType="touchUpInside" id="Wzz-9g-9Km"/>
+                    </connections>
+                </button>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="wqr-Ll-BPE">
+                    <rect key="frame" x="16" y="196" width="343" height="407"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </tableView>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="wqr-Ll-BPE" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="topMargin" constant="176" id="MC5-ft-9kk"/>
+                <constraint firstItem="j02-9m-zoN" firstAttribute="top" secondItem="wqr-Ll-BPE" secondAttribute="bottom" constant="8" id="Tj8-y0-ncl"/>
+                <constraint firstItem="wqr-Ll-BPE" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="VcQ-WK-i1c"/>
+                <constraint firstAttribute="bottom" secondItem="j02-9m-zoN" secondAttribute="bottom" constant="20" id="eVK-7o-0cM"/>
+                <constraint firstItem="wqr-Ll-BPE" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="fis-bX-qeD"/>
+                <constraint firstItem="j02-9m-zoN" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="qfv-lb-EYu"/>
+            </constraints>
+            <point key="canvasLocation" x="53.600000000000001" y="48.125937031484263"/>
+        </view>
+    </objects>
+</document>

@@ -22,6 +22,7 @@ protocol APIManagerProtocol {
     func getEmailConfirmationCode(completion: @escaping(JSON?, Error?)->())
     func getEmailVerified(completion: @escaping(Bool?, Error?)->())
     func signUp(email: String, password: String, username: String, completion: @escaping (Error?) -> ())
+    func initialLoad(completion: @escaping(JSON?, Error?)->())
     func loadSurveyCategories(completion: @escaping(JSON?, Error?)->())
     func loadSurveys(type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
     func loadSurvey(survey: ShortSurvey, completion: @escaping(JSON?, Error?)->())
@@ -29,8 +30,9 @@ protocol APIManagerProtocol {
     func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->())
     func markFavorite(mark: Bool, survey: ShortSurvey, completion: @escaping(JSON?, Error?)->())
     func postSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->())
-    func rejectSurvey(survey: FullSurvey)
+    func rejectSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->())
     func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->())
+    func postClaim(surveyID: Int, claimID: Int, completion: @escaping(JSON?, Error?)->())
     
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
     func downloadImage(url: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
@@ -50,7 +52,7 @@ protocol UserDataPreparatory: class {
 class APIManager: APIManagerProtocol {
     
     public enum SurveyType: String {
-        case Top,New,All,Own,Favorite, Hot
+        case Top,New,All,Own,Favorite, Hot, HotExcept
         
         func getURL() -> URL {
             let url = URL(string: SERVER_URLS.BASE)!//.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE)
@@ -67,6 +69,8 @@ class APIManager: APIManagerProtocol {
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_FAVORITE)
             case .Hot:
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT)
+            case .HotExcept:
+                return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT_EXCEPT)
             }
         }
     }
@@ -83,8 +87,8 @@ class APIManager: APIManagerProtocol {
     }
     private var defaultSessionManager: Alamofire.SessionManager {
         let configuration = Alamofire.SessionManager.default.session.configuration
-        configuration.timeoutIntervalForRequest = 15
-        configuration.timeoutIntervalForResource = 10
+        configuration.timeoutIntervalForRequest = 10
+//        configuration.timeoutIntervalForResource = 10
         return Alamofire.SessionManager(configuration: configuration)
     }
     private var proxySessionManager: Alamofire.SessionManager {
@@ -679,7 +683,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func loadSurveys(type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->()) {
+    func initialLoad(completion: @escaping(JSON?, Error?)->()) {
         var error: Error?
         
         checkForReachability {
@@ -690,7 +694,47 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error)
                     } else if success {
-                        self._performRequest(url: type.getURL(), httpMethod: .get, parameters: nil, encoding: JSONEncoding.default, completion: completion)
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.APP_LAUNCH), httpMethod: .get, parameters: nil, encoding: URLEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
+    func loadSurveys(type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        var httpMethod: HTTPMethod = .get
+        var url: URL = type.getURL()
+//        var encoding
+        
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        var parameters: [String: [Any]]?
+                        if type == .Hot {
+//                            var list: [Int] = []
+//                            if !Surveys.shared.stackObjects.isEmpty {
+//                                list = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+//                            }
+//                            if let _id = Surveys.shared.currentHotSurvey?.ID {
+//                                list.append(_id)
+//                            }
+//                            if !list.isEmpty {
+//                                parameters = list.asParameters(arrayParametersKey: "ids") as! [String : [Any]]//["ids": ["df", "sdf"]]
+//                                httpMethod = .post
+//                                url = APIManager.SurveyType.HotExcept.getURL()
+//                            }
+                        }
+//                        parameters = nil
+                        self._performRequest(url: url, httpMethod: httpMethod, parameters: parameters, encoding: JSONEncoding.default, completion: completion)
                     }
                 }
             } else {
@@ -1005,7 +1049,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func rejectSurvey(survey: FullSurvey) {
+    func rejectSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->()) {
         checkForReachability {
             reachable in
             if reachable == .Reachable {
@@ -1014,14 +1058,41 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         print(error!)
                     } else if success {
-                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_REJECT), httpMethod: .post, parameters: ["survey": survey.ID!], encoding: JSONEncoding.default, completion: {_,_ in })
+                        var parameters: [String: Any] = ["survey": survey.ID! as Any]
+                        if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
+                            var list = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+                            if !list.isEmpty {
+                                let dict = list.asParameters(arrayParametersKey: "ids") as! [String : Any]
+                                parameters.merge(dict) {(current, _) in current}
+                            }
+                        }
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_REJECT), httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, completion: completion)
                     }
                 }
             } else {
                 print(NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error)
             }
         }
-        
+    }
+    
+    func postClaim(surveyID: Int, claimID: Int, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error!)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_CLAIM), httpMethod: .post, parameters: ["survey": surveyID, "claim": claimID], encoding: JSONEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
     }
     
     private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(JSON?, Error?)->()) {
@@ -1031,7 +1102,7 @@ class APIManager: APIManagerProtocol {
             "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
             "Content-Type": "application/json"
         ]
-        
+
         sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseJSON() {
             response in
             if response.result.isFailure {
@@ -1051,7 +1122,6 @@ class APIManager: APIManagerProtocol {
                         } else if 400...499 ~= statusCode {
                             do {
                                 let errorJSON = try JSON(data: response.data!)
-                                response.request?.url
                                 error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
                                 print(error!.localizedDescription)
                             } catch let _error {

@@ -17,6 +17,8 @@ import UserNotifications
 
 typealias Closure = (()->())
 
+var isTesting = false
+
 let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateFormat = "dd.MM.yyyy"
@@ -182,11 +184,14 @@ let kNotificationSurveysStackReceived            = Notification.Name("Notificati
 let kNotificationSurveysStackUpdated             = Notification.Name("NotificationSurveysStackUpdated")
 let kNotificationOwnSurveysUpdated               = Notification.Name("NotificationOwnSurveysUpdated")
 let kNotificationSurveysByCategoryUpdated        = Notification.Name("NotificationSurveysByCategoryUpdated")
-let kNotificationFavoriteSurveysUpdated         = Notification.Name("NotificationSurveysByCategoryUpdated")
+let kNotificationFavoriteSurveysUpdated          = Notification.Name("NotificationSurveysByCategoryUpdated")
+
+let kNotificationClaimSignAppeared               = NSNotification.Name(rawValue: "ClaimSignAppeared")
 
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
-
+let MIN_STACK_SIZE                               = 1//Min quantity of hot surveys to request another portion
+let REJECTED_SURVEYS_ERASE_INTERVAL:TimeInterval = 60//Timer parameter to wipe out rejectedSurveys container
 //MARK: - Segues
 struct Segues {
     struct Launch {
@@ -214,6 +219,7 @@ struct Segues {
         static let ProfileToSettingsSelection = "PROFILE_SETINGS_SELECTION"
         static let ProfileToInfo            = "INFO"
         static let Logout                   = "BACK_TO_AUTH"
+        static let FeedToSurveyFromTop      = "FEED_TO_SURVEY_FROM_TOP"
         static let FeedToSurvey             = "FEED_TO_SURVEY"
         static let FeedToNewSurvey          = "FEED_TO_NEW_SURVEY"
         static let FeedToUser               = "FEED_TO_USER"
@@ -222,6 +228,7 @@ struct Segues {
         static let NewSurveyToAnonymity     = "NEW_TO_ANONYMITY"
         static let NewSurveyToCategorySelection = "NEW_TO_CATEGORY_SELECTION"
         static let SurveyToUser             = "SURVEY_TO_USER"
+        static let SurveyToClaim            = "SURVEY_TO_CLAIM"
     }
 }
 ////MARK: Auth
@@ -612,14 +619,16 @@ struct VK_IDS {
 }
 
 struct SERVER_URLS {
-    static let BASE                     = "https://damp-oasis-64585.herokuapp.com/"//"http://127.0.0.1:8000/"//
-    static let CLIENT_ID                = "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
-    static let CLIENT_SECRET            = "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
+    static let BASE                     = isTesting ? "http://127.0.0.1:8000/" : "https://damp-oasis-64585.herokuapp.com/"////
+    static let CLIENT_ID                = isTesting ? "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS" : "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
+    static let CLIENT_SECRET            = isTesting ? "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH" : "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
     static let SIGNUP                   = "api/sign_up/"
     static let TOKEN                    = "api/social/token/"
     static let TOKEN_CONVERT            = "api/social/convert-token/"
     static let TOKEN_REVOKE             = "api/social/revoke-token/"
     
+    
+    static let APP_LAUNCH               = "api/app_launch/load/"
     //Profiles
     static let USERS                    = "api/users/"
     static let USERNAME_EXISTS          = "api/profiles/username_exists"
@@ -638,12 +647,14 @@ struct SERVER_URLS {
     static let SURVEYS_ALL              = "api/surveys/all/"
     static let SURVEYS_OWN              = "api/surveys/own/"
     static let SURVEYS_HOT              = "api/surveys/hot/"
+    static let SURVEYS_HOT_EXCEPT       = "api/surveys/hot_except/"
     static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
     static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
     static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
     static let SURVEYS_ADD_FAVORITE     = "api/surveys/add_favorite/"
     static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
     static let SURVEYS_REJECT           = "api/surveys/reject/"
+    static let SURVEYS_CLAIM            = "api/surveys/claim/"
     
     static let SURVEYS_RESULTS          = "api/survey_results/"
     

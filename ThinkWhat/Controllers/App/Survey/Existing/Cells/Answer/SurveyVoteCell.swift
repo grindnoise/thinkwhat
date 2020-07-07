@@ -17,10 +17,10 @@ class SurveyVoteCell: UITableViewCell {
         }
     }
     @IBAction func btnTapped(_ sender: Any) {
-        delegate?.signalReceived(self as AnyObject)
+        delegate?.callbackReceived(self as AnyObject)
     }
     
-    weak var delegate: ButtonDelegate?
+    weak var delegate: CallbackDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()

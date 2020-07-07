@@ -15,7 +15,7 @@ class SurveyPreview: UIView {
     }
 
     var survey: FullSurvey!
-    weak fileprivate var delegate: ButtonDelegate?
+    weak fileprivate var delegate: CallbackDelegate?
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var userImage: UIImageView! {
         didSet {
@@ -31,9 +31,9 @@ class SurveyPreview: UIView {
     @IBOutlet weak var nextButton: UIButton!
     
     @IBAction func buttonTapped(_ sender: Any) {
-        delegate?.signalReceived(sender as AnyObject)
+        delegate?.callbackReceived(sender as AnyObject)
     }
-    init(frame: CGRect, survey _survey: FullSurvey, delegate _delegate: ButtonDelegate) {
+    init(frame: CGRect, survey _survey: FullSurvey, delegate _delegate: CallbackDelegate) {
         survey = _survey
         delegate = _delegate
         super.init(frame: frame)
@@ -54,7 +54,7 @@ class SurveyPreview: UIView {
         
         content.frame = self.bounds
         content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        content.backgroundColor = UIColor.lightGray.withAlphaComponent(0.09)
+        //content.backgroundColor = UIColor.lightGray.withAlphaComponent(0.09)
         self.addSubview(content)
         titleLabel.text = survey.title
         surveyDate.text = survey.startDate.toDateString()//.toDateTimeStringWithoutSeconds()
@@ -62,9 +62,10 @@ class SurveyPreview: UIView {
     }
     
     @objc fileprivate func callback(recognizer: UITapGestureRecognizer) {
-        if recognizer.state == .ended, let _view = recognizer.view {
-            _view.setValue(survey.userProfile, forKey: "userProfile")
-            delegate?.signalReceived(_view as AnyObject)
+        if recognizer.state == .ended {
+//            _view.setValue("", forKey: "userProfile")
+//            _view.setValue("123", forUndefinedKey: "test")
+            delegate?.callbackReceived(survey.userProfile as AnyObject)
         }
     }
 }

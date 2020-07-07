@@ -61,20 +61,29 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     fileprivate lazy var voteCompletionView: VoteCompletionView? = {
         return VoteCompletionView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
     } ()
-    fileprivate let sections = ["ОСНОВНОЕ", "ОТВЕТЫ", "КНОПКА ГОЛОСОВАНИЯ"]
-    fileprivate var isRequesting = false
+    fileprivate lazy var surveyClaimView: SurveyClaimView? = {
+        return SurveyClaimView(frame: (UIApplication.shared.keyWindow?.frame)!, delegate: self)
+    } ()
+    fileprivate let sections            = ["ОСНОВНОЕ", "ОТВЕТЫ", "КНОПКА ГОЛОСОВАНИЯ"]
+    fileprivate var isRequesting        = false
 //    fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     var apiManager: APIManagerProtocol!
-    fileprivate let requestAttempts = 3
-    fileprivate var loadingIndicator: LoadingIndicator?
-    fileprivate let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
-    fileprivate var isInitialLoading = true {
+    fileprivate let requestAttempts     = 3
+    fileprivate var loadingIndicator:   LoadingIndicator?
+    fileprivate let claimButton         = ClaimBarButton(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
+    fileprivate var claimPosition       = CGPoint.zero
+    fileprivate var claimButtonNeedsAnimation = true
+    fileprivate var tempClaimButton:    ClaimBarButton?
+    fileprivate var tempClaimMaxY:      CGFloat = 0
+    fileprivate let likeButton          = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
+    fileprivate var isInitialLoading    = true {
         didSet {
             if tableView != nil {
                 tableView.isUserInteractionEnabled = !isInitialLoading
             }
         }
     }
+    weak var delegate: CallbackDelegate?
     fileprivate var isLoadingImages  = true
     fileprivate var selectedAnswerID = 0 {
         didSet {
@@ -120,6 +129,9 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             if survey != nil, isInitialLoading {
 //                delay(seconds: 0.01) {
                     self.presentSurvey()
+                if surveyLink == nil {
+                    surveyLink = ShortSurvey(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100)
+                }
 //                }
             }
         }
@@ -143,17 +155,21 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         self.navigationController?.navigationBar.barTintColor    = .white
         self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         self.navigationItem.backBarButtonItem?.tintColor         = .black
-        self.navigationItem.rightBarButtonItem                   = UIBarButtonItem(customView: likeButton)
+        self.navigationItem.rightBarButtonItems                   = [UIBarButtonItem(customView: likeButton), UIBarButtonItem(customView: claimButton)]
         self.loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)))
         self.loadingIndicator!.layoutCentered(in: self.view, multiplier: 0.8)
         self.loadingIndicator!.layer.zPosition = 1
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.likeTapped(gesture:)))
+        let gesture     = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.barButtonTapped(gesture:)))
+        let gesture_1   = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.barButtonTapped(gesture:)))
         likeButton.addGestureRecognizer(gesture)
+        claimButton.addGestureRecognizer(gesture_1)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationItem.setHidesBackButton(true, animated: false)
+        navigationItem.setHidesBackButton(true, animated: false)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        navigationItem.setHidesBackButton(false, animated: true)
         //surveyTitle.text = surveyLink.title
         if survey != nil {
             isInitialLoading = false
@@ -161,6 +177,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             if survey!.images != nil {
                 isLoadingImages = false
             }
+            tableView.reloadData()
         } else if let _survey = Surveys.shared[surveyLink.ID] {
             isInitialLoading = false
             survey = _survey
@@ -168,28 +185,42 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             if survey!.images != nil {
                 isLoadingImages = false
             }
+            tableView.reloadData()
         } else {
             isInitialLoading = true
             loadingIndicator?.alpha = 1
             loadingIndicator?.addEnableAnimation()
             loadData()
         }
-        if let likeBtn = navigationItem.rightBarButtonItem?.customView {
-            likeBtn.alpha = 0
-            likeBtn.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+//        if let claimBtn = navigationItem.rightBarButtonItems?.first?.customView as? HeartView, let likeBtn = navigationItem.rightBarButtonItems?.last?.customView as? HeartView{
+        if claimButtonNeedsAnimation {
+            claimButton.alpha = 0
+            claimButton.isOpaque = false
+            claimButton.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
-                likeBtn.transform = .identity
-                likeBtn.alpha = 1
+                self.claimButton.transform = .identity
+                self.claimButton.alpha = 1
+            })
+
+        }
+            likeButton.alpha = 0
+            likeButton.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+                        UIView.animate(withDuration: 0.3, delay: 0.1, options: .curveEaseInOut, animations: {
+                self.likeButton.transform = .identity
+                self.likeButton.alpha = 1
                 
 //                self.navigationController?.navigationBar.layoutIfNeeded()
             })
-        }
-        self.navigationItem.setHidesBackButton(false, animated: true)
+//        }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        (navigationController as! NavigationControllerPreloaded).isFadeTransition = false
         tabBarController?.setTabBarVisible(visible: false, animated: true)
+        
+        claimButtonNeedsAnimation = true
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -449,18 +480,18 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         }
     }
     
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-            let animation = AnimationFactory.makeFadeAnimation(duration: 0.18, delayFactor: 0.015)//AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
-            let animator = Animator(animation: animation)
-            animator.animate(cell: cell, at: indexPath, in: tableView)
-    }
-    
-    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-            view.alpha = 0
-            UIView.animate(withDuration: 0.18) {
-                view.alpha = 1
-            }
-    }
+//    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//            let animation = AnimationFactory.makeFadeAnimation(duration: 0.18, delayFactor: 0.015)//AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
+//            let animator = Animator(animation: animation)
+//            animator.animate(cell: cell, at: indexPath, in: tableView)
+//    }
+//
+//    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+//            view.alpha = 0
+//            UIView.animate(withDuration: 0.18) {
+//                view.alpha = 1
+//            }
+//    }
 }
 
 
@@ -501,30 +532,68 @@ extension SurveyViewController {
     }
     
     //POST request FavoriteSurvey model
-    @objc fileprivate func likeTapped(gesture: UITapGestureRecognizer) {
-        if !isRequesting {
-            isRequesting = true
-            if gesture.state == .ended {
-                var mark = true
-                if likeButton.state == .disabled {
-                    likeButton.state = .enabled
-                    mark = true
-                    if Array(Surveys.shared.favoriteLinks.keys).filter( {$0.ID == surveyLink.ID }).isEmpty { Surveys.shared.favoriteLinks[self.surveyLink] = Date() }
-                } else {
-                    likeButton.state = .disabled
-                    mark = false
-                    if let key = Surveys.shared.favoriteLinks.keys.filter({ $0.ID == surveyLink.ID }).first {
-                        Surveys.shared.favoriteLinks.removeValue(forKey: key)
+    @objc fileprivate func barButtonTapped(gesture: UITapGestureRecognizer) {
+        if gesture.state == .ended {
+            if gesture.view is HeartView {
+                if !isRequesting {
+                    isRequesting = true
+                    var mark = true
+                    if likeButton.state == .disabled {
+                        likeButton.state = .enabled
+                        mark = true
+                        if Array(Surveys.shared.favoriteLinks.keys).filter( {$0.ID == surveyLink.ID }).isEmpty { Surveys.shared.favoriteLinks[self.surveyLink] = Date() }
+                    } else {
+                        likeButton.state = .disabled
+                        mark = false
+                        if let key = Surveys.shared.favoriteLinks.keys.filter({ $0.ID == surveyLink.ID }).first {
+                            Surveys.shared.favoriteLinks.removeValue(forKey: key)
+                        }
+                        //                Surveys.shared.favoriteSurveys.removeValue(forKey: self.surveyLink)
+                        NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
                     }
-                    //                Surveys.shared.favoriteSurveys.removeValue(forKey: self.surveyLink)
-                    NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
+                    apiManager.markFavorite(mark: mark, survey: surveyLink!) {
+                        _, error in
+                        self.isRequesting = false
+                        if error != nil {
+                            showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Опрос не добавлен в любимые. \(error!.localizedDescription)")
+                        }
+                    }
                 }
-                apiManager.markFavorite(mark: mark, survey: surveyLink!) {
-                    _, error in
-                    self.isRequesting = false
-                    if error != nil {
-                        showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Опрос не добавлен в любимые. \(error!.localizedDescription)")
-                    }
+            } else {
+                tempClaimButton = ClaimBarButton(frame: claimButton.frame)
+                tempClaimButton!.center = claimButton.center
+                tempClaimButton!.isOpaque = false
+                
+                if let rbtn = navigationItem.rightBarButtonItems?.filter({ $0.customView is ClaimBarButton }).first?.customView as? ClaimBarButton {
+                    claimPosition = rbtn.convert(rbtn.center, to: tabBarController?.view)
+                    tempClaimButton!.center = claimPosition
+                }
+//                surveyClaimView?.present()
+                claimButton.alpha = 0
+                UIApplication.shared.keyWindow?.addSubview(tempClaimButton!)
+                
+                
+                
+                
+                let height = tempClaimButton!.frame.height / 2
+                let size = view.frame.width * 0.4
+                let center = CGPoint(x: self.view.center.x - size/2 + height, y: size/1.5)
+                tempClaimMaxY = CGPoint(x: self.view.center.x - size/2 + height, y: size/1.5).y + (view.frame.width * 0.4)/2
+                UIView.animate(
+                    withDuration: 0.4,
+                    delay: 0,
+                    usingSpringWithDamping: 0.8,
+                    initialSpringVelocity: 2.5,
+                    options: [.curveEaseInOut],
+                    animations: {
+                        self.tempClaimButton!.center = center
+                        self.tempClaimButton!.frame.size = CGSize(width: size, height: size)
+                }) {
+                    _ in
+                    NotificationCenter.default.post(name: kNotificationClaimSignAppeared, object: self.tempClaimButton)
+                }
+                delay(seconds: 0.01) {
+                    self.performSegue(withIdentifier: Segues.App.SurveyToClaim, sender: self)
                 }
             }
         }
@@ -604,19 +673,48 @@ extension SurveyViewController: WKYTPlayerViewDelegate {
     }
 }
 
-extension SurveyViewController: ButtonDelegate {
-    func signalReceived(_ sender: AnyObject) {
+extension SurveyViewController: CallbackDelegate {
+    func callbackReceived(_ sender: AnyObject) {
         if sender is UIButton {
-            if let url = URL(string: survey!.link!) {
-                var vc: SFSafariViewController!
-                if #available(iOS 11.0, *) {
-                    let config = SFSafariViewController.Configuration()
-                    config.entersReaderIfAvailable = true
-                    vc = SFSafariViewController(url: url, configuration: config)
-                } else {
-                    vc = SFSafariViewController(url: url)
+            if (sender as! UIButton).accessibilityIdentifier == "Cancel" {
+                claimButtonNeedsAnimation = false
+                if let rbtn = navigationItem.rightBarButtonItems?.filter({ $0.customView is ClaimBarButton }).first?.customView as? ClaimBarButton {//}, let finalPos = claimButton.convert(claimButton.center, to: tabBarController?.view) as? CGPoint {
+                    let height = tempClaimButton!.frame.height / 2
+                    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
+                        self.tempClaimButton!.center = CGPoint(x: self.claimPosition.x + height/2 + rbtn.frame.size.width/2 - 3, y: self.claimPosition.y + height/2 + rbtn.frame.size.width/2 - 3)
+                        self.tempClaimButton!.frame.size = rbtn.frame.size
+                    }) {
+                        _ in
+                        self.claimButton.alpha = 1
+                        self.tempClaimButton?.alpha = 0
+                        self.tempClaimButton?.removeFromSuperview()
+                    }
                 }
-                present(vc, animated: true)
+            } else if (sender as! UIButton).accessibilityIdentifier == "PostClaim", let claimID = (sender as! UIButton).layer.value(forKey: "claimID") as? Int {
+                apiManager.postClaim(surveyID: survey!.ID!, claimID: claimID) { _, error in print(error?.localizedDescription) }
+                UIView.animate(withDuration: 0.5) {
+                    self.tempClaimButton?.center.y = self.view.frame.height / 3
+                }
+            } else if (sender as! UIButton).accessibilityIdentifier == "Close", let claimCategory = (sender as! UIButton).layer.value(forKey: "claimCategory") as? ClaimCategory {
+                UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
+                    self.tempClaimButton?.alpha = 0
+                }) {
+                    _ in
+                    self.delegate?.callbackReceived(claimCategory)//Claim - update UI
+                    self.navigationController?.popViewController(animated: true)
+                }
+            } else {
+                if let url = URL(string: survey!.link!) {
+                    var vc: SFSafariViewController!
+                    if #available(iOS 11.0, *) {
+                        let config = SFSafariViewController.Configuration()
+                        config.entersReaderIfAvailable = true
+                        vc = SFSafariViewController(url: url, configuration: config)
+                    } else {
+                        vc = SFSafariViewController(url: url)
+                    }
+                    present(vc, animated: true)
+                }
             }
         } else if sender is SurveyVoteCell {
             if selectedAnswerID != 0 {
@@ -630,6 +728,18 @@ extension SurveyViewController: ButtonDelegate {
             tableView.scrollToRow(at: IndexPath(row: 3, section: 0), at: .top, animated: true)
         } else if sender is AnswerHeaderCell {
             tableView.scrollToRow(at: IndexPath(row: 0, section: 1), at: .top, animated: true)
+        } else if let claim = sender as? ClaimCategory {
+            apiManager.postClaim(surveyID: survey!.ID!, claimID: claim.ID) { _, error in print(error?.localizedDescription) }
+        }
+    }
+}
+
+extension SurveyViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == Segues.App.SurveyToClaim, let destination = segue.destination as? ClaimViewController {
+            (navigationController as! NavigationControllerPreloaded).isFadeTransition = true
+            destination.delegate = self
+            destination.topConstraintConstant = tempClaimMaxY
         }
     }
 }

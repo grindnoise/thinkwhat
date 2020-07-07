@@ -82,7 +82,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     var isDataLoaded = false {
         didSet {
             if oldValue != isDataLoaded {
-                UIView.animate(withDuration: 0.3, animations: {
+                UIView.animate(withDuration: 0.2, animations: {
                     self.loadingIndicator.alpha = 0
                     self.navigationItem.titleView?.alpha = 1
                     self.tabBarController?.tabBar.tintColor = K_COLOR_TABBAR
@@ -90,9 +90,11 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                     _ in
                     self.tabBarController?.tabBar.isUserInteractionEnabled = true
                     for (index, icon) in self.icons.enumerated() {
-                        delay(seconds: Double(index) * 0.1) {
-                            UIView.animate(withDuration: 0.6) {
+                        icon.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+                        delay(seconds: Double(index) * 0.09) {
+                            UIView.animate(withDuration: 0.3) {
                                 icon.alpha = 1
+                                icon.transform = .identity
                             }
                         }
                     }
@@ -183,7 +185,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         if startingPoint == .zero, let rbtn = navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
                 startingPoint = rbtn.convert(rbtn.center, to: tabBarController?.view)
         }
-        
+        (navigationController as? NavigationControllerPreloaded)?.startingPoint = .zero
         UIView.animate(withDuration: 0.2, animations: {
             self.navigationItem.titleView?.alpha = 1
         }) {
@@ -193,7 +195,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
 //                    rbtn.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
 //                    UIView.animate(withDuration: 0.3) {
 //                        rbtn.transform = .identity
-//                        rbtn.alpha = 1
+//                        rbtn.alpha = 1w
 //                    }
 //                }
 //            }
@@ -286,23 +288,38 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             case .New:
                 if let cell = newTableVC.tableView.cellForRow(at: newTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
                     destinationVC.surveyLink = cell.survey
+                    destinationVC.apiManager = apiManager
                 }
             case.Top:
                 if let cell = topTableVC.tableView.cellForRow(at: topTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
                     destinationVC.surveyLink = cell.survey
+                    destinationVC.apiManager = apiManager
                 }
             default: //Hot
-                if let sender = sender as? SurveyStackViewController {
-                    destinationVC.apiManager = apiManager
-                    destinationVC.survey = sender.surveyPreview.survey
-                }
+                print("s")
+//                if let sender = sender as? SurveyStackViewController {
+//                    destinationVC.apiManager = apiManager
+//                    destinationVC.survey = sender.surveyPreview.survey
+//                    destinationVC.delegate = sender
+//                }
             }
             tabBarController?.setTabBarVisible(visible: false, animated: true)
             
+        } else if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController, let sender = sender as? SurveyStackViewController {
+            destinationVC.apiManager = apiManager
+            destinationVC.survey = sender.surveyPreview.survey
+            destinationVC.delegate = sender
+            tabBarController?.setTabBarVisible(visible: false, animated: true)
         } else if segue.identifier == Segues.App.FeedToNewSurvey { //New survey
             navigationController?.setNavigationBarHidden(true, animated: false)
             tabBarController?.setTabBarVisible(visible: false, animated: false)
-            (navigationController as? NavigationControllerPreloaded)?.startingPoint = startingPoint
+            if let _sender = sender as? EmptySurvey {
+                (navigationController as? NavigationControllerPreloaded)?.startingPoint = _sender.startingPoint//.createButton.center//.convert(_sender.createButton.frame.origin, to: tabBarController?.view)
+            } else {
+                (navigationController as? NavigationControllerPreloaded)?.startingPoint = startingPoint
+            }
+        } else if segue.identifier == Segues.App.FeedToUser, let userProfile = sender as? UserProfile, let destinationVC = segue.destination as? UserViewController {
+            destinationVC.userProfile = userProfile
         }
     }
     
@@ -398,8 +415,8 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     }
 }
 
-extension SurveysViewController: ButtonDelegate {
-    func signalReceived(_ sender: AnyObject) {
+extension SurveysViewController: CallbackDelegate {
+    func callbackReceived(_ sender: AnyObject) {
         if sender is LostConnectionView {
             loadData()
             UIView.animate(withDuration: 0.3, animations: {
@@ -421,8 +438,8 @@ extension SurveysViewController: ServerProtocol {
         
 //                delay(seconds: 3) {
 //                    self.presentLostConnectionView()
-//                }
-        apiManager.loadSurveyCategories() {
+        //                }
+        apiManager.initialLoad() {
             json, error in
             if error != nil {
                 if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
@@ -436,12 +453,40 @@ extension SurveysViewController: ServerProtocol {
                 }
             }
             if json != nil {
-                SurveyCategories.shared.importJson(json!)
-                self.updateSurveysTotalCount()
-                self.updateSurveys(type: .All)
+                SurveyCategories.shared.importJson(json!["categories"])
+                SurveyCategories.shared.updateCount(json!["total_count"])
+                ClaimCategories.shared.importJson(json!["claim_categories"])
+                Surveys.shared.importSurveys(json!["surveys"])
+                self.newTableVC.refreshControl?.endRefreshing()
+                self.newTableVC.needsAnimation = true
+                if self.isInitialLoad {
+                    self.newTableVC.tableView.isUserInteractionEnabled = true
+                    self.isDataLoaded = true
+                }
                 self.requestAttempt = 0
             }
         }
+    
+//        apiManager.loadSurveyCategories() {
+//            json, error in
+//            if error != nil {
+//                if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
+//                    self.presentLostConnectionView()
+//                } else {
+//                    //Retry unless successfull
+//                    self.requestAttempt += 1
+//                    if self.isInitialLoad {
+//                        self.loadData()
+//                    }
+//                }
+//            }
+//            if json != nil {
+//                SurveyCategories.shared.importJson(json!)
+//                self.updateSurveysTotalCount()
+//                self.updateSurveys(type: .All)
+//                self.requestAttempt = 0
+//            }
+//        }
     }
     
     func updateSurveysTotalCount() {

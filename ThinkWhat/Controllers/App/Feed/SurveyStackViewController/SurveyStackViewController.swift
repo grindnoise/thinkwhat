@@ -10,13 +10,16 @@ import UIKit
 
 class SurveyStackViewController: UIViewController {
     
+    var isPause = false
     var delegate: SurveysViewController!
     var surveyPreview: SurveyPreview!
-    fileprivate var isRequesting = false //Don't overlap requests
+//    fileprivate var isRequesting = false //Don't overlap requests
+    fileprivate var isFirstAppearance = true
     fileprivate var removePreview:  SurveyPreview!
     fileprivate var nextPreview:    SurveyPreview?
     fileprivate var timer:          Timer?
     fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
+    fileprivate lazy var loadingView: EmptySurvey = self.createLoadingView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,7 +27,14 @@ class SurveyStackViewController: UIViewController {
                                                selector: #selector(SurveyStackViewController.generatePreviews),
                                                name: kNotificationSurveysStackReceived,
                                                object: nil)
-        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(SurveyStackViewController.didBecomeActive),
+                                               name: UIApplication.didBecomeActiveNotification,
+                                               object: nil)
+//        NotificationCenter.default.addObserver(self,
+//                                               selector: #selector(SurveyStackViewController.didEnterBackground),
+//                                               name: UIApplication.didEnterBackgroundNotification,
+//                                               object: nil)
     }
     
     deinit {
@@ -32,15 +42,35 @@ class SurveyStackViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        generatePreviews()
+        isPause = false
+        delay(seconds: 0.2) {
+            self.generatePreviews()
+        }
+        if isFirstAppearance  {
+            isFirstAppearance = false
+        }
     }
     
+    @objc fileprivate func didBecomeActive() {
+        if Surveys.shared.stackObjects.isEmpty {
+            startTimer()
+        }
+    }
+    
+//    @objc fileprivate func didEnterBackground() {
+//        stopTimer()
+//    }
+    
     @objc fileprivate func generatePreviews() {
-        if surveyPreview == nil {
-            if let _nextPreview = createSurveyPreview() {
-                stopTimer()
-                nextPreview = _nextPreview
-                nextSurvey(nextPreview!)
+        if !isPause {
+            if surveyPreview == nil {
+                if let _nextPreview = createSurveyPreview() {
+                    stopTimer()
+                    nextPreview = _nextPreview
+                    nextSurvey(nextPreview!)
+                } else {
+                    loadingView.setEnabled(true) { _ in }
+                }
             }
         }
     }
@@ -48,12 +78,27 @@ class SurveyStackViewController: UIViewController {
     @objc fileprivate func createSurveyPreview() -> SurveyPreview? {
         if !Surveys.shared.stackObjects.isEmpty {
             if let survey = Surveys.shared.stackObjects.remove(at: 0) as? FullSurvey {
-                let _surveyPreview = SurveyPreview(frame: CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * 0.95, height: view.frame.size.height * 0.95)), survey: survey, delegate: self)
+//                Surveys.shared.currentHotSurvey = survey
+                let multiplier: CGFloat = 0.95
+                var _rect = CGRect.zero
+                if tabBarController!.tabBar.isHidden {
+////                    tabBarController?.tabBar.frame.size.height
+//                    _rect = CGRect(origin: CGPoint(x: view.frame.origin.x, y:  view.frame.origin.y - tabBarController!.tabBar.frame.height),
+//                                   size: CGSize(width: view.frame.width * multiplier, height: view.frame.height * multiplier - tabBarController!.tabBar.frame.height))
+                    _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height/* * multiplier*/ - tabBarController!.tabBar.frame.height))
+                } else {
+                    _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height/* * multiplier*/))
+                }
+                let _surveyPreview = SurveyPreview(frame: _rect, survey: survey, delegate: self)
+                //let _surveyPreview = SurveyPreview(frame: CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * 0.95, height: view.frame.size.height * 0.95)), survey: survey, delegate: self)
                 _surveyPreview.setNeedsLayout()
                 _surveyPreview.layoutIfNeeded()
-                _surveyPreview.voteButton.cornerRadius = _surveyPreview.voteButton.frame.height / 2
+                _surveyPreview.voteButton.layer.cornerRadius = _surveyPreview.voteButton.frame.height / 2
                 _surveyPreview.center = view.center
                 _surveyPreview.center.x += view.frame.width
+//                if tabBarController!.tabBar.isHidden {
+//                    _surveyPreview.center.y -= tabBarController!.tabBar.frame.height
+//                }
                 //            _surveyPreview.alpha = 0
                 if let userProfile = survey.userProfile as? UserProfile {
                     _surveyPreview.userName.text = userProfile.name
@@ -80,25 +125,44 @@ class SurveyStackViewController: UIViewController {
                 return _surveyPreview
             }
         }
-        startTimer()
+//        Surveys.shared.currentHotSurvey = nil
+//        if !isFirstAppearance {
+            startTimer()
+//        }
         return nil
     }
     
+    fileprivate func createLoadingView() -> EmptySurvey {
+        let multiplier: CGFloat = 0.95
+        let loadingView = EmptySurvey(frame: CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier)), delegate: self)
+        loadingView.alpha = 0
+        loadingView.center = view.center
+//        loadingView.addEquallyTo(to: view)
+        loadingView.setNeedsLayout()
+        loadingView.layoutIfNeeded()
+        loadingView.createButton.layer.cornerRadius = loadingView.createButton.frame.height / 2
+        view.addSubview(loadingView)
+//        loadingView.startingPoint = loadingView.createButton.convert(loadingView.createButton.center, to: tabBarController?.view)
+        return loadingView
+    }
+    
     fileprivate func nextSurvey(_ _surveyPreview: SurveyPreview?) {
-        if _surveyPreview != nil {
-            _surveyPreview!.transform = _surveyPreview!.transform.scaledBy(x: 0.85, y: 0.85)
-            view.addSubview(_surveyPreview!)
+        func nextFrame() {
             UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
                 if self.removePreview != nil {
                     self.removePreview.alpha = 0
                     self.removePreview.voteButton.backgroundColor = K_COLOR_GRAY
                     self.removePreview.nextButton.tintColor = K_COLOR_GRAY
                     self.removePreview.center.x -= self.view.frame.width
+//                    self.removePreview.frame.origin = self.view.frame.origin
                     self.removePreview.transform = self.removePreview.transform.scaledBy(x: 0.85, y: 0.85)
                 }
                 //            _surveyPreview.alpha = 1
                 _surveyPreview!.transform  = .identity
                 _surveyPreview!.center = self.view.center
+                if self.tabBarController!.tabBar.isHidden {
+                    _surveyPreview!.center.y -= self.tabBarController!.tabBar.frame.height
+                }
             }) {
                 _ in
                 self.surveyPreview = _surveyPreview
@@ -112,8 +176,43 @@ class SurveyStackViewController: UIViewController {
                     self.nextPreview = nil
                 }
             }
+        }
+        
+        if _surveyPreview != nil {
+            _surveyPreview!.transform = _surveyPreview!.transform.scaledBy(x: 0.85, y: 0.85)
+            view.addSubview(_surveyPreview!)
+            self.loadingView.setEnabled(false) {
+                completed in
+                nextFrame()
+            }
+
+//            UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
+//                if self.removePreview != nil {
+//                    self.removePreview.alpha = 0
+//                    self.removePreview.voteButton.backgroundColor = K_COLOR_GRAY
+//                    self.removePreview.nextButton.tintColor = K_COLOR_GRAY
+//                    self.removePreview.center.x -= self.view.frame.width
+//                    self.removePreview.transform = self.removePreview.transform.scaledBy(x: 0.85, y: 0.85)
+//                }
+//                //            _surveyPreview.alpha = 1
+//                _surveyPreview!.transform  = .identity
+//                _surveyPreview!.center = self.view.center
+//            }) {
+//                _ in
+//                self.surveyPreview = _surveyPreview
+//                if self.removePreview != nil {
+//                    self.removePreview.removeFromSuperview()
+//                }
+//
+//                if let _nextPreview = self.createSurveyPreview() {
+//                    self.nextPreview = _nextPreview
+//                } else {
+//                    self.nextPreview = nil
+//                }
+//            }
         } else {
             //Start timer
+            
             UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
                 if self.removePreview != nil {
                     self.removePreview.alpha = 0
@@ -127,6 +226,12 @@ class SurveyStackViewController: UIViewController {
                 self.removePreview.removeFromSuperview()
                 self.surveyPreview.removeFromSuperview()
                 self.surveyPreview = nil
+                Surveys.shared.stackObjects.removeAll()
+                self.startTimer()
+                self.loadingView.setEnabled(true) {
+                    completed in
+                    self.loadingView.createButton.layer.cornerRadius = self.loadingView.createButton.frame.height / 2
+                }
             }
         }
     }
@@ -142,37 +247,52 @@ class SurveyStackViewController: UIViewController {
         timer = nil
     }
     
-    /*
      // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
      override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
+        if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController {
+            destinationVC.delegate = self
+        }
      }
-     */
 }
 
 
 
 
-extension SurveyStackViewController: ButtonDelegate {
-    func signalReceived(_ sender: AnyObject) {
+extension SurveyStackViewController: CallbackDelegate {
+    func callbackReceived(_ sender: AnyObject) {
         if sender is UIButton {
             let button = sender as! UIButton
             if button.tag == 0 {//Vote
-                delegate.performSegue(withIdentifier: Segues.App.FeedToSurvey, sender: self)
+                delegate.performSegue(withIdentifier: Segues.App.FeedToSurveyFromTop, sender: self)
             } else {//Next
                 //Reject
-                apiManager.rejectSurvey(survey: surveyPreview.survey)
+                Surveys.shared.rejectedSurveys.append(surveyPreview.survey)
+                apiManager.rejectSurvey(survey: surveyPreview.survey) {
+                    json, error in
+                    if error != nil {
+                        print(error.debugDescription)
+                    }
+                    if json != nil {
+                        Surveys.shared.importSurveys(json!)
+//                        print("Surveys.shared.stackObjects \(Surveys.shared.stackObjects.count)")
+//                        if Surveys.shared.stackObjects.isEmpty { self.startTimer() }
+                    }
+                }
                 removePreview = surveyPreview
                 nextSurvey(nextPreview)
             }
-        } else if sender is UIImageView {
-            if let userProfile = sender.value(forKey: "userProfile") as? UserProfile {
-                print(userProfile)
+        } else if sender is UserProfile {
+            delegate.performSegue(withIdentifier: Segues.App.FeedToUser, sender: sender)
+        } else if let _view = sender as? EmptySurvey  {
+            isPause = true
+            _view.startingPoint = view.convert(_view.createButton.center, to: tabBarController?.view)
+
+            delegate.performSegue(withIdentifier: Segues.App.FeedToNewSurvey, sender: _view)
+        } else if sender is ClaimCategory { //Claim
+            removePreview = surveyPreview
+            delay(seconds: 0.5) {
+                self.nextSurvey(self.nextPreview)
             }
-            delegate.performSegue(withIdentifier: Segues.App.FeedToUser, sender: self)
         }
     }
 }
@@ -183,18 +303,13 @@ extension SurveyStackViewController: ServerInitializationProtocol {
     }
     
     @objc fileprivate func requestSurveys() {
-        print("-------requestSurveys()-------")
-        if !isRequesting {
-            isRequesting = true
-            apiManager.loadSurveys(type: .Hot) {
-                json, error in
-                if error != nil {
-                    print(error.debugDescription)
-                }
-                if json != nil {
-                    Surveys.shared.importSurveys(json!)
-                }
-                self.isRequesting = false
+        apiManager.loadSurveys(type: .Hot) {
+            json, error in
+            if error != nil {
+                print(error.debugDescription)
+            }
+            if json != nil {
+                Surveys.shared.importSurveys(json!)
             }
         }
     }

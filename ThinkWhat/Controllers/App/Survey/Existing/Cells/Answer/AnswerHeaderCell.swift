@@ -10,7 +10,7 @@ import UIKit
 
 class AnswerHeaderCell: UITableViewHeaderFooterView {
 
-    weak var delegate: ButtonDelegate?
+    weak var delegate: CallbackDelegate?
     @IBOutlet weak var icon: ManTalikngIcon! {
         didSet {
             let touch = UITapGestureRecognizer(target:self, action:#selector(self.callback))
@@ -20,7 +20,7 @@ class AnswerHeaderCell: UITableViewHeaderFooterView {
     }
     
     @objc fileprivate func callback() {
-        delegate?.signalReceived(self)
+        delegate?.callbackReceived(self)
     }
     
     override func awakeFromNib() {

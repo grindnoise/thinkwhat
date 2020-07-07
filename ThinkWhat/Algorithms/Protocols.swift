@@ -41,6 +41,6 @@ protocol StorageInitializationProtocol {
 }
 
 import UIKit
-protocol ButtonDelegate: class {
-    func signalReceived(_ sender: AnyObject)
+protocol CallbackDelegate: class {
+    func callbackReceived(_ sender: AnyObject)
 }

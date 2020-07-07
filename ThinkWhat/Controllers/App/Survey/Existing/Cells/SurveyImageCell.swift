@@ -34,9 +34,9 @@ class SurveyImageCell: UITableViewCell, UIScrollViewDelegate {
     }
     
     @objc fileprivate func callback() {
-        delegate?.signalReceived(self)
+        delegate?.callbackReceived(self)
     }
-    weak var delegate: ButtonDelegate?
+    weak var delegate: CallbackDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

@@ -32,6 +32,9 @@ class Surveys {
     static let shared = Surveys()
     private init() {}
     
+//    var currentHotSurvey:   FullSurvey?//Add to list of hot_except
+    fileprivate var timer:  Timer?
+    var rejectedSurveys:    [FullSurvey]  = []//Local list of rejected surveys, should be cleared periodically
     var topLinks:           [ShortSurvey] = []
     var newLinks:           [ShortSurvey] = [] {
         didSet {
@@ -46,7 +49,11 @@ class Surveys {
     var favoriteLinks:      [ShortSurvey: Date] = [:]
     var downloadedObjects:  [FullSurvey] = []
     var completedSurveyIDs: [Int] = []//Completed surveys IDs
-    var stackObjects:       [FullSurvey] = []//Stack of hot surveys
+    var stackObjects:       [FullSurvey] = []{
+        didSet {
+            print("didSet stackObjects \(stackObjects.count)")
+        }
+    }//Stack of hot surveys
     
     func importSurveys(_ json: JSON) {
         for i in json {
@@ -113,7 +120,9 @@ class Surveys {
                             append(object: survey, type: .Stack)
                         }
                     }
+                    
                     NotificationCenter.default.post(name: kNotificationSurveysStackReceived, object: nil)
+//                    delay(seconds: 30) { self.startTimer() }
                 }
             }
         }
@@ -124,15 +133,16 @@ class Surveys {
         case .Stack:
             if let _object = object as? FullSurvey {
                 if let _foundObject = downloadedObjects.filter({ $0.hashValue == _object.hashValue}).first {
-                    if stackObjects.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
+                    if stackObjects.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty, rejectedSurveys.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
                         stackObjects.append(_foundObject)
                     }
                 } else {
-                    if stackObjects.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+                    if stackObjects.filter({ $0.hashValue == _object.hashValue}).isEmpty, rejectedSurveys.filter({ $0.hashValue == _object.hashValue}).isEmpty {
                         stackObjects.append(_object)
+                        append(object: _object, type: .Downloaded)
                     }
                 }
-                append(object: _object, type: .Downloaded)
+//                append(object: _object, type: .Downloaded)
             }
         case .Downloaded:
             if let _object = object as? FullSurvey {
@@ -241,6 +251,7 @@ class Surveys {
         favoriteLinks.removeAll()
         downloadedObjects.removeAll()
         stackObjects.removeAll()
+        rejectedSurveys.removeAll()
     }
     
     subscript (ID: Int) -> FullSurvey? {
@@ -249,6 +260,16 @@ class Surveys {
         } else {
             return nil
         }
+    }
+    
+    @objc fileprivate func clearRejectedSurveys() {
+        rejectedSurveys.removeAll()
+    }
+    
+    fileprivate func startTimer() {
+        guard timer == nil else { return }
+        timer = Timer.scheduledTimer(timeInterval: REJECTED_SURVEYS_ERASE_INTERVAL, target: self, selector: #selector(Surveys.clearRejectedSurveys), userInfo: nil, repeats: true)
+        timer?.fire()
     }
 }
 
@@ -296,6 +317,57 @@ extension ShortSurvey: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(title)
         hasher.combine(ID)
+    }
+}
+
+
+class ClaimCategory {
+    let ID: Int
+    let description: String
+    
+    init?(_ json: JSON) {
+        if  let _ID     = json["id"].intValue as? Int,
+            let _description  = json["description"].stringValue as? String {
+            ID          = _ID
+            description = _description
+        } else {
+            return nil
+        }
+    }
+}
+
+extension ClaimCategory: Hashable {
+    static func == (lhs: ClaimCategory, rhs: ClaimCategory) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(description)
+        hasher.combine(ID)
+    }
+}
+
+
+class ClaimCategories {
+    static let shared = ClaimCategories()
+    var container: [ClaimCategory] = []
+    private init() {}
+    
+    func importJson(_ json: JSON) {
+        container.removeAll()
+        for i in json {
+            if let category = ClaimCategory(i.1) {
+                container.append(category)
+            }
+        }
+    }
+    
+    subscript (ID: Int) -> ClaimCategory? {
+        if let i = container.first(where: {$0.ID == ID}) {
+            return i
+        } else {
+            return nil
+        }
     }
 }
 

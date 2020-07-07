@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Semibold.ttf">
+            <string>OpenSans-Semibold</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EmptySurvey" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="contentView" destination="iN0-l3-epB" id="MlO-nC-MOI"/>
+                <outlet property="createButton" destination="Ugp-Qt-uAz" id="LEX-13-Pbz"/>
+                <outlet property="loadingIndicator" destination="AfZ-e7-Bps" id="FWS-g3-cDs"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AfZ-e7-Bps" customClass="LoadingIndicator" customModule="ThinkWhat" customModuleProvider="target">
+                    <rect key="frame" x="87.5" y="243.5" width="200" height="200"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="AfZ-e7-Bps" secondAttribute="height" multiplier="1:1" id="WO9-SV-mln"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ugp-Qt-uAz">
+                    <rect key="frame" x="27.5" y="545.5" width="320" height="77"/>
+                    <color key="backgroundColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="Ugp-Qt-uAz" secondAttribute="height" multiplier="25:6" id="GqV-Jd-MwQ"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="17"/>
+                    <state key="normal" title="СОЗДАТЬ ОПРОС">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </state>
+                    <connections>
+                        <action selector="buttonTapped:" destination="-1" eventType="touchUpInside" id="Edl-sQ-UfY"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="Ugp-Qt-uAz" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="320:667" id="23o-xK-ehO"/>
+                <constraint firstItem="AfZ-e7-Bps" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="5YE-go-G9x"/>
+                <constraint firstItem="AfZ-e7-Bps" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="200:667" id="9Ek-zF-VOP"/>
+                <constraint firstItem="AfZ-e7-Bps" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="TnA-wJ-8m4"/>
+                <constraint firstItem="Ugp-Qt-uAz" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" multiplier="1.7" id="dFA-4d-XSV"/>
+                <constraint firstItem="Ugp-Qt-uAz" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="sqA-5b-cC7"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                    <real key="value" value="15"/>
+                </userDefinedRuntimeAttribute>
+            </userDefinedRuntimeAttributes>
+        </view>
+    </objects>
+</document>

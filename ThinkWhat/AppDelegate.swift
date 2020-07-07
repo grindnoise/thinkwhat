@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         self.registerContainers()
         
-        _ = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.checkInternetConnection), userInfo: nil, repeats: true)
+//        _ = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.checkInternetConnection), userInfo: nil, repeats: true)
         
         self.window?.backgroundColor = .white
         self.window!.makeKeyAndVisible()
@@ -68,6 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
+        apiManager.cancelAllRequests()
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
@@ -136,5 +137,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+}
+
+extension AppDelegate: ServerProtocol {
+    
 }
 

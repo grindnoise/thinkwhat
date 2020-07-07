@@ -264,18 +264,23 @@ class CircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
     }
     
     func animate(operation: UINavigationController.Operation, toView: UIView) {
+        var durationMultiplier = 1
         //Starting Path
         let rect = CGRect(x: startingPoint.x,
                           y: startingPoint.y,
                           width: 0,
                           height: 0)
         var circleMaskPathInitial = UIBezierPath(ovalIn: rect)
-
+        
         //Destination Path
         let extremePoint = CGPoint(x: startingPoint.x,
                                    y: startingPoint.y)// - fullHeight)
+        //        sqrt(max((extremePoint.x*extremePoint.x), (extremePoint.y*extremePoint.y)))
         let radius = sqrt((extremePoint.x*extremePoint.x) +
             (extremePoint.y*extremePoint.y))
+        if operation == .push {
+            durationMultiplier = Int(radius) / 200
+        }
         let initialRect = toView.frame.insetBy(dx: -radius, dy: -radius)
         let finalRect = CGRect(origin: initialRect.origin, size: CGSize(width: initialRect.width, height: initialRect.width))
         
@@ -296,7 +301,7 @@ class CircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
         maskLayerAnimation.fromValue = operation == .push ? circleMaskPathInitial.cgPath : circleMaskPathFinal.cgPath
         maskLayerAnimation.toValue = operation == .push ? circleMaskPathFinal.cgPath : circleMaskPathInitial.cgPath
         maskLayerAnimation.delegate = self
-        maskLayerAnimation.duration = duration
+        maskLayerAnimation.duration = duration * Double(durationMultiplier)
 //        maskLayerAnimation.isRemovedOnCompletion = true
         maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         if operation == .pop {
@@ -330,7 +335,11 @@ class TransitionCoordinator: NSObject, UINavigationControllerDelegate {
                               from fromVC: UIViewController,
                               to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         if let nc = navigationController as? NavigationControllerPreloaded {
-            return CircularTransition(nc, operation, nc.startingPoint)
+            if nc.isFadeTransition {
+                return FadeTransition(nc, operation)
+            } else if nc.startingPoint != .zero {
+                return CircularTransition(nc, operation, nc.startingPoint)
+            }
         }
         return nil
     }
