@@ -32,6 +32,11 @@ class SurveyStackViewController: UIViewController {
                                                name: UIApplication.didBecomeActiveNotification,
                                                object: nil)
 //        NotificationCenter.default.addObserver(self,
+//                                               selector: #selector(SurveyStackViewController.profileImageReceived),
+//                                               name: kNotificationProfileImageReceived,
+//                                               object: nil)
+        
+//        NotificationCenter.default.addObserver(self,
 //                                               selector: #selector(SurveyStackViewController.didEnterBackground),
 //                                               name: UIApplication.didEnterBackgroundNotification,
 //                                               object: nil)
@@ -113,6 +118,7 @@ class SurveyStackViewController: UIViewController {
                             }
                             if image != nil {
                                 userProfile.image = image!
+                                NotificationCenter.default.post(name: kNotificationProfileImageReceived, object: nil)
                                 UIView.transition(with: _surveyPreview.userImage,
                                                   duration: 0.75,
                                                   options: .transitionCrossDissolve,
@@ -235,6 +241,10 @@ class SurveyStackViewController: UIViewController {
             }
         }
     }
+    
+//    @objc func profileImageReceived() {
+//        
+//    }
     
     fileprivate func startTimer() {
         guard timer == nil else { return }

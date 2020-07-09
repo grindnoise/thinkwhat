@@ -307,6 +307,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             
         } else if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController, let sender = sender as? SurveyStackViewController {
             destinationVC.apiManager = apiManager
+            destinationVC.needsImageLoading = false
             destinationVC.survey = sender.surveyPreview.survey
             destinationVC.delegate = sender
             tabBarController?.setTabBarVisible(visible: false, animated: true)
@@ -320,6 +321,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             }
         } else if segue.identifier == Segues.App.FeedToUser, let userProfile = sender as? UserProfile, let destinationVC = segue.destination as? UserViewController {
             destinationVC.userProfile = userProfile
+            tabBarController?.setTabBarVisible(visible: false, animated: true)
         }
     }
     

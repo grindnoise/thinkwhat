@@ -178,6 +178,7 @@ let kNotificationApiReachable                    = Notification.Name("smsNotific
 let kNotificationApiNotReachable                 = Notification.Name("smsNotificationApiNotReachable")
 
 let kNotificationUserImageChanged                = Notification.Name("NotificationUserImageChanged")
+let kNotificationProfileImageReceived            = Notification.Name("NotificationProfileImageReceived")
 let kNotificationTopSurveysUpdated               = Notification.Name("NotificationTopSurveysUpdated")
 let kNotificationNewSurveysUpdated               = Notification.Name("NotificationNewSurveysUpdated")
 let kNotificationSurveysStackReceived            = Notification.Name("NotificationSurveysStackReceived")

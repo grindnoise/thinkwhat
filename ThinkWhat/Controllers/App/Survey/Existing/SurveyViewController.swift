@@ -15,6 +15,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     
     deinit {
         print("deinit")
+        NotificationCenter.default.removeObserver(self)
     }
     
     class var answerHeaderCell: UINib {
@@ -28,7 +29,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             }
         }
     }
-    
+    var needsImageLoading = true//True - segue from list, false - from stack
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .default
     }
@@ -70,12 +71,12 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     var apiManager: APIManagerProtocol!
     fileprivate let requestAttempts     = 3
     fileprivate var loadingIndicator:   LoadingIndicator?
-    fileprivate let claimButton         = ClaimBarButton(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
+    fileprivate let claimButton         = ClaimBarButton(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
     fileprivate var claimPosition       = CGPoint.zero
     fileprivate var claimButtonNeedsAnimation = true
     fileprivate var tempClaimButton:    ClaimBarButton?
     fileprivate var tempClaimMaxY:      CGFloat = 0
-    fileprivate let likeButton          = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
+    fileprivate let likeButton          = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
     fileprivate var isInitialLoading    = true {
         didSet {
             if tableView != nil {
@@ -115,6 +116,8 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     fileprivate var answersCells: [SurveyAnswerCell]    = []
     fileprivate var needsAnimation                      = true
     fileprivate var headerNeedsAnimation                = true
+    fileprivate var navTitle: UIImageView!
+    fileprivate var navTitleImageSize: CGSize!
     
     var surveyLink: ShortSurvey! {
         didSet {
@@ -132,6 +135,21 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 if surveyLink == nil {
                     surveyLink = ShortSurvey(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100)
                 }
+                if let image = survey!.userProfile!.image as? UIImage {
+                    NotificationCenter.default.post(name: kNotificationProfileImageReceived, object: nil)
+                }
+                if needsImageLoading, let url = survey!.userProfile!.imageURL as? String {
+                    apiManager.downloadImage(url: url) {
+                        image, error in
+                        if error != nil {
+                            print(error!.localizedDescription)
+                        }
+                        if image != nil {
+                            self.survey!.userProfile!.image = image!
+                            NotificationCenter.default.post(name: kNotificationProfileImageReceived, object: nil)
+                        }
+                    }
+                }
 //                }
             }
         }
@@ -139,6 +157,12 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(SurveyViewController.profileImageReceived),
+                                               name: kNotificationProfileImageReceived,
+                                               object: nil)
+        
         setupViews()
         tableView.register(SurveyViewController.answerHeaderCell, forHeaderFooterViewReuseIdentifier: "answerHeader")
         //Check if user has already answered
@@ -163,6 +187,23 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         let gesture_1   = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.barButtonTapped(gesture:)))
         likeButton.addGestureRecognizer(gesture)
         claimButton.addGestureRecognizer(gesture_1)
+        
+        //NavTitle setup
+        navTitleImageSize = CGSize(width: 45, height: 45)
+        self.navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
+        var image: UIImage!
+        if let _image = survey?.userProfile?.image {
+            image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+        } else {
+            let pic = UIImage(named: "user")!
+            image = pic.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+        }
+        self.navTitle.clipsToBounds = false
+        self.navTitle.image = image
+        self.navTitle.isUserInteractionEnabled = true
+        let gesture_2 = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.showOwnerProfile))
+        navTitle.addGestureRecognizer(gesture_2)
+        self.navigationItem.titleView = self.navTitle
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -212,7 +253,9 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
 //                self.navigationController?.navigationBar.layoutIfNeeded()
             })
 //        }
-        
+        if navTitle != nil, let image = survey?.userProfile?.image {
+            navTitle.image = image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -245,7 +288,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
 //            } else if selectedAnswerID != 0 {
 //                return 1
 //            }
-            return 2
+            return 1//2
         }
         return 0
     }
@@ -540,6 +583,10 @@ extension SurveyViewController {
                     var mark = true
                     if likeButton.state == .disabled {
                         likeButton.state = .enabled
+                        //self.likeButton.transform = .identity
+//                        UIView.animate(withDuration: 0.4, delay: 1.4, options: [.autoreverse], animations: {
+//                            self.likeButton.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+//                        })
                         mark = true
                         if Array(Surveys.shared.favoriteLinks.keys).filter( {$0.ID == surveyLink.ID }).isEmpty { Surveys.shared.favoriteLinks[self.surveyLink] = Date() }
                     } else {
@@ -681,7 +728,7 @@ extension SurveyViewController: CallbackDelegate {
                 if let rbtn = navigationItem.rightBarButtonItems?.filter({ $0.customView is ClaimBarButton }).first?.customView as? ClaimBarButton {//}, let finalPos = claimButton.convert(claimButton.center, to: tabBarController?.view) as? CGPoint {
                     let height = tempClaimButton!.frame.height / 2
                     UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
-                        self.tempClaimButton!.center = CGPoint(x: self.claimPosition.x + height/2 + rbtn.frame.size.width/2 - 3, y: self.claimPosition.y + height/2 + rbtn.frame.size.width/2 - 3)
+                        self.tempClaimButton!.center = CGPoint(x: self.claimPosition.x + height/2 + rbtn.frame.size.width/2, y: self.claimPosition.y + height/2 + rbtn.frame.size.width/2)
                         self.tempClaimButton!.frame.size = rbtn.frame.size
                     }) {
                         _ in
@@ -691,6 +738,7 @@ extension SurveyViewController: CallbackDelegate {
                     }
                 }
             } else if (sender as! UIButton).accessibilityIdentifier == "PostClaim", let claimID = (sender as! UIButton).layer.value(forKey: "claimID") as? Int {
+                Surveys.shared.append(object: survey!, type: .Claim)
                 apiManager.postClaim(surveyID: survey!.ID!, claimID: claimID) { _, error in print(error?.localizedDescription) }
                 UIView.animate(withDuration: 0.5) {
                     self.tempClaimButton?.center.y = self.view.frame.height / 3
@@ -740,6 +788,22 @@ extension SurveyViewController {
             (navigationController as! NavigationControllerPreloaded).isFadeTransition = true
             destination.delegate = self
             destination.topConstraintConstant = tempClaimMaxY
+        } else if segue.identifier == Segues.App.SurveyToUser, let destination = segue.destination as? UserViewController {
+            destination.userProfile = survey?.userProfile
         }
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    @objc func profileImageReceived() {
+        needsImageLoading = false
+        UIView.transition(with: navTitle,
+                          duration: 0.75,
+                          options: .transitionCrossDissolve,
+                          animations: { self.navTitle?.image = self.survey!.userProfile!.image!.circularImage(size: self.navTitleImageSize, frameColor: K_COLOR_RED) },
+                          completion: nil)
+    }
+    
+    @objc func showOwnerProfile() {
+        performSegue(withIdentifier: Segues.App.SurveyToUser, sender: nil)
     }
 }

@@ -27,7 +27,7 @@ enum SurveyPoints: Int {
 
 class Surveys {
     enum SurveyContainerType {
-        case Top, New, Categorized, Own, Favorite, Downloaded, Completed, Stack
+        case Top, New, Categorized, Own, Favorite, Downloaded, Completed, Stack, Claim
     }
     static let shared = Surveys()
     private init() {}
@@ -54,6 +54,7 @@ class Surveys {
             print("didSet stackObjects \(stackObjects.count)")
         }
     }//Stack of hot surveys
+    var claimObjects:       [FullSurvey] = []
     
     func importSurveys(_ json: JSON) {
         for i in json {
@@ -190,8 +191,34 @@ class Surveys {
                     }
                 }
             }
+        case .Claim:
+            if let _object = object as? FullSurvey {
+                if claimObjects.isEmpty {
+                    claimObjects.append(_object)
+                    removeClaimSurvey(object: _object)
+                } else {
+                    if claimObjects.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+                        claimObjects.append(_object)
+                        removeClaimSurvey(object: _object)
+                    }
+                }
+            }
         default:
             print("")
+        }
+    }
+    
+    //Remove from lists -> post Notification
+    func removeClaimSurvey(object: FullSurvey) {
+        if let surveyLink = object.createSurveyLink() as? ShortSurvey {
+            if contains(object: surveyLink, type: .New) {
+                newLinks.remove(object: surveyLink)
+                NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)// (kNotificationNewSurveysUpdated)
+            }
+            if contains(object: surveyLink, type: .Top) {
+                topLinks.remove(object: surveyLink)
+                NotificationCenter.default.post(name: kNotificationTopSurveysUpdated, object: nil)// (kNotificationTopSurveysUpdated)
+            }
         }
     }
     
