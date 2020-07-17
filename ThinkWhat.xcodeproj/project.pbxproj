@@ -118,6 +118,7 @@
 		AB791D85243B70D00085E00E /* VoteCompletionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB791D83243B4EBE0085E00E /* VoteCompletionView.xib */; };
 		AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */; };
 		AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */; };
+		AB7A2E4E24BDC376007B96F2 /* Megaphone.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7A2E4D24BDC376007B96F2 /* Megaphone.swift */; };
 		AB7CE6FE23A36283006FDBD8 /* CategorySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7CE6FC23A36283006FDBD8 /* CategorySelectionCell.swift */; };
 		AB868A6A23EB04A3008DEB84 /* CategorySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB868A6923EB04A3008DEB84 /* CategorySelectionViewController.swift */; };
 		AB868A6F23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB868A6D23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift */; };
@@ -320,6 +321,7 @@
 		AB791D83243B4EBE0085E00E /* VoteCompletionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VoteCompletionView.xib; sourceTree = "<group>"; };
 		AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryViewController.swift; sourceTree = "<group>"; };
 		AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRegistrationViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB7A2E4D24BDC376007B96F2 /* Megaphone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Megaphone.swift; sourceTree = "<group>"; };
 		AB7CE6FC23A36283006FDBD8 /* CategorySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionCell.swift; sourceTree = "<group>"; };
 		AB868A6923EB04A3008DEB84 /* CategorySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionViewController.swift; sourceTree = "<group>"; };
 		AB868A6D23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubcategorySelectionTableViewCell.swift; sourceTree = "<group>"; };
@@ -779,6 +781,7 @@
 			isa = PBXGroup;
 			children = (
 				AB7478C42428D0A300317EB6 /* FilmIcon.swift */,
+				AB7A2E4D24BDC376007B96F2 /* Megaphone.swift */,
 			);
 			path = Icons;
 			sourceTree = "<group>";
@@ -1242,6 +1245,8 @@
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/VK-ios-sdk/VK_ios_sdk.framework",
@@ -1252,6 +1257,8 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VK_ios_sdk.framework",
@@ -1272,6 +1279,8 @@
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
 				"${BUILT_PRODUCTS_DIR}/VK-ios-sdk/VK_ios_sdk.framework",
@@ -1284,6 +1293,8 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VK_ios_sdk.framework",
@@ -1393,6 +1404,7 @@
 				AB19B6432432282B00999917 /* PercentageLabel.swift in Sources */,
 				AB8FD485241F761F00BB74EF /* SurveyLinkCell.swift in Sources */,
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
+				AB7A2E4E24BDC376007B96F2 /* Megaphone.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteSign.swift in Sources */,
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB7478C52428D0A300317EB6 /* FilmIcon.swift in Sources */,

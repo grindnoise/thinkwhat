@@ -55,10 +55,10 @@ class SurveysTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        NotificationCenter.default.addObserver(self,
-                                       selector: #selector(SurveysTableViewController.updateTableView),
-                                       name: kNotificationTopSurveysUpdated,
-                                       object: nil)
+//        NotificationCenter.default.addObserver(self,
+//                                       selector: #selector(SurveysTableViewController.updateTableView),
+//                                       name: kNotificationTopSurveysUpdated,
+//                                       object: nil)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(SurveysTableViewController.updateTableView),
                                                name: kNotificationNewSurveysUpdated,

@@ -10,7 +10,7 @@ import UIKit
 class FadeTransition: NSObject, UIViewControllerAnimatedTransitioning {
     var operation: UINavigationController.Operation!
     var navigationController: NavigationControllerPreloaded!
-    var duration = 0.2
+    var duration = 0.15
     
     init(_ _navigationController: NavigationControllerPreloaded, _ _operation: UINavigationController.Operation) {
         navigationController = _navigationController

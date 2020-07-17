@@ -81,25 +81,9 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
                         self.configureHeader(header: header, forSection: 4)
                     }
                     
-//                    delay(seconds: 0.1) {
                         if let indexPath = IndexPath(row: self.answers.count - 1, section: 5) as? IndexPath, let _ = self.tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
-//                            self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .bottom)
                             self.tableView(self.tableView, didSelectRowAt: indexPath)
                         }
-//                    }
-                    
-//                    if #available(iOS 11.0, *) {
-////                        tableView.performBatchUpdates({
-//                            tableView.insertRows(at: [IndexPath(row: answers.count-1, section: 5)], with: .top)
-//                            if let header = self.tableView.headerView(forSection: 4) as? NewSurveyHeaderCell {
-//                                self.configureHeader(header: header, forSection: 4)
-//                            }
-////                        })
-//                    } else {
-//                        tableView.beginUpdates()
-//                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 5)], with: .top)
-//                        tableView.endUpdates()
-//                    }
                 }
             }
         }
@@ -120,36 +104,9 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
                     delay(seconds: 0.2) {
                         self.tableView.selectRow(at: IndexPath(row: self.images.count-1, section: 3), animated: true, scrollPosition: .bottom)
                     }
-//                    if let cell = tableView.cellForRow(at: IndexPath(row: images.count-1, section: 3)) as? ImageSelectionCell {
-//                        cell.textField.becomeFirstResponder()
-//                    }
                     if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
                         self.configureHeader(header: header, forSection: 2)
                     }
-//                    if #available(iOS 11.0, *) {
-//                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
-//                        //                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
-//                        //                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-//                        //                            }
-//                        if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
-//                            self.configureHeader(header: header, forSection: 2)
-//                            //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
-//                        }
-////                        tableView.performBatchUpdates({
-////                            tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
-////                            //                            if let c = tableView.cellForRow(at: IndexPath(row: 0, section: 10)) {
-////                            //                                c.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-////                            //                            }
-////                            if let header = self.tableView.headerView(forSection: 2) as? NewSurveyHeaderCell {
-////                                self.configureHeader(header: header, forSection: 2)
-////                                //                    tableView.reloadData()//Sections(IndexSet(arrayLiteral: indexPath.section), with: .bottom)
-////                            }
-////                        })
-//                    } else {
-//                        tableView.beginUpdates()
-//                        tableView.insertRows(at: [IndexPath(row: images.count-1, section: 3)], with: .top)
-//                        tableView.endUpdates()
-//                    }
                 }
             }
         }
@@ -1162,9 +1119,9 @@ extension NewSurveyViewController: ServerProtocol {
                                 survey.answers.append(answer)
                             }
                         }
-                        if !self.images.isEmpty {
-                            survey.images = self.images
-                        }
+//                        if !self.images.isEmpty {
+//                            survey.images = self.images
+//                        }
                         
 //                        for _answer in _answersWithID {
 //                            if let text = _answer["text"].stringValue as? String, let ID = _answer["id"].stringValue as? Int {

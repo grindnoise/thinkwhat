@@ -192,7 +192,14 @@ let kNotificationClaimSignAppeared               = NSNotification.Name(rawValue:
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
 let MIN_STACK_SIZE                               = 1//Min quantity of hot surveys to request another portion
-let REJECTED_SURVEYS_ERASE_INTERVAL:TimeInterval = 60//Timer parameter to wipe out rejectedSurveys container
+
+struct TimeIntervals {
+    static let ClearRejectedSurveys: TimeInterval = 60//Timer parameter to wipe out rejectedSurveys container
+    static let NetworkInactivity: TimeInterval = 15//Timer parameter to wipe out rejectedSurveys container
+}
+
+
+
 //MARK: - Segues
 struct Segues {
     struct Launch {
@@ -639,6 +646,7 @@ struct SERVER_URLS {
     static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_social_update/"
     static let PROFILES                 = "api/profiles/"
     static let CURRENT_USER             = "api/profiles/current/"
+    static let USER_PROFILE_DATA        = "api/profiles/get_data/"
 
     //Surveys
     static let SURVEYS                  = "api/surveys/"

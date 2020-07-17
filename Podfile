@@ -6,7 +6,8 @@ target 'ThinkWhat' do
     pod 'Swinject'
     pod 'Alamofire'
     pod 'SwiftyJSON'
-    pod 'FBSDKLoginKit'
+    pod 'FacebookCore'
+    pod 'FacebookLogin'
     pod 'VK-ios-sdk'
     pod "YoutubePlayer-in-WKWebView", "~> 0.3.0"
     target 'ThinkWhatTests' do

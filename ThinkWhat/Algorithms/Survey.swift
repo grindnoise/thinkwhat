@@ -123,6 +123,8 @@ class Surveys {
                     }
                     
                     NotificationCenter.default.post(name: kNotificationSurveysStackReceived, object: nil)
+                    
+                    //TODO - clear rejected
 //                    delay(seconds: 30) { self.startTimer() }
                 }
             }
@@ -160,10 +162,8 @@ class Surveys {
                 if newLinks.isEmpty {
                     newLinks.append(_object)
                 } else {
-                    newLinks.map() {
-                        if $0.hashValue != _object.hashValue {
-                            newLinks.append(_object)
-                        }
+                    if newLinks.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+                        newLinks.append(_object)
                     }
                 }
             }
@@ -172,10 +172,8 @@ class Surveys {
                 if topLinks.isEmpty {
                     topLinks.append(_object)
                 } else {
-                    topLinks.map() {
-                        if $0.hashValue != _object.hashValue {
-                            topLinks.append(_object)
-                        }
+                    if topLinks.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+                        topLinks.append(_object)
                     }
                 }
             }
@@ -184,10 +182,8 @@ class Surveys {
                 if ownLinks.isEmpty {
                     ownLinks.append(_object)
                 } else {
-                    ownLinks.map() {
-                        if $0.hashValue != _object.hashValue {
-                            ownLinks.append(_object)
-                        }
+                    if ownLinks.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+                        ownLinks.append(_object)
                     }
                 }
             }
@@ -219,6 +215,10 @@ class Surveys {
                 topLinks.remove(object: surveyLink)
                 NotificationCenter.default.post(name: kNotificationTopSurveysUpdated, object: nil)// (kNotificationTopSurveysUpdated)
             }
+        }
+        if contains(object: object, type: .Stack) {
+            stackObjects.remove(object: object)
+//            NotificationCenter.default.post(name: kNotificationTopSurveysUpdated, object: nil)// (kNotificationTopSurveysUpdated)
         }
     }
     
@@ -295,7 +295,7 @@ class Surveys {
     
     fileprivate func startTimer() {
         guard timer == nil else { return }
-        timer = Timer.scheduledTimer(timeInterval: REJECTED_SURVEYS_ERASE_INTERVAL, target: self, selector: #selector(Surveys.clearRejectedSurveys), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: TimeIntervals.ClearRejectedSurveys, target: self, selector: #selector(Surveys.clearRejectedSurveys), userInfo: nil, repeats: true)
         timer?.fire()
     }
 }
