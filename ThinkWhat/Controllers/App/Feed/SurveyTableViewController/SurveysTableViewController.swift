@@ -13,7 +13,11 @@ import UIKit
 
 
 class SurveysTableViewController: UITableViewController {
-    
+
+    deinit {
+        "SurveysTableViewController deinit"
+        NotificationCenter.default.removeObserver(self)
+    }
 //    fileprivate var requestAttempt = 0 {
 //        didSet {
 //            if oldValue != requestAttempt {
@@ -24,11 +28,11 @@ class SurveysTableViewController: UITableViewController {
 //        }
 //    }
     enum SurveyTableType {
-        case New, Top
+        case New, Top, User
     }
     
     var type: SurveyTableType = .New
-    var delegate: SurveysViewController!
+    var delegate: UIViewController?
     public var needsAnimation = true
 //    private var isViewSetupCompleted = false
 //    private var loadingIndicator: LoadingIndicator!
@@ -39,6 +43,9 @@ class SurveysTableViewController: UITableViewController {
 //            }
 //        }
 //    }
+    fileprivate var navTitle: UIImageView?
+    var navTitleImage: UIImage?
+    fileprivate var navTitleImageSize: CGSize = .zero
     fileprivate var lastContentOffset: CGFloat = 0
     
     class var surveyNib: UINib {
@@ -63,6 +70,10 @@ class SurveysTableViewController: UITableViewController {
                                                selector: #selector(SurveysTableViewController.updateTableView),
                                                name: kNotificationNewSurveysUpdated,
                                                object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
+                                               name: kNotificationProfileImageReceived,
+                                               object: nil)
         
         refreshControl?.attributedTitle = NSAttributedString(string: "")
         refreshControl?.addTarget(self, action: #selector(SurveysTableViewController.refreshTableView), for: .valueChanged)
@@ -83,15 +94,31 @@ class SurveysTableViewController: UITableViewController {
             self.navigationController?.navigationBar.barTintColor    = .white
             self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         }
+        
+        if type == .User {
+            navTitleImageSize = CGSize(width: 45, height: 45)
+            navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
+            if let _image = navTitleImage {
+                navTitle!.image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+            } else if let _image = UIImage(named: "user") {
+                navTitle!.image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+            }
+            navTitle!.isUserInteractionEnabled = false
+            navTitle!.clipsToBounds = false
+            navigationItem.titleView = navTitle
+        }
     }
 
-//    override func viewDidLayoutSubviews() {
-//        tableView.layoutIfNeeded()
-////        if !isViewSetupCompleted {
-////            tableView.isUserInteractionEnabled = false
-////
-////        }
-//    }
+    @objc func profileImageReceived(_ notification: Notification) {
+        if type == .User, navTitle != nil, let image = notification.object as? UIImage {
+            UIView.transition(with: navTitle!,
+                              duration: 0.75,
+                              options: .transitionCrossDissolve,
+                              animations: { self.navTitle!.image = image.circularImage(size: self.navTitleImageSize, frameColor: K_COLOR_RED) },
+                              completion: nil)
+        }
+    }
+    
     
     @objc private func updateTableView() {
         tableView.reloadData()
@@ -110,6 +137,8 @@ class SurveysTableViewController: UITableViewController {
         switch type {
         case .New:
             return Surveys.shared.newLinks.count
+        case .Top:
+            return Surveys.shared.topLinks.count
         default:
             return Surveys.shared.topLinks.count
         }
@@ -196,7 +225,9 @@ class SurveysTableViewController: UITableViewController {
 //    }
     
     @objc private func refreshTableView() {
-        delegate.updateSurveys(type: .New)
+        if delegate != nil, delegate is SurveysViewController {
+            (delegate as! SurveysViewController).updateSurveys(type: .New)
+        }
 //        updateSurveys(type: vc.currentIcon == .New ? .New : .Top)
     }
 
@@ -241,7 +272,9 @@ class SurveysTableViewController: UITableViewController {
 //        } else {
 //            vc.performSegue(withIdentifier: kSegueAppFeedToSurvey, sender: nil)
 //        }
-        delegate.performSegue(withIdentifier: Segues.App.FeedToSurvey, sender: nil)
+        if delegate != nil, delegate is SurveysViewController {
+            (delegate as! SurveysViewController).performSegue(withIdentifier: Segues.App.FeedToSurvey, sender: nil)
+        }
     }
     
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
@@ -262,100 +295,6 @@ extension SurveysTableViewController: ServerInitializationProtocol {
         return ((self.navigationController as! NavigationControllerPreloaded).parent as! TabBarController).apiManager
     }
 }
-
-//extension FeedSurveysTableViewController: ServerProtocol {
-//    func loadData() {
-//        requestAttempt += 1
-////        delay(seconds: 3) {
-////            self.vc.presentLostConnectionView()
-////        }
-//        apiManager.loadSurveyCategories() {
-//            json, error in
-//            if error != nil {
-//                if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
-//                    self.vc.presentLostConnectionView()
-////                    showAlert(type: .Warning, buttons: [["Повторить": [CustomAlertView.ButtonType.Ok: {self.requestAttempt = 0; self.loadData()}]],
-////                                                        ["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка соединения с сервером\(error!.localizedDescription). Повторить?")
-//                } else {
-//                    //Retry unless successfull
-//                    if self.isInitialLoad {
-//                        self.loadData()
-//                    }
-//                }
-//            }
-//            if json != nil {
-//                SurveyCategories.shared.importJson(json!)
-//                self.updateSurveysTotalCount()
-//                self.updateSurveys(type: .All)
-//                self.requestAttempt = 0
-//            }
-//        }
-//    }
-//
-//    private func updateSurveysTotalCount() {
-//        self.apiManager.loadTotalSurveysCount() {
-//            json, error in
-//            if error != nil {
-//                print(error!.localizedDescription)
-//                //Retry unless successfull
-//                if self.isInitialLoad {
-//                    self.updateSurveysTotalCount()
-//                }
-//            } else if json != nil {
-//                SurveyCategories.shared.updateCount(json!)
-//            }
-//        }
-//    }
-//
-//    private func updateSurveys(type: APIManager.SurveyType) {
-//        self.apiManager.loadSurveys(type: type) {
-//            json, error in
-//            if error != nil {
-//                //Retry unless successfull
-//                if self.isInitialLoad {
-//                    self.updateSurveys(type: .All)
-//                } else {
-//                    self.refreshControl?.attributedTitle = NSAttributedString(string: "Ошибка, повторите позже", attributes: self.semiboldAttrs)
-//                    self.refreshControl?.endRefreshing()
-//                    delay(seconds: 0.5) {
-//                        self.refreshControl?.attributedTitle = NSAttributedString(string: "")
-//                    }
-//                }
-//            }
-//            if json != nil {
-//                Surveys.shared.importSurveys(json!)
-//                self.refreshControl?.endRefreshing()
-//                self.needsAnimation = true
-//                if self.isInitialLoad {
-//
-//                    self.tableView.isUserInteractionEnabled = true
-//                    self.vc.isDataLoaded = true
-////                    UIView.animate(withDuration: 0.3, animations: {
-////                        self.loadingIndicator.alpha = 0
-////                    }) {
-////                        comleted in
-////                        self.loadingIndicator.removeAllAnimations()
-////                        self.isInitialLoad = false
-////                        self.vc.animateNew()
-////                    }
-//                }
-//            }
-//        }
-//    }
-
-//    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//        self.lastContentOffset = scrollView.contentOffset.y
-//    }
-////
-//    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        if self.lastContentOffset < scrollView.contentOffset.y {
-////        if scrollView.contentOffset.y > 0 {
-//            vc.navigationController?.setNavigationBarHidden(true, animated: true)
-//        } else /*if (scrollView.contentOffset.y < 0 )*/ {
-//            vc.navigationController?.setNavigationBarHidden(false, animated: true)
-//        }
-//    }
-//}
 
 typealias Animation = (UITableViewCell, IndexPath, UITableView) -> Void
 

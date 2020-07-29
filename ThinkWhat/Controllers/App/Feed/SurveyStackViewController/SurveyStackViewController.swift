@@ -83,33 +83,26 @@ class SurveyStackViewController: UIViewController {
     @objc fileprivate func createSurveyPreview() -> SurveyPreview? {
         if !Surveys.shared.stackObjects.isEmpty {
             if let survey = Surveys.shared.stackObjects.remove(at: 0) as? FullSurvey {
-//                Surveys.shared.currentHotSurvey = survey
                 let multiplier: CGFloat = 0.95
                 var _rect = CGRect.zero
                 if tabBarController!.tabBar.isHidden {
-////                    tabBarController?.tabBar.frame.size.height
-//                    _rect = CGRect(origin: CGPoint(x: view.frame.origin.x, y:  view.frame.origin.y - tabBarController!.tabBar.frame.height),
-//                                   size: CGSize(width: view.frame.width * multiplier, height: view.frame.height * multiplier - tabBarController!.tabBar.frame.height))
                     _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height/* * multiplier*/ - tabBarController!.tabBar.frame.height))
                 } else {
                     _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height/* * multiplier*/))
                 }
                 let _surveyPreview = SurveyPreview(frame: _rect, survey: survey, delegate: self)
-                //let _surveyPreview = SurveyPreview(frame: CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * 0.95, height: view.frame.size.height * 0.95)), survey: survey, delegate: self)
                 _surveyPreview.setNeedsLayout()
                 _surveyPreview.layoutIfNeeded()
                 _surveyPreview.voteButton.layer.cornerRadius = _surveyPreview.voteButton.frame.height / 2
                 _surveyPreview.center = view.center
                 _surveyPreview.center.x += view.frame.width
-//                if tabBarController!.tabBar.isHidden {
-//                    _surveyPreview.center.y -= tabBarController!.tabBar.frame.height
-//                }
-                //            _surveyPreview.alpha = 0
+
                 if let userProfile = survey.userProfile as? UserProfile {
                     _surveyPreview.userName.text = userProfile.name
                     if userProfile.image != nil {
                         _surveyPreview.userImage.image = userProfile.image!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED)
                     } else {
+                        let postImageNotification = self.nextPreview === _surveyPreview//Notify only if current preview is on screen
                         _surveyPreview.userImage.image = UIImage(named: "user")!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED)
                         apiManager.downloadImage(url: userProfile.imageURL) {
                             image, error in
@@ -118,7 +111,9 @@ class SurveyStackViewController: UIViewController {
                             }
                             if image != nil {
                                 userProfile.image = image!
-                                NotificationCenter.default.post(name: kNotificationProfileImageReceived, object: nil)
+                                if postImageNotification {
+                                    NotificationCenter.default.post(name: kNotificationProfileImageReceived, object: image)
+                                }
                                 UIView.transition(with: _surveyPreview.userImage,
                                                   duration: 0.75,
                                                   options: .transitionCrossDissolve,

@@ -1,31 +1,16 @@
 //
-//  HeartButton.swift
+//  HeartExpandingView.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 19.11.2019.
-//  Copyright © 2019 Pavel Bukharov. All rights reserved.
+//  Created by Pavel Bukharov on 21.07.2020.
+//  Copyright © 2020 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 
 @IBDesignable
-class HeartView: UIView, CAAnimationDelegate {
+class HeartExpandingView: UIView, CAAnimationDelegate {
     
-    enum State {
-        case enabled, disabled
-    }
-    
-    var state: HeartView.State = .disabled {
-        didSet {
-            if oldValue != state {
-                if state == .enabled {
-                    self.addEnableAnimation()
-                } else {
-                    self.addDisableAnimation()
-                }
-            }
-        }
-    }
     var layers = [String: CALayer]()
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
     var updateLayerValueForCompletedAnimation : Bool = false
@@ -62,7 +47,7 @@ class HeartView: UIView, CAAnimationDelegate {
     
     func setupProperties(){
         self.disabled = UIColor(red:0.754, green: 0.754, blue:0.754, alpha:1)
-        self.active = UIColor(red:1.00, green: 0.00, blue:0.00, alpha:0.7)
+        self.active = UIColor(red:1.00, green: 0.00, blue:0.00, alpha:0.0)
     }
     
     func setupLayers(){
@@ -83,7 +68,7 @@ class HeartView: UIView, CAAnimationDelegate {
         if layerIds == nil || layerIds.contains("path"){
             let path = layers["path"] as! CAShapeLayer
             path.fillRule    = .evenOdd
-            path.fillColor   = self.disabled.cgColor
+            path.fillColor   = nil
             path.strokeColor = UIColor.black.cgColor
             path.lineWidth   = 0
         }
@@ -96,7 +81,7 @@ class HeartView: UIView, CAAnimationDelegate {
         CATransaction.setDisableActions(true)
         
         if let path = layers["path"] as? CAShapeLayer{
-            path.frame = CGRect(x: 0.09817 * path.superlayer!.bounds.width, y: 0.15587 * path.superlayer!.bounds.height, width: 0.80366 * path.superlayer!.bounds.width, height: 0.68827 * path.superlayer!.bounds.height)
+            path.frame = CGRect(x: 0, y: 0.07179 * path.superlayer!.bounds.height, width:  path.superlayer!.bounds.width, height: 0.85642 * path.superlayer!.bounds.height)
             path.path  = pathPath(bounds: layers["path"]!.bounds).cgPath
         }
         
@@ -108,7 +93,7 @@ class HeartView: UIView, CAAnimationDelegate {
     func addEnableAnimation(completionBlock: ((_ finished: Bool) -> Void)? = nil){
         if completionBlock != nil{
             let completionAnim = CABasicAnimation(keyPath:"completionAnim")
-            completionAnim.duration = 0.2
+            completionAnim.duration = 1.3
             completionAnim.delegate = self
             completionAnim.setValue("enable", forKey:"animId")
             completionAnim.setValue(false, forKey:"needEndAnim")
@@ -122,50 +107,24 @@ class HeartView: UIView, CAAnimationDelegate {
         
         ////Path animation
         let pathFillColorAnim            = CAKeyframeAnimation(keyPath:"fillColor")
-        pathFillColorAnim.values         = [self.disabled.cgColor,
-                                            self.active.cgColor]
-        pathFillColorAnim.keyTimes       = [0, 1]
-        pathFillColorAnim.duration       = 0.2
-        pathFillColorAnim.timingFunction = CAMediaTimingFunction(name:.easeIn)
+        pathFillColorAnim.values         = [UIColor(red:1.00, green: 0.00, blue:0.00, alpha:0.0).cgColor,
+                                            UIColor(red:1.00, green: 0.00, blue:0.00, alpha:0.1).cgColor,
+                                            UIColor(red:1.00, green: 0.00, blue:0.00, alpha:0.0).cgColor]
+        pathFillColorAnim.keyTimes       = [0, 0.5, 1]
+        pathFillColorAnim.duration       = 1
+        pathFillColorAnim.timingFunction = CAMediaTimingFunction(name:.easeOut)
         
         let path = layers["path"] as! CAShapeLayer
         
         let pathTransformAnim            = CAKeyframeAnimation(keyPath:"transform")
         pathTransformAnim.values         = [NSValue(caTransform3D: CATransform3DIdentity),
-                                            NSValue(caTransform3D: CATransform3DMakeScale(1.1, 1.1, 1)),
-                                            NSValue(caTransform3D: CATransform3DIdentity)]
-        pathTransformAnim.keyTimes       = [0, 0.5, 1]
-        pathTransformAnim.duration       = 0.2
-        pathTransformAnim.timingFunction = CAMediaTimingFunction(name:.easeIn)
+                                            NSValue(caTransform3D: CATransform3DMakeScale(2, 2, 1))]
+        pathTransformAnim.keyTimes       = [0, 1]
+        pathTransformAnim.duration       = 1.3
+        pathTransformAnim.timingFunction = CAMediaTimingFunction(name:.easeOut)
         
         let pathEnableAnim : CAAnimationGroup = QCMethod.group(animations: [pathFillColorAnim, pathTransformAnim], fillMode:fillMode)
         path.add(pathEnableAnim, forKey:"pathEnableAnim")
-    }
-    
-    func addDisableAnimation(completionBlock: ((_ finished: Bool) -> Void)? = nil){
-        if completionBlock != nil{
-            let completionAnim = CABasicAnimation(keyPath:"completionAnim")
-            completionAnim.duration = 0.15
-            completionAnim.delegate = self
-            completionAnim.setValue("disable", forKey:"animId")
-            completionAnim.setValue(false, forKey:"needEndAnim")
-            layer.add(completionAnim, forKey:"disable")
-            if let anim = layer.animation(forKey: "disable"){
-                completionBlocks[anim] = completionBlock
-            }
-        }
-        
-        let fillMode : CAMediaTimingFillMode = .forwards
-        
-        ////Path animation
-        let pathFillColorAnim      = CAKeyframeAnimation(keyPath:"fillColor")
-        pathFillColorAnim.values   = [self.active.cgColor,
-                                      self.disabled.cgColor]
-        pathFillColorAnim.keyTimes = [0, 1]
-        pathFillColorAnim.duration = 0.14
-        
-        let pathDisableAnim : CAAnimationGroup = QCMethod.group(animations: [pathFillColorAnim], fillMode:fillMode)
-        layers["path"]?.add(pathDisableAnim, forKey:"pathDisableAnim")
     }
     
     //MARK: - Animation Cleanup
@@ -185,17 +144,11 @@ class HeartView: UIView, CAAnimationDelegate {
         if identifier == "enable"{
             QCMethod.updateValueFromPresentationLayer(forAnimation: layers["path"]!.animation(forKey: "pathEnableAnim"), theLayer:layers["path"]!)
         }
-        else if identifier == "disable"{
-            QCMethod.updateValueFromPresentationLayer(forAnimation: layers["path"]!.animation(forKey: "pathDisableAnim"), theLayer:layers["path"]!)
-        }
     }
     
     func removeAnimations(forAnimationId identifier: String){
         if identifier == "enable"{
             layers["path"]?.removeAnimation(forKey: "pathEnableAnim")
-        }
-        else if identifier == "disable"{
-            layers["path"]?.removeAnimation(forKey: "pathDisableAnim")
         }
     }
     

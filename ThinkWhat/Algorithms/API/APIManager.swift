@@ -110,7 +110,7 @@ class APIManager: APIManagerProtocol {
     }
     
     private func checkForReachability(completion: @escaping(ApiReachabilityState) -> ()) {
-        let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.TOKEN)
+        let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.CURRENT_TIME)
         Alamofire.SessionManager.default.request(url, method: .get, parameters: [:], encoding: URLEncoding(), headers: nil).responseJSON(completionHandler: {
             response in
             var state = ApiReachabilityState.None

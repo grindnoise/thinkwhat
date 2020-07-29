@@ -322,19 +322,19 @@ extension UIImage {
         
         self.draw(in: CGRect(origin: CGPoint.zero, size: size), blendMode: .copy, alpha: 1.0)
         
-        let offset = size.height * 0.03
+        let offset = size.height * 0.04
         
         if frameColor != .clear {
-        let outerPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint.zero, size: size))
-        outerPath.lineWidth = offset * 2
-        frameColor.setStroke()
-        outerPath.stroke()
-        
-        let innerFrame = CGRect(origin: CGPoint(x: CGPoint.zero.x + offset, y: CGPoint.zero.y + offset), size: CGSize(width: size.width - offset * 2, height: size.height - offset * 2))
-        let innerPath = UIBezierPath(ovalIn: innerFrame)
-        innerPath.lineWidth = offset
-        UIColor.white.setStroke()
-        innerPath.stroke()
+            let outerPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint.zero, size: size))
+            outerPath.lineWidth = offset * 2.5
+            frameColor.setStroke()
+            outerPath.stroke()
+            
+            let innerFrame = CGRect(origin: CGPoint(x: CGPoint.zero.x + offset , y: CGPoint.zero.y + offset), size: CGSize(width: size.width - offset * 2, height: size.height - offset * 2))
+            let innerPath = UIBezierPath(ovalIn: innerFrame)
+            innerPath.lineWidth = offset * 0.7
+            UIColor.white.setStroke()
+            innerPath.stroke()
         }
         
         context!.setBlendMode(.copy)

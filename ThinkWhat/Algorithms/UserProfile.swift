@@ -35,22 +35,36 @@ class UserProfile {
     var gender:     Gender
     var imageURL:   String
     var image:      UIImage?
+    var surveysAnsweredTotal: Int
+    var surveysFavoriteTotal: Int
+    var surveysCreatedTotal: Int
+    var updatedAt: Date
+    var lastVisit: Date
     var hashValue:  Int {
         return ObjectIdentifier(self).hashValue
     }
     
     init?(_ json: JSON) {
-        if let _ID                      = json["id"].intValue as? Int,
-            let _name                   = json["name"].stringValue as? String,
-            let _age                    = json["age"].intValue as? Int,
-            let _genderString           = json["gender"].stringValue as? String,
-            let _imageURL               = json["image"].stringValue as? String,
+        if let _ID                      = json[DjangoVariables.ID].intValue as? Int,
+            let _name                   = json[DjangoVariables.UserProfile.name].stringValue as? String,
+            let _age                    = json[DjangoVariables.UserProfile.age].intValue as? Int,
+            let _genderString           = json[DjangoVariables.UserProfile.gender].stringValue as? String,
+            let _imageURL               = json[DjangoVariables.UserProfile.image].stringValue as? String,
+            let _surveysAnsweredTotal   = json[DjangoVariables.UserProfile.surveysAnsweredTotal].intValue as? Int,
+            let _favoriteSurveysTotal   = json[DjangoVariables.UserProfile.surveysFavoriteTotal].intValue as? Int,
+            let _surveysCreatedTotal    = json[DjangoVariables.UserProfile.surveysCreatedTotal].intValue as? Int,
+            let _lastVisit              = json[DjangoVariables.UserProfile.lastVisit] is NSNull ? nil : Date(dateTimeString: json[DjangoVariables.UserProfile.lastVisit].stringValue as! String),
             let _gender                 = Gender(rawValue: _genderString) {
             ID = _ID
             name = _name
             age = _age
             gender = _gender
             imageURL = _imageURL
+            surveysAnsweredTotal = _surveysAnsweredTotal
+            surveysFavoriteTotal = _favoriteSurveysTotal
+            surveysCreatedTotal = _surveysCreatedTotal
+            lastVisit = _lastVisit
+            updatedAt = Date()
         } else {
             return nil
         }

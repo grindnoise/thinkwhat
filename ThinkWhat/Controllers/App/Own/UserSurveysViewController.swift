@@ -16,11 +16,17 @@ class UserSurveysViewController: UIViewController {
         
     }
     
-    fileprivate let tableVC: UserSurveysTableViewController = {
+    /*fileprivate let tableVC: UserSurveysTableViewController = {
         let storyboard = UIStoryboard(name: "App", bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: "UserSurveysTableViewController") as! UserSurveysTableViewController
         return vc
+    } ()*/
+    fileprivate let tableVC: SurveysTableViewController = {
+        let storyboard = UIStoryboard(name: "Controllers", bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: "SurveysTableViewController") as! SurveysTableViewController
+        return vc
     } ()
+
     fileprivate let statisticsVC: StatisticsViewController = {
         return StatisticsViewController(nibName :"StatisticsViewController",bundle : nil)
     } ()

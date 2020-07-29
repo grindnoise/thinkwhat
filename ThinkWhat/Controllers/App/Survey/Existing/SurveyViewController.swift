@@ -21,7 +21,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     class var answerHeaderCell: UINib {
         return UINib(nibName: "AnswerHeaderCell", bundle: nil)
     }
-    
+    fileprivate var heartExpandingView: HeartExpandingView?
     var statusBarHidden = false {
         didSet {
             UIView.animate(withDuration: 0.3) {
@@ -140,9 +140,9 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 if surveyLink == nil {
                     surveyLink = ShortSurvey(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100)
                 }
-                if let image = survey!.userProfile!.image as? UIImage {
+                if let userProfile = survey!.userProfile as? UserProfile, let image = userProfile.image as? UIImage {
                     NotificationCenter.default.post(name: kNotificationProfileImageReceived, object: nil)
-                } else if needsImageLoading, let url = survey!.userProfile!.imageURL as? String {
+                } else if needsImageLoading, let userProfile = survey!.userProfile as? UserProfile, let url = userProfile.imageURL as? String {
                     apiManager.downloadImage(url: url) {
                         image, error in
                         if error != nil {
@@ -197,19 +197,12 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         //NavTitle setup
         navTitleImageSize = CGSize(width: 45, height: 45)
         self.navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
-//        var image: UIImage!
         if let _image = survey?.userProfile?.image {
             navTitle.image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
         } else {
             navTitle.isUserInteractionEnabled = false
         }
-//        } else {
-//            let pic = UIImage(named: "user")!
-//            image = pic.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
-//        }
         navTitle.clipsToBounds = false
-//        self.navTitle.image = image
-//        navTitle.isUserInteractionEnabled = true
         navTitle.alpha = 0
         let gesture_2 = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.showOwnerProfile))
         navTitle.addGestureRecognizer(gesture_2)
@@ -621,6 +614,7 @@ extension SurveyViewController {
                     isRequesting = true
                     var mark = true
                     if likeButton.state == .disabled {
+                        animateHeartExpandingView()
                         likeButton.state = .enabled
                         //self.likeButton.transform = .identity
 //                        UIView.animate(withDuration: 0.4, delay: 1.4, options: [.autoreverse], animations: {
@@ -683,6 +677,14 @@ extension SurveyViewController {
                 }
             }
         }
+    }
+    
+    fileprivate func animateHeartExpandingView() {
+        if heartExpandingView == nil {
+            heartExpandingView = HeartExpandingView(frame: CGRect(origin: .zero, size: .zero))
+            heartExpandingView!.layoutCentered(in: view, multiplier: 0.6)
+        }
+        heartExpandingView?.addEnableAnimation()
     }
     
     //POST request post result

@@ -427,8 +427,10 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 || indexPath.section == 2 || indexPath.section == 4 {//Params, Image add, Answer add
-                return 50
+        if indexPath.section == 0 {//Params
+                return 70
+        } else if indexPath.section == 2 || indexPath.section == 4 {//Image add, Answer add
+            return 50
         } else if indexPath.section == 1 {//Question
             if indexPath.row == 0 { //Title
                 if let cell = tableView.cellForRow(at: indexPath) as? QuestionTitleCreationCell {

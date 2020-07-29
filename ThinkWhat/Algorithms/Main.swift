@@ -17,7 +17,7 @@ import UserNotifications
 
 typealias Closure = (()->())
 
-var isTesting = false
+var localhost = false
 
 let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
@@ -237,6 +237,7 @@ struct Segues {
         static let NewSurveyToCategorySelection = "NEW_TO_CATEGORY_SELECTION"
         static let SurveyToUser             = "SURVEY_TO_USER"
         static let SurveyToClaim            = "SURVEY_TO_CLAIM"
+        static let UserToUserSurveys        = "USER_TO_USER_SURVEYS"
     }
 }
 ////MARK: Auth
@@ -627,10 +628,11 @@ struct VK_IDS {
 }
 
 struct SERVER_URLS {
-    static let BASE                     = isTesting ? "http://127.0.0.1:8000/" : "https://damp-oasis-64585.herokuapp.com/"////
-    static let CLIENT_ID                = isTesting ? "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS" : "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
-    static let CLIENT_SECRET            = isTesting ? "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH" : "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
+    static let BASE                     = localhost ? "http://127.0.0.1:8000/" : "https://damp-oasis-64585.herokuapp.com/"////
+    static let CLIENT_ID                = localhost ? "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS" : "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
+    static let CLIENT_SECRET            = localhost ? "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH" : "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
     static let SIGNUP                   = "api/sign_up/"
+    static let CURRENT_TIME             = "api/current_time/"
     static let TOKEN                    = "api/social/token/"
     static let TOKEN_CONVERT            = "api/social/convert-token/"
     static let TOKEN_REVOKE             = "api/social/revoke-token/"
@@ -646,7 +648,7 @@ struct SERVER_URLS {
     static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_social_update/"
     static let PROFILES                 = "api/profiles/"
     static let CURRENT_USER             = "api/profiles/current/"
-    static let USER_PROFILE_DATA        = "api/profiles/get_data/"
+    static let USER_PROFILE_DATA        = "api/profiles/get_profile_data/"
 
     //Surveys
     static let SURVEYS                  = "api/surveys/"
@@ -660,6 +662,7 @@ struct SERVER_URLS {
     static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
     static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
     static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
+    static let SURVEYS_BY_OWNER         = "api/surveys/by_category/"
     static let SURVEYS_ADD_FAVORITE     = "api/surveys/add_favorite/"
     static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
     static let SURVEYS_REJECT           = "api/surveys/reject/"
@@ -675,6 +678,7 @@ struct SERVER_URLS {
 }
 
 struct DjangoVariables {
+    static let ID                           = "id"
     struct User {
         static let firstName                = "first_name"
         static let lastName                 = "last_name"
@@ -682,8 +686,10 @@ struct DjangoVariables {
     }
     struct UserProfile {
         static let owner                    = "owner"
+        static let name                     = "name"
         static let gender                   = "gender"
         static let birthDate                = "birth_date"
+        static let age                      = "age"
         static let image                    = "image"
         static let isDeleted                = "is_del"
         static let isBanned                 = "is_banned"
@@ -692,6 +698,10 @@ struct DjangoVariables {
         static let vkID                     = "vk_ID"
         static let isEdited                 = "is_edited"
         static let isEmailVerified          = "is_email_verified"
+        static let surveysAnsweredTotal     = "surveys_results_count"
+        static let surveysFavoriteTotal     = "favorite_surveys_count"
+        static let surveysCreatedTotal      = "surveys_count"
+        static let lastVisit                = "last_visit"
     }
     struct Survey {
         static let category                 = "category"
