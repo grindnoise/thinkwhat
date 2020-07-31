@@ -1135,13 +1135,13 @@ extension NewSurveyViewController: ServerProtocol {
                         //Create SurveyLink & append to own & new arrays
                         if let surveyLink = survey.createSurveyLink() {
                             Surveys.shared.categorizedLinks[self.category!]?.append(surveyLink)
-                            Surveys.shared.append(object: surveyLink, type: .Own)
-                            Surveys.shared.append(object: surveyLink, type: .New)
+                            Surveys.shared.append(object: surveyLink, type: .OwnLinks)
+                            Surveys.shared.append(object: surveyLink, type: .NewLinks)
                             
                             //Send notification
-                            NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)
-                            NotificationCenter.default.post(name: kNotificationSurveysByCategoryUpdated, object: nil)
-                            NotificationCenter.default.post(name: kNotificationOwnSurveysUpdated, object: nil)
+                            NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)
+                            NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
+                            NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
                         }
                         self.confirmationView?.showReadySign()
                     } else {

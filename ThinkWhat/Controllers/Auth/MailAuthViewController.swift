@@ -112,8 +112,8 @@ class MailAuthViewController: UIViewController {
         for tf in textFields {
             tf.delegate = self
         }
-        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleTokenState), name: kNotificationTokenReceived, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleTokenState), name: kNotificationTokenWrongCredentials, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleTokenState), name: Notifications.OAuth.TokenReceived, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleTokenState), name: Notifications.OAuth.TokenWrongCredentials, object: nil)
 //        NotificationCenter.default.addObserver(self,
 //                                       selector: #selector(AuthViewController.handleReachabilitySignal),
 //                                       name: kNotificationApiNotReachable,

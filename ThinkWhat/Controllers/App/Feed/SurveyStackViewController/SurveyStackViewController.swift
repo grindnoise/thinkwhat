@@ -25,7 +25,7 @@ class SurveyStackViewController: UIViewController {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(SurveyStackViewController.generatePreviews),
-                                               name: kNotificationSurveysStackReceived,
+                                               name: Notifications.Surveys.SurveysStackReceived,
                                                object: nil)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(SurveyStackViewController.didBecomeActive),
@@ -112,7 +112,7 @@ class SurveyStackViewController: UIViewController {
                             if image != nil {
                                 userProfile.image = image!
                                 if postImageNotification {
-                                    NotificationCenter.default.post(name: kNotificationProfileImageReceived, object: image)
+                                    NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: image)
                                 }
                                 UIView.transition(with: _surveyPreview.userImage,
                                                   duration: 0.75,

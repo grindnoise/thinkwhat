@@ -27,7 +27,7 @@ enum SurveyPoints: Int {
 
 class Surveys {
     enum SurveyContainerType {
-        case Top, New, Categorized, Own, Favorite, Downloaded, Completed, Stack, Claim
+        case TopLinks, NewLinks, Categorized, OwnLinks, Favorite, Downloaded, Completed, Stack, Claim, AllLinks
     }
     static let shared = Surveys()
     private init() {}
@@ -35,6 +35,7 @@ class Surveys {
 //    var currentHotSurvey:   FullSurvey?//Add to list of hot_except
     fileprivate var timer:  Timer?
     var rejectedSurveys:    [FullSurvey]  = []//Local list of rejected surveys, should be cleared periodically
+    var allLinks:           [ShortSurvey] = []
     var topLinks:           [ShortSurvey] = []
     var newLinks:           [ShortSurvey] = [] {
         didSet {
@@ -62,39 +63,49 @@ class Surveys {
                 topLinks.removeAll()
                 for j in i.1 {
                     if let survey = ShortSurvey(j.1) {
-                        topLinks.append(survey)
+                        append(object: survey, type: .TopLinks)
+                        //topLinks.append(survey)
                     }
                 }
-                NotificationCenter.default.post(name: kNotificationTopSurveysUpdated, object: nil)
+                NotificationCenter.default.post(name: Notifications.Surveys.TopSurveysUpdated, object: nil)
             } else if i.0 == "new" && !i.1.isEmpty {
                 newLinks.removeAll()
                 for k in i.1 {
                     if let survey = ShortSurvey(k.1) {
-                        newLinks.append(survey)
+                        append(object: survey, type: .NewLinks)
+                        //newLinks.append(survey)
                     }
                 }
-                NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)
+                NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)
             }  else if i.0 == "by_category" && !i.1.isEmpty {
                 categorizedLinks.removeAll()
                 for cat in i.1 {
                     let category = SurveyCategories.shared[Int(cat.0)!]
                     var data: [ShortSurvey] = []
-                    for survey in cat.1 {
-                        data.append(ShortSurvey(survey.1)!)
+                    for _survey in cat.1 {
+                        if let survey = ShortSurvey(_survey.1) {
+                            if let _foundObject = allLinks.filter({ $0.hashValue == survey.hashValue}).first {
+                                data.append(_foundObject)
+                            } else {
+                                data.append(survey)
+                            }
+                        }
+                        //data.append(ShortSurvey(_survey.1)!)
                     }
                     categorizedLinks[category!] = data
                 }
-                NotificationCenter.default.post(name: kNotificationSurveysByCategoryUpdated, object: nil)
+                NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
             } else if i.0 == "own" {
                 ownLinks.removeAll()
                 if !i.1.isEmpty {
                     for k in i.1 {
                         if let survey = ShortSurvey(k.1) {
-                            ownLinks.append(survey)
+                            append(object: survey, type: .OwnLinks)
+                            //ownLinks.append(survey)
                         }
                     }
                 }
-                NotificationCenter.default.post(name: kNotificationOwnSurveysUpdated, object: nil)
+                NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
             } else if i.0 == "favorite" {
                 favoriteLinks.removeAll()
                 if !i.1.isEmpty {
@@ -102,11 +113,16 @@ class Surveys {
 //                        print(k)
                         if let date = Date(dateTimeString: (k.1["added_at"].stringValue as? String)!) as? Date,
                             let survey = ShortSurvey(k.1["survey"]) {
-                            favoriteLinks[survey] = date
+                            if let _foundObject = allLinks.filter({ $0.hashValue == survey.hashValue}).first {
+                                favoriteLinks[_foundObject] = date
+                            } else {
+                                favoriteLinks[survey] = date
+                            }
+//                            favoriteLinks[survey] = date
                         }
                     }
                 }
-                NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
+                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
             } else if i.0 == "user_results" {
                 completedSurveyIDs.removeAll()
                 for k in i.1 {
@@ -122,7 +138,7 @@ class Surveys {
                         }
                     }
                     
-                    NotificationCenter.default.post(name: kNotificationSurveysStackReceived, object: nil)
+                    NotificationCenter.default.post(name: Notifications.Surveys.SurveysStackReceived, object: nil)
                     
                     //TODO - clear rejected
 //                    delay(seconds: 30) { self.startTimer() }
@@ -140,12 +156,12 @@ class Surveys {
                         stackObjects.append(_foundObject)
                     }
                 } else {
+                    downloadedObjects.append(_object)
                     if stackObjects.filter({ $0.hashValue == _object.hashValue}).isEmpty, rejectedSurveys.filter({ $0.hashValue == _object.hashValue}).isEmpty {
                         stackObjects.append(_object)
-                        append(object: _object, type: .Downloaded)
+//                        append(object: _object, type: .Downloaded)
                     }
                 }
-//                append(object: _object, type: .Downloaded)
             }
         case .Downloaded:
             if let _object = object as? FullSurvey {
@@ -157,35 +173,65 @@ class Surveys {
                     }
                 }
             }
-        case .New:
+        case .NewLinks:
             if let _object = object as? ShortSurvey {
-                if newLinks.isEmpty {
-                    newLinks.append(_object)
+                if let _foundObject = allLinks.filter({ $0.hashValue == _object.hashValue}).first {
+                    if newLinks.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
+                        newLinks.append(_foundObject)
+                    }
                 } else {
                     if newLinks.filter({ $0.hashValue == _object.hashValue}).isEmpty {
                         newLinks.append(_object)
+                        allLinks.append(_object)
                     }
                 }
+//                if newLinks.isEmpty {
+//                    newLinks.append(_object)
+//                } else {
+//                    if newLinks.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+//                        newLinks.append(_object)
+//                    }
+//                }
             }
-        case .Top:
+        case .TopLinks:
             if let _object = object as? ShortSurvey {
-                if topLinks.isEmpty {
-                    topLinks.append(_object)
+                if let _foundObject = allLinks.filter({ $0.hashValue == _object.hashValue}).first {
+                    if topLinks.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
+                        topLinks.append(_foundObject)
+                    }
                 } else {
                     if topLinks.filter({ $0.hashValue == _object.hashValue}).isEmpty {
                         topLinks.append(_object)
+                        allLinks.append(_object)
                     }
                 }
+//                if topLinks.isEmpty {
+//                    topLinks.append(_object)
+//                } else {
+//                    if topLinks.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+//                        topLinks.append(_object)
+//                    }
+//                }
             }
-        case .Own:
+        case .OwnLinks:
             if let _object = object as? ShortSurvey {
-                if ownLinks.isEmpty {
-                    ownLinks.append(_object)
+                if let _foundObject = allLinks.filter({ $0.hashValue == _object.hashValue}).first {
+                    if ownLinks.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
+                        ownLinks.append(_foundObject)
+                    }
                 } else {
                     if ownLinks.filter({ $0.hashValue == _object.hashValue}).isEmpty {
                         ownLinks.append(_object)
+                        allLinks.append(_object)
                     }
                 }
+//                if ownLinks.isEmpty {
+//                    ownLinks.append(_object)
+//                } else {
+//                    if ownLinks.filter({ $0.hashValue == _object.hashValue}).isEmpty {
+//                        ownLinks.append(_object)
+//                    }
+//                }
             }
         case .Claim:
             if let _object = object as? FullSurvey {
@@ -207,13 +253,13 @@ class Surveys {
     //Remove from lists -> post Notification
     func removeClaimSurvey(object: FullSurvey) {
         if let surveyLink = object.createSurveyLink() as? ShortSurvey {
-            if contains(object: surveyLink, type: .New) {
+            if contains(object: surveyLink, type: .NewLinks) {
                 newLinks.remove(object: surveyLink)
-                NotificationCenter.default.post(name: kNotificationNewSurveysUpdated, object: nil)// (kNotificationNewSurveysUpdated)
+                NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)// (kNotificationNewSurveysUpdated)
             }
-            if contains(object: surveyLink, type: .Top) {
+            if contains(object: surveyLink, type: .TopLinks) {
                 topLinks.remove(object: surveyLink)
-                NotificationCenter.default.post(name: kNotificationTopSurveysUpdated, object: nil)// (kNotificationTopSurveysUpdated)
+                NotificationCenter.default.post(name: Notifications.Surveys.TopSurveysUpdated, object: nil)// (kNotificationTopSurveysUpdated)
             }
         }
         if contains(object: object, type: .Stack) {
@@ -240,7 +286,7 @@ class Surveys {
                     return !downloadedObjects.map() { $0.hashValue == _object.hashValue }.isEmpty
                 }
             }
-        case .New:
+        case .NewLinks:
             if let _object = object as? ShortSurvey {
                 if newLinks.isEmpty {
                     return false
@@ -248,7 +294,7 @@ class Surveys {
                     return !newLinks.map() { $0.hashValue == _object.hashValue }.isEmpty
                 }
             }
-        case .Top:
+        case .TopLinks:
             if let _object = object as? ShortSurvey {
                 if topLinks.isEmpty {
                     return false
@@ -256,7 +302,7 @@ class Surveys {
                     return !topLinks.map() { $0.hashValue == _object.hashValue }.isEmpty
                 }
             }
-        case .Own:
+        case .OwnLinks:
             if let _object = object as? ShortSurvey {
                 if ownLinks.isEmpty {
                     return false

@@ -22,7 +22,7 @@ class EmailResponse {
                 print(self.expiresIn)
             }
         }
-        NotificationCenter.default.addObserver(self, selector: #selector(EmailResponse.eraseData), name: kNotificationEmailResponseExpired, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(EmailResponse.eraseData), name: Notifications.EmailResponse.Expired, object: nil)
     }
     fileprivate var confirmation_code:  Int?
     fileprivate var expiresIn:          Date?

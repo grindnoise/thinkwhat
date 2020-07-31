@@ -28,11 +28,13 @@ protocol APIManagerProtocol {
     func loadSurvey(survey: ShortSurvey, completion: @escaping(JSON?, Error?)->())
     func loadTotalSurveysCount(completion: @escaping(JSON?, Error?)->())
     func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->())
+    func loadSurveysByOwner(userProfile: UserProfile, type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
     func markFavorite(mark: Bool, survey: ShortSurvey, completion: @escaping(JSON?, Error?)->())
     func postSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->())
     func rejectSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->())
     func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->())
     func postClaim(surveyID: Int, claimID: Int, completion: @escaping(JSON?, Error?)->())
+    func getUserStats(userProfile: UserProfile, completion: @escaping(JSON?, Error?)->())
     
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
     func downloadImage(url: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
@@ -52,7 +54,7 @@ protocol UserDataPreparatory: class {
 class APIManager: APIManagerProtocol {
     
     public enum SurveyType: String {
-        case Top,New,All,Own,Favorite, Hot, HotExcept
+        case Top,New,All,Own,Favorite, Hot, HotExcept, User, UserFavorite
         
         func getURL() -> URL {
             let url = URL(string: SERVER_URLS.BASE)!//.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE)
@@ -71,6 +73,12 @@ class APIManager: APIManagerProtocol {
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT)
             case .HotExcept:
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT_EXCEPT)
+            case .User:
+                return url.appendingPathComponent(SERVER_URLS.SURVEYS_BY_OWNER)
+            case .UserFavorite:
+                return url.appendingPathComponent(SERVER_URLS.SURVEYS_FAVORITE_LIST_BY_OWNER)
+            default:
+                return url.appendingPathComponent(SERVER_URLS.SURVEYS_ALL)
             }
         }
     }
@@ -1086,6 +1094,48 @@ class APIManager: APIManagerProtocol {
                         completion(nil, error!)
                     } else if success {
                         self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_CLAIM), httpMethod: .post, parameters: ["survey": surveyID, "claim": claimID], encoding: JSONEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
+    func getUserStats(userProfile: UserProfile, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.USER_PROFILE_STATS), httpMethod: .get, parameters: ["userprofile_id": userProfile.ID], encoding: URLEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
+    func loadSurveysByOwner(userProfile: UserProfile, type: SurveyType, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        self._performRequest(url: type.getURL(), httpMethod: .get, parameters: ["userprofile_id": userProfile.ID], encoding: URLEncoding.default, completion: completion)
                     }
                 }
             } else {

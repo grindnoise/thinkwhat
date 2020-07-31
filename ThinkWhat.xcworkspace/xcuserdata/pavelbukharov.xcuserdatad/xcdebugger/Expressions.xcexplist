@@ -210,6 +210,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "SurveysTableViewController.tableView(_:numberOfRowsInSection:):SurveysTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "userProfile!.surveysCreated.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "SurveysViewController.viewDidLayoutSubviews():SurveysViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -825,6 +833,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in closure #1 in APIManager.loadSurveysByOwner(userProfile:type:completion:):APIManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "url">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.questionRowHeight.didset:NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -1053,7 +1069,10 @@
          contextName = "UserViewController.viewWillAppear(_:):UserViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "userProfile">
+               value = "calendar.dateComponents([.minute], from: endComponents, to: nowComponents).minute!">
+            </PersistentString>
+            <PersistentString
+               value = "apiManager">
             </PersistentString>
             <PersistentString
                value = "isViewSetupCompleted">
@@ -1226,6 +1245,14 @@
          <PersistentStrings>
             <PersistentString
                value = "survey">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ShortSurvey.init(_:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "json[&quot;start_date&quot;].stringValue!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1448,6 +1475,9 @@
                value = "survey">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "UserProfile.importSurveys(_:json:):UserProfile.swift">
       </ContextState>
       <ContextState
          contextName = "AnswerCreationHeaderCell.addTapped(_:):AnswerCreationHeaderCell.swift">

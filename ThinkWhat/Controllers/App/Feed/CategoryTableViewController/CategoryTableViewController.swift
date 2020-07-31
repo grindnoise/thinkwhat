@@ -37,7 +37,7 @@ class CategoryTableViewController: UITableViewController {
         }
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(CategoryTableViewController.updateTableView),
-                                               name: kNotificationSurveysByCategoryUpdated,
+                                               name: Notifications.Surveys.SurveysByCategoryUpdated,
                                                object: nil)
         refreshControl?.attributedTitle = NSAttributedString(string: "")
         refreshControl?.addTarget(self, action: #selector(CategoryTableViewController.refreshTableView), for: .valueChanged)

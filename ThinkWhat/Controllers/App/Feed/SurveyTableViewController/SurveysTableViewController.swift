@@ -28,7 +28,7 @@ class SurveysTableViewController: UITableViewController {
 //        }
 //    }
     enum SurveyTableType {
-        case New, Top, User
+        case New, Top, User, UserFavorite
     }
     
     var type: SurveyTableType = .New
@@ -47,6 +47,7 @@ class SurveysTableViewController: UITableViewController {
     var navTitleImage: UIImage?
     fileprivate var navTitleImageSize: CGSize = .zero
     fileprivate var lastContentOffset: CGFloat = 0
+    weak var userProfile: UserProfile?
     
     class var surveyNib: UINib {
         return UINib(nibName: "SurveyTableViewCell", bundle: nil)
@@ -66,18 +67,36 @@ class SurveysTableViewController: UITableViewController {
 //                                       selector: #selector(SurveysTableViewController.updateTableView),
 //                                       name: kNotificationTopSurveysUpdated,
 //                                       object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(SurveysTableViewController.updateTableView),
-                                               name: kNotificationNewSurveysUpdated,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
-                                               name: kNotificationProfileImageReceived,
-                                               object: nil)
+        if type == .New {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(SurveysTableViewController.updateTableView),
+                                                   name: Notifications.Surveys.NewSurveysUpdated,
+                                                   object: nil)
+            refreshControl?.attributedTitle = NSAttributedString(string: "")
+            refreshControl?.addTarget(self, action: #selector(SurveysTableViewController.refreshTableView), for: .valueChanged)
+            refreshControl?.tintColor = K_COLOR_RED
+        } else if type == .User {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
+                                                   name: Notifications.UI.ProfileImageReceived,
+                                                   object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(SurveysTableViewController.updateTableView),
+                                                   name: Notifications.Surveys.UserSurveysUpdated,
+                                                   object: nil)
+            tableView.refreshControl = nil
+        } else if type == .UserFavorite {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
+                                                   name: Notifications.UI.ProfileImageReceived,
+                                                   object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(SurveysTableViewController.updateTableView),
+                                                   name: Notifications.Surveys.UserFavoriteSurveysUpdated,
+                                                   object: nil)
+            tableView.refreshControl = nil
+        }
         
-        refreshControl?.attributedTitle = NSAttributedString(string: "")
-        refreshControl?.addTarget(self, action: #selector(SurveysTableViewController.refreshTableView), for: .valueChanged)
-        refreshControl?.tintColor = K_COLOR_RED
     }
     
     
@@ -95,7 +114,7 @@ class SurveysTableViewController: UITableViewController {
             self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         }
         
-        if type == .User {
+        if type == .User || type == .UserFavorite {
             navTitleImageSize = CGSize(width: 45, height: 45)
             navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
             if let _image = navTitleImage {
@@ -110,7 +129,7 @@ class SurveysTableViewController: UITableViewController {
     }
 
     @objc func profileImageReceived(_ notification: Notification) {
-        if type == .User, navTitle != nil, let image = notification.object as? UIImage {
+        if type == .User || type == .User, navTitle != nil, let image = notification.object as? UIImage {
             UIView.transition(with: navTitle!,
                               duration: 0.75,
                               options: .transitionCrossDissolve,
@@ -139,8 +158,13 @@ class SurveysTableViewController: UITableViewController {
             return Surveys.shared.newLinks.count
         case .Top:
             return Surveys.shared.topLinks.count
+        case .User:
+            return userProfile!.surveysCreated.count
+        case .UserFavorite:
+            return userProfile!.surveysFavorite.count
         default:
-            return Surveys.shared.topLinks.count
+            print("default")
+            //return Surveys.shared.topLinks.count
         }
         
 //        } else if vc.currentIcon == .Hot{
@@ -170,6 +194,10 @@ class SurveysTableViewController: UITableViewController {
                 switch type {
                 case .New:
                     dataSource = Surveys.shared.newLinks
+                case .User:
+                    dataSource = userProfile!.surveysCreated
+                case .UserFavorite:
+                    dataSource = userProfile!.surveysFavorite
                 default:
                     dataSource = Surveys.shared.topLinks
                 }
@@ -225,8 +253,10 @@ class SurveysTableViewController: UITableViewController {
 //    }
     
     @objc private func refreshTableView() {
-        if delegate != nil, delegate is SurveysViewController {
-            (delegate as! SurveysViewController).updateSurveys(type: .New)
+        if type == .New {
+            if delegate != nil, delegate is SurveysViewController {
+                (delegate as! SurveysViewController).updateSurveys(type: .New)
+            }
         }
 //        updateSurveys(type: vc.currentIcon == .New ? .New : .Top)
     }

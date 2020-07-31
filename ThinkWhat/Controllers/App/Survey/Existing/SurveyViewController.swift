@@ -141,7 +141,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                     surveyLink = ShortSurvey(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100)
                 }
                 if let userProfile = survey!.userProfile as? UserProfile, let image = userProfile.image as? UIImage {
-                    NotificationCenter.default.post(name: kNotificationProfileImageReceived, object: nil)
+                    NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: nil)
                 } else if needsImageLoading, let userProfile = survey!.userProfile as? UserProfile, let url = userProfile.imageURL as? String {
                     apiManager.downloadImage(url: url) {
                         image, error in
@@ -150,7 +150,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                         }
                         if image != nil {
                             self.survey!.userProfile!.image = image!
-                            NotificationCenter.default.post(name: kNotificationProfileImageReceived, object: nil)
+                            NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: nil)
                         }
                     }
                 }
@@ -163,7 +163,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(SurveyViewController.profileImageReceived),
-                                               name: kNotificationProfileImageReceived,
+                                               name: Notifications.UI.ProfileImageReceived,
                                                object: nil)
         
         setupViews()
@@ -629,7 +629,7 @@ extension SurveyViewController {
                             Surveys.shared.favoriteLinks.removeValue(forKey: key)
                         }
                         //                Surveys.shared.favoriteSurveys.removeValue(forKey: self.surveyLink)
-                        NotificationCenter.default.post(name: kNotificationFavoriteSurveysUpdated, object: nil)
+                        NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
                     }
                     apiManager.markFavorite(mark: mark, survey: surveyLink!) {
                         _, error in
@@ -670,7 +670,7 @@ extension SurveyViewController {
                         self.tempClaimButton!.frame.size = CGSize(width: size, height: size)
                 }) {
                     _ in
-                    NotificationCenter.default.post(name: kNotificationClaimSignAppeared, object: self.tempClaimButton)
+                    NotificationCenter.default.post(name: Notifications.UI.ClaimSignAppeared, object: self.tempClaimButton)
                 }
                 delay(seconds: 0.01) {
                     self.performSegue(withIdentifier: Segues.App.SurveyToClaim, sender: self)

@@ -8,10 +8,10 @@
 
 import UIKit
 
-class UserViewController: UIViewController {
+class UserViewController: UIViewController, ServerProtocol {
 
     deinit {
-        "UserViewController deinit"
+        print("UserViewController deinit")
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -30,13 +30,14 @@ class UserViewController: UIViewController {
     fileprivate var headerHeightConstraint:NSLayoutConstraint!
     fileprivate var headerMaxHeight: CGFloat = 0
     fileprivate var leftEdgeInset: CGFloat = 0
+    var apiManager: APIManagerProtocol!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(UserViewController.profileImageReceived(_:)),
-                                               name: kNotificationProfileImageReceived,
+                                               name: Notifications.UI.ProfileImageReceived,
                                                object: nil)
     }
     
@@ -59,6 +60,34 @@ class UserViewController: UIViewController {
             NSLayoutConstraint.deactivate([proportionalHeightConstraint])
             headerHeightConstraint.isActive = true
             headerMaxHeight = headerHeightConstraint.constant
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        let calendar = Calendar.current
+        let endComponents = calendar.dateComponents([.hour, .minute], from: userProfile.updatedAt)
+        let nowComponents = calendar.dateComponents([.hour, .minute], from: Date())
+        if calendar.dateComponents([.minute], from: endComponents, to: nowComponents).minute! >= Int(TimeIntervals.UserStatsTimeOutdated) {
+            apiManager.getUserStats(userProfile: userProfile) {
+                json, error in
+                if error != nil {
+                    print(error?.localizedDescription)
+                } else if json != nil {
+                    self.userProfile.updateStats(json!)
+                    if let cell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? UserSurveysCell {
+                        cell.count.text = "\(self.userProfile.surveysCreatedTotal)"
+                    }
+                    if let cell = self.tableView.cellForRow(at: IndexPath(row: 2, section: 0)) as? UserVotesCell {
+                        cell.count.text = "\(self.userProfile.surveysAnsweredTotal)"
+                    }
+                    if let cell = self.tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? UserFavoriteCell {
+                        cell.count.text = "\(self.userProfile.surveysFavoriteTotal)"
+                    }
+                    if let cell = self.tableView.cellForRow(at: IndexPath(row: 5, section: 0)) as? UserActivityCell {
+                        cell.label.text = self.userProfile.gender == .Male ? "Был \(self.userProfile.lastVisit.toDateTimeStringLiteral())" : "Была \(self.userProfile.lastVisit.toDateTimeStringLiteral())"
+                    }
+                }
+            }
         }
     }
     
@@ -97,7 +126,7 @@ class UserViewController: UIViewController {
     
     fileprivate func animateHeader(isFolding: Bool) {
         if isFolding {
-            UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
+            UIView.animate(withDuration: 0.4, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.3, options: [.curveEaseInOut], animations: {
                 self.view.setNeedsLayout()
                 self.headerHeightConstraint.constant = 100
                 self.header.stackView.alpha = 0
@@ -118,6 +147,13 @@ class UserViewController: UIViewController {
             destinationVC.type = .User
             if let image = userProfile.image {
                 destinationVC.navTitleImage = image
+                destinationVC.userProfile = userProfile
+            }
+        } else if segue.identifier == Segues.App.UserToUserFavoriteSurveys, let destinationVC = segue.destination as? SurveysTableViewController {
+            destinationVC.type = .UserFavorite
+            if let image = userProfile.image {
+                destinationVC.navTitleImage = image
+                destinationVC.userProfile = userProfile
             }
         }
     }
@@ -192,9 +228,8 @@ extension UserViewController: UITableViewDataSource, UITableViewDelegate {
         } else if indexPath.row == 4, let cell = tableView.dequeueReusableCell(withIdentifier: "claim") as? UserClaimCell {
             cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
             return cell
-        } else if let cell = tableView.dequeueReusableCell(withIdentifier: "activity") as? UserActivityCell {
-            //            cell.count.text = "\(userProfile.surveysFavoriteTotal)"
-            cell.label.text = "Последняя активность: \(userProfile.lastVisit.toDateTimeStringWithoutSecondsLiteral())"
+        } else if indexPath.row == 5, let cell = tableView.dequeueReusableCell(withIdentifier: "activity") as? UserActivityCell {
+            cell.label.text = userProfile.gender == .Male ? "Был \(userProfile.lastVisit.toDateTimeStringLiteral())" : "Была \(userProfile.lastVisit.toDateTimeStringLiteral())"
             cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
             return cell
         }
@@ -213,6 +248,25 @@ extension UserViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 {
             performSegue(withIdentifier: Segues.App.UserToUserSurveys, sender: nil)
+            apiManager.loadSurveysByOwner(userProfile: userProfile, type: .User) {
+                json, error in
+                if error != nil {
+                    print(error?.localizedDescription)
+                } else if json != nil {
+                    self.userProfile.importSurveys(UserProfile.UserSurveyType.Own, json: json!)
+                }
+            }
+        } else if indexPath.row == 1 {
+            performSegue(withIdentifier: Segues.App.UserToUserFavoriteSurveys, sender: nil)
+            apiManager.loadSurveysByOwner(userProfile: userProfile, type: .UserFavorite) {
+                json, error in
+                if error != nil {
+                    print(error?.localizedDescription)
+                } else if json != nil {
+                    self.userProfile.importSurveys(UserProfile.UserSurveyType.Favorite, json: json!)
+                }
+            }
         }
+
     }
 }

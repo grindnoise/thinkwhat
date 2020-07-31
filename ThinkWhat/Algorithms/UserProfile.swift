@@ -29,6 +29,11 @@ class UserProfiles {
 }
 
 class UserProfile {
+    
+    enum UserSurveyType {
+        case Own, Favorite
+    }
+    
     var ID:         Int
     var name:       String
     var age:        Int
@@ -43,6 +48,8 @@ class UserProfile {
     var hashValue:  Int {
         return ObjectIdentifier(self).hashValue
     }
+    var surveysCreated: [ShortSurvey]   = []
+    var surveysFavorite: [ShortSurvey]  = []
     
     init?(_ json: JSON) {
         if let _ID                      = json[DjangoVariables.ID].intValue as? Int,
@@ -67,6 +74,53 @@ class UserProfile {
             updatedAt = Date()
         } else {
             return nil
+        }
+    }
+    
+    func updateStats(_ json: JSON) {
+        if let _surveysAnsweredTotal   = json[DjangoVariables.UserProfile.surveysAnsweredTotal].intValue as? Int,
+            let _favoriteSurveysTotal   = json[DjangoVariables.UserProfile.surveysFavoriteTotal].intValue as? Int,
+            let _surveysCreatedTotal    = json[DjangoVariables.UserProfile.surveysCreatedTotal].intValue as? Int,
+            let _lastVisit              = json[DjangoVariables.UserProfile.lastVisit] is NSNull ? nil : Date(dateTimeString: json[DjangoVariables.UserProfile.lastVisit].stringValue as! String) {
+            surveysAnsweredTotal = _surveysAnsweredTotal
+            surveysFavoriteTotal = _favoriteSurveysTotal
+            surveysCreatedTotal = _surveysCreatedTotal
+            lastVisit = _lastVisit
+            updatedAt = Date()
+        }
+    }
+    
+    func importSurveys(_ type: UserSurveyType, json: JSON) {
+        for i in json {
+            if let survey = ShortSurvey(i.1) {
+                if let _foundObject = Surveys.shared.allLinks.filter({ $0.hashValue == survey.hashValue}).first {
+                    if type == .Own {
+                        if surveysCreated.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
+                            surveysCreated.append(_foundObject)
+                        }
+                    } else if type == .Favorite {
+                        if surveysFavorite.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
+                            surveysFavorite.append(_foundObject)
+                        }
+                    }
+                } else {
+                    if type == .Own {
+                        if surveysCreated.filter({ $0.hashValue == survey.hashValue}).isEmpty {
+                            surveysCreated.append(survey)
+                        }
+                    } else if type == .Favorite {
+                        if surveysFavorite.filter({ $0.hashValue == survey.hashValue}).isEmpty {
+                            surveysFavorite.append(survey)
+                        }
+                    }
+                }
+            }
+        }
+        //If smth changes
+        if type == .Own {
+            NotificationCenter.default.post(name: Notifications.Surveys.UserSurveysUpdated, object: nil)
+        } else if type == .Favorite {
+            NotificationCenter.default.post(name: Notifications.Surveys.UserFavoriteSurveysUpdated, object: nil)
         }
     }
     

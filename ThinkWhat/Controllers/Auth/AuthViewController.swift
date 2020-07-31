@@ -75,15 +75,15 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self,
                                        selector: #selector(AuthViewController.handleTokenState),
-                                       name: kNotificationTokenReceived,
+                                       name: Notifications.OAuth.TokenReceived,
                                        object: nil)
         notificationCenter.addObserver(self,
                                        selector: #selector(AuthViewController.handleTokenState),
-                                       name: kNotificationTokenConnectionError,
+                                       name: Notifications.OAuth.TokenConnectionError,
                                        object: nil)
         notificationCenter.addObserver(self,
                                        selector: #selector(AuthViewController.handleTokenState),
-                                       name: kNotificationTokenError,
+                                       name: Notifications.OAuth.TokenError,
                                        object: nil)
         if !isViewSetupCompleted {
             //            self.phoneButton.layer.cornerRadius = self.phoneButton.frame.height / 2

@@ -63,8 +63,8 @@ class ValidationCodeTextField: UITextField {
         timerLabel.textColor = .lightGray
         timerLabel.textAlignment = .right
         timerLabel.addEquallyTo(to: rightView!)
-        NotificationCenter.default.addObserver(self, selector: #selector(ValidationCodeTextField.runTimer), name: kNotificationEmailResponseReceived, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(ValidationCodeTextField.showCaution), name: kNotificationEmailResponseExpired, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ValidationCodeTextField.runTimer), name: Notifications.EmailResponse.Received, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ValidationCodeTextField.showCaution), name: Notifications.EmailResponse.Expired, object: nil)
     }
     
     open override func layoutSubviews() {
@@ -116,7 +116,7 @@ class ValidationCodeTextField: UITextField {
         seconds -= 1
         timerLabel.text = timeString(time: TimeInterval(seconds))
         if seconds == 0 {
-            NotificationCenter.default.post(name: kNotificationEmailResponseExpired, object: nil)
+            NotificationCenter.default.post(name: Notifications.EmailResponse.Expired, object: nil)
         }
     }
     

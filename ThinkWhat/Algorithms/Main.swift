@@ -121,17 +121,17 @@ var tokenState: TokenState    = .Unassigned {
     didSet {
         switch tokenState {
         case .Received:
-            NotificationCenter.default.post(name: kNotificationTokenReceived, object: nil)
+            NotificationCenter.default.post(name: Notifications.OAuth.TokenReceived, object: nil)
         case .Error:
-            NotificationCenter.default.post(name: kNotificationTokenError, object: nil)
+            NotificationCenter.default.post(name: Notifications.OAuth.TokenError, object: nil)
         case .Revoked:
-            NotificationCenter.default.post(name: kNotificationTokenRevoked, object: nil)
+            NotificationCenter.default.post(name: Notifications.OAuth.TokenRevoked, object: nil)
         case .WrongCredentials:
-            NotificationCenter.default.post(name: kNotificationTokenWrongCredentials, object: nil)
+            NotificationCenter.default.post(name: Notifications.OAuth.TokenWrongCredentials, object: nil)
         case .ConnectionError:
-            NotificationCenter.default.post(name: kNotificationTokenConnectionError, object: nil)
+            NotificationCenter.default.post(name: Notifications.OAuth.TokenConnectionError, object: nil)
         case .AccessDenied:
-            NotificationCenter.default.post(name: kNotificationTokenAccessDenied, object: nil)
+            NotificationCenter.default.post(name: Notifications.OAuth.TokenAccessDenied, object: nil)
         default:
             print(tokenState)
         }
@@ -140,7 +140,7 @@ var tokenState: TokenState    = .Unassigned {
 var emailResponse: EmailResponse? {
     didSet {
         if emailResponse != nil {
-            NotificationCenter.default.post(name: kNotificationEmailResponseReceived, object: nil)
+            NotificationCenter.default.post(name: Notifications.EmailResponse.Received, object: nil)
         }
     }
 }
@@ -148,46 +148,61 @@ var firstLaunch                                 = true
 var internetConnection: InternetConnection      = .Available {
     didSet {
         if internetConnection != oldValue {
-            NotificationCenter.default.post(name: kNotificationInternetConnectionChange, object: nil)
+            NotificationCenter.default.post(name: Notifications.Network.InternetConnectionChange, object: nil)
         }
     }
 }
 var apiReachability: ApiReachabilityState = .Reachable {
     didSet {
         if apiReachability == .None {
-            NotificationCenter.default.post(name: kNotificationApiNotReachable, object: nil)
+            NotificationCenter.default.post(name: Notifications.Network.RemoteNotReachable, object: nil)
         } else {
-            NotificationCenter.default.post(name: kNotificationApiReachable, object: nil)
+            NotificationCenter.default.post(name: Notifications.Network.RemoteReachable, object: nil)
         }
     }
 }
 var temporaryTokenToRevoke = ""
 
-let kNotificationInternetConnectionChange        = Notification.Name("InternetConnectionChange")
-let kNotificationTokenReceived                   = Notification.Name("NotificationTokenReceived")
-let kNotificationTokenError                      = Notification.Name("NotificationTokenError")
-let kNotificationTokenRevoked                    = Notification.Name("NotificationTokenRevoked")
-let kNotificationTokenWrongCredentials           = Notification.Name("NotificationTokenWrongCredentials")
-let kNotificationTokenConnectionError            = Notification.Name("NotificationTokenConnectionError")
-let kNotificationTokenAccessDenied               = Notification.Name("NotificationTokenAccessDenied")
+struct Notifications {
+    struct Network {
+        static let InternetConnectionChange        = Notification.Name("InternetConnectionChange")
+        static let RemoteReachable                 = Notification.Name("smsNotificationApiReachable")
+        static let RemoteNotReachable              = Notification.Name("smsNotificationApiNotReachable")
+    }
+    
+    struct OAuth {
+        static let TokenReceived                   = Notification.Name("NotificationTokenReceived")
+        static let TokenError                      = Notification.Name("NotificationTokenError")
+        static let TokenRevoked                    = Notification.Name("NotificationTokenRevoked")
+        static let TokenWrongCredentials           = Notification.Name("NotificationTokenWrongCredentials")
+        static let TokenConnectionError            = Notification.Name("NotificationTokenConnectionError")
+        static let TokenAccessDenied               = Notification.Name("NotificationTokenAccessDenied")
+    }
+    
+    struct EmailResponse {
+        static let Received                        = Notification.Name("NotificationEmailResponseReceived")
+        static let Expired                         = Notification.Name("NotificationEmailResponseExpired")
+    }
 
-let kNotificationEmailResponseReceived           = Notification.Name("NotificationEmailResponseReceived")
-let kNotificationEmailResponseExpired            = Notification.Name("NotificationEmailResponseExpired")
-
-let kNotificationApiReachable                    = Notification.Name("smsNotificationApiReachable")
-let kNotificationApiNotReachable                 = Notification.Name("smsNotificationApiNotReachable")
-
-let kNotificationUserImageChanged                = Notification.Name("NotificationUserImageChanged")
-let kNotificationProfileImageReceived            = Notification.Name("NotificationProfileImageReceived")
-let kNotificationTopSurveysUpdated               = Notification.Name("NotificationTopSurveysUpdated")
-let kNotificationNewSurveysUpdated               = Notification.Name("NotificationNewSurveysUpdated")
-let kNotificationSurveysStackReceived            = Notification.Name("NotificationSurveysStackReceived")
-let kNotificationSurveysStackUpdated             = Notification.Name("NotificationSurveysStackUpdated")
-let kNotificationOwnSurveysUpdated               = Notification.Name("NotificationOwnSurveysUpdated")
-let kNotificationSurveysByCategoryUpdated        = Notification.Name("NotificationSurveysByCategoryUpdated")
-let kNotificationFavoriteSurveysUpdated          = Notification.Name("NotificationSurveysByCategoryUpdated")
-
-let kNotificationClaimSignAppeared               = NSNotification.Name(rawValue: "ClaimSignAppeared")
+    struct Surveys {
+        static let TopSurveysUpdated               = Notification.Name("NotificationTopSurveysUpdated")
+        static let NewSurveysUpdated               = Notification.Name("NotificationNewSurveysUpdated")
+        static let SurveysStackReceived            = Notification.Name("NotificationSurveysStackReceived")
+        static let SurveysStackUpdated             = Notification.Name("NotificationSurveysStackUpdated")
+        static let OwnSurveysUpdated               = Notification.Name("NotificationOwnSurveysUpdated")
+        static let SurveysByCategoryUpdated        = Notification.Name("NotificationSurveysByCategoryUpdated")
+        static let FavoriteSurveysUpdated          = Notification.Name("NotificationFavoriteSurveysUpdated")
+        static let UserSurveysUpdated              = Notification.Name("NotificationUserSurveysUpdated")
+        static let UserFavoriteSurveysUpdated      = Notification.Name("NotificationUserFavoriteSurveysUpdated")
+    }
+    
+    struct UI {
+        static let ClaimSignAppeared               = Notification.Name("ClaimSignAppeared")
+        static let UserImageChanged                = Notification.Name("NotificationUserImageChanged")
+        static let ProfileImageReceived            = Notification.Name("NotificationProfileImageReceived")
+        
+    }
+}
 
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
@@ -196,6 +211,7 @@ let MIN_STACK_SIZE                               = 1//Min quantity of hot survey
 struct TimeIntervals {
     static let ClearRejectedSurveys: TimeInterval = 60//Timer parameter to wipe out rejectedSurveys container
     static let NetworkInactivity: TimeInterval = 15//Timer parameter to wipe out rejectedSurveys container
+    static let UserStatsTimeOutdated: TimeInterval = 5//Timer parameter to update user stats (called in UI)
 }
 
 
@@ -238,6 +254,7 @@ struct Segues {
         static let SurveyToUser             = "SURVEY_TO_USER"
         static let SurveyToClaim            = "SURVEY_TO_CLAIM"
         static let UserToUserSurveys        = "USER_TO_USER_SURVEYS"
+        static let UserToUserFavoriteSurveys = "USER_TO_FAVORITE_USER_SURVEYS"
     }
 }
 ////MARK: Auth
@@ -407,7 +424,7 @@ class AppData {
             didSet {
                 if imagePath != nil {
                     UserDefaults.standard.set(imagePath!, forKey: "userImagePath")
-                    NotificationCenter.default.post(name: kNotificationUserImageChanged, object: nil)
+                    NotificationCenter.default.post(name: Notifications.UI.UserImageChanged, object: nil)
                 }
             }
         }
@@ -648,7 +665,7 @@ struct SERVER_URLS {
     static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_social_update/"
     static let PROFILES                 = "api/profiles/"
     static let CURRENT_USER             = "api/profiles/current/"
-    static let USER_PROFILE_DATA        = "api/profiles/get_profile_data/"
+    static let USER_PROFILE_STATS       = "api/profiles/get_profile_data/"
 
     //Surveys
     static let SURVEYS                  = "api/surveys/"
@@ -662,7 +679,8 @@ struct SERVER_URLS {
     static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
     static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
     static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
-    static let SURVEYS_BY_OWNER         = "api/surveys/by_category/"
+    static let SURVEYS_BY_OWNER         = "api/surveys/by_owner/"
+    static let SURVEYS_FAVORITE_LIST_BY_OWNER = "api/surveys/favorite_surveys_list_by_user/"
     static let SURVEYS_ADD_FAVORITE     = "api/surveys/add_favorite/"
     static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
     static let SURVEYS_REJECT           = "api/surveys/reject/"

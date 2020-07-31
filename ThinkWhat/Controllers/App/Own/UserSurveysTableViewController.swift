@@ -27,11 +27,11 @@ class UserSurveysTableViewController: UITableViewController {
         setupViews()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(UserSurveysTableViewController.updateTableView),
-                                               name: kNotificationOwnSurveysUpdated,
+                                               name: Notifications.Surveys.OwnSurveysUpdated,
                                                object: nil)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(UserSurveysTableViewController.updateTableView),
-                                               name: kNotificationFavoriteSurveysUpdated,
+                                               name: Notifications.Surveys.FavoriteSurveysUpdated,
                                                object: nil)
         refreshControl?.attributedTitle = NSAttributedString(string: "")
         refreshControl?.addTarget(self, action: #selector(UserSurveysTableViewController.refreshTableView), for: .valueChanged)

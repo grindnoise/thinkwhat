@@ -26,7 +26,7 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
 
         delegate = sdelegate
         navigationController?.isNavigationBarHidden = true
-        NotificationCenter.default.addObserver(self, selector: #selector(TabBarController.handleTokenState), name: kNotificationTokenRevoked, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(TabBarController.handleTokenState), name: Notifications.OAuth.TokenRevoked, object: nil)
         viewControllers?.forEach {
             if let navController = $0 as? UINavigationController {
                 navController.topViewController?.view

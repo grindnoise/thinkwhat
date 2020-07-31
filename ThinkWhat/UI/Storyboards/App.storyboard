@@ -1172,10 +1172,10 @@
                                             <rect key="frame" x="16" y="11" width="288" height="77"/>
                                             <subviews>
                                                 <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sft-rh-7uc" customClass="FilmIcon" customModule="ThinkWhat" customModuleProvider="target">
-                                                    <rect key="frame" x="119" y="13.5" width="50" height="50"/>
+                                                    <rect key="frame" x="114" y="8.5" width="60" height="60"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="50" id="GRB-9n-vf8"/>
+                                                        <constraint firstAttribute="height" constant="60" id="GRB-9n-vf8"/>
                                                         <constraint firstAttribute="width" secondItem="sft-rh-7uc" secondAttribute="height" multiplier="1:1" id="I74-YH-BSD"/>
                                                     </constraints>
                                                 </view>
@@ -1240,10 +1240,10 @@
                                             <rect key="frame" x="16" y="11" width="288" height="66"/>
                                             <subviews>
                                                 <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hBt-LR-eW7" customClass="GalleryIcon" customModule="ThinkWhat" customModuleProvider="target">
-                                                    <rect key="frame" x="119" y="8" width="50" height="50"/>
+                                                    <rect key="frame" x="114" y="3" width="60" height="60"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="50" id="W74-9J-YaU"/>
+                                                        <constraint firstAttribute="height" constant="60" id="W74-9J-YaU"/>
                                                         <constraint firstAttribute="width" secondItem="hBt-LR-eW7" secondAttribute="height" multiplier="1:1" id="pwa-wT-ggQ"/>
                                                     </constraints>
                                                 </view>
@@ -1281,15 +1281,15 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wOU-9b-ywp" customClass="CheckBox" customModule="ThinkWhat" customModuleProvider="target">
-                                            <rect key="frame" x="16" y="25" width="50" height="50"/>
+                                            <rect key="frame" x="16" y="32.5" width="35" height="35"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" constant="50" id="CUr-XE-sfx"/>
-                                                <constraint firstAttribute="height" constant="50" id="X5L-di-eap"/>
+                                                <constraint firstAttribute="width" constant="35" id="CUr-XE-sfx"/>
+                                                <constraint firstAttribute="height" constant="35" id="X5L-di-eap"/>
                                             </constraints>
                                         </view>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hTF-rn-oFS">
-                                            <rect key="frame" x="74" y="11" width="230" height="78"/>
+                                            <rect key="frame" x="59" y="11" width="245" height="78"/>
                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -1716,22 +1716,22 @@
                                         <rect key="frame" x="0.0" y="9" width="320" height="163.5"/>
                                         <subviews>
                                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="l5G-ph-ezo">
-                                                <rect key="frame" x="105.5" y="0.0" width="109" height="109"/>
+                                                <rect key="frame" x="106" y="0.0" width="108" height="108"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="l5G-ph-ezo" secondAttribute="height" multiplier="1:1" id="wc8-yw-uzc"/>
                                                 </constraints>
                                             </imageView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="F09-Ez-ImL">
-                                                <rect key="frame" x="107" y="114" width="106" height="49.5"/>
+                                                <rect key="frame" x="107" y="113" width="106" height="50.5"/>
                                                 <subviews>
                                                     <textField opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Alex Turner" textAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="QqS-fO-Rej">
-                                                        <rect key="frame" x="0.0" y="0.0" width="106" height="24.5"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="106" height="25.5"/>
                                                         <nil key="textColor"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
                                                         <textInputTraits key="textInputTraits"/>
                                                     </textField>
                                                     <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="мужчина, 32 года" textAlignment="center" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="TaN-q5-kik">
-                                                        <rect key="frame" x="0.0" y="32.5" width="106" height="17"/>
+                                                        <rect key="frame" x="0.0" y="33.5" width="106" height="17"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                                                         <textInputTraits key="textInputTraits"/>
@@ -1906,7 +1906,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Zvd-rd-kcK">
                                 <rect key="frame" x="0.0" y="304" width="320" height="264"/>
                                 <subviews>
-                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="80" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="nbf-33-zfG">
+                                    <tableView contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="80" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="nbf-33-zfG">
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="264"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <prototypes>
@@ -2099,7 +2099,7 @@
                                                 <rect key="frame" x="0.0" y="308" width="320" height="50"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="IZA-Lq-7CG" id="uGR-CW-5Je">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="49.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LOs-Ak-IlC">
@@ -2133,7 +2133,7 @@
                                                 <rect key="frame" x="0.0" y="358" width="320" height="50"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="iTX-H2-LRF" id="dQX-TE-k2m">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="49.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Последний визит: вчера" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sDd-L4-0yA">
@@ -2170,7 +2170,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="Ch0-Mv-kpn" firstAttribute="leading" secondItem="Bsz-tj-h3V" secondAttribute="leading" id="5pu-Lq-SSz"/>
                             <constraint firstItem="Ch0-Mv-kpn" firstAttribute="height" secondItem="Bsz-tj-h3V" secondAttribute="height" multiplier="0.5" id="BG2-7z-UpD"/>
@@ -2189,6 +2189,7 @@
                         <outlet property="proportionalHeightConstraint" destination="BG2-7z-UpD" id="riq-fu-cED"/>
                         <outlet property="tableView" destination="nbf-33-zfG" id="Kks-LN-hvb"/>
                         <segue destination="T19-iX-3Xw" kind="show" identifier="USER_TO_USER_SURVEYS" id="jPa-cZ-lJ6"/>
+                        <segue destination="T19-iX-3Xw" kind="show" identifier="USER_TO_FAVORITE_USER_SURVEYS" id="GHH-zE-cDh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Gc2-Nq-h2Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -2202,9 +2203,10 @@
         <image name="ic_profile" width="20" height="21"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="d8f-vM-p00"/>
+        <segue reference="a89-Iq-3Go"/>
         <segue reference="UIy-Ib-ofi"/>
         <segue reference="ekf-Db-gyY"/>
+        <segue reference="GHH-zE-cDh"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
 </document>

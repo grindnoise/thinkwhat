@@ -29,7 +29,7 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         loginWebView.delegate                                           = self
         unSignedRequest()
-        NotificationCenter.default.addObserver(self, selector: #selector(SocialAuthViewController.handleSuccessTokenNotification), name: kNotificationTokenReceived, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(SocialAuthViewController.handleSuccessTokenNotification), name: Notifications.OAuth.TokenReceived, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
