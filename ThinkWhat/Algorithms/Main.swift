@@ -206,7 +206,7 @@ struct Notifications {
 
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
-let MIN_STACK_SIZE                               = 1//Min quantity of hot surveys to request another portion
+let MIN_STACK_SIZE                               = 2//Min quantity of hot surveys to request another portion
 
 struct TimeIntervals {
     static let ClearRejectedSurveys: TimeInterval = 60//Timer parameter to wipe out rejectedSurveys container
@@ -666,6 +666,8 @@ struct SERVER_URLS {
     static let PROFILES                 = "api/profiles/"
     static let CURRENT_USER             = "api/profiles/current/"
     static let USER_PROFILE_STATS       = "api/profiles/get_profile_data/"
+    static let USERPOFILE_SUBSCRIBE      = "api/profiles/subscribe/"
+    static let USERPOFILE_UNSUBSCRIBE    = "api/profiles/unsubscribe/"
 
     //Surveys
     static let SURVEYS                  = "api/surveys/"

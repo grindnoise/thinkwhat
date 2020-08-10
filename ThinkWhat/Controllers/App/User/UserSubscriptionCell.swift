@@ -13,7 +13,11 @@ class UserSubscriptionCell: UITableViewCell {
     
     @IBOutlet weak var claimSwitch: UISwitch!
     @IBAction func claimSwitched(_ sender: UISwitch) {
+        delegate?.callbackReceived(sender)
     }
+    
+    weak var delegate: CallbackDelegate?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

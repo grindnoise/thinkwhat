@@ -62,9 +62,9 @@ class SurveyStackViewController: UIViewController {
         }
     }
     
-//    @objc fileprivate func didEnterBackground() {
-//        stopTimer()
-//    }
+    @objc fileprivate func didEnterBackground() {
+        stopTimer()
+    }
     
     @objc fileprivate func generatePreviews() {
         if !isPause {
@@ -97,7 +97,7 @@ class SurveyStackViewController: UIViewController {
                 _surveyPreview.center = view.center
                 _surveyPreview.center.x += view.frame.width
 
-                if let userProfile = survey.userProfile as? UserProfile {
+                if let userProfile = survey.userProfile {
                     _surveyPreview.userName.text = userProfile.name
                     if userProfile.image != nil {
                         _surveyPreview.userImage.image = userProfile.image!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED)

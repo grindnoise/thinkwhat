@@ -438,8 +438,9 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         }
         newView.alpha = 0
         newView.addEquallyTo(to: container)
-        newView.transform = newView.transform.scaledBy(x: 0.75, y: 0.75)
-        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+        newView.layer.zPosition = 2
+        newView.transform = newView.transform.scaledBy(x: 0.8, y: 0.8)
+        UIView.animate(withDuration: 0.35, delay: 0, options: [.curveEaseOut], animations: {
             oldView?.alpha = 0
             newView.alpha = 1
             newView.transform = .identity

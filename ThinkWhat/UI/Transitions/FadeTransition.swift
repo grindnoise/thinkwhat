@@ -10,7 +10,7 @@ import UIKit
 class FadeTransition: NSObject, UIViewControllerAnimatedTransitioning {
     var operation: UINavigationController.Operation!
     var navigationController: NavigationControllerPreloaded!
-    var duration = 0.15
+    var duration = 0.35
     
     init(_ _navigationController: NavigationControllerPreloaded, _ _operation: UINavigationController.Operation) {
         navigationController = _navigationController
@@ -45,7 +45,7 @@ class FadeTransition: NSObject, UIViewControllerAnimatedTransitioning {
 //        })
         UIView.animate(withDuration: self.duration,
                        delay: 0,
-                       options: .curveLinear, animations: {
+                       options: operation == .pop ? .curveEaseOut : .curveEaseIn , animations: {
                         toVC.view.alpha = 1
                         fromVC.view.alpha = 0
         }) {

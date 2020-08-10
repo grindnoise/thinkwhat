@@ -9,10 +9,23 @@
 import UIKit
 import YoutubePlayer_in_WKWebView
 
-class SurveyYoutubeCell: UITableViewCell {
+class SurveyYoutubeCell: UITableViewCell, WKYTPlayerViewDelegate {
 
+    fileprivate var loadingIndicator: LoadingIndicator!
     fileprivate var isVideoLoaded = false
-    @IBOutlet weak var playerView: WKYTPlayerView!
+    @IBOutlet weak var subv: UIView! {
+        didSet {
+            loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: subv.frame.height, height: subv.frame.height)))
+            loadingIndicator.layoutCentered(in: subv, multiplier: 0.6)//addEquallyTo(to: tableView)
+            loadingIndicator.addEnableAnimation()
+        }
+    }
+    @IBOutlet weak var playerView: WKYTPlayerView! {
+        didSet {
+            playerView.alpha = 0
+            playerView.delegate = self
+        }
+    }
     @IBOutlet weak var icon: FilmIcon! {
         didSet {
             let touch = UITapGestureRecognizer(target:self, action:#selector(self.callback))
@@ -42,7 +55,18 @@ class SurveyYoutubeCell: UITableViewCell {
             if let id = url.youtubeID {
                 playerView.load(withVideoId: id)
             }
-                //self.playerView.load(withVideoId: "LSebnSTh3Ks", playerVars: ["playsinline" : 1])
+        }
+    }
+    
+    func playerViewDidBecomeReady(_ playerView: WKYTPlayerView) {
+        print("ready")
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loadingIndicator.alpha = 0
+        }) {
+            _ in
+            UIView.animate(withDuration: 1, delay: 0, options: .curveEaseInOut, animations: {
+                self.playerView.alpha = 1
+            })
         }
     }
 }

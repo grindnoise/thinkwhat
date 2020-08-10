@@ -545,7 +545,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ССЫЛКА" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="o6o-0J-PWb">
-                                                    <rect key="frame" x="129.5" y="11" width="61" height="30"/>
+                                                    <rect key="frame" x="129.5" y="8" width="61" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="HCV-bQ-ZqT"/>
                                                     </constraints>
@@ -554,7 +554,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" placeholder="Вставьте (необязательно)" textAlignment="center" minimumFontSize="15" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="wNj-6b-udp" customClass="CopyPasteTextField" customModule="ThinkWhat" customModuleProvider="target">
-                                                    <rect key="frame" x="15" y="41" width="290" height="28"/>
+                                                    <rect key="frame" x="8" y="38" width="304" height="28"/>
                                                     <color key="tintColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="28" id="f4E-rJ-2Ju"/>
@@ -568,31 +568,31 @@
                                                     </userDefinedRuntimeAttributes>
                                                 </textField>
                                                 <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="07W-Rp-G8A">
-                                                    <rect key="frame" x="88" y="69" width="144" height="30"/>
+                                                    <rect key="frame" x="77" y="66" width="166" height="35.5"/>
                                                     <subviews>
                                                         <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9Yx-vw-TYn" customClass="InstagramLogo" customModule="ThinkWhat" customModuleProvider="target">
-                                                            <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="35.5" height="35.5"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" secondItem="9Yx-vw-TYn" secondAttribute="height" multiplier="1:1" id="TZn-aR-QqP"/>
                                                             </constraints>
                                                         </view>
                                                         <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="a36-WK-yoF" customClass="YoutubeLogo" customModule="ThinkWhat" customModuleProvider="target">
-                                                            <rect key="frame" x="38" y="0.0" width="30" height="30"/>
+                                                            <rect key="frame" x="43.5" y="0.0" width="35.5" height="35.5"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" secondItem="a36-WK-yoF" secondAttribute="height" multiplier="1:1" id="nMk-MU-6cL"/>
                                                             </constraints>
                                                         </view>
                                                         <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vvz-56-ttA" customClass="WikiLogo" customModule="ThinkWhat" customModuleProvider="target">
-                                                            <rect key="frame" x="76" y="0.0" width="30" height="30"/>
+                                                            <rect key="frame" x="87" y="0.0" width="35.5" height="35.5"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" secondItem="vvz-56-ttA" secondAttribute="height" multiplier="1:1" id="w0S-vE-yE7"/>
                                                             </constraints>
                                                         </view>
                                                         <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cTK-us-Bvl" customClass="SafariLogo" customModule="ThinkWhat" customModuleProvider="target">
-                                                            <rect key="frame" x="114" y="0.0" width="30" height="30"/>
+                                                            <rect key="frame" x="130.5" y="0.0" width="35.5" height="35.5"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" secondItem="cTK-us-Bvl" secondAttribute="height" multiplier="1:1" id="2Wd-Gb-uSD"/>
@@ -1156,23 +1156,11 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aG6-tu-KXV" customClass="WKYTPlayerView">
-                                            <rect key="frame" x="16" y="88" width="288" height="162"/>
-                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" secondItem="aG6-tu-KXV" secondAttribute="height" multiplier="16:9" id="9Pi-Rm-wXA"/>
-                                            </constraints>
-                                            <userDefinedRuntimeAttributes>
-                                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                    <real key="value" value="10"/>
-                                                </userDefinedRuntimeAttribute>
-                                            </userDefinedRuntimeAttributes>
-                                        </view>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="auH-HU-l47">
-                                            <rect key="frame" x="16" y="11" width="288" height="77"/>
+                                            <rect key="frame" x="16" y="11" width="288" height="66"/>
                                             <subviews>
                                                 <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sft-rh-7uc" customClass="FilmIcon" customModule="ThinkWhat" customModuleProvider="target">
-                                                    <rect key="frame" x="114" y="8.5" width="60" height="60"/>
+                                                    <rect key="frame" x="114" y="3" width="60" height="60"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="60" id="GRB-9n-vf8"/>
@@ -1186,20 +1174,46 @@
                                                 <constraint firstItem="sft-rh-7uc" firstAttribute="centerY" secondItem="auH-HU-l47" secondAttribute="centerY" id="pFc-ef-O2v"/>
                                             </constraints>
                                         </view>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Tbe-Vc-kel">
+                                            <rect key="frame" x="16" y="77" width="288" height="162"/>
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aG6-tu-KXV" customClass="WKYTPlayerView">
+                                                    <rect key="frame" x="0.0" y="0.0" width="288" height="162"/>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="aG6-tu-KXV" secondAttribute="height" multiplier="16:9" id="9Pi-Rm-wXA"/>
+                                                    </constraints>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                            <real key="value" value="10"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </view>
+                                            </subviews>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstItem="aG6-tu-KXV" firstAttribute="top" secondItem="Tbe-Vc-kel" secondAttribute="top" id="DBI-u5-4rn"/>
+                                                <constraint firstItem="aG6-tu-KXV" firstAttribute="leading" secondItem="Tbe-Vc-kel" secondAttribute="leading" id="SeM-UO-Cep"/>
+                                                <constraint firstAttribute="bottom" secondItem="aG6-tu-KXV" secondAttribute="bottom" id="dTu-u7-kIR"/>
+                                                <constraint firstAttribute="width" secondItem="Tbe-Vc-kel" secondAttribute="height" multiplier="16:9" id="dqq-zR-PnN"/>
+                                                <constraint firstAttribute="trailing" secondItem="aG6-tu-KXV" secondAttribute="trailing" id="yYQ-3n-3ey"/>
+                                            </constraints>
+                                        </view>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="Tbe-Vc-kel" firstAttribute="top" secondItem="auH-HU-l47" secondAttribute="bottom" id="3n8-cu-2b8"/>
                                         <constraint firstItem="auH-HU-l47" firstAttribute="leading" secondItem="XwP-gy-S3z" secondAttribute="leadingMargin" id="4ht-oh-Bsr"/>
                                         <constraint firstItem="auH-HU-l47" firstAttribute="top" secondItem="XwP-gy-S3z" secondAttribute="topMargin" id="R3v-yn-0gC"/>
                                         <constraint firstItem="auH-HU-l47" firstAttribute="trailing" secondItem="XwP-gy-S3z" secondAttribute="trailingMargin" id="bod-pc-HqA"/>
-                                        <constraint firstAttribute="trailingMargin" secondItem="aG6-tu-KXV" secondAttribute="trailing" id="huN-WM-Z8Z"/>
-                                        <constraint firstItem="aG6-tu-KXV" firstAttribute="leading" secondItem="XwP-gy-S3z" secondAttribute="leadingMargin" id="kQx-MQ-kys"/>
-                                        <constraint firstAttribute="bottom" secondItem="aG6-tu-KXV" secondAttribute="bottom" id="udW-N6-a3R"/>
-                                        <constraint firstItem="aG6-tu-KXV" firstAttribute="top" secondItem="auH-HU-l47" secondAttribute="bottom" id="y5g-Mp-Wph"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="Tbe-Vc-kel" secondAttribute="trailing" id="du7-5w-4Tf"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="Tbe-Vc-kel" secondAttribute="bottom" id="gOD-di-YKs"/>
+                                        <constraint firstItem="Tbe-Vc-kel" firstAttribute="leading" secondItem="XwP-gy-S3z" secondAttribute="leadingMargin" id="hQ7-1C-lRo"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="icon" destination="sft-rh-7uc" id="104-2c-TYC"/>
                                     <outlet property="playerView" destination="aG6-tu-KXV" id="32v-NE-OoR"/>
+                                    <outlet property="subv" destination="Tbe-Vc-kel" id="m0X-U2-GPu"/>
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="image" rowHeight="250" id="jBu-HM-dJU" customClass="SurveyImageCell" customModule="ThinkWhat" customModuleProvider="target">
@@ -1716,22 +1730,22 @@
                                         <rect key="frame" x="0.0" y="9" width="320" height="163.5"/>
                                         <subviews>
                                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="l5G-ph-ezo">
-                                                <rect key="frame" x="106" y="0.0" width="108" height="108"/>
+                                                <rect key="frame" x="106" y="0.0" width="108" height="107.5"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="l5G-ph-ezo" secondAttribute="height" multiplier="1:1" id="wc8-yw-uzc"/>
                                                 </constraints>
                                             </imageView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="F09-Ez-ImL">
-                                                <rect key="frame" x="107" y="113" width="106" height="50.5"/>
+                                                <rect key="frame" x="107" y="112.5" width="106" height="51"/>
                                                 <subviews>
                                                     <textField opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Alex Turner" textAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="QqS-fO-Rej">
-                                                        <rect key="frame" x="0.0" y="0.0" width="106" height="25.5"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="106" height="26"/>
                                                         <nil key="textColor"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
                                                         <textInputTraits key="textInputTraits"/>
                                                     </textField>
                                                     <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="мужчина, 32 года" textAlignment="center" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="TaN-q5-kik">
-                                                        <rect key="frame" x="0.0" y="33.5" width="106" height="17"/>
+                                                        <rect key="frame" x="0.0" y="34" width="106" height="17"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                                                         <textInputTraits key="textInputTraits"/>
@@ -2012,19 +2026,19 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Добавлено в избранные" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dLJ-Yp-QuY">
-                                                            <rect key="frame" x="63" y="11" width="186.5" height="48"/>
+                                                            <rect key="frame" x="63.5" y="11" width="186.5" height="48"/>
                                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X3X-3A-Zbu">
-                                                            <rect key="frame" x="249.5" y="11" width="37.5" height="48"/>
+                                                            <rect key="frame" x="250" y="11" width="37" height="48"/>
                                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bFl-GD-HGV" customClass="FavoriteIcon" customModule="ThinkWhat" customModuleProvider="target">
-                                                            <rect key="frame" x="15" y="15.5" width="38" height="38.5"/>
+                                                            <rect key="frame" x="15" y="16" width="38.5" height="38"/>
                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" secondItem="bFl-GD-HGV" secondAttribute="height" multiplier="1:1" id="sxD-yA-dkX"/>

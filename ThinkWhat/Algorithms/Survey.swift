@@ -52,7 +52,11 @@ class Surveys {
     var completedSurveyIDs: [Int] = []//Completed surveys IDs
     var stackObjects:       [FullSurvey] = []{
         didSet {
-            print("didSet stackObjects \(stackObjects.count)")
+            if stackObjects.count < oldValue.count {
+                print("didSet stackObjects DECREASE \(stackObjects.count)")
+            } else {
+                print("didSet stackObjects INCREASE \(stackObjects.count)")
+            }
         }
     }//Stack of hot surveys
     var claimObjects:       [FullSurvey] = []

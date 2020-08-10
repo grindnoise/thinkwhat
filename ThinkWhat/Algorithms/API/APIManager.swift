@@ -35,6 +35,7 @@ protocol APIManagerProtocol {
     func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->())
     func postClaim(surveyID: Int, claimID: Int, completion: @escaping(JSON?, Error?)->())
     func getUserStats(userProfile: UserProfile, completion: @escaping(JSON?, Error?)->())
+    func subsribeToUserProfile(subscribe: Bool, userprofile: UserProfile, completion: @escaping(JSON?, Error?)->())
     
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
     func downloadImage(url: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
@@ -1067,6 +1068,7 @@ class APIManager: APIManagerProtocol {
                         print(error!)
                     } else if success {
                         var parameters: [String: Any] = ["survey": survey.ID! as Any]
+//                        print("Surveys.shared.stackObjects.count \(Surveys.shared.stackObjects.count)")
                         if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
                             var list = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
                             if !list.isEmpty {
@@ -1136,6 +1138,26 @@ class APIManager: APIManagerProtocol {
                         completion(nil, error)
                     } else if success {
                         self._performRequest(url: type.getURL(), httpMethod: .get, parameters: ["userprofile_id": userProfile.ID], encoding: URLEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
+    func subsribeToUserProfile(subscribe: Bool, userprofile: UserProfile, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error!)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(subscribe ? SERVER_URLS.USERPOFILE_SUBSCRIBE : SERVER_URLS.USERPOFILE_UNSUBSCRIBE), httpMethod: .get, parameters: ["userprofile_id": userprofile.ID], encoding: URLEncoding.default, completion: completion)
                     }
                 }
             } else {

@@ -48,8 +48,8 @@ class UserProfile {
     var hashValue:  Int {
         return ObjectIdentifier(self).hashValue
     }
-    var surveysCreated: [ShortSurvey]   = []
-    var surveysFavorite: [ShortSurvey]  = []
+    var surveysCreated:     [Date: [ShortSurvey]]   = [:]
+    var surveysFavorite:    [Date: [ShortSurvey]]   = [:]
     
     init?(_ json: JSON) {
         if let _ID                      = json[DjangoVariables.ID].intValue as? Int,
@@ -70,6 +70,8 @@ class UserProfile {
             surveysAnsweredTotal = _surveysAnsweredTotal
             surveysFavoriteTotal = _favoriteSurveysTotal
             surveysCreatedTotal = _surveysCreatedTotal
+            surveysCreated = [Date(): []]
+            surveysFavorite = [Date(): []]
             lastVisit = _lastVisit
             updatedAt = Date()
         } else {
@@ -91,27 +93,49 @@ class UserProfile {
     }
     
     func importSurveys(_ type: UserSurveyType, json: JSON) {
+        if !json.isEmpty {
+            if type == .Own {
+                surveysCreated.removeAll()
+                surveysCreated[Date()] = []
+            } else if type == .Favorite {
+                surveysFavorite.removeAll()
+                surveysFavorite[Date()] = []
+            }
+        }
         for i in json {
             if let survey = ShortSurvey(i.1) {
                 if let _foundObject = Surveys.shared.allLinks.filter({ $0.hashValue == survey.hashValue}).first {
                     if type == .Own {
-                        if surveysCreated.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
-                            surveysCreated.append(_foundObject)
+                        if var container = surveysCreated.values.first, container.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty, let key = surveysCreated.keys.first {
+                            container.append(_foundObject)
+                            surveysCreated[key] = container
+                            //container.append(_foundObject)
                         }
                     } else if type == .Favorite {
-                        if surveysFavorite.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
-                            surveysFavorite.append(_foundObject)
+                        if var container = surveysFavorite.values.first, container.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty, let key = surveysFavorite.keys.first {
+                            container.append(_foundObject)
+                            surveysFavorite[key] = container
                         }
                     }
                 } else {
                     if type == .Own {
-                        if surveysCreated.filter({ $0.hashValue == survey.hashValue}).isEmpty {
-                            surveysCreated.append(survey)
+                        if var container = surveysCreated.values.first, let key = surveysCreated.keys.first {
+                            container.append(survey)
+                            surveysCreated[key] = container
+                            Surveys.shared.allLinks.append(survey)
                         }
+//                        if surveysCreated.filter({ $0.hashValue == survey.hashValue}).isEmpty {
+//                            surveysCreated.append(survey)
+//                        }
                     } else if type == .Favorite {
-                        if surveysFavorite.filter({ $0.hashValue == survey.hashValue}).isEmpty {
-                            surveysFavorite.append(survey)
+                        if var container = surveysFavorite.values.first, let key = surveysFavorite.keys.first {
+                            container.append(survey)
+                            surveysFavorite[key] = container
+                            Surveys.shared.allLinks.append(survey)
                         }
+//                        if surveysFavorite.filter({ $0.hashValue == survey.hashValue}).isEmpty {
+//                            surveysFavorite.append(survey)
+//                        }
                     }
                 }
             }
@@ -119,8 +143,10 @@ class UserProfile {
         //If smth changes
         if type == .Own {
             NotificationCenter.default.post(name: Notifications.Surveys.UserSurveysUpdated, object: nil)
+            surveysCreatedTotal = surveysCreated.values.first?.count ?? surveysCreatedTotal
         } else if type == .Favorite {
             NotificationCenter.default.post(name: Notifications.Surveys.UserFavoriteSurveysUpdated, object: nil)
+            surveysFavoriteTotal = surveysFavorite.values.first?.count ?? surveysFavoriteTotal
         }
     }
     

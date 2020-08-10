@@ -30,6 +30,7 @@ class UserViewController: UIViewController, ServerProtocol {
     fileprivate var headerHeightConstraint:NSLayoutConstraint!
     fileprivate var headerMaxHeight: CGFloat = 0
     fileprivate var leftEdgeInset: CGFloat = 0
+    fileprivate var setNeedsAwaitForNotification = false
     var apiManager: APIManagerProtocol!
     
     override func viewDidLoad() {
@@ -64,10 +65,7 @@ class UserViewController: UIViewController, ServerProtocol {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        let calendar = Calendar.current
-        let endComponents = calendar.dateComponents([.hour, .minute], from: userProfile.updatedAt)
-        let nowComponents = calendar.dateComponents([.hour, .minute], from: Date())
-        if calendar.dateComponents([.minute], from: endComponents, to: nowComponents).minute! >= Int(TimeIntervals.UserStatsTimeOutdated) {
+        if esteemMinutes(date: userProfile.updatedAt) {
             apiManager.getUserStats(userProfile: userProfile) {
                 json, error in
                 if error != nil {
@@ -143,19 +141,33 @@ class UserViewController: UIViewController, ServerProtocol {
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == Segues.App.UserToUserSurveys, let destinationVC = segue.destination as? SurveysTableViewController {
-            destinationVC.type = .User
-            if let image = userProfile.image {
-                destinationVC.navTitleImage = image
-                destinationVC.userProfile = userProfile
+        if segue.identifier == Segues.App.UserToUserSurveys || segue.identifier == Segues.App.UserToUserFavoriteSurveys, let destinationVC = segue.destination as? SurveysTableViewController {
+            if segue.identifier == Segues.App.UserToUserSurveys {
+                destinationVC.type = .User
+            } else if segue.identifier == Segues.App.UserToUserFavoriteSurveys {
+                destinationVC.type = .UserFavorite
             }
-        } else if segue.identifier == Segues.App.UserToUserFavoriteSurveys, let destinationVC = segue.destination as? SurveysTableViewController {
-            destinationVC.type = .UserFavorite
             if let image = userProfile.image {
                 destinationVC.navTitleImage = image
                 destinationVC.userProfile = userProfile
+                destinationVC.needsAwaitForNotification = setNeedsAwaitForNotification
             }
         }
+//        } else if segue.identifier == Segues.App.UserToUserFavoriteSurveys, let destinationVC = segue.destination as? SurveysTableViewController {
+//            destinationVC.type = .UserFavorite
+//            if let image = userProfile.image {
+//                destinationVC.navTitleImage = image
+//                destinationVC.userProfile = userProfile
+//                destinationVC.needsAwaitForNotification = setNeedsAwaitForNotification
+//            }
+//        }
+    }
+    
+    fileprivate func esteemMinutes(date: Date) -> Bool {
+        let calendar = Calendar.current
+        let endComponents = calendar.dateComponents([.hour, .minute], from: date)
+        let nowComponents = calendar.dateComponents([.hour, .minute], from: Date())
+        return calendar.dateComponents([.minute], from: endComponents, to: nowComponents).minute! >= Int(TimeIntervals.UserStatsTimeOutdated)
     }
 }
 
@@ -224,6 +236,7 @@ extension UserViewController: UITableViewDataSource, UITableViewDelegate {
             return cell
         } else if indexPath.row == 3, let cell = tableView.dequeueReusableCell(withIdentifier: "subscription") as? UserSubscriptionCell {
             cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
+            cell.delegate = self
             return cell
         } else if indexPath.row == 4, let cell = tableView.dequeueReusableCell(withIdentifier: "claim") as? UserClaimCell {
             cell.separatorInset = UIEdgeInsets(top: 0, left: cell.bounds.size.width, bottom: 0, right: .greatestFiniteMagnitude)
@@ -246,27 +259,44 @@ extension UserViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        setNeedsAwaitForNotification = false
         if indexPath.row == 0 {
-            performSegue(withIdentifier: Segues.App.UserToUserSurveys, sender: nil)
-            apiManager.loadSurveysByOwner(userProfile: userProfile, type: .User) {
-                json, error in
-                if error != nil {
-                    print(error?.localizedDescription)
-                } else if json != nil {
-                    self.userProfile.importSurveys(UserProfile.UserSurveyType.Own, json: json!)
+            if userProfile.surveysCreated.values.first!.isEmpty || esteemMinutes(date: userProfile.surveysCreated.keys.first!) {
+                setNeedsAwaitForNotification = true
+                apiManager.loadSurveysByOwner(userProfile: userProfile, type: .User) {
+                    json, error in
+                    if error != nil {
+                        print(error?.localizedDescription)
+                    } else if json != nil {
+                        self.userProfile.importSurveys(UserProfile.UserSurveyType.Own, json: json!)
+                    }
                 }
             }
+            performSegue(withIdentifier: Segues.App.UserToUserSurveys, sender: nil)
         } else if indexPath.row == 1 {
-            performSegue(withIdentifier: Segues.App.UserToUserFavoriteSurveys, sender: nil)
-            apiManager.loadSurveysByOwner(userProfile: userProfile, type: .UserFavorite) {
-                json, error in
-                if error != nil {
-                    print(error?.localizedDescription)
-                } else if json != nil {
-                    self.userProfile.importSurveys(UserProfile.UserSurveyType.Favorite, json: json!)
+            if userProfile.surveysFavorite.values.first!.isEmpty || esteemMinutes(date: userProfile.surveysFavorite.keys.first!) {
+                setNeedsAwaitForNotification = true
+                apiManager.loadSurveysByOwner(userProfile: userProfile, type: .UserFavorite) {
+                    json, error in
+                    if error != nil {
+                        print(error?.localizedDescription)
+                    } else if json != nil {
+                        self.userProfile.importSurveys(UserProfile.UserSurveyType.Favorite, json: json!)
+                    }
                 }
+            }
+            performSegue(withIdentifier: Segues.App.UserToUserFavoriteSurveys, sender: nil)
+        }
+    }
+}
+
+extension UserViewController: CallbackDelegate {
+    func callbackReceived(_ sender: AnyObject) {
+        if let _sender = sender as? UISwitch {
+            apiManager.subsribeToUserProfile(subscribe: _sender.isOn, userprofile: userProfile) {
+                json, error in
+                
             }
         }
-
     }
 }

@@ -306,7 +306,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 cell = _cell
             } else if indexPath.row == 3, survey!.link != nil, !survey!.link!.isEmpty, let _cell = tableView.dequeueReusableCell(withIdentifier: "youtube", for: indexPath) as? SurveyYoutubeCell {
                 let isYoutube = isYoutubeLink(checkString: survey!.link!)
-                _cell.playerView.delegate = self
+//                _cell.playerView.delegate = self
                 _cell.delegate = self
                 if isYoutube {
                     _cell.loadVideo(url: survey!.link!)
@@ -759,12 +759,12 @@ extension SurveyViewController {
     }
 }
 
-extension SurveyViewController: WKYTPlayerViewDelegate {
-    func playerViewDidBecomeReady(_ playerView: WKYTPlayerView) {
-        print("ready")
-        //playerView.load(withVideoId: "LSebnSTh3Ks")
-    }
-}
+//extension SurveyViewController: WKYTPlayerViewDelegate {
+//    func playerViewDidBecomeReady(_ playerView: WKYTPlayerView) {
+//        print("ready")
+//        //playerView.load(withVideoId: "LSebnSTh3Ks")
+//    }
+//}
 
 extension SurveyViewController: CallbackDelegate {
     func callbackReceived(_ sender: AnyObject) {

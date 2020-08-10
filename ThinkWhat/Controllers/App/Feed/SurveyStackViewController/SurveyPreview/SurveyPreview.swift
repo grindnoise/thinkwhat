@@ -27,6 +27,7 @@ class SurveyPreview: UIView {
     @IBOutlet weak var userName: UILabel!
     @IBOutlet weak var surveyDate: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var voteButton: UIButton!
     @IBOutlet weak var nextButton: UIButton!
     
@@ -57,6 +58,7 @@ class SurveyPreview: UIView {
         //content.backgroundColor = UIColor.lightGray.withAlphaComponent(0.09)
         self.addSubview(content)
         titleLabel.text = survey.title
+        descriptionLabel.text = "   \(survey.description)"
         surveyDate.text = survey.startDate.toDateString()//.toDateTimeStringWithoutSeconds()
         
     }
