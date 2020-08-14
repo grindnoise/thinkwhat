@@ -31,7 +31,12 @@ class SurveyPreview: UIView {
     @IBOutlet weak var voteButton: UIButton!
     @IBOutlet weak var nextButton: UIButton!
     
-    @IBAction func buttonTapped(_ sender: Any) {
+    @IBAction func buttonTapped(_ sender: UIButton) {
+        if sender.tag ==  0 {
+            sender.accessibilityIdentifier = "Vote"
+        } else {
+            sender.accessibilityIdentifier = "Reject"
+        }
         delegate?.callbackReceived(sender as AnyObject)
     }
     init(frame: CGRect, survey _survey: FullSurvey, delegate _delegate: CallbackDelegate) {

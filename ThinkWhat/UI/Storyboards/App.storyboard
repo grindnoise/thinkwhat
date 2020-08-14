@@ -1149,18 +1149,18 @@
                                     <outlet property="linkButton" destination="b2w-uO-lLH" id="kVE-qO-k61"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="youtube" rowHeight="250" id="O2D-U8-6wr" customClass="SurveyYoutubeCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="439.5" width="320" height="250"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="youtube" rowHeight="270" id="O2D-U8-6wr" customClass="SurveyYoutubeCell" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="439.5" width="320" height="270"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="O2D-U8-6wr" id="XwP-gy-S3z">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="270"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="auH-HU-l47">
-                                            <rect key="frame" x="16" y="11" width="288" height="66"/>
+                                            <rect key="frame" x="16" y="11" width="288" height="86"/>
                                             <subviews>
                                                 <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sft-rh-7uc" customClass="FilmIcon" customModule="ThinkWhat" customModuleProvider="target">
-                                                    <rect key="frame" x="114" y="3" width="60" height="60"/>
+                                                    <rect key="frame" x="114" y="13" width="60" height="60"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="60" id="GRB-9n-vf8"/>
@@ -1175,7 +1175,7 @@
                                             </constraints>
                                         </view>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Tbe-Vc-kel">
-                                            <rect key="frame" x="16" y="77" width="288" height="162"/>
+                                            <rect key="frame" x="16" y="97" width="288" height="162"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aG6-tu-KXV" customClass="WKYTPlayerView">
                                                     <rect key="frame" x="0.0" y="0.0" width="288" height="162"/>
@@ -1216,15 +1216,15 @@
                                     <outlet property="subv" destination="Tbe-Vc-kel" id="m0X-U2-GPu"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="image" rowHeight="250" id="jBu-HM-dJU" customClass="SurveyImageCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="689.5" width="320" height="250"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="image" rowHeight="270" id="jBu-HM-dJU" customClass="SurveyImageCell" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="709.5" width="320" height="270"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jBu-HM-dJU" id="C3s-nC-Eov">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="270"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KH5-Ua-xkE">
-                                            <rect key="frame" x="16" y="77" width="288" height="162"/>
+                                            <rect key="frame" x="16" y="97" width="288" height="162"/>
                                             <subviews>
                                                 <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="arf-oP-RoR">
                                                     <rect key="frame" x="0.0" y="0.0" width="288" height="162"/>
@@ -1251,10 +1251,10 @@
                                             </userDefinedRuntimeAttributes>
                                         </view>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2aB-o9-zCR">
-                                            <rect key="frame" x="16" y="11" width="288" height="66"/>
+                                            <rect key="frame" x="16" y="11" width="288" height="86"/>
                                             <subviews>
                                                 <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hBt-LR-eW7" customClass="GalleryIcon" customModule="ThinkWhat" customModuleProvider="target">
-                                                    <rect key="frame" x="114" y="3" width="60" height="60"/>
+                                                    <rect key="frame" x="114" y="13" width="60" height="60"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="60" id="W74-9J-YaU"/>
@@ -1271,13 +1271,13 @@
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="KH5-Ua-xkE" secondAttribute="trailing" constant="16" id="4BW-7x-Ik5"/>
                                         <constraint firstItem="KH5-Ua-xkE" firstAttribute="bottom" secondItem="C3s-nC-Eov" secondAttribute="bottomMargin" id="6a3-nS-pfn"/>
                                         <constraint firstItem="2aB-o9-zCR" firstAttribute="trailing" secondItem="C3s-nC-Eov" secondAttribute="trailingMargin" id="Dv8-4b-Xha"/>
                                         <constraint firstItem="2aB-o9-zCR" firstAttribute="leading" secondItem="C3s-nC-Eov" secondAttribute="leadingMargin" id="IlM-N4-UrG"/>
+                                        <constraint firstItem="KH5-Ua-xkE" firstAttribute="leading" secondItem="C3s-nC-Eov" secondAttribute="leading" constant="16" id="NC3-5L-1tz"/>
                                         <constraint firstItem="KH5-Ua-xkE" firstAttribute="top" secondItem="2aB-o9-zCR" secondAttribute="bottom" id="NgW-cU-7No"/>
                                         <constraint firstItem="2aB-o9-zCR" firstAttribute="top" secondItem="C3s-nC-Eov" secondAttribute="topMargin" id="OxL-ZO-FkH"/>
-                                        <constraint firstItem="KH5-Ua-xkE" firstAttribute="leading" secondItem="C3s-nC-Eov" secondAttribute="leadingMargin" id="b7J-XU-o3B"/>
-                                        <constraint firstItem="KH5-Ua-xkE" firstAttribute="trailing" secondItem="C3s-nC-Eov" secondAttribute="trailingMargin" id="vH1-uu-fxA"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1288,7 +1288,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="answer" rowHeight="100" id="vKJ-8U-cEl" customClass="SurveyAnswerCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="939.5" width="320" height="100"/>
+                                <rect key="frame" x="0.0" y="979.5" width="320" height="100"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vKJ-8U-cEl" id="2wd-9j-zFi">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
@@ -1326,7 +1326,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="vote" rowHeight="100" id="4FC-3N-JFn" userLabel="vote" customClass="SurveyVoteCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="1039.5" width="320" height="100"/>
+                                <rect key="frame" x="0.0" y="1079.5" width="320" height="100"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="4FC-3N-JFn" id="hjY-uA-eK4">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
@@ -1360,7 +1360,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="result" rowHeight="100" id="Dgk-aH-BDD" customClass="SurveyResultCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="1139.5" width="320" height="100"/>
+                                <rect key="frame" x="0.0" y="1179.5" width="320" height="100"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Dgk-aH-BDD" id="v6q-Vn-5K4">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
@@ -1412,7 +1412,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="total" rowHeight="50" id="h8v-x6-RJn" customClass="SurveyTotalCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="1239.5" width="320" height="50"/>
+                                <rect key="frame" x="0.0" y="1279.5" width="320" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="h8v-x6-RJn" id="xVa-TL-0aq">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
@@ -1437,7 +1437,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="info" rowHeight="50" id="RaS-cG-1bE" customClass="SurveyInfoCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="1289.5" width="320" height="50"/>
+                                <rect key="frame" x="0.0" y="1329.5" width="320" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="RaS-cG-1bE" id="Nv9-H3-u9l">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
@@ -1730,7 +1730,7 @@
                                         <rect key="frame" x="0.0" y="9" width="320" height="163.5"/>
                                         <subviews>
                                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="l5G-ph-ezo">
-                                                <rect key="frame" x="106" y="0.0" width="108" height="107.5"/>
+                                                <rect key="frame" x="106.5" y="0.0" width="107" height="107.5"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="l5G-ph-ezo" secondAttribute="height" multiplier="1:1" id="wc8-yw-uzc"/>
                                                 </constraints>

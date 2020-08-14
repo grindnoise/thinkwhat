@@ -351,14 +351,14 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     }
     
     @objc fileprivate func applicationDidBecomeActive() {
-        if Surveys.shared.topLinks.isEmpty {
-            loadData()
-        }
+//        if Surveys.shared.topLinks.isEmpty {
+//            loadData()
+//        }
     }
     
     @objc fileprivate func applicationDidEnterBackground() {
         //TODD: Cancel requests?
-        apiManager
+        apiManager.cancelAllRequests()
     }
     
     @objc private func handleIconTap(gesture: UITapGestureRecognizer) {
@@ -439,15 +439,20 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         newView.alpha = 0
         newView.addEquallyTo(to: container)
         newView.layer.zPosition = 2
-        newView.transform = newView.transform.scaledBy(x: 0.8, y: 0.8)
-        UIView.animate(withDuration: 0.35, delay: 0, options: [.curveEaseOut], animations: {
-            oldView?.alpha = 0
+        newView.transform = newView.transform.scaledBy(x: 0.93, y: 0.93)
+        if oldView != nil {
+            UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseIn], animations: {
+                    oldView!.alpha = 0
+                    oldView!.transform = oldView!.transform.scaledBy(x: 0.93, y: 0.93)
+            }) {
+                _ in
+                oldView!.removeFromSuperview()
+            }
+        }
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
             newView.alpha = 1
             newView.transform = .identity
-        }) {
-            _ in
-            oldView?.removeFromSuperview()
-        }
+        })
     }
     
     func presentLostConnectionView() {
@@ -514,6 +519,7 @@ extension SurveysViewController: ServerProtocol {
                     }
                 }
                 if json != nil, !self.interruptRequests {
+                    AppData.shared.system.APIVersion = json!["api_version"].stringValue
                     SurveyCategories.shared.importJson(json!["categories"])
                     SurveyCategories.shared.updateCount(json!["total_count"])
                     ClaimCategories.shared.importJson(json!["claim_categories"])

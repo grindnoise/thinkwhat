@@ -20,6 +20,8 @@ class SurveyStackViewController: UIViewController {
     fileprivate var timer:          Timer?
     fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     fileprivate lazy var loadingView: EmptySurvey = self.createLoadingView()
+    fileprivate var previewSurveys: [FullSurvey] = []
+    fileprivate var isRequestingStack = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,7 +84,13 @@ class SurveyStackViewController: UIViewController {
     
     @objc fileprivate func createSurveyPreview() -> SurveyPreview? {
         if !Surveys.shared.stackObjects.isEmpty {
-            if let survey = Surveys.shared.stackObjects.remove(at: 0) as? FullSurvey {
+//            if let survey = Surveys.shared.stackObjects.remove(at: 0) as? FullSurvey {
+            
+            if let survey = Surveys.shared.stackObjects.filter({$0 != self.previewSurveys.map({$0}).last}).first {//Set(Surveys.shared.stackObjects).symmetricDifference(Set(previewSurveys)).first {//zip(Surveys.shared.stackObjects, previewSurveys).filter({ $0.0.hashValue != $0.1.hashValue}).fir {//Surveys.shared.stackObjects.//.filter({$0.hashValue != self.previewSurveys.map({$0.hashValue}).f}).first {
+//                previewSurveys.addUnique(object: survey)
+                if previewSurveys.filter({ $0.hashValue == survey.hashValue }).isEmpty {
+                    previewSurveys.append(survey)
+                }
                 let multiplier: CGFloat = 0.95
                 var _rect = CGRect.zero
                 if tabBarController!.tabBar.isHidden {
@@ -265,12 +273,10 @@ class SurveyStackViewController: UIViewController {
 
 extension SurveyStackViewController: CallbackDelegate {
     func callbackReceived(_ sender: AnyObject) {
-        if sender is UIButton {
-            let button = sender as! UIButton
-            if button.tag == 0 {//Vote
+        if let button = sender as? UIButton, let accessibilityIdentifier = button.accessibilityIdentifier {
+            if accessibilityIdentifier == "Vote" {//Vote
                 delegate.performSegue(withIdentifier: Segues.App.FeedToSurveyFromTop, sender: self)
-            } else {//Next
-                //Reject
+            } else if accessibilityIdentifier == "Reject" {//Reject
                 Surveys.shared.rejectedSurveys.append(surveyPreview.survey)
                 apiManager.rejectSurvey(survey: surveyPreview.survey) {
                     json, error in
@@ -286,6 +292,10 @@ extension SurveyStackViewController: CallbackDelegate {
                 removePreview = surveyPreview
                 nextSurvey(nextPreview)
             }
+//            } else if accessibilityIdentifier == "Next" {
+//                removePreview = surveyPreview
+//                nextSurvey(nextPreview)
+//            }
         } else if sender is UserProfile {
             delegate.performSegue(withIdentifier: Segues.App.FeedToUser, sender: sender)
         } else if let _view = sender as? EmptySurvey  {
@@ -296,6 +306,11 @@ extension SurveyStackViewController: CallbackDelegate {
         } else if sender is ClaimCategory { //Claim
             removePreview = surveyPreview
             delay(seconds: 0.5) {
+                self.nextSurvey(self.nextPreview)
+            }
+        } else if sender is FullSurvey { //Voted
+            delay(seconds: 0.4) {
+                self.removePreview = self.surveyPreview
                 self.nextSurvey(self.nextPreview)
             }
         }

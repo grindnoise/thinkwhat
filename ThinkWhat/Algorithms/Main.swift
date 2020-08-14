@@ -206,7 +206,7 @@ struct Notifications {
 
 
 let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
-let MIN_STACK_SIZE                               = 2//Min quantity of hot surveys to request another portion
+let MIN_STACK_SIZE                               = 4//Min quantity of hot surveys to request another portion
 
 struct TimeIntervals {
     static let ClearRejectedSurveys: TimeInterval = 60//Timer parameter to wipe out rejectedSurveys container
@@ -532,6 +532,13 @@ class AppData {
                 }
             }
         }
+        var APIVersion: String? {
+            didSet {
+                if APIVersion != nil, APIVersion != oldValue {
+                    UserDefaults.standard.set(APIVersion!, forKey: "APIVersion")
+                }
+            }
+        }
 //        var emailResponseExpirationDate: Date? {
 //            didSet {
 //                if emailResponseExpirationDate != nil  {
@@ -575,6 +582,9 @@ class AppData {
                     self.language = .Russian
                 }
             }
+            if let kAPIVersion = UserDefaults.standard.object(forKey: "APIVersion") {
+                self.APIVersion = (kAPIVersion as! String)
+            }
         }
         
         mutating func eraseData() {
@@ -586,6 +596,8 @@ class AppData {
             } else if langStr == "ru_RU" {
                 language = .Russian
             }
+            APIVersion = ""
+            UserDefaults.standard.removeObject(forKey: "userEmailVerified")
         }
     }
     
@@ -735,6 +747,8 @@ struct DjangoVariables {
         static let images                   = "media"
         static let startDate                = "start_date"
         static let endDate                  = "end_date"
+        static let likes                    = "likes"
+        static let userprofile              = "userprofile"
     }
     struct FieldRestrictions {
         static let surveyTitleLength        = 30

@@ -44,7 +44,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     }
     
     fileprivate var lastContentOffset: CGFloat = 0//Nav bar reveal depend on scroll view offset's limit
-    
+    fileprivate var isSurveyJustCompleted = false
     fileprivate var isReadOnly = false {//false - user hasn't answered this survey
         didSet {
             if isReadOnly {
@@ -122,6 +122,8 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     fileprivate var headerNeedsAnimation                = true
     fileprivate var navTitle: UIImageView!
     fileprivate var navTitleImageSize: CGSize!
+    fileprivate var scrollArrow: ScrollArrow!
+    fileprivate var isAutoScrolling = false   //is on when scrollArrow is tapped
     
     var surveyLink: ShortSurvey! {
         didSet {
@@ -180,7 +182,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         self.navigationController?.navigationBar.isTranslucent   = false
         self.navigationController?.isNavigationBarHidden         = false
         self.navigationController?.navigationBar.barTintColor    = .white
-        self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
+        self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action: nil)
         self.navigationItem.backBarButtonItem?.tintColor         = .black
         self.navigationItem.rightBarButtonItems                   = [UIBarButtonItem(customView: likeButton), UIBarButtonItem(customView: claimButton)]
         self.loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)))
@@ -258,11 +260,34 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         tabBarController?.setTabBarVisible(visible: false, animated: true)
         
         claimButtonNeedsAnimation = true
+        if scrollArrow == nil {
+            scrollArrow = ScrollArrow(frame: CGRect(origin: CGPoint(x: navigationController!.view.frame.width - 50, y: navigationController!.view.frame.height - 150), size: CGSize(width: 40, height: 40)))
+            scrollArrow.isOpaque = false
+            scrollArrow.alpha = 0
+            scrollArrow.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.scrollToTop)))
+//            scrollArrow.transform = CGAffineTransform(rotationAngle: 90)
+            navigationController?.view.addSubview(scrollArrow)
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         voteCompletionView = nil
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        if delegate is SurveyStackViewController, isSurveyJustCompleted {
+            delegate?.callbackReceived(survey!)
+        }
+    }
+    
+    @objc func scrollToTop() {
+        isAutoScrolling = true
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut, animations: {
+            self.scrollArrow.alpha = 0
+        })
     }
     
     // MARK: - Table view data source
@@ -496,8 +521,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if section == 1 {
-
-            return 100
+            return 86
         }
         return CGFloat.leastNonzeroMagnitude
     }
@@ -542,9 +566,24 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if self.lastContentOffset < scrollView.contentOffset.y {
-            navigationController?.setNavigationBarHidden(true, animated: true)
+            if !isAutoScrolling {
+                navigationController?.setNavigationBarHidden(true, animated: true)
+                if scrollArrow.alpha == 0 {
+                    UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut, animations: {
+                        self.scrollArrow.alpha = 1
+                    })
+                }
+            }
         } else if scrollView.contentOffset.y <= 0  {//if (lastContentOffset - scrollView.contentOffset.y) > 160 {
-            navigationController?.setNavigationBarHidden(false, animated: true)
+            if !isAutoScrolling {
+                navigationController?.setNavigationBarHidden(false, animated: true)
+                if scrollArrow.alpha != 0 {
+                    UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut, animations: {
+                        self.scrollArrow.alpha = 0
+                    })
+                }
+            }
+            isAutoScrolling = false
         }
     }//    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
 //            let animation = AnimationFactory.makeFadeAnimation(duration: 0.18, delayFactor: 0.015)//AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
@@ -689,41 +728,52 @@ extension SurveyViewController {
     
     //POST request post result
     fileprivate func postResult() {
+        voteCompletionView?.present()
         let result = ["survey": survey!.ID!, "answer": selectedAnswerID]
         apiManager.postResult(result: result) {
             json, error in
             if error != nil {
-                showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { UIView.animate(withDuration: 0.3, animations: {
-                    self.loadingIndicator?.alpha = 0
-                }) { _ in self.loadingIndicator?.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
+                self.voteCompletionView?.dismiss() {
+                    _ in
+                    showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { UIView.animate(withDuration: 0.3, animations: {
+                        self.loadingIndicator?.alpha = 0
+                    }) { _ in self.loadingIndicator?.removeAllAnimations() } }]]], text: "Ошибка: \(error!.localizedDescription)")
+                }
             }
             if json != nil {
-                self.voteCompletionView?.present()
-                print(json!)
+                
+                self.voteCompletionView?.animate() {_ in}
                 //Update answer votes count, survey total votes, user's survey result & add to completed
-                if let response = json!.arrayValue as? [JSON] {
-                    for entity in response {
-                        if let _answer = entity["answer"].intValue as? Int, let _timestamp = Date(dateTimeString: entity["timestamp"].stringValue as! String) as? Date {
-                            self.survey!.result = [_answer: _timestamp]
-                            self.survey!.totalVotes += 1
-                            for answer in self.survey!.answers {
-                                if answer.ID == _answer {
-                                    answer.totalVotes += 1
-                                    break
+                for i in json! {
+                    if i.0 == "survey_result" && !i.1.isEmpty {
+                        for entity in i.1 {
+                            print(entity)
+                            if let _answer = entity.1["answer"].intValue as? Int, let _timestamp = Date(dateTimeString: entity.1["timestamp"].stringValue as! String) as? Date {
+                                self.survey!.result = [_answer: _timestamp]
+                                self.survey!.totalVotes += 1
+                                for answer in self.survey!.answers {
+                                    if answer.ID == _answer {
+                                        answer.totalVotes += 1
+                                        break
+                                    }
                                 }
+                                if !Surveys.shared.completedSurveyIDs.contains(self.survey!.ID!) {
+                                    Surveys.shared.completedSurveyIDs.append(self.survey!.ID!)
+                                }
+                                Surveys.shared.stackObjects.remove(object: self.survey!)
+                                //Increase user's balance
+                                //TODO: Detect, whether it's an ordinary survey
+                                AppData.shared.userProfile.balance += SurveyPoints.Vote.rawValue
                             }
-                            if !Surveys.shared.completedSurveyIDs.contains(self.survey!.ID!) {
-                                Surveys.shared.completedSurveyIDs.append(self.survey!.ID!)
-                            }
-                            //Increase user's balance
-                            //TODO Detect, whether it's an ordinary survey
-                            AppData.shared.userProfile.balance += SurveyPoints.Vote.rawValue
                         }
+                        self.isSurveyJustCompleted = true
+                        self.isReadOnly = true
+                        self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .fade)
+                        self.tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .fade)
+                    } else if i.0 == "hot" && !i.1.isEmpty {
+                        Surveys.shared.importSurveys(i.1)
                     }
                 }
-                self.isReadOnly = true
-                self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .fade)
-                self.tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .fade)
             }
         }
     }
@@ -821,6 +871,8 @@ extension SurveyViewController: CallbackDelegate {
         } else if sender is SurveyYoutubeCell {
             tableView.scrollToRow(at: IndexPath(row: 3, section: 0), at: .top, animated: true)
         } else if sender is AnswerHeaderCell {
+//            tableView.scrollToBottom()
+            navigationController?.setNavigationBarHidden(true, animated: true)
             tableView.scrollToRow(at: IndexPath(row: 0, section: 1), at: .top, animated: true)
         } else if let claim = sender as? ClaimCategory {
             apiManager.postClaim(surveyID: survey!.ID!, claimID: claim.ID) { _, error in print(error?.localizedDescription) }

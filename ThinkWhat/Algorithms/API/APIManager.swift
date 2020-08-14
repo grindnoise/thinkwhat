@@ -179,6 +179,7 @@ class APIManager: APIManagerProtocol {
                     } else if errorDesc.contains(DjangoError.Authentication.ConnectionFailed.rawValue) {
                         _tokenState = .ConnectionError
                     } else {
+                        print(attr.1.stringValue)
                         fatalError("func parseDjangoError failed to downcast attr.1.string")
                     }
                     //            case "error_description":
@@ -1039,7 +1040,18 @@ class APIManager: APIManagerProtocol {
     }
     
     func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->()) {
+        var parameters: [String: Any] = result
         var error: Error?
+        var dict: Parameters = [:]
+//        if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
+            let stackList = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+            let rejectedList = Surveys.shared.rejectedSurveys.filter({ $0.ID != nil }).map(){ $0.ID!}
+            let completedList = [result.values.first!]
+            let list = Array(Set(stackList + rejectedList + completedList))//Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+            if !list.isEmpty {
+                parameters["ids"] = list
+            }
+//        }
         checkForReachability {
             reachable in
             if reachable == .Reachable {
@@ -1048,7 +1060,7 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error!)
                     } else if success {
-                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_RESULTS), httpMethod: .post, parameters: result, encoding: JSONEncoding.default, completion: completion)
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_RESULTS), httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, completion: completion)
                     }
                 }
             } else {
@@ -1059,6 +1071,16 @@ class APIManager: APIManagerProtocol {
     }
     
     func rejectSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->()) {
+        var parameters: [String: Any] = ["survey": survey.ID! as Any]
+        if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
+            let stackList = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+            let rejectedList = Surveys.shared.rejectedSurveys.filter({ $0.ID != nil }).map(){ $0.ID!}
+            let list = Array(Set(stackList + rejectedList))//Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+            if !list.isEmpty {
+                let dict = list.asParameters(arrayParametersKey: "ids")
+                parameters.merge(dict) {(current, _) in current}
+            }
+        }
         checkForReachability {
             reachable in
             if reachable == .Reachable {
@@ -1067,15 +1089,15 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         print(error!)
                     } else if success {
-                        var parameters: [String: Any] = ["survey": survey.ID! as Any]
-//                        print("Surveys.shared.stackObjects.count \(Surveys.shared.stackObjects.count)")
-                        if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
-                            var list = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
-                            if !list.isEmpty {
-                                let dict = list.asParameters(arrayParametersKey: "ids") as! [String : Any]
-                                parameters.merge(dict) {(current, _) in current}
-                            }
-                        }
+//                        var parameters: [String: Any] = ["survey": survey.ID! as Any]
+////                        print("Surveys.shared.stackObjects.count \(Surveys.shared.stackObjects.count)")
+//                        if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
+//                            var list = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+//                            if !list.isEmpty {
+//                                let dict = list.asParameters(arrayParametersKey: "ids") as! [String : Any]
+//                                parameters.merge(dict) {(current, _) in current}
+//                            }
+//                        }
                         self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_REJECT), httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, completion: completion)
                     }
                 }

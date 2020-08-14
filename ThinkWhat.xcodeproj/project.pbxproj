@@ -112,6 +112,7 @@
 		AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7478C12428962700317EB6 /* CameraLoadingIndicator.swift */; };
 		AB7478C52428D0A300317EB6 /* FilmIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7478C42428D0A300317EB6 /* FilmIcon.swift */; };
 		AB7478C724290D8600317EB6 /* SurveyAnswerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7478C624290D8600317EB6 /* SurveyAnswerCell.swift */; };
+		AB75838024E5661D004367DF /* ScrollArrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB75837F24E5661D004367DF /* ScrollArrow.swift */; };
 		AB7599ED245B29FE008B0569 /* SurveyPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7599EC245B29FE008B0569 /* SurveyPreview.swift */; };
 		AB7599EF245B2F51008B0569 /* SurveyPreview.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7599EE245B2F51008B0569 /* SurveyPreview.xib */; };
 		AB791D7D243B1BF00085E00E /* VoteAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB791D7C243B1BF00085E00E /* VoteAnimationView.swift */; };
@@ -324,6 +325,7 @@
 		AB7478C12428962700317EB6 /* CameraLoadingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraLoadingIndicator.swift; sourceTree = "<group>"; };
 		AB7478C42428D0A300317EB6 /* FilmIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmIcon.swift; sourceTree = "<group>"; };
 		AB7478C624290D8600317EB6 /* SurveyAnswerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SurveyAnswerCell.swift; path = "../New Group/SurveyAnswerCell.swift"; sourceTree = "<group>"; };
+		AB75837F24E5661D004367DF /* ScrollArrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollArrow.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB7599EC245B29FE008B0569 /* SurveyPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyPreview.swift; sourceTree = "<group>"; };
 		AB7599EE245B2F51008B0569 /* SurveyPreview.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyPreview.xib; sourceTree = "<group>"; };
 		AB791D7C243B1BF00085E00E /* VoteAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteAnimationView.swift; sourceTree = "<group>"; };
@@ -691,7 +693,6 @@
 			isa = PBXGroup;
 			children = (
 				AB6C9030240D38F2009BE941 /* Animated */,
-				ABDFA748238C1B5C00321EE0 /* AddButton.swift */,
 				AB3C682F223FD3EE00B57580 /* Google.swift */,
 				AB3C6830223FD3EE00B57580 /* Facebook.swift */,
 				AB3C6831223FD3EE00B57580 /* VK.swift */,
@@ -700,15 +701,8 @@
 				AB3C6834223FD3EE00B57580 /* UpdateButton.swift */,
 				ABC3E7C622E9B33700DEA9FD /* Mail.swift */,
 				ABBA73F72383F74E00540ECF /* HeartButton.swift */,
-				ABBA73F92386EC7B00540ECF /* NewIcon.swift */,
-				ABBA73FB2386ECC200540ECF /* Icon.swift */,
-				ABBA73FD2387C5A200540ECF /* FlameIcon.swift */,
-				ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */,
-				ABDA424E23B0D60500BAC3A5 /* NewAnswerIcons.swift */,
-				ABDA425023B0D7BF00BAC3A5 /* WebIcon.swift */,
-				AB8DAB5323BA2A790089E25F /* PlainIcons.swift */,
-				AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */,
-				AB4BD891244DE52100D9A3F0 /* TopIcon.swift */,
+				ABDFA748238C1B5C00321EE0 /* AddButton.swift */,
+				AB75837F24E5661D004367DF /* ScrollArrow.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -779,7 +773,6 @@
 		AB72A8422418CF2D005B58F1 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				AB791D7E243B30D90085E00E /* VoteCompletionView */,
 				AB2FBD00242A431A00344DCC /* Answer */,
 				AB735C082418EABD00776248 /* SurveyTitleCell.swift */,
 				AB735C0A241902E600776248 /* SurveyQuestionCell.swift */,
@@ -805,10 +798,27 @@
 		AB7478C32428D08B00317EB6 /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				AB75837E24E51C7F004367DF /* Animated */,
+				AB8DAB5323BA2A790089E25F /* PlainIcons.swift */,
 				AB7478C42428D0A300317EB6 /* FilmIcon.swift */,
 				AB7A2E4D24BDC376007B96F2 /* Megaphone.swift */,
+				ABDA425023B0D7BF00BAC3A5 /* WebIcon.swift */,
+				ABDA424E23B0D60500BAC3A5 /* NewAnswerIcons.swift */,
+				AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */,
 			);
 			path = Icons;
+			sourceTree = "<group>";
+		};
+		AB75837E24E51C7F004367DF /* Animated */ = {
+			isa = PBXGroup;
+			children = (
+				ABBA73FB2386ECC200540ECF /* Icon.swift */,
+				ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */,
+				ABBA73F92386EC7B00540ECF /* NewIcon.swift */,
+				ABBA73FD2387C5A200540ECF /* FlameIcon.swift */,
+				AB4BD891244DE52100D9A3F0 /* TopIcon.swift */,
+			);
+			path = Animated;
 			sourceTree = "<group>";
 		};
 		AB7599EB245B29D1008B0569 /* SurveyPreview */ = {
@@ -845,6 +855,7 @@
 		AB7CE6FA23A36123006FDBD8 /* Existing */ = {
 			isa = PBXGroup;
 			children = (
+				AB791D7E243B30D90085E00E /* VoteCompletionView */,
 				ABDAA38C248E7D1700569F68 /* ClaimViewController */,
 				AB8C99552486760B00BC517B /* Claim */,
 				AB72A8422418CF2D005B58F1 /* Cells */,
@@ -1354,6 +1365,7 @@
 				AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
 				AB868A6A23EB04A3008DEB84 /* CategorySelectionViewController.swift in Sources */,
+				AB75838024E5661D004367DF /* ScrollArrow.swift in Sources */,
 				AB889818240FA65B0087E5AD /* CopyPasteTextField.swift in Sources */,
 				ABDA425923B3475400BAC3A5 /* AnswerCreationHeaderCell.swift in Sources */,
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,

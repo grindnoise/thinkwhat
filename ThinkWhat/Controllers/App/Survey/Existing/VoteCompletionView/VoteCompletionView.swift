@@ -10,11 +10,12 @@ import UIKit
 
 class VoteCompletionView: UIView {
 
-    @IBOutlet var contentView: UIView!
-    @IBOutlet weak var frameView: BorderedView!
-    @IBOutlet      var lightBlurView: UIVisualEffectView!
-    @IBOutlet weak var voteAnimation: VoteAnimationView!
-    fileprivate var delegate: SurveyViewController?
+    @IBOutlet       var contentView:        UIView!
+    @IBOutlet weak  var frameView:          BorderedView!
+    @IBOutlet       var lightBlurView:      UIVisualEffectView!
+    @IBOutlet weak  var voteAnimation:      VoteAnimationView!
+    fileprivate     var delegate:           SurveyViewController?
+    fileprivate     var loadingIndicator:   LoadingIndicator!
     
     init(frame: CGRect, delegate: SurveyViewController?) {
         super.init(frame: frame)
@@ -27,8 +28,7 @@ class VoteCompletionView: UIView {
         self.commonInit()
     }
     
-    
-    private func commonInit() {
+    fileprivate func commonInit() {
         Bundle.main.loadNibNamed("VoteCompletionView", owner: self, options: nil)
         guard let content = contentView else {
             return
@@ -36,6 +36,7 @@ class VoteCompletionView: UIView {
         frameView.backgroundColor = .white
         frameView.borderWidth = 1.5
         frameView.borderColor = K_COLOR_GRAY
+        voteAnimation.alpha = 0
         content.frame = self.bounds
         content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(content)
@@ -49,7 +50,9 @@ class VoteCompletionView: UIView {
         lightBlurView.alpha = 0
         frameView.layer.transform = CATransform3DMakeScale(0.7, 0.7, 1)
         frameView.layer.opacity = 1
-        voteAnimation.alpha = 0
+        loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: frameView.frame.width, height: frameView.frame.width)))
+        loadingIndicator.layoutCentered(in: frameView, multiplier: 0.8)
+        loadingIndicator.alpha = 0
         
         delegate?.statusBarHidden = true
         UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
@@ -76,20 +79,51 @@ class VoteCompletionView: UIView {
         frameView.layer.add(scaleAnim, forKey: nil)
         frameView.layer.opacity = Float(1)
         frameView.layer.transform = CATransform3DMakeScale(1, 1, 1)
+//        delay(seconds: 0.1) {
+//            UIView.animate(withDuration: 0.3, animations: {
+//                self.voteAnimation.alpha = 1
+//            }) {
+//                _ in
+//                self.voteAnimation.addEnableAnimation()
+//                delay(seconds: 1) {
+//                    self.dismiss()
+//                }
+//            }
+//        }
         delay(seconds: 0.1) {
-            UIView.animate(withDuration: 0.3, animations: {
+            UIView.animate(withDuration: 0.3) {
+                self.loadingIndicator.alpha = 1
+                self.loadingIndicator.addEnableAnimation()
+            }
+        }
+    }
+    
+    public func animate(_ completion: @escaping(Bool)->()) {
+        UIView.animate(withDuration: 0.7, animations: {
+            self.loadingIndicator.alpha = 0
+        }) {
+            _ in
+            self.loadingIndicator.removeAllAnimations()
+            self.voteAnimation.addEnableAnimation()
+            UIView.animate(withDuration: 1.1, delay: 0, options: .curveEaseOut, animations: {
                 self.voteAnimation.alpha = 1
-            }) {
-                _ in
-                self.voteAnimation.addEnableAnimation()
-                delay(seconds: 1) {
-                    self.dismiss()
+            })
+//            UIView.animate(withDuration: 0.8) {//}, animations: {
+//                self.voteAnimation.alpha = 1
+////            }) {
+////                _ in
+////                self.voteAnimation.addEnableAnimation()
+//            }
+            delay(seconds: 1.1) {
+                self.dismiss() {
+                    completed in
+                    completion(completed)
                 }
             }
         }
     }
     
-    public func dismiss() {
+    func dismiss(_ completion: @escaping(Bool)->()) {
         //Slight scale/fade animation
         let scaleAnim       = CABasicAnimation(keyPath: "transform.scale")
         let fadeAnim        = CABasicAnimation(keyPath: "opacity")
@@ -119,9 +153,10 @@ class VoteCompletionView: UIView {
             }, completion: {
                 _ in
                 self.voteAnimation.removeAllAnimations()
+                self.loadingIndicator.removeAllAnimations()
                 self.removeFromSuperview()
+                completion(true)
             })
         }
     }
-
 }

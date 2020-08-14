@@ -1,5 +1,5 @@
 PODS:
-  - Alamofire (4.8.2)
+  - Alamofire (4.7.2)
   - FacebookCore (0.9.0):
     - FBSDKCoreKit (~> 5.0)
   - FacebookLogin (0.9.0):
@@ -16,15 +16,15 @@ PODS:
     - FBSDKLoginKit/Login (= 5.15.1)
   - FBSDKLoginKit/Login (5.15.1):
     - FBSDKCoreKit (~> 5.0)
-  - Nimble (8.0.2)
-  - Quick (2.1.0)
+  - Nimble (8.1.1)
+  - Quick (3.0.0)
   - SwiftyJSON (5.0.0)
-  - Swinject (2.6.2)
-  - VK-ios-sdk (1.4.6)
-  - YoutubePlayer-in-WKWebView (0.3.0)
+  - Swinject (2.7.1)
+  - VK-ios-sdk (1.5.1)
+  - YoutubePlayer-in-WKWebView (0.3.4)
 
 DEPENDENCIES:
-  - Alamofire
+  - Alamofire (= 4.7.2)
   - FacebookCore
   - FacebookLogin
   - Nimble
@@ -35,18 +35,18 @@ DEPENDENCIES:
   - YoutubePlayer-in-WKWebView (~> 0.3.0)
 
 SPEC CHECKSUMS:
-  Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
+  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
   FacebookCore: ba86524b66cfa86d0f8e65d08faa8504a9f732dd
   FacebookLogin: 6cee9fd6e1fe976fe8f7eec199e27b28b14f5d63
   FBSDKCoreKit: 1d5acf7c9d7a2f92bb1a242dc60cae5b7adb91df
   FBSDKLoginKit: f1ea8026a58b52d30c9f2e6a58ca7d813619fb83
-  Nimble: 622629381bda1dd5678162f21f1368cec7cbba60
-  Quick: 4be43f6634acfa727dd106bdf3929ce125ffa79d
+  Nimble: 5f8a2fb6fa343a7242dfdd9d42f7267419d464b2
+  Quick: 6d9559f40647bc4d510103842ef2fdd882d753e2
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
-  Swinject: cf7458774b1b00323080a9c67e47a1ee7f9d2af1
-  VK-ios-sdk: 7fd48bc5aaa6b96c3197c1987eb6593f2ea67331
-  YoutubePlayer-in-WKWebView: 17a33b2fa619d357c9ddd763942ce556660facae
+  Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
+  VK-ios-sdk: 62a10b6571fbcda0657f455fedce7fedf55b4cd0
+  YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: ba5cc2eaa325da0b9673890b5e404e4fb77f0c91
+PODFILE CHECKSUM: 1c7d3ca79f0f13b330497b167faf54a64da0bde3
 
 COCOAPODS: 1.4.0

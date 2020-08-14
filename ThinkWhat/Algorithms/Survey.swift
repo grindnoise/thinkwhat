@@ -34,7 +34,15 @@ class Surveys {
     
 //    var currentHotSurvey:   FullSurvey?//Add to list of hot_except
     fileprivate var timer:  Timer?
-    var rejectedSurveys:    [FullSurvey]  = []//Local list of rejected surveys, should be cleared periodically
+    var rejectedSurveys:    [FullSurvey]  = [] {//Local list of rejected surveys, should be cleared periodically
+        didSet {
+            if !rejectedSurveys.isEmpty, rejectedSurveys.count != oldValue.count {
+                if let survey = rejectedSurveys.last {//Set(oldValue).symmetricDifference(rejectedSurveys).first {
+                    stackObjects.remove(object: survey)
+                }
+            }
+        }
+    }
     var allLinks:           [ShortSurvey] = []
     var topLinks:           [ShortSurvey] = []
     var newLinks:           [ShortSurvey] = [] {
@@ -356,16 +364,19 @@ class ShortSurvey {
     var startDate: Date
     var category: SurveyCategory?
     var completionPercentage: Int
+    var likes: Int
 //    var hashValue: Int {
 //        return ObjectIdentifier(self).hashValue
 //    }
     
-    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int) {
+    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int) {//}, likes _likes: Int) {
         ID                      = _id
         title                   = _title
         category                = _category
         completionPercentage    = _completionPercentage
         startDate               = _startDate
+        likes = 0
+        //likes                   = _likes
     }
     
     init?(_ json: JSON) {
@@ -373,12 +384,14 @@ class ShortSurvey {
             let _title                  = json["title"].stringValue as? String,
             let _category               = json["category"].intValue as? Int,
             let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
-            let _completionPercentage   = json["vote_capacity"].intValue as? Int {
+            let _completionPercentage   = json["vote_capacity"].intValue as? Int,
+            let _likes                  = json["likes"].intValue as? Int {
             ID                      = _ID
             title                   = _title
             category                = SurveyCategories.shared[_category]
             completionPercentage    = _completionPercentage
             startDate               = _startDate
+            likes                   = _likes
         } else {
             return nil
         }
@@ -570,6 +583,7 @@ class FullSurvey {
     var watchers: Int = 0
     var result: [Int: Date]?
     var userProfile: UserProfile?
+    var likes: Int
     
 //    var hashValue: Int {
 //        return ObjectIdentifier(self).hashValue
@@ -620,6 +634,7 @@ class FullSurvey {
             voteCapacity        = _voteCapacity
             isPrivate           = _isPrivate
             answersWithoutID    = _answers
+            likes               = 0
 //            userProfile         = AppData.shared.userProfile
             
             //Optional fields
@@ -655,7 +670,8 @@ class FullSurvey {
             let _totalVotes             = json["total_votes"].intValue as? Int,
             let _result                 = json["result"].arrayValue as? [JSON],
             let _balance                = json["balance"].intValue as? Int,
-            let _userProfileDict        = json["userprofile"] as? JSON {
+            let _userProfileDict        = json[DjangoVariables.Survey.userprofile] as? JSON,
+            let _likes                  = json[DjangoVariables.Survey.likes].intValue as? Int {
             ID = _ID
             title = _title
             startDate = _startDate
@@ -670,6 +686,7 @@ class FullSurvey {
             totalVotes = _totalVotes
             watchers = _watchers
             AppData.shared.userProfile.balance = _balance
+            likes = _likes
             
             for _answer in _answers {
                 if let answer = SurveyAnswer(json: _answer) {

@@ -27,7 +27,7 @@ public struct ArrayEncoding: ParameterEncoding {
     
     
     /// Creates a new instance of the encoding using the given options
-    ///
+    ///œ
     /// - parameter options: The options used to encode the json. Default is `[]`
     ///
     /// - returns: The new instance
