@@ -91,12 +91,12 @@ class SurveyStackViewController: UIViewController {
                 if previewSurveys.filter({ $0.hashValue == survey.hashValue }).isEmpty {
                     previewSurveys.append(survey)
                 }
-                let multiplier: CGFloat = 0.95
+                let multiplier: CGFloat = 0.93
                 var _rect = CGRect.zero
                 if tabBarController!.tabBar.isHidden {
-                    _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height/* * multiplier*/ - tabBarController!.tabBar.frame.height))
+                    _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier - tabBarController!.tabBar.frame.height))
                 } else {
-                    _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height/* * multiplier*/))
+                    _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier))
                 }
                 let _surveyPreview = SurveyPreview(frame: _rect, survey: survey, delegate: self)
                 _surveyPreview.setNeedsLayout()
@@ -104,6 +104,18 @@ class SurveyStackViewController: UIViewController {
                 _surveyPreview.voteButton.layer.cornerRadius = _surveyPreview.voteButton.frame.height / 2
                 _surveyPreview.center = view.center
                 _surveyPreview.center.x += view.frame.width
+                
+                //Add shadow
+                _surveyPreview.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
+//                let shadowSize: CGFloat = 5
+//                let contactRect = CGRect(x: -shadowSize, y: _surveyPreview.frame.height - (shadowSize * 0.4), width: _surveyPreview.frame.width + shadowSize * 2, height: shadowSize)
+//                _surveyPreview.layer.shadowPath = UIBezierPath(rect: contactRect).cgPath
+                _surveyPreview.layer.shadowPath = UIBezierPath(rect: _surveyPreview.bounds).cgPath
+                _surveyPreview.layer.shadowRadius = 5
+                _surveyPreview.layer.shadowOffset = .zero
+                _surveyPreview.layer.shadowOpacity = 1
+                //                    self.buttonsContainer.layer.shadowOpacity = 0
+//                _surveyPreview.layer.zPosition = 100
 
                 if let userProfile = survey.userProfile {
                     _surveyPreview.userName.text = userProfile.name

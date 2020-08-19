@@ -36,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.backgroundColor = .white
         self.window!.makeKeyAndVisible()
         
+        
         let statusBarFrame = UIView(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: (UIApplication.shared.keyWindow?.bounds.width)!, height: UIApplication.shared.statusBarFrame.height)))
         statusBarFrame.backgroundColor = UIColor.white
         UIApplication.shared.keyWindow?.addSubview(statusBarFrame)

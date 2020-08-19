@@ -11,11 +11,57 @@ import UIKit
 class SurveyTableViewCell: UITableViewCell {
 
     @IBOutlet weak var title: UILabel!
-    @IBOutlet weak var tags: UIView!
-    @IBOutlet weak var completionPercentage: ProgressCirle!
+//    @IBOutlet weak var tags: UIView!
+//    @IBOutlet weak var completionPercentage: ProgressCirle!
+    @IBOutlet weak var join: UIView!
+    @IBOutlet weak var icon: SurveyCategoryIcon! {
+        didSet {
+            print("icon didSet")
+        }
+    }
+//    @IBOutlet weak var icon: UIView!// {
+//        didSet {
+//            if icon.subviews.isEmpty, survey != nil, let _icon = survey.category!.icon {
+//                _icon.isOpaque = false
+//                _icon.addEquallyTo(to: icon)
+//            } else {
+//                if survey != nil, let _icon = survey.category!.icon {
+//                    _icon.isOpaque = false
+//                    _icon.addEquallyTo(to: icon)
+//                }
+//            }
+//        }
+//    }
+    @IBOutlet weak var category: UILabel!
+//    @IBOutlet weak var subCategory: UILabel!
     @IBOutlet weak var duration: UILabel!
-    
-    var survey: ShortSurvey?
+    var survey: ShortSurvey! {
+        didSet {
+            icon.tagColor = survey.category?.parent?.tagColor
+            icon.categoryID = SurveyCategoryIcon.CategoryID(rawValue: survey.category!.ID) ?? .Null
+        }
+    }// {
+//        didSet {
+//            if icon != nil {
+//                if icon.subviews.isEmpty, survey != nil, let _icon = survey.category!.icon {
+//                    _icon.isOpaque = false
+//                    _icon.addEquallyTo(to: icon)
+//                } else {
+//                    if survey != nil, let _icon = survey.category!.icon {
+//                        _icon.isOpaque = false
+//                        _icon.addEquallyTo(to: icon)
+//                    }
+//                }
+//            }
+////            if title != nil, icon != nil, category != nil, subCategory != nil {
+////                title.text = survey.title
+////                survey.category!.icon.isOpaque = false
+////                survey.category!.icon.addEquallyTo(to: icon)
+////                subCategory.text = survey.category!.title
+////                category.text = survey.category!.parent!.title
+////            }
+//        }
+//    }
     
 //    var surveyLink: SurveyLink?
     

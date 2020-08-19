@@ -24,7 +24,11 @@ class SurveyImageCell: UITableViewCell, UIScrollViewDelegate {
             scrollView.delegate = self
         }
     }
-    @IBOutlet weak var pageControl: UIPageControl!
+    @IBOutlet weak var pageControl: UIPageControl! {
+        didSet {
+            pageControl.alpha = 0
+        }
+    }
     @IBOutlet weak var icon: GalleryIcon! {
         didSet {
             let touch = UITapGestureRecognizer(target:self, action:#selector(self.callback))

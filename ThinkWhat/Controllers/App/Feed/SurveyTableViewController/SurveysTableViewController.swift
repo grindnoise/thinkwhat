@@ -248,28 +248,56 @@ class SurveysTableViewController: UITableViewController {
                 default:
                     dataSource = Surveys.shared.topLinks
                 }
-                cell.survey = dataSource[indexPath.row]
-                cell.title.text = dataSource[indexPath.row].title
-                for view in cell.tags.subviews {
-                    view.removeFromSuperview()
-                }
-                //        if cell.tags.subviews.isEmpty {
-                if let subcategory = dataSource[indexPath.row].category, let category: SurveyCategory? = dataSource[indexPath.row].category?.parent {
-                    let categoryTag = TagLabel(frame: cell.tags.frame, surveyCategory: category!)
-                    cell.completionPercentage.color = category!.tagColor
-                    cell.tags.addSubview(categoryTag)
-                    cell.tags.addSubview(TagLabel(frame: CGRect(origin: CGPoint(x: categoryTag.frame.maxX + 2, y: 0), size: categoryTag.frame.size), surveyCategory: subcategory))
-                    cell.duration.text = "\(daysBetweenDate(startDate: dataSource[indexPath.row].startDate, endDate: Date())) дн."
-                }
-                //        }
+                let survey = dataSource[indexPath.row]
 
-                cell.completionPercentage.progress = CGFloat(dataSource[indexPath.row].completionPercentage)
-
-                if (indexPath.row % 2 == 0) {
-                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
-                } else {
-                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
+                cell.survey = survey
+                let attrString = NSMutableAttributedString()
+                attrString.append(NSAttributedString(string: "  \(survey.category!.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 10), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 10), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "\(survey.category!.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 10), foregroundColor: .white, backgroundColor: .clear)))
+//                attrString.append(NSAttributedString(string: " \(survey.category!.title.uppercased())", attributes: StringAttributes.Bold.red_11))
+//                attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.Regular.red_11))
+//                attrString.append(NSAttributedString(string: "\(survey.category!.parent!.title.uppercased()) ", attributes: StringAttributes.SemiBold.red_11))
+                cell.category.attributedText = attrString
+                cell.category.backgroundColor = .clear
+                if let color = survey.category!.parent!.tagColor {
+                    cell.category.backgroundColor = color//.withAlphaComponent(0.5)
+                    cell.join.backgroundColor = color
+                    cell.category.cornerRadius = cell.category.frame.height / 2.5
                 }
+                cell.title.text = survey.title
+//                if !cell.isIconAdded {
+//                    if let icon = survey.category!.icon {
+//                        icon.isOpaque = false
+//                        icon.addEquallyTo(to: cell.icon)
+//                        cell.isIconAdded = true
+//                    }
+//                }
+//                if cell.icon.subviews.isEmpty, let icon = survey.category!.icon {
+//                    icon.frame = cell.icon.frame
+//                    cell.icon = icon
+//                }
+//                if cell.icon.subviews.isEmpty, let icon = survey.category!.icon {
+//                    icon.isOpaque = false
+//                    icon.addEquallyTo(to: cell.icon)
+//                } else if let currentIcon = cell.icon.subviews.first as? SurveyCategoryIcon, currentIcon.ID != survey.category!.ID, let icon = survey.category!.icon {
+//                    (currentIcon as! UIView).removeFromSuperview()
+//                    icon.isOpaque = false
+//                    icon.addEquallyTo(to: cell.icon)
+//                }
+//                cell.icon.subviews.map {
+//                    $0.removeFromSuperview()
+//                }
+//                if let icon = dataSource[indexPath.row].category!.icon {
+//                    icon.isOpaque = false
+//                    icon.addEquallyTo(to: cell.icon)
+//                }
+                cell.duration.text = "\(dataSource[indexPath.row].startDate.toDateTimeStringLiteral_ddMMMM())"
+//                if (indexPath.row % 2 == 0) {
+//                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
+//                } else {
+//                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
+//                }
                 return cell
             }
 //        }
@@ -493,7 +521,7 @@ extension SurveysTableViewController: ServerProtocol {
         apiManager.loadSurveysByOwner(userProfile: userProfile!, type: _type) {
             json, error in
             if error != nil {
-                self.refreshControl?.attributedTitle = NSAttributedString(string: "Ошибка, повторите позже", attributes: semiboldAttrs_red_12)
+                self.refreshControl?.attributedTitle = NSAttributedString(string: "Ошибка, повторите позже", attributes: StringAttributes.SemiBold.red_12)//semiboldAttrs_red_12)
                 self.refreshControl?.endRefreshing()
                 delay(seconds: 0.5) {
                     self.refreshControl?.attributedTitle = NSAttributedString(string: "")

@@ -385,14 +385,19 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                                             _cell.slides[i].imageView.progressIndicatorView.reveal()
                                         }
                                     }
-                                    } else {
-                                        self.survey!.images!.append([image!: imageURL.values.first!])
-                                        _cell.slides[i].imageView.image = image
-                                        _cell.slides[i].imageView.progressIndicatorView.reveal()
-                                    }
+                                } else {
+                                    self.survey!.images!.append([image!: imageURL.values.first!])
+                                    _cell.slides[i].imageView.image = image
+                                    _cell.slides[i].imageView.progressIndicatorView.reveal()
+                                }
+                                if self.survey!.images!.count > 1 {
+                                    UIView.animate(withDuration: 0.3, delay: 0.5, options: .curveEaseInOut, animations: {
+                                        _cell.pageControl.alpha = 1
+                                    })
                                 }
                             }
                         }
+                    }
                 } else if survey!.images != nil, !survey!.images!.isEmpty {
                     for (i, dict) in survey!.images!.enumerated() {
                         if let image = dict.keys.first {
@@ -565,7 +570,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if self.lastContentOffset < scrollView.contentOffset.y {
+        if lastContentOffset < scrollView.contentOffset.y {
             if !isAutoScrolling {
                 navigationController?.setNavigationBarHidden(true, animated: true)
                 if scrollArrow.alpha == 0 {
@@ -574,9 +579,13 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                     })
                 }
             }
-        } else if scrollView.contentOffset.y <= 0  {//if (lastContentOffset - scrollView.contentOffset.y) > 160 {
+        } else {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+        }
+        
+        if scrollView.contentOffset.y <= 0  {//if (lastContentOffset - scrollView.contentOffset.y) > 160 {
             if !isAutoScrolling {
-                navigationController?.setNavigationBarHidden(false, animated: true)
+//                navigationController?.setNavigationBarHidden(false, animated: true)
                 if scrollArrow.alpha != 0 {
                     UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut, animations: {
                         self.scrollArrow.alpha = 0

@@ -314,6 +314,7 @@ let alert                                       = CustomAlertView(frame: (UIAppl
 let K_COLOR_RED                                 = UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)//UIColor(red:0.805, green: 0.342, blue:0.339, alpha:1)
 let K_COLOR_GRAY                                = UIColor(red:0.574, green: 0.574, blue:0.574, alpha:1)
 let K_COLOR_TABBAR                              = UIColor(red:0.592, green: 0.46, blue:0.574, alpha:1)
+let K_COLOR_CONTAINER_BG                        = UIColor(red: 0.910, green: 0.929, blue: 0.929, alpha: 1.000)
 //let K_COLOR_TABBAR_INACTIVE                     = UIColor(red:0.636, green: 0.636, blue:0.636, alpha:1)
 let options: UNAuthorizationOptions             = [.alert, .sound, .badge]
 
@@ -868,6 +869,84 @@ func loadImageFromPath(path: String) -> UIImage? {
     @objc func handleReachabilitySignal()
 }
 
-let semiboldAttrs_red_12       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Semibold", size: 12),
-                                  NSAttributedString.Key.foregroundColor: K_COLOR_RED,
-                                  NSAttributedString.Key.backgroundColor: UIColor.clear]
+/// Invokes a given closure with a buffer containing all metaclasses known to the Obj-C
+/// runtime. The buffer is only valid for the duration of the closure call.
+func withAllClasses<R>(
+    _ body: (UnsafeBufferPointer<AnyClass>) throws -> R
+    ) rethrows -> R {
+    
+    var count: UInt32 = 0
+    let classListPtr = objc_copyClassList(&count)
+    defer {
+        free(UnsafeMutableRawPointer(classListPtr))
+    }
+    let classListBuffer = UnsafeBufferPointer(
+        start: classListPtr, count: Int(count)
+    )
+    
+    return try body(classListBuffer)
+}
+//                               .flatMap in Swift < 4.1
+
+struct StringAttributes {
+    
+    static func getFont(name: String, size: CGFloat) -> UIFont {
+        if let font = UIFont(name: name, size: size) {
+            return font
+        }
+        return UIFont()
+    }
+    
+    static func getAttributes(font: UIFont, foregroundColor: UIColor, backgroundColor: UIColor) -> [NSAttributedString.Key : Optional<NSObject>] {
+        var stringAttrs: [NSAttributedString.Key : Optional<NSObject>] = [:]
+        
+        stringAttrs[NSAttributedString.Key.font]            = font
+        stringAttrs[NSAttributedString.Key.foregroundColor] = foregroundColor
+        stringAttrs[NSAttributedString.Key.backgroundColor] = backgroundColor
+        
+        return stringAttrs
+    }
+    
+    struct Fonts {
+        
+        
+        
+        struct Style {
+            static let Semibold     = "OpenSans-Semibold"
+            static let Bold         = "OpenSans-Bold"
+            static let Regular      = "OpenSans"
+            static let Light        = "OpenSans-Light"
+            static let Italic       = "OpenSans-Italic"
+            static let Extrabold    = "OpenSans-ExtraBold"
+        }
+    }
+    
+    struct SemiBold {
+        static let red_12       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Semibold", size: 12),
+                                                 NSAttributedString.Key.foregroundColor: K_COLOR_RED,
+                                                 NSAttributedString.Key.backgroundColor: UIColor.clear]
+        static let red_11       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Semibold", size: 11),
+                                                 NSAttributedString.Key.foregroundColor: K_COLOR_RED,
+                                                 NSAttributedString.Key.backgroundColor: UIColor.clear]
+    }
+    
+    struct Bold {
+        static let red_12       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Bold", size: 12),
+                                   NSAttributedString.Key.foregroundColor: K_COLOR_RED,
+                                   NSAttributedString.Key.backgroundColor: UIColor.clear]
+        static let red_11       = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Bold", size: 11),
+                                   NSAttributedString.Key.foregroundColor: K_COLOR_RED,
+                                   NSAttributedString.Key.backgroundColor: UIColor.clear]
+    }
+    
+    struct Regular {
+        static let red_12       = [NSAttributedString.Key.font : UIFont(name: "OpenSans", size: 12),
+                                   NSAttributedString.Key.foregroundColor: K_COLOR_RED,
+                                   NSAttributedString.Key.backgroundColor: UIColor.clear]
+        static let red_11       = [NSAttributedString.Key.font : UIFont(name: "OpenSans", size: 11),
+                                   NSAttributedString.Key.foregroundColor: K_COLOR_RED,
+                                   NSAttributedString.Key.backgroundColor: UIColor.clear]
+    }
+
+}
+

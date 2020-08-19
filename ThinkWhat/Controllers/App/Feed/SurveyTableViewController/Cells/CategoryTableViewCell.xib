@@ -105,7 +105,7 @@
                     <constraint firstItem="CcP-Vw-BhE" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="sQK-kY-0SI"/>
                 </constraints>
             </tableViewCellContentView>
-            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color key="backgroundColor" red="1" green="0.14901960784313725" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="active" destination="2bK-ZH-Nks" id="tt8-c6-TeP"/>

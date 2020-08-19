@@ -90,25 +90,25 @@ class CategoryTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell, let dataSource = Surveys.shared.categorizedLinks[category] {
-                cell.title.text = dataSource[indexPath.row].title
-                for view in cell.tags.subviews {
-                    view.removeFromSuperview()
-                }
-                if let subcategory = dataSource[indexPath.row].category, let category: SurveyCategory? = dataSource[indexPath.row].category?.parent {
-                    let categoryTag = TagLabel(frame: cell.tags.frame, surveyCategory: category!)
-                    cell.completionPercentage.color = category!.tagColor
-                    cell.tags.addSubview(categoryTag)
-                    cell.tags.addSubview(TagLabel(frame: CGRect(origin: CGPoint(x: categoryTag.frame.maxX + 2, y: 0), size: categoryTag.frame.size), surveyCategory: subcategory))
-                    cell.duration.text = "\(daysBetweenDate(startDate: dataSource[indexPath.row].startDate, endDate: Date())) дн."
-                }
-                
-                cell.completionPercentage.progress = CGFloat(dataSource[indexPath.row].completionPercentage)
-                
-                if (indexPath.row % 2 == 0) {
-                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
-                } else {
-                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
-                }
+//                cell.title.text = dataSource[indexPath.row].title
+//                for view in cell.tags.subviews {
+//                    view.removeFromSuperview()
+//                }
+//                if let subcategory = dataSource[indexPath.row].category, let category: SurveyCategory? = dataSource[indexPath.row].category?.parent {
+//                    let categoryTag = TagLabel(frame: cell.tags.frame, surveyCategory: category!)
+//                    cell.completionPercentage.color = category!.tagColor
+//                    cell.tags.addSubview(categoryTag)
+//                    cell.tags.addSubview(TagLabel(frame: CGRect(origin: CGPoint(x: categoryTag.frame.maxX + 2, y: 0), size: categoryTag.frame.size), surveyCategory: subcategory))
+//                    cell.duration.text = "\(daysBetweenDate(startDate: dataSource[indexPath.row].startDate, endDate: Date())) дн."
+//                }
+//
+//                cell.completionPercentage.progress = CGFloat(dataSource[indexPath.row].completionPercentage)
+//
+//                if (indexPath.row % 2 == 0) {
+//                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
+//                } else {
+//                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
+//                }
                 return cell
             }
         return UITableViewCell()

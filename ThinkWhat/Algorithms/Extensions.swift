@@ -255,6 +255,13 @@ extension Date {
         return formatter.string(from: self)
     }
     
+    func toDateTimeStringLiteral_ddMMMM() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "dd MMMM"
+        return formatter.string(from: self)
+    }
+    
     func toDateTimeStringWithoutSeconds() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy HH:mm"

@@ -56,8 +56,10 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                     newTableVC.tableView.bounces = false
                 case .Hot:
                     setTitle("Горячие")
+                    toggleFilter(isOn: false)
                 case .New:
                     setTitle("Новые")
+                    toggleFilter(isOn: true)
                 case .Top:
                     setTitle("Популярные")
                 case .Unknown:
@@ -108,6 +110,12 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                             }
                         }
                     }
+                    
+                    UIView.animate(withDuration: 0.5) {
+                        self.container.backgroundColor = K_COLOR_CONTAINER_BG
+//                        self.view.backgroundColor = K_COLOR_CONTAINER_BG
+                    }
+                    
                     self.loadingIndicator.removeFromSuperview()
                     self.currentIcon = .Hot
                     self.hotIcon.state = .enabled
@@ -134,6 +142,67 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                         })
                         self.navigationController?.navigationBar.setNeedsLayout()
                     }
+                    if let btn = self.navigationItem.leftBarButtonItem as? UIBarButtonItem {
+                        let v = Filter(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))//PlusIcon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
+                        v.isOpaque = false
+                        let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleFilterTap))
+                        v.addGestureRecognizer(tap)
+                        btn.customView = v
+                        btn.customView?.alpha = 0
+//                        btn.customView?.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+//                        UIView.animate(
+//                            withDuration: 0.4,
+//                            delay: 0,
+//                            usingSpringWithDamping: 0.6,
+//                            initialSpringVelocity: 2.5,
+//                            options: [.curveEaseInOut],
+//                            animations: {
+//                                btn.customView?.transform = .identity
+//                                btn.customView?.alpha = 1
+//                        })
+//                        self.navigationController?.navigationBar.setNeedsLayout()
+                    }
+//                    delay(seconds: 1) {
+                        self.buttonsContainer.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
+                        let shadowSize: CGFloat = 5
+                        let contactRect = CGRect(x: -shadowSize, y: self.buttonsContainer.frame.height - (shadowSize * 0.4), width: self.buttonsContainer.frame.width + shadowSize * 2, height: shadowSize)
+                        self.buttonsContainer.layer.shadowPath = UIBezierPath(rect: contactRect).cgPath
+                        self.buttonsContainer.layer.shadowRadius = 5
+                        self.buttonsContainer.layer.shadowOffset = .zero
+                        //                    self.buttonsContainer.layer.shadowOpacity = 0
+                        self.buttonsContainer.layer.zPosition = 100
+                        CATransaction.begin()
+                        let anim = CABasicAnimation(keyPath: "shadowOpacity")
+                        anim.fromValue = 0
+                        anim.toValue = 1
+                        anim.duration = 0.5
+                        anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+                        anim.isRemovedOnCompletion = false
+                        self.buttonsContainer.layer.add(anim, forKey: "shadowOpacity")//.shadowOpacity = 1
+                        //                    self.buttonsContainer.layer.shadowOpacity = 1
+                        CATransaction.commit()
+                                            self.buttonsContainer.layer.shadowOpacity = 1
+//                    }
+                    
+                    if let tbView = self.tabBarController?.tabBar {
+                        tbView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
+                        let shadowSize: CGFloat = 5
+                        let contactRect = CGRect(x: -shadowSize, y: -shadowSize, width: tbView.frame.width + shadowSize * 2, height: shadowSize)
+                        tbView.layer.shadowPath = UIBezierPath(rect: tbView.bounds).cgPath//contactRect).cgPath
+                        tbView.layer.shadowRadius = 5
+                        tbView.layer.shadowOffset = .zero
+                        tbView.layer.zPosition = 100
+                        CATransaction.begin()
+                        let anim = CABasicAnimation(keyPath: "shadowOpacity")
+                        anim.fromValue = 0
+                        anim.toValue = 1
+                        anim.duration = 0.5
+                        anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+                        anim.isRemovedOnCompletion = false
+                        tbView.layer.add(anim, forKey: "shadowOpacity")
+                        CATransaction.commit()
+                        tbView.layer.shadowOpacity = 1
+                    }
                 }
             }
         }
@@ -145,6 +214,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
 //            topIcon.addGestureRecognizer(tap)
 //        }
 //    }
+    @IBOutlet weak var buttonsContainer: UIView!
     @IBOutlet weak var iconsHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var newIcon: NewIcon! {
         didSet {
@@ -174,6 +244,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     fileprivate var icons: [Icon] = []
     @IBOutlet weak var container: UIView!
     @IBOutlet weak var addButton: UIBarButtonItem!
+    @IBOutlet weak var filterButton: UIBarButtonItem!
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
@@ -220,6 +291,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         delay(seconds: TimeIntervals.NetworkInactivity) {
             self.checkDataIsLoaded()
         }
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -262,6 +334,14 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
 //            container.layoutIfNeeded()
 //            icons = [self.topIcon, self.newIcon, self.hotIcon, self.categoryIcon, self.unknownIcon]
             icons = [newIcon, hotIcon, categoryIcon]
+//            buttonsContainer.layer.shadowColor = UIColor.lightGray.cgColor
+//            let shadowSize: CGFloat = 20
+//            let contactRect = CGRect(x: -shadowSize, y: buttonsContainer.frame.height - (shadowSize * 0.4), width: buttonsContainer.frame.width + shadowSize * 2, height: shadowSize)
+//            buttonsContainer.layer.shadowPath = UIBezierPath(rect: contactRect).cgPath
+//            buttonsContainer.layer.shadowRadius = 5
+//            buttonsContainer.layer.shadowOffset = .zero
+//            buttonsContainer.layer.shadowOpacity = 0.5
+//            buttonsContainer.layer.zPosition = 100
         }
     }
     
@@ -297,6 +377,14 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         addChild(self.surveyStackVC)
         surveyStackVC.delegate = self
         surveyStackVC.didMove(toParent: self)
+//        buttonsContainer.layer.shadowColor = UIColor.lightGray.cgColor
+//        let shadowSize: CGFloat = 5
+//        let contactRect = CGRect(x: -shadowSize, y: buttonsContainer.frame.height - (shadowSize * 0.4), width: buttonsContainer.frame.width + shadowSize * 2, height: shadowSize)
+//        buttonsContainer.layer.shadowPath = UIBezierPath(rect: contactRect).cgPath
+//        buttonsContainer.layer.shadowRadius = 5
+//        buttonsContainer.layer.shadowOffset = .zero
+//        buttonsContainer.layer.shadowOpacity = 0
+//        buttonsContainer.layer.zPosition = 100
     }
     
     // MARK: - Navigation
@@ -377,6 +465,27 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     
     @objc private func handleAddTap() {
         performSegue(withIdentifier: Segues.App.FeedToNewSurvey, sender: self)
+    }
+    
+    @objc private func handleFilterTap() {
+        
+    }
+    
+    fileprivate func toggleFilter(isOn: Bool) {
+        if let filter = navigationItem.leftBarButtonItem?.customView as? Filter {
+            if isOn { filter.transform = CGAffineTransform(scaleX: 0.7, y: 0.7) }
+            UIView.animate(
+                withDuration: 0.4,
+                delay: 0,
+                usingSpringWithDamping: 0.6,
+                initialSpringVelocity: 3,
+                options: [.curveEaseInOut],
+                animations: {
+                    if isOn { filter.transform =  .identity }
+                    filter.alpha = isOn ? 1 : 0
+            })
+            self.navigationController?.navigationBar.setNeedsLayout()
+        }
     }
     
     fileprivate func setTitle(_ _title: String) {
@@ -580,7 +689,7 @@ extension SurveysViewController: ServerProtocol {
                 if self.isInitialLoad {
                     self.updateSurveys(type: .All)
                 } else {
-                    self.newTableVC.refreshControl?.attributedTitle = NSAttributedString(string: "Ошибка, повторите позже", attributes: semiboldAttrs_red_12)
+                    self.newTableVC.refreshControl?.attributedTitle = NSAttributedString(string: "Ошибка, повторите позже", attributes: StringAttributes.SemiBold.red_12)//semiboldAttrs_red_12)
                     self.newTableVC.refreshControl?.endRefreshing()
                     delay(seconds: 0.5) {
                         self.newTableVC.refreshControl?.attributedTitle = NSAttributedString(string: "")

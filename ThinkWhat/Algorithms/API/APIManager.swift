@@ -1043,7 +1043,7 @@ class APIManager: APIManagerProtocol {
         var parameters: [String: Any] = result
         var error: Error?
         var dict: Parameters = [:]
-//        if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
+        if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
             let stackList = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
             let rejectedList = Surveys.shared.rejectedSurveys.filter({ $0.ID != nil }).map(){ $0.ID!}
             let completedList = [result.values.first!]
@@ -1051,7 +1051,7 @@ class APIManager: APIManagerProtocol {
             if !list.isEmpty {
                 parameters["ids"] = list
             }
-//        }
+        }
         checkForReachability {
             reachable in
             if reachable == .Reachable {
