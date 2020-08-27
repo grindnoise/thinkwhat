@@ -14,7 +14,7 @@ class SurveyPreview: UIView {
         print("SurveyPreview deinit")
     }
 
-    var survey: FullSurvey!
+    var survey: FullSurvey! 
     weak fileprivate var delegate: CallbackDelegate?
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var userImage: UIImageView! {
@@ -25,7 +25,10 @@ class SurveyPreview: UIView {
         }
     }
     @IBOutlet weak var userName: UILabel!
-    @IBOutlet weak var surveyDate: UILabel!
+    @IBOutlet weak var icon: SurveyCategoryIcon!
+    @IBOutlet weak var category: UILabel!
+    @IBOutlet weak var parentCategory: UILabel!
+//    @IBOutlet weak var surveyDate: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var voteButton: UIButton!
@@ -64,7 +67,7 @@ class SurveyPreview: UIView {
         self.addSubview(content)
         titleLabel.text = survey.title
         descriptionLabel.text = "   \(survey.description)"
-        surveyDate.text = survey.startDate.toDateString()//.toDateTimeStringWithoutSeconds()
+//        surveyDate.text = survey.startDate.toDateString()//.toDateTimeStringWithoutSeconds()
         
     }
     

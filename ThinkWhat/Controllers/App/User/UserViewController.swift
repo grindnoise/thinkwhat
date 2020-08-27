@@ -87,6 +87,11 @@ class UserViewController: UIViewController, ServerProtocol {
                 }
             }
         }
+        if let nav = navigationController as? NavigationControllerPreloaded {
+            delay(seconds: 0.3){
+                nav.isShadowed = true
+            }
+        }
     }
     
     fileprivate func setupViews() {

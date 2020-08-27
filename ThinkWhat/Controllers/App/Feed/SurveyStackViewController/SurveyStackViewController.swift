@@ -42,6 +42,7 @@ class SurveyStackViewController: UIViewController {
 //                                               selector: #selector(SurveyStackViewController.didEnterBackground),
 //                                               name: UIApplication.didEnterBackgroundNotification,
 //                                               object: nil)
+        view.backgroundColor = .white
     }
     
     deinit {
@@ -105,17 +106,36 @@ class SurveyStackViewController: UIViewController {
                 _surveyPreview.center = view.center
                 _surveyPreview.center.x += view.frame.width
                 
+                _surveyPreview.category.attributedText = NSAttributedString(string: "  \(survey.category.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 8), foregroundColor: .white, backgroundColor: .clear))
+                _surveyPreview.parentCategory.attributedText = NSAttributedString(string: "  \(survey.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 8), foregroundColor: .white, backgroundColor: .clear))
+                _surveyPreview.icon.categoryID = SurveyCategoryIcon.CategoryID(rawValue: survey.category.ID) ?? .Null
+                if let color = survey.category.parent!.tagColor {
+                    _surveyPreview.category.backgroundColor = color
+                    _surveyPreview.parentCategory.backgroundColor = color
+//                    _surveyPreview.surveyDate.backgroundColor = color
+                    _surveyPreview.icon.tagColor = color
+                    _surveyPreview.setNeedsLayout()
+                    _surveyPreview.layoutIfNeeded()
+                    _surveyPreview.category.cornerRadius = _surveyPreview.category.frame.height / 2.5
+                    _surveyPreview.parentCategory.cornerRadius = _surveyPreview.parentCategory.frame.height / 2.5
+//                    _surveyPreview.surveyDate.cornerRadius = _surveyPreview.surveyDate.frame.height / 2.5
+                }
+//                _surveyPreview.surveyDate.attributedText = NSAttributedString(string: "  \(survey.startDate.toDateStringLiteral_dMMM())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
+                
+                
+                
                 //Add shadow
-                _surveyPreview.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
-//                let shadowSize: CGFloat = 5
-//                let contactRect = CGRect(x: -shadowSize, y: _surveyPreview.frame.height - (shadowSize * 0.4), width: _surveyPreview.frame.width + shadowSize * 2, height: shadowSize)
-//                _surveyPreview.layer.shadowPath = UIBezierPath(rect: contactRect).cgPath
-                _surveyPreview.layer.shadowPath = UIBezierPath(rect: _surveyPreview.bounds).cgPath
-                _surveyPreview.layer.shadowRadius = 5
+                _surveyPreview.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+                _surveyPreview.layer.shadowPath = UIBezierPath(roundedRect: _surveyPreview.bounds, cornerRadius: 15).cgPath//(rect: _surveyPreview.bounds).cgPath
+                _surveyPreview.layer.shadowRadius = 7
                 _surveyPreview.layer.shadowOffset = .zero
                 _surveyPreview.layer.shadowOpacity = 1
-                //                    self.buttonsContainer.layer.shadowOpacity = 0
-//                _surveyPreview.layer.zPosition = 100
+                
+                _surveyPreview.voteButton.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+                _surveyPreview.voteButton.layer.shadowPath = UIBezierPath(roundedRect: _surveyPreview.voteButton.bounds, cornerRadius: _surveyPreview.voteButton.frame.height / 2).cgPath//(ovalIn: _surveyPreview.voteButton.bounds).cgPath
+                _surveyPreview.voteButton.layer.shadowRadius = 5
+                _surveyPreview.voteButton.layer.shadowOffset = .zero
+                _surveyPreview.voteButton.layer.shadowOpacity = 1
 
                 if let userProfile = survey.userProfile {
                     _surveyPreview.userName.text = userProfile.name
@@ -146,10 +166,7 @@ class SurveyStackViewController: UIViewController {
                 return _surveyPreview
             }
         }
-//        Surveys.shared.currentHotSurvey = nil
-//        if !isFirstAppearance {
-            startTimer()
-//        }
+        startTimer()
         return nil
     }
     
@@ -158,12 +175,10 @@ class SurveyStackViewController: UIViewController {
         let loadingView = EmptySurvey(frame: CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier)), delegate: self)
         loadingView.alpha = 0
         loadingView.center = view.center
-//        loadingView.addEquallyTo(to: view)
         loadingView.setNeedsLayout()
         loadingView.layoutIfNeeded()
         loadingView.createButton.layer.cornerRadius = loadingView.createButton.frame.height / 2
         view.addSubview(loadingView)
-//        loadingView.startingPoint = loadingView.createButton.convert(loadingView.createButton.center, to: tabBarController?.view)
         return loadingView
     }
     
@@ -175,10 +190,8 @@ class SurveyStackViewController: UIViewController {
                     self.removePreview.voteButton.backgroundColor = K_COLOR_GRAY
                     self.removePreview.nextButton.tintColor = K_COLOR_GRAY
                     self.removePreview.center.x -= self.view.frame.width
-//                    self.removePreview.frame.origin = self.view.frame.origin
                     self.removePreview.transform = self.removePreview.transform.scaledBy(x: 0.85, y: 0.85)
                 }
-                //            _surveyPreview.alpha = 1
                 _surveyPreview!.transform  = .identity
                 _surveyPreview!.center = self.view.center
                 if self.tabBarController!.tabBar.isHidden {

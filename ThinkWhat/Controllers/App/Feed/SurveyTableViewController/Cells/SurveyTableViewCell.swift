@@ -19,7 +19,8 @@ class SurveyTableViewCell: UITableViewCell {
             print("icon didSet")
         }
     }
-//    @IBOutlet weak var icon: UIView!// {
+    @IBOutlet weak var join_2: UIView!
+    //    @IBOutlet weak var icon: UIView!// {
 //        didSet {
 //            if icon.subviews.isEmpty, survey != nil, let _icon = survey.category!.icon {
 //                _icon.isOpaque = false

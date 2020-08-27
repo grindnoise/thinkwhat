@@ -255,7 +255,21 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    func toDateTimeStringLiteral_ddMMMM() -> String {
+    func toDateStringLiteral_dMMM() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "d MMM"
+        return formatter.string(from: self)
+    }
+    
+    func toDateStringLiteral_ddMMM() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "dd MMM"
+        return formatter.string(from: self)
+    }
+    
+    func toDateStringLiteral_ddMMMM() -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "dd MMMM"

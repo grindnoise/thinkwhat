@@ -51,9 +51,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                 switch currentIcon {
                 case .Category:
                     setTitle("Разделы")
-                    newTableVC.needsAnimation = false
-                    newTableVC.refreshControl?.removeFromSuperview()
-                    newTableVC.tableView.bounces = false
+                    toggleFilter(isOn: false)
                 case .Hot:
                     setTitle("Горячие")
                     toggleFilter(isOn: false)
@@ -75,6 +73,10 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         let vc = Storyboards.controllers.instantiateViewController(withIdentifier: "SurveysTableViewController") as! SurveysTableViewController
         vc.type = .New
         return vc
+    } ()
+    
+    public let categoryVC: CategoryCollectionViewController = {
+        return Storyboards.controllers.instantiateViewController(withIdentifier: "CategoryCollectionViewController") as! CategoryCollectionViewController
     } ()
 //    fileprivate let topTableVC: SurveysTableViewController = {
 //        let vc = Storyboards.controllers.instantiateViewController(withIdentifier: "SurveysTableViewController") as! SurveysTableViewController
@@ -111,11 +113,6 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                         }
                     }
                     
-                    UIView.animate(withDuration: 0.5) {
-                        self.container.backgroundColor = K_COLOR_CONTAINER_BG
-//                        self.view.backgroundColor = K_COLOR_CONTAINER_BG
-                    }
-                    
                     self.loadingIndicator.removeFromSuperview()
                     self.currentIcon = .Hot
                     self.hotIcon.state = .enabled
@@ -123,7 +120,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                     self.presentSubview()
                     self.lostConnectionView = nil
                     if let btn = self.navigationItem.rightBarButtonItem as? UIBarButtonItem {
-                        let v = Megaphone(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))//PlusIcon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
+                        let v = Megaphone(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
                         v.isOpaque = false
                         let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleAddTap))
                         v.addGestureRecognizer(tap)
@@ -143,65 +140,42 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                         self.navigationController?.navigationBar.setNeedsLayout()
                     }
                     if let btn = self.navigationItem.leftBarButtonItem as? UIBarButtonItem {
-                        let v = Filter(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))//PlusIcon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
+                        let v = Filter(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
                         v.isOpaque = false
                         let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleFilterTap))
                         v.addGestureRecognizer(tap)
                         btn.customView = v
                         btn.customView?.alpha = 0
-//                        btn.customView?.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
-//                        UIView.animate(
-//                            withDuration: 0.4,
-//                            delay: 0,
-//                            usingSpringWithDamping: 0.6,
-//                            initialSpringVelocity: 2.5,
-//                            options: [.curveEaseInOut],
-//                            animations: {
-//                                btn.customView?.transform = .identity
-//                                btn.customView?.alpha = 1
-//                        })
-//                        self.navigationController?.navigationBar.setNeedsLayout()
                     }
-//                    delay(seconds: 1) {
+
                         self.buttonsContainer.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
                         let shadowSize: CGFloat = 5
                         let contactRect = CGRect(x: -shadowSize, y: self.buttonsContainer.frame.height - (shadowSize * 0.4), width: self.buttonsContainer.frame.width + shadowSize * 2, height: shadowSize)
                         self.buttonsContainer.layer.shadowPath = UIBezierPath(rect: contactRect).cgPath
                         self.buttonsContainer.layer.shadowRadius = 5
                         self.buttonsContainer.layer.shadowOffset = .zero
-                        //                    self.buttonsContainer.layer.shadowOpacity = 0
                         self.buttonsContainer.layer.zPosition = 100
-                        CATransaction.begin()
                         let anim = CABasicAnimation(keyPath: "shadowOpacity")
                         anim.fromValue = 0
                         anim.toValue = 1
                         anim.duration = 0.5
                         anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
                         anim.isRemovedOnCompletion = false
-                        self.buttonsContainer.layer.add(anim, forKey: "shadowOpacity")//.shadowOpacity = 1
-                        //                    self.buttonsContainer.layer.shadowOpacity = 1
-                        CATransaction.commit()
-                                            self.buttonsContainer.layer.shadowOpacity = 1
-//                    }
                     
                     if let tbView = self.tabBarController?.tabBar {
                         tbView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
                         let shadowSize: CGFloat = 5
-                        let contactRect = CGRect(x: -shadowSize, y: -shadowSize, width: tbView.frame.width + shadowSize * 2, height: shadowSize)
+                        let contactRectTB = CGRect(x: -shadowSize, y: -shadowSize, width: tbView.frame.width + shadowSize * 2, height: shadowSize)
                         tbView.layer.shadowPath = UIBezierPath(rect: tbView.bounds).cgPath//contactRect).cgPath
                         tbView.layer.shadowRadius = 5
                         tbView.layer.shadowOffset = .zero
                         tbView.layer.zPosition = 100
                         CATransaction.begin()
-                        let anim = CABasicAnimation(keyPath: "shadowOpacity")
-                        anim.fromValue = 0
-                        anim.toValue = 1
-                        anim.duration = 0.5
-                        anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-                        anim.isRemovedOnCompletion = false
+                        self.buttonsContainer.layer.add(anim, forKey: "shadowOpacity")
                         tbView.layer.add(anim, forKey: "shadowOpacity")
                         CATransaction.commit()
                         tbView.layer.shadowOpacity = 1
+                        self.buttonsContainer.layer.shadowOpacity = 1
                     }
                 }
             }
@@ -253,33 +227,16 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         loadData()
         tabBarController?.tabBar.isUserInteractionEnabled = false
         tabBarController?.tabBar.tintColor = .lightGray
-//        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: K_COLOR_RED], for: .selected)
     }
-    
-//    override func viewWillDisappear(_ animated: Bool) {
-//        UIView.animate(withDuration: 0.2) {
-//            self.navigationItem.titleView?.alpha = 0
-//        }
-//    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if startingPoint == .zero, let rbtn = navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
                 startingPoint = rbtn.convert(rbtn.center, to: tabBarController?.view)
         }
         (navigationController as? NavigationControllerPreloaded)?.startingPoint = .zero
-        UIView.animate(withDuration: 0.2, animations: {
+        UIView.animate(withDuration: 0.2) {
             self.navigationItem.titleView?.alpha = 1
-        }) {
-            _ in
-//            if self.isDataLoaded {
-//                if let rbtn = self.navigationItem.rightBarButtonItem?.value(forKey: "view") as? UIView {
-//                    rbtn.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
-//                    UIView.animate(withDuration: 0.3) {
-//                        rbtn.transform = .identity
-//                        rbtn.alpha = 1w
-//                    }
-//                }
-//            }
         }
         if !isDataLoaded {
             loadingIndicator.alpha = 0
@@ -291,7 +248,6 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         delay(seconds: TimeIntervals.NetworkInactivity) {
             self.checkDataIsLoaded()
         }
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -305,9 +261,14 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                 })
             }
             tabBarController?.tabBar.isUserInteractionEnabled = true
-            tabBarController?.setTabBarVisible(visible: true, animated: true)
+            delay(seconds: 0.1) {
+                self.tabBarController?.setTabBarVisible(visible: true, animated: true)
+            }
         }
         
+        if let nav = navigationController as? NavigationControllerPreloaded {
+            nav.isShadowed = false
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -370,6 +331,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         
         addChild(self.newTableVC)
         newTableVC.delegate = self
+        newTableVC.view.backgroundColor = .white
         newTableVC.didMove(toParent: self)
 //        addChild(self.topTableVC)
 //        topTableVC.delegate = self
@@ -377,26 +339,25 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         addChild(self.surveyStackVC)
         surveyStackVC.delegate = self
         surveyStackVC.didMove(toParent: self)
-//        buttonsContainer.layer.shadowColor = UIColor.lightGray.cgColor
-//        let shadowSize: CGFloat = 5
-//        let contactRect = CGRect(x: -shadowSize, y: buttonsContainer.frame.height - (shadowSize * 0.4), width: buttonsContainer.frame.width + shadowSize * 2, height: shadowSize)
-//        buttonsContainer.layer.shadowPath = UIBezierPath(rect: contactRect).cgPath
-//        buttonsContainer.layer.shadowRadius = 5
-//        buttonsContainer.layer.shadowOffset = .zero
-//        buttonsContainer.layer.shadowOpacity = 0
-//        buttonsContainer.layer.zPosition = 100
+        
+        addChild(self.categoryVC)
+        categoryVC.delegate = self
+        categoryVC.didMove(toParent: self)
     }
     
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        (navigationController as? NavigationControllerPreloaded)?.delegate = nil
-        if segue.identifier == Segues.App.FeedToCategory, let destinationVC = segue.destination as? CategoryTableViewController {
-            if let cell = newTableVC.tableView.cellForRow(at: newTableVC.tableView.indexPathForSelectedRow!) as? SubcategoryTableViewCell {
-                destinationVC.category = cell.category
-                destinationVC.title = cell.category.title
-            }
+        let nc = navigationController as! NavigationControllerPreloaded
+        nc.transitionStyle = .Default
+        if segue.identifier == Segues.App.FeedToCategory, let destinationVC = segue.destination as? SubcategoryViewController, let category = sender as? SurveyCategory {
+            destinationVC.parentCategory = category
+            destinationVC.title = category.title
+            nc.category = category
+            nc.duration = 0.3
+            nc.transitionStyle = .Icon
+            destinationVC.delegate = self
+            tabBarController?.setTabBarVisible(visible: false, animated: true)
         } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? SurveyViewController {
-//            var cell: SurveyTableViewCell!
             switch currentIcon {
             case .New:
                 if let cell = newTableVC.tableView.cellForRow(at: newTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
@@ -408,16 +369,10 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
 //                    destinationVC.surveyLink = cell.survey
 //                    destinationVC.apiManager = apiManager
 //                }
-            default: //Hot
+            default:
                 print("s")
-//                if let sender = sender as? SurveyStackViewController {
-//                    destinationVC.apiManager = apiManager
-//                    destinationVC.survey = sender.surveyPreview.survey
-//                    destinationVC.delegate = sender
-//                }
             }
             tabBarController?.setTabBarVisible(visible: false, animated: true)
-            
         } else if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController, let sender = sender as? SurveyStackViewController {
             destinationVC.apiManager = apiManager
             destinationVC.needsImageLoading = false
@@ -425,13 +380,14 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             destinationVC.delegate = sender
             tabBarController?.setTabBarVisible(visible: false, animated: true)
         } else if segue.identifier == Segues.App.FeedToNewSurvey { //New survey
-            navigationController?.setNavigationBarHidden(true, animated: false)
+            nc.setNavigationBarHidden(true, animated: false)
             tabBarController?.setTabBarVisible(visible: false, animated: false)
             if let _sender = sender as? EmptySurvey {
-                (navigationController as? NavigationControllerPreloaded)?.startingPoint = _sender.startingPoint//.createButton.center//.convert(_sender.createButton.frame.origin, to: tabBarController?.view)
+                nc.startingPoint = _sender.startingPoint
             } else {
-                (navigationController as? NavigationControllerPreloaded)?.startingPoint = startingPoint
+                nc.startingPoint = startingPoint
             }
+            nc.transitionStyle = .Circular
         } else if segue.identifier == Segues.App.FeedToUser, let userProfile = sender as? UserProfile, let destinationVC = segue.destination as? UserViewController {
             destinationVC.userProfile = userProfile
             tabBarController?.setTabBarVisible(visible: false, animated: true)
@@ -539,9 +495,8 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             surveyStackVC.view.frame = container.frame
             newView = surveyStackVC.view
         case .Category:
-            print("")
-//        case .Unknown:
-//            print("")
+            categoryVC.view.frame = container.frame
+            newView = categoryVC.view
         default:
             print("default")
         }
@@ -602,6 +557,8 @@ extension SurveysViewController: CallbackDelegate {
                 self.loadingIndicator.alpha = 1
                 }
             }
+        } else if let category = sender as? SurveyCategory {//let dict = sender as? [String: Any], let startingPoint = dict["startingPoint"] as? CGPoint, let category = dict["category"] as? SurveyCategory, let size = dict["size"] as? CGSize {//if sender is SurveyCategory {
+            performSegue(withIdentifier: Segues.App.FeedToCategory, sender: sender)
         }
     }
 }

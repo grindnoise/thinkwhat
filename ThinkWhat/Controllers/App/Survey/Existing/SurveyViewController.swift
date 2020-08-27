@@ -98,7 +98,11 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                         cell.btn.backgroundColor = K_COLOR_RED
                     }
                 }
+                isAutoScrolling = true
                 navigationController?.setNavigationBarHidden(true, animated: true)
+                delay(seconds: 0.3) {
+                    self.isAutoScrolling = false
+                }
                 tableView.scrollToBottom()//scrollToRow(at: IndexPath(row: 0, section: 2), at: .bottom, animated: true)
                 for cell in answersCells {
                     if cell.answer!.ID != selectedAnswerID {
@@ -245,18 +249,25 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             if needsNavBarIconsAnimated {
                 showLikeButton()
             }
-            if let _ = survey?.userProfile?.image as? UIImage {
+            if survey?.userProfile?.image != nil {
                 showNavTitle()
             }
         } else {
             //Check if user has already answered
             isReadOnly = Surveys.shared.completedSurveyIDs.contains(surveyLink.ID)
         }
+        if let nav = navigationController as? NavigationControllerPreloaded {
+//            delay(seconds: 0.2) {
+                nav.isShadowed = true
+//            }
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-        (navigationController as! NavigationControllerPreloaded).isFadeTransition = false
+        if let nav = navigationController as? NavigationControllerPreloaded {
+            nav.transitionStyle = .Default
+        }
         tabBarController?.setTabBarVisible(visible: false, animated: true)
         
         claimButtonNeedsAnimation = true
@@ -265,7 +276,6 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             scrollArrow.isOpaque = false
             scrollArrow.alpha = 0
             scrollArrow.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.scrollToTop)))
-//            scrollArrow.transform = CGAffineTransform(rotationAngle: 90)
             navigationController?.view.addSubview(scrollArrow)
         }
     }
@@ -278,6 +288,9 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     override func viewWillDisappear(_ animated: Bool) {
         if delegate is SurveyStackViewController, isSurveyJustCompleted {
             delegate?.callbackReceived(survey!)
+        }
+        if let nav = navigationController as? NavigationControllerPreloaded {
+            nav.isShadowed = false
         }
     }
     
@@ -317,9 +330,39 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         if indexPath.section == 0 { //Params
             if indexPath.row == 0, let _cell = tableView.dequeueReusableCell(withIdentifier: "title", for: indexPath) as? SurveyTitleCell {
                 if survey != nil {
+                    let attrString = NSMutableAttributedString()
+                    attrString.append(NSAttributedString(string: "  \(survey!.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: "\(survey!.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    _cell.category.attributedText = attrString
+                    _cell.survey = surveyLink
                     _cell.label.text = survey!.title
+                    if let color = survey!.category.parent?.tagColor {
+                        _cell.category.backgroundColor = color//.withAlphaComponent(0.5)
+                        _cell.date.backgroundColor = color
+                        _cell.join.backgroundColor = color
+                        _cell.join_2.backgroundColor = color
+                        _cell.category.cornerRadius = _cell.category.frame.height / 2.5
+                        _cell.date.cornerRadius = _cell.date.frame.height / 2.5
+                    }
+                    _cell.date.attributedText = NSAttributedString(string: " \(survey!.startDate.toDateStringLiteral_dMMM())   ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
                 } else {
+                    let attrString = NSMutableAttributedString()
+                    attrString.append(NSAttributedString(string: "  \(surveyLink.category?.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: "\((surveyLink.category?.parent?.title.uppercased() ?? ""))  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
                     _cell.label.text = surveyLink.title
+                    _cell.survey = surveyLink
+                    _cell.label.text = survey!.title
+                    if let color = surveyLink.category?.parent?.tagColor {
+                        _cell.category.backgroundColor = color//.withAlphaComponent(0.5)
+                        _cell.date.backgroundColor = color
+                        _cell.join.backgroundColor = color
+                        _cell.join_2.backgroundColor = color
+                        _cell.category.cornerRadius = _cell.category.frame.height / 2.5
+                        _cell.date.cornerRadius = _cell.date.frame.height / 2.5
+                    }
+                    _cell.date.attributedText = NSAttributedString(string: " \(surveyLink.startDate.toDateStringLiteral_dMMM())   ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
                 }
                 cell = _cell
             } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "question", for: indexPath) as? SurveyQuestionCell {
@@ -580,7 +623,9 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 }
             }
         } else {
-            navigationController?.setNavigationBarHidden(false, animated: true)
+            if !isAutoScrolling {
+                navigationController?.setNavigationBarHidden(false, animated: true)
+            }
         }
         
         if scrollView.contentOffset.y <= 0  {//if (lastContentOffset - scrollView.contentOffset.y) > 160 {
@@ -730,7 +775,7 @@ extension SurveyViewController {
     fileprivate func animateHeartExpandingView() {
         if heartExpandingView == nil {
             heartExpandingView = HeartExpandingView(frame: CGRect(origin: .zero, size: .zero))
-            heartExpandingView!.layoutCentered(in: view, multiplier: 0.6)
+            heartExpandingView!.layoutCentered(in: view, multiplier: 0.4)
         }
         heartExpandingView?.addEnableAnimation()
     }
@@ -892,7 +937,10 @@ extension SurveyViewController: CallbackDelegate {
 extension SurveyViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == Segues.App.SurveyToClaim, let destination = segue.destination as? ClaimViewController {
-            (navigationController as! NavigationControllerPreloaded).isFadeTransition = true
+//            (navigationController as! NavigationControllerPreloaded).isFadeTransition = true
+            if let nc = navigationController as? NavigationControllerPreloaded {
+                nc.transitionStyle = .Default
+            }
             destination.delegate = self
             destination.topConstraintConstant = tempClaimMaxY
             needsNavBarIconsAnimated = false

@@ -28,9 +28,14 @@ class SurveysTableViewController: UITableViewController {
 //        }
 //    }
     enum SurveyTableType {
-        case New, Top, User, UserFavorite
+        case New, Top, User, UserFavorite, Category
     }
     
+    var category: SurveyCategory? {
+        didSet {
+            type = .Category
+        }
+    }
     var type: SurveyTableType = .New
     var delegate: UIViewController?
     public var needsAnimation = true
@@ -44,7 +49,7 @@ class SurveysTableViewController: UITableViewController {
 //            }
 //        }
 //    }
-    fileprivate var navTitle: UIImageView?
+    fileprivate var navTitle: UIView?
     var navTitleImage: UIImage?
     fileprivate var navTitleImageSize: CGSize = .zero
     fileprivate var lastContentOffset: CGFloat = 0
@@ -119,8 +124,19 @@ class SurveysTableViewController: UITableViewController {
                                                        object: nil)
             }
 //            tableView.refreshControl = nil
+        } else if type == .Category {
+//            NotificationCenter.default.addObserver(self,
+//                                                   selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
+//                                                   name: Notifications.UI.ProfileImageReceived,
+//                                                   object: nil)
+//            if needsAwaitForNotification {
+//                NotificationCenter.default.addObserver(self,
+//                                                       selector: #selector(SurveysTableViewController.updateTableView),
+//                                                       name: Notifications.Surveys.UserFavoriteSurveysUpdated,
+//                                                       object: nil)
+//            }
         }
-        
+    navigationItem.backBarButtonItem?.title = ""
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,9 +147,20 @@ class SurveysTableViewController: UITableViewController {
                 loadingIndicator.layoutCentered(in: view, multiplier: 0.6)//addEquallyTo(to: tableView)
                 loadingIndicator.addEnableAnimation()
                 isViewSetupCompleted = true
+                if let nav = navigationController as? NavigationControllerPreloaded {
+                    nav.isShadowed = true
+                }
+            } else if type == .Category {
+                if let nav = navigationController as? NavigationControllerPreloaded {
+                    nav.isShadowed = true
+                }
             }
         }
     }
+    
+//    override func viewDidAppear(_ animated: Bool) {
+//        navigationItem.backBarButtonItem?.title = ""//               = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
+//    }
     
     private func setupViews() {
         tableView.register(SurveysTableViewController.surveyNib, forCellReuseIdentifier: "topSurveyCell")
@@ -147,15 +174,25 @@ class SurveysTableViewController: UITableViewController {
             self.navigationController?.navigationBar.barTintColor    = .white
             self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         }
-        
+        navTitleImageSize = CGSize(width: 45, height: 45)
         if type == .User || type == .UserFavorite {
             navTitleImageSize = CGSize(width: 45, height: 45)
             navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
             if let _image = navTitleImage {
-                navTitle!.image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+                (navTitle! as! UIImageView).image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
             } else if let _image = UIImage(named: "user") {
-                navTitle!.image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+                (navTitle! as! UIImageView).image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
             }
+            navTitle!.isUserInteractionEnabled = false
+            navTitle!.clipsToBounds = false
+            navigationItem.titleView = navTitle
+        } else if type == .Category {
+            navTitleImageSize = CGSize(width: 45, height: 45)
+            let icon = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: navTitleImageSize))
+            icon.categoryID = SurveyCategoryIcon.CategoryID(rawValue: category!.ID) ?? .Null
+            icon.isOpaque = false
+            icon.tagColor = category?.parent?.tagColor ?? category?.tagColor
+            navTitle = icon
             navTitle!.isUserInteractionEnabled = false
             navTitle!.clipsToBounds = false
             navigationItem.titleView = navTitle
@@ -167,7 +204,7 @@ class SurveysTableViewController: UITableViewController {
             UIView.transition(with: navTitle!,
                               duration: 0.75,
                               options: .transitionCrossDissolve,
-                              animations: { self.navTitle!.image = image.circularImage(size: self.navTitleImageSize, frameColor: K_COLOR_RED) },
+                              animations: { (self.navTitle! as! UIImageView).image = image.circularImage(size: self.navTitleImageSize, frameColor: K_COLOR_RED) },
                               completion: nil)
         }
     }
@@ -209,6 +246,8 @@ class SurveysTableViewController: UITableViewController {
             } else {
                 return 0
             }
+        case .Category:
+            return Surveys.shared.allLinks.filter({ $0.category == self.category }).count
 //        default:
 //            print("default")
             //return Surveys.shared.topLinks.count
@@ -245,6 +284,8 @@ class SurveysTableViewController: UITableViewController {
                     dataSource = userProfile?.surveysCreated.values.first ?? []//userProfile!.surveysCreated
                 case .UserFavorite:
                     dataSource = userProfile?.surveysFavorite.values.first ?? []//userProfile!.surveysFavorite
+                case .Category:
+                    dataSource = Surveys.shared.allLinks.filter { $0.category == self.category }
                 default:
                     dataSource = Surveys.shared.topLinks
                 }
@@ -252,52 +293,25 @@ class SurveysTableViewController: UITableViewController {
 
                 cell.survey = survey
                 let attrString = NSMutableAttributedString()
-                attrString.append(NSAttributedString(string: "  \(survey.category!.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 10), foregroundColor: .white, backgroundColor: .clear)))
-                attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 10), foregroundColor: .white, backgroundColor: .clear)))
-                attrString.append(NSAttributedString(string: "\(survey.category!.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 10), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "  \(survey.category!.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "\(survey.category!.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
 //                attrString.append(NSAttributedString(string: " \(survey.category!.title.uppercased())", attributes: StringAttributes.Bold.red_11))
 //                attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.Regular.red_11))
 //                attrString.append(NSAttributedString(string: "\(survey.category!.parent!.title.uppercased()) ", attributes: StringAttributes.SemiBold.red_11))
                 cell.category.attributedText = attrString
                 cell.category.backgroundColor = .clear
+                cell.duration.backgroundColor = .clear
                 if let color = survey.category!.parent!.tagColor {
                     cell.category.backgroundColor = color//.withAlphaComponent(0.5)
+                    cell.duration.backgroundColor = color
                     cell.join.backgroundColor = color
+                    cell.join_2.backgroundColor = color
                     cell.category.cornerRadius = cell.category.frame.height / 2.5
+                    cell.duration.cornerRadius = cell.duration.frame.height / 2.5
                 }
                 cell.title.text = survey.title
-//                if !cell.isIconAdded {
-//                    if let icon = survey.category!.icon {
-//                        icon.isOpaque = false
-//                        icon.addEquallyTo(to: cell.icon)
-//                        cell.isIconAdded = true
-//                    }
-//                }
-//                if cell.icon.subviews.isEmpty, let icon = survey.category!.icon {
-//                    icon.frame = cell.icon.frame
-//                    cell.icon = icon
-//                }
-//                if cell.icon.subviews.isEmpty, let icon = survey.category!.icon {
-//                    icon.isOpaque = false
-//                    icon.addEquallyTo(to: cell.icon)
-//                } else if let currentIcon = cell.icon.subviews.first as? SurveyCategoryIcon, currentIcon.ID != survey.category!.ID, let icon = survey.category!.icon {
-//                    (currentIcon as! UIView).removeFromSuperview()
-//                    icon.isOpaque = false
-//                    icon.addEquallyTo(to: cell.icon)
-//                }
-//                cell.icon.subviews.map {
-//                    $0.removeFromSuperview()
-//                }
-//                if let icon = dataSource[indexPath.row].category!.icon {
-//                    icon.isOpaque = false
-//                    icon.addEquallyTo(to: cell.icon)
-//                }
-                cell.duration.text = "\(dataSource[indexPath.row].startDate.toDateTimeStringLiteral_ddMMMM())"
-//                if (indexPath.row % 2 == 0) {
-//                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
-//                } else {
-//                    cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
-//                }
+                cell.duration.attributedText = NSAttributedString(string: " \(dataSource[indexPath.row].startDate.toDateStringLiteral_dMMM())   ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
                 return cell
             }
 //        }
@@ -334,6 +348,8 @@ class SurveysTableViewController: UITableViewController {
             }
         } else if type == .UserFavorite || type == .User {
             loadSurveys()
+        } else if type == .Category {
+            fatalError("TODO: refresh")
         }
 //        updateSurveys(type: vc.currentIcon == .New ? .New : .Top)
     }

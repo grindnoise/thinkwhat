@@ -198,6 +198,7 @@ struct Notifications {
     
     struct UI {
         static let ClaimSignAppeared               = Notification.Name("ClaimSignAppeared")
+        static let CategorySelected                = Notification.Name("CategorySelected")
         static let UserImageChanged                = Notification.Name("NotificationUserImageChanged")
         static let ProfileImageReceived            = Notification.Name("NotificationProfileImageReceived")
         
@@ -255,6 +256,7 @@ struct Segues {
         static let SurveyToClaim            = "SURVEY_TO_CLAIM"
         static let UserToUserSurveys        = "USER_TO_USER_SURVEYS"
         static let UserToUserFavoriteSurveys = "USER_TO_FAVORITE_USER_SURVEYS"
+        static let CategoryToSurveys        = "CATEGORY_TO_SURVEYS"
     }
 }
 ////MARK: Auth
@@ -903,6 +905,7 @@ struct StringAttributes {
         stringAttrs[NSAttributedString.Key.font]            = font
         stringAttrs[NSAttributedString.Key.foregroundColor] = foregroundColor
         stringAttrs[NSAttributedString.Key.backgroundColor] = backgroundColor
+//        stringAttrs[NSAttributedString.Key.] = backgroundColor
         
         return stringAttrs
     }

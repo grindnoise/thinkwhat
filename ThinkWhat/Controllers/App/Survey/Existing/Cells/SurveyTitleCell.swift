@@ -10,7 +10,18 @@ import UIKit
 
 class SurveyTitleCell: UITableViewCell {
 
+    @IBOutlet weak var icon: SurveyCategoryIcon!
+    @IBOutlet weak var category: UILabel!
+    @IBOutlet weak var date: UILabel!
     @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var join: UIView!
+    @IBOutlet weak var join_2: UIView!
+    var survey: ShortSurvey! {
+        didSet {
+            icon.tagColor = survey.category?.parent?.tagColor
+            icon.categoryID = SurveyCategoryIcon.CategoryID(rawValue: survey.category!.ID) ?? .Null
+        }
+    }
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

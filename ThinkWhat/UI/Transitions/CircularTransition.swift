@@ -329,18 +329,4 @@ extension CircularTransition: CAAnimationDelegate {
     }
 }
 
-class TransitionCoordinator: NSObject, UINavigationControllerDelegate {
-    func navigationController(_ navigationController: UINavigationController,
-                              animationControllerFor operation: UINavigationController.Operation,
-                              from fromVC: UIViewController,
-                              to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        if let nc = navigationController as? NavigationControllerPreloaded {
-            if nc.isFadeTransition {
-                return FadeTransition(nc, operation)
-            } else if nc.startingPoint != .zero {
-                return CircularTransition(nc, operation, nc.startingPoint)
-            }
-        }
-        return nil
-    }
-}
+
