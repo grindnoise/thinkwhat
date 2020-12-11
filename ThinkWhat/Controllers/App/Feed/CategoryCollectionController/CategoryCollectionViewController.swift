@@ -18,10 +18,13 @@ class CategoryCollectionViewController: UICollectionViewController {
     var categories: [SurveyCategory]!
     fileprivate var parentMode = false
     fileprivate var needsAnimation = true
+//    fileprivate var effectView: AnimatedVisualEffectView!
+    let effectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
     weak var delegate: CallbackDelegate?
     var currentIndex: IndexPath = IndexPath(row: 0, section: 0)
     var childColor: UIColor?
     var returnPos: CGPoint = .zero
+    var selectionMode = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,13 +33,36 @@ class CategoryCollectionViewController: UICollectionViewController {
             parentMode = true
             categories = SurveyCategories.shared.categories.filter { $0.parent == nil }.sorted { $0.total > $1.total }
         }
+        effectView.frame = collectionView.bounds
+        effectView.addEquallyTo(to: collectionView)
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0, delay: 0, options: [], animations: {
+            self.effectView.effect = nil
+        }) {
+            _ in
+            self.effectView.alpha = 0
+        }
+        
+//        animator = UIViewPropertyAnimator(duration: 1, curve: .linear) {
+//            // this is the main trick, animating between a blur effect and nil is how you can manipulate blur radius
+//            self.effectView.effect = nil
+//        }
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         collectionView.backgroundColor = .white
+        needsAnimation = true
+//        effectView = AnimatedVisualEffectView(duration: 0.5, curve: .linear)//, effect: UIBlurEffect(style: .light))
+//        effectView.beginAnimator = UIViewPropertyAnimator(duration: 0.5, curve: .linear) { self.effectView.effect = nil }
+//        effectView.beginAnimator.startAnimation()
+//        effectView.beginAnimator.pauseAnimation()
+//        effectView.frame = collectionView.bounds
+//        effectView.addEquallyTo(to: collectionView)
+//        effectView.alpha = 0
     }
-
+    
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -45,17 +71,21 @@ class CategoryCollectionViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return categories.count
     }
-
+    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? CategoryCollectionViewCell {
             if let category = categories[indexPath.row] as? SurveyCategory {
                 cell.childColor = childColor
                 cell.category = category
+                cell.total.alpha = selectionMode ? 0 : 1
+                if selectionMode, (category.parent != nil || category.hasNoChildren) {
+                    cell.selectionMode = true
+                }
             }
-//            if parentMode {
-//                cell.layer.cornerRadius = cell.frame.width / 8
-//                cell.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-//                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.frame.width / 8).cgPath//(rect: cell.bounds).cgPath
+            //            if parentMode {
+            //                cell.layer.cornerRadius = cell.frame.width / 8
+            //                cell.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            //                cell.layer.shadowPath = UIBezierPath(roundedRect: cell.bounds, cornerRadius: cell.frame.width / 8).cgPath//(rect: cell.bounds).cgPath
 //                cell.layer.shadowRadius = 4
 //                cell.layer.shadowOffset = .zero
 //                cell.layer.shadowOpacity = 1
@@ -67,12 +97,13 @@ class CategoryCollectionViewController: UICollectionViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if !parentMode && needsAnimation {
+//        if !parentMode && needsAnimation {
+        if needsAnimation {
             cell.alpha = 0
             cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             UIView.animate(
                 withDuration: 0.6,
-                delay: (Double(arc4random_uniform(7)) * 0.01) * Double(arc4random_uniform(9)),//Double(indexPath.row),
+                delay: (Double(arc4random_uniform(6)) * 0.01) * Double(arc4random_uniform(5)),//Double(indexPath.row),
                 usingSpringWithDamping: 0.6,
                 initialSpringVelocity: 1.1,
                 options: [.curveEaseOut],
@@ -90,9 +121,71 @@ class CategoryCollectionViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let cell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell, let category = cell.category {
             currentIndex = indexPath
-            delegate?.callbackReceived(category)
-        }
+            if let cell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell, let category = cell.category, category.parent == nil, selectionMode  {
+                if category.hasNoChildren {
+                    //Subcategory
+                    delegate?.callbackReceived(category)
+                } else {
+                    //Parent category
+//                    let icon = SurveyCategoryIcon(frame: cell.icon.frame)
+//                    icon.isOpaque = false
+//                    icon.center = cell.convert(cell.icon.center, to: view)
+//                    icon.tagColor = cell.icon.tagColor
+//                    icon.categoryID = cell.icon.categoryID
+//
+//                    collectionView.addSubview(icon)
+////                    cell.icon.alpha = 0
+                    
+                    view.isUserInteractionEnabled = false
+                    self.effectView.alpha = 1
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.12, delay: 0, options: [.curveLinear], animations: {
+                        self.effectView.effect = UIBlurEffect(style: .prominent)
+                        self.collectionView.alpha = 0
+                    }) {
+                        _ in
+                        DispatchQueue.main.async {
+                            self.delegate?.callbackReceived(category)
+                        }
+                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.19, delay: 0, options: [.curveLinear], animations: {
+                            self.effectView.effect = nil
+                            self.collectionView.alpha = 1
+                        }) {
+                            _ in
+                            self.effectView.alpha = 0
+                            self.view.isUserInteractionEnabled = true
+                        }
+                    }
+                }
+            } else {
+                //Subcategory
+                delegate?.callbackReceived(category)
+            }
+        } 
     }
+    
+//    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+//        if let cell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell, let category = cell.category, category.parent == nil {
+//            if selectionMode {
+//                let icon = SurveyCategoryIcon(frame: cell.icon.frame)
+//                icon.isOpaque = false
+//                icon.center = cell.convert(cell.icon.center, to: view)
+//                icon.tagColor = cell.icon.tagColor
+//                icon.categoryID = cell.icon.categoryID
+//                collectionView.addSubview(icon)
+//                cell.icon.alpha = 0
+//                UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseOut], animations: {
+//                    icon.transform = CGAffineTransform(scaleX: 1.6, y: 1.6)
+//                    icon.alpha = 0
+//                }) {
+//                    _ in
+//                    icon.removeFromSuperview()
+//                    cell.icon.alpha = 1
+//                }
+//            }
+//            //                category.pointInParentView = cell.convert(cell.icon.center, to: view)
+//        }
+//        return true
+//    }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView.contentOffset.y < 0 {

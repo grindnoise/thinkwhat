@@ -108,7 +108,12 @@ class Surveys {
                 }
                 NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
             } else if i.0 == "own" {
-                ownLinks.removeAll()
+                var isFirstLoad = false
+                if ownLinks.isEmpty {
+                    isFirstLoad = true
+                } else {
+                    ownLinks.removeAll()
+                }
                 if !i.1.isEmpty {
                     for k in i.1 {
                         if let survey = ShortSurvey(k.1) {
@@ -117,7 +122,7 @@ class Surveys {
                         }
                     }
                 }
-                NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
+                NotificationCenter.default.post(name: isFirstLoad ? Notifications.Surveys.OwnSurveysReceived : Notifications.Surveys.OwnSurveysUpdated, object: nil)
             } else if i.0 == "favorite" {
                 favoriteLinks.removeAll()
                 if !i.1.isEmpty {

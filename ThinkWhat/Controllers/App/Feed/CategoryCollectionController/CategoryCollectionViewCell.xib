@@ -45,7 +45,7 @@
                     </label>
                 </subviews>
             </view>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="Hbk-PG-lQe" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="05j-4d-VuV"/>
                 <constraint firstItem="vtO-Rz-aCP" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="6" id="7bU-2u-1Wb"/>
@@ -59,6 +59,11 @@
             </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="100" height="130"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                    <real key="value" value="10"/>
+                </userDefinedRuntimeAttribute>
+            </userDefinedRuntimeAttributes>
             <connections>
                 <outlet property="icon" destination="Hbk-PG-lQe" id="8RO-oJ-W1t"/>
                 <outlet property="title" destination="0LY-59-bgI" id="xDQ-Y1-BGc"/>

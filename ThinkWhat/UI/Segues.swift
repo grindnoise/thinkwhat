@@ -71,7 +71,7 @@ class SegueFromTop: UIStoryboardSegue {
                        delay: 0.0,
                        options: .curveEaseInOut,
                        animations: {
-//                        foregroundView.alpha = 0
+                        //                        foregroundView.alpha = 0
                         backgroundView.frame.origin = src.view.frame.origin
                         dst.view.alpha = 1
                         dst.view.frame.origin = src.view.frame.origin

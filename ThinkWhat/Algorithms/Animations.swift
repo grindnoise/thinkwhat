@@ -100,7 +100,7 @@ func animateImageChange(annotationView: MKAnnotationView, fromImage: UIImage, to
     
 }
 
-func animateTransformScale(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, repeatCount: Float, autoreverses: Bool, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String) -> CABasicAnimation {
+func animateTransformScale(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, repeatCount: Float, autoreverses: Bool, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String, delegate: CAAnimationDelegate?) -> CABasicAnimation {
     
     let anim = CABasicAnimation(keyPath:"transform.scale")
     anim.fromValue = fromValue
@@ -108,6 +108,9 @@ func animateTransformScale(fromValue: CGFloat, toValue: CGFloat, duration: CFTim
     anim.duration = duration
     anim.repeatCount = repeatCount
     anim.autoreverses = autoreverses
+    if delegate != nil {
+        anim.delegate = delegate!
+    }
     anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: timingFunction))
     
     return anim
@@ -124,3 +127,70 @@ func animateTransformScale(fromValue: CGFloat, toValue: CGFloat) -> CABasicAnima
 }
 
 
+//class CustomIntensityVisualEffectView: UIVisualEffectView {
+//
+////    fileprivate let _duration: TimeInterval
+////    fileprivate let _intensity: CGFloat
+////    fileprivate let _effect: UIVisualEffect
+//    let animator: UIViewPropertyAnimator
+//    /// Create visual effect view with given effect and its intensity
+//    ///
+//    /// - Parameters:
+//    ///   - effect: visual effect, eg UIBlurEffect(style: .dark)
+//    ///   - intensity: custom intensity from 0.0 (no effect) to 1.0 (full effect) using linear scale
+//    var delegate: CallbackDelegate?
+//
+//    init(effect: UIVisualEffect, duration: TimeInterval, intensity: CGFloat) {
+////        _effect = effect
+////        _duration = duration
+////        _intensity = intensity
+//        animator = UIViewPropertyAnimator(duration: duration, curve: .linear)
+//        super.init(effect: nil)
+//
+////        animator = UIViewPropertyAnimator(duration: duration, curve: .linear)// { [unowned self] in self.effect = effect }
+////        animator.fractionComplete = intensity
+//    }
+//
+//    required init?(coder aDecoder: NSCoder) {
+//        fatalError()
+//    }
+//
+//
+//
+//    // MARK: Private
+////    private var animator: UIViewPropertyAnimator!
+//
+//}
+//
+//import UIKit
+
+class AnimatedVisualEffectView: UIVisualEffectView {
+    
+//    fileprivate var _effect: UIVisualEffect
+    var beginAnimator: UIViewPropertyAnimator!
+    let endAnimator: UIViewPropertyAnimator
+    
+    init(duration: TimeInterval, curve _curve: UIView.AnimationCurve) {
+//        beginAnimator = UIViewPropertyAnimator(duration: duration, curve: _curve)
+        endAnimator   = UIViewPropertyAnimator(duration: duration, curve: _curve)//, effect _effect: UIVisualEffect)
+//        _effect = _effect
+        
+        super.init(effect: UIBlurEffect(style: .light))
+        effect = UIBlurEffect(style: .light)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError()
+    }
+    
+//
+//    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+//        // Get the hit view we would normally get with a standard UIView
+//        let hitView = super.hitTest(point, with: event)
+//
+//        // If the hit view was ourself (meaning no subview was touched),
+//        // return nil instead. Otherwise, return hitView, which must be a subview.
+//        return hitView == self ? nil : hitView
+//    }
+    
+}

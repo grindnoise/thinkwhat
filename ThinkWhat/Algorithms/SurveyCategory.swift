@@ -31,6 +31,8 @@ class SurveyCategories {
                             array.append(subCategory)
                         }
                     }
+                } else {
+                    category.hasNoChildren = true
                 }
                 let entry:[String: [SurveyCategory]] = [category.title: array]
                 tree.append(entry)
@@ -83,9 +85,11 @@ class SurveyCategory {
     var tagColor: UIColor?
     var total: Int = 0
     var active: Int = 0
+    var hasNoChildren = false
     var hashValue: Int {
         return ObjectIdentifier(self).hashValue
     }
+//    var pointInParentView: CGPoint = .zero
 //    var icon: UIView!
     
     init?(_ json: JSON, _ _parent: SurveyCategory? = nil) {
@@ -99,7 +103,11 @@ class SurveyCategory {
             dateCreated             = _dateCreated
             ageRestriction          = _ageRestriction
             parent                  = _parent
-            tagColor                = _tagColor.hexColor
+            if _parent != nil {
+                tagColor            = parent!.tagColor
+            } else {
+                tagColor            = _tagColor.hexColor
+            }
 //            if let _icon = SurveyCategoryIcons.shared.container[ID] as? UIView {
 //                icon = _icon
 //            } else {

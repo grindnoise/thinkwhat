@@ -190,6 +190,7 @@ struct Notifications {
         static let SurveysStackReceived            = Notification.Name("NotificationSurveysStackReceived")
         static let SurveysStackUpdated             = Notification.Name("NotificationSurveysStackUpdated")
         static let OwnSurveysUpdated               = Notification.Name("NotificationOwnSurveysUpdated")
+        static let OwnSurveysReceived              = Notification.Name("NotificationOwnSurveysReceived")
         static let SurveysByCategoryUpdated        = Notification.Name("NotificationSurveysByCategoryUpdated")
         static let FavoriteSurveysUpdated          = Notification.Name("NotificationFavoriteSurveysUpdated")
         static let UserSurveysUpdated              = Notification.Name("NotificationUserSurveysUpdated")
@@ -241,22 +242,27 @@ struct Segues {
     }
     
     struct App {
-        static let ProfileToSettingsSelection = "PROFILE_SETINGS_SELECTION"
-        static let ProfileToInfo            = "INFO"
-        static let Logout                   = "BACK_TO_AUTH"
-        static let FeedToSurveyFromTop      = "FEED_TO_SURVEY_FROM_TOP"
-        static let FeedToSurvey             = "FEED_TO_SURVEY"
-        static let FeedToNewSurvey          = "FEED_TO_NEW_SURVEY"
-        static let FeedToUser               = "FEED_TO_USER"
-        static let FeedToCategory           = "FEED_TO_CATEGORY"
-        static let UserSurveysToSurvey      = "USER_SURVEYS_TO_SURVEY"
-        static let NewSurveyToAnonymity     = "NEW_TO_ANONYMITY"
-        static let NewSurveyToCategorySelection = "NEW_TO_CATEGORY_SELECTION"
-        static let SurveyToUser             = "SURVEY_TO_USER"
-        static let SurveyToClaim            = "SURVEY_TO_CLAIM"
-        static let UserToUserSurveys        = "USER_TO_USER_SURVEYS"
-        static let UserToUserFavoriteSurveys = "USER_TO_FAVORITE_USER_SURVEYS"
-        static let CategoryToSurveys        = "CATEGORY_TO_SURVEYS"
+        static let ProfileToSettingsSelection           = "PROFILE_SETINGS_SELECTION"
+        static let ProfileToInfo                        = "INFO"
+        static let Logout                               = "BACK_TO_AUTH"
+        static let FeedToSurveyFromTop                  = "FEED_TO_SURVEY_FROM_TOP"
+        static let FeedToSurvey                         = "FEED_TO_SURVEY"
+        static let FeedToNewSurvey                      = "FEED_TO_NEW_SURVEY"
+        static let FeedToUser                           = "FEED_TO_USER"
+        static let FeedToCategory                       = "FEED_TO_CATEGORY"
+        static let UserSurveysToSurvey                  = "USER_SURVEYS_TO_SURVEY"
+        static let UserSurveysToNewSurvey               = "OWN_TO_NEW_SURVEY"
+        static let NewSurveyToAnonymity                 = "NEW_TO_ANONYMITY"
+        static let NewSurveyToCategorySelection         = "NEW_TO_CATEGORY_SELECTION"
+        static let NewSurveyToAnonimitySelection        = "NEW_TO_ANONIMITY_SELECTION"
+        static let NewSurveyToPrivacySelection          = "NEW_TO_PRIVACY_SELECTION"
+        static let NewSurveyToTypingViewController      = "NEW_TO_TYPE"
+        static let NewSurveyToVotesCountViewController  = "NEW_TO_VOTES_COUNT"
+        static let SurveyToUser                         = "SURVEY_TO_USER"
+        static let SurveyToClaim                        = "SURVEY_TO_CLAIM"
+        static let UserToUserSurveys                    = "USER_TO_USER_SURVEYS"
+        static let UserToUserFavoriteSurveys            = "USER_TO_FAVORITE_USER_SURVEYS"
+        static let CategoryToSurveys                    = "CATEGORY_TO_SURVEYS"
     }
 }
 ////MARK: Auth
@@ -313,11 +319,29 @@ struct Storyboards {
 //let segueWelcomeBarber                          = "segueWelcomeBarber"
 //let segueClientSettingsPicker                   = "segueClientSettingsPicker"
 let alert                                       = CustomAlertView(frame: (UIApplication.shared.keyWindow?.frame)!)
-let K_COLOR_RED                                 = UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)//UIColor(red:0.805, green: 0.342, blue:0.339, alpha:1)
+let K_COLOR_RED                                 = UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)//C03E45 English Vermillion//UIColor(red:0.805, green: 0.342, blue:0.339, alpha:1)
 let K_COLOR_GRAY                                = UIColor(red:0.574, green: 0.574, blue:0.574, alpha:1)
-let K_COLOR_TABBAR                              = UIColor(red:0.592, green: 0.46, blue:0.574, alpha:1)
+let K_COLOR_TABBAR                              = UIColor(red: 0.416, green: 0.400, blue: 0.639, alpha: 1.000)//UIColor(red: 0.227, green: 0.337, blue: 0.514, alpha: 1.000)//UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)//UIColor(red: 0.035, green: 0.016, blue: 0.275, alpha: 1.000)//UIColor(red: 0.157, green: 0.188, blue: 0.267, alpha: 1.000)//283044 Space Cadet//UIColor(red:0.592, green: 0.46, blue:0.574, alpha:1)
 let K_COLOR_CONTAINER_BG                        = UIColor(red: 0.910, green: 0.929, blue: 0.929, alpha: 1.000)
 //let K_COLOR_TABBAR_INACTIVE                     = UIColor(red:0.636, green: 0.636, blue:0.636, alpha:1)
+let K_COLOR_PEACH                               = UIColor(red: 0.910, green: 0.929, blue: 0.929, alpha: 1.000)
+let K_COLOR_XANADU                              = UIColor(red: 0.482, green: 0.533, blue: 0.435, alpha: 1.000)
+let K_COLOR_TUMBLEWEED                          = UIColor(red: 0.945, green: 0.671, blue: 0.525, alpha: 1.000)
+let K_COLOR_SPACE_CADET                         = UIColor(red: 0.157, green: 0.188, blue: 0.267, alpha: 1.000)
+let K_COLOR_INDIAN_YELLOW                       = UIColor(red: 0.859, green: 0.616, blue: 0.278, alpha: 1.000)
+let K_COLOR_DARK_RURPLE                         = UIColor(red: 0.161, green: 0.024, blue: 0.157, alpha: 1.000)
+
+struct Colors {
+    struct UpperButtons {
+        static let VioletBlueCrayola = UIColor(hexString: "#7776BC")
+        static let Avocado           = UIColor(hexString: "#5C8001")
+        static let HoneyYellow       = UIColor(hexString: "#FBB02D")
+        static let MaximumRed        = UIColor(hexString: "#DD1C1A")
+    }
+    static let CadetBlue        = UIColor(hexString: "#699999")
+    static let RussianViolet    = UIColor(hexString: "#1F2143")
+}
+
 let options: UNAuthorizationOptions             = [.alert, .sound, .badge]
 
 //HTTP request attempts before assertion
@@ -852,6 +876,14 @@ func daysBetweenDate(startDate: Date, endDate: Date) -> Int {
     let calendar = Calendar.current
     let components = calendar.dateComponents([.day], from: startDate, to: endDate)
     return components.day!
+}
+
+func CGPointDistanceSquared(from: CGPoint, to: CGPoint) -> CGFloat {
+    return (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
+}
+
+func CGPointDistance(from: CGPoint, to: CGPoint) -> CGFloat {
+    return sqrt(CGPointDistanceSquared(from: from, to: to))
 }
 
 func loadImageFromPath(path: String) -> UIImage? {

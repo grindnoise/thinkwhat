@@ -22,10 +22,26 @@ class CategoryCollectionViewCell: UICollectionViewCell {
             total.attributedText = NSAttributedString(string: "\(category.total)", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .lightGray, backgroundColor: .clear))
         }
     }
+    var selectionMode = false
+    
+    override var isSelected: Bool {
+        didSet {
+            if selectionMode {
+                UIView.animate(withDuration: 0.12) {
+                    self.contentView.backgroundColor = self.isSelected ? self.category.tagColor?.withAlphaComponent(0.2) ?? K_COLOR_RED.withAlphaComponent(0.2) : .white
+                }
+                if isSelected {
+                    let anim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.12, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut.rawValue,  delegate: nil)
+                    layer.add(anim, forKey: nil)
+                }
+            }
+        }
+    }
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
     }
 
+    
 }

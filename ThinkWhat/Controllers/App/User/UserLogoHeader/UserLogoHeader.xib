@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
-        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -55,16 +54,15 @@
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="2XT-yG-Huj" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="9zH-8c-kio"/>
+                <constraint firstItem="2XT-yG-Huj" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="9zH-8c-kio"/>
                 <constraint firstItem="2XT-yG-Huj" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="18:30" id="EQi-U4-HLG"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="KTp-yR-4E2" secondAttribute="trailing" id="K7E-Fs-Iaz"/>
-                <constraint firstItem="2XT-yG-Huj" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="Zl0-10-0od"/>
+                <constraint firstAttribute="trailing" secondItem="KTp-yR-4E2" secondAttribute="trailing" id="K7E-Fs-Iaz"/>
+                <constraint firstItem="2XT-yG-Huj" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="Zl0-10-0od"/>
                 <constraint firstAttribute="bottom" secondItem="KTp-yR-4E2" secondAttribute="bottom" id="aHR-Q4-yH1"/>
                 <constraint firstItem="KTp-yR-4E2" firstAttribute="top" secondItem="2XT-yG-Huj" secondAttribute="bottom" id="mWA-Ob-TjN"/>
-                <constraint firstItem="KTp-yR-4E2" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="mjB-93-Rpw"/>
+                <constraint firstItem="KTp-yR-4E2" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="mjB-93-Rpw"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <point key="canvasLocation" x="137.59999999999999" y="142.1289355322339"/>
         </view>
     </objects>

@@ -106,10 +106,7 @@ class TextEditingView: UIView, CAAnimationDelegate {
 //        title = _title
         constantTitle = NSMutableAttributedString(string: _title, attributes: boldAttrs)
         textView = _textView
-//        text.delegate = self
         text.delegate = self
-//        label.text = title
-//        title = _title
         closure = _closure
         placeholder = _placeholder
         firstAppearance = true

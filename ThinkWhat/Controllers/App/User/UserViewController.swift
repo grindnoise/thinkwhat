@@ -146,7 +146,8 @@ class UserViewController: UIViewController, ServerProtocol {
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == Segues.App.UserToUserSurveys || segue.identifier == Segues.App.UserToUserFavoriteSurveys, let destinationVC = segue.destination as? SurveysTableViewController {
+        if segue.identifier == Segues.App.UserToUserSurveys || segue.identifier == Segues.App.UserToUserFavoriteSurveys, let destinationVC = segue.destination as? SurveysTableViewController, let nav = navigationController as? NavigationControllerPreloaded {
+            nav.transitionStyle = .Default
             if segue.identifier == Segues.App.UserToUserSurveys {
                 destinationVC.type = .User
             } else if segue.identifier == Segues.App.UserToUserFavoriteSurveys {

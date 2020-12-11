@@ -10,6 +10,7 @@ import UIKit
 
 class SurveyTitleCell: UITableViewCell {
 
+    @IBOutlet weak var iconContainer: UIView!
     @IBOutlet weak var icon: SurveyCategoryIcon!
     @IBOutlet weak var category: UILabel!
     @IBOutlet weak var date: UILabel!

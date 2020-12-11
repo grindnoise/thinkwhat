@@ -22,6 +22,8 @@ class SurveyStackViewController: UIViewController {
     fileprivate lazy var loadingView: EmptySurvey = self.createLoadingView()
     fileprivate var previewSurveys: [FullSurvey] = []
     fileprivate var isRequestingStack = false
+    fileprivate var surveyPreviewInitialRect = CGRect.zero
+    fileprivate var surveyPreviewCurrentCenter = CGPoint.zero
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,14 +94,16 @@ class SurveyStackViewController: UIViewController {
                 if previewSurveys.filter({ $0.hashValue == survey.hashValue }).isEmpty {
                     previewSurveys.append(survey)
                 }
-                let multiplier: CGFloat = 0.93
-                var _rect = CGRect.zero
-                if tabBarController!.tabBar.isHidden {
-                    _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier - tabBarController!.tabBar.frame.height))
-                } else {
-                    _rect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier))
+                if surveyPreviewInitialRect == .zero {
+                    let multiplier: CGFloat = 0.93
+                    if tabBarController!.tabBar.isHidden {
+                        surveyPreviewInitialRect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier - tabBarController!.tabBar.frame.height))
+                    } else {
+                        surveyPreviewInitialRect = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier))
+                    }
                 }
-                let _surveyPreview = SurveyPreview(frame: _rect, survey: survey, delegate: self)
+                
+                let _surveyPreview = SurveyPreview(frame: surveyPreviewInitialRect, survey: survey, delegate: self)//SurveyPreview(frame: _rect, survey: survey, delegate: self)
                 _surveyPreview.setNeedsLayout()
                 _surveyPreview.layoutIfNeeded()
                 _surveyPreview.voteButton.layer.cornerRadius = _surveyPreview.voteButton.frame.height / 2
@@ -192,11 +196,15 @@ class SurveyStackViewController: UIViewController {
                     self.removePreview.center.x -= self.view.frame.width
                     self.removePreview.transform = self.removePreview.transform.scaledBy(x: 0.85, y: 0.85)
                 }
+                
                 _surveyPreview!.transform  = .identity
-                _surveyPreview!.center = self.view.center
-                if self.tabBarController!.tabBar.isHidden {
-                    _surveyPreview!.center.y -= self.tabBarController!.tabBar.frame.height
+                if self.surveyPreviewCurrentCenter == .zero {
+                    self.surveyPreviewCurrentCenter = self.view.center
+                    if self.tabBarController!.tabBar.isHidden {
+                        self.surveyPreviewCurrentCenter.y -= self.tabBarController!.tabBar.frame.height
+                    }
                 }
+                _surveyPreview!.center = self.surveyPreviewCurrentCenter
             }) {
                 _ in
                 self.surveyPreview = _surveyPreview
@@ -219,31 +227,6 @@ class SurveyStackViewController: UIViewController {
                 completed in
                 nextFrame()
             }
-
-//            UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
-//                if self.removePreview != nil {
-//                    self.removePreview.alpha = 0
-//                    self.removePreview.voteButton.backgroundColor = K_COLOR_GRAY
-//                    self.removePreview.nextButton.tintColor = K_COLOR_GRAY
-//                    self.removePreview.center.x -= self.view.frame.width
-//                    self.removePreview.transform = self.removePreview.transform.scaledBy(x: 0.85, y: 0.85)
-//                }
-//                //            _surveyPreview.alpha = 1
-//                _surveyPreview!.transform  = .identity
-//                _surveyPreview!.center = self.view.center
-//            }) {
-//                _ in
-//                self.surveyPreview = _surveyPreview
-//                if self.removePreview != nil {
-//                    self.removePreview.removeFromSuperview()
-//                }
-//
-//                if let _nextPreview = self.createSurveyPreview() {
-//                    self.nextPreview = _nextPreview
-//                } else {
-//                    self.nextPreview = nil
-//                }
-//            }
         } else {
             //Start timer
             

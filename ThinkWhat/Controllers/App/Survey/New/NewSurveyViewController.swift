@@ -204,6 +204,22 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
             tableView.dragDelegate = self
             tableView.dropDelegate = self
         }
+        tableView.backgroundColor = .clear
+        
+        let lightBlurView = UIVisualEffectView(frame: tableView.frame)
+        lightBlurView.effect = UIBlurEffect(style: .extraLight)
+        let bgView = UIView(frame: tableView.frame)
+        bgView.backgroundColor = .white
+        let pic = Megaphone(frame: CGRect(origin: .zero, size: CGSize(width: 100, height: 100)))
+        pic.isOpaque = false
+        pic.alpha = 1
+        pic.layoutCentered(in: bgView, multiplier: 0.7)
+        lightBlurView.alpha = 1
+        lightBlurView.addEquallyTo(to: bgView)
+        
+        
+        
+        tableView.backgroundView = bgView
     }
     
     private func setupViews() {
@@ -214,8 +230,8 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
             self.navigationController?.isNavigationBarHidden         = false
             self.navigationController?.navigationBar.barTintColor    = .white
             self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-            self.navigationItem.setHidesBackButton(true, animated: false)
-            self.navigationController?.setNavigationBarHidden(true, animated: false)
+//            self.navigationItem.setHidesBackButton(true, animated: false)
+//            self.navigationController?.setNavigationBarHidden(true, animated: false)
             self.createButton.backgroundColor = K_COLOR_GRAY
         }
 
@@ -238,7 +254,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        navigationController?.setNavigationBarHidden(false, animated: true)
+//        navigationController?.setNavigationBarHidden(false, animated: true)
         if (navigationController as! NavigationControllerPreloaded).delegate == nil {
             (navigationController as! NavigationControllerPreloaded).delegate = appDelegate.transitionCoordinator//TransitionCoordinator()
         }
@@ -1069,8 +1085,8 @@ extension NewSurveyViewController {
             destinationVC.delegate = self
             destinationVC.anonymity = anonymity
         } else if segue.identifier == Segues.App.NewSurveyToCategorySelection, let destinationVC = segue.destination as? CategorySelectionViewController {
-            destinationVC.delegate = self
-            destinationVC.category = category
+//            destinationVC.delegate = self
+//            destinationVC.category = category
         }
     }
     

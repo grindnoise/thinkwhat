@@ -95,20 +95,31 @@
                         </constraints>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="sdas" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kOG-0O-rHh">
-                        <rect key="frame" x="28.666666666666668" y="44" width="36.333333333333329" height="25"/>
+                        <rect key="frame" x="28.666666666666657" y="44" width="238.99999999999997" height="25"/>
                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
                         <color key="textColor" cocoaTouchSystemColor="viewFlipsideBackgroundColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <view opaque="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eb2-AY-TJr" customClass="FlameBadge" customModule="ThinkWhat" customModuleProvider="target">
+                        <rect key="frame" x="275.66666666666669" y="49" width="15" height="15"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="eb2-AY-TJr" secondAttribute="height" multiplier="1:1" id="1wE-hs-PPt"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="kOG-0O-rHh" firstAttribute="bottom" secondItem="H2p-sc-9uM" secondAttribute="bottomMargin" id="0DS-MJ-gPe"/>
+                    <constraint firstItem="eb2-AY-TJr" firstAttribute="centerY" secondItem="kOG-0O-rHh" secondAttribute="centerY" id="5X6-qQ-ws1"/>
                     <constraint firstItem="kOG-0O-rHh" firstAttribute="top" secondItem="PAr-lg-cMj" secondAttribute="bottom" constant="8" id="7es-r0-U7R"/>
                     <constraint firstItem="PAr-lg-cMj" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="PGV-M4-TkR"/>
                     <constraint firstItem="kOG-0O-rHh" firstAttribute="leading" secondItem="hUt-V7-gqQ" secondAttribute="centerX" id="QB0-Qd-6Yq"/>
                     <constraint firstItem="PAr-lg-cMj" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailingMargin" id="QGp-sm-yKE"/>
+                    <constraint firstItem="eb2-AY-TJr" firstAttribute="centerX" secondItem="pes-4x-Qy0" secondAttribute="centerX" id="beM-V4-rvh"/>
+                    <constraint firstItem="eb2-AY-TJr" firstAttribute="leading" secondItem="kOG-0O-rHh" secondAttribute="trailing" constant="8" id="fAp-P8-EYg"/>
                     <constraint firstItem="PAr-lg-cMj" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="op9-lW-Age"/>
+                    <constraint firstItem="eb2-AY-TJr" firstAttribute="height" secondItem="pes-4x-Qy0" secondAttribute="height" id="yNj-Z8-oxN"/>
                 </constraints>
                 <userDefinedRuntimeAttributes>
                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -122,6 +133,7 @@
             <connections>
                 <outlet property="category" destination="3dI-5J-1Sh" id="UF9-OD-et9"/>
                 <outlet property="duration" destination="pes-4x-Qy0" id="GjW-Fq-at5"/>
+                <outlet property="hotBadge" destination="eb2-AY-TJr" id="8vV-VV-T3U"/>
                 <outlet property="icon" destination="hUt-V7-gqQ" id="3pV-pF-Pn6"/>
                 <outlet property="join" destination="NQU-7I-xoj" id="x1w-jz-rwU"/>
                 <outlet property="join_2" destination="jG0-FT-Uxs" id="XF8-I1-8CO"/>

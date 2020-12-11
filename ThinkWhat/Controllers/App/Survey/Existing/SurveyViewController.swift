@@ -124,8 +124,19 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     fileprivate var answersCells: [SurveyAnswerCell]    = []
     fileprivate var needsAnimation                      = true
     fileprivate var headerNeedsAnimation                = true
-    fileprivate var navTitle: UIImageView!
-    fileprivate var navTitleImageSize: CGSize!
+    public      var navTitle:                           UIImageView! {
+        didSet {
+            navigationItem.titleView = navTitle
+//            navTitle.clipsToBounds = false
+//            navTitle.alpha = 1
+            let gesture = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.showOwnerProfile))
+            navTitle.addGestureRecognizer(gesture)
+            navTitle.contentMode = .scaleAspectFit
+            
+        }
+    }
+    public      var navTitleSize                        = CGSize(width: 45, height: 45)
+    public      var isNavTitleEnabled                   = true
     fileprivate var scrollArrow: ScrollArrow!
     fileprivate var isAutoScrolling = false   //is on when scrollArrow is tapped
     
@@ -200,19 +211,20 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         claimButton.isOpaque = false
         likeButton.alpha = 0
         
+        title = ""
         //NavTitle setup
-        navTitleImageSize = CGSize(width: 45, height: 45)
-        self.navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
-        if let _image = survey?.userProfile?.image {
-            navTitle.image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
-        } else {
-            navTitle.isUserInteractionEnabled = false
-        }
-        navTitle.clipsToBounds = false
-        navTitle.alpha = 0
-        let gesture_2 = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.showOwnerProfile))
-        navTitle.addGestureRecognizer(gesture_2)
-        navigationItem.titleView = navTitle
+//        navTitleImageSize = CGSize(width: 45, height: 45)
+//        self.navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
+//        if let _image = survey?.userProfile?.image {
+//            navTitle.image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+//        } else {
+//            navTitle.isUserInteractionEnabled = false
+//        }
+//        navTitle.clipsToBounds = false
+//        navTitle.alpha = 0
+//        let gesture_2 = UITapGestureRecognizer(target: self, action: #selector(SurveyViewController.showOwnerProfile))
+//        navTitle.addGestureRecognizer(gesture_2)
+//        navigationItem.titleView = navTitle
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -250,7 +262,25 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 showLikeButton()
             }
             if survey?.userProfile?.image != nil {
-                showNavTitle()
+//                if navTitle == nil {
+//                    let  userImage = UIImageView(frame: CGRect(origin: .zero, size: navTitleSize))
+//                    userImage.image = survey?.userProfile?.image
+//                    navTitle = userImage
+//                }
+                if isNavTitleEnabled {
+                    showNavTitle()
+                }
+            } else if let url  = survey?.userProfile?.imageURL as? String {
+                apiManager.downloadImage(url: url) {
+                    image, error in
+                    if error != nil {
+                        print(error!.localizedDescription)
+                    }
+                    if image != nil {
+                        self.survey!.userProfile!.image = image!
+                        NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: nil)
+                    }
+                }
             }
         } else {
             //Check if user has already answered
@@ -267,6 +297,10 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         if let nav = navigationController as? NavigationControllerPreloaded {
             nav.transitionStyle = .Default
+            if delegate is SurveyStackViewController {
+                nav.transitionStyle = .Icon
+                nav.duration = 0.25
+            }
         }
         tabBarController?.setTabBarVisible(visible: false, animated: true)
         
@@ -287,7 +321,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     
     override func viewWillDisappear(_ animated: Bool) {
         if delegate is SurveyStackViewController, isSurveyJustCompleted {
-            delegate?.callbackReceived(survey!)
+                delegate?.callbackReceived(survey!)
         }
         if let nav = navigationController as? NavigationControllerPreloaded {
             nav.isShadowed = false
@@ -722,8 +756,9 @@ extension SurveyViewController {
                             Surveys.shared.favoriteLinks.removeValue(forKey: key)
                         }
                         //                Surveys.shared.favoriteSurveys.removeValue(forKey: self.surveyLink)
-                        NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
+                        
                     }
+                    NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
                     apiManager.markFavorite(mark: mark, survey: surveyLink!) {
                         _, error in
                         self.isRequesting = false
@@ -958,8 +993,11 @@ extension SurveyViewController {
     }
     
     fileprivate func showNavTitle() {
-        navTitle?.alpha = 0
-        navTitle?.image = survey!.userProfile!.image!.circularImage(size: self.navTitleImageSize, frameColor: K_COLOR_RED)
+        let  userImage = UIImageView(frame: CGRect(origin: .zero, size: navTitleSize))
+        userImage.image = survey!.userProfile!.image!.circularImage(size: navTitleSize, frameColor: K_COLOR_RED)//survey?.userProfile?.image
+        userImage.alpha = 0
+        navTitle = userImage
+//        navTitle?.image = survey!.userProfile!.image!.circularImage(size: navTitleSize, frameColor: K_COLOR_RED)
         navTitle.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
         UIView.animate(withDuration: 0.4, delay: 0, options: .curveEaseOut, animations: {
             self.navTitle.transform = .identity

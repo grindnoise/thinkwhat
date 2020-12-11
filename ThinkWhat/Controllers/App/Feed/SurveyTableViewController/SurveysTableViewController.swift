@@ -28,7 +28,7 @@ class SurveysTableViewController: UITableViewController {
 //        }
 //    }
     enum SurveyTableType {
-        case New, Top, User, UserFavorite, Category
+        case New, Top, User, UserFavorite, Own, Favorite, Category
     }
     
     var category: SurveyCategory? {
@@ -36,9 +36,78 @@ class SurveysTableViewController: UITableViewController {
             type = .Category
         }
     }
-    var type: SurveyTableType = .New
+    var type: SurveyTableType = .New {
+        didSet {
+            if oldValue != type {
+                NotificationCenter.default.removeObserver(self)
+//                if oldValue == .Top {
+//                    tableView.reloadSections(IndexSet(arrayLiteral: 0), with: .left)
+//                } else {
+//                    tableView.reloadSections(IndexSet(arrayLiteral: 0), with: .right)
+//                }
+                if type == .New || type == .Top {
+                    NotificationCenter.default.addObserver(self,
+                                                           selector: #selector(SurveysTableViewController.updateTableView),
+                                                           name: Notifications.Surveys.NewSurveysUpdated,
+                                                           object: nil)
+                    NotificationCenter.default.addObserver(self,
+                                                           selector: #selector(SurveysTableViewController.updateTableView),
+                                                           name: Notifications.Surveys.TopSurveysUpdated,
+                                                           object: nil)
+                    
+                    //            refreshControl?.attributedTitle = NSAttributedString(string: "")
+                    //            refreshControl?.addTarget(self, action: #selector(SurveysTableViewController.refreshTableView), for: .valueChanged)
+                    //            refreshControl?.tintColor = K_COLOR_RED
+                } else if type == .Own || type == .Favorite {
+                    NotificationCenter.default.addObserver(self,
+                                                           selector: #selector(SurveysTableViewController.updateTableView),
+                                                           name: Notifications.Surveys.OwnSurveysUpdated,
+                                                           object: nil)
+                    //            refreshControl?.attributedTitle = NSAttributedString(string: "")
+                    //            refreshControl?.addTarget(self, action: #selector(SurveysTableViewController.refreshTableView), for: .valueChanged)
+                    //            refreshControl?.tintColor = K_COLOR_RED
+                    NotificationCenter.default.addObserver(self,
+                                                           selector: #selector(SurveysTableViewController.updateTableView),
+                                                           name: Notifications.Surveys.FavoriteSurveysUpdated,
+                                                           object: nil)
+                    //            refreshControl?.attributedTitle = NSAttributedString(string: "")
+                    //            refreshControl?.addTarget(self, action: #selector(SurveysTableViewController.refreshTableView), for: .valueChanged)
+                    //            refreshControl?.tintColor = K_COLOR_RED
+                } else if type == .User || type == .UserFavorite {
+                    NotificationCenter.default.addObserver(self,
+                                                           selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
+                                                           name: Notifications.UI.ProfileImageReceived,
+                                                           object: nil)
+                    if needsAwaitForNotification {
+                        NotificationCenter.default.addObserver(self,
+                                                               selector: #selector(SurveysTableViewController.updateTableView(_:)),
+                                                               name: Notifications.Surveys.UserSurveysUpdated,
+                                                               object: nil)
+                        NotificationCenter.default.addObserver(self,
+                                                               selector: #selector(SurveysTableViewController.updateTableView),
+                                                               name: Notifications.Surveys.UserFavoriteSurveysUpdated,
+                                                               object: nil)
+                        
+                    }
+                    //            tableView.refreshControl = nil
+                } else if type == .Category {
+                    //            NotificationCenter.default.addObserver(self,
+                    //                                                   selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
+                    //                                                   name: Notifications.UI.ProfileImageReceived,
+                    //                                                   object: nil)
+                    //            if needsAwaitForNotification {
+                    //                NotificationCenter.default.addObserver(self,
+                    //                                                       selector: #selector(SurveysTableViewController.updateTableView),
+                    //                                                       name: Notifications.Surveys.UserFavoriteSurveysUpdated,
+                    //                                                       object: nil)
+                    //            }
+                }
+                tableView.reloadSections(IndexSet(arrayLiteral: 0), with: .automatic)
+            }
+        }
+    }
     var delegate: UIViewController?
-    public var needsAnimation = true
+//    public var needsAnimation = true
     fileprivate var isViewSetupCompleted = false
     fileprivate var loadingIndicator: LoadingIndicator!
     var needsAwaitForNotification = false
@@ -92,54 +161,15 @@ class SurveysTableViewController: UITableViewController {
         refreshControl?.attributedTitle = NSAttributedString(string: "")
         refreshControl?.addTarget(self, action: #selector(SurveysTableViewController.refreshTableView), for: .valueChanged)
         refreshControl?.tintColor = K_COLOR_RED
-        if type == .New {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(SurveysTableViewController.updateTableView),
-                                                   name: Notifications.Surveys.NewSurveysUpdated,
-                                                   object: nil)
-//            refreshControl?.attributedTitle = NSAttributedString(string: "")
-//            refreshControl?.addTarget(self, action: #selector(SurveysTableViewController.refreshTableView), for: .valueChanged)
-//            refreshControl?.tintColor = K_COLOR_RED
-        } else if type == .User {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
-                                                   name: Notifications.UI.ProfileImageReceived,
-                                                   object: nil)
-            if needsAwaitForNotification {
-                NotificationCenter.default.addObserver(self,
-                                                       selector: #selector(SurveysTableViewController.updateTableView(_:)),
-                                                       name: Notifications.Surveys.UserSurveysUpdated,
-                                                       object: nil)
-            }
-//            tableView.refreshControl = nil
-        } else if type == .UserFavorite {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
-                                                   name: Notifications.UI.ProfileImageReceived,
-                                                   object: nil)
-            if needsAwaitForNotification {
-                NotificationCenter.default.addObserver(self,
-                                                       selector: #selector(SurveysTableViewController.updateTableView),
-                                                       name: Notifications.Surveys.UserFavoriteSurveysUpdated,
-                                                       object: nil)
-            }
-//            tableView.refreshControl = nil
-        } else if type == .Category {
-//            NotificationCenter.default.addObserver(self,
-//                                                   selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
-//                                                   name: Notifications.UI.ProfileImageReceived,
-//                                                   object: nil)
-//            if needsAwaitForNotification {
-//                NotificationCenter.default.addObserver(self,
-//                                                       selector: #selector(SurveysTableViewController.updateTableView),
-//                                                       name: Notifications.Surveys.UserFavoriteSurveysUpdated,
-//                                                       object: nil)
-//            }
-        }
+        
     navigationItem.backBarButtonItem?.title = ""
     }
     
     override func viewWillAppear(_ animated: Bool) {
+//        needsAnimation = true
+//        if userSurveysReceived {
+        
+//        }
         if !isViewSetupCompleted {
             if type == .User || type == .UserFavorite, needsAwaitForNotification {
                 tabBarController?.setTabBarVisible(visible: false, animated: false)
@@ -159,8 +189,21 @@ class SurveysTableViewController: UITableViewController {
     }
     
 //    override func viewDidAppear(_ animated: Bool) {
+////        tableView.reloadData()
+//        let seconds = Double(tableView.visibleCells.count) * 0.04 + 0.2
+//        delay(seconds: seconds) {
+//            self.needsAnimation = false
+//        }
+//    }
+    
+//    override func viewDidAppear(_ animated: Bool) {
 //        navigationItem.backBarButtonItem?.title = ""//               = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
 //    }
+    override func viewDidDisappear(_ animated: Bool) {
+        if let index = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: index, animated: false)
+        }
+    }
     
     private func setupViews() {
         tableView.register(SurveysTableViewController.surveyNib, forCellReuseIdentifier: "topSurveyCell")
@@ -196,6 +239,17 @@ class SurveysTableViewController: UITableViewController {
             navTitle!.isUserInteractionEnabled = false
             navTitle!.clipsToBounds = false
             navigationItem.titleView = navTitle
+        } else if type == .Own || type == .Favorite {
+            navTitleImageSize = CGSize(width: 45, height: 45)
+            navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
+            if let imagePath = AppData.shared.userProfile.imagePath, let image = loadImageFromPath(path: imagePath) {
+                (navTitle! as! UIImageView).image = image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+            } else if let _image = UIImage(named: "user") {
+                (navTitle! as! UIImageView).image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
+            }
+            navTitle!.isUserInteractionEnabled = false
+            navTitle!.clipsToBounds = false
+            navigationItem.titleView = navTitle
         }
     }
 
@@ -214,9 +268,10 @@ class SurveysTableViewController: UITableViewController {
         if let name = notification?.name, name == Notifications.Surveys.UserSurveysUpdated || name == Notifications.Surveys.UserFavoriteSurveysUpdated {
             userSurveysReceived = true
         }
-        if type == .New {
+//        if type == .New || type == .Top {
+            //TODO User, UserFavorite, Own, Favorite?
             tableView.reloadData()
-        }
+//        }
     }
 
     // MARK: - Table view data source
@@ -251,7 +306,12 @@ class SurveysTableViewController: UITableViewController {
 //        default:
 //            print("default")
             //return Surveys.shared.topLinks.count
+        case .Own:
+            return Surveys.shared.ownLinks.count
+        case .Favorite:
+            return Surveys.shared.favoriteLinks.count
         }
+        
         
 //        } else if vc.currentIcon == .Hot{
 //            return Surveys.shared.topSurveys.count
@@ -280,12 +340,18 @@ class SurveysTableViewController: UITableViewController {
                 switch type {
                 case .New:
                     dataSource = Surveys.shared.newLinks
+                case .Top:
+                    dataSource = Surveys.shared.topLinks
                 case .User:
                     dataSource = userProfile?.surveysCreated.values.first ?? []//userProfile!.surveysCreated
                 case .UserFavorite:
                     dataSource = userProfile?.surveysFavorite.values.first ?? []//userProfile!.surveysFavorite
-                case .Category:
-                    dataSource = Surveys.shared.allLinks.filter { $0.category == self.category }
+//                case .Category:
+//                    dataSource = Surveys.shared.allLinks.filter { $0.category == self.category }
+                case .Own:
+                    dataSource = Surveys.shared.ownLinks
+                case .Favorite:
+                    dataSource = Surveys.shared.favoriteLinks.keys.compactMap({ $0 })
                 default:
                     dataSource = Surveys.shared.topLinks
                 }
@@ -342,9 +408,9 @@ class SurveysTableViewController: UITableViewController {
 //    }
     
     @objc private func refreshTableView() {
-        if type == .New {
+        if type == .New || type == .Top {
             if delegate != nil, delegate is SurveysViewController {
-                (delegate as! SurveysViewController).updateSurveys(type: .New)
+                (delegate as! SurveysViewController).updateSurveys(type: type == .New ? .New : .Top)
             }
         } else if type == .UserFavorite || type == .User {
             loadSurveys()
@@ -371,23 +437,24 @@ class SurveysTableViewController: UITableViewController {
     }
     
 //    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-//        if vc.currentIcon == .Category {
-//            cell.alpha = 0
-//            UIView.animate(withDuration: 0.1, delay: 0.05, options: [], animations: { cell.alpha = 1 })
-//        } else {
-//            if needsAnimation {
-//                let animation = AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//AnimationFactory.makeFadeAnimation(duration: 0.25, delayFactor: 0.015)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)//makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.05)//
-//                let animator = Animator(animation: animation)
-//                animator.animate(cell: cell, at: indexPath, in: tableView)
-//                needsAnimation = (tableView.visibleCells.count < (indexPath.row + 1))
-//            }
+//        if needsAnimation {
+//            let animation = AnimationFactory.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.03)////makeFadeAnimation(duration: 0.15, delayFactor: 0.04)//.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.25, delayFactor: 0.03)//makeFadeAnimation(duration: 0.25, delayFactor: 0.03)AnimationFactory.makeSlideInWithFade(duration: 0.1, delayFactor: 0.05)//
+//            let animator = Animator(animation: animation)
+//            animator.animate(cell: cell, at: indexPath, in: tableView)
+////            needsAnimation = (tableView.visibleCells.count < (indexPath.row + 1))
 //        }
 //    }
     
-    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        view.alpha = 0
-        UIView.animate(withDuration: 0.15) { view.alpha = 1 }
-    }
+//    override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        if needsAnimation {
+//            needsAnimation = (tableView.visibleCells.count < (indexPath.row + 1))
+//        }
+//    }
+    
+//    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+//        view.alpha = 0
+//        UIView.animate(withDuration: 0.15) { view.alpha = 1 }
+//    }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        if vc.currentIcon == .Category {
@@ -401,13 +468,13 @@ class SurveysTableViewController: UITableViewController {
     }
     
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if type == .New {
+        if type == .New || type == .Top {
             lastContentOffset = scrollView.contentOffset.y
         }
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if type == .New {
+        if type == .New || type == .Top {
             if self.lastContentOffset < scrollView.contentOffset.y {
                 navigationController?.setNavigationBarHidden(true, animated: true)
             } else if (lastContentOffset - scrollView.contentOffset.y) > 160 {
@@ -527,7 +594,7 @@ enum AnimationFactory {
 
 extension SurveysTableViewController: ServerProtocol {
     fileprivate func loadSurveys() {
-        NotificationCenter.default.removeObserver(self)
+//        NotificationCenter.default.removeObserver(self)
         var _type: APIManager.SurveyType!
         if type == .User {
             _type = APIManager.SurveyType.User

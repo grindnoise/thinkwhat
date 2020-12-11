@@ -58,7 +58,7 @@ class FlameIcon: Icon, CAAnimationDelegate {
     }
     
     func setupProperties(){
-        self.active = K_COLOR_RED//UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
+        self.active = Colors.UpperButtons.MaximumRed//K_COLOR_RED//K_COLOR_RED//UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
         self.inactive = UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1)
     }
     
@@ -128,7 +128,7 @@ class FlameIcon: Icon, CAAnimationDelegate {
         
         let pathFillColorAnim            = CAKeyframeAnimation(keyPath:"fillColor")
         pathFillColorAnim.values         = [self.inactive.cgColor,
-                                            UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1).cgColor]
+                                            active.cgColor]
         pathFillColorAnim.keyTimes       = [0, 1]
         pathFillColorAnim.duration       = 0.15
         pathFillColorAnim.timingFunction = CAMediaTimingFunction(name:.easeInEaseOut)
@@ -163,8 +163,8 @@ class FlameIcon: Icon, CAAnimationDelegate {
         pathTransformAnim.timingFunction = CAMediaTimingFunction(name:.easeOut)
         
         let pathFillColorAnim            = CAKeyframeAnimation(keyPath:"fillColor")
-        pathFillColorAnim.values         = [UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1).cgColor,
-                                            UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1).cgColor]
+        pathFillColorAnim.values         = [active.cgColor,
+                                            inactive.cgColor]
         pathFillColorAnim.keyTimes       = [0, 1]
         pathFillColorAnim.duration       = 0.2
         pathFillColorAnim.timingFunction = CAMediaTimingFunction(name:.easeOut)

@@ -55,7 +55,7 @@ class TopIcon: Icon, CAAnimationDelegate {
     }
     
     func setupProperties(){
-        self.active = K_COLOR_RED//UIColor(red:1.00, green: 0.49, blue:0.47, alpha:1.0)
+        self.active = Colors.UpperButtons.HoneyYellow//K_COLOR_RED//K_COLOR_RED//UIColor(red:1.00, green: 0.49, blue:0.47, alpha:1.0)
     }
     
     func setupLayers(){

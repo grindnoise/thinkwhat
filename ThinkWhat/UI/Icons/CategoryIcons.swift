@@ -64,7 +64,12 @@ class SurveyCategoryIcon: UIView {
         //FINANCE
         case Finance = 21
         
+        //Technical
         case Null  = 0
+        case Eye = 10000
+        case EyeDisabled = 10003
+        case Text = 10001
+        case AnonDisabled = 10002
     }
     
     var categoryID: CategoryID = .Null {
@@ -74,7 +79,13 @@ class SurveyCategoryIcon: UIView {
             }
         }
     }
-    
+    var text = "" {
+        didSet {
+            if categoryID == .Text, oldValue != text {
+                setNeedsDisplay()
+            }
+        }
+    }
     var tagColor: UIColor?
 //    var ID: Int { get }
 //    init()
@@ -86,6 +97,8 @@ class SurveyCategoryIcon: UIView {
             
         case .Anon:
             CategoryIconsStyleKit.drawAnon(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+        case .AnonDisabled:
+            CategoryIconsStyleKit.drawAnonDisabled(frame: rect, resizing: .aspectFit, outerColor: tagColor)
             
         case .Health:
             CategoryIconsStyleKit.drawHealth(frame: rect, resizing: .aspectFit, outerColor: tagColor)
@@ -141,10 +154,17 @@ class SurveyCategoryIcon: UIView {
         case .Finance:
             CategoryIconsStyleKit.drawFinance(frame: rect, resizing: .aspectFit, outerColor: tagColor)
         
+        case .Eye:
+            CategoryIconsStyleKit.drawEye(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+        case .EyeDisabled:
+            CategoryIconsStyleKit.drawEyeDisabled(frame: rect, resizing: .aspectFit, outerColor: tagColor)
             
             
-        case .OutdoorOther, .HealthOther, .RelationshipOther, .LeisureOther, .SocietyOther, .TechOther:
-            CategoryIconsStyleKit.drawOther(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+        case .Text:
+            CategoryIconsStyleKit.drawText(frame: rect, resizing: .aspectFit, countText: text, outerColor: tagColor)
+            
+        case .OutdoorOther, .HealthOther, .RelationshipOther, .LeisureOther, .SocietyOther, .TechOther, .Null:
+            CategoryIconsStyleKit.drawOther(frame: rect, resizing: .aspectFit, outerColor: tagColor ?? .lightGray)
             
         default:
             super.draw(rect)
@@ -172,10 +192,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -393,10 +418,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -791,10 +821,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -864,10 +899,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Bezier 2 Drawing
@@ -936,10 +976,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Bezier 5 Drawing
@@ -1016,10 +1061,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -1096,10 +1146,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -1322,10 +1377,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -1476,10 +1536,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.75).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -1584,37 +1649,42 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.withLuminosity(0.3).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
         //// Bezier Drawing
         let bezierPath = UIBezierPath()
-        bezierPath.move(to: CGPoint(x: 70.45, y: 50.23))
-        bezierPath.addCurve(to: CGPoint(x: 61.45, y: 73.04), controlPoint1: CGPoint(x: 66.36, y: 52.51), controlPoint2: CGPoint(x: 65.46, y: 54.87))
-        bezierPath.addLine(to: CGPoint(x: 57.71, y: 90.18))
-        bezierPath.addLine(to: CGPoint(x: 55.28, y: 89.67))
-        bezierPath.addCurve(to: CGPoint(x: 52.58, y: 89), controlPoint1: CGPoint(x: 53.9, y: 89.37), controlPoint2: CGPoint(x: 52.72, y: 89.08))
-        bezierPath.addCurve(to: CGPoint(x: 53.41, y: 84.22), controlPoint1: CGPoint(x: 52.51, y: 88.86), controlPoint2: CGPoint(x: 52.86, y: 86.72))
-        bezierPath.addCurve(to: CGPoint(x: 47.11, y: 81.57), controlPoint1: CGPoint(x: 54.59, y: 78.85), controlPoint2: CGPoint(x: 54.8, y: 79))
-        bezierPath.addCurve(to: CGPoint(x: 40.81, y: 99.16), controlPoint1: CGPoint(x: 32.3, y: 86.5), controlPoint2: CGPoint(x: 29.81, y: 93.42))
-        bezierPath.addCurve(to: CGPoint(x: 66.57, y: 106.37), controlPoint1: CGPoint(x: 46.91, y: 102.32), controlPoint2: CGPoint(x: 53.62, y: 104.23))
-        bezierPath.addCurve(to: CGPoint(x: 99.52, y: 107.98), controlPoint1: CGPoint(x: 75.15, y: 107.76), controlPoint2: CGPoint(x: 79.17, y: 107.98))
-        bezierPath.addCurve(to: CGPoint(x: 147.29, y: 103.57), controlPoint1: CGPoint(x: 124.86, y: 108.06), controlPoint2: CGPoint(x: 133.17, y: 107.25))
-        bezierPath.addCurve(to: CGPoint(x: 163.77, y: 96.36), controlPoint1: CGPoint(x: 155.6, y: 101.36), controlPoint2: CGPoint(x: 160.59, y: 99.23))
-        bezierPath.addCurve(to: CGPoint(x: 159.55, y: 84.3), controlPoint1: CGPoint(x: 168, y: 92.53), controlPoint2: CGPoint(x: 166.26, y: 87.68))
-        bezierPath.addCurve(to: CGPoint(x: 146.26, y: 79.88), controlPoint1: CGPoint(x: 156.16, y: 82.6), controlPoint2: CGPoint(x: 146.67, y: 79.44))
-        bezierPath.addCurve(to: CGPoint(x: 147.71, y: 87.9), controlPoint1: CGPoint(x: 145.98, y: 80.1), controlPoint2: CGPoint(x: 146.88, y: 85.18))
-        bezierPath.addCurve(to: CGPoint(x: 145.49, y: 89.59), controlPoint1: CGPoint(x: 147.92, y: 88.86), controlPoint2: CGPoint(x: 147.43, y: 89.22))
-        bezierPath.addCurve(to: CGPoint(x: 142.73, y: 89.89), controlPoint1: CGPoint(x: 144.11, y: 89.89), controlPoint2: CGPoint(x: 142.86, y: 90.03))
-        bezierPath.addCurve(to: CGPoint(x: 138.71, y: 72.45), controlPoint1: CGPoint(x: 142.59, y: 89.74), controlPoint2: CGPoint(x: 140.79, y: 81.87))
-        bezierPath.addCurve(to: CGPoint(x: 129.71, y: 50.01), controlPoint1: CGPoint(x: 134.63, y: 54.35), controlPoint2: CGPoint(x: 133.73, y: 52.07))
-        bezierPath.addCurve(to: CGPoint(x: 114.27, y: 50.82), controlPoint1: CGPoint(x: 126.39, y: 48.39), controlPoint2: CGPoint(x: 122.99, y: 48.54))
-        bezierPath.addCurve(to: CGPoint(x: 86.16, y: 50.82), controlPoint1: CGPoint(x: 104.02, y: 53.47), controlPoint2: CGPoint(x: 96.27, y: 53.47))
-        bezierPath.addCurve(to: CGPoint(x: 70.45, y: 50.23), controlPoint1: CGPoint(x: 77.3, y: 48.47), controlPoint2: CGPoint(x: 73.7, y: 48.32))
+        bezierPath.move(to: CGPoint(x: 73.58, y: 55.09))
+        bezierPath.addCurve(to: CGPoint(x: 65.54, y: 75.46), controlPoint1: CGPoint(x: 69.93, y: 57.13), controlPoint2: CGPoint(x: 69.13, y: 59.23))
+        bezierPath.addLine(to: CGPoint(x: 62.19, y: 90.77))
+        bezierPath.addLine(to: CGPoint(x: 60.03, y: 90.31))
+        bezierPath.addCurve(to: CGPoint(x: 57.61, y: 89.72), controlPoint1: CGPoint(x: 58.79, y: 90.04), controlPoint2: CGPoint(x: 57.74, y: 89.78))
+        bezierPath.addCurve(to: CGPoint(x: 58.36, y: 85.44), controlPoint1: CGPoint(x: 57.55, y: 89.58), controlPoint2: CGPoint(x: 57.86, y: 87.68))
+        bezierPath.addCurve(to: CGPoint(x: 52.72, y: 83.08), controlPoint1: CGPoint(x: 59.41, y: 80.65), controlPoint2: CGPoint(x: 59.59, y: 80.78))
+        bezierPath.addCurve(to: CGPoint(x: 47.09, y: 98.78), controlPoint1: CGPoint(x: 39.48, y: 87.48), controlPoint2: CGPoint(x: 37.25, y: 93.66))
+        bezierPath.addCurve(to: CGPoint(x: 70.12, y: 105.22), controlPoint1: CGPoint(x: 52.54, y: 101.61), controlPoint2: CGPoint(x: 58.54, y: 103.32))
+        bezierPath.addCurve(to: CGPoint(x: 99.58, y: 106.67), controlPoint1: CGPoint(x: 77.79, y: 106.47), controlPoint2: CGPoint(x: 81.38, y: 106.67))
+        bezierPath.addCurve(to: CGPoint(x: 142.28, y: 102.72), controlPoint1: CGPoint(x: 122.23, y: 106.73), controlPoint2: CGPoint(x: 129.66, y: 106.01))
+        bezierPath.addCurve(to: CGPoint(x: 157.02, y: 96.29), controlPoint1: CGPoint(x: 149.71, y: 100.75), controlPoint2: CGPoint(x: 154.17, y: 98.85))
+        bezierPath.addCurve(to: CGPoint(x: 153.24, y: 85.51), controlPoint1: CGPoint(x: 160.79, y: 92.87), controlPoint2: CGPoint(x: 159.24, y: 88.53))
+        bezierPath.addCurve(to: CGPoint(x: 141.36, y: 81.57), controlPoint1: CGPoint(x: 150.21, y: 84), controlPoint2: CGPoint(x: 141.73, y: 81.17))
+        bezierPath.addCurve(to: CGPoint(x: 142.66, y: 88.73), controlPoint1: CGPoint(x: 141.11, y: 81.77), controlPoint2: CGPoint(x: 141.91, y: 86.3))
+        bezierPath.addCurve(to: CGPoint(x: 140.68, y: 90.24), controlPoint1: CGPoint(x: 142.84, y: 89.58), controlPoint2: CGPoint(x: 142.41, y: 89.91))
+        bezierPath.addCurve(to: CGPoint(x: 138.2, y: 90.5), controlPoint1: CGPoint(x: 139.44, y: 90.5), controlPoint2: CGPoint(x: 138.32, y: 90.64))
+        bezierPath.addCurve(to: CGPoint(x: 134.61, y: 74.93), controlPoint1: CGPoint(x: 138.08, y: 90.37), controlPoint2: CGPoint(x: 136.47, y: 83.34))
+        bezierPath.addCurve(to: CGPoint(x: 126.56, y: 54.89), controlPoint1: CGPoint(x: 130.96, y: 58.77), controlPoint2: CGPoint(x: 130.15, y: 56.73))
+        bezierPath.addCurve(to: CGPoint(x: 112.76, y: 55.62), controlPoint1: CGPoint(x: 123.59, y: 53.45), controlPoint2: CGPoint(x: 120.56, y: 53.58))
+        bezierPath.addCurve(to: CGPoint(x: 87.63, y: 55.62), controlPoint1: CGPoint(x: 103.6, y: 57.98), controlPoint2: CGPoint(x: 96.67, y: 57.98))
+        bezierPath.addCurve(to: CGPoint(x: 73.58, y: 55.09), controlPoint1: CGPoint(x: 79.71, y: 53.51), controlPoint2: CGPoint(x: 76.49, y: 53.38))
         bezierPath.close()
         innerColor.setFill()
         bezierPath.fill()
@@ -1622,34 +1692,34 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Bezier 2 Drawing
         let bezier2Path = UIBezierPath()
-        bezier2Path.move(to: CGPoint(x: 52.86, y: 112.18))
-        bezier2Path.addCurve(to: CGPoint(x: 50.78, y: 128.58), controlPoint1: CGPoint(x: 52.65, y: 113.58), controlPoint2: CGPoint(x: 51.68, y: 120.93))
-        bezier2Path.addCurve(to: CGPoint(x: 60.75, y: 150.29), controlPoint1: CGPoint(x: 48.43, y: 147.86), controlPoint2: CGPoint(x: 48.91, y: 148.89))
-        bezier2Path.addCurve(to: CGPoint(x: 88.03, y: 151.54), controlPoint1: CGPoint(x: 70.31, y: 151.39), controlPoint2: CGPoint(x: 85.88, y: 152.13))
-        bezier2Path.addCurve(to: CGPoint(x: 93.64, y: 147.42), controlPoint1: CGPoint(x: 89, y: 151.32), controlPoint2: CGPoint(x: 91.56, y: 149.4))
-        bezier2Path.addCurve(to: CGPoint(x: 108.18, y: 147.42), controlPoint1: CGPoint(x: 99.66, y: 141.61), controlPoint2: CGPoint(x: 102.15, y: 141.61))
-        bezier2Path.addCurve(to: CGPoint(x: 113.79, y: 151.54), controlPoint1: CGPoint(x: 110.25, y: 149.4), controlPoint2: CGPoint(x: 112.82, y: 151.32))
-        bezier2Path.addCurve(to: CGPoint(x: 140.72, y: 150.29), controlPoint1: CGPoint(x: 115.93, y: 152.13), controlPoint2: CGPoint(x: 131.99, y: 151.39))
-        bezier2Path.addCurve(to: CGPoint(x: 149.44, y: 126.52), controlPoint1: CGPoint(x: 151.86, y: 148.96), controlPoint2: CGPoint(x: 152.14, y: 148.15))
-        bezier2Path.addCurve(to: CGPoint(x: 147.09, y: 110.12), controlPoint1: CGPoint(x: 148.33, y: 117.7), controlPoint2: CGPoint(x: 147.23, y: 110.34))
-        bezier2Path.addCurve(to: CGPoint(x: 141.27, y: 110.93), controlPoint1: CGPoint(x: 146.88, y: 109.97), controlPoint2: CGPoint(x: 144.25, y: 110.27))
-        bezier2Path.addCurve(to: CGPoint(x: 106.65, y: 114.09), controlPoint1: CGPoint(x: 131.23, y: 113.06), controlPoint2: CGPoint(x: 124.86, y: 113.65))
-        bezier2Path.addCurve(to: CGPoint(x: 55.42, y: 110.19), controlPoint1: CGPoint(x: 84.64, y: 114.61), controlPoint2: CGPoint(x: 71.21, y: 113.58))
-        bezier2Path.addCurve(to: CGPoint(x: 52.86, y: 112.18), controlPoint1: CGPoint(x: 53.35, y: 109.75), controlPoint2: CGPoint(x: 53.21, y: 109.9))
+        bezier2Path.move(to: CGPoint(x: 57.86, y: 110.41))
+        bezier2Path.addCurve(to: CGPoint(x: 56, y: 125.06), controlPoint1: CGPoint(x: 57.68, y: 111.66), controlPoint2: CGPoint(x: 56.81, y: 118.23))
+        bezier2Path.addCurve(to: CGPoint(x: 64.92, y: 144.44), controlPoint1: CGPoint(x: 53.9, y: 142.27), controlPoint2: CGPoint(x: 54.33, y: 143.19))
+        bezier2Path.addCurve(to: CGPoint(x: 89.3, y: 145.56), controlPoint1: CGPoint(x: 73.46, y: 145.43), controlPoint2: CGPoint(x: 87.38, y: 146.09))
+        bezier2Path.addCurve(to: CGPoint(x: 94.32, y: 141.88), controlPoint1: CGPoint(x: 90.17, y: 145.36), controlPoint2: CGPoint(x: 92.46, y: 143.65))
+        bezier2Path.addCurve(to: CGPoint(x: 107.31, y: 141.88), controlPoint1: CGPoint(x: 99.7, y: 136.69), controlPoint2: CGPoint(x: 101.93, y: 136.69))
+        bezier2Path.addCurve(to: CGPoint(x: 112.33, y: 145.56), controlPoint1: CGPoint(x: 109.17, y: 143.65), controlPoint2: CGPoint(x: 111.46, y: 145.36))
+        bezier2Path.addCurve(to: CGPoint(x: 136.4, y: 144.44), controlPoint1: CGPoint(x: 114.25, y: 146.09), controlPoint2: CGPoint(x: 128.61, y: 145.43))
+        bezier2Path.addCurve(to: CGPoint(x: 144.2, y: 123.22), controlPoint1: CGPoint(x: 146.37, y: 143.26), controlPoint2: CGPoint(x: 146.62, y: 142.54))
+        bezier2Path.addCurve(to: CGPoint(x: 142.1, y: 108.57), controlPoint1: CGPoint(x: 143.21, y: 115.34), controlPoint2: CGPoint(x: 142.22, y: 108.77))
+        bezier2Path.addCurve(to: CGPoint(x: 136.9, y: 109.29), controlPoint1: CGPoint(x: 141.91, y: 108.44), controlPoint2: CGPoint(x: 139.56, y: 108.7))
+        bezier2Path.addCurve(to: CGPoint(x: 105.95, y: 112.12), controlPoint1: CGPoint(x: 127.93, y: 111.2), controlPoint2: CGPoint(x: 122.23, y: 111.72))
+        bezier2Path.addCurve(to: CGPoint(x: 60.15, y: 108.64), controlPoint1: CGPoint(x: 86.27, y: 112.58), controlPoint2: CGPoint(x: 74.26, y: 111.66))
+        bezier2Path.addCurve(to: CGPoint(x: 57.86, y: 110.41), controlPoint1: CGPoint(x: 58.29, y: 108.24), controlPoint2: CGPoint(x: 58.17, y: 108.37))
         bezier2Path.close()
-        bezier2Path.move(to: CGPoint(x: 81.94, y: 126.45))
-        bezier2Path.addCurve(to: CGPoint(x: 88.93, y: 132.19), controlPoint1: CGPoint(x: 86.16, y: 127.77), controlPoint2: CGPoint(x: 89.55, y: 130.57))
-        bezier2Path.addCurve(to: CGPoint(x: 84.85, y: 135.43), controlPoint1: CGPoint(x: 88.72, y: 132.85), controlPoint2: CGPoint(x: 86.85, y: 134.32))
-        bezier2Path.addCurve(to: CGPoint(x: 69.06, y: 135.28), controlPoint1: CGPoint(x: 79.58, y: 138.29), controlPoint2: CGPoint(x: 74.25, y: 138.22))
-        bezier2Path.addCurve(to: CGPoint(x: 67.61, y: 128.8), controlPoint1: CGPoint(x: 64.56, y: 132.63), controlPoint2: CGPoint(x: 64.15, y: 130.94))
-        bezier2Path.addCurve(to: CGPoint(x: 81.94, y: 126.45), controlPoint1: CGPoint(x: 73.15, y: 125.27), controlPoint2: CGPoint(x: 76.61, y: 124.76))
+        bezier2Path.move(to: CGPoint(x: 83.86, y: 123.16))
+        bezier2Path.addCurve(to: CGPoint(x: 90.11, y: 128.28), controlPoint1: CGPoint(x: 87.63, y: 124.34), controlPoint2: CGPoint(x: 90.66, y: 126.84))
+        bezier2Path.addCurve(to: CGPoint(x: 86.46, y: 131.17), controlPoint1: CGPoint(x: 89.92, y: 128.87), controlPoint2: CGPoint(x: 88.25, y: 130.19))
+        bezier2Path.addCurve(to: CGPoint(x: 72.34, y: 131.04), controlPoint1: CGPoint(x: 81.75, y: 133.73), controlPoint2: CGPoint(x: 76.99, y: 133.67))
+        bezier2Path.addCurve(to: CGPoint(x: 71.04, y: 125.26), controlPoint1: CGPoint(x: 68.32, y: 128.67), controlPoint2: CGPoint(x: 67.95, y: 127.16))
+        bezier2Path.addCurve(to: CGPoint(x: 83.86, y: 123.16), controlPoint1: CGPoint(x: 76, y: 122.11), controlPoint2: CGPoint(x: 79.09, y: 121.65))
         bezier2Path.close()
-        bezier2Path.move(to: CGPoint(x: 130.54, y: 127.48))
-        bezier2Path.addCurve(to: CGPoint(x: 135.11, y: 132.26), controlPoint1: CGPoint(x: 134, y: 129.39), controlPoint2: CGPoint(x: 135.59, y: 131.01))
-        bezier2Path.addCurve(to: CGPoint(x: 131.16, y: 135.35), controlPoint1: CGPoint(x: 134.9, y: 132.78), controlPoint2: CGPoint(x: 133.1, y: 134.18))
-        bezier2Path.addCurve(to: CGPoint(x: 115.86, y: 135.65), controlPoint1: CGPoint(x: 126.32, y: 138.15), controlPoint2: CGPoint(x: 120.71, y: 138.29))
-        bezier2Path.addCurve(to: CGPoint(x: 113.02, y: 129.32), controlPoint1: CGPoint(x: 111.02, y: 133), controlPoint2: CGPoint(x: 110.39, y: 131.6))
-        bezier2Path.addCurve(to: CGPoint(x: 130.54, y: 127.48), controlPoint1: CGPoint(x: 117.8, y: 125.2), controlPoint2: CGPoint(x: 124.93, y: 124.46))
+        bezier2Path.move(to: CGPoint(x: 127.31, y: 124.08))
+        bezier2Path.addCurve(to: CGPoint(x: 131.39, y: 128.35), controlPoint1: CGPoint(x: 130.4, y: 125.78), controlPoint2: CGPoint(x: 131.82, y: 127.23))
+        bezier2Path.addCurve(to: CGPoint(x: 127.86, y: 131.11), controlPoint1: CGPoint(x: 131.21, y: 128.81), controlPoint2: CGPoint(x: 129.6, y: 130.05))
+        bezier2Path.addCurve(to: CGPoint(x: 114.18, y: 131.37), controlPoint1: CGPoint(x: 123.53, y: 133.6), controlPoint2: CGPoint(x: 118.52, y: 133.73))
+        bezier2Path.addCurve(to: CGPoint(x: 111.65, y: 125.72), controlPoint1: CGPoint(x: 109.85, y: 129), controlPoint2: CGPoint(x: 109.29, y: 127.76))
+        bezier2Path.addCurve(to: CGPoint(x: 127.31, y: 124.08), controlPoint1: CGPoint(x: 115.92, y: 122.04), controlPoint2: CGPoint(x: 122.29, y: 121.38))
         bezier2Path.close()
         innerColor.setFill()
         bezier2Path.fill()
@@ -1673,10 +1743,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -1788,10 +1863,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -1946,10 +2026,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -2076,10 +2161,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -2313,10 +2403,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -2607,10 +2702,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.53).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -2810,10 +2910,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -2908,10 +3013,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -3015,10 +3125,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -3088,10 +3203,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -3226,10 +3346,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group
@@ -3269,10 +3394,20 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+//        //// bg Drawing
+//        let bgPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+//        UIColor.white.setFill()
+//        bgPath.fill()
+        
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Bezier Drawing
@@ -3375,10 +3510,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -4275,10 +4415,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -4575,10 +4720,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -4942,10 +5092,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -5044,10 +5199,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -5151,10 +5311,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -5252,10 +5417,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -5413,10 +5583,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Group 2
@@ -5515,10 +5690,15 @@ public class CategoryIconsStyleKit : NSObject {
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
         let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.65).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        tagColor.setFill()
-        ovalPath.fill()
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
         
         
         //// Text Drawing
@@ -5586,6 +5766,286 @@ public class CategoryIconsStyleKit : NSObject {
         textPath.close()
         innerColor.setFill()
         textPath.fill()
+        
+        context.restoreGState()
+        
+    }
+    
+    @objc public dynamic class func drawEye(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+        //// General Declarations
+        let context = UIGraphicsGetCurrentContext()!
+        
+        //// Resize to Target Frame
+        context.saveGState()
+        let resizedFrame: CGRect = resizing.apply(rect: CGRect(x: 0, y: 0, width: 200, height: 200), target: targetFrame)
+        context.translateBy(x: resizedFrame.minX, y: resizedFrame.minY)
+        context.scaleBy(x: resizedFrame.width / 200, y: resizedFrame.height / 200)
+        
+        
+        //// Color Declarations
+        let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
+        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor,  tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
+        //// Oval Drawing
+        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
+        
+        
+        //// Page-1
+        //// Group-Copy
+        //// Oval 3 Drawing
+        let oval3Path = UIBezierPath(ovalIn: CGRect(x: 80, y: 80, width: 40, height: 40))
+        innerColor.setFill()
+        oval3Path.fill()
+        
+        
+        //// Combined-Shape Drawing
+        let combinedShapePath = UIBezierPath()
+        combinedShapePath.move(to: CGPoint(x: 100, y: 58))
+        combinedShapePath.addCurve(to: CGPoint(x: 30, y: 100), controlPoint1: CGPoint(x: 68.69, y: 58), controlPoint2: CGPoint(x: 41.78, y: 75.28))
+        combinedShapePath.addCurve(to: CGPoint(x: 100, y: 142), controlPoint1: CGPoint(x: 41.78, y: 124.72), controlPoint2: CGPoint(x: 68.69, y: 142))
+        combinedShapePath.addCurve(to: CGPoint(x: 170, y: 100), controlPoint1: CGPoint(x: 131.31, y: 142), controlPoint2: CGPoint(x: 158.22, y: 124.72))
+        combinedShapePath.addCurve(to: CGPoint(x: 100, y: 58), controlPoint1: CGPoint(x: 158.22, y: 75.28), controlPoint2: CGPoint(x: 131.31, y: 58))
+        combinedShapePath.close()
+        combinedShapePath.move(to: CGPoint(x: 100.11, y: 72))
+        combinedShapePath.addCurve(to: CGPoint(x: 43.3, y: 100), controlPoint1: CGPoint(x: 74.7, y: 72), controlPoint2: CGPoint(x: 52.86, y: 83.52))
+        combinedShapePath.addCurve(to: CGPoint(x: 100.11, y: 128), controlPoint1: CGPoint(x: 52.86, y: 116.48), controlPoint2: CGPoint(x: 74.7, y: 128))
+        combinedShapePath.addCurve(to: CGPoint(x: 156.92, y: 100), controlPoint1: CGPoint(x: 125.52, y: 128), controlPoint2: CGPoint(x: 147.36, y: 116.48))
+        combinedShapePath.addCurve(to: CGPoint(x: 100.11, y: 72), controlPoint1: CGPoint(x: 147.36, y: 83.52), controlPoint2: CGPoint(x: 125.52, y: 72))
+        combinedShapePath.close()
+        combinedShapePath.usesEvenOddFillRule = true
+        innerColor.setFill()
+        combinedShapePath.fill()
+        
+        context.restoreGState()
+        
+    }
+    
+    @objc public dynamic class func drawEyeDisabled(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+        //// General Declarations
+        let context = UIGraphicsGetCurrentContext()!
+        
+        //// Resize to Target Frame
+        context.saveGState()
+        let resizedFrame: CGRect = resizing.apply(rect: CGRect(x: 0, y: 0, width: 200, height: 200), target: targetFrame)
+        context.translateBy(x: resizedFrame.minX, y: resizedFrame.minY)
+        context.scaleBy(x: resizedFrame.width / 200, y: resizedFrame.height / 200)
+        
+        
+        //// Color Declarations
+        let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
+        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor,  tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
+        //// Oval Drawing
+        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
+        
+        
+        //// Page-1
+        //// Group-Copy
+        //// Oval 3 Drawing
+        let oval3Path = UIBezierPath(ovalIn: CGRect(x: 80, y: 80, width: 40, height: 40))
+        innerColor.setFill()
+        oval3Path.fill()
+        
+        
+        //// Combined-Shape Drawing
+        let combinedShapePath = UIBezierPath()
+        combinedShapePath.move(to: CGPoint(x: 100, y: 58))
+        combinedShapePath.addCurve(to: CGPoint(x: 30, y: 100), controlPoint1: CGPoint(x: 68.69, y: 58), controlPoint2: CGPoint(x: 41.78, y: 75.28))
+        combinedShapePath.addCurve(to: CGPoint(x: 100, y: 142), controlPoint1: CGPoint(x: 41.78, y: 124.72), controlPoint2: CGPoint(x: 68.69, y: 142))
+        combinedShapePath.addCurve(to: CGPoint(x: 170, y: 100), controlPoint1: CGPoint(x: 131.31, y: 142), controlPoint2: CGPoint(x: 158.22, y: 124.72))
+        combinedShapePath.addCurve(to: CGPoint(x: 100, y: 58), controlPoint1: CGPoint(x: 158.22, y: 75.28), controlPoint2: CGPoint(x: 131.31, y: 58))
+        combinedShapePath.close()
+        combinedShapePath.move(to: CGPoint(x: 100.11, y: 72))
+        combinedShapePath.addCurve(to: CGPoint(x: 43.3, y: 100), controlPoint1: CGPoint(x: 74.7, y: 72), controlPoint2: CGPoint(x: 52.86, y: 83.52))
+        combinedShapePath.addCurve(to: CGPoint(x: 100.11, y: 128), controlPoint1: CGPoint(x: 52.86, y: 116.48), controlPoint2: CGPoint(x: 74.7, y: 128))
+        combinedShapePath.addCurve(to: CGPoint(x: 156.92, y: 100), controlPoint1: CGPoint(x: 125.52, y: 128), controlPoint2: CGPoint(x: 147.36, y: 116.48))
+        combinedShapePath.addCurve(to: CGPoint(x: 100.11, y: 72), controlPoint1: CGPoint(x: 147.36, y: 83.52), controlPoint2: CGPoint(x: 125.52, y: 72))
+        combinedShapePath.close()
+        combinedShapePath.usesEvenOddFillRule = true
+        innerColor.setFill()
+        combinedShapePath.fill()
+        
+        
+        
+        
+        
+        
+        //// Rectangle Drawing
+        context.saveGState()
+        context.translateBy(x: 47.57, y: 159.5)
+        context.rotate(by: -135 * CGFloat.pi/180)
+        
+        let rectanglePath = UIBezierPath(rect: CGRect(x: 0, y: 0, width: 10, height: 158))
+        innerColor.setFill()
+        rectanglePath.fill()
+        tagColor.setStroke()
+        rectanglePath.lineWidth = 3
+        rectanglePath.stroke()
+        
+        context.restoreGState()
+        
+    }
+    
+    @objc public dynamic class func drawText(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, countText: String = "100", outerColor: UIColor?) {
+        //// General Declarations
+        let context = UIGraphicsGetCurrentContext()!
+        
+        //// Resize to Target Frame
+        context.saveGState()
+        let resizedFrame: CGRect = resizing.apply(rect: CGRect(x: 0, y: 0, width: 200, height: 200), target: targetFrame)
+        context.translateBy(x: resizedFrame.minX, y: resizedFrame.minY)
+        context.scaleBy(x: resizedFrame.width / 200, y: resizedFrame.height / 200)
+        
+        
+        //// Color Declarations
+        let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
+        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor,  tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
+        //// Oval Drawing
+        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
+        
+        
+        //// Text Drawing
+        let textRect = CGRect(x: 0, y: 75, width: 200, height: 49)
+        let textStyle = NSMutableParagraphStyle()
+        textStyle.alignment = .center
+        let textFontAttributes = [NSAttributedString.Key.font: UIFont(name: "OpenSans-Bold", size: 43)!, NSAttributedString.Key.foregroundColor: innerColor, NSAttributedString.Key.paragraphStyle: textStyle]
+        
+        let textTextHeight: CGFloat = countText.boundingRect(with: CGSize(width: textRect.width, height: CGFloat.infinity), options: .usesLineFragmentOrigin, attributes: textFontAttributes, context: nil).height
+        context.saveGState()
+        context.clip(to: textRect)
+        countText.draw(in: CGRect(x: textRect.minX, y: textRect.minY + (textRect.height - textTextHeight) / 2, width: textRect.width, height: textTextHeight), withAttributes: textFontAttributes)
+        context.restoreGState()
+        
+        context.restoreGState()
+        
+    }
+    
+    @objc public dynamic class func drawAnonDisabled(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+        //// General Declarations
+        let context = UIGraphicsGetCurrentContext()!
+        
+        //// Resize to Target Frame
+        context.saveGState()
+        let resizedFrame: CGRect = resizing.apply(rect: CGRect(x: 0, y: 0, width: 200, height: 200), target: targetFrame)
+        context.translateBy(x: resizedFrame.minX, y: resizedFrame.minY)
+        context.scaleBy(x: resizedFrame.width / 200, y: resizedFrame.height / 200)
+        
+        
+        //// Color Declarations
+        let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
+        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        
+        //// Gradient Declarations
+        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.withLuminosity(0.3).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        
+        //// Oval Drawing
+        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        context.saveGState()
+        ovalPath.addClip()
+        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        context.restoreGState()
+        
+        
+        //// Group 2
+        //// Bezier Drawing
+        let bezierPath = UIBezierPath()
+        bezierPath.move(to: CGPoint(x: 73.58, y: 55.09))
+        bezierPath.addCurve(to: CGPoint(x: 65.54, y: 75.46), controlPoint1: CGPoint(x: 69.93, y: 57.13), controlPoint2: CGPoint(x: 69.13, y: 59.23))
+        bezierPath.addLine(to: CGPoint(x: 62.19, y: 90.77))
+        bezierPath.addLine(to: CGPoint(x: 60.03, y: 90.31))
+        bezierPath.addCurve(to: CGPoint(x: 57.61, y: 89.72), controlPoint1: CGPoint(x: 58.79, y: 90.04), controlPoint2: CGPoint(x: 57.74, y: 89.78))
+        bezierPath.addCurve(to: CGPoint(x: 58.36, y: 85.44), controlPoint1: CGPoint(x: 57.55, y: 89.58), controlPoint2: CGPoint(x: 57.86, y: 87.68))
+        bezierPath.addCurve(to: CGPoint(x: 52.72, y: 83.08), controlPoint1: CGPoint(x: 59.41, y: 80.65), controlPoint2: CGPoint(x: 59.59, y: 80.78))
+        bezierPath.addCurve(to: CGPoint(x: 47.09, y: 98.78), controlPoint1: CGPoint(x: 39.48, y: 87.48), controlPoint2: CGPoint(x: 37.25, y: 93.66))
+        bezierPath.addCurve(to: CGPoint(x: 70.12, y: 105.22), controlPoint1: CGPoint(x: 52.54, y: 101.61), controlPoint2: CGPoint(x: 58.54, y: 103.32))
+        bezierPath.addCurve(to: CGPoint(x: 99.58, y: 106.67), controlPoint1: CGPoint(x: 77.79, y: 106.47), controlPoint2: CGPoint(x: 81.38, y: 106.67))
+        bezierPath.addCurve(to: CGPoint(x: 142.28, y: 102.72), controlPoint1: CGPoint(x: 122.23, y: 106.73), controlPoint2: CGPoint(x: 129.66, y: 106.01))
+        bezierPath.addCurve(to: CGPoint(x: 157.02, y: 96.29), controlPoint1: CGPoint(x: 149.71, y: 100.75), controlPoint2: CGPoint(x: 154.17, y: 98.85))
+        bezierPath.addCurve(to: CGPoint(x: 153.24, y: 85.51), controlPoint1: CGPoint(x: 160.79, y: 92.87), controlPoint2: CGPoint(x: 159.24, y: 88.53))
+        bezierPath.addCurve(to: CGPoint(x: 141.36, y: 81.57), controlPoint1: CGPoint(x: 150.21, y: 84), controlPoint2: CGPoint(x: 141.73, y: 81.17))
+        bezierPath.addCurve(to: CGPoint(x: 142.66, y: 88.73), controlPoint1: CGPoint(x: 141.11, y: 81.77), controlPoint2: CGPoint(x: 141.91, y: 86.3))
+        bezierPath.addCurve(to: CGPoint(x: 140.68, y: 90.24), controlPoint1: CGPoint(x: 142.84, y: 89.58), controlPoint2: CGPoint(x: 142.41, y: 89.91))
+        bezierPath.addCurve(to: CGPoint(x: 138.2, y: 90.5), controlPoint1: CGPoint(x: 139.44, y: 90.5), controlPoint2: CGPoint(x: 138.32, y: 90.64))
+        bezierPath.addCurve(to: CGPoint(x: 134.61, y: 74.93), controlPoint1: CGPoint(x: 138.08, y: 90.37), controlPoint2: CGPoint(x: 136.47, y: 83.34))
+        bezierPath.addCurve(to: CGPoint(x: 126.56, y: 54.89), controlPoint1: CGPoint(x: 130.96, y: 58.77), controlPoint2: CGPoint(x: 130.15, y: 56.73))
+        bezierPath.addCurve(to: CGPoint(x: 112.76, y: 55.62), controlPoint1: CGPoint(x: 123.59, y: 53.45), controlPoint2: CGPoint(x: 120.56, y: 53.58))
+        bezierPath.addCurve(to: CGPoint(x: 87.63, y: 55.62), controlPoint1: CGPoint(x: 103.6, y: 57.98), controlPoint2: CGPoint(x: 96.67, y: 57.98))
+        bezierPath.addCurve(to: CGPoint(x: 73.58, y: 55.09), controlPoint1: CGPoint(x: 79.71, y: 53.51), controlPoint2: CGPoint(x: 76.49, y: 53.38))
+        bezierPath.close()
+        innerColor.setFill()
+        bezierPath.fill()
+        
+        
+        //// Bezier 2 Drawing
+        let bezier2Path = UIBezierPath()
+        bezier2Path.move(to: CGPoint(x: 57.86, y: 110.41))
+        bezier2Path.addCurve(to: CGPoint(x: 56, y: 125.06), controlPoint1: CGPoint(x: 57.68, y: 111.66), controlPoint2: CGPoint(x: 56.81, y: 118.23))
+        bezier2Path.addCurve(to: CGPoint(x: 64.92, y: 144.44), controlPoint1: CGPoint(x: 53.9, y: 142.27), controlPoint2: CGPoint(x: 54.33, y: 143.19))
+        bezier2Path.addCurve(to: CGPoint(x: 89.3, y: 145.56), controlPoint1: CGPoint(x: 73.46, y: 145.43), controlPoint2: CGPoint(x: 87.38, y: 146.09))
+        bezier2Path.addCurve(to: CGPoint(x: 94.32, y: 141.88), controlPoint1: CGPoint(x: 90.17, y: 145.36), controlPoint2: CGPoint(x: 92.46, y: 143.65))
+        bezier2Path.addCurve(to: CGPoint(x: 107.31, y: 141.88), controlPoint1: CGPoint(x: 99.7, y: 136.69), controlPoint2: CGPoint(x: 101.93, y: 136.69))
+        bezier2Path.addCurve(to: CGPoint(x: 112.33, y: 145.56), controlPoint1: CGPoint(x: 109.17, y: 143.65), controlPoint2: CGPoint(x: 111.46, y: 145.36))
+        bezier2Path.addCurve(to: CGPoint(x: 136.4, y: 144.44), controlPoint1: CGPoint(x: 114.25, y: 146.09), controlPoint2: CGPoint(x: 128.61, y: 145.43))
+        bezier2Path.addCurve(to: CGPoint(x: 144.2, y: 123.22), controlPoint1: CGPoint(x: 146.37, y: 143.26), controlPoint2: CGPoint(x: 146.62, y: 142.54))
+        bezier2Path.addCurve(to: CGPoint(x: 142.1, y: 108.57), controlPoint1: CGPoint(x: 143.21, y: 115.34), controlPoint2: CGPoint(x: 142.22, y: 108.77))
+        bezier2Path.addCurve(to: CGPoint(x: 136.9, y: 109.29), controlPoint1: CGPoint(x: 141.91, y: 108.44), controlPoint2: CGPoint(x: 139.56, y: 108.7))
+        bezier2Path.addCurve(to: CGPoint(x: 105.95, y: 112.12), controlPoint1: CGPoint(x: 127.93, y: 111.2), controlPoint2: CGPoint(x: 122.23, y: 111.72))
+        bezier2Path.addCurve(to: CGPoint(x: 60.15, y: 108.64), controlPoint1: CGPoint(x: 86.27, y: 112.58), controlPoint2: CGPoint(x: 74.26, y: 111.66))
+        bezier2Path.addCurve(to: CGPoint(x: 57.86, y: 110.41), controlPoint1: CGPoint(x: 58.29, y: 108.24), controlPoint2: CGPoint(x: 58.17, y: 108.37))
+        bezier2Path.close()
+        bezier2Path.move(to: CGPoint(x: 83.86, y: 123.16))
+        bezier2Path.addCurve(to: CGPoint(x: 90.11, y: 128.28), controlPoint1: CGPoint(x: 87.63, y: 124.34), controlPoint2: CGPoint(x: 90.66, y: 126.84))
+        bezier2Path.addCurve(to: CGPoint(x: 86.46, y: 131.17), controlPoint1: CGPoint(x: 89.92, y: 128.87), controlPoint2: CGPoint(x: 88.25, y: 130.19))
+        bezier2Path.addCurve(to: CGPoint(x: 72.34, y: 131.04), controlPoint1: CGPoint(x: 81.75, y: 133.73), controlPoint2: CGPoint(x: 76.99, y: 133.67))
+        bezier2Path.addCurve(to: CGPoint(x: 71.04, y: 125.26), controlPoint1: CGPoint(x: 68.32, y: 128.67), controlPoint2: CGPoint(x: 67.95, y: 127.16))
+        bezier2Path.addCurve(to: CGPoint(x: 83.86, y: 123.16), controlPoint1: CGPoint(x: 76, y: 122.11), controlPoint2: CGPoint(x: 79.09, y: 121.65))
+        bezier2Path.close()
+        bezier2Path.move(to: CGPoint(x: 127.31, y: 124.08))
+        bezier2Path.addCurve(to: CGPoint(x: 131.39, y: 128.35), controlPoint1: CGPoint(x: 130.4, y: 125.78), controlPoint2: CGPoint(x: 131.82, y: 127.23))
+        bezier2Path.addCurve(to: CGPoint(x: 127.86, y: 131.11), controlPoint1: CGPoint(x: 131.21, y: 128.81), controlPoint2: CGPoint(x: 129.6, y: 130.05))
+        bezier2Path.addCurve(to: CGPoint(x: 114.18, y: 131.37), controlPoint1: CGPoint(x: 123.53, y: 133.6), controlPoint2: CGPoint(x: 118.52, y: 133.73))
+        bezier2Path.addCurve(to: CGPoint(x: 111.65, y: 125.72), controlPoint1: CGPoint(x: 109.85, y: 129), controlPoint2: CGPoint(x: 109.29, y: 127.76))
+        bezier2Path.addCurve(to: CGPoint(x: 127.31, y: 124.08), controlPoint1: CGPoint(x: 115.92, y: 122.04), controlPoint2: CGPoint(x: 122.29, y: 121.38))
+        bezier2Path.close()
+        innerColor.setFill()
+        bezier2Path.fill()
+        
+        
+        //// Rectangle Drawing
+        context.saveGState()
+        context.translateBy(x: 48.07, y: 159)
+        context.rotate(by: -135 * CGFloat.pi/180)
+        
+        let rectanglePath = UIBezierPath(rect: CGRect(x: 0, y: 0, width: 10, height: 158))
+        innerColor.setFill()
+        rectanglePath.fill()
+        tagColor.setStroke()
+        rectanglePath.lineWidth = 3
+        rectanglePath.stroke()
+        
+        context.restoreGState()
         
         context.restoreGState()
         

@@ -9,6 +9,9 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
+        <array key="OpenSans-Bold.ttf">
+            <string>OpenSans-Bold</string>
+        </array>
         <array key="OpenSans-Regular.ttf">
             <string>OpenSans</string>
         </array>
@@ -132,7 +135,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Пользовательское соглашение" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="apM-mq-0Fi">
-                                                    <rect key="frame" x="16" y="12" width="317" height="20.5"/>
+                                                    <rect key="frame" x="16" y="13.5" width="317" height="17.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -153,7 +156,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Обратная связь" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aAH-Ho-5wp">
-                                                    <rect key="frame" x="16" y="12" width="317" height="20.5"/>
+                                                    <rect key="frame" x="16" y="13.5" width="317" height="17.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -174,7 +177,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Поделиться с другом" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vul-F8-gS4">
-                                                    <rect key="frame" x="16" y="12" width="343" height="20.5"/>
+                                                    <rect key="frame" x="16" y="13.5" width="343" height="17.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -195,7 +198,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="О разработчике" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RZm-pP-YDb">
-                                                    <rect key="frame" x="16" y="12" width="343" height="20.5"/>
+                                                    <rect key="frame" x="16" y="13.5" width="343" height="17.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -229,6 +232,52 @@
             </objects>
             <point key="canvasLocation" x="2438" y="833"/>
         </scene>
+        <!--Votes Count View Controller-->
+        <scene sceneID="qUh-ss-C9o">
+            <objects>
+                <viewController storyboardIdentifier="VotesCountViewController" id="3TX-ua-xLh" customClass="VotesCountViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="enM-cW-VU5"/>
+                        <viewControllerLayoutGuide type="bottom" id="KzD-id-m0Z"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="fXZ-9E-StZ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RMN-5i-8Mu" customClass="SurveyCategoryIcon" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="112.5" y="92" width="150" height="150"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="..." textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="0ci-Mm-mBy">
+                                <rect key="frame" x="75" y="308.5" width="225" height="50"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="36"/>
+                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                <connections>
+                                    <action selector="editingChanged:" destination="3TX-ua-xLh" eventType="editingChanged" id="nw4-h2-7nl"/>
+                                </connections>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="RMN-5i-8Mu" firstAttribute="centerX" secondItem="fXZ-9E-StZ" secondAttribute="centerX" id="65o-Y1-nUj"/>
+                            <constraint firstItem="0ci-Mm-mBy" firstAttribute="centerY" secondItem="fXZ-9E-StZ" secondAttribute="centerY" id="DXl-bg-oNh"/>
+                            <constraint firstItem="RMN-5i-8Mu" firstAttribute="centerY" secondItem="fXZ-9E-StZ" secondAttribute="centerY" multiplier="0.5" id="QSh-xq-iuh"/>
+                            <constraint firstItem="RMN-5i-8Mu" firstAttribute="width" secondItem="RMN-5i-8Mu" secondAttribute="height" multiplier="1:1" id="QlP-tO-2Ts"/>
+                            <constraint firstItem="0ci-Mm-mBy" firstAttribute="centerX" secondItem="fXZ-9E-StZ" secondAttribute="centerX" id="kDL-TK-xVu"/>
+                            <constraint firstItem="RMN-5i-8Mu" firstAttribute="width" secondItem="fXZ-9E-StZ" secondAttribute="width" multiplier="0.4" id="mYD-Fv-TqN"/>
+                            <constraint firstItem="0ci-Mm-mBy" firstAttribute="width" secondItem="fXZ-9E-StZ" secondAttribute="width" multiplier="0.6" id="z13-Qs-dMx"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="actionButton" destination="RMN-5i-8Mu" id="LgE-lO-Nyd"/>
+                        <outlet property="votesCountTF" destination="0ci-Mm-mBy" id="yEv-fC-xIN"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ZOb-D0-qED" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3534" y="833"/>
+        </scene>
         <!--Profile Settings Table View Controller-->
         <scene sceneID="PeY-Xf-7tE">
             <objects>
@@ -248,13 +297,13 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Доступно 100 голосов" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gaa-dZ-z2R">
-                                                    <rect key="frame" x="16" y="12" width="243" height="20.5"/>
+                                                    <rect key="frame" x="16" y="13.5" width="248.5" height="17.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Пополнить" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ni-VP-wAe">
-                                                    <rect key="frame" x="259" y="12" width="82" height="20.5"/>
+                                                    <rect key="frame" x="264.5" y="12.5" width="76.5" height="19"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="9ni-VP-wAe" secondAttribute="height" multiplier="20:5" id="sPm-X8-S2e"/>
                                                     </constraints>
@@ -344,7 +393,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="О приложении" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Zp-Yj-w6B">
-                                                    <rect key="frame" x="16" y="12" width="317" height="20.5"/>
+                                                    <rect key="frame" x="16" y="13.5" width="317" height="17.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -401,6 +450,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="F2c-x8-ETl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2438" y="133"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="wqJ-xW-cB0">
+            <objects>
+                <viewController storyboardIdentifier="TypingViewController" id="Lwm-ff-lkc" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="eeW-Bm-zWE"/>
+                        <viewControllerLayoutGuide type="bottom" id="xtQ-Yh-93s"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="JWy-dj-Tz3">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Sga-kI-BYz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3535" y="133"/>
         </scene>
     </scenes>
 </document>
