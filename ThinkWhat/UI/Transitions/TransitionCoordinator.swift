@@ -23,8 +23,9 @@ class TransitionCoordinator: NSObject, UINavigationControllerDelegate {
                 return FadeTransition(nc, operation)
             case .Icon:
                 return IconCircularTransition(nc, operation, nc.duration)//, nc.startingPoint, nc.category, nc.iconSize)
+            case .Blur:
+                return BlurTransition(nc, operation, nc.duration)
             }
-            
             //            if nc.isFadeTransition {
             //                return FadeTransition(nc, operation)
             //            } else if nc.isIconCircularTransition {

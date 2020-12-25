@@ -14,8 +14,6 @@ class AnonimitySelectionViewController: UIViewController {
     fileprivate let anonEnabledDescription = "Владелец опроса скрыт, респонденты никогда не узнают автора"
     fileprivate let anonDisabledDescription = "Владелец опроса виден респондентам"
     fileprivate var isAnimating = false
-    fileprivate var heightConstraintConstant: CGFloat = 0
-    fileprivate var newHeightConstraint: NSLayoutConstraint!
     fileprivate var isSelected = false
     var isAnonymous = false
     @IBOutlet weak var upperView: UIView!
@@ -73,18 +71,6 @@ class AnonimitySelectionViewController: UIViewController {
         navigationItem.setHidesBackButton(true, animated: false)
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        newHeightConstraint = NSLayoutConstraint(item: upperView, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.height, multiplier: 1, constant: upperView.frame.size.height)
-        NSLayoutConstraint.deactivate([heightConstraint])
-        NSLayoutConstraint.activate([newHeightConstraint])
-//        if heightConstraintConstant == 0 {
-//            heightConstraintConstant = upperView.frame.size.height
-//            heightConstraint.multiplier = 1
-//            heightConstraint.constant = heightConstraintConstant
-//        }
-    }
-    
-    
     @objc fileprivate func okButtonTapped() {
         if let v = isAnonymous ? anonEnabledSubview : anonDisabledSubview {
             UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
@@ -115,14 +101,6 @@ class AnonimitySelectionViewController: UIViewController {
                 self.actionButton.text = "OK"
                 self.actionButton.tagColor = K_COLOR_RED
                 self.actionButton.categoryID = .Text
-                UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
-                    self.view.setNeedsLayout()
-                    self.newHeightConstraint.constant *= 0.7
-                    self.view.layoutIfNeeded()
-                }) {
-                    _ in
-                    
-                }
             }
 //            v.cornerRadius = v.frame.width * 0.25
             

@@ -1,0 +1,84 @@
+//
+//  BlurTransition.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 14.12.2020.
+//  Copyright © 2020 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+
+class BlurTransition: NSObject, UIViewControllerAnimatedTransitioning {
+    var operation: UINavigationController.Operation!
+    var navigationController: NavigationControllerPreloaded!
+    var duration: TimeInterval = 0.3
+    
+    init(_ _navigationController: NavigationControllerPreloaded, _ _operation: UINavigationController.Operation, _ _duration: TimeInterval) {
+        navigationController = _navigationController
+        operation = _operation
+        duration = _duration
+    }
+    
+    weak var context: UIViewControllerContextTransitioning?
+    
+    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return duration
+    }
+    
+    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        guard let fromVC = transitionContext.viewController(forKey: .from),
+            let toVC = transitionContext.viewController(forKey: .to) else {
+                transitionContext.completeTransition(false)
+                return
+        }
+        
+        let containerView = transitionContext.containerView
+        context = transitionContext
+        toVC.view.alpha = 0//self.operation == .push ? 0 : toVC.view.alpha
+        containerView.addSubview(toVC.view)
+        
+        let effectViewOutgoing = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+        effectViewOutgoing.frame = fromVC.view.bounds
+        effectViewOutgoing.addEquallyTo(to: fromVC.view)
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0, delay: 0, options: [], animations: {
+            effectViewOutgoing.effect = nil
+        })
+        let effectViewIncoming = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
+        effectViewIncoming.frame = toVC.view.bounds
+        effectViewIncoming.addEquallyTo(to: toVC.view)
+        let delay = duration * 0.25
+        
+        if operation == .pop{
+            if let vc_1 = fromVC as? TextViewController, let vc_2 = toVC as? CreateNewSurveyViewController {
+                if vc_1.accessibilityIdentifier == "Title" {
+                    vc_2.questionTitle = vc_1.text.text
+                } else if vc_1.accessibilityIdentifier == "Question" {
+                    vc_2.question = vc_1.text.text
+                    vc_2.questionLabel.font = vc_1.font
+                    vc_2.questionLabel.textAlignment = .natural
+                    vc_2.questionLabel.numberOfLines = 0
+                }
+            }
+        }
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration - delay, delay: 0, options: [.curveLinear], animations: {
+            fromVC.view.alpha = 0
+            effectViewOutgoing.effect = UIBlurEffect(style: .light)
+        }) {
+            _ in
+            effectViewOutgoing.removeFromSuperview()
+        }
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration, delay: delay, options: [.curveLinear], animations: {
+                       effectViewIncoming.effect = nil
+            toVC.view.alpha = 1
+        }) {
+            _ in
+           
+            effectViewIncoming.removeFromSuperview()
+            fromVC.view.removeFromSuperview()
+            self.context?.completeTransition(true)
+        }
+    }
+}
+

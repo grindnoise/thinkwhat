@@ -31,7 +31,7 @@ public class HideKBStyleKit : NSObject {
         
         
         //// Color Declarations
-        let fillColor = UIColor(red: 0.000, green: 0.000, blue: 0.000, alpha: 1.000)
+        let fillColor = K_COLOR_GRAY//UIColor(red: 0.000, green: 0.000, blue: 0.000, alpha: 1.000)
         
         //// Group 2
         //// Bezier 9 Drawing

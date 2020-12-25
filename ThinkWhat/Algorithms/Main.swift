@@ -258,6 +258,7 @@ struct Segues {
         static let NewSurveyToPrivacySelection          = "NEW_TO_PRIVACY_SELECTION"
         static let NewSurveyToTypingViewController      = "NEW_TO_TYPE"
         static let NewSurveyToVotesCountViewController  = "NEW_TO_VOTES_COUNT"
+        static let NewSurveyToHyperlinkViewController   = "NEW_TO_HYPERLINK"
         static let SurveyToUser                         = "SURVEY_TO_USER"
         static let SurveyToClaim                        = "SURVEY_TO_CLAIM"
         static let UserToUserSurveys                    = "USER_TO_USER_SURVEYS"

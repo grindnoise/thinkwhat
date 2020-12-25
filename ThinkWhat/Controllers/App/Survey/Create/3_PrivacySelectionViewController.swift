@@ -15,12 +15,8 @@ class PrivacySelectionViewController: UIViewController {
     fileprivate let privacyDisabledDescription = "Опрос публичный, голосовать могут все"
     fileprivate var isAnimationStopped = false
     fileprivate var isAnimating = false
-    fileprivate var heightConstraintConstant: CGFloat = 0
-    fileprivate var newHeightConstraint: NSLayoutConstraint!
     fileprivate var isSelected = false
     var isPrivate = false
-    @IBOutlet weak var upperView: UIView!
-    @IBOutlet weak var heightConstraint: NSLayoutConstraint!
     @IBOutlet weak var actionButton: SurveyCategoryIcon! {
         didSet {
             actionButton.text = "?"
@@ -74,17 +70,6 @@ class PrivacySelectionViewController: UIViewController {
         navigationItem.setHidesBackButton(true, animated: false)
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        newHeightConstraint = NSLayoutConstraint(item: upperView, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.height, multiplier: 1, constant: upperView.frame.size.height)
-        NSLayoutConstraint.deactivate([heightConstraint])
-        NSLayoutConstraint.activate([newHeightConstraint])
-        //        if heightConstraintConstant == 0 {
-        //            heightConstraintConstant = upperView.frame.size.height
-        //            heightConstraint.multiplier = 1
-        //            heightConstraint.constant = heightConstraintConstant
-        //        }
-    }
-    
     @objc fileprivate func okButtonTapped() {
         if let v = isPrivate ? privacyEnabledSubview : privacyDisabledSubview {
             UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
@@ -115,14 +100,6 @@ class PrivacySelectionViewController: UIViewController {
                 self.actionButton.text = "OK"
                 self.actionButton.tagColor = K_COLOR_RED
                 self.actionButton.categoryID = .Text
-                UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
-                    self.view.setNeedsLayout()
-                    self.newHeightConstraint.constant *= 0.7
-                    self.view.layoutIfNeeded()
-                }) {
-                    _ in
-                    
-                }
             }
             //            v.cornerRadius = v.frame.width * 0.25
             
@@ -132,7 +109,7 @@ class PrivacySelectionViewController: UIViewController {
             
             //            UIView.animate(withDuration: 0.12) {
             UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
-                selectedView.backgroundColor = Colors.RussianViolet.withAlphaComponent(0.2)
+                selectedView.backgroundColor = Colors.UpperButtons.HoneyYellow.withAlphaComponent(0.2)
                 selectedView.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
                 deselectedView.backgroundColor = .white
                 deselectedView.transform = .identity

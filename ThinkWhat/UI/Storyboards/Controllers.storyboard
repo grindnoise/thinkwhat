@@ -12,6 +12,9 @@
         <array key="OpenSans-Bold.ttf">
             <string>OpenSans-Bold</string>
         </array>
+        <array key="OpenSans-Light.ttf">
+            <string>OpenSans-Light</string>
+        </array>
         <array key="OpenSans-Regular.ttf">
             <string>OpenSans</string>
         </array>
@@ -135,7 +138,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Пользовательское соглашение" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="apM-mq-0Fi">
-                                                    <rect key="frame" x="16" y="13.5" width="317" height="17.5"/>
+                                                    <rect key="frame" x="16" y="12" width="317" height="20.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -156,7 +159,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Обратная связь" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aAH-Ho-5wp">
-                                                    <rect key="frame" x="16" y="13.5" width="317" height="17.5"/>
+                                                    <rect key="frame" x="16" y="12" width="317" height="20.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -177,7 +180,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Поделиться с другом" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vul-F8-gS4">
-                                                    <rect key="frame" x="16" y="13.5" width="343" height="17.5"/>
+                                                    <rect key="frame" x="16" y="12" width="343" height="20.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -198,7 +201,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="О разработчике" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RZm-pP-YDb">
-                                                    <rect key="frame" x="16" y="13.5" width="343" height="17.5"/>
+                                                    <rect key="frame" x="16" y="12" width="343" height="20.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -232,10 +235,10 @@
             </objects>
             <point key="canvasLocation" x="2438" y="833"/>
         </scene>
-        <!--Votes Count View Controller-->
+        <!--Количество голосов-->
         <scene sceneID="qUh-ss-C9o">
             <objects>
-                <viewController storyboardIdentifier="VotesCountViewController" id="3TX-ua-xLh" customClass="VotesCountViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="VotesCountViewController" title="Количество голосов" id="3TX-ua-xLh" customClass="VotesCountViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="enM-cW-VU5"/>
                         <viewControllerLayoutGuide type="bottom" id="KzD-id-m0Z"/>
@@ -250,6 +253,7 @@
                             </view>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="..." textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="0ci-Mm-mBy">
                                 <rect key="frame" x="75" y="308.5" width="225" height="50"/>
+                                <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="36"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
@@ -297,13 +301,13 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Доступно 100 голосов" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gaa-dZ-z2R">
-                                                    <rect key="frame" x="16" y="13.5" width="248.5" height="17.5"/>
+                                                    <rect key="frame" x="16" y="12" width="243" height="20.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Пополнить" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ni-VP-wAe">
-                                                    <rect key="frame" x="264.5" y="12.5" width="76.5" height="19"/>
+                                                    <rect key="frame" x="259" y="12" width="82" height="20.5"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="9ni-VP-wAe" secondAttribute="height" multiplier="20:5" id="sPm-X8-S2e"/>
                                                     </constraints>
@@ -393,7 +397,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="О приложении" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Zp-Yj-w6B">
-                                                    <rect key="frame" x="16" y="13.5" width="317" height="17.5"/>
+                                                    <rect key="frame" x="16" y="12" width="317" height="20.5"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -451,10 +455,10 @@
             </objects>
             <point key="canvasLocation" x="2438" y="133"/>
         </scene>
-        <!--View Controller-->
+        <!--Text View Controller-->
         <scene sceneID="wqJ-xW-cB0">
             <objects>
-                <viewController storyboardIdentifier="TypingViewController" id="Lwm-ff-lkc" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="TextViewController" id="Lwm-ff-lkc" customClass="TextViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="eeW-Bm-zWE"/>
                         <viewControllerLayoutGuide type="bottom" id="xtQ-Yh-93s"/>
@@ -462,12 +466,142 @@
                     <view key="view" contentMode="scaleToFill" id="JWy-dj-Tz3">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8CO-2I-C7i" customClass="BorderedView" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="20" y="30" width="335" height="200"/>
+                                <subviews>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="hKq-lh-xUm">
+                                        <rect key="frame" x="10" y="10" width="315" height="180"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                        <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="15"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="hKq-lh-xUm" secondAttribute="trailing" constant="10" id="5eA-gB-bMc"/>
+                                    <constraint firstItem="hKq-lh-xUm" firstAttribute="leading" secondItem="8CO-2I-C7i" secondAttribute="leading" constant="10" id="Kp2-Gr-PeA"/>
+                                    <constraint firstAttribute="bottom" secondItem="hKq-lh-xUm" secondAttribute="bottom" constant="10" id="T8i-Yh-5AJ"/>
+                                    <constraint firstItem="hKq-lh-xUm" firstAttribute="top" secondItem="8CO-2I-C7i" secondAttribute="top" constant="10" id="Vkq-qN-fgC"/>
+                                    <constraint firstAttribute="height" constant="200" id="zz7-9g-hj3"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="rounded" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="bordered" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                        <real key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="kSc-q7-XBV">
+                                <rect key="frame" x="20" y="230" width="335" height="50"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gpp-mN-yes">
+                                        <rect key="frame" x="0.0" y="0.0" width="92.5" height="50"/>
+                                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
+                                        <state key="normal" title="Отмена">
+                                            <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="cancelTapped:" destination="Lwm-ff-lkc" eventType="touchUpInside" id="pXP-Pc-ZBJ"/>
+                                        </connections>
+                                    </button>
+                                    <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nNf-mq-uog" customClass="HideKeyboardIcon" customModule="ThinkWhat" customModuleProvider="target">
+                                        <rect key="frame" x="142.5" y="0.0" width="50" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="nNf-mq-uog" secondAttribute="height" multiplier="1:1" id="wdl-TN-cow"/>
+                                        </constraints>
+                                    </view>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iJU-cy-xrl">
+                                        <rect key="frame" x="242.5" y="0.0" width="92.5" height="50"/>
+                                        <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="17"/>
+                                        <state key="normal" title="Ок">
+                                            <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="okTapped:" destination="Lwm-ff-lkc" eventType="touchUpInside" id="Qly-JJ-dKl"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="iJU-cy-xrl" firstAttribute="width" secondItem="Gpp-mN-yes" secondAttribute="width" id="jka-rL-CBk"/>
+                                    <constraint firstAttribute="height" constant="50" id="w7X-Ta-CMp"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="kSc-q7-XBV" firstAttribute="top" secondItem="8CO-2I-C7i" secondAttribute="bottom" id="O7d-Nd-D0c"/>
+                            <constraint firstItem="kSc-q7-XBV" firstAttribute="width" secondItem="8CO-2I-C7i" secondAttribute="width" id="RyY-gx-TOP"/>
+                            <constraint firstItem="kSc-q7-XBV" firstAttribute="centerX" secondItem="8CO-2I-C7i" secondAttribute="centerX" id="Rza-Rx-eml"/>
+                            <constraint firstAttribute="trailing" secondItem="8CO-2I-C7i" secondAttribute="trailing" constant="20" id="SB1-T1-8Kh"/>
+                            <constraint firstItem="8CO-2I-C7i" firstAttribute="top" secondItem="eeW-Bm-zWE" secondAttribute="bottom" constant="10" id="WRF-7D-Oa8"/>
+                            <constraint firstItem="8CO-2I-C7i" firstAttribute="leading" secondItem="JWy-dj-Tz3" secondAttribute="leading" constant="20" id="ZVq-tw-fXM"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="frameHeight" destination="zz7-9g-hj3" id="0zp-GC-Xj5"/>
+                        <outlet property="frameToStackHeight" destination="O7d-Nd-D0c" id="82l-5z-q0m"/>
+                        <outlet property="frameView" destination="8CO-2I-C7i" id="NjM-Sv-jXQ"/>
+                        <outlet property="hideKBIcon" destination="nNf-mq-uog" id="3aY-KL-69Y"/>
+                        <outlet property="stackView" destination="kSc-q7-XBV" id="YRR-4s-x1v"/>
+                        <outlet property="text" destination="hKq-lh-xUm" id="Itr-EY-L23"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Sga-kI-BYz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3535" y="133"/>
+        </scene>
+        <!--Ресурс-->
+        <scene sceneID="u8A-sa-xjt">
+            <objects>
+                <viewController storyboardIdentifier="HyperlinkSelectionViewController" title="Ресурс" id="ReM-Ze-RY2" customClass="HyperlinkSelectionViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="sTI-cn-her"/>
+                        <viewControllerLayoutGuide type="bottom" id="Bgi-en-3px"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="hO4-6a-JDS">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DKY-6i-cjf" customClass="SurveyCategoryIcon" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="112.5" y="92" width="150" height="150"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QCf-ff-G76">
+                                <rect key="frame" x="55.5" y="262" width="264" height="33"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="15"/>
+                                <state key="normal" title="ПРОПУСТИТЬ">
+                                    <color key="titleColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="dismiss:" destination="ReM-Ze-RY2" eventType="touchUpInside" id="h6H-hu-uyd"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="DKY-6i-cjf" firstAttribute="centerY" secondItem="hO4-6a-JDS" secondAttribute="centerY" multiplier="0.5" id="DQ9-JW-0Ly"/>
+                            <constraint firstItem="QCf-ff-G76" firstAttribute="centerX" secondItem="hO4-6a-JDS" secondAttribute="centerX" id="Psf-OX-R0J"/>
+                            <constraint firstItem="DKY-6i-cjf" firstAttribute="width" secondItem="DKY-6i-cjf" secondAttribute="height" multiplier="1:1" id="Xza-D6-LsB"/>
+                            <constraint firstItem="DKY-6i-cjf" firstAttribute="width" secondItem="hO4-6a-JDS" secondAttribute="width" multiplier="0.4" id="Y7r-q8-oyL"/>
+                            <constraint firstItem="DKY-6i-cjf" firstAttribute="centerX" secondItem="hO4-6a-JDS" secondAttribute="centerX" id="b7c-US-52M"/>
+                            <constraint firstItem="QCf-ff-G76" firstAttribute="width" secondItem="QCf-ff-G76" secondAttribute="height" multiplier="40:5" id="d2i-ks-Sl0"/>
+                            <constraint firstItem="QCf-ff-G76" firstAttribute="top" secondItem="DKY-6i-cjf" secondAttribute="bottom" constant="20" id="io6-gY-VXy"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="actionButton" destination="DKY-6i-cjf" id="6Ae-bG-dmt"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="G39-pm-9Hd" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4593" y="833"/>
         </scene>
     </scenes>
 </document>
