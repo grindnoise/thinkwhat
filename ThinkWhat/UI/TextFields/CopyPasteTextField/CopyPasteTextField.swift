@@ -11,7 +11,7 @@ import UIKit
 @IBDesignable
 class CopyPasteTextField: UITextField {
 
-    private var copyPasteSign: CopyPasteSign!
+    private var copyPasteSign: CopyPasteIcon!
     private var signSize = CGSize.zero {//(width: 32, height: 32) {
         didSet {
             layoutSubviews()
@@ -43,7 +43,7 @@ class CopyPasteTextField: UITextField {
             rightView?.addGestureRecognizer(recognizer)
         }
         if copyPasteSign == nil  {
-            copyPasteSign = CopyPasteSign(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
+            copyPasteSign = CopyPasteIcon(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
             copyPasteSign.isOpaque = false
             copyPasteSign.addEquallyTo(to: rightView!)
         }

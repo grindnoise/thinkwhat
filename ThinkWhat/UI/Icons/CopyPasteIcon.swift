@@ -9,7 +9,7 @@
 import UIKit
 
 @IBDesignable
-final class CopyPasteSign: UIView {
+final class CopyPasteIcon: UIView {
     override func draw(_ rect: CGRect) {
         CopyPasteStyleKit.drawPaste(frame: rect, resizing: .aspectFit)
     }
@@ -88,7 +88,7 @@ public class CopyPasteStyleKit : NSObject {
         bezierPath.addLine(to: CGPoint(x: 183.46, y: 17))
         bezierPath.addCurve(to: CGPoint(x: 192.19, y: 17.67), controlPoint1: CGPoint(x: 187.93, y: 17), controlPoint2: CGPoint(x: 190.17, y: 17))
         bezierPath.close()
-        UIColor.darkGray.setFill()
+        UIColor.gray.setFill()
         bezierPath.fill()
         
         context.restoreGState()

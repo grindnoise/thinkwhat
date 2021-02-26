@@ -87,6 +87,19 @@ func makeGroupAnimation(animations: [CAAnimation], duration: CFTimeInterval, tim
 //        imageView.image = toImage
 //
 //    }
+func joinAnimations(animations: [CAAnimation], repeatCount: Float, autoreverses: Bool, duration: CFTimeInterval, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String, delegate: CAAnimationDelegate?) -> CAAnimationGroup {
+    
+    let anim = CAAnimationGroup()
+    anim.animations = animations
+    anim.duration = duration
+    anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: timingFunction))
+    anim.repeatCount = repeatCount
+    anim.delegate = delegate
+    anim.autoreverses = autoreverses
+    anim.delegate = delegate
+    return anim
+    
+}
 
 //Анимация смены изображения v.2
 func animateImageChange(annotationView: MKAnnotationView, fromImage: UIImage, toImage: UIImage, duration: CFTimeInterval) {
@@ -103,6 +116,40 @@ func animateImageChange(annotationView: MKAnnotationView, fromImage: UIImage, to
 func animateTransformScale(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, repeatCount: Float, autoreverses: Bool, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String, delegate: CAAnimationDelegate?) -> CABasicAnimation {
     
     let anim = CABasicAnimation(keyPath:"transform.scale")
+    anim.fromValue = fromValue
+    anim.toValue = toValue
+    anim.duration = duration
+    anim.repeatCount = repeatCount
+    anim.autoreverses = autoreverses
+    if delegate != nil {
+        anim.delegate = delegate!
+    }
+    anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: timingFunction))
+    
+    return anim
+    
+}
+
+func animateShadowPath(fromValue: CGPath, toValue: CGPath, duration: CFTimeInterval, repeatCount: Float, autoreverses: Bool, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String, delegate: CAAnimationDelegate?) -> CABasicAnimation {
+    
+    let anim = CABasicAnimation(keyPath:"shadowPath")
+    anim.fromValue = fromValue
+    anim.toValue = toValue
+    anim.duration = duration
+    anim.repeatCount = repeatCount
+    anim.autoreverses = autoreverses
+    if delegate != nil {
+        anim.delegate = delegate!
+    }
+    anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: timingFunction))
+    
+    return anim
+    
+}
+
+func animateShadowOpacity(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, repeatCount: Float, autoreverses: Bool, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String, delegate: CAAnimationDelegate?) -> CABasicAnimation {
+    
+    let anim = CABasicAnimation(keyPath:"shadowOpacity")
     anim.fromValue = fromValue
     anim.toValue = toValue
     anim.duration = duration

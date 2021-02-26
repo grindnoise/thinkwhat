@@ -136,25 +136,25 @@ class CategoryCollectionViewController: UICollectionViewController {
 //                    collectionView.addSubview(icon)
 ////                    cell.icon.alpha = 0
                     
-                    view.isUserInteractionEnabled = false
-                    self.effectView.alpha = 1
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.12, delay: 0, options: [.curveLinear], animations: {
-                        self.effectView.effect = UIBlurEffect(style: .prominent)
-                        self.collectionView.alpha = 0
-                    }) {
-                        _ in
+//                    view.isUserInteractionEnabled = false
+//                    self.effectView.alpha = 1
+//                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.12, delay: 0, options: [.curveLinear], animations: {
+//                        self.effectView.effect = UIBlurEffect(style: .prominent)
+//                        self.collectionView.alpha = 0
+//                    }) {
+//                        _ in
                         DispatchQueue.main.async {
                             self.delegate?.callbackReceived(category)
                         }
-                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.19, delay: 0, options: [.curveLinear], animations: {
-                            self.effectView.effect = nil
-                            self.collectionView.alpha = 1
-                        }) {
-                            _ in
-                            self.effectView.alpha = 0
-                            self.view.isUserInteractionEnabled = true
-                        }
-                    }
+//                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.19, delay: 0, options: [.curveLinear], animations: {
+//                            self.effectView.effect = nil
+//                            self.collectionView.alpha = 1
+//                        }) {
+//                            _ in
+//                            self.effectView.alpha = 0
+//                            self.view.isUserInteractionEnabled = true
+//                        }
+//                    }
                 }
             } else {
                 //Subcategory

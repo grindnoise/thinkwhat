@@ -71,7 +71,7 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
             if !isRearranging {
                 if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 4)) as? AnswerCreationHeaderCell {
                     delay(seconds: 0.5) {
-                        cell.addButton.state = self.answers.count < self.MAX_ANSWERS_COUNT ? .enabled : .disabled
+                        cell.addButton.state = self.answers.count < MAX_ANSWERS_COUNT ? .enabled : .disabled
                     }
                 }
                 if answers.count > oldValue.count {
@@ -95,8 +95,8 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
             if !isRearranging {
                 if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) as? ImageHeaderCell {
                     delay(seconds: 0.5) {
-                        cell.cameraIcon.state = self.images.count < self.MAX_IMAGES_COUNT ? .enabled : .disabled
-                        cell.galleryIcon.state = self.images.count < self.MAX_IMAGES_COUNT ? .enabled : .disabled
+                        cell.cameraIcon.state = self.images.count < MAX_IMAGES_COUNT ? .enabled : .disabled
+                        cell.galleryIcon.state = self.images.count < MAX_IMAGES_COUNT ? .enabled : .disabled
                     }
                 }
                 if images.count > oldValue.count {
@@ -158,8 +158,6 @@ class NewSurveyViewController: UIViewController, UINavigationControllerDelegate 
     fileprivate var isMovedUp:          Bool?
 //    fileprivate var isReplacingImage = false
     fileprivate var questionTextChanged = false
-    fileprivate let MAX_IMAGES_COUNT = 3
-    fileprivate let MAX_ANSWERS_COUNT = 6
     fileprivate let sections = ["ПАРАМЕТРЫ", "ВОПРОС", "ИЗОБРАЖЕНИЯ", "", "ОТВЕТЫ", "", ""]
     fileprivate var questionTitleRowHeight: CGFloat = 0
     fileprivate var questionRowHeight: CGFloat = 0

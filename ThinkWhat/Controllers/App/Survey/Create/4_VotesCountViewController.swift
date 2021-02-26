@@ -12,6 +12,12 @@ class VotesCountViewController: UIViewController {
 
     private var isAnimating = false
     private var isAnimationStopped = false
+    private var finalShadowPath: CGPath!
+    private var initialShadowPath: CGPath!
+    private var scaleAnim: CABasicAnimation!
+    private var shadowPathAnim: CABasicAnimation!
+    private var groupAnim: CAAnimationGroup!
+    var color: UIColor!
     var votesCount = 100 {
         didSet {
             if votesCount != oldValue {
@@ -27,9 +33,8 @@ class VotesCountViewController: UIViewController {
                         actionButton.isUserInteractionEnabled = true
                         if !isAnimating {
                             isAnimationStopped = false
-                            let anim = animateTransformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut.rawValue, delegate: self as CAAnimationDelegate)
-                            anim.setValue(actionButton, forKey: "btn")
-                            actionButton.layer.add(anim, forKey: nil)
+                            groupAnim.setValue(actionButton, forKey: "btn")
+                            actionButton.layer.add(groupAnim, forKey: nil)
                             isAnimating = true
                         }
                     }
@@ -40,7 +45,7 @@ class VotesCountViewController: UIViewController {
     @IBOutlet weak var actionButton: SurveyCategoryIcon! {
         didSet {
             actionButton.categoryID = .Text
-            actionButton.tagColor   = Colors.UpperButtons.Avocado
+            actionButton.tagColor   = color//Colors.UpperButtons.Avocado
             actionButton.text = "\(votesCount)"
             let tap = UITapGestureRecognizer(target: self, action: #selector(VotesCountViewController.actionButtonTapped))
             actionButton.addGestureRecognizer(tap)
@@ -70,18 +75,34 @@ class VotesCountViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-//        votesCountTF.becomeFirstResponder()
-//        let anim = animateTransformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut.rawValue, delegate: self as CAAnimationDelegate)
-//        anim.setValue(actionButton, forKey: "btn")
-//        actionButton.layer.add(anim, forKey: nil)
-//        isAnimating = true
+        if scaleAnim == nil {
+            scaleAnim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+        }
+        if shadowPathAnim == nil {
+            shadowPathAnim = animateShadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+        }
+        if groupAnim == nil {
+            groupAnim = joinAnimations(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: self)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        DispatchQueue.main.async {
+            self.actionButton.setNeedsLayout()
+            self.actionButton.layoutIfNeeded()
+            self.actionButton.layer.shadowColor = K_COLOR_GRAY.withAlphaComponent(0.3).cgColor
+            let delta = self.actionButton.bounds.width - self.actionButton.bounds.width / 1.15
+            self.initialShadowPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint(x: self.actionButton.bounds.origin.x + delta/2, y: self.actionButton.bounds.origin.y + delta/2), size: CGSize(width: self.actionButton.bounds.width - delta, height: self.actionButton.bounds.height - delta))).cgPath
+            self.finalShadowPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint(x: self.actionButton.bounds.origin.x - delta/2, y: self.actionButton.bounds.origin.y - delta/2), size: CGSize(width: self.actionButton.bounds.width + delta, height: self.actionButton.bounds.height + delta))).cgPath//UIBezierPath(ovalIn: self.actionButton.bounds).cgPath
+            self.actionButton.layer.shadowPath = self.initialShadowPath
+            self.actionButton.layer.shadowRadius = 5
+            self.actionButton.layer.shadowOffset = .zero
+            self.actionButton.layer.shadowOpacity = 1
+            self.actionButton.layer.masksToBounds = false
+        }
         delay(seconds: 0.4) {
-            let anim = animateTransformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut.rawValue, delegate: self as CAAnimationDelegate)
-            anim.setValue(self.actionButton, forKey: "btn")
-            self.actionButton.layer.add(anim, forKey: nil)
+            self.groupAnim.setValue(self.actionButton, forKey: "btn")
+            self.actionButton.layer.add(self.groupAnim, forKey: nil)
             self.isAnimating = true
         }
         delay(seconds: 0.1) {
@@ -108,9 +129,8 @@ extension VotesCountViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         isAnimating = false
         if !isAnimationStopped, let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon {
-            let _anim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.5, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut.rawValue, delegate: self as CAAnimationDelegate)
-            _anim.setValue(btn, forKey: "btn")
-            btn.layer.add(_anim, forKey: nil)
+            groupAnim.setValue(btn, forKey: "btn")
+            btn.layer.add(groupAnim, forKey: nil)
             isAnimating = true
         }
     }

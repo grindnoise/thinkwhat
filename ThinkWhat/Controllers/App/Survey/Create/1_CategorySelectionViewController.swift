@@ -13,24 +13,18 @@ class CategorySelectionViewController: UIViewController {
     let categoryVC: CategoryCollectionViewController = {
         return Storyboards.controllers.instantiateViewController(withIdentifier: "CategoryCollectionViewController") as! CategoryCollectionViewController
     } ()
-    fileprivate var parentCategory: SurveyCategory? {
+    private var parentCategory: SurveyCategory? {
         didSet {
-//            if parentCategory == nil {
-                isAnimationStopped = true
-                category = nil
-//            } else {
-                
-                //Animate with colored circle
-//                view.backgroundColor = parentCategory!.tagColor// ?? .lightGray
-//            }
-            
+            isAnimationStopped = true
+            category = nil
             backButton.color = parentCategory?.tagColor
             UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
+                self.view.setNeedsLayout()
+                self.backButtonConstraint.constant = self.parentCategory == nil ? self.hiddenConstraintConstant : self.initialConstraintConstant
+                self.view.layoutIfNeeded()
                 self.backButton.transform = self.parentCategory == nil ? CGAffineTransform(scaleX: 0.7, y: 0.7) : CGAffineTransform.identity
                 self.backButton.alpha = self.parentCategory == nil ? 0 : 1
             })
-            
-            upperContainer.layer.shadowColor = parentCategory?.tagColor?.withAlphaComponent(0.3).cgColor ?? K_COLOR_RED.withAlphaComponent(0.3).cgColor
             dataSource = SurveyCategories.shared.categories.filter { $0.parent == parentCategory }
         }
     }
@@ -48,11 +42,11 @@ class CategorySelectionViewController: UIViewController {
                     if !isAnimating {
                         isAnimationStopped = false
                         actionButton.text = "OK"
-                        //                    actionButton.tagColor = category!.parent!.tagColor
-                        //                    actionButton.categoryID = .Text
-                        let anim = animateTransformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut.rawValue, delegate: self as CAAnimationDelegate)
-                        anim.setValue(actionButton, forKey: "btn")
-                        actionButton.layer.add(anim, forKey: nil)
+//                        let anim = animateTransformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut.rawValue, delegate: self as CAAnimationDelegate)
+//                        anim.setValue(actionButton, forKey: "btn")
+//                        actionButton.layer.add(anim, forKey: nil)
+                        groupAnim.setValue(actionButton, forKey: "btn")
+                        actionButton.layer.add(groupAnim, forKey: nil)
                         isAnimating = true
                     }
                 } else {
@@ -65,18 +59,25 @@ class CategorySelectionViewController: UIViewController {
             }
         }
     }
-    fileprivate var dataSource: [SurveyCategory]! {
+    private var dataSource: [SurveyCategory]! {
         didSet {
             if oldValue != dataSource {
                 categoryVC.categories = dataSource
                 categoryVC.childColor = parentCategory?.tagColor
-                categoryVC.collectionView.reloadData()//.reloadSections(IndexSet(arrayLiteral: 0))
+                categoryVC.collectionView.reloadSections(IndexSet(arrayLiteral: 0))
             }
         }
     }
-    fileprivate var isViewSetupCompleted = false
-    fileprivate var isAnimationStopped = false
-    fileprivate var isAnimating = false
+    private var isViewSetupCompleted = false
+    private var isAnimationStopped = false
+    private var isAnimating = false
+    private var initialConstraintConstant: CGFloat = 0//When backButton is on the screen
+    private var hiddenConstraintConstant: CGFloat = 0//When backButton is out of the screen
+    private var finalShadowPath: CGPath!
+    private var initialShadowPath: CGPath!
+    private var scaleAnim: CABasicAnimation!
+    private var shadowPathAnim: CABasicAnimation!
+    private var groupAnim: CAAnimationGroup!
     @IBOutlet weak var upperContainer: UIView!
     @IBOutlet weak var actionButton: SurveyCategoryIcon! {
         didSet {
@@ -86,30 +87,28 @@ class CategorySelectionViewController: UIViewController {
             actionButton.tagColor = K_COLOR_GRAY
             actionButton.text = "?"
             actionButton.categoryID = .Text
-//            if category != nil {
-//                actionButton.tagColor = category!.parent!.tagColor
-//                actionButton.categoryID = SurveyCategoryIcon.CategoryID(rawValue: category!.ID) ?? .Null
-//            } else {
-//                actionButton.text = "?"
-//                actionButton.categoryID = .Text
-//            }
         }
     }
+    @IBOutlet weak var containerBg: UIView!
     @IBOutlet weak var container: UIView!
+    @IBOutlet weak var backButtonBg: UIView!
+    @IBOutlet weak var backButtonFg: UIView! {
+        didSet {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(CategorySelectionViewController.backButtonTapped))
+            backButton.addGestureRecognizer(tap)
+        }
+    }
     @IBOutlet weak var backButton: BackRoundedButton! {
         didSet {
             let tap = UITapGestureRecognizer(target: self, action: #selector(CategorySelectionViewController.backButtonTapped))
             backButton.addGestureRecognizer(tap)
-            backButton.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
         }
     }
+    @IBOutlet weak var backButtonConstraint: NSLayoutConstraint!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         categoryVC.delegate = self
-//        container.backgroundColor = .clear
-//        categoryVC.view.backgroundColor = .clear
-//        categoryVC.collectionView.backgroundColor = .clear
         categoryVC.selectionMode = true
         categoryVC.categories = SurveyCategories.shared.categories.filter { $0.parent == parentCategory }
         categoryVC.view.addEquallyTo(to: container)
@@ -125,59 +124,85 @@ class CategorySelectionViewController: UIViewController {
         }
         
         if !isViewSetupCompleted {
+            DispatchQueue.main.async {
+                self.actionButton.setNeedsLayout()
+                self.actionButton.layoutIfNeeded()
+                self.actionButton.layer.shadowColor = K_COLOR_GRAY.withAlphaComponent(0.3).cgColor
+                let delta = self.actionButton.bounds.width - self.actionButton.bounds.width / 1.15
+                self.initialShadowPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint(x: self.actionButton.bounds.origin.x + delta/2, y: self.actionButton.bounds.origin.y + delta/2), size: CGSize(width: self.actionButton.bounds.width - delta, height: self.actionButton.bounds.height - delta))).cgPath
+                self.finalShadowPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint(x: self.actionButton.bounds.origin.x - delta/2, y: self.actionButton.bounds.origin.y - delta/2), size: CGSize(width: self.actionButton.bounds.width + delta, height: self.actionButton.bounds.height + delta))).cgPath//UIBezierPath(ovalIn: self.actionButton.bounds).cgPath
+                self.actionButton.layer.shadowPath = self.initialShadowPath
+                self.actionButton.layer.shadowRadius = 5
+                self.actionButton.layer.shadowOffset = .zero
+                self.actionButton.layer.shadowOpacity = 1
+                self.actionButton.layer.masksToBounds = false
+            }
             navigationItem.setHidesBackButton(true, animated: false)
-            upperContainer.layer.shadowOpacity = 0
-            upperContainer.layer.shadowColor = K_COLOR_RED.withAlphaComponent(0.3).cgColor
-            upperContainer.layer.shadowPath = UIBezierPath(rect: upperContainer.bounds).cgPath
-            upperContainer.layer.masksToBounds = false
-            upperContainer.layer.shadowRadius = 10
-            upperContainer.layer.shadowOffset = .zero
+            containerBg.setNeedsLayout()
+            containerBg.layoutIfNeeded()
+            containerBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            containerBg.layer.shadowPath = UIBezierPath(roundedRect: containerBg.bounds, cornerRadius: 15).cgPath
+            containerBg.layer.shadowRadius = 7
+            containerBg.layer.shadowOffset = .zero
+            containerBg.layer.shadowOpacity = 1
+            containerBg.layer.masksToBounds = false
+            backButtonBg.setNeedsLayout()
+            backButtonBg.layoutIfNeeded()
+//            backButtonFg.setNeedsLayout()
+//            backButtonFg.layoutIfNeeded()
+            backButtonFg.layer.cornerRadius = backButtonFg.frame.height / 2
+            backButtonBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            backButtonBg.layer.shadowPath = UIBezierPath(roundedRect: backButtonBg.bounds, cornerRadius: 15).cgPath
+            backButtonBg.layer.shadowRadius = 7
+            backButtonBg.layer.shadowOffset = .zero
+            backButtonBg.layer.shadowOpacity = 1
+            backButtonBg.layer.masksToBounds = false
+            initialConstraintConstant = backButtonConstraint.constant
+            hiddenConstraintConstant = backButtonConstraint.constant - (initialConstraintConstant * 1.2 + backButtonBg.frame.width)
+            backButtonBg.setNeedsLayout()
+            backButtonConstraint.constant = hiddenConstraintConstant
+            backButtonBg.layoutIfNeeded()
+            
             isViewSetupCompleted = true
         }
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if scaleAnim == nil {
+            scaleAnim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+        }
+        if shadowPathAnim == nil {
+            shadowPathAnim = animateShadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+        }
+        if groupAnim == nil {
+            groupAnim = joinAnimations(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: self)
+        }
+    }
+
     
     override func viewWillDisappear(_ animated: Bool) {
         isAnimationStopped = true
     }
     
-    fileprivate func animateShadow(_ isShadowed: Bool) {
-        if NSNumber(value: upperContainer.layer.shadowOpacity).boolValue != isShadowed {
-            print("anim")
-            let anim = CABasicAnimation(keyPath: "shadowOpacity")
-            anim.fromValue = isShadowed ? 0 : 1
-            anim.toValue = isShadowed ? 1 : 0
-            anim.duration = 0.2
-            anim.isRemovedOnCompletion = false
-            upperContainer.layer.add(anim, forKey: anim.keyPath)
-            upperContainer.layer.shadowOpacity = isShadowed ? 1 : 0
-        }
-    }
+//    fileprivate func animateShadow(_ isShadowed: Bool) {
+//        if NSNumber(value: upperContainer.layer.shadowOpacity).boolValue != isShadowed {
+//            print("anim")
+//            let anim = CABasicAnimation(keyPath: "shadowOpacity")
+//            anim.fromValue = isShadowed ? 0 : 1
+//            anim.toValue = isShadowed ? 1 : 0
+//            anim.duration = 0.2
+//            anim.isRemovedOnCompletion = false
+//            upperContainer.layer.add(anim, forKey: anim.keyPath)
+//            upperContainer.layer.shadowOpacity = isShadowed ? 1 : 0
+//        }
+//    }
     
     @objc fileprivate func backButtonTapped() {
-        self.categoryVC.effectView.alpha = 1
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.12, delay: 0, options: [.curveLinear], animations: {
-            self.categoryVC.effectView.effect = UIBlurEffect(style: .prominent)
-            self.categoryVC.collectionView.alpha = 0
-        }) {
-            _ in
-            DispatchQueue.main.async {
-                self.parentCategory = nil
-            }
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
-                self.categoryVC.effectView.effect = nil
-                self.categoryVC.collectionView.alpha = 1
-            }) {
-                _ in
-                self.categoryVC.effectView.alpha = 0
-                self.categoryVC.view.isUserInteractionEnabled = true
-            }
-        }
-//        parentCategory = nil
+        parentCategory = nil
     }
     
     @objc fileprivate func okButtonTapped() {
         isModified = true
-//        delegate?.callbackReceived(category as AnyObject)
         navigationController?.popViewController(animated: true)
     }
 }
@@ -192,8 +217,6 @@ extension CategorySelectionViewController: CallbackDelegate {
             } else {
                 category = _category
             }
-        } else if let dict = sender as? Dictionary<String, Any>, let isShadowed = dict["isShadowed"] as? Bool {
-            animateShadow(isShadowed)
         }
     }
 }
@@ -202,9 +225,11 @@ extension CategorySelectionViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         isAnimating = false
         if !isAnimationStopped, let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon {
-            let _anim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.5, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut.rawValue, delegate: self as CAAnimationDelegate)
-            _anim.setValue(btn, forKey: "btn")
-            btn.layer.add(_anim, forKey: nil)
+//            let _anim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.5, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut.rawValue, delegate: self as CAAnimationDelegate)
+//            _anim.setValue(btn, forKey: "btn")
+//            btn.layer.add(_anim, forKey: nil)
+            groupAnim.setValue(btn, forKey: "btn")
+            btn.layer.add(groupAnim, forKey: nil)
             isAnimating = true
         }
     }

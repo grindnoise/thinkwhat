@@ -10,8 +10,13 @@ import UIKit
 
 @IBDesignable
 class HideKeyboardIcon: UIView {
+    var color: UIColor = .gray {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
     override func draw(_ rect: CGRect) {
-        HideKBStyleKit.drawCanvas1(frame: rect, resizing: .aspectFit)
+        HideKBStyleKit.drawCanvas1(frame: rect, resizing: .aspectFit, color: color)
     }
 }
 
@@ -19,7 +24,7 @@ public class HideKBStyleKit : NSObject {
     
     //// Drawing Methods
     
-    @objc public dynamic class func drawCanvas1(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 167, height: 167), resizing: ResizingBehavior = .aspectFit) {
+    @objc public dynamic class func drawCanvas1(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 167, height: 167), resizing: ResizingBehavior = .aspectFit, color: UIColor) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -31,7 +36,7 @@ public class HideKBStyleKit : NSObject {
         
         
         //// Color Declarations
-        let fillColor = K_COLOR_GRAY//UIColor(red: 0.000, green: 0.000, blue: 0.000, alpha: 1.000)
+        let fillColor = color//UIColor(red: 0.000, green: 0.000, blue: 0.000, alpha: 1.000)
         
         //// Group 2
         //// Bezier 9 Drawing

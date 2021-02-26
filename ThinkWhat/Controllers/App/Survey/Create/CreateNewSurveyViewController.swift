@@ -26,6 +26,22 @@ class CreateNewSurveyViewController: UIViewController {
             }
         }
     }
+    @IBOutlet weak var categoryLabel: UILabel!
+    @IBOutlet weak var anonLabel: UILabel! {
+        didSet {
+            anonLabel.alpha = 0
+        }
+    }
+    @IBOutlet weak var privacyLabel: UILabel! {
+        didSet {
+            privacyLabel.alpha = 0
+        }
+    }
+    @IBOutlet weak var votesLabel: UILabel! {
+        didSet {
+            votesLabel.alpha = 0
+        }
+    }
     @IBOutlet weak var anonTitle: UILabel!
     @IBOutlet weak var privacyTitle: UILabel!
     @IBOutlet weak var categoryIcon: SurveyCategoryIcon! {
@@ -35,6 +51,7 @@ class CreateNewSurveyViewController: UIViewController {
                 categoryIcon.tagColor = K_COLOR_RED
                 categoryIcon.text = "?"
                 categoryIcon.categoryID = .Text
+                categoryIcon.isGradient = false
                 if category != nil {
                     categoryTitle.text = "КАТЕГОРИЯ"
                 }
@@ -49,7 +66,7 @@ class CreateNewSurveyViewController: UIViewController {
     }
     @IBOutlet weak var privacyIcon: SurveyCategoryIcon! {
         didSet {
-            privacyIcon.categoryID = .Eye
+            privacyIcon.categoryID = .Privacy
             privacyIcon.tagColor   = K_COLOR_RED
         }
     }
@@ -97,14 +114,16 @@ class CreateNewSurveyViewController: UIViewController {
 //            }
         }
     }
-    @IBOutlet weak var titleSubview: UIView! {
+//    @IBOutlet weak var titleSubview: UIView! {
+//        didSet {
+//            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+//            titleSubview.addGestureRecognizer(tap)
+//        }
+//    }
+    @IBOutlet weak var titleLabel: UILabel! {
         didSet {
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
-            titleSubview.addGestureRecognizer(tap)
-        }
-    }
-    @IBOutlet weak var titleLabel: BorderedLabel! {
-        didSet {
+            titleLabel.backgroundColor = selectedColor
+            titleLabel.textColor = .white
             titleLabel.alpha = 0
             titleLabel.accessibilityIdentifier = "Title"
             titleLabel.isUserInteractionEnabled = true
@@ -126,9 +145,10 @@ class CreateNewSurveyViewController: UIViewController {
             questionIcon.addGestureRecognizer(tap)
         }
     }
-    @IBOutlet weak var questionLabel: BorderedLabel! {
+    @IBOutlet weak var questionLabel: UILabel! {
         didSet {
             questionLabel.alpha = 0
+            questionLabel.textColor = .white
             questionLabel.accessibilityIdentifier = "Question"
             let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
             questionLabel.isUserInteractionEnabled = true
@@ -145,47 +165,103 @@ class CreateNewSurveyViewController: UIViewController {
             hyperlinkIcon.addGestureRecognizer(tap)
         }
     }
-    @IBOutlet weak var hyperlinkLabel: BorderedLabel! {
+    @IBOutlet weak var hyperlinkLabel: UILabel! {
         didSet {
             hyperlinkLabel.alpha = 0
+            hyperlinkLabel.textColor = .white
             hyperlinkLabel.accessibilityIdentifier = "Hyperlink"
             let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
             hyperlinkLabel.isUserInteractionEnabled = true
             hyperlinkLabel.addGestureRecognizer(tap)
         }
     }
+    @IBOutlet weak var imagesHeaderIcon: SurveyCategoryIcon! {
+        didSet {
+            //            hyperlinkIcon.accessibilityIdentifier = "questionIcon"
+            imagesHeaderIcon.tagColor = K_COLOR_RED
+            imagesHeaderIcon.categoryID = .ImagesHeaderWithCount
+            imagesHeaderIcon.text = "0/3"
+            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            imagesHeaderIcon.addGestureRecognizer(tap)
+        }
+    }
+    @IBOutlet weak var imagesLabel: UILabel!
     
-    @IBOutlet weak var titleVerticalSpacingConstraint: NSLayoutConstraint!
+//    @IBOutlet weak var titleVerticalSpacingConstraint: NSLayoutConstraint!
 //    @IBOutlet weak var questionVerticalSpacingConstraint: NSLayoutConstraint!
     @IBOutlet weak var questionLabelHeightConstraint: NSLayoutConstraint!
 //    @IBOutlet weak var hyperlinkVerticalSpacingConstraint: NSLayoutConstraint!
     @IBInspectable var lineWidth: CGFloat = 5
     
-    private var subviewVerticalSpacing: CGFloat = 0 {
-        didSet {
-            if oldValue != subviewVerticalSpacing {
-                titleVerticalSpacingConstraint.constant = subviewVerticalSpacing
-                titleSubview.setNeedsLayout()
-                titleSubview.layoutIfNeeded()
-//                questionVerticalSpacingConstraint.constant = subviewVerticalSpacing
-//                questionIcon.setNeedsLayout()
-//                questionIcon.layoutIfNeeded()
-//                hyperlinkVerticalSpacingConstraint.constant = subviewVerticalSpacing
-//                hyperlinkIcon.setNeedsLayout()
-//                hyperlinkIcon.layoutIfNeeded()
-            }
-        }
-    }
+//    private var subviewVerticalSpacing: CGFloat = 0 {
+//        didSet {
+//            if oldValue != subviewVerticalSpacing {
+//                titleVerticalSpacingConstraint.constant = subviewVerticalSpacing
+//                titleSubview.setNeedsLayout()
+//                titleSubview.layoutIfNeeded()
+////                questionVerticalSpacingConstraint.constant = subviewVerticalSpacing
+////                questionIcon.setNeedsLayout()
+////                questionIcon.layoutIfNeeded()
+////                hyperlinkVerticalSpacingConstraint.constant = subviewVerticalSpacing
+////                hyperlinkIcon.setNeedsLayout()
+////                hyperlinkIcon.layoutIfNeeded()
+//            }
+//        }
+//    }
 //    var isNavigationBarHidden = false
     private var lastContentOffset: CGFloat = 0
     private var lineAnimationDuration = 0.3
+    //Color based on selected category
+    private var selectedColor = K_COLOR_RED {
+        didSet {
+            anonIcon.tagColor               = selectedColor
+            privacyIcon.tagColor            = selectedColor
+            votesIcon.tagColor              = selectedColor
+            titleIcon.tagColor              = selectedColor
+            titleLabel.backgroundColor      = selectedColor.withAlphaComponent(0.25)
+            titleLabel.textColor            = selectedColor
+            questionIcon.tagColor           = selectedColor
+            questionLabel.backgroundColor   = selectedColor.withAlphaComponent(0.25)
+            questionLabel.textColor         = selectedColor
+            hyperlinkIcon.tagColor          = selectedColor
+            hyperlinkLabel.backgroundColor  = selectedColor.withAlphaComponent(0.25)
+            hyperlinkLabel.textColor        = selectedColor
+            imagesHeaderIcon.tagColor       = selectedColor
+            //TODO: Continue coloring
+            anonIcon.setNeedsDisplay()
+            privacyIcon.setNeedsDisplay()
+            votesIcon.setNeedsDisplay()
+            titleIcon.setNeedsDisplay()
+            questionIcon.setNeedsDisplay()
+            hyperlinkIcon.setNeedsDisplay()
+            imagesHeaderIcon.setNeedsDisplay()
+            lines.map({$0.layer.strokeColor = selectedColor.withAlphaComponent(0.25).cgColor})
+        }
+    }
+    //Array of lines between stages
+    private var lines: [Line] = []
+    //Corner for labels
+    private var cornerRadius: CGFloat! {
+        didSet {
+            titleLabel.layer.cornerRadius = cornerRadius
+            questionLabel.layer.cornerRadius = cornerRadius
+            hyperlinkLabel.layer.cornerRadius = cornerRadius
+        }
+    }
+    var color: UIColor {
+        get {
+            return selectedColor
+        }
+    }
 //    var delegate: CallbackDelegate?
 //    var childColor: UIColor?
     var category: SurveyCategory? {
         didSet {
+            setTitle()
             if category != nil {
                 categoryIcon.tagColor = category!.tagColor ?? K_COLOR_RED
                 categoryIcon.categoryID = SurveyCategoryIcon.CategoryID(rawValue: category!.ID) ?? .Null
+                selectedColor = categoryIcon.tagColor!//.withAlphaComponent(0.5)
                 categoryTitle.text = category!.title.uppercased()
                 if oldValue == nil {
                     self.animateNextStage(startView: self.categorySubview, endView: self.anonSubview, completionHandler: {
@@ -211,7 +287,7 @@ class CreateNewSurveyViewController: UIViewController {
     }
     var votesCount = 100 {
         didSet {
-            animateNextStage(startView: votesSubview, endView: titleSubview, completionHandler: nil)
+            animateNextStage(startView: votesSubview, endView: titleIcon, completionHandler: nil)
         }
     }
     var questionTitle = "" {
@@ -232,9 +308,10 @@ class CreateNewSurveyViewController: UIViewController {
     }
     var hyperlink: URL? {
         didSet {
-            animateNextStage(startView: hyperlinkLabel, endView: hyperlinkIcon, completionHandler: nil)
+            animateNextStage(startView: hyperlinkLabel, endView: imagesHeaderIcon, completionHandler: nil)
         }
     }
+    var images: [[UIImage: String]] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -252,11 +329,13 @@ class CreateNewSurveyViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if subviewVerticalSpacing == 0 {
-            subviewVerticalSpacing = CGPointDistance(from: votesSubview.convert(votesIcon.center, to: contentView), to: categorySubview.convert(categoryIcon.center, to: contentView))
-            
+//        if subviewVerticalSpacing == 0 {
+//            subviewVerticalSpacing = CGPointDistance(from: votesSubview.convert(votesIcon.center, to: contentView), to: categorySubview.convert(categoryIcon.center, to: contentView))
+//
+//        }
+        if cornerRadius == nil {
+            cornerRadius = view.frame.width / 20
         }
-        
         scrollView.contentSize.height = 1500
     }
 
@@ -278,6 +357,8 @@ class CreateNewSurveyViewController: UIViewController {
                 performSegue(withIdentifier: Segues.App.NewSurveyToTypingViewController, sender: titleIcon)
             } else if v === questionLabel || v === questionIcon {
                 performSegue(withIdentifier: Segues.App.NewSurveyToTypingViewController, sender: questionIcon)
+            } else if v === hyperlinkLabel || v === hyperlinkIcon {
+                performSegue(withIdentifier: Segues.App.NewSurveyToHyperlinkViewController, sender: nil)
             }
         }
     }
@@ -301,10 +382,11 @@ class CreateNewSurveyViewController: UIViewController {
             line.layer.strokeStart = 0
             line.layer.strokeEnd = 0
             line.layer.lineWidth = lineWidth
-            line.layer.strokeColor = K_COLOR_RED.withAlphaComponent(0.1).cgColor
+            line.layer.strokeColor = selectedColor.withAlphaComponent(0.25).cgColor//K_COLOR_RED.withAlphaComponent(0.1).cgColor
             line.layer.lineCap = lineCap
             
             line.layer.path = path.cgPath
+            lines.append(line)
             return line
         }
         
@@ -321,21 +403,22 @@ class CreateNewSurveyViewController: UIViewController {
             line.layer.strokeStart = 0
             line.layer.strokeEnd = 0
             line.layer.lineWidth = lineWidth
-            line.layer.strokeColor = K_COLOR_RED.withAlphaComponent(0.1).cgColor
+            line.layer.strokeColor = selectedColor.withAlphaComponent(0.25).cgColor//K_COLOR_RED.withAlphaComponent(0.1).cgColor
             line.layer.lineCap = lineCap
             
             line.layer.path = path.cgPath
+            lines.append(line)
             return line
         }
         
         func createLineAnimation(line: Line) -> CAAnimationGroup {
             let strokeEndAnimation      = CABasicAnimation(path: #keyPath(CAShapeLayer.strokeEnd), fromValue: line.layer.strokeEnd, toValue: 1, duration: lineAnimationDuration)
             let strokeWidthAnimation    = CAKeyframeAnimation(keyPath:"lineWidth")
-            strokeWidthAnimation.values   = [lineWidth * 3, lineWidth]
+            strokeWidthAnimation.values   = [lineWidth * 2, lineWidth]
             strokeWidthAnimation.keyTimes = [0, 1]
             strokeWidthAnimation.duration = lineAnimationDuration
             let pathFillColorAnim      = CAKeyframeAnimation(keyPath:"strokeColor")
-            pathFillColorAnim.values   = [K_COLOR_RED.cgColor, K_COLOR_RED.withAlphaComponent(0.1).cgColor]
+            pathFillColorAnim.values   = [selectedColor.withAlphaComponent(0.8).cgColor, selectedColor.withAlphaComponent(0.25).cgColor]
             pathFillColorAnim.keyTimes = [0, 1]
             pathFillColorAnim.duration = lineAnimationDuration
             
@@ -346,7 +429,7 @@ class CreateNewSurveyViewController: UIViewController {
             return groupAnimation
         }
         
-        func getLabelAnimation(startView: UIView, endView: BorderedLabel, segueIdentifier: String) -> Closure {
+        func scrollToLabelMoveNext(startView: UIView, endView: UILabel, segueIdentifier: String) -> Closure {
             return {
 //                let navigationBarHeight: CGFloat! = self.isNavigationBarHidden ? self.navigationController?.navigationBar.frame.height : 0
                 UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseInOut], animations: {
@@ -359,8 +442,9 @@ class CreateNewSurveyViewController: UIViewController {
                 }) {
                     _ in
                     self.animateNextStage(startView: startView, endView: endView) {
-                        endView.animate()
-                        delay(seconds: 0.6) {
+                        
+//                        endView.animate()
+                        delay(seconds: 0.4) {
                             self.performSegue(withIdentifier: segueIdentifier, sender: startView)
                         }
                     }
@@ -368,13 +452,27 @@ class CreateNewSurveyViewController: UIViewController {
             }
         }
         
+        func animateLabel(label: UILabel, labelParent: UIView) {
+            labelParent.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+            labelParent.alpha = 0
+            labelParent.layer.cornerRadius = 1
+            label.layer.cornerRadius = 1
+            UIView.animate(withDuration: lineAnimationDuration * 2, delay: 0, options: [.curveEaseOut], animations: {
+                labelParent.alpha = 1
+                label.alpha = 1
+                labelParent.transform = .identity
+                labelParent.layer.cornerRadius = self.cornerRadius
+                label.layer.cornerRadius = self.cornerRadius
+            })
+        }
+        
         if endView.alpha == 0, let startIcon = startView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let endIcon = endView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let line = drawLine(fromView: startIcon, toView: endIcon, lineCap: .round) as? Line, let groupAnimation = createLineAnimation(line: line) as? CAAnimationGroup {
             contentView.layer.insertSublayer(line.layer, at: 0)
             groupAnimation.delegate = self
             if endIcon == titleIcon {
-                groupAnimation.setValue(getLabelAnimation(startView: titleIcon, endView: titleLabel, segueIdentifier: Segues.App.NewSurveyToTypingViewController), forKey: "completionHandler")
+                groupAnimation.setValue(scrollToLabelMoveNext(startView: titleIcon, endView: titleLabel, segueIdentifier: Segues.App.NewSurveyToTypingViewController), forKey: "completionHandler")
             } else if endIcon == questionIcon {
-                groupAnimation.setValue(getLabelAnimation(startView: questionIcon, endView: questionLabel, segueIdentifier: Segues.App.NewSurveyToTypingViewController), forKey: "completionHandler")
+                groupAnimation.setValue(scrollToLabelMoveNext(startView: questionIcon, endView: questionLabel, segueIdentifier: Segues.App.NewSurveyToTypingViewController), forKey: "completionHandler")
             } else if endIcon == hyperlinkIcon {
                 let closure: Closure = {
                     UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseInOut], animations: {
@@ -390,11 +488,23 @@ class CreateNewSurveyViewController: UIViewController {
                     }
                 }
                 groupAnimation.setValue(closure, forKey: "completionHandler")
+            } else if endIcon == anonIcon {
+                UIView.animate(withDuration: 0.6) {
+                    self.anonLabel.alpha = 1
+                }
+            } else if endIcon == privacyIcon {
+                UIView.animate(withDuration: 0.6) {
+                    self.privacyLabel.alpha = 1
+                }
+            } else if endIcon == votesIcon {
+                UIView.animate(withDuration: 0.6) {
+                    self.votesLabel.alpha = 1
+                }
             }
             
             line.layer.add(groupAnimation, forKey: "animEnd")
             endView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            UIView.animate(withDuration: lineAnimationDuration, delay: lineAnimationDuration * 0.75, options: [.curveEaseInOut], animations:
+            UIView.animate(withDuration: lineAnimationDuration, delay: lineAnimationDuration * 0.55, options: [.curveEaseInOut], animations:
                 {
                     endView.alpha = 1
                     endView.transform = .identity
@@ -407,11 +517,10 @@ class CreateNewSurveyViewController: UIViewController {
             
             line.layer.strokeEnd = 1
             
-        } else if startView == titleIcon, let label = endView as? BorderedLabel, label.alpha == 0 {
+        } else if startView == titleIcon, endView == titleLabel, let parentView = endView.superview, endView.alpha == 0 {
 
             let fromPoint = titleIcon!.convert(titleIcon!.center, to: contentView)// CGPoint(x: 0, y: yOffset)
-            let endPoint = CGPoint(x: fromPoint.x, y: scrollView.convert(label.frame.origin, to: contentView).y + lineWidth)//CGPoint(x: frame.width, y: yOffset)
-            
+            let endPoint = CGPoint(x: fromPoint.x, y: scrollView.convert(parentView.center, to: contentView).y)// + lineWidth)//CGPoint(x: frame.width, y: yOffset)
             let line = drawLine(fromPoint: fromPoint, endPoint: endPoint, lineCap: .square)
             
             contentView.layer.insertSublayer(line.layer, at: 0)//, below: endView.layer)//.addSublayer(line.layer)
@@ -419,17 +528,13 @@ class CreateNewSurveyViewController: UIViewController {
             strokeEndAnimation.setValue(completionHandler, forKey: "completionHandler")
             strokeEndAnimation.delegate = self
             line.layer.add(strokeEndAnimation, forKey: "animEnd")
-            UIView.animate(withDuration: lineAnimationDuration, delay: lineAnimationDuration / 2, options: [.curveEaseInOut], animations: {
-                endView.alpha = 1
-            })
+            animateLabel(label: titleLabel, labelParent: parentView)
             line.layer.strokeEnd = 1
             
-            //Transition from label to icon
-        } else if startView == questionIcon, let label = endView as? BorderedLabel, label.alpha == 0 {
+        } else if startView == questionIcon, endView == questionLabel, let parentView = endView.superview, endView.alpha == 0  {
             
             let fromPoint = scrollView.convert(questionIcon.center, to: contentView)
-            let endPoint = CGPoint(x: fromPoint.x, y: scrollView.convert(label.frame.origin, to: contentView).y + lineWidth)//CGPoint(x: frame.width, y: yOffset)
-            
+            let endPoint = CGPoint(x: fromPoint.x, y: scrollView.convert(parentView.center, to: contentView).y)// + lineWidth)//CGPoint(x: frame.width, y: yOffset)
             let line = drawLine(fromPoint: fromPoint, endPoint: endPoint, lineCap: .square)
             
             contentView.layer.insertSublayer(line.layer, at: 0)//, below: endView.layer)//.addSublayer(line.layer)
@@ -437,16 +542,13 @@ class CreateNewSurveyViewController: UIViewController {
             strokeEndAnimation.setValue(completionHandler, forKey: "completionHandler")
             strokeEndAnimation.delegate = self
             line.layer.add(strokeEndAnimation, forKey: "animEnd")
-            UIView.animate(withDuration: lineAnimationDuration, delay: lineAnimationDuration / 2, options: [.curveEaseInOut], animations: {
-                endView.alpha = 1
-            })
+            animateLabel(label: questionLabel, labelParent: parentView)
             line.layer.strokeEnd = 1
             
-            //Transition from label to icon
-        } else if startView == hyperlinkIcon, let label = endView as? BorderedLabel, label.alpha == 0 {
+        } else if startView == hyperlinkIcon, endView == hyperlinkLabel, let parentView = endView.superview, endView.alpha == 0   {
             
             let fromPoint = scrollView.convert(hyperlinkIcon.center, to: contentView)
-            let endPoint = CGPoint(x: fromPoint.x, y: scrollView.convert(label.frame.origin, to: contentView).y + lineWidth)//CGPoint(x: frame.width, y: yOffset)
+            let endPoint = CGPoint(x: fromPoint.x, y: scrollView.convert(parentView.center, to: contentView).y)// + lineWidth)//CGPoint(x: frame.width, y: yOffset)
             
             let line = drawLine(fromPoint: fromPoint, endPoint: endPoint, lineCap: .square)
             
@@ -455,23 +557,35 @@ class CreateNewSurveyViewController: UIViewController {
             strokeEndAnimation.setValue(completionHandler, forKey: "completionHandler")
             strokeEndAnimation.delegate = self
             line.layer.add(strokeEndAnimation, forKey: "animEnd")
-            UIView.animate(withDuration: lineAnimationDuration, delay: lineAnimationDuration / 2, options: [.curveEaseInOut], animations: {
-                endView.alpha = 1
-            })
+            animateLabel(label: hyperlinkLabel, labelParent: parentView)
             line.layer.strokeEnd = 1
             
             //Transition from label to icon
-        } else if let borderedLabel = startView as? BorderedLabel, let _endView = endView as? SurveyCategoryIcon {
-            var label: BorderedLabel!
-            if borderedLabel.accessibilityIdentifier == "Title" {
+        } else if let borderedLabel = startView as? UILabel, let _endView = endView as? SurveyCategoryIcon, endView.alpha == 0 {
+            var label: UILabel!
+            var segue = ""
+            var fromPoint = CGPoint.zero//scrollView.convert(CGPoint(x: label!.frame.midX, y: label!.frame.maxY), to: contentView)
+            if borderedLabel.accessibilityIdentifier == "Title", let parentView = borderedLabel.superview {
                 label = titleLabel
-            } else if borderedLabel.accessibilityIdentifier == "Question" {
+                fromPoint = scrollView.convert(CGPoint(x: parentView.frame.midX, y: parentView.frame.maxY), to: contentView)
+                segue = Segues.App.NewSurveyToTypingViewController
+            } else if borderedLabel.accessibilityIdentifier == "Question", let parentView = borderedLabel.superview {
                 label = questionLabel
-            } else if borderedLabel.accessibilityIdentifier == "Hyperlink" {
+                fromPoint = scrollView.convert(CGPoint(x: parentView.frame.midX, y: parentView.frame.maxY), to: contentView)
+                segue = Segues.App.NewSurveyToHyperlinkViewController
+            } else if borderedLabel.accessibilityIdentifier == "Hyperlink", let parentView = borderedLabel.superview {
                 label = hyperlinkLabel
+                fromPoint = scrollView.convert(CGPoint(x: parentView.frame.midX, y: parentView.frame.maxY), to: contentView)
+                segue = Segues.App.NewSurveyToImagesViewController
             }
-            let nextLabel: BorderedLabel? = view.viewWithTag(endView.tag + 1) as? BorderedLabel
-            let fromPoint = scrollView.convert(CGPoint(x: label!.frame.midX, y: label!.frame.maxY), to: contentView)
+//            } else if borderedLabel.accessibilityIdentifier == "Hyperlink" {
+//                label = hyperlinkLabel
+//                segue = Segues.App.NewSurveyToImagesViewController
+//            }
+            let nextLabel: UILabel? = view.viewWithTag(endView.tag + 1) as? UILabel
+            if fromPoint == .zero {
+                fromPoint = scrollView.convert(CGPoint(x: label!.frame.midX, y: label!.frame.maxY), to: contentView)
+            }
             let endPoint =  scrollView.convert(_endView.center, to: contentView)
             let line = drawLine(fromPoint: fromPoint, endPoint: endPoint, lineCap: .square)
             contentView.layer.insertSublayer(line.layer, at: 0)
@@ -480,17 +594,33 @@ class CreateNewSurveyViewController: UIViewController {
 
             line.layer.add(groupAnimation, forKey: "animEnd")
             endView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            UIView.animate(withDuration: lineAnimationDuration, delay: lineAnimationDuration * 0.75, options: [.curveEaseInOut], animations: {
+            UIView.animate(withDuration: lineAnimationDuration, delay: lineAnimationDuration * 0.55, options: [.curveEaseInOut], animations: {
                 endView.alpha = 1
                 endView.transform = .identity
             }) {
                 _ in
                 if nextLabel != nil {
-                    getLabelAnimation(startView: endView, endView: nextLabel!, segueIdentifier: //Segues.App.NewSurveyToHyperlinkViewController)()
+                    scrollToLabelMoveNext(startView: endView, endView: nextLabel!, segueIdentifier: segue)()
+                } else {
+                    self.performSegue(withIdentifier: segue, sender: nil)
                 }
             }
             line.layer.strokeEnd = 1
         }
+    }
+    
+    private func setTitle() {
+        let navTitle = UILabel()
+        navTitle.numberOfLines = 2
+        navTitle.textAlignment = .center
+        let attrString = NSMutableAttributedString()
+        attrString.append(NSAttributedString(string: title!, attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
+        if category != nil {
+            //TODO - Fatal error when parent is nil
+            attrString.append(NSAttributedString(string: "\n\(category!.parent!.title)", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 13), foregroundColor: .darkGray, backgroundColor: .clear)))
+        }
+        navTitle.attributedText = attrString
+        navigationItem.titleView = navTitle
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -502,16 +632,16 @@ class CreateNewSurveyViewController: UIViewController {
             if segue.identifier == Segues.App.NewSurveyToCategorySelection, let destinationVC = segue.destination as? CategorySelectionViewController {
                 destinationVC.category = category
                 //                destinationVC.delegate = self
-            } else if segue.identifier == Segues.App.NewSurveyToTypingViewController, let destinationVC = segue.destination as? TextViewController {
+            } else if segue.identifier == Segues.App.NewSurveyToTypingViewController, let destinationVC = segue.destination as? TextInputViewController {
                 if let icon = sender as? SurveyCategoryIcon {
                     if icon === titleIcon {
                         destinationVC.titleString = "Титул"
                         destinationVC.charactersLimit = DjangoVariables.FieldRestrictions.surveyTitleLength
-                        destinationVC.textContent = questionTitle.isEmpty ? titleLabel.text! : questionTitle
+                        destinationVC.textContent = questionTitle.isEmpty ? "" : questionTitle
                         //                    destinationVC.placeholder = "Введите титул.."
                         destinationVC.delegate = self
                         destinationVC.font = titleLabel.font
-                        destinationVC.textColor = titleLabel.textColor
+                        destinationVC.textColor = selectedColor//titleLabel.textColor
                         destinationVC.textCentered = true
                         destinationVC.accessibilityIdentifier = "Title"
                     } else if icon === questionIcon {
@@ -520,29 +650,32 @@ class CreateNewSurveyViewController: UIViewController {
                         destinationVC.textContent = question.isEmpty ? "" : question
                         destinationVC.delegate = self
                         destinationVC.font = StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 13)
-                        destinationVC.textColor = questionLabel.textColor
+                        destinationVC.textColor = selectedColor//questionLabel.textColor
                         destinationVC.accessibilityIdentifier = "Question"
                     }
                 }
-                nc.duration = 0.2
-                nc.transitionStyle = .Blur
-                //                if titleLabel.gestureRecognizers == nil {
-//                    let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
-//                    titleLabel.isUserInteractionEnabled = true
-//                    titleLabel.addGestureRecognizer(tap)
-//                }
+                destinationVC.cornerRadius = titleLabel.cornerRadius
+                destinationVC.color = selectedColor
+                nc.duration = 0.35
+//                nc.transitionStyle = .Blur
+            } else if segue.identifier == Segues.App.NewSurveyToAnonimitySelection, let destinationVC = segue.destination as? AnonimitySelectionViewController {
+                destinationVC.color = selectedColor
+            } else if segue.identifier == Segues.App.NewSurveyToPrivacySelection, let destinationVC = segue.destination as? PrivacySelectionViewController {
+                destinationVC.color = selectedColor
             } else if segue.identifier == Segues.App.NewSurveyToVotesCountViewController, let destinationVC = segue.destination as? VotesCountViewController {
                 destinationVC.votesCount = votesCount
-            } else if segue.identifier == Segues.App.NewSurveyToVotesCountViewController, let destinationVC = segue.destination as? HyperlinkSelectionViewController {
+                destinationVC.color = selectedColor
+            } else if segue.identifier == Segues.App.NewSurveyToHyperlinkViewController, let destinationVC = segue.destination as? HyperlinkSelectionViewController {
+                destinationVC.color = selectedColor
+                nc.transitionStyle = .Icon
                 if hyperlink != nil {
                     destinationVC.hyperlink = hyperlink
                 }
+                destinationVC.color = selectedColor
+                destinationVC._labelHeight = hyperlinkLabel.frame.height
+            } else if segue.identifier == Segues.App.NewSurveyToImagesViewController, let destinationVC = segue.destination as? ImagesSelectionViewController {
+                destinationVC.images = images
             }
-            /*else if segue.identifier == Segues.App.NewSurveyToAnonimitySelection || segue.identifier == Segues.App.NewSurveyToPrivacySelection {
-             nc.duration = 0.4
-             nc.transitionStyle = .Icon
-             }*/
-            
         }
     }
 }
@@ -590,11 +723,13 @@ class BorderedLabel: UILabel {
     let line = Line()
     var lineWidth: CGFloat = 5
     var isAnimated = false
+    var isClosed = false
     var isCentered = true {
         didSet {
             
         }
     }
+    var rightInset: CGFloat = 0
     
 //    override func textRect(forBounds bounds: CGRect, limitedToNumberOfLines numberOfLines: Int) -> CGRect {
 //        return CGRect(origin: .zero, size: CGSize(width: bounds.width - lineWidth * 2, height: bounds.height - lineWidth * 2))
@@ -602,7 +737,7 @@ class BorderedLabel: UILabel {
 
     override func drawText(in rect: CGRect) {
         let border = lineWidth * 2
-        let insets = UIEdgeInsets(top: border, left: border, bottom: border, right: border)
+        let insets = UIEdgeInsets(top: border, left: border, bottom: border, right: border + rightInset)
         super.drawText(in: rect.inset(by: insets))
     }
     
@@ -648,7 +783,7 @@ class BorderedLabel: UILabel {
     
     fileprivate func calculateLine() {
         let path = UIBezierPath()
-        let point_1 = CGPoint(x: bounds.width/2 + lineWidth, y: 0 + lineWidth)
+        let point_1 = CGPoint(x: bounds.width/2 + (isClosed ? 0 : lineWidth), y: 0 + lineWidth)
         path.move(to: point_1)
         
         let point_2 = CGPoint(x: bounds.width - lineWidth, y: 0 + lineWidth)
@@ -659,14 +794,14 @@ class BorderedLabel: UILabel {
         path.addLine(to: point_4)
         let point_5 = CGPoint(x: 0 + lineWidth, y: 0 + lineWidth)
         path.addLine(to: point_5)
-        let point_6 = CGPoint(x: bounds.width/2 - lineWidth, y: 0 + lineWidth)
+        let point_6 = CGPoint(x: bounds.width/2 - (isClosed ? 0 : lineWidth), y: 0 + lineWidth)
         path.addLine(to: point_6)
         line.layer.strokeEnd = isAnimated ? 1 : 0
         line.layer.path = path.cgPath
     }
     
-    func animate() {
-        let strokeEndAnimation   = CABasicAnimation(path: #keyPath(CAShapeLayer.strokeEnd), fromValue: line.layer.strokeEnd, toValue: 1, duration: 0.65)
+    func animate(_ duration: TimeInterval = 0.3) {
+        let strokeEndAnimation   = CABasicAnimation(path: #keyPath(CAShapeLayer.strokeEnd), fromValue: line.layer.strokeEnd, toValue: 1, duration: 0.5)
 //        let strokeEndAnimation = CABasicAnimation(keyPath: #keyPath(CAShapeLayer.strokeEnd))
 //        strokeEndAnimation.fromValue = line.layer.strokeEnd
 //        strokeEndAnimation.toValue = 1

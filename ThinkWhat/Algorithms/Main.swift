@@ -207,8 +207,10 @@ struct Notifications {
 }
 
 
-let appDelegate                                  = UIApplication.shared.delegate as! AppDelegate
-let MIN_STACK_SIZE                               = 4//Min quantity of hot surveys to request another portion
+let appDelegate         = UIApplication.shared.delegate as! AppDelegate
+let MIN_STACK_SIZE      = 4//Min quantity of hot surveys to request another portion
+let MAX_IMAGES_COUNT    = 3
+let MAX_ANSWERS_COUNT   = 6
 
 struct TimeIntervals {
     static let ClearRejectedSurveys: TimeInterval = 60//Timer parameter to wipe out rejectedSurveys container
@@ -259,6 +261,7 @@ struct Segues {
         static let NewSurveyToTypingViewController      = "NEW_TO_TYPE"
         static let NewSurveyToVotesCountViewController  = "NEW_TO_VOTES_COUNT"
         static let NewSurveyToHyperlinkViewController   = "NEW_TO_HYPERLINK"
+        static let NewSurveyToImagesViewController      = "NEW_TO_IMAGES"
         static let SurveyToUser                         = "SURVEY_TO_USER"
         static let SurveyToClaim                        = "SURVEY_TO_CLAIM"
         static let UserToUserSurveys                    = "USER_TO_USER_SURVEYS"
@@ -322,7 +325,7 @@ struct Storyboards {
 let alert                                       = CustomAlertView(frame: (UIApplication.shared.keyWindow?.frame)!)
 let K_COLOR_RED                                 = UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)//C03E45 English Vermillion//UIColor(red:0.805, green: 0.342, blue:0.339, alpha:1)
 let K_COLOR_GRAY                                = UIColor(red:0.574, green: 0.574, blue:0.574, alpha:1)
-let K_COLOR_TABBAR                              = UIColor(red: 0.416, green: 0.400, blue: 0.639, alpha: 1.000)//UIColor(red: 0.227, green: 0.337, blue: 0.514, alpha: 1.000)//UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)//UIColor(red: 0.035, green: 0.016, blue: 0.275, alpha: 1.000)//UIColor(red: 0.157, green: 0.188, blue: 0.267, alpha: 1.000)//283044 Space Cadet//UIColor(red:0.592, green: 0.46, blue:0.574, alpha:1)
+let K_COLOR_TABBAR                              = UIColor(red: 0.416, green: 0.400, blue: 0.639, alpha: 1.000)//UIColor(red: 0.227, green: 0.337, blue: 0.514, alpha: 1.000)//UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)//UIColor(red: 0.035, green: 0.016, blue: 0.275, alpha: 1.000)//UIColor(red: 0.157, green: 0.188, blue: 0.267, alpha: 1.000)//283044 Space Cadet//UIColor(red:0.592, green: 0.46, кblue:0.574, alpha:1)
 let K_COLOR_CONTAINER_BG                        = UIColor(red: 0.910, green: 0.929, blue: 0.929, alpha: 1.000)
 //let K_COLOR_TABBAR_INACTIVE                     = UIColor(red:0.636, green: 0.636, blue:0.636, alpha:1)
 let K_COLOR_PEACH                               = UIColor(red: 0.910, green: 0.929, blue: 0.929, alpha: 1.000)

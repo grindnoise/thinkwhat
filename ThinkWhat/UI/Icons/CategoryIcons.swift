@@ -66,10 +66,11 @@ class SurveyCategoryIcon: UIView {
         
         //Technical
         case Null  = 0
-        case Eye = 10000
-        case EyeDisabled = 10003
+        case Privacy = 10000
         case Text = 10001
         case AnonDisabled = 10002
+        case PrivacyDisabled = 10003
+        case ImagesHeaderWithCount = 10004
     }
     
     var categoryID: CategoryID = .Null {
@@ -86,85 +87,90 @@ class SurveyCategoryIcon: UIView {
             }
         }
     }
+    var textSize: CGFloat = 43
     var tagColor: UIColor?
+    var isGradient = false
 //    var ID: Int { get }
 //    init()
     
     override func draw(_ rect: CGRect) {
         switch categoryID {
         case .Outdoor:
-            CategoryIconsStyleKit.drawHiking(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawHiking(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
             
         case .Anon:
-            CategoryIconsStyleKit.drawAnon(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawAnon(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .AnonDisabled:
-            CategoryIconsStyleKit.drawAnonDisabled(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawAnonDisabled(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
             
         case .Health:
-            CategoryIconsStyleKit.drawHealth(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawHealth(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Food:
-            CategoryIconsStyleKit.drawFood(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawFood(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Habits:
-            CategoryIconsStyleKit.drawHabits(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawHabits(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Exercizes:
-            CategoryIconsStyleKit.drawYoga(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawYoga(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
             
         case .Relationship:
-            CategoryIconsStyleKit.drawRelationship(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawRelationship(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Male:
-            CategoryIconsStyleKit.drawManHead(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawManHead(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Female:
-            CategoryIconsStyleKit.drawWomanHead(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawWomanHead(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Children:
-            CategoryIconsStyleKit.drawMotherChild(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawMotherChild(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Sex:
-            CategoryIconsStyleKit.drawAgeRestriction(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawAgeRestriction(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
             
         case .Leisure:
-            CategoryIconsStyleKit.drawLeisure(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawLeisure(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Video:
-            CategoryIconsStyleKit.drawFilm(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawFilm(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Education:
-            CategoryIconsStyleKit.drawEducation(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawEducation(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Games:
-            CategoryIconsStyleKit.drawVideoGames(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawVideoGames(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Music:
-            CategoryIconsStyleKit.drawMusic(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawMusic(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Literature:
-            CategoryIconsStyleKit.drawBooks(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawBooks(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Internet:
-            CategoryIconsStyleKit.drawInternet(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawInternet(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
             
         case .Society:
-            CategoryIconsStyleKit.drawSociety(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawSociety(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Politics:
-            CategoryIconsStyleKit.drawGovernment(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawGovernment(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Events:
-            CategoryIconsStyleKit.drawPolitics(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawPolitics(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
             
         case .Tech:
-            CategoryIconsStyleKit.drawTech(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawTech(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Vehicles:
-            CategoryIconsStyleKit.drawCar(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawCar(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Gadgets:
-            CategoryIconsStyleKit.drawGadgets_2(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawGadgets_2(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         case .Computers:
-            CategoryIconsStyleKit.drawLaptop(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawLaptop(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
             
         case .Finance:
-            CategoryIconsStyleKit.drawFinance(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+            CategoryIconsStyleKit.drawFinance(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
         
-        case .Eye:
-            CategoryIconsStyleKit.drawEye(frame: rect, resizing: .aspectFit, outerColor: tagColor)
-        case .EyeDisabled:
-            CategoryIconsStyleKit.drawEyeDisabled(frame: rect, resizing: .aspectFit, outerColor: tagColor)
+        case .Privacy:
+            CategoryIconsStyleKit.drawEye(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
+        case .PrivacyDisabled:
+            CategoryIconsStyleKit.drawEyeDisabled(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient)
             
             
         case .Text:
-            CategoryIconsStyleKit.drawText(frame: rect, resizing: .aspectFit, countText: text, outerColor: tagColor)
+            CategoryIconsStyleKit.drawText(frame: rect, resizing: .aspectFit, countText: text, outerColor: tagColor, isGradient: isGradient, textSize: textSize)
+            
+        case .ImagesHeaderWithCount:
+            CategoryIconsStyleKit.drawImageHeader(frame: rect, resizing: .aspectFit, countText: text, outerColor: tagColor, isGradient: isGradient)
             
         case .OutdoorOther, .HealthOther, .RelationshipOther, .LeisureOther, .SocietyOther, .TechOther, .Null:
-            CategoryIconsStyleKit.drawOther(frame: rect, resizing: .aspectFit, outerColor: tagColor ?? .lightGray)
+            CategoryIconsStyleKit.drawOther(frame: rect, resizing: .aspectFit, outerColor: tagColor ?? .lightGray, isGradient: isGradient)
             
         default:
             super.draw(rect)
@@ -177,7 +183,7 @@ public class CategoryIconsStyleKit : NSObject {
     
     //// Drawing Methods
     
-    @objc public dynamic class func drawVideo(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawVideo(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -403,7 +409,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawWomanHead(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawWomanHead(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -806,7 +812,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawFemale(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawFemale(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -884,7 +890,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawMale(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawMale(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -961,7 +967,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawCar(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawCar(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -1046,7 +1052,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawEducation(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawEducation(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -1131,7 +1137,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
 
-    @objc public dynamic class func drawGadgets(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawGadgets(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -1362,7 +1368,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
 
-    @objc public dynamic class func drawGadgets_2(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawGadgets_2(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -1521,7 +1527,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawHiking(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawHiking(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -1634,7 +1640,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawAnon(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawAnon(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -1654,10 +1660,16 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
+        if isGradient {
+            context.saveGState()
+            ovalPath.addClip()
+            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+            context.restoreGState()
+        } else {
+            tagColor.setFill()
+            ovalPath.fill()
+        }
+        
         
         
         //// Group 2
@@ -1728,7 +1740,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawHealth(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawHealth(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -1848,7 +1860,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawRelationship(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawRelationship(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -2011,7 +2023,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawLeisure(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawLeisure(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -2146,7 +2158,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawSociety(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawSociety(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -2388,7 +2400,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawTech(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawTech(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -2687,7 +2699,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawFinance(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawFinance(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -2895,7 +2907,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawLaptop(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawLaptop(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -2998,7 +3010,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawVideoGames(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawVideoGames(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -3110,7 +3122,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawMusic(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawMusic(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -3188,7 +3200,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawBooks(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawBooks(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -3331,7 +3343,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawOther(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawOther(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -3379,7 +3391,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawFilm(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawFilm(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -3495,7 +3507,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawInternet(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawInternet(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -4400,7 +4412,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawPolitics(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawPolitics(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -4705,7 +4717,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawManHead(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawManHead(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5077,7 +5089,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawFood(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawFood(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5184,7 +5196,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawHabits(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawHabits(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5296,7 +5308,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawYoga(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawYoga(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5402,7 +5414,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawMotherChild(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawMotherChild(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5568,7 +5580,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawGovernment(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawGovernment(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5675,7 +5687,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawAgeRestriction(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawAgeRestriction(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5771,7 +5783,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawEye(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawEye(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5791,10 +5803,16 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
+        if isGradient {
+            context.saveGState()
+            ovalPath.addClip()
+            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+            context.restoreGState()
+        } else {
+            tagColor.setFill()
+            ovalPath.fill()
+        }
+        
         
         
         //// Page-1
@@ -5827,7 +5845,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawEyeDisabled(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawEyeDisabled(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5847,10 +5865,15 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
+        if isGradient {
+            context.saveGState()
+            ovalPath.addClip()
+            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+            context.restoreGState()
+        } else {
+            tagColor.setFill()
+            ovalPath.fill()
+        }
         
         
         //// Page-1
@@ -5900,7 +5923,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawText(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, countText: String = "100", outerColor: UIColor?) {
+    @objc public dynamic class func drawText(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, countText: String = "100", outerColor: UIColor?, isGradient: Bool = true, textSize: CGFloat = 43) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5930,7 +5953,7 @@ public class CategoryIconsStyleKit : NSObject {
         let textRect = CGRect(x: 0, y: 75, width: 200, height: 49)
         let textStyle = NSMutableParagraphStyle()
         textStyle.alignment = .center
-        let textFontAttributes = [NSAttributedString.Key.font: UIFont(name: "OpenSans-Bold", size: 43)!, NSAttributedString.Key.foregroundColor: innerColor, NSAttributedString.Key.paragraphStyle: textStyle]
+        let textFontAttributes = [NSAttributedString.Key.font: UIFont(name: "OpenSans-Bold", size: textSize)!, NSAttributedString.Key.foregroundColor: innerColor, NSAttributedString.Key.paragraphStyle: textStyle]
         
         let textTextHeight: CGFloat = countText.boundingRect(with: CGSize(width: textRect.width, height: CGFloat.infinity), options: .usesLineFragmentOrigin, attributes: textFontAttributes, context: nil).height
         context.saveGState()
@@ -5942,7 +5965,7 @@ public class CategoryIconsStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawAnonDisabled(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?) {
+    @objc public dynamic class func drawAnonDisabled(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -5962,10 +5985,15 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
+        if isGradient {
+            context.saveGState()
+            ovalPath.addClip()
+            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+            context.restoreGState()
+        } else {
+            tagColor.setFill()
+            ovalPath.fill()
+        }
         
         
         //// Group 2
@@ -6046,6 +6074,58 @@ public class CategoryIconsStyleKit : NSObject {
         rectanglePath.stroke()
         
         context.restoreGState()
+        
+        context.restoreGState()
+        
+    }
+    
+    @objc public dynamic class func drawImageHeader(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, countText: String = "0/3", outerColor: UIColor?, isGradient: Bool = true) {
+        //// General Declarations
+        let context = UIGraphicsGetCurrentContext()!
+        
+        //// Resize to Target Frame
+        context.saveGState()
+        let resizedFrame: CGRect = resizing.apply(rect: CGRect(x: 0, y: 0, width: 200, height: 200), target: targetFrame)
+        context.translateBy(x: resizedFrame.minX, y: resizedFrame.minY)
+        context.scaleBy(x: resizedFrame.width / 200, y: resizedFrame.height / 200)
+        
+        
+        //// Color Declarations
+        let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
+        let tagColor = outerColor ?? K_COLOR_RED
+        tagColor.setFill()
+        
+        //// Oval Drawing
+        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        ovalPath.fill()
+        
+        
+        //// img Drawing
+        let imgRect = CGRect(x: 0, y: 128, width: 200, height: 49)
+        let imgStyle = NSMutableParagraphStyle()
+        imgStyle.alignment = .center
+        let imgFontAttributes = [NSAttributedString.Key.font: UIFont(name: "OpenSans-SemiBold", size: 43)!, NSAttributedString.Key.foregroundColor: innerColor, NSAttributedString.Key.paragraphStyle: imgStyle]
+        
+        let imgTextHeight: CGFloat = countText.boundingRect(with: CGSize(width: imgRect.width, height: CGFloat.infinity), options: .usesLineFragmentOrigin, attributes: imgFontAttributes, context: nil).height
+        context.saveGState()
+        context.clip(to: imgRect)
+        countText.draw(in: CGRect(x: imgRect.minX, y: imgRect.minY + (imgRect.height - imgTextHeight) / 2, width: imgRect.width, height: imgTextHeight), withAttributes: imgFontAttributes)
+        context.restoreGState()
+        
+        
+        //// Bezier Drawing
+        let bezierPath = UIBezierPath()
+        bezierPath.move(to: CGPoint(x: 78, y: 48.5))
+        bezierPath.addCurve(to: CGPoint(x: 113.12, y: 109.91), controlPoint1: CGPoint(x: 78, y: 48.5), controlPoint2: CGPoint(x: 99.7, y: 86.45))
+        bezierPath.addCurve(to: CGPoint(x: 135, y: 71.75), controlPoint1: CGPoint(x: 122.55, y: 93.46), controlPoint2: CGPoint(x: 135, y: 71.75))
+        bezierPath.addLine(to: CGPoint(x: 167.26, y: 128))
+        bezierPath.addLine(to: CGPoint(x: 32.53, y: 128))
+        bezierPath.addLine(to: CGPoint(x: 78, y: 48.5))
+        bezierPath.addLine(to: CGPoint(x: 78, y: 48.5))
+        bezierPath.close()
+        innerColor.setFill()
+        bezierPath.fill()
         
         context.restoreGState()
         
