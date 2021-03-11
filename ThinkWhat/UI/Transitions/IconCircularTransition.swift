@@ -75,7 +75,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 
                 animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: block) {
                     _ in
-                    completionBlocks.map({ $0() })
+                    completionBlocks.map{ $0() }
                     destinationIcon.alpha = 1
                     tempIcon?.removeFromSuperview()
                     icon.removeFromSuperview()
@@ -251,7 +251,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 vc_2.view.layoutIfNeeded()
                 
                 let icon = getIcon(frame: CGRect(origin: .zero, size: vc_1.categoryIcon.frame.size), category: vc_1.category != nil ? SurveyCategoryIcon.CategoryID(rawValue: vc_1.category!.ID) ?? .Text : .Text, color: vc_1.category != nil ? vc_1.category!.tagColor! : K_COLOR_RED, text: "?")
-                let pos = vc_1.categoryIcon.convert(vc_1.categoryIcon.center, to: navigationController?.view)
+                let pos = vc_1.contentView.convert(vc_1.categoryIcon.center, to: navigationController?.view)//vc_1.categoryIcon.convert(vc_1.categoryIcon.center, to: navigationController?.view)
                 icon.center = pos
                 
                 vc_2.categoryVC.returnPos = pos
@@ -297,19 +297,19 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
 
             } else if let vc_1 = fromVC as? CreateNewSurveyViewController, let initialIcon = vc_1.anonIcon, let vc_2 = toVC as? AnonimitySelectionViewController, let destinationIcon = vc_2.actionButton {
 
-                animateIconStyleTransition(initialIcon: initialIcon, destinationIcon: destinationIcon, iconFrame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: navigationController?.view), size: initialIcon.frame.size), iconText: "?", animatesIconChange: true, animationBlocks: [], completionBlocks: [])
+                animateIconStyleTransition(initialIcon: initialIcon, destinationIcon: destinationIcon, iconFrame: CGRect(origin: vc_1.contentView.convert(initialIcon.frame.origin, to: navigationController?.view), size: initialIcon.frame.size), iconText: "?", animatesIconChange: true, animationBlocks: [], completionBlocks: [])
                 
             } else if let vc_1 = fromVC as? CreateNewSurveyViewController, let initialIcon = vc_1.privacyIcon, let vc_2 = toVC as? PrivacySelectionViewController, let destinationIcon = vc_2.actionButton {
                 
-                animateIconStyleTransition(initialIcon: initialIcon, destinationIcon: destinationIcon, iconFrame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: navigationController?.view), size: initialIcon.frame.size), iconText: "?", animatesIconChange: true, animationBlocks: [], completionBlocks: [])
+                animateIconStyleTransition(initialIcon: initialIcon, destinationIcon: destinationIcon, iconFrame: CGRect(origin: vc_1.contentView.convert(initialIcon.frame.origin, to: navigationController?.view), size: initialIcon.frame.size), iconText: "?", animatesIconChange: true, animationBlocks: [], completionBlocks: [])
                 
             } else if let vc_1 = fromVC as? CreateNewSurveyViewController, let initialIcon = vc_1.votesIcon, let vc_2 = toVC as? VotesCountViewController, let destinationIcon = vc_2.actionButton {
                 
-                animateIconStyleTransition(initialIcon: initialIcon, destinationIcon: destinationIcon, iconFrame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: navigationController?.view), size: initialIcon.frame.size), iconText: initialIcon.text, animatesIconChange: false, animationBlocks: [], completionBlocks: [])
+                animateIconStyleTransition(initialIcon: initialIcon, destinationIcon: destinationIcon, iconFrame: CGRect(origin: vc_1.contentView.convert(initialIcon.frame.origin, to: navigationController?.view), size: initialIcon.frame.size), iconText: initialIcon.text, animatesIconChange: false, animationBlocks: [], completionBlocks: [])
 
             } else if let vc_1 = fromVC as? CreateNewSurveyViewController, let initialIcon = vc_1.hyperlinkIcon, let initialLabel = vc_1.hyperlinkLabel, let vc_2 = toVC as? HyperlinkSelectionViewController, let destinationIcon = vc_2.actionButton, let destinationLabel = vc_2.hyperlinkLabel {
                 vc_2.view.setNeedsLayout()
-                vc_2.heightConstraint.constant = initialLabel.bounds.height
+                vc_2.heightConstraint.constant = initialLabel.bounds.height / 2
                 vc_2.widthConstraint.constant = initialLabel.bounds.width
                 vc_2.hyperlinkLabel.leftInset = (initialLabel as? PaddingLabel)?.leftInset ?? 0
                 vc_2.hyperlinkLabel.rightInset = (initialLabel as? PaddingLabel)?.rightInset ?? 0
@@ -324,33 +324,65 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 vc_2.hyperlinkLabel.alpha = 0
                 vc_2.view.layoutIfNeeded()
                 
+//                let tempLabel = PaddingLabel(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
+//                tempLabel.leftInset = (initialLabel as? PaddingLabel)?.leftInset ?? 0
+//                tempLabel.rightInset = (initialLabel as? PaddingLabel)?.rightInset ?? 0
+//                tempLabel.topInset = (initialLabel as? PaddingLabel)?.topInset ?? 0
+//                tempLabel.bottomInset = (initialLabel as? PaddingLabel)?.bottomInset ?? 0
+//                tempLabel.backgroundColor = initialLabel.backgroundColor
+//                tempLabel.textAlignment = initialLabel.textAlignment
+//                tempLabel.text = initialLabel.text
+//                tempLabel.font = initialLabel.font
+//                tempLabel.textColor = initialLabel.textColor
+//                tempLabel.cornerRadius = initialLabel.cornerRadius
+//                initialLabel.alpha = 0
+//                containerView.addSubview(tempLabel)
+                let tempFrame = UIView(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
+                tempFrame.backgroundColor = destinationLabel.backgroundColor
+                tempFrame.cornerRadius = initialLabel.cornerRadius
                 let tempLabel = PaddingLabel(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
                 tempLabel.leftInset = (initialLabel as? PaddingLabel)?.leftInset ?? 0
                 tempLabel.rightInset = (initialLabel as? PaddingLabel)?.rightInset ?? 0
                 tempLabel.topInset = (initialLabel as? PaddingLabel)?.topInset ?? 0
                 tempLabel.bottomInset = (initialLabel as? PaddingLabel)?.bottomInset ?? 0
-                tempLabel.backgroundColor = initialLabel.backgroundColor
+                tempLabel.backgroundColor = .clear//initialLabel.backgroundColor
                 tempLabel.textAlignment = initialLabel.textAlignment
                 tempLabel.text = initialLabel.text
                 tempLabel.font = initialLabel.font
                 tempLabel.textColor = initialLabel.textColor
                 tempLabel.cornerRadius = initialLabel.cornerRadius
-                initialLabel.alpha = 0
+                containerView.addSubview(tempFrame)
                 containerView.addSubview(tempLabel)
+                initialLabel.alpha = 0
                 
                 let iconText = vc_1.hyperlink == nil ? "?" : "OK"
                 let tempIconText = vc_1.hyperlink == nil ? "ПРОПУСТИТЬ" : "OK"
                 let tempIconTextSize: CGFloat = vc_1.hyperlink == nil ? 26 : 43
                 
                 //Sizes are equal
-                let destinationPos = CGPoint(x: destinationLabel.center.x, y: destinationLabel.center.y + UIApplication.shared.statusBarFrame.height + (navigationController?.navigationBar.subviews.first!.frame.height)!)
+                var destinationPos = CGPoint(x: destinationLabel.center.x, y: destinationLabel.center.y + UIApplication.shared.statusBarFrame.height + (navigationController?.navigationBar.subviews.first!.frame.height)!)
+                let destinationSize = CGSize(width: destinationLabel.frame.size.width, height: vc_2.hyperlinkLabel.frame.size.height)
+                
+                //
+                destinationPos.x = destinationLabel.center.x
+                destinationPos.x -= destinationSize.width / 2 - tempLabel.frame.size.width / 2
+                destinationPos.y = destinationLabel.center.y + (navigationController?.navigationBar.subviews.first!.frame.height)! + UIApplication.shared.statusBarFrame.height
+                destinationPos.y -= destinationSize.height / 2 - tempLabel.frame.size.height / 2
+                //
+                
                 let animationBlock: Closure = { UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseOut], animations: {
+//                    tempLabel.center = destinationPos
+                    tempFrame.center = destinationPos
+                    tempFrame.frame.size = destinationSize
                     tempLabel.center = destinationPos
+                    tempLabel.frame.size = destinationSize
                 }) }
                 let completionBlock: Closure = { UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseOut], animations: {
                     delay(seconds: 0.1) {
                         vc_2.hyperlinkLabel.alpha = 1
+//                        tempLabel.removeFromSuperview()
                         tempLabel.removeFromSuperview()
+                        tempFrame.removeFromSuperview()
                     }
                 }) }
                 
@@ -391,7 +423,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 initialLabel.alpha = 0
                 
                 let tempIcon = getIcon(frame: initialIcon.frame, category: initialIcon.categoryID, color: initialIcon.tagColor!, text: initialIcon.text, textSize: initialIcon.textSize)
-                tempIcon.center = CGPoint(x: initialIcon.superview!.convert(initialIcon.center, to: navigationController?.view).x, y: -initialIcon.bounds.height*4)
+                tempIcon.center = CGPoint(x: initialIcon.superview!.convert(initialIcon.center, to: navigationController?.view).x, y: destinationLabel.convert(destinationLabel.bounds.origin, to: vc_2.view).y)//-initialIcon.frame.height)//-initialIcon.frame.height)
                 vc_2.view.addSubview(tempIcon)
                 print(tempIcon.frame)
                 
@@ -408,8 +440,12 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     tempFrame.frame.size = destinationSize
                     tempLabel.center = destinationPos
                     tempLabel.frame.size = destinationSize
+//                    UIView.animate(withDuration: 0.4) {
+//                        tempIcon.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+//                    }
                 }) }
-                let completionBlock: Closure = {
+                var completionBlocks: [Closure] = []
+                completionBlocks.append {
                     UIView.animate(withDuration: 0.2, delay: 0.12, options: [.curveLinear], animations: {
                         destinationLabel.alpha = 1
                         tempLabel.alpha = 0
@@ -422,21 +458,12 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         tempIcon.removeFromSuperview()
                     }
                 }
+                completionBlocks.append {
+                    tempIcon.animateMaskLayer(duration: 0.3, completionBlocks: [], completionDelegate: nil)
+                }
                 
-//                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: [animationBlock]) {
-//                    _ in
-//                    UIView.animate(withDuration: 0.2, delay: 0.12, options: [.curveLinear], animations: {
-//                        destinationLabel.alpha = 1
-//                        tempLabel.alpha = 0
-//                        tempFrame.alpha = 0
-//                    }) {
-//                        _ in
-//                        tempLabel.removeFromSuperview()
-//                        tempFrame.removeFromSuperview()
-//                    }
-//                    self.context?.completeTransition(true)
-//                }
-                animateIconStyleTransition(initialIcon: initialIcon, destinationIcon: tempIcon, iconFrame: CGRect(origin: vc_1.contentView.convert(initialIcon.frame.origin, to: navigationController?.view), size: initialIcon.frame.size), iconText: "", animationBlocks: [animationBlock], completionBlocks: [completionBlock])
+                animateIconStyleTransition(initialIcon: initialIcon, destinationIcon: tempIcon, iconFrame: CGRect(origin: vc_1.contentView.convert(initialIcon.frame.origin, to: navigationController?.view), size: initialIcon.frame.size), iconText: "", animationBlocks: [animationBlock], completionBlocks: completionBlocks)
+                
             }
         } else if operation == .pop {
             if let vc_1 = fromVC as? SubcategoryViewController, let initialIcon = vc_1.icon, let vc_2 = toVC as? SurveysViewController, let collVC = vc_2.categoryVC as? CategoryCollectionViewController, let indexPath = collVC.currentIndex as? IndexPath, let cell = collVC.collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell {
@@ -636,6 +663,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 initialIcon.alpha = 0//vc_1.isModified ? 0 : 1
                 vc_2.categoryTitle.text = ""
                 vc_2.categoryIcon.tagColor = vc_1.category?.tagColor
+                vc_2.selectedColor = vc_2.categoryIcon.tagColor!
 //                toVC.view.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
                 let destinationSize = destinationIcon.frame.size
                 var destinationPos = collectionVC.returnPos
@@ -676,7 +704,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 destinationIcon.setNeedsDisplay()
 //                toVC.view.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
                 let destinationSize = destinationIcon.frame.size
-                var destinationPos = destinationIcon.convert(destinationIcon.center, to: navigationController?.view)
+                var destinationPos = vc_2.contentView.convert(destinationIcon.center, to: navigationController?.view)
                 if destinationSize > icon.frame.size {
                     destinationPos.x += icon.frame.size.width / 2 - destinationSize.width / 2
                     destinationPos.y += icon.frame.size.height / 2 - destinationSize.height / 2
@@ -718,7 +746,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 destinationIcon.setNeedsDisplay()
 //                toVC.view.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
                 let destinationSize = destinationIcon.frame.size
-                var destinationPos = destinationIcon.convert(destinationIcon.center, to: navigationController?.view)
+                var destinationPos = vc_2.contentView.convert(destinationIcon.center, to: navigationController?.view)
                 if destinationSize > icon.frame.size {
                     destinationPos.x += icon.frame.size.width / 2 - destinationSize.width / 2
                     destinationPos.y += icon.frame.size.height / 2 - destinationSize.height / 2
@@ -761,7 +789,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 destinationIcon.setNeedsDisplay()
 //                toVC.view.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
                 let destinationSize = destinationIcon.frame.size
-                var destinationPos = destinationIcon.convert(destinationIcon.center, to: navigationController?.view)
+                var destinationPos = vc_2.contentView.convert(destinationIcon.center, to: navigationController?.view)
                 if destinationSize > icon.frame.size {
                     destinationPos.x -= icon.frame.size.width / 2 - destinationSize.width / 2
                     destinationPos.y -= icon.frame.size.height / 2 - destinationSize.height / 2
@@ -934,10 +962,10 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         self.context?.completeTransition(true)
                     }
                 }
-            } else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? CreateNewSurveyViewController, let initialLabel = vc_1.frameView, let destinationLabel = vc_1.accessibilityIdentifier == "Title" ? vc_2.titleLabel : vc_2.questionLabel {
+            } else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? CreateNewSurveyViewController, let initialLabel = vc_1.frameView, let destinationLabel = vc_1.accessibilityIdentifier == "Title" ? vc_2.titleLabel : vc_2.questionLabel, let destinationIcon = vc_1.accessibilityIdentifier == "Title" ? vc_2.titleIcon : vc_2.questionIcon {
                 
-//                toVC.view.setNeedsLayout()
-//                toVC.view.layoutIfNeeded()
+                toVC.view.setNeedsLayout()
+                toVC.view.layoutIfNeeded()
 //
                 destinationLabel.alpha = 0
                 let tempFrame = UIView(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
@@ -958,22 +986,14 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 initialLabel.alpha = 0
                 containerView.addSubview(tempFrame)
                 containerView.addSubview(tempLabel)
-                //                tempFrame.addSubview(tempLabel)
-                //                tempLabel.centerYAnchor.constraint(equalTo: tempFrame.centerYAnchor).isActive = true
-                //                tempLabel.centerXAnchor.constraint(equalTo: tempFrame.centerXAnchor).isActive = true
-                //                tempFrame.setNeedsLayout()
-                //                tempFrame.layoutIfNeeded()
                 
-                //                tempLabel.trailingAnchor.constraint(equalTo: tempFrame.trailingAnchor).isActive = true
-                //                tempLabel.leadingAnchor.constraint(equalTo: tempFrame.leadingAnchor).isActive = true
-                //                tempLabel.bottomAnchor.constraint(equalTo: tempFrame.bottomAnchor).isActive = true
-                //                tempLabel.topAnchor.constraint(equalTo: tempFrame.topAnchor).isActive = true
+                let tempIcon = getIcon(frame: destinationIcon.frame, category: destinationIcon.categoryID, color: destinationIcon.tagColor!, text: destinationIcon.text, textSize: destinationIcon.textSize)
+                tempIcon.center = CGPoint(x: vc_2.contentView.superview!.convert(destinationIcon.center, to: navigationController?.view).x, y: -(destinationIcon.bounds.height + destinationIcon.frame.height))
+                destinationIcon.alpha = 0
+                vc_2.view.addSubview(tempIcon)
+                let destinationIconPos = vc_2.contentView.convert(destinationIcon.center, to: vc_2.view)
                 
-                //                tempLabel.addEquallyTo(to: tempFrame)
-                
-                
-                
-                var destinationPos = destinationLabel.convert(destinationLabel.center, to: navigationController?.view)
+                var destinationPos = vc_2.contentView.convert(destinationLabel.center, to: navigationController?.view)
                 let destinationSize = destinationLabel.frame.size
 
                 if destinationSize.width != tempLabel.frame.size.width {
@@ -996,6 +1016,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
 //                }
 
                 let animationBlock: Closure = { UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
+                    tempIcon.center = destinationIconPos
                     tempFrame.center = destinationPos
                     tempFrame.frame.size = destinationSize
                     tempLabel.center = destinationPos
@@ -1003,19 +1024,28 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                     delay(seconds: self.duration / 1.55) {
                         if vc_1.accessibilityIdentifier == "Title" {
                             vc_2.titleLabel.text = vc_1.text.text
-                            vc_2.questionTitle = vc_1.text.text
+//                            vc_2.questionTitle = vc_1.text.text
                         } else {
                             vc_2.questionLabel.text = vc_1.text.text
-                            vc_2.question = vc_1.text.text
+//                            vc_2.question = vc_1.text.text
                         }
                     }
                 }) }
-
-                    self.animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: [animationBlock]) {
+                
+                self.animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: [animationBlock]) {
                     _ in
+                    destinationIcon.alpha = 1
+                    tempIcon.removeFromSuperview()
                     destinationLabel.alpha = 1
                     tempLabel.removeFromSuperview()
                     tempFrame.removeFromSuperview()
+                    if vc_1.accessibilityIdentifier == "Title" {
+//                        vc_2.titleLabel.text = vc_1.text.text
+                        vc_2.questionTitle = vc_1.text.text
+                    } else {
+//                        vc_2.questionLabel.text = vc_1.text.text
+                        vc_2.question = vc_1.text.text
+                    }
                     self.context?.completeTransition(true)
                 }
             } else {
@@ -1060,15 +1090,15 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
         }
     }
     
-    private func getIcon(frame: CGRect, category: SurveyCategoryIcon.CategoryID, color: UIColor, text: String = "", textSize: CGFloat = 43) -> SurveyCategoryIcon {
-        let icon = SurveyCategoryIcon(frame: frame)
-        icon.textSize = textSize
-        icon.text = text
-        icon.tagColor = color
-        icon.categoryID = category
-        icon.isOpaque = false
-        return icon
-    }
+//    private func getIcon(frame: CGRect, category: SurveyCategoryIcon.CategoryID, color: UIColor, text: String = "", textSize: CGFloat = 43) -> SurveyCategoryIcon {
+//        let icon = SurveyCategoryIcon(frame: frame)
+//        icon.textSize = textSize
+//        icon.text = text
+//        icon.tagColor = color
+//        icon.categoryID = category
+//        icon.isOpaque = false
+//        return icon
+//    }
     
     
     

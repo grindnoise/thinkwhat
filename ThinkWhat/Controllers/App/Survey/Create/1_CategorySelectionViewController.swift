@@ -18,11 +18,11 @@ class CategorySelectionViewController: UIViewController {
             isAnimationStopped = true
             category = nil
             backButton.color = parentCategory?.tagColor
-            UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
+            UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
                 self.view.setNeedsLayout()
                 self.backButtonConstraint.constant = self.parentCategory == nil ? self.hiddenConstraintConstant : self.initialConstraintConstant
                 self.view.layoutIfNeeded()
-                self.backButton.transform = self.parentCategory == nil ? CGAffineTransform(scaleX: 0.7, y: 0.7) : CGAffineTransform.identity
+//                self.backButton.transform = self.parentCategory == nil ? CGAffineTransform(scaleX: 0.7, y: 0.7) : CGAffineTransform.identity
                 self.backButton.alpha = self.parentCategory == nil ? 0 : 1
             })
             dataSource = SurveyCategories.shared.categories.filter { $0.parent == parentCategory }
@@ -119,7 +119,7 @@ class CategorySelectionViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.25
+            nc.duration = 0.32
             nc.transitionStyle = .Icon
         }
         
@@ -169,13 +169,13 @@ class CategorySelectionViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         if scaleAnim == nil {
-            scaleAnim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+            scaleAnim = Animations.transformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
         }
         if shadowPathAnim == nil {
-            shadowPathAnim = animateShadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+            shadowPathAnim = Animations.shadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
         }
         if groupAnim == nil {
-            groupAnim = joinAnimations(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: self)
+            groupAnim = Animations.group(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear, delegate: self)
         }
     }
 
@@ -234,130 +234,3 @@ extension CategorySelectionViewController: CAAnimationDelegate {
         }
     }
 }
-
-
-
-
-
-//
-//class CategorySelectionViewController: UIViewController {
-//
-//    class var subcategoryNib: UINib {
-//        return UINib(nibName: "SubcategorySelectionTableViewCell", bundle: nil)
-//    }
-//    class var categoryNib: UINib {
-//        return UINib(nibName: "CategoryTableViewCell", bundle: nil)
-//    }
-//
-//    @IBOutlet weak var selectButton: UIButton!
-//    @IBOutlet weak var tableView: UITableView!
-//    @IBAction func selectTapped(_ sender: Any) {
-//        if delegate != nil {
-//            delegate!.category = category
-//            if let cell = delegate?.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? CategorySelectionCell {
-//                cell.categoryTitle.text = category?.title
-//            }
-//            //delegate?.tableView.reloadSections(IndexSet(arrayLiteral: 0), with: .none)//reloadRows(at: [IndexPath(row: 0, section: 0)], with: .none)
-//            navigationController?.popViewController(animated: true)
-//        }
-//    }
-//
-//    fileprivate var isViewSetupCompleted = false
-//    var delegate: NewSurveyViewController?
-//    var category: SurveyCategory? {
-//        didSet {
-//            if category != nil, selectButton != nil {
-//                UIView.animate(withDuration: 0.2) {
-//                    self.selectButton.backgroundColor = K_COLOR_RED
-//                }
-//            }
-//        }
-//    }
-//
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        tableView.delegate = self as UITableViewDelegate
-//        tableView.dataSource = self
-//        tableView.register(CategorySelectionViewController.subcategoryNib, forCellReuseIdentifier: "subcategoryCell")
-//        tableView.register(CategorySelectionViewController.categoryNib, forCellReuseIdentifier: "categoryCell")
-//    }
-//
-//    override func viewWillAppear(_ animated: Bool) {
-//        if !isViewSetupCompleted {
-//            self.view.setNeedsLayout()
-//            self.view.layoutIfNeeded()
-//            isViewSetupCompleted = true
-//            self.selectButton.layer.cornerRadius = self.selectButton.frame.height / 2
-//        }
-//        if category == nil {
-//            selectButton.backgroundColor = K_COLOR_GRAY
-//        }
-//    }
-//}
-//
-//extension CategorySelectionViewController: UITableViewDelegate, UITableViewDataSource {
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return SurveyCategories.shared.tree[section].first!.value.count
-//    }
-//
-//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        return SurveyCategories.shared.tree[section].first?.key
-//    }
-//
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        if let cell = tableView.dequeueReusableCell(withIdentifier: "subcategoryCell", for: indexPath) as? SubcategorySelectionTableViewCell {
-//            cell.title.text = SurveyCategories.shared.tree[indexPath.section].first?.value[indexPath.row].title.lowercased()//
-//            cell.category = SurveyCategories.shared.tree[indexPath.section].first?.value[indexPath.row]
-//            cell.isMarked = cell.category == category
-//            if (indexPath.row % 2 == 0) {
-//                cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
-//            } else {
-//                cell.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
-//            }
-//            return cell
-//        }
-//        return UITableViewCell()
-//    }
-//
-//    func numberOfSections(in tableView: UITableView) -> Int {
-//        return SurveyCategories.shared.tree.count
-//    }
-//
-//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//        if let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell") as? CategoryTableViewCell {
-//            cell.title.text = SurveyCategories.shared.categories.filter { $0.title == SurveyCategories.shared.tree[section].first?.key}.first?.title.uppercased()
-//            cell.backgroundColor = SurveyCategories.shared.categories.filter { $0.title == SurveyCategories.shared.tree[section].first?.key}.first?.tagColor ?? UIColor.gray
-//            cell.total.text = "всего " + (SurveyCategories.shared.categories.filter { $0.title == SurveyCategories.shared.tree[section].first?.key}.first?.total.stringValue!)!
-//            cell.active.text = "активных " + (SurveyCategories.shared.categories.filter { $0.title == SurveyCategories.shared.tree[section].first?.key}.first?.active.stringValue!)!
-//            return cell
-//        }
-//        return nil
-//    }
-//
-//
-//    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        if let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell") as? CategoryTableViewCell {
-//            return cell.contentView.frame.height
-//        }
-//        return 0
-//    }
-//
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        return 35
-//    }
-//
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        if let cell = tableView.cellForRow(at: indexPath) as? SubcategorySelectionTableViewCell {
-//            if !cell.isMarked {
-//                cell.isMarked = true
-//                category = cell.category
-//                for c in tableView.visibleCells {
-//                    if let _cell = c as? SubcategorySelectionTableViewCell, _cell.isMarked, _cell != cell {
-//                        _cell.isMarked = false
-//                    }
-//                }
-//            }
-//        }
-//        tableView.deselectRow(at: indexPath, animated: true)
-//    }
-//}

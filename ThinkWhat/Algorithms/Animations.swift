@@ -9,6 +9,112 @@
 import UIKit
 import MapKit
 
+struct Animations {
+    static func group(animations: [CAAnimation], repeatCount: Float = 0, autoreverses: Bool = false, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CAAnimationGroup {
+        
+        let anim = CAAnimationGroup()
+        anim.animations = animations
+        anim.duration = duration
+        anim.beginTime = CACurrentMediaTime() + beginTime
+        anim.timingFunction = CAMediaTimingFunction(name: timingFunction)
+        anim.repeatCount = repeatCount
+        anim.delegate = delegate
+        anim.autoreverses = autoreverses
+        anim.delegate = delegate
+        anim.isRemovedOnCompletion = isRemovedOnCompletion
+        return anim
+        
+    }
+    
+    static func shadowPath(fromValue: CGPath, toValue: CGPath, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CABasicAnimation {
+        
+        let anim = CABasicAnimation(keyPath:"shadowPath")
+        anim.fromValue = fromValue
+        anim.toValue = toValue
+        anim.duration = duration
+        anim.beginTime = CACurrentMediaTime() + beginTime
+        anim.repeatCount = repeatCount
+        anim.autoreverses = autoreverses
+        anim.isRemovedOnCompletion = isRemovedOnCompletion
+        if delegate != nil {
+            anim.delegate = delegate!
+        }
+        anim.timingFunction = CAMediaTimingFunction(name: timingFunction)
+        
+        return anim
+        
+    }
+    
+    static func shadowOpacity(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CABasicAnimation {
+        
+        let anim = CABasicAnimation(keyPath:"shadowOpacity")
+        anim.fromValue = fromValue
+        anim.toValue = toValue
+        anim.duration = duration
+        anim.beginTime = CACurrentMediaTime() + beginTime
+        anim.repeatCount = repeatCount
+        anim.autoreverses = autoreverses
+        anim.isRemovedOnCompletion = isRemovedOnCompletion
+        if delegate != nil {
+            anim.delegate = delegate!
+        }
+        anim.timingFunction = CAMediaTimingFunction(name: timingFunction)
+        
+        return anim
+        
+    }
+    
+    static func transformScale(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CABasicAnimation {
+        
+        let anim = CABasicAnimation(keyPath:"transform.scale")
+        anim.fromValue = fromValue
+        anim.toValue = toValue
+        anim.duration = duration
+        anim.beginTime = CACurrentMediaTime() + beginTime
+        anim.repeatCount = repeatCount
+        anim.autoreverses = autoreverses
+        anim.isRemovedOnCompletion = isRemovedOnCompletion
+        if delegate != nil {
+            anim.delegate = delegate!
+        }
+        anim.timingFunction = CAMediaTimingFunction(name: timingFunction)
+        
+        return anim
+        
+    }
+    
+    static func fadeInFadeOut(layer: CALayer, fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, keyValue: String = "", isRemovedOnCompletion: Bool = true) -> CABasicAnimation {
+        
+        let anim = CABasicAnimation(keyPath: "opacity")//анимируемое свойство
+        anim.fromValue = fromValue//стартовое значение
+        anim.toValue = toValue//конечное значение
+        anim.duration = duration//длительность
+        anim.beginTime = CACurrentMediaTime() + beginTime//время начала (берем текущее время и прибавляем задержку, если необходимо)
+        anim.isRemovedOnCompletion = isRemovedOnCompletion
+        anim.timingFunction = CAMediaTimingFunction(name: timingFunction)//темп анимации (быстрое начало и медленное завершение, медленное начало и быстрое завершение и тд)
+        anim.setValue(keyValue, forKey: "name")//добавляем характеристики
+        anim.setValue(layer, forKey: "layer")
+        //anim.delegate = self//делегат для выполнения протокола
+        return anim
+        
+    }
+
+    static func rotate360(layer: CALayer, duration: CFTimeInterval = 1.0, keyValue: String? = nil) -> CABasicAnimation {
+        
+        let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation")
+        //rotationAnimation.fromValue = 360.0//(360.0 * CGFloat(M_PI)) / 360.0 * -1.0
+        //rotationAnimation.toValue = 0.0
+        rotationAnimation.byValue = CGFloat(Double.pi * 2)
+        rotationAnimation.duration = duration
+        //rotationAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        rotationAnimation.setValue(keyValue, forKey: "name")
+        rotationAnimation.setValue(layer, forKey: "layer")
+        //rotationAnimation.delegate = self
+        return rotationAnimation
+    }
+    
+}
+
 func animateImageChange(imageView: UIImageView, fromImage: UIImage, toImage: UIImage, duration: CFTimeInterval) {
     
     let anim = CABasicAnimation(keyPath: "contents")
@@ -21,37 +127,6 @@ func animateImageChange(imageView: UIImageView, fromImage: UIImage, toImage: UII
     
 }
 
-//MARK: - Animations
-//Анимация вращения на 360
-func animate360DegreesRotation(layer: CALayer, duration: CFTimeInterval = 1.0, keyValue: String? = nil) -> CABasicAnimation {
-    
-    let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation")
-    //rotationAnimation.fromValue = 360.0//(360.0 * CGFloat(M_PI)) / 360.0 * -1.0
-    //rotationAnimation.toValue = 0.0
-    rotationAnimation.byValue = CGFloat(Double.pi * 2)
-    rotationAnimation.duration = duration
-    //rotationAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
-    rotationAnimation.setValue(keyValue, forKey: "name")
-    rotationAnimation.setValue(layer, forKey: "layer")
-    //rotationAnimation.delegate = self
-    return rotationAnimation
-}
-
-//Анимация прозрачности. Входные параметры: 1) анимируемый слой, 2) длительность (сек), 3) время задержки старта (по умолч в сек), 4) темп анимации (по умолч линейный). Возвращаемое значение - ссылка на созданную анимацию
-func animateFadeInOut(layer: CALayer, fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, beginTime: CFTimeInterval = 0.0, timingFunction:CAMediaTimingFunction, keyValue: String = "") -> CABasicAnimation {
-    
-    let anim = CABasicAnimation(keyPath: "opacity")//анимируемое свойство
-    anim.fromValue = fromValue//стартовое значение
-    anim.toValue = toValue//конечное значение
-    anim.duration = duration//длительность
-    anim.beginTime = CACurrentMediaTime() + beginTime//время начала (берем текущее время и прибавляем задержку, если необходимо)
-    anim.timingFunction = timingFunction//темп анимации (быстрое начало и медленное завершение, медленное начало и быстрое завершение и тд)
-    anim.setValue(keyValue, forKey: "name")//добавляем характеристики
-    anim.setValue(layer, forKey: "layer")
-    //anim.delegate = self//делегат для выполнения протокола
-    return anim
-    
-}
 
 func animateFadeInOut(fromValue: CGFloat, toValue: CGFloat) -> CABasicAnimation {
     
@@ -63,45 +138,6 @@ func animateFadeInOut(fromValue: CGFloat, toValue: CGFloat) -> CABasicAnimation 
     
 }
 
-func makeGroupAnimation(animations: [CAAnimation], duration: CFTimeInterval, timingFunction:CAMediaTimingFunction, repeatCount: Float, delegate: CAAnimationDelegate) -> CAAnimationGroup {
-    
-    let anim = CAAnimationGroup()
-    anim.animations = animations
-    anim.duration = duration
-    anim.timingFunction = timingFunction
-    anim.repeatCount = repeatCount
-    anim.delegate = delegate
-    
-    return anim
-    
-}
-
-//Анимация смены изображения v.1
-//    static func animateImageChange(imageView: UIImageView, fromImage: UIImage, toImage: UIImage, duration: CFTimeInterval) {
-//
-//        let anim = CABasicAnimation(keyPath: "contents")
-//        anim.fromValue = fromImage
-//        anim.toValue = toImage
-//        anim.duration = duration
-//        imageView.layer.add(anim, forKey: nil)
-//        imageView.image = toImage
-//
-//    }
-func joinAnimations(animations: [CAAnimation], repeatCount: Float, autoreverses: Bool, duration: CFTimeInterval, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String, delegate: CAAnimationDelegate?) -> CAAnimationGroup {
-    
-    let anim = CAAnimationGroup()
-    anim.animations = animations
-    anim.duration = duration
-    anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: timingFunction))
-    anim.repeatCount = repeatCount
-    anim.delegate = delegate
-    anim.autoreverses = autoreverses
-    anim.delegate = delegate
-    return anim
-    
-}
-
-//Анимация смены изображения v.2
 func animateImageChange(annotationView: MKAnnotationView, fromImage: UIImage, toImage: UIImage, duration: CFTimeInterval) {
     
     let anim = CABasicAnimation(keyPath: "contents")
@@ -113,103 +149,7 @@ func animateImageChange(annotationView: MKAnnotationView, fromImage: UIImage, to
     
 }
 
-func animateTransformScale(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, repeatCount: Float, autoreverses: Bool, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String, delegate: CAAnimationDelegate?) -> CABasicAnimation {
-    
-    let anim = CABasicAnimation(keyPath:"transform.scale")
-    anim.fromValue = fromValue
-    anim.toValue = toValue
-    anim.duration = duration
-    anim.repeatCount = repeatCount
-    anim.autoreverses = autoreverses
-    if delegate != nil {
-        anim.delegate = delegate!
-    }
-    anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: timingFunction))
-    
-    return anim
-    
-}
 
-func animateShadowPath(fromValue: CGPath, toValue: CGPath, duration: CFTimeInterval, repeatCount: Float, autoreverses: Bool, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String, delegate: CAAnimationDelegate?) -> CABasicAnimation {
-    
-    let anim = CABasicAnimation(keyPath:"shadowPath")
-    anim.fromValue = fromValue
-    anim.toValue = toValue
-    anim.duration = duration
-    anim.repeatCount = repeatCount
-    anim.autoreverses = autoreverses
-    if delegate != nil {
-        anim.delegate = delegate!
-    }
-    anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: timingFunction))
-    
-    return anim
-    
-}
-
-func animateShadowOpacity(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, repeatCount: Float, autoreverses: Bool, timingFunction: String = CAMediaTimingFunctionName.default.rawValue as String, delegate: CAAnimationDelegate?) -> CABasicAnimation {
-    
-    let anim = CABasicAnimation(keyPath:"shadowOpacity")
-    anim.fromValue = fromValue
-    anim.toValue = toValue
-    anim.duration = duration
-    anim.repeatCount = repeatCount
-    anim.autoreverses = autoreverses
-    if delegate != nil {
-        anim.delegate = delegate!
-    }
-    anim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName(rawValue: timingFunction))
-    
-    return anim
-    
-}
-
-func animateTransformScale(fromValue: CGFloat, toValue: CGFloat) -> CABasicAnimation {
-    
-    let anim = CABasicAnimation(keyPath:"transform.scale")
-    anim.fromValue = fromValue
-    anim.toValue = toValue
-    return anim
-    
-}
-
-
-//class CustomIntensityVisualEffectView: UIVisualEffectView {
-//
-////    fileprivate let _duration: TimeInterval
-////    fileprivate let _intensity: CGFloat
-////    fileprivate let _effect: UIVisualEffect
-//    let animator: UIViewPropertyAnimator
-//    /// Create visual effect view with given effect and its intensity
-//    ///
-//    /// - Parameters:
-//    ///   - effect: visual effect, eg UIBlurEffect(style: .dark)
-//    ///   - intensity: custom intensity from 0.0 (no effect) to 1.0 (full effect) using linear scale
-//    var delegate: CallbackDelegate?
-//
-//    init(effect: UIVisualEffect, duration: TimeInterval, intensity: CGFloat) {
-////        _effect = effect
-////        _duration = duration
-////        _intensity = intensity
-//        animator = UIViewPropertyAnimator(duration: duration, curve: .linear)
-//        super.init(effect: nil)
-//
-////        animator = UIViewPropertyAnimator(duration: duration, curve: .linear)// { [unowned self] in self.effect = effect }
-////        animator.fractionComplete = intensity
-//    }
-//
-//    required init?(coder aDecoder: NSCoder) {
-//        fatalError()
-//    }
-//
-//
-//
-//    // MARK: Private
-////    private var animator: UIViewPropertyAnimator!
-//
-//}
-//
-//import UIKit
 
 class AnimatedVisualEffectView: UIVisualEffectView {
     

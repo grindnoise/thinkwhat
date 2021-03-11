@@ -128,6 +128,65 @@ extension UIView {
         let heightConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.width, multiplier: 1, constant: 0)
         NSLayoutConstraint.activate([horizontalConstraint, verticalConstraint, widthConstraint, heightConstraint])
     }
+ 
+    func animateMaskLayer(duration: TimeInterval, completionBlocks: [Closure], completionDelegate: CAAnimationDelegate?) {
+        
+        let circlePathLayer = CAShapeLayer()
+        
+        func circleFrameTopCenter() -> CGRect {
+            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+            let circlePathBounds = circlePathLayer.bounds
+            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+            return circleFrame
+        }
+        
+        func circleFrameTop() -> CGRect {
+            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+            let circlePathBounds = circlePathLayer.bounds
+            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+            return circleFrame
+        }
+        
+        func circlePath() -> UIBezierPath {
+            return UIBezierPath(ovalIn: circleFrameTopCenter())
+        }
+        
+        circlePathLayer.frame = self.bounds
+        circlePathLayer.path = circlePath().cgPath
+        self.layer.mask = circlePathLayer
+        self.alpha = 1
+        
+        let center = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
+        
+        let finalRadius = sqrt((center.x*center.x) + (center.y*center.y))
+        
+        let radiusInset = finalRadius
+        
+        let outerRect = circleFrameTop().insetBy(dx: -radiusInset, dy: -radiusInset)
+        
+        let fromPath = UIBezierPath(ovalIn: outerRect).cgPath
+        
+        let toPath = circlePathLayer.path
+        
+        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
+        
+        maskLayerAnimation.fromValue = fromPath
+        maskLayerAnimation.toValue = toPath
+        maskLayerAnimation.duration = duration
+        maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+        maskLayerAnimation.isRemovedOnCompletion = false
+        
+        if !completionBlocks.isEmpty {
+            maskLayerAnimation.delegate = completionDelegate
+            maskLayerAnimation.setValue(completionBlocks, forKey: "maskCompletionBlocks")
+        }
+        
+        circlePathLayer.add(maskLayerAnimation, forKey: "path")
+        circlePathLayer.path = toPath
+        
+    }
     
 }
 

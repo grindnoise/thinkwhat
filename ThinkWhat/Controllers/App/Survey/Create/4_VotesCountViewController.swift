@@ -29,7 +29,7 @@ class VotesCountViewController: UIViewController {
                 } else {
                     if actionButton != nil {
                         actionButton.text = "\(votesCount)"
-                        actionButton.tagColor = Colors.UpperButtons.Avocado
+                        actionButton.tagColor = color//Colors.UpperButtons.Avocado
                         actionButton.isUserInteractionEnabled = true
                         if !isAnimating {
                             isAnimationStopped = false
@@ -68,22 +68,14 @@ class VotesCountViewController: UIViewController {
         super.viewDidLoad()
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.25
+            nc.duration = 0.32
             nc.transitionStyle = .Icon
         }
         navigationItem.setHidesBackButton(true, animated: false)
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if scaleAnim == nil {
-            scaleAnim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
-        }
-        if shadowPathAnim == nil {
-            shadowPathAnim = animateShadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
-        }
-        if groupAnim == nil {
-            groupAnim = joinAnimations(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: self)
-        }
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -99,6 +91,15 @@ class VotesCountViewController: UIViewController {
             self.actionButton.layer.shadowOffset = .zero
             self.actionButton.layer.shadowOpacity = 1
             self.actionButton.layer.masksToBounds = false
+            if self.scaleAnim == nil {
+                self.scaleAnim = Animations.transformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
+            }
+            if self.shadowPathAnim == nil {
+                self.shadowPathAnim = Animations.shadowPath(fromValue: self.initialShadowPath, toValue: self.finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
+            }
+            if self.groupAnim == nil {
+                self.groupAnim = Animations.group(animations: [self.scaleAnim, self.shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear, delegate: self)
+            }
         }
         delay(seconds: 0.4) {
             self.groupAnim.setValue(self.actionButton, forKey: "btn")
@@ -115,6 +116,7 @@ class VotesCountViewController: UIViewController {
     }
     
     @objc fileprivate func actionButtonTapped() {
+        isAnimationStopped = true
         UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
             self.actionButton.transform = .identity
         }) {

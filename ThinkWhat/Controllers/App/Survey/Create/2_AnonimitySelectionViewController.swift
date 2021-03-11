@@ -14,6 +14,7 @@ class AnonimitySelectionViewController: UIViewController {
     private let anonEnabledDescription = "Владелец опроса скрыт, респонденты никогда не узнают автора"
     private let anonDisabledDescription = "Владелец опроса виден респондентам"
     private var isAnimating = false
+    private var isAnimationStopped = false
     private var isSelected = false
     private var isFirstSelection = true
     private var finalShadowPath: CGPath!
@@ -74,7 +75,7 @@ class AnonimitySelectionViewController: UIViewController {
         super.viewDidLoad()
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.25
+            nc.duration = 0.32
             nc.transitionStyle = .Icon
         }
         navigationItem.setHidesBackButton(true, animated: false)
@@ -118,17 +119,18 @@ class AnonimitySelectionViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         if scaleAnim == nil {
-            scaleAnim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+            scaleAnim = Animations.transformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
         }
         if shadowPathAnim == nil {
-            shadowPathAnim = animateShadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+            shadowPathAnim = Animations.shadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
         }
         if groupAnim == nil {
-            groupAnim = joinAnimations(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: self)
+            groupAnim = Animations.group(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear, delegate: self)
         }
     }
     
     @objc fileprivate func okButtonTapped() {
+        isAnimationStopped = true
         navigationController?.popViewController(animated: true)
     }
     
@@ -192,7 +194,7 @@ class AnonimitySelectionViewController: UIViewController {
 extension AnonimitySelectionViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         isAnimating = false
-        if let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon {
+        if let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon, !isAnimationStopped {
             groupAnim.setValue(btn, forKey: "btn")
             btn.layer.add(groupAnim, forKey: nil)
             isAnimating = true

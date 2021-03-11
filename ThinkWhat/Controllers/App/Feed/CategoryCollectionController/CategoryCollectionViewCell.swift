@@ -27,13 +27,13 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     override var isSelected: Bool {
         didSet {
             if selectionMode {
-                UIView.animate(withDuration: 0.12) {
+                UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseOut], animations: {
                     self.contentView.backgroundColor = self.isSelected ? self.category.tagColor?.withAlphaComponent(0.2) ?? K_COLOR_RED.withAlphaComponent(0.2) : .white
-                }
-                if isSelected {
-                    let anim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.12, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut.rawValue,  delegate: nil)
-                    layer.add(anim, forKey: nil)
-                }
+                })
+//                if isSelected {
+//                    let anim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.12, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut.rawValue,  delegate: nil)
+//                    layer.add(anim, forKey: nil)
+//                }
             }
         }
     }

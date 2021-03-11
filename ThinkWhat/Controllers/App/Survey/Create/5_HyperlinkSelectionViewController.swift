@@ -54,7 +54,7 @@ class HyperlinkSelectionViewController: UIViewController {
                 }
                 isAnimationStopped = false
 //                actionButton.isUserInteractionEnabled = true
-                let anim = animateTransformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut.rawValue, delegate: self as CAAnimationDelegate)
+                let anim = Animations.transformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut, delegate: self as CAAnimationDelegate)
                 anim.setValue(self.actionButton, forKey: "btn")
                 actionButton.layer.add(anim, forKey: nil)
                 actionButton.tagColor = K_COLOR_RED
@@ -143,7 +143,7 @@ class HyperlinkSelectionViewController: UIViewController {
         super.viewDidLoad()
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.2
+            nc.duration = 0.32
             nc.transitionStyle = .Icon
         }
         navigationItem.setHidesBackButton(true, animated: false)
@@ -157,7 +157,7 @@ class HyperlinkSelectionViewController: UIViewController {
         if hyperlink != nil {
             isAnimationStopped = false
 //            actionButton.isUserInteractionEnabled = true
-            let anim = animateTransformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut.rawValue, delegate: self as CAAnimationDelegate)
+            let anim = Animations.transformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut, delegate: self as CAAnimationDelegate)
             anim.setValue(self.actionButton, forKey: "btn")
             actionButton.layer.add(anim, forKey: nil)
         }
@@ -168,6 +168,7 @@ class HyperlinkSelectionViewController: UIViewController {
         if let v = recognizer.view {
             switch v {
             case actionButton:
+                isAnimationStopped = true
                 if hyperlink == nil {
                     navigationController?.popViewController(animated: true)
                 } else {
@@ -223,7 +224,7 @@ extension HyperlinkSelectionViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         isAnimating = false
         if !isAnimationStopped, let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon {
-            let _anim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.5, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut.rawValue, delegate: self as CAAnimationDelegate)
+            let _anim = Animations.transformScale(fromValue: 1, toValue: 1.1, duration: 0.5, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self as CAAnimationDelegate)
             _anim.setValue(btn, forKey: "btn")
             btn.layer.add(_anim, forKey: nil)
             isAnimating = true

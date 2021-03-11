@@ -70,12 +70,13 @@ class PrivacySelectionViewController: UIViewController {
     //        }
     //    }
     @IBOutlet weak var descriptionLabel: UILabel!
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.25
+            nc.duration = 0.32
             nc.transitionStyle = .Icon
         }
         navigationItem.setHidesBackButton(true, animated: false)
@@ -119,17 +120,21 @@ class PrivacySelectionViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         if scaleAnim == nil {
-            scaleAnim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+            scaleAnim = Animations.transformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
         }
         if shadowPathAnim == nil {
-            shadowPathAnim = animateShadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: nil)
+            shadowPathAnim = Animations.shadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
         }
         if groupAnim == nil {
-            groupAnim = joinAnimations(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear.rawValue, delegate: self)
+            groupAnim = Animations.group(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear, delegate: self)
         }
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        actionButton.layer.removeAllAnimations()
+    }
     @objc fileprivate func okButtonTapped() {
+        isAnimationStopped = true
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -189,7 +194,7 @@ class PrivacySelectionViewController: UIViewController {
 extension PrivacySelectionViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         isAnimating = false
-        if let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon {
+        if let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon, !isAnimationStopped {
             groupAnim.setValue(btn, forKey: "btn")
             btn.layer.add(groupAnim, forKey: nil)
             isAnimating = true

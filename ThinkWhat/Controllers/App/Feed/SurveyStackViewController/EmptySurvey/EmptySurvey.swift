@@ -45,7 +45,7 @@ class EmptySurvey: UIView {
         
         content.frame = self.bounds
         content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        content.backgroundColor = UIColor.lightGray.withAlphaComponent(0.09)
+        content.backgroundColor = .white//UIColor.lightGray.withAlphaComponent(0.09)
         self.addSubview(content)
     }
     
