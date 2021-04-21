@@ -15,63 +15,68 @@ class HyperlinkSelectionViewController: UIViewController {
             hyperlinkLabel.font = font
             hyperlinkLabel.textColor = textColor
             hyperlinkLabel.tintColor = textColor
-            hyperlinkLabel.backgroundColor = color.withAlphaComponent(0.25)
+            hyperlinkLabel.backgroundColor = .clear
             if let str = hyperlink?.absoluteString {
                 hyperlinkLabel.text = str
             } else {
                 hyperlinkLabel.text = placeholder
             }
+            let tap = UITapGestureRecognizer(target: self, action: #selector(HyperlinkSelectionViewController.somethingTapped))
+            hyperlinkLabel.addGestureRecognizer(tap)
         }
     }
-    @IBOutlet weak var heightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var widthConstraint: NSLayoutConstraint!
-    
+//    @IBOutlet weak var trashIconConstaint: NSLayoutConstraint!
     
     //    private var placeholder = NSAttributedString(string: "http://...", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 20), foregroundColor: UIColor.lightGray, backgroundColor: .clear))
-    var placeholder: String = "ВСТАВИТЬ ССЫЛКУ"
-    private var isAnimating = false
-    private var isAnimationStopped = false
+    var isAnimationStopped = false
+    var placeholder: String = "ВСТАВИТЬ"
     var font: UIFont?
     var textColor: UIColor?
     var hyperlink: URL? {
         didSet {
-            if hyperlink == nil {
-                UIView.animate(withDuration: 0.2) {
-//                    self.copySign.alpha = 1
-                    self.trashSign.alpha = 0
+            if actionButton != nil, trashSign != nil {
+                if hyperlink == nil {
+                    UIView.animate(withDuration: 0.2) {
+                        //                    self.copySign.alpha = 1
+                        self.trashSign.alpha = 0
+                    }
+                    if actionButton != nil {
+                        //                    actionButton.isUserInteractionEnabled = false
+//                            actionButton.color = K_COLOR_GRAY
+                        actionButton.icon.textSize = 26
+                        actionButton.text = "ПРОПУСТИТЬ"
+                    }
+                } else {
+                    UIView.animate(withDuration: 0.2) {
+                        //                    self.copySign.alpha = 0
+                        self.trashSign.alpha = 1
+                    }
+                    actionButton.color = K_COLOR_RED
+                    actionButton.icon.textSize = 43
+                    actionButton.text = "OK"
                 }
-                if actionButton != nil {
-//                    actionButton.isUserInteractionEnabled = false
-                    actionButton.tagColor = K_COLOR_GRAY
-                    isAnimationStopped = true
-                    actionButton.textSize = 26
-                    actionButton.text = "ПРОПУСТИТЬ"
-                }
-            } else {
-                UIView.animate(withDuration: 0.2) {
-//                    self.copySign.alpha = 0
-                    self.trashSign.alpha = 1
-                }
-                isAnimationStopped = false
-//                actionButton.isUserInteractionEnabled = true
-                let anim = Animations.transformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut, delegate: self as CAAnimationDelegate)
-                anim.setValue(self.actionButton, forKey: "btn")
-                actionButton.layer.add(anim, forKey: nil)
-                actionButton.tagColor = K_COLOR_RED
-                actionButton.textSize = 43
-                actionButton.text = "OK"
             }
         }
     }
+    private var isViewSetupCompleted = false
     var _labelHeight: CGFloat = 0
     var color: UIColor!
-    @IBOutlet weak var actionButton: SurveyCategoryIcon! {
+    var lineWidth: CGFloat = 5 {
+        didSet {
+            if oldValue != lineWidth, actionButton != nil {
+                actionButton.lineWidth = lineWidth
+            }
+        }
+    }
+    @IBOutlet weak var actionButton: CircleButton! {
         didSet {
 //            actionButton.isUserInteractionEnabled = hyperlink == nil ? false : true
-            actionButton.categoryID = .Text
-            actionButton.tagColor   = hyperlink == nil ? K_COLOR_GRAY : K_COLOR_RED
-            actionButton.text       = hyperlink == nil ? "ПРОПУСТИТЬ" : "OK"
-            actionButton.textSize = hyperlink == nil ? 26 : 43
+            actionButton.lineWidth = lineWidth
+            actionButton.state = .Off
+            actionButton.category = .Ready_RU
+            actionButton.color = hyperlink == nil ? K_COLOR_GRAY : K_COLOR_RED
+            actionButton.text = hyperlink == nil ? "ПРОПУСТИТЬ" : "OK"
+            actionButton.icon.textSize = hyperlink == nil ? 26 : 43
             let tap = UITapGestureRecognizer(target: self, action: #selector(HyperlinkSelectionViewController.somethingTapped))
             actionButton.addGestureRecognizer(tap)
         }
@@ -107,9 +112,16 @@ class HyperlinkSelectionViewController: UIViewController {
 //            copySign.addGestureRecognizer(tap)
 //        }
 //    }
+    
+    @IBOutlet weak var circle_1: UIView!
+    @IBOutlet weak var circle_2: UIView!
+    @IBOutlet weak var circle_3: UIView!
+    @IBOutlet weak var circle_4: UIView!
+    
     @IBOutlet weak var trashSign: TrashIcon! {
         didSet {
-            trashSign.alpha = hyperlink == nil ? 0 : 1
+//            trashSign.alpha = hyperlink == nil ? 0 : 1
+            trashSign.color = color
             let tap = UITapGestureRecognizer(target: self, action: #selector(HyperlinkSelectionViewController.somethingTapped))
             trashSign.addGestureRecognizer(tap)
         }
@@ -138,28 +150,40 @@ class HyperlinkSelectionViewController: UIViewController {
             safari.addGestureRecognizer(tap)
         }
     }
+    @IBOutlet weak var contentView: UIView! {
+        didSet {
+            contentView.backgroundColor = color
+        }
+    }
+    @IBOutlet weak var stackView: UIStackView! {
+        didSet {
+            stackView.alpha = 0
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.32
+            nc.duration = 0.5
             nc.transitionStyle = .Icon
         }
         navigationItem.setHidesBackButton(true, animated: false)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        isAnimationStopped = true
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        if hyperlink != nil {
-            isAnimationStopped = false
-//            actionButton.isUserInteractionEnabled = true
-            let anim = Animations.transformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut, delegate: self as CAAnimationDelegate)
-            anim.setValue(self.actionButton, forKey: "btn")
-            actionButton.layer.add(anim, forKey: nil)
+    override func viewWillAppear(_ animated: Bool) {
+        lineWidth = actionButton.bounds.height / 10
+        if !isViewSetupCompleted {
+            view.setNeedsLayout()
+            view.layoutIfNeeded()
+            circle_1.cornerRadius = circle_1.frame.width / 2
+            circle_2.cornerRadius = circle_1.frame.width / 2
+            circle_3.cornerRadius = circle_1.frame.width / 2
+            circle_4.cornerRadius = circle_1.frame.width / 2
+            isViewSetupCompleted = true
+            if hyperlink != nil {
+                actionButton.setNext(animationDelegate: self)
+            }
         }
     }
     
@@ -168,8 +192,8 @@ class HyperlinkSelectionViewController: UIViewController {
         if let v = recognizer.view {
             switch v {
             case actionButton:
-                isAnimationStopped = true
                 if hyperlink == nil {
+                    isAnimationStopped = true
                     navigationController?.popViewController(animated: true)
                 } else {
                     UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
@@ -179,18 +203,32 @@ class HyperlinkSelectionViewController: UIViewController {
                         self.navigationController?.popViewController(animated: true)
                     }
                 }
-//            case copySign:
-//                if let text = UIPasteboard.general.string, !text.isEmpty {
-////                    hyperlinkLabel.attributedText = NSAttributedString(string: text, attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 20), foregroundColor: UIColor.black, backgroundColor: .clear))
-//                    hyperlinkLabel.text = text
-//                    if let url = URL(string: hyperlinkLabel.text!) as? URL {
-//                        hyperlink = url
-//                    } else {
-//
-//                    }
-//                }
+            case hyperlinkLabel:
+                if let text = UIPasteboard.general.string, !text.isEmpty {
+//                    hyperlinkLabel.attributedText = NSAttributedString(string: text, attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 20), foregroundColor: UIColor.black, backgroundColor: .clear))
+                    hyperlinkLabel.text = text
+                    if let url = URL(string: hyperlinkLabel.text!) as? URL {
+                        isAnimationStopped = false
+                        if hyperlink == nil {
+                            actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Ready_RU)
+                            UIView.animate(withDuration: 0.15, animations: {
+                                self.actionButton.color = K_COLOR_RED
+                            }) {
+                                _ in
+                                self.actionButton.setNext(animationDelegate: self)
+                            }
+                            
+                        }
+                        hyperlink = url
+                    }
+                }
             case trashSign:
 //                hyperlinkLabel.attributedText = placeholder
+                actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Next_RU)
+                UIView.animate(withDuration: 0.15, animations: {
+                    self.actionButton.color = K_COLOR_GRAY
+                })
+                isAnimationStopped = true
                 hyperlinkLabel.text = placeholder
                 hyperlink = nil
             case youtube:
@@ -222,12 +260,13 @@ class HyperlinkSelectionViewController: UIViewController {
 
 extension HyperlinkSelectionViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        isAnimating = false
-        if !isAnimationStopped, let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon {
-            let _anim = Animations.transformScale(fromValue: 1, toValue: 1.1, duration: 0.5, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self as CAAnimationDelegate)
-            _anim.setValue(btn, forKey: "btn")
-            btn.layer.add(_anim, forKey: nil)
-            isAnimating = true
+        if !isAnimationStopped {
+            actionButton.setNext(animationDelegate: self)
         }
+//        } else {
+//            UIView.animate(withDuration: 0.25) {
+//                self.actionButton.icon.backgroundColor = K_COLOR_GRAY
+//            }
+//        }
     }
 }

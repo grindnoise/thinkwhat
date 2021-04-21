@@ -10,6 +10,14 @@ import UIKit
 import MapKit
 
 struct Animations {
+    enum AnimationProperty: String {
+        case FillColor       = "fillColor"
+        case ShadowPath      = "shadowPath"
+        case ShadowOpacity   = "shadowOpacity"
+        case Scale           = "transform.scale"
+        case Path            = "path"
+        case BackgroundColor = "backgroundColor"
+    }
     static func group(animations: [CAAnimation], repeatCount: Float = 0, autoreverses: Bool = false, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CAAnimationGroup {
         
         let anim = CAAnimationGroup()
@@ -26,53 +34,16 @@ struct Animations {
         
     }
     
-    static func shadowPath(fromValue: CGPath, toValue: CGPath, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CABasicAnimation {
+    static func get(property: AnimationProperty, fromValue: Any, toValue: Any, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CAAnimation {
         
-        let anim = CABasicAnimation(keyPath:"shadowPath")
+        let anim = CABasicAnimation(keyPath: property.rawValue)
         anim.fromValue = fromValue
         anim.toValue = toValue
         anim.duration = duration
         anim.beginTime = CACurrentMediaTime() + beginTime
         anim.repeatCount = repeatCount
         anim.autoreverses = autoreverses
-        anim.isRemovedOnCompletion = isRemovedOnCompletion
-        if delegate != nil {
-            anim.delegate = delegate!
-        }
-        anim.timingFunction = CAMediaTimingFunction(name: timingFunction)
-        
-        return anim
-        
-    }
-    
-    static func shadowOpacity(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CABasicAnimation {
-        
-        let anim = CABasicAnimation(keyPath:"shadowOpacity")
-        anim.fromValue = fromValue
-        anim.toValue = toValue
-        anim.duration = duration
-        anim.beginTime = CACurrentMediaTime() + beginTime
-        anim.repeatCount = repeatCount
-        anim.autoreverses = autoreverses
-        anim.isRemovedOnCompletion = isRemovedOnCompletion
-        if delegate != nil {
-            anim.delegate = delegate!
-        }
-        anim.timingFunction = CAMediaTimingFunction(name: timingFunction)
-        
-        return anim
-        
-    }
-    
-    static func transformScale(fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CABasicAnimation {
-        
-        let anim = CABasicAnimation(keyPath:"transform.scale")
-        anim.fromValue = fromValue
-        anim.toValue = toValue
-        anim.duration = duration
-        anim.beginTime = CACurrentMediaTime() + beginTime
-        anim.repeatCount = repeatCount
-        anim.autoreverses = autoreverses
+        anim.fillMode = CAMediaTimingFillMode.forwards
         anim.isRemovedOnCompletion = isRemovedOnCompletion
         if delegate != nil {
             anim.delegate = delegate!

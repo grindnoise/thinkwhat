@@ -31,14 +31,15 @@ class SubcategoryViewController: UIViewController {
         categoryVC.view.addEquallyTo(to: container)
         addChild(self.categoryVC)
         categoryVC.didMove(toParent: self)
-        icon.tagColor = parentCategory.tagColor
-        icon.categoryID = SurveyCategoryIcon.CategoryID(rawValue: parentCategory.ID) ?? .Null
+        icon.backgroundColor = parentCategory.tagColor
+        icon.category = SurveyCategoryIcon.Category(rawValue: parentCategory.ID) ?? .Null
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = true
-            nc.duration = 0.3
+            nc.duration = 0.4
             nc.transitionStyle = .Icon
         }
         let navTitle = UILabel()

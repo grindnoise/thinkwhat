@@ -77,12 +77,12 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
         }
         if isStackViewHidden {
             print(stackView.frame.height)
-            let newConstraint           = stackViewHeightConstraint.setMultiplier(0, duration: 0)
+            let newConstraint           = stackViewHeightConstraint.setMultiplierWithFade(0, duration: 0)
             stackViewHeightConstraint   = newConstraint
             stackView.alpha             = 0
             print(stackView.frame.height)
         } else {
-            let newConstraint           = stackViewHeightConstraint.setMultiplier(stackViewHeightConstraintDefaultValue, duration: 0)
+            let newConstraint           = stackViewHeightConstraint.setMultiplierWithFade(stackViewHeightConstraintDefaultValue, duration: 0)
             stackViewHeightConstraint   = newConstraint
             stackView.alpha             = 1
         }

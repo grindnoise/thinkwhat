@@ -1,194 +1,12 @@
 //
-//  CategoryIcons.swift
+//  CategoryIconsStyleKit.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 17.08.2020.
-//  Copyright © 2020 Pavel Bukharov. All rights reserved.
+//  Created by Pavel Bukharov on 23.03.2021.
+//  Copyright © 2021 Pavel Bukharov. All rights reserved.
 //
 
-
 import UIKit
-
-//protocol SurveyCategoryIcon: class {
-//    var ID: Int { get }
-//    init()
-//}
-
-func getIcon(frame: CGRect, category: SurveyCategoryIcon.CategoryID, color: UIColor, text: String = "", textSize: CGFloat = 43, isGradient: Bool = false, isFramed: Bool = true) -> SurveyCategoryIcon {
-    let icon = SurveyCategoryIcon(frame: frame)
-    icon.textSize = textSize
-    icon.text = text
-    icon.tagColor = color
-    icon.categoryID = category
-    icon.isOpaque = false
-    return icon
-}
-
-class SurveyCategoryIcon: UIView {
-    enum CategoryID: Int {
-        //OUTDOOR
-        case Outdoor = 29//Parent
-        case OutdoorOther = 36
-        
-        //ANON
-        case Anon = 100//Parent
-        
-        //HEALTH
-        case Health = 3//Parent
-        case Food = 78
-        case Habits = 81
-        case Exercizes = 79
-        case HealthOther = 41
-        
-        //RELATIONSHIP
-        case Relationship = 6//Parent
-        case Male = 82
-        case Female = 86
-        case Children = 71
-        case Sex = 69
-        case RelationshipOther = 37
-        
-        //LEISURE
-        case Leisure = 8//Parent
-        case Video = 73
-        case Education = 61
-        case Games = 60
-        case Music = 72
-        case Literature = 74
-        case LeisureOther = 38
-        case Internet = 64
-        
-        //SOCIETY
-        case Society = 1//Parent
-        case Politics = 59
-        case Events = 56
-        case SocietyOther = 35
-        
-        //TECH
-        case Tech = 28//Parent
-        case Gadgets = 47
-        case Vehicles = 52
-        case Computers = 49
-        case TechOther = 19
-
-        //FINANCE
-        case Finance = 21
-        
-        //Technical
-        case Null  = 0
-        case Privacy = 10000
-        case Text = 10001
-        case AnonDisabled = 10002
-        case PrivacyDisabled = 10003
-        case ImagesHeaderWithCount = 10004
-    }
-    
-    var categoryID: CategoryID = .Null {
-        didSet {
-            if categoryID != oldValue {
-                setNeedsDisplay()
-            }
-        }
-    }
-    var text = "" {
-        didSet {
-            if categoryID == .Text, oldValue != text {
-                setNeedsDisplay()
-            }
-        }
-    }
-    var textSize: CGFloat = 43
-    var tagColor: UIColor?
-    var isGradient = false
-    var isFramed = true
-//    var ID: Int { get }
-//    init()
-    
-    override func draw(_ rect: CGRect) {
-        switch categoryID {
-        case .Outdoor:
-            CategoryIconsStyleKit.drawHiking(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-            
-        case .Anon:
-            CategoryIconsStyleKit.drawAnon(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .AnonDisabled:
-            CategoryIconsStyleKit.drawAnonDisabled(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-            
-        case .Health:
-            CategoryIconsStyleKit.drawHealth(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Food:
-            CategoryIconsStyleKit.drawFood(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Habits:
-            CategoryIconsStyleKit.drawHabits(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Exercizes:
-            CategoryIconsStyleKit.drawYoga(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-            
-        case .Relationship:
-            CategoryIconsStyleKit.drawRelationship(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Male:
-            CategoryIconsStyleKit.drawManHead(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Female:
-            CategoryIconsStyleKit.drawWomanHead(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Children:
-            CategoryIconsStyleKit.drawMotherChild(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Sex:
-            CategoryIconsStyleKit.drawAgeRestriction(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-            
-        case .Leisure:
-            CategoryIconsStyleKit.drawLeisure(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Video:
-            CategoryIconsStyleKit.drawFilm(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Education:
-            CategoryIconsStyleKit.drawEducation(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Games:
-            CategoryIconsStyleKit.drawVideoGames(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Music:
-            CategoryIconsStyleKit.drawMusic(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Literature:
-            CategoryIconsStyleKit.drawBooks(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Internet:
-            CategoryIconsStyleKit.drawInternet(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-            
-        case .Society:
-            CategoryIconsStyleKit.drawSociety(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Politics:
-            CategoryIconsStyleKit.drawGovernment(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Events:
-            CategoryIconsStyleKit.drawPolitics(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-            
-        case .Tech:
-            CategoryIconsStyleKit.drawTech(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Vehicles:
-            CategoryIconsStyleKit.drawCar(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Gadgets:
-            CategoryIconsStyleKit.drawGadgets_2(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .Computers:
-            CategoryIconsStyleKit.drawLaptop(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-            
-        case .Finance:
-            CategoryIconsStyleKit.drawFinance(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        
-        case .Privacy:
-            CategoryIconsStyleKit.drawEye(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-        case .PrivacyDisabled:
-            CategoryIconsStyleKit.drawEyeDisabled(frame: rect, resizing: .aspectFit, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-            
-            
-        case .Text:
-            CategoryIconsStyleKit.drawText(frame: rect, resizing: .aspectFit, countText: text, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed, textSize: textSize)
-            
-        case .ImagesHeaderWithCount:
-            CategoryIconsStyleKit.drawImageHeader(frame: rect, resizing: .aspectFit, countText: text, outerColor: tagColor, isGradient: isGradient, isFramed: isFramed)
-            
-        case .OutdoorOther, .HealthOther, .RelationshipOther, .LeisureOther, .SocietyOther, .TechOther, .Null:
-            CategoryIconsStyleKit.drawOther(frame: rect, resizing: .aspectFit, outerColor: tagColor ?? .lightGray, isGradient: isGradient, isFramed: isFramed)
-            
-        default:
-            super.draw(rect)
-        }
-
-    }
-}
 
 public class CategoryIconsStyleKit : NSObject {
     
@@ -207,19 +25,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         
         //// Group 2
@@ -435,19 +253,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         
         //// Group 2
@@ -821,7 +639,7 @@ public class CategoryIconsStyleKit : NSObject {
         bezier4Path.close()
         innerColor.setFill()
         bezier4Path.fill()
-
+        
         
         context.restoreGState()
         
@@ -840,19 +658,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -919,19 +737,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Bezier 2 Drawing
         let bezier2Path = UIBezierPath()
@@ -997,19 +815,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Bezier 5 Drawing
         let bezier5Path = UIBezierPath()
@@ -1083,19 +901,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -1155,7 +973,7 @@ public class CategoryIconsStyleKit : NSObject {
         context.restoreGState()
         
     }
-
+    
     @objc public dynamic class func drawGadgets(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true, isFramed: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
@@ -1169,19 +987,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -1387,7 +1205,7 @@ public class CategoryIconsStyleKit : NSObject {
         context.restoreGState()
         
     }
-
+    
     @objc public dynamic class func drawGadgets_2(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 200, height: 200), resizing: ResizingBehavior = .aspectFit, outerColor: UIColor?, isGradient: Bool = true, isFramed: Bool = true) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
@@ -1401,19 +1219,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -1561,19 +1379,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.75).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.75).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -1675,24 +1493,24 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.withLuminosity(0.3).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        if isGradient {
-            context.saveGState()
-            ovalPath.addClip()
-            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-            context.restoreGState()
-        } else {
-            tagColor.setFill()
-            ovalPath.fill()
-        }
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color == K_COLOR_RED ? color.cgColor : color.withLuminosity(0.3).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        if isGradient {
+        //            context.saveGState()
+        //            ovalPath.addClip()
+        //            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //            context.restoreGState()
+        //        } else {
+        //            color.setFill()
+        //            ovalPath.fill()
+        //        }
+        //        }
         
         
         //// Group 2
@@ -1776,19 +1594,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -1897,19 +1715,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -2061,19 +1879,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -2197,19 +2015,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -2440,19 +2258,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -2740,19 +2558,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.53).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.53).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -2949,19 +2767,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.62).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -3053,19 +2871,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -3147,7 +2965,7 @@ public class CategoryIconsStyleKit : NSObject {
         bezierPath.close()
         innerColor.setFill()
         bezierPath.fill()
-
+        
         
         context.restoreGState()
         
@@ -3166,19 +2984,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -3226,7 +3044,7 @@ public class CategoryIconsStyleKit : NSObject {
         bezierPath.close()
         innerColor.setFill()
         bezierPath.fill()
-
+        
         
         context.restoreGState()
         
@@ -3245,19 +3063,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -3389,19 +3207,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group
         //// Oval 2 Drawing
@@ -3438,23 +3256,23 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-//        //// bg Drawing
-//        let bgPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-//        UIColor.white.setFill()
-//        bgPath.fill()
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        //// bg Drawing
+        //        let bgPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        UIColor.white.setFill()
+        //        bgPath.fill()
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Bezier Drawing
         let bezierPath = UIBezierPath()
@@ -3535,7 +3353,7 @@ public class CategoryIconsStyleKit : NSObject {
         bezierPath.close()
         innerColor.setFill()
         bezierPath.fill()
-
+        
         
         context.restoreGState()
         
@@ -3554,19 +3372,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.66).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -4441,7 +4259,7 @@ public class CategoryIconsStyleKit : NSObject {
         bezier2Path.close()
         innerColor.setFill()
         bezier2Path.fill()
-
+        
         
         context.restoreGState()
         
@@ -4460,10 +4278,10 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
         //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
         
         //// Oval Drawing
         let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
@@ -4765,20 +4583,20 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
-        
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
+        //
         //// Group 2
         //// Bezier Drawing
         let bezierPath = UIBezierPath()
@@ -5119,7 +4937,7 @@ public class CategoryIconsStyleKit : NSObject {
         bezier2Path.close()
         innerColor.setFill()
         bezier2Path.fill()
-
+        
         
         context.restoreGState()
         
@@ -5138,19 +4956,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -5227,7 +5045,7 @@ public class CategoryIconsStyleKit : NSObject {
         bezier3Path.close()
         innerColor.setFill()
         bezier3Path.fill()
-
+        
         
         context.restoreGState()
         
@@ -5246,19 +5064,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -5340,7 +5158,7 @@ public class CategoryIconsStyleKit : NSObject {
         bezier2Path.close()
         innerColor.setFill()
         bezier2Path.fill()
-
+        
         
         context.restoreGState()
         
@@ -5359,19 +5177,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.4).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -5466,19 +5284,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -5633,19 +5451,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.7).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -5741,19 +5559,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor.withLuminosity(0.65).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color.withLuminosity(0.65).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Text Drawing
         let textPath = UIBezierPath()
@@ -5838,24 +5656,24 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor,  tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        if isGradient {
-            context.saveGState()
-            ovalPath.addClip()
-            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-            context.restoreGState()
-        } else {
-            tagColor.setFill()
-            ovalPath.fill()
-        }
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor,  color == K_COLOR_RED ? color.cgColor : color.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        if isGradient {
+        //            context.saveGState()
+        //            ovalPath.addClip()
+        //            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //            context.restoreGState()
+        //        } else {
+        //            color.setFill()
+        //            ovalPath.fill()
+        //        }
+        //        }
         
         
         //// Page-1
@@ -5901,24 +5719,24 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor,  tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        if isGradient {
-            context.saveGState()
-            ovalPath.addClip()
-            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-            context.restoreGState()
-        } else {
-            tagColor.setFill()
-            ovalPath.fill()
-        }
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor,  color == K_COLOR_RED ? color.cgColor : color.withLuminosity(0.55).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        if isGradient {
+        //            context.saveGState()
+        //            ovalPath.addClip()
+        //            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //            context.restoreGState()
+        //        } else {
+        //            color.setFill()
+        //            ovalPath.fill()
+        //        }
+        //        }
         
         //// Page-1
         //// Group-Copy
@@ -5959,7 +5777,7 @@ public class CategoryIconsStyleKit : NSObject {
         let rectanglePath = UIBezierPath(rect: CGRect(x: 0, y: 0, width: 10, height: 158))
         innerColor.setFill()
         rectanglePath.fill()
-        tagColor.setStroke()
+        color.setStroke()
         rectanglePath.lineWidth = 3
         rectanglePath.stroke()
         
@@ -5980,19 +5798,19 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor,  tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        context.saveGState()
-        ovalPath.addClip()
-        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-        context.restoreGState()
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor,  color == K_COLOR_RED ? color.cgColor : color.cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        context.saveGState()
+        //        ovalPath.addClip()
+        //        context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //        context.restoreGState()
+        //        }
         
         //// Text Drawing
         let textRect = CGRect(x: 0, y: 75, width: 200, height: 49)
@@ -6023,24 +5841,24 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        let color = outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
         
-        if isFramed {
-        //// Gradient Declarations
-        let gradient = CGGradient(colorsSpace: nil, colors: [tagColor.cgColor, tagColor.blended(withFraction: 0.5, of: tagColor).cgColor, tagColor == K_COLOR_RED ? tagColor.cgColor : tagColor.withLuminosity(0.3).cgColor] as CFArray, locations: [0, 0.5, 1])!
-        
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        if isGradient {
-            context.saveGState()
-            ovalPath.addClip()
-            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
-            context.restoreGState()
-        } else {
-            tagColor.setFill()
-            ovalPath.fill()
-        }
-        }
+        //        if isFramed {
+        //        //// Gradient Declarations
+        //        let gradient = CGGradient(colorsSpace: nil, colors: [color.cgColor, color.blended(withFraction: 0.5, of: color).cgColor, color == K_COLOR_RED ? color.cgColor : color.withLuminosity(0.3).cgColor] as CFArray, locations: [0, 0.5, 1])!
+        //
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        if isGradient {
+        //            context.saveGState()
+        //            ovalPath.addClip()
+        //            context.drawLinearGradient(gradient, start: CGPoint(x: 29.29, y: 29.29), end: CGPoint(x: 170.71, y: 170.71), options: [])
+        //            context.restoreGState()
+        //        } else {
+        //            color.setFill()
+        //            ovalPath.fill()
+        //        }
+        //        }
         
         //// Group 2
         //// Bezier Drawing
@@ -6115,7 +5933,7 @@ public class CategoryIconsStyleKit : NSObject {
         let rectanglePath = UIBezierPath(rect: CGRect(x: 0, y: 0, width: 10, height: 158))
         innerColor.setFill()
         rectanglePath.fill()
-        tagColor.setStroke()
+        color.setStroke()
         rectanglePath.lineWidth = 3
         rectanglePath.stroke()
         
@@ -6138,15 +5956,15 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-        let tagColor = outerColor ?? K_COLOR_RED
-        tagColor.setFill()
+        let color = outerColor ?? K_COLOR_RED
+        color.setFill()
         
-        if isFramed {
-        //// Oval Drawing
-        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
-        outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
-        ovalPath.fill()
-        }
+        //        if isFramed {
+        //        //// Oval Drawing
+        //        let ovalPath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 200, height: 200))
+        //        outerColor ?? UIColor(red: 0.806, green: 0.806, blue: 0.806, alpha: 1.000)
+        //        ovalPath.fill()
+        //        }
         
         //// img Drawing
         let imgRect = CGRect(x: 0, y: 128, width: 200, height: 49)
@@ -6177,7 +5995,7 @@ public class CategoryIconsStyleKit : NSObject {
         context.restoreGState()
         
     }
-        
+    
     @objc public enum ResizingBehavior: Int {
         case aspectFit /// The content is proportionally resized to fit into the target rectangle.
         case aspectFill /// The content is proportionally resized to completely fill the target rectangle.

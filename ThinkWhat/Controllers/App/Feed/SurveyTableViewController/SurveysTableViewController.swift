@@ -232,9 +232,9 @@ class SurveysTableViewController: UITableViewController {
         } else if type == .Category {
             navTitleImageSize = CGSize(width: 45, height: 45)
             let icon = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: navTitleImageSize))
-            icon.categoryID = SurveyCategoryIcon.CategoryID(rawValue: category!.ID) ?? .Null
+            icon.category = SurveyCategoryIcon.Category(rawValue: category!.ID) ?? .Null
             icon.isOpaque = false
-            icon.tagColor = category?.parent?.tagColor ?? category?.tagColor
+            icon.backgroundColor = category?.parent?.tagColor ?? category?.tagColor
             navTitle = icon
             navTitle!.isUserInteractionEnabled = false
             navTitle!.clipsToBounds = false

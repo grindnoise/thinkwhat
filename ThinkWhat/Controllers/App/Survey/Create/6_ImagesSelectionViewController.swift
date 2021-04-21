@@ -9,9 +9,7 @@
 import UIKit
 
 class ImagesSelectionViewController: UIViewController, UINavigationControllerDelegate {
-    
-    private var isAnimating = false
-    private var isAnimationStopped = false
+
     private var isRearranging = false
     private var textFields: [UITextField] = []
     var images:         [[UIImage: String]] = [] {//[Int] = [] {//
@@ -44,10 +42,9 @@ class ImagesSelectionViewController: UIViewController, UINavigationControllerDel
                         self.label.alpha = 1
                     }) {
                         _ in
-                        self.isAnimationStopped      = true
-                        self.actionButton.tagColor   = K_COLOR_GRAY
+                        self.actionButton.color   = K_COLOR_GRAY
                         self.actionButton.text       = "ПРОПУСТИТЬ"
-                        self.actionButton.textSize   = 26
+                        self.actionButton.icon.textSize   = 26
                     }
                 }
             }
@@ -82,6 +79,13 @@ class ImagesSelectionViewController: UIViewController, UINavigationControllerDel
     private var offsetY:    CGFloat = 0
     private var kbHeight:   CGFloat!
     private var isMovedUp:  Bool?
+    var lineWidth: CGFloat = 5 {
+        didSet {
+            if oldValue != lineWidth, actionButton != nil {
+                actionButton.lineWidth = lineWidth
+            }
+        }
+    }
     @IBOutlet weak var tableView: UITableView! {
         didSet {
             tableView.delegate = self
@@ -94,12 +98,14 @@ class ImagesSelectionViewController: UIViewController, UINavigationControllerDel
             label.alpha = images.isEmpty ? 1 : 0
         }
     }
-    @IBOutlet weak var actionButton: SurveyCategoryIcon! {
+    @IBOutlet weak var actionButton: CircleButton! {
         didSet {
-            actionButton.categoryID = .Text
-            actionButton.tagColor   = images.isEmpty ? K_COLOR_GRAY : K_COLOR_RED
+            actionButton.lineWidth = lineWidth
+            actionButton.state = .On
+            actionButton.category = .Text
+            actionButton.color   = images.isEmpty ? K_COLOR_GRAY : K_COLOR_RED
             actionButton.text       = images.isEmpty ? "ПРОПУСТИТЬ" : "OK"
-            actionButton.textSize = images.isEmpty ? 26 : 43
+            actionButton.icon.textSize = images.isEmpty ? 26 : 43
             let tap = UITapGestureRecognizer(target: self, action: #selector(ImagesSelectionViewController.somethingTapped))
             actionButton.addGestureRecognizer(tap)
         }
@@ -149,21 +155,12 @@ class ImagesSelectionViewController: UIViewController, UINavigationControllerDel
         imagePicker.delegate = self
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        isAnimationStopped = true
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         setTitle()
-        actionButton.tagColor   = images.isEmpty ? K_COLOR_GRAY : K_COLOR_RED
+        actionButton.color   = images.isEmpty ? K_COLOR_GRAY : K_COLOR_RED
         actionButton.text       = images.isEmpty ? "ПРОПУСТИТЬ" : "OK"
-        actionButton.textSize = images.isEmpty ? 26 : 43
-        if !images.isEmpty {
-            isAnimationStopped = false
-            let anim = Animations.transformScale(fromValue: 1, toValue: 1.15, duration: 0.4, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut, delegate: self as CAAnimationDelegate)
-            anim.setValue(self.actionButton, forKey: "btn")
-            actionButton.layer.add(anim, forKey: nil)
-        }
+        actionButton.icon.textSize = images.isEmpty ? 26 : 43
+        lineWidth = actionButton.bounds.height / 10
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -197,7 +194,6 @@ class ImagesSelectionViewController: UIViewController, UINavigationControllerDel
         if let v = recognizer.view {
             switch v {
             case actionButton:
-                isAnimationStopped = true
                 if images.isEmpty {
                     navigationController?.popViewController(animated: true)
                 } else {
@@ -224,18 +220,6 @@ class ImagesSelectionViewController: UIViewController, UINavigationControllerDel
         attrString.append(NSAttributedString(string: ")", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
         navTitle.attributedText = attrString
         navigationItem.titleView = navTitle
-    }
-}
-
-extension ImagesSelectionViewController: CAAnimationDelegate {
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        isAnimating = false
-        if !isAnimationStopped, let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon {
-            let _anim = Animations.transformScale(fromValue: 1, toValue: 1.1, duration: 0.5, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self as CAAnimationDelegate)
-            _anim.setValue(btn, forKey: "btn")
-            btn.layer.add(_anim, forKey: nil)
-            isAnimating = true
-        }
     }
 }
 

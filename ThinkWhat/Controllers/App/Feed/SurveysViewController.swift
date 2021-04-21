@@ -364,7 +364,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             destinationVC.parentCategory = category
             destinationVC.title = category.title
             nc.category = category
-            nc.duration = 0.3
+            nc.duration = 0.4
             nc.transitionStyle = .Icon
             destinationVC.delegate = self
         } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? SurveyViewController {

@@ -202,7 +202,7 @@ struct Notifications {
         static let CategorySelected                = Notification.Name("CategorySelected")
         static let UserImageChanged                = Notification.Name("NotificationUserImageChanged")
         static let ProfileImageReceived            = Notification.Name("NotificationProfileImageReceived")
-        
+        static let LineWidth                       = Notification.Name("LineWidth")
     }
 }
 

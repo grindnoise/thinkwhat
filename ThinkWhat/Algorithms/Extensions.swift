@@ -188,6 +188,70 @@ extension UIView {
         
     }
     
+    func animateCircleLayer(shapeLayer: CAShapeLayer, reveal: Bool, duration: TimeInterval, completionBlocks: [Closure], completionDelegate: CAAnimationDelegate?) {
+        self.layer.masksToBounds = true
+        
+        
+        func circleFrameTopCenter() -> CGRect {
+            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+            let circlePathBounds = shapeLayer.bounds
+            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+            return circleFrame
+        }
+        
+        func circleFrameTop() -> CGRect {
+            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+            let circlePathBounds = shapeLayer.bounds
+            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+            return circleFrame
+        }
+        
+        func circlePath() -> UIBezierPath {
+            return UIBezierPath(ovalIn: circleFrameTopCenter())
+        }
+        
+        shapeLayer.frame = self.bounds
+//        let startPath = circlePath().cgPath
+//        shapeLayer.path = reveal ? startPath : //circlePath().cgPath
+//        self.layer.insertSublayer(shapeLayer, at: 0)
+//        self.layer.mask = circlePathLayer
+//        self.alpha = 1
+        
+        let center = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
+        
+        let finalRadius = sqrt((center.x*center.x) + (center.y*center.y))
+        
+        let radiusInset = finalRadius
+        
+        let outerRect = circleFrameTop().insetBy(dx: -radiusInset, dy: -radiusInset)
+        
+        let fromPath = UIBezierPath(ovalIn: outerRect).cgPath
+        
+        let toPath = shapeLayer.path
+        
+        let startPath = circlePath().cgPath
+        shapeLayer.path = reveal ? startPath : fromPath//circlePath().cgPath
+        
+        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
+        
+        maskLayerAnimation.fromValue = reveal ? startPath : fromPath//startPath//fromPath
+        maskLayerAnimation.toValue = !reveal ? startPath : fromPath//fromPath//toPath
+        maskLayerAnimation.duration = duration
+        maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+        maskLayerAnimation.isRemovedOnCompletion = false
+        
+        if !completionBlocks.isEmpty {
+            maskLayerAnimation.delegate = completionDelegate
+            maskLayerAnimation.setValue(completionBlocks, forKey: "maskCompletionBlocks")
+        }
+        
+        shapeLayer.add(maskLayerAnimation, forKey: "path")
+        shapeLayer.path = !reveal ? startPath : fromPath//fromPath//toPath
+        
+    }
+    
 }
 
 extension String {
@@ -373,7 +437,7 @@ extension CGFloat {
 
 extension NSLayoutConstraint {
 
-    func setMultiplier(_ multiplier:CGFloat, duration: Double = 0) -> NSLayoutConstraint {
+    func setMultiplierWithFade(_ multiplier:CGFloat, duration: Double = 0) -> NSLayoutConstraint {
         
         let newConstraint = NSLayoutConstraint(
             item: firstItem as Any,
@@ -398,6 +462,23 @@ extension NSLayoutConstraint {
 //        UIView.animate(withDuration: 0.3, delay: 0.3, options: [], animations: {
 //            (self.firstItem as? UIView)?.alpha = 1
 //        }, completion: nil)
+        
+        return newConstraint
+    }
+    
+    func getMultipliedConstraint(_ multiplier:CGFloat, duration: Double = 0) -> NSLayoutConstraint {
+        
+        let newConstraint = NSLayoutConstraint(
+            item: firstItem as Any,
+            attribute: firstAttribute,
+            relatedBy: relation,
+            toItem: secondItem,
+            attribute: secondAttribute,
+            multiplier: multiplier,
+            constant: constant)
+        newConstraint.priority = priority
+        newConstraint.shouldBeArchived = self.shouldBeArchived
+        newConstraint.identifier = self.identifier
         
         return newConstraint
     }
@@ -942,6 +1023,43 @@ extension UIColor {
         
         return UIColor(red: newRed, green: newGreen, blue: newBlue, alpha: alpha)
     }
+    
+    func lighter(_ amount : CGFloat = 0.25) -> UIColor {
+        return hueColorWithBrightnessAmount(amount: 1 + amount)
+    }
+    
+    func darker(_ amount : CGFloat = 0.25) -> UIColor {
+        return hueColorWithBrightnessAmount(amount: 1 - amount)
+    }
+    
+    private func hueColorWithBrightnessAmount(amount: CGFloat) -> UIColor {
+        var hue         : CGFloat = 0
+        var saturation  : CGFloat = 0
+        var brightness  : CGFloat = 0
+        var alpha       : CGFloat = 0
+        
+        #if os(iOS)
+        
+        if getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) {
+            return UIColor( hue: hue,
+                            saturation: saturation,
+                            brightness: brightness * amount,
+                            alpha: alpha )
+        } else {
+            return self
+        }
+        
+        #else
+        
+        getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        return UIColor( hue: hue,
+                        saturation: saturation,
+                        brightness: brightness * amount,
+                        alpha: alpha )
+        
+        #endif
+        
+    }
 }
 
 fileprivate extension CGFloat {
@@ -995,3 +1113,45 @@ extension CGSize {
     }
 }
 
+extension CGPath {
+    func getScaledPath(size: CGSize) -> CGPath {
+        
+        let boundingBox = self.boundingBox
+        
+        let boundingBoxAspectRatio = boundingBox.width/boundingBox.height
+        let viewAspectRatio = size.width/size.height
+        
+        var scaleFactor: CGFloat = 1.0
+        if (boundingBoxAspectRatio > viewAspectRatio) {
+            
+            // Width is limiting factor
+            scaleFactor = size.width/boundingBox.width
+        } else {
+            // Height is limiting factor
+            scaleFactor = size.height/boundingBox.height
+        }
+        
+        scaleFactor /= 1.75
+        
+        scaleFactor = scaleFactor == 0 ? 1 : scaleFactor
+        // Scaling the path ...
+        var scaleTransform = CGAffineTransform.identity
+        // Scale down the path first
+        scaleTransform = scaleTransform.scaledBy(x: scaleFactor, y: scaleFactor);
+        // Then translate the path to the upper left corner
+        scaleTransform = scaleTransform.translatedBy(x: -boundingBox.minX, y: -boundingBox.minY);
+        
+        // If you want to be fancy you could also center the path in the view
+        // i.e. if you don't want it to stick to the top.
+        // It is done by calculating the heigth and width difference and translating
+        // half the scaled value of that in both x and y (the scaled side will be 0)
+        let scaledSize = boundingBox.size.applying(CGAffineTransform(scaleX: scaleFactor, y: scaleFactor))
+        
+        let centerOffset = CGSize(width: (size.width-scaledSize.width)/(scaleFactor*2.0), height: (size.height-scaledSize.height)/(scaleFactor*2.0))
+        scaleTransform = scaleTransform.translatedBy(x: centerOffset.width, y: centerOffset.height);
+        // End of "center in view" transformation code
+        
+        let scaledPath = self.copy(using: &scaleTransform)
+        return scaledPath!
+    }
+}

@@ -112,12 +112,12 @@ class SurveyStackViewController: UIViewController {
                 
                 _surveyPreview.category.attributedText = NSAttributedString(string: "  \(survey.category.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 8), foregroundColor: .white, backgroundColor: .clear))
                 _surveyPreview.parentCategory.attributedText = NSAttributedString(string: "  \(survey.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 8), foregroundColor: .white, backgroundColor: .clear))
-                _surveyPreview.icon.categoryID = SurveyCategoryIcon.CategoryID(rawValue: survey.category.ID) ?? .Null
+                _surveyPreview.icon.category = SurveyCategoryIcon.Category(rawValue: survey.category.ID) ?? .Null
                 if let color = survey.category.parent!.tagColor {
                     _surveyPreview.category.backgroundColor = color
                     _surveyPreview.parentCategory.backgroundColor = color
 //                    _surveyPreview.surveyDate.backgroundColor = color
-                    _surveyPreview.icon.tagColor = color
+                    _surveyPreview.icon.backgroundColor = color
                     _surveyPreview.setNeedsLayout()
                     _surveyPreview.layoutIfNeeded()
                     _surveyPreview.category.cornerRadius = _surveyPreview.category.frame.height / 2.5

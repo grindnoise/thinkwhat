@@ -8,125 +8,115 @@
 
 import UIKit
 
-class AnonimitySelectionViewController: UIViewController {
+class BinarySelectionViewController: UIViewController {
     
+    enum SelectionType {
+        case Anonimity, Privacy
+    }
+    var selectionType: SelectionType = .Anonimity {
+        didSet {
+            enabledString   = selectionType == .Anonimity ? "Вы будете скрыты от пользователей на протяжении всего времени существования опроса" : "Доступ к опросу осуществляется только по ссылке"
+            disabledString  = selectionType == .Anonimity ? "Вы будете видны пользователям" : "Опрос доступен всем пользователям"
+        }
+    }
     var delegate: CallbackDelegate?
-    private let anonEnabledDescription = "Владелец опроса скрыт, респонденты никогда не узнают автора"
-    private let anonDisabledDescription = "Владелец опроса виден респондентам"
-    private var isAnimating = false
-    private var isAnimationStopped = false
+    private var enabledString = ""
+    private var disabledString = ""
     private var isSelected = false
     private var isFirstSelection = true
-    private var finalShadowPath: CGPath!
-    private var initialShadowPath: CGPath!
-    private var scaleAnim: CABasicAnimation!
-    private var shadowPathAnim: CABasicAnimation!
-    private var groupAnim: CAAnimationGroup!
-    var isAnonymous = false
+    var isAnimationStopped = false
+    var isEnabled: Bool?
     var color: UIColor!
-    @IBOutlet weak var actionButton: SurveyCategoryIcon! {
+    var lineWidth: CGFloat = 5 {
         didSet {
+            if oldValue != lineWidth, actionButton != nil {
+                actionButton.lineWidth = lineWidth
+            }
+        }
+    }
+    @IBOutlet weak var actionButton: CircleButton! {
+        didSet {
+            actionButton.lineWidth = lineWidth
+            actionButton.state = .Off
             actionButton.text = "?"
-            actionButton.tagColor = K_COLOR_GRAY
-            actionButton.categoryID = .Text
-            let tap = UITapGestureRecognizer(target: self, action: #selector(AnonimitySelectionViewController.okButtonTapped))
+            actionButton.color = K_COLOR_GRAY
+            actionButton.category = .Ready_RU
+            let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.okButtonTapped))
             actionButton.addGestureRecognizer(tap)
             actionButton.isUserInteractionEnabled = false
+            actionButton.oval.strokeStart = 1
         }
     }
     @IBOutlet weak var enabledIcon: SurveyCategoryIcon! {
         didSet {
-            enabledIcon.isGradient = false
-            enabledIcon.tagColor   = K_COLOR_GRAY
-            enabledIcon.categoryID = .Anon
+            enabledIcon.backgroundColor = UIColor.clear
+            enabledIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
+            switch selectionType {
+            case .Anonimity:
+                enabledIcon.category = .Anon
+            case .Privacy:
+                enabledIcon.category = .Locked
+            }
+        }
+    }
+    @IBOutlet weak var enabledLabel: UILabel! {
+        didSet {
+            enabledLabel.text = selectionType == .Anonimity ? "Скрыт" : "Приватный"
         }
     }
     @IBOutlet weak var disabledIcon: SurveyCategoryIcon! {
         didSet {
-            disabledIcon.isGradient = false
-            disabledIcon.tagColor   = K_COLOR_GRAY
-            disabledIcon.categoryID = .AnonDisabled
+            disabledIcon.backgroundColor = UIColor.clear
+            disabledIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
+            switch selectionType {
+            case .Anonimity:
+                disabledIcon.category        = .AnonDisabled
+            case .Privacy:
+                disabledIcon.category        = .Unlocked
+            }
         }
     }
-    @IBOutlet weak var enabledBg: UIView!
-    @IBOutlet weak var enabledFg: UIView! {
+    @IBOutlet weak var enabledBg: UIView! {
         didSet {
-            let tap = UITapGestureRecognizer(target: self, action: #selector(AnonimitySelectionViewController.iconTapped(gesture:)))
-            enabledFg.addGestureRecognizer(tap)
+            let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.iconTapped(gesture:)))
+            enabledBg.addGestureRecognizer(tap)
         }
     }
-    @IBOutlet weak var disabledBg: UIView!
-    @IBOutlet weak var disabledFg: UIView! {
+    @IBOutlet weak var disabledLabel: UILabel! {
         didSet {
-            disabledFg.layer.masksToBounds = false
-            let tap = UITapGestureRecognizer(target: self, action: #selector(AnonimitySelectionViewController.iconTapped(gesture:)))
-            disabledFg.addGestureRecognizer(tap)
+            disabledLabel.text = selectionType == .Anonimity ? "Виден" : "Публичный"
         }
     }
-//    @IBOutlet weak var usersAnonLabel: UILabel! {
-//        didSet {
-//            usersAnonLabel.clipsToBounds = false
-//            usersAnonLabel.layer.masksToBounds = false
-//        }
-//    }
+    @IBOutlet weak var disabledBg: UIView! {
+        didSet {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.iconTapped(gesture:)))
+            disabledBg.addGestureRecognizer(tap)
+        }
+    }
     @IBOutlet weak var descriptionLabel: UILabel!
+    @IBOutlet weak var leftConstraint: NSLayoutConstraint!
+    @IBOutlet weak var rightConstraint: NSLayoutConstraint!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.32
+            nc.duration = 0.5
             nc.transitionStyle = .Icon
         }
         navigationItem.setHidesBackButton(true, animated: false)
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        DispatchQueue.main.async {
-            self.enabledBg.setNeedsLayout()
-            self.enabledBg.layoutIfNeeded()
-            self.enabledBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-            self.enabledBg.layer.shadowPath = UIBezierPath(roundedRect: self.enabledBg.bounds, cornerRadius: 10).cgPath
-            self.enabledBg.layer.shadowRadius = 15
-            self.enabledBg.layer.shadowOffset = .zero
-            self.enabledBg.layer.shadowOpacity = 0
-            self.enabledBg.layer.masksToBounds = false
-//            self.enabledBg.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-        }
-        DispatchQueue.main.async {
-            self.actionButton.setNeedsLayout()
-            self.actionButton.layoutIfNeeded()
-            self.actionButton.layer.shadowColor = K_COLOR_GRAY.withAlphaComponent(0.3).cgColor
-            let delta = self.actionButton.bounds.width - self.actionButton.bounds.width / 1.15
-            self.initialShadowPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint(x: self.actionButton.bounds.origin.x + delta/2, y: self.actionButton.bounds.origin.y + delta/2), size: CGSize(width: self.actionButton.bounds.width - delta, height: self.actionButton.bounds.height - delta))).cgPath
-            self.finalShadowPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint(x: self.actionButton.bounds.origin.x - delta/2, y: self.actionButton.bounds.origin.y - delta/2), size: CGSize(width: self.actionButton.bounds.width + delta, height: self.actionButton.bounds.height + delta))).cgPath//UIBezierPath(ovalIn: self.actionButton.bounds).cgPath
-            self.actionButton.layer.shadowPath = self.initialShadowPath
-            self.actionButton.layer.shadowRadius = 5
-            self.actionButton.layer.shadowOffset = .zero
-            self.actionButton.layer.shadowOpacity = 1
-            self.actionButton.layer.masksToBounds = false
-        }
-        disabledBg.setNeedsLayout()
-        disabledBg.layoutIfNeeded()
-        disabledBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-        disabledBg.layer.shadowPath = UIBezierPath(roundedRect: disabledBg.bounds, cornerRadius: 10).cgPath
-        disabledBg.layer.shadowRadius = 15
-        disabledBg.layer.shadowOffset = .zero
-        disabledBg.layer.shadowOpacity = 0
-        disabledBg.layer.masksToBounds = false
-//        disabledBg.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        if scaleAnim == nil {
-            scaleAnim = Animations.transformScale(fromValue: 1, toValue: 1.1, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
-        }
-        if shadowPathAnim == nil {
-            shadowPathAnim = Animations.shadowPath(fromValue: initialShadowPath, toValue: finalShadowPath, duration: 0.6, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.linear, delegate: nil)
-        }
-        if groupAnim == nil {
-            groupAnim = Animations.group(animations: [scaleAnim, shadowPathAnim], repeatCount: 0, autoreverses: true, duration: 0.6, timingFunction: CAMediaTimingFunctionName.linear, delegate: self)
-        }
+        
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+        leftConstraint.constant -= (enabledBg.frame.width) + enabledBg.frame.origin.x
+        rightConstraint.constant += (disabledBg.frame.width) + (self.view.frame.width - disabledBg.frame.origin.x)
+        lineWidth = actionButton.bounds.height / 10
+        
+        title = selectionType == .Anonimity ? "Анонимность" : "Доступность"
+
     }
     
     @objc fileprivate func okButtonTapped() {
@@ -136,42 +126,48 @@ class AnonimitySelectionViewController: UIViewController {
     
     @objc fileprivate func iconTapped(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended, let v = gesture.view {
+         
             actionButton.isUserInteractionEnabled = true
-            let selectedView: UIView! = v == enabledFg ? enabledFg : disabledFg
-            let deselectedView: UIView! = v != enabledFg ? enabledFg : disabledFg
+            let selectedView: UIView! = v == enabledBg ? enabledBg : disabledBg
+            let deselectedView: UIView! = v != enabledBg ? enabledBg : disabledBg
             
-            if let enabled = selectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let disabled = deselectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon {
-                disabled.tagColor = K_COLOR_GRAY
-                disabled.setNeedsDisplay()
-                enabled.tagColor = color
-                enabled.setNeedsDisplay()
+            if isEnabled != nil, (isEnabled! && v == enabledBg) || (!isEnabled! && v == disabledBg) {
+                return
             }
             
+            if let selectedIcon = selectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let deselectedIcon = deselectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon {
+                
+                let enableAnim = Animations.get(property: .FillColor, fromValue: selectedIcon.iconColor.cgColor, toValue: UIColor.darkGray.cgColor, duration: 0.3, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
+                let disableAnim = Animations.get(property: .FillColor, fromValue: UIColor.darkGray.cgColor, toValue: deselectedIcon.iconColor.cgColor, duration: 0.3, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
+            
+                selectedIcon.icon.add(enableAnim, forKey: nil)
+                
+                if !isFirstSelection { deselectedIcon.icon.add(disableAnim, forKey: nil) }
+            
+            }
+
+            
             if !isSelected {
+                
                 isSelected = true
-                groupAnim.setValue(actionButton, forKey: "btn")
-                actionButton.layer.add(groupAnim, forKey: nil)
-                actionButton.text = "OK"
-                actionButton.tagColor = K_COLOR_RED
-                actionButton.categoryID = .Text
+                
+                actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Next_RU)
+                
+                UIView.animate(withDuration: 0.15, animations: {
+                    self.actionButton.color = K_COLOR_RED
+                }) {
+                    _ in
+                    self.actionButton.setNext(animationDelegate: self)
+                }
             }
             
             UIView.transition(with: descriptionLabel, duration: 0.2, options: .transitionCrossDissolve, animations: {
-                self.descriptionLabel.text = v == self.enabledFg ? self.anonEnabledDescription : self.anonDisabledDescription
+                self.descriptionLabel.text = v == self.enabledBg ? self.enabledString : self.disabledString
             })
-            
-            UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseOut], animations: {
-//                if !self.isFirstSelection {
-                    deselectedView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//                }
-                selectedView.transform = .identity
-            })
-            if !isFirstSelection {
-                setShadow(subview: deselectedView.superview!, on: false)
-            }
-            setShadow(subview: selectedView.superview!, on: true)
-            isAnonymous = v == enabledFg ? true : false
+
+            isEnabled = v == enabledBg ? true : false
             isFirstSelection = false
+            
         }
     }
     
@@ -189,15 +185,10 @@ class AnonimitySelectionViewController: UIViewController {
     }
 }
 
-
-
-extension AnonimitySelectionViewController: CAAnimationDelegate {
+extension BinarySelectionViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        isAnimating = false
-        if let btn = anim.value(forKey: "btn") as? SurveyCategoryIcon, !isAnimationStopped {
-            groupAnim.setValue(btn, forKey: "btn")
-            btn.layer.add(groupAnim, forKey: nil)
-            isAnimating = true
+        if !isAnimationStopped {
+            actionButton.setNext(animationDelegate: self)
         }
     }
 }

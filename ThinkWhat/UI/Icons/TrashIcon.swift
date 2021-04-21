@@ -10,9 +10,13 @@ import UIKit
 
 @IBDesignable
 final class TrashIcon: UIView {
-    @IBInspectable var color: UIColor?
+    @IBInspectable var color: UIColor = K_COLOR_RED {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
     override func draw(_ rect: CGRect) {
-        TrashIconStyleKit.drawTrashIcon(frame: rect, resizing: .aspectFit)
+        TrashIconStyleKit.drawTrashIcon(frame: rect, resizing: .aspectFit, color: color)
     }
 }
 
@@ -20,7 +24,7 @@ public class TrashIconStyleKit : NSObject {
     
     //// Drawing Methods
     
-    @objc public dynamic class func drawTrashIcon(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 216, height: 216), resizing: ResizingBehavior = .aspectFit) {
+    @objc public dynamic class func drawTrashIcon(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 216, height: 216), resizing: ResizingBehavior = .aspectFit, color: UIColor) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -137,7 +141,7 @@ public class TrashIconStyleKit : NSObject {
         bezier6Path.addCurve(to: CGPoint(x: 140.2, y: 89.84), controlPoint1: CGPoint(x: 142.71, y: 90.09), controlPoint2: CGPoint(x: 142.09, y: 89.84))
         bezier6Path.addCurve(to: CGPoint(x: 136.31, y: 90.6), controlPoint1: CGPoint(x: 138.97, y: 89.89), controlPoint2: CGPoint(x: 137.23, y: 90.2))
         bezier6Path.close()
-        K_COLOR_RED.setFill()
+        color.setFill()
         bezier6Path.fill()
         
         context.restoreGState()
