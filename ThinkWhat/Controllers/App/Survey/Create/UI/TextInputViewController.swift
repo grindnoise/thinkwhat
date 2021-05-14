@@ -117,53 +117,33 @@ class TextInputViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(TextInputViewController.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        if let nc = navigationController as? NavigationControllerPreloaded {
+            nc.isShadowed = false
+            nc.duration = 0.5
+            nc.transitionStyle = .Icon
+            navigationItem.setHidesBackButton(true, animated: false)
+        }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(TextInputViewController.keyboardWillShow(_:)),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
 //        NotificationCenter.default.addObserver(self, selector: #selector(TextInputViewController.keyboardDidShow(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(TextInputViewController.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        setupViews()
+        NotificationCenter.default.addObserver(self, selector: #selector(TextInputViewController.keyboardWillHide(_:)),
+                                               name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
-//        DispatchQueue.main.async {
-//            self.backgroundView.setNeedsLayout()
-//            self.backgroundView.layoutIfNeeded()
-//            self.backgroundView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-//            self.backgroundView.layer.shadowPath = UIBezierPath(roundedRect: self.backgroundView.bounds, cornerRadius: 10).cgPath
-//            self.backgroundView.layer.shadowRadius = 15
-//            self.backgroundView.layer.shadowOffset = .zero
-//            self.backgroundView.layer.shadowOpacity = 1
-//            self.backgroundView.layer.masksToBounds = false
-//            self.backgroundView.backgroundColor = .clear
-//        }
-//
-        if let nc = navigationController as? NavigationControllerPreloaded {
-            nc.transitionStyle = .Icon
-            nc.duration = 0.4
-            nc.isShadowed = true
-        }
+        
         delay(seconds: 0.1) {
             self.text.becomeFirstResponder()
         }
-        setTitle()
+        
+        DispatchQueue.main.async {
+            self.setTitle()
+        }
     }
    
     override func viewDidDisappear(_ animated: Bool) {
         accessibilityIdentifier = ""
-    }
-    
-    private func setupViews() {
-        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
-        self.navigationController?.navigationBar.shadowImage     = UIImage()
-        
-        self.navigationItem.setHidesBackButton(true, animated: false)
-        self.navigationController?.navigationBar.isTranslucent   = false
-        self.navigationController?.isNavigationBarHidden         = false
-        self.navigationController?.navigationBar.barTintColor    = .white
-        self.navigationItem.backBarButtonItem                    = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-        
-        if let nc = navigationController as? NavigationControllerPreloaded {
-            nc.isShadowed = false
-        }
     }
     
     private func setTitle() {

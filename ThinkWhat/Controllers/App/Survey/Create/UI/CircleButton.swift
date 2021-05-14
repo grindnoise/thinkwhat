@@ -97,7 +97,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         self.layer.insertSublayer(oval, at: 1)//(oval)
         layers["oval"] = oval
         
-        icon = getIcon(frame: .zero, category: .Outdoor/*category*/, backgroundColor: color, text: text)//SurveyCategoryIcon(frame: self.bounds)//getIcon(frame: self.bounds, category: category, color: color)
+        icon = SurveyCategoryIcon.getIcon(frame: .zero, category: .Outdoor/*category*/, backgroundColor: color, text: text)//SurveyCategoryIcon(frame: self.bounds)//getIcon(frame: self.bounds, category: category, color: color)
         self.addSubview(icon)
         icon.translatesAutoresizingMaskIntoConstraints = false
         icon.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true

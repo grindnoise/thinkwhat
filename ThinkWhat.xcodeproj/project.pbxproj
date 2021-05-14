@@ -25,11 +25,11 @@
 		AB1D844E24EA7FD500B75929 /* NavigationButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1D844D24EA7FD500B75929 /* NavigationButtons.swift */; };
 		AB1D845024EA90C200B75929 /* SurveyCategoryIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1D844F24EA90C200B75929 /* SurveyCategoryIcon.swift */; };
 		AB1D845224EA91D200B75929 /* SurveyCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1D845124EA91D200B75929 /* SurveyCategory.swift */; };
-		AB1F2C2725503FF100D95176 /* 3_PrivacySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1F2C2625503FF100D95176 /* 3_PrivacySelectionViewController.swift */; };
-		AB1F75832594DC7F002DCA9D /* 5_HyperlinkSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1F75822594DC7F002DCA9D /* 5_HyperlinkSelectionViewController.swift */; };
+		AB1F75832594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1F75822594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift */; };
 		AB215DE623B39E6C0073F0CA /* AnswerCreationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB215DE523B39E6C0073F0CA /* AnswerCreationCell.swift */; };
 		AB219CA22420D0400074CF9F /* SurveyYoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB219CA12420D0400074CF9F /* SurveyYoutubeCell.swift */; };
 		AB229D842464512500968D52 /* Segues.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB229D832464512400968D52 /* Segues.swift */; };
+		AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */; };
 		AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2918C7238E5B4600EF488A /* CircularTransition.swift */; };
 		AB2984FA23A79EA70086A92B /* PrivacySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */; };
 		AB2984FC23A7A2340086A92B /* AnonymitySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */; };
@@ -45,6 +45,7 @@
 		AB2AA1B8235D94DF0086D16C /* SurveyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */; };
 		AB2AA1B9235D94DF0086D16C /* SurveyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */; };
 		AB2AA1BB235DDC6F0086D16C /* SurveysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2AA1BA235DDC6F0086D16C /* SurveysViewController.swift */; };
+		AB2BC365264D0A31009B44BA /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2BC364264D0A31009B44BA /* ImageViewController.swift */; };
 		AB2C03CE24407C5D001BFD75 /* LostConnectionAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2C03CD24407C5D001BFD75 /* LostConnectionAnimation.swift */; };
 		AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2C03D02440A611001BFD75 /* LostConnectionView.swift */; };
 		AB2C03D32440A61C001BFD75 /* LostConnectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB2C03D22440A61C001BFD75 /* LostConnectionView.xib */; };
@@ -142,7 +143,7 @@
 		AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */; };
 		AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */; };
 		AB7CE6FE23A36283006FDBD8 /* CategorySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7CE6FC23A36283006FDBD8 /* CategorySelectionCell.swift */; };
-		AB7F4B8A25B5D7230017573D /* 6_ImagesSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7F4B8925B5D7230017573D /* 6_ImagesSelectionViewController.swift */; };
+		AB7F4B8A25B5D7230017573D /* 5_ImagesSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */; };
 		AB82C368259C826100888C74 /* TrashIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB82C367259C826100888C74 /* TrashIcon.swift */; };
 		AB868A6A23EB04A3008DEB84 /* 1_CategorySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB868A6923EB04A3008DEB84 /* 1_CategorySelectionViewController.swift */; };
 		AB868A6F23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB868A6D23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift */; };
@@ -161,7 +162,7 @@
 		AB93FD78247EA245009546DD /* EmptySurvey.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD77247EA245009546DD /* EmptySurvey.swift */; };
 		AB93FD7A247EA255009546DD /* EmptySurvey.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB93FD79247EA255009546DD /* EmptySurvey.xib */; };
 		AB988A9E254811AB00E3C39A /* CreateNewSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9D254811AB00E3C39A /* CreateNewSurveyViewController.swift */; };
-		AB988AA02548663400E3C39A /* 2_AnonimitySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9F2548663400E3C39A /* 2_AnonimitySelectionViewController.swift */; };
+		AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */; };
 		AB99675D23D85E180037CD6C /* TextEditingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99675C23D85E180037CD6C /* TextEditingView.swift */; };
 		AB99675F23D85E6A0037CD6C /* TextEditingView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB99675E23D85E6A0037CD6C /* TextEditingView.xib */; };
 		AB99676123D9AA210037CD6C /* HideKeyboardIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */; };
@@ -207,10 +208,11 @@
 		ABDA425523B1036400BAC3A5 /* NewSurveyHeaderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */; };
 		ABDA425923B3475400BAC3A5 /* AnswerCreationHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */; };
 		ABDAA38E248E7D3600569F68 /* ClaimViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDAA38D248E7D3600569F68 /* ClaimViewController.swift */; };
-		ABDAE152258211D5007DD188 /* 4_VotesCountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDAE151258211D5007DD188 /* 4_VotesCountViewController.swift */; };
+		ABDAE152258211D5007DD188 /* 3_VotesCountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDAE151258211D5007DD188 /* 3_VotesCountViewController.swift */; };
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
 		ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE43694251C7FD300C1428D /* CustomSwitch.swift */; };
+		ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */; };
 		ABEDC4E32450168D00FA9128 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEDC4E22450168D00FA9128 /* UserProfile.swift */; };
 		ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEDC4E42450608700FA9128 /* SurveyInfoCell.swift */; };
 		ABF01A6C25418E2C009E2BC4 /* BackRoundedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF01A6B25418E2C009E2BC4 /* BackRoundedButton.swift */; };
@@ -264,11 +266,11 @@
 		AB1D844D24EA7FD500B75929 /* NavigationButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButtons.swift; sourceTree = "<group>"; };
 		AB1D844F24EA90C200B75929 /* SurveyCategoryIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCategoryIcon.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB1D845124EA91D200B75929 /* SurveyCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCategory.swift; sourceTree = "<group>"; };
-		AB1F2C2625503FF100D95176 /* 3_PrivacySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 3_PrivacySelectionViewController.swift; sourceTree = "<group>"; };
-		AB1F75822594DC7F002DCA9D /* 5_HyperlinkSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 5_HyperlinkSelectionViewController.swift; sourceTree = "<group>"; };
+		AB1F75822594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 4_HyperlinkSelectionViewController.swift; sourceTree = "<group>"; };
 		AB215DE523B39E6C0073F0CA /* AnswerCreationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCreationCell.swift; sourceTree = "<group>"; };
 		AB219CA12420D0400074CF9F /* SurveyYoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyYoutubeCell.swift; sourceTree = "<group>"; };
 		AB229D832464512400968D52 /* Segues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segues.swift; sourceTree = "<group>"; };
+		AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNet.mlmodel; sourceTree = "<group>"; };
 		AB2918C7238E5B4600EF488A /* CircularTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacySelectionCell.swift; sourceTree = "<group>"; };
 		AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymitySelectionCell.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 		AB2AA1B6235D94DF0086D16C /* SurveyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTableViewCell.swift; sourceTree = "<group>"; };
 		AB2AA1B7235D94DF0086D16C /* SurveyTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyTableViewCell.xib; sourceTree = "<group>"; };
 		AB2AA1BA235DDC6F0086D16C /* SurveysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveysViewController.swift; sourceTree = "<group>"; };
+		AB2BC364264D0A31009B44BA /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
 		AB2C03CD24407C5D001BFD75 /* LostConnectionAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LostConnectionAnimation.swift; sourceTree = "<group>"; };
 		AB2C03D02440A611001BFD75 /* LostConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LostConnectionView.swift; sourceTree = "<group>"; };
 		AB2C03D22440A61C001BFD75 /* LostConnectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LostConnectionView.xib; sourceTree = "<group>"; };
@@ -387,7 +390,7 @@
 		AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRecoveryViewController.swift; sourceTree = "<group>"; };
 		AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRegistrationViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB7CE6FC23A36283006FDBD8 /* CategorySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySelectionCell.swift; sourceTree = "<group>"; };
-		AB7F4B8925B5D7230017573D /* 6_ImagesSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 6_ImagesSelectionViewController.swift; sourceTree = "<group>"; };
+		AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 5_ImagesSelectionViewController.swift; sourceTree = "<group>"; };
 		AB82C367259C826100888C74 /* TrashIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashIcon.swift; sourceTree = "<group>"; };
 		AB868A6923EB04A3008DEB84 /* 1_CategorySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 1_CategorySelectionViewController.swift; sourceTree = "<group>"; };
 		AB868A6D23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubcategorySelectionTableViewCell.swift; sourceTree = "<group>"; };
@@ -406,7 +409,7 @@
 		AB93FD77247EA245009546DD /* EmptySurvey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptySurvey.swift; sourceTree = "<group>"; };
 		AB93FD79247EA255009546DD /* EmptySurvey.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmptySurvey.xib; sourceTree = "<group>"; };
 		AB988A9D254811AB00E3C39A /* CreateNewSurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNewSurveyViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		AB988A9F2548663400E3C39A /* 2_AnonimitySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 2_AnonimitySelectionViewController.swift; sourceTree = "<group>"; };
+		AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 2_BinarySelectionViewController.swift; sourceTree = "<group>"; };
 		AB99675C23D85E180037CD6C /* TextEditingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditingView.swift; sourceTree = "<group>"; };
 		AB99675E23D85E6A0037CD6C /* TextEditingView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextEditingView.xib; sourceTree = "<group>"; };
 		AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideKeyboardIcon.swift; sourceTree = "<group>"; };
@@ -452,10 +455,11 @@
 		ABDA425323B1036400BAC3A5 /* NewSurveyHeaderCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewSurveyHeaderCell.xib; sourceTree = "<group>"; };
 		ABDA425823B3475400BAC3A5 /* AnswerCreationHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCreationHeaderCell.swift; sourceTree = "<group>"; };
 		ABDAA38D248E7D3600569F68 /* ClaimViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimViewController.swift; sourceTree = "<group>"; };
-		ABDAE151258211D5007DD188 /* 4_VotesCountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 4_VotesCountViewController.swift; sourceTree = "<group>"; };
+		ABDAE151258211D5007DD188 /* 3_VotesCountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 3_VotesCountViewController.swift; sourceTree = "<group>"; };
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
 		ABE43694251C7FD300C1428D /* CustomSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSwitch.swift; sourceTree = "<group>"; };
+		ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditingListTableViewController.swift; sourceTree = "<group>"; };
 		ABEDC4E22450168D00FA9128 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		ABEDC4E42450608700FA9128 /* SurveyInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyInfoCell.swift; sourceTree = "<group>"; };
 		ABF01A6B25418E2C009E2BC4 /* BackRoundedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackRoundedButton.swift; sourceTree = "<group>"; };
@@ -557,11 +561,10 @@
 				ABF01A6A25418E1F009E2BC4 /* UI */,
 				AB988A9D254811AB00E3C39A /* CreateNewSurveyViewController.swift */,
 				AB868A6923EB04A3008DEB84 /* 1_CategorySelectionViewController.swift */,
-				AB988A9F2548663400E3C39A /* 2_AnonimitySelectionViewController.swift */,
-				AB1F2C2625503FF100D95176 /* 3_PrivacySelectionViewController.swift */,
-				ABDAE151258211D5007DD188 /* 4_VotesCountViewController.swift */,
-				AB1F75822594DC7F002DCA9D /* 5_HyperlinkSelectionViewController.swift */,
-				AB7F4B8925B5D7230017573D /* 6_ImagesSelectionViewController.swift */,
+				AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */,
+				ABDAE151258211D5007DD188 /* 3_VotesCountViewController.swift */,
+				AB1F75822594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift */,
+				AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */,
 			);
 			path = Create;
 			sourceTree = "<group>";
@@ -679,6 +682,7 @@
 		AB3C6810223FC6F500B57580 /* Algorithms */ = {
 			isa = PBXGroup;
 			children = (
+				AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */,
 				ABB46F3C2345DDA000AF212B /* API */,
 				AB3C6817223FD04500B57580 /* Animations.swift */,
 				AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */,
@@ -1138,6 +1142,8 @@
 				AB9CADBE25F755B3002AFD19 /* CircleButton.xib */,
 				AB9CADC025F755CE002AFD19 /* CircleButton.swift */,
 				ABFD793D25F8CD99009A2824 /* RoundIcon.swift */,
+				ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */,
+				AB2BC364264D0A31009B44BA /* ImageViewController.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -1491,10 +1497,11 @@
 				AB75838024E5661D004367DF /* ScrollArrow.swift in Sources */,
 				AB889818240FA65B0087E5AD /* CopyPasteTextField.swift in Sources */,
 				ABDA425923B3475400BAC3A5 /* AnswerCreationHeaderCell.swift in Sources */,
-				AB7F4B8A25B5D7230017573D /* 6_ImagesSelectionViewController.swift in Sources */,
+				AB7F4B8A25B5D7230017573D /* 5_ImagesSelectionViewController.swift in Sources */,
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
 				AB0BFDF7253093B000BD5EFF /* FlameBadge.swift in Sources */,
 				AB7478C724290D8600317EB6 /* SurveyAnswerCell.swift in Sources */,
+				AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */,
 				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
 				ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */,
 				AB7599ED245B29FE008B0569 /* SurveyPreview.swift in Sources */,
@@ -1520,8 +1527,9 @@
 				AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */,
 				AB82C368259C826100888C74 /* TrashIcon.swift in Sources */,
 				ABBCF4142431F1F300BFEAB9 /* VerticallyCenteredTextView.swift in Sources */,
+				AB2BC365264D0A31009B44BA /* ImageViewController.swift in Sources */,
 				AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */,
-				AB988AA02548663400E3C39A /* 2_AnonimitySelectionViewController.swift in Sources */,
+				AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */,
 				ABFE1411239109FA0026D27C /* NewSurveyViewController.swift in Sources */,
 				AB2984FA23A79EA70086A92B /* PrivacySelectionCell.swift in Sources */,
 				ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */,
@@ -1579,13 +1587,13 @@
 				AB2AA1AE235605FD0086D16C /* InfoViewController.swift in Sources */,
 				ABDAA38E248E7D3600569F68 /* ClaimViewController.swift in Sources */,
 				AB2AA1B0235613450086D16C /* InfoTableViewController.swift in Sources */,
-				ABDAE152258211D5007DD188 /* 4_VotesCountViewController.swift in Sources */,
+				ABDAE152258211D5007DD188 /* 3_VotesCountViewController.swift in Sources */,
 				AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */,
 				ABBA73FE2387C5A200540ECF /* FlameIcon.swift in Sources */,
 				AB8C99522485322000BC517B /* ClaimBarButton.swift in Sources */,
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
 				AB72A8442418D05E005B58F1 /* SurveyViewController.swift in Sources */,
-				AB1F75832594DC7F002DCA9D /* 5_HyperlinkSelectionViewController.swift in Sources */,
+				AB1F75832594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift in Sources */,
 				AB2AA1B32359E9D30086D16C /* SurveysTableViewController.swift in Sources */,
 				AB735C092418EABD00776248 /* SurveyTitleCell.swift in Sources */,
 				ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */,
@@ -1628,7 +1636,6 @@
 				AB48B90624348CDC00A27B0D /* SurveyTotalCell.swift in Sources */,
 				AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */,
 				AB229D842464512500968D52 /* Segues.swift in Sources */,
-				AB1F2C2725503FF100D95176 /* 3_PrivacySelectionViewController.swift in Sources */,
 				AB29850223AA2FFC0086A92B /* LinkAttachmentCell.swift in Sources */,
 				AB29850423AA471B0086A92B /* ImageHeaderCell.swift in Sources */,
 				AB988A9E254811AB00E3C39A /* CreateNewSurveyViewController.swift in Sources */,
@@ -1656,6 +1663,7 @@
 				ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */,
 				AB7478BF2428951F00317EB6 /* CircularIndicatorImageView.swift in Sources */,
 				ABF20FB824C994250092B223 /* UserSurveysCell.swift in Sources */,
+				ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */,
 				AB32DA3D25D56138007AFF05 /* TextInputViewController.swift in Sources */,
 				AB3C6847223FD3EE00B57580 /* Instagram.swift in Sources */,
 				AB7CE6FE23A36283006FDBD8 /* CategorySelectionCell.swift in Sources */,
@@ -1845,7 +1853,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhat/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1868,7 +1876,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhat/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -305,21 +305,6 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 
                 animateIconStyleTransition(initialIcon: initialIcon.icon, destinationIcon: destinationIcon.icon, origin: initialIcon.convert(initialIcon.icon.frame.origin, to: navigationController?.view), text: "?", iconChange: true, animationBlocks: animationBlocks, completionBlocks: [], useIncomingEffect: false)
                 
-            } else if let vc_1 = fromVC as? CreateNewSurveyViewController, let initialIcon = vc_1.privacyIcon, let vc_2 = toVC as? PrivacySelectionViewController, let destinationIcon = vc_2.actionButton {
-                
-                var animationBlocks: [Closure] = []
-                //                vc_2.view.alpha = 1
-                animationBlocks.append {
-                    UIView.animate(withDuration: self.duration * 0.8, delay: 0, options: [.curveEaseInOut], animations: {
-                        vc_2.view.setNeedsLayout()
-                        vc_2.leftConstraint.constant = 0
-                        vc_2.rightConstraint.constant = 0
-                        vc_2.view.layoutIfNeeded()
-                    })
-                }
-                
-                animateIconStyleTransition(initialIcon: initialIcon.icon, destinationIcon: destinationIcon.icon, origin: initialIcon.convert(initialIcon.icon.frame.origin, to: navigationController?.view), text: "?", iconChange: true, animationBlocks: animationBlocks, completionBlocks: [], useIncomingEffect: false)
-                
             } else if let vc_1 = fromVC as? CreateNewSurveyViewController, let initialIcon = vc_1.votesIcon, let vc_2 = toVC as? VotesCountViewController, let destinationIcon = vc_2.actionButton {
                 
                 animateIconStyleTransition(initialIcon: initialIcon.icon, destinationIcon: destinationIcon.icon, origin: initialIcon.convert(initialIcon.icon.frame.origin, to: navigationController?.view), text: "?", iconChange: false, animationBlocks: [], completionBlocks: [])//, useIncomingEffect: false)
@@ -329,27 +314,12 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 vc_2.contentView.alpha = 0
                 vc_2.contentView.backgroundColor = initialLabel.backgroundColor
                 vc_2.contentView.cornerRadius = initialLabel.cornerRadius
-                vc_2.hyperlinkLabel.textAlignment = initialLabel.textAlignment
-                vc_2.hyperlinkLabel.text = initialLabel.text
-                vc_2.hyperlinkLabel.font = initialLabel.font
-                vc_2.hyperlinkLabel.textColor = initialLabel.textColor
                 
                 let tempFrame = UIView(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
                 tempFrame.backgroundColor = vc_2.contentView.backgroundColor
                 tempFrame.cornerRadius = initialLabel.cornerRadius
-//                let tempLabel = PaddingLabel(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
-//                tempLabel.leftInset = (initialLabel as? PaddingLabel)?.leftInset ?? 0
-//                tempLabel.rightInset = (initialLabel as? PaddingLabel)?.rightInset ?? 0
-//                tempLabel.topInset = (initialLabel as? PaddingLabel)?.topInset ?? 0
-//                tempLabel.bottomInset = (initialLabel as? PaddingLabel)?.bottomInset ?? 0
-//                tempLabel.backgroundColor = .clear
-//                tempLabel.textAlignment = initialLabel.textAlignment
-//                tempLabel.text = initialLabel.text
-//                tempLabel.font = initialLabel.font
-//                tempLabel.textColor = initialLabel.textColor
-//                tempLabel.center = vc_1.contentView.convert(initialLabel.center, to: navigationController?.view)
                 containerView.addSubview(tempFrame)
-//                containerView.addSubview(tempLabel)
+
                 initialLabel.backgroundColor = .clear
                 
                 let destinationPos = vc_2.view.convert(vc_2.contentView.frame.origin, to: navigationController?.view)
@@ -427,7 +397,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 vc_2.hideKBIcon.alpha = 0
                 vc_2.okButton.alpha = 0
                 animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.8, delay: 0, options: [.curveEaseOut], animations: {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.8, delay: 0, options: [.curveEaseInOut], animations: {
                         icon.frame.origin = CGPoint(x: containerView.frame.width/2 - icon.frame.width/2, y: destinationPos.y - icon.frame.height/2)
                         icon.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
                         icon.icon.backgroundColor = icon.color.withAlphaComponent(0.2)
@@ -460,7 +430,10 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks, useIncomingEffect: false) { _ in }
                 
+            } else if let vc_1 = fromVC as? CreateNewSurveyViewController, let vc_2 = toVC as? ImageViewController {
+                print(vc_2)
             }
+            
         } else if operation == .pop {
             if let vc_1 = fromVC as? SubcategoryViewController, let initialIcon = vc_1.icon, let vc_2 = toVC as? SurveysViewController, let collVC = vc_2.categoryVC as? CategoryCollectionViewController, let indexPath = collVC.currentIndex as? IndexPath, let cell = collVC.collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell {
                 let animDuration = duration + Double(indexPath.row / 3 ) / 20
@@ -699,13 +672,13 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 let destinationPos = destinationIcon.convert(destinationIcon.icon.frame.origin, to: navigationController?.view)
                 
                 let destinationPath = (icon.icon as! CAShapeLayer).path?.getScaledPath(size: destinationIcon.icon.frame.size)//(destinationIcon.icon.icon as! CAShapeLayer).path
-                let pathAnim        = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path as Any, toValue: destinationPath as Any, duration: duration * 0.8, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeIn, delegate: nil, isRemovedOnCompletion: false)
-                let fillColorAnim   = Animations.get(property: .FillColor, fromValue: UIColor.darkGray.cgColor as Any, toValue: UIColor.white.cgColor as Any, duration: duration * 0.9, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeIn, delegate: nil, isRemovedOnCompletion: false)
+                let pathAnim        = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path as Any, toValue: destinationPath as Any, duration: duration * 0.8, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
+                let fillColorAnim   = Animations.get(property: .FillColor, fromValue: UIColor.darkGray.cgColor as Any, toValue: UIColor.white.cgColor as Any, duration: duration * 0.9, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
                 
                 
                 var animationBlocks: [Closure] = []
                 animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.8, delay: 0, options: [.curveEaseIn], animations: {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.8, delay: 0, options: [.curveEaseInOut], animations: {
                         icon.frame.origin = destinationPos
                         icon.frame.size = destinationSize
                         icon.backgroundColor = vc_2.color
@@ -806,18 +779,23 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 
                 vc_2.hyperlinkIcon.alpha = 0
                 
-                let destinationPath = (destinationIcon.icon as! CAShapeLayer).path
-                let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path as Any, toValue: destinationPath as Any, duration: duration, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeOut, delegate: nil, isRemovedOnCompletion: false)
+                if vc_1.hyperlink != nil {
+                    destinationLabel.numberOfLines = 1
+                    destinationLabel.attributedText = NSAttributedString(string: vc_1.hyperlink!.absoluteString, attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 25), foregroundColor: .blue, backgroundColor: .clear))//initialLabel.text
+                } else {
+                    destinationLabel.numberOfLines = 0
+                    destinationLabel.attributedText = vc_2.hyperlinkPlaceholder
+                }
                 
-//                let opacityAnim = Animations.get(property: ., fromValue: <#T##Any#>, toValue: <#T##Any#>, duration: <#T##CFTimeInterval#>, delegate: <#T##CAAnimationDelegate?#>)
+                let destinationPath = (destinationIcon.icon as! CAShapeLayer).path
+                let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path as Any, toValue: destinationPath as Any, duration: duration, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
                 
                 destinationIcon.alpha = 0
                 destinationLabel.alpha = 0
-                destinationLabel.text = initialLabel.text
                 
                 var animationBlocks: [Closure] = []
                 animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.8, delay: 0, options: [.curveEaseOut], animations: {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.8, delay: 0, options: [.curveEaseInOut], animations: {
                         bgIcon.frame.origin = destinationBgIconPos
                         bgIcon.frame.size = destinationBgIconSize
                         bgIcon.oval.opacity = 1
@@ -826,28 +804,26 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         icon.backgroundColor = destinationIcon.backgroundColor
                         tempFrame.frame.origin = destinationPos
                         tempFrame.frame.size = destinationSize
-//                        initialLabel.backgroundColor = initialColor
-                    }) {
-                        _ in
-                        destinationLabel.alpha = 1
-                        destinationIcon.alpha = 1
-                        bgIcon.removeFromSuperview()
-                        icon.removeFromSuperview()
-                        vc_2.hyperlinkIcon.alpha = 1
-                        vc_2.hyperlink = vc_1.hyperlink
-                        tempFrame.removeFromSuperview()
-//                        initialLabel.backgroundColor = initialColor
-                        self.context?.completeTransition(true)
-                    }
+                    })
                 }
                 animationBlocks.append {
                     icon.icon.add(pathAnim, forKey: nil)
                     (icon.icon as! CAShapeLayer).path = destinationPath
                 }
                 
-                animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
+                animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks) {
+                    _ in
+                    destinationLabel.alpha = 1
+                    destinationIcon.alpha = 1
+                    bgIcon.removeFromSuperview()
+                    icon.removeFromSuperview()
+                    vc_2.hyperlinkIcon.alpha = 1
+                    vc_2.hyperlink = vc_1.hyperlink
+                    tempFrame.removeFromSuperview()
+                    self.context?.completeTransition(true)
+                }
 
-            } else if let vc_1 = fromVC as? ImagesSelectionViewController, let initialIcon = vc_1.actionButton as? CircleButton, let vc_2 = toVC as? CreateNewSurveyViewController, let destinationIcon = vc_2.imagesHeaderIcon {
+            } /*else if let vc_1 = fromVC as? ImagesSelectionViewController, let initialIcon = vc_1.actionButton as? CircleButton, let vc_2 = toVC as? CreateNewSurveyViewController, let destinationIcon = vc_2.imagesHeaderIcon {
                 
                 let icon = initialIcon.icon.copyView() as! SurveyCategoryIcon
                 //                let icon = getIcon(frame: CGRect(origin: vc_1.actionButton.superview!.convert(vc_1.actionButton.frame.origin, to: navigationController?.view), size: vc_1.actionButton.frame.size), category: vc_1.actionButton.categoryID, color: vc_1.images.isEmpty ? K_COLOR_GRAY : K_COLOR_RED, text: vc_1.actionButton.text)
@@ -871,7 +847,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 
                 var bgIcon: SurveyCategoryIcon?
                 //                if vc_1.hyperlink == nil {
-                bgIcon = getIcon(frame: icon.frame, category: .ImagesHeaderWithCount, backgroundColor: vc_2.color, text: "\(vc_1.images.count)/\(MAX_IMAGES_COUNT)")
+                bgIcon = SurveyCategoryIcon.getIcon(frame: icon.frame, category: .ImagesHeaderWithCount, backgroundColor: vc_2.color, text: "\(vc_1.images.count)/\(MAX_IMAGES_COUNT)")
                 bgIcon!.alpha = 0
                 bgIcon!.translatesAutoresizingMaskIntoConstraints = false
                 containerView.addSubview(bgIcon!)
@@ -904,7 +880,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                         self.context?.completeTransition(true)
                     }
                 }
-            } else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? CreateNewSurveyViewController, let initialLabel = vc_1.frameView, let destinationLabel = vc_1.accessibilityIdentifier == "Title" ? vc_2.titleLabel : vc_2.questionLabel, let destinationIcon = vc_1.accessibilityIdentifier == "Title" ? vc_2.titleIcon : vc_2.questionIcon {
+            } */else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? CreateNewSurveyViewController, let initialLabel = vc_1.frameView, let destinationLabel = vc_1.accessibilityIdentifier == "Title" ? vc_2.titleLabel : vc_2.questionLabel, let destinationIcon = vc_1.accessibilityIdentifier == "Title" ? vc_2.titleIcon : vc_2.questionIcon {
                 
                 toVC.view.setNeedsLayout()
                 toVC.view.layoutIfNeeded()
@@ -922,10 +898,10 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
                 tempFrame.backgroundColor = destinationLabel.backgroundColor
                 tempFrame.cornerRadius = initialLabel.cornerRadius
                 let tempLabel = PaddingLabel(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
-                tempLabel.leftInset = (initialLabel as? PaddingLabel)?.leftInset ?? 0
-                tempLabel.rightInset = (initialLabel as? PaddingLabel)?.rightInset ?? 0
-                tempLabel.topInset = (initialLabel as? PaddingLabel)?.topInset ?? 0
-                tempLabel.bottomInset = (initialLabel as? PaddingLabel)?.bottomInset ?? 0
+                tempLabel.leftInset = (destinationLabel as? PaddingLabel)?.leftInset ?? 0
+                tempLabel.rightInset = (destinationLabel as? PaddingLabel)?.rightInset ?? 0
+                tempLabel.topInset = (destinationLabel as? PaddingLabel)?.topInset ?? 0
+                tempLabel.bottomInset = (destinationLabel as? PaddingLabel)?.bottomInset ?? 0
                 tempLabel.backgroundColor = .clear//initialLabel.backgroundColor
                 tempLabel.textAlignment = destinationLabel.textAlignment
                 tempLabel.text = destinationLabel.text
@@ -1000,7 +976,9 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
         }
         let delay = duration * 0.25
         
-        animationBlocks.map({ $0() })
+        DispatchQueue.main.async {
+            animationBlocks.map({ $0() })
+        }
         
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration - delay, delay: 0, options: [.curveLinear], animations: {
             fromView.alpha = 0
@@ -1018,7 +996,7 @@ class IconCircularTransition: NSObject, UIViewControllerAnimatedTransitioning {
         }
         
         if useIncomingEffect {
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration, delay: delay, options: [.curveLinear], animations: {
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration, delay: 0/*delay*/, options: [.curveLinear], animations: {
                 effectViewIncoming.effect = nil
                 toView.alpha = 1
             }) {
