@@ -100,6 +100,10 @@ class SurveyCategoryIcon: UIView {
         case Zoom = 10017
         case Trash = 10018
         case Replace = 10019
+        case Answer = 10020
+        case Rating = 10021
+        case Poll = 10022
+        case AddStar = 10023
     }
     
     override func encode(with aCoder: NSCoder) {
@@ -134,10 +138,10 @@ class SurveyCategoryIcon: UIView {
     var iconColor: UIColor = .white
     var category: Category = .Null {
         didSet {
-            if category != oldValue {
+//            if category != oldValue {
                 //                setupLayerFrames()
                 icon = getLayer()
-            }
+//            }
         }
     }
     var text = "" {
@@ -148,6 +152,11 @@ class SurveyCategoryIcon: UIView {
         }
     }
     var textSize: CGFloat = 43
+    var scaleFactor: CGFloat = 1 {
+        didSet {
+            icon = getLayer()
+        }
+    }
     
     override var frame: CGRect{
         didSet {
@@ -166,7 +175,7 @@ class SurveyCategoryIcon: UIView {
 //                    let path = getScaledPath(originalPath: path)
 //                    newLayer.path = path
 //                    icon = newLayer
-                    (icon as! CAShapeLayer).path = path.getScaledPath(size: bounds.size)
+                    (icon as! CAShapeLayer).path = path.getScaledPath(size: bounds.size, scaleFactor: scaleFactor)
                 }
             } else {
                 icon = getLayer()
@@ -326,7 +335,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 76.44, y: 58.5), controlPoint1: CGPoint(x: 77.04, y: 69.66), controlPoint2: CGPoint(x: 78.97, y: 63.38))
             iconPath.addCurve(to: CGPoint(x: 61.49, y: 53.95), controlPoint1: CGPoint(x: 73.7, y: 53.15), controlPoint2: CGPoint(x: 66.83, y: 51.08))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
             
         case .Anon:
@@ -383,7 +392,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 111.65, y: 125.72), controlPoint1: CGPoint(x: 109.85, y: 129), controlPoint2: CGPoint(x: 109.29, y: 127.76))
             iconPath.addCurve(to: CGPoint(x: 127.31, y: 124.08), controlPoint1: CGPoint(x: 115.92, y: 122.04), controlPoint2: CGPoint(x: 122.29, y: 121.38))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .AnonDisabled:
             
@@ -451,7 +460,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 127.31, y: 124.08), controlPoint1: CGPoint(x: 131.82, y: 127.23), controlPoint2: CGPoint(x: 130.4, y: 125.78))
             iconPath.addCurve(to: CGPoint(x: 111.65, y: 125.72), controlPoint1: CGPoint(x: 122.29, y: 121.38), controlPoint2: CGPoint(x: 115.92, y: 122.04))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Health:
             
@@ -533,7 +542,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 83.34, y: 88.31), controlPoint1: CGPoint(x: 84.09, y: 95.16), controlPoint2: CGPoint(x: 83.41, y: 88.31))
             iconPath.addCurve(to: CGPoint(x: 80.45, y: 96.3), controlPoint1: CGPoint(x: 83.34, y: 88.31), controlPoint2: CGPoint(x: 82.02, y: 91.9))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
             
         case .Food:
@@ -596,7 +605,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 54.72, y: 138.2))
             iconPath.addLine(to: CGPoint(x: 52.58, y: 140.12))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
             
         case .Habits:
@@ -670,7 +679,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 123.68, y: 58.07), controlPoint1: CGPoint(x: 124.27, y: 63.47), controlPoint2: CGPoint(x: 124.03, y: 58.72))
             iconPath.addCurve(to: CGPoint(x: 119.64, y: 57.65), controlPoint1: CGPoint(x: 122.96, y: 56.82), controlPoint2: CGPoint(x: 120.71, y: 56.58))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
             
         case .Exercizes:
@@ -739,7 +748,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 119.68, y: 121.13))
             iconPath.addCurve(to: CGPoint(x: 122.34, y: 126.06), controlPoint1: CGPoint(x: 120.25, y: 122.03), controlPoint2: CGPoint(x: 121.44, y: 124.25))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Relationship:
             
@@ -870,7 +879,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 86.92, y: 33.4), controlPoint1: CGPoint(x: 87.77, y: 33.49), controlPoint2: CGPoint(x: 87.86, y: 33.4))
             iconPath.addCurve(to: CGPoint(x: 84.79, y: 33.61), controlPoint1: CGPoint(x: 86.32, y: 33.4), controlPoint2: CGPoint(x: 85.39, y: 33.49))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Male:
             
@@ -1203,7 +1212,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 99.94, y: 138.27), controlPoint1: CGPoint(x: 99.69, y: 138.46), controlPoint2: CGPoint(x: 99.9, y: 138.27))
             iconPath.addCurve(to: CGPoint(x: 100.35, y: 138.58), controlPoint1: CGPoint(x: 99.99, y: 138.26), controlPoint2: CGPoint(x: 100.16, y: 138.41))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
             
         case .Female:
@@ -1556,7 +1565,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 66.29, y: 130.49), controlPoint1: CGPoint(x: 68.02, y: 131.53), controlPoint2: CGPoint(x: 67.24, y: 130.95))
             iconPath.addCurve(to: CGPoint(x: 63.43, y: 130.01), controlPoint1: CGPoint(x: 64.39, y: 129.54), controlPoint2: CGPoint(x: 64.05, y: 129.48))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Children:
             
@@ -1683,7 +1692,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 96.94, y: 94.12), controlPoint1: CGPoint(x: 98.19, y: 94.42), controlPoint2: CGPoint(x: 97.76, y: 94.12))
             iconPath.addCurve(to: CGPoint(x: 95.97, y: 94.44), controlPoint1: CGPoint(x: 96.62, y: 94.12), controlPoint2: CGPoint(x: 96.31, y: 94.22))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Sex:
             
@@ -1748,7 +1757,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 138.48, y: 118.69))
             iconPath.addLine(to: CGPoint(x: 138.48, y: 105.47))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Leisure:
             
@@ -1827,7 +1836,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 138.03, y: 131.78), controlPoint1: CGPoint(x: 139.16, y: 138.91), controlPoint2: CGPoint(x: 139.98, y: 138.23))
             iconPath.addCurve(to: CGPoint(x: 118.68, y: 118.58), controlPoint1: CGPoint(x: 135.11, y: 122.18), controlPoint2: CGPoint(x: 127.53, y: 117.01))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Video:
             
@@ -1906,7 +1915,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 69.24, y: 126.91))
             iconPath.addLine(to: CGPoint(x: 69.24, y: 116.23))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Education:
             
@@ -1953,7 +1962,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 51.59, y: 95.18), controlPoint1: CGPoint(x: 62.1, y: 99.22), controlPoint2: CGPoint(x: 51.67, y: 95.18))
             iconPath.addCurve(to: CGPoint(x: 51.56, y: 105.34), controlPoint1: CGPoint(x: 51.51, y: 95.18), controlPoint2: CGPoint(x: 51.51, y: 99.77))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Games:
             
@@ -2032,7 +2041,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 123.69, y: 100.76), controlPoint1: CGPoint(x: 126.15, y: 105.49), controlPoint2: CGPoint(x: 123.92, y: 103.55))
             iconPath.addCurve(to: CGPoint(x: 130.78, y: 96.45), controlPoint1: CGPoint(x: 123.39, y: 96.86), controlPoint2: CGPoint(x: 127.51, y: 94.33))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Music:
             
@@ -2077,7 +2086,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 140.54, y: 45.32), controlPoint1: CGPoint(x: 144.16, y: 46.72), controlPoint2: CGPoint(x: 142.79, y: 45.8))
             iconPath.addCurve(to: CGPoint(x: 133.46, y: 45.08), controlPoint1: CGPoint(x: 139.18, y: 45.03), controlPoint2: CGPoint(x: 135.44, y: 44.9))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Literature:
             
@@ -2188,7 +2197,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 96.53, y: 81.74), controlPoint1: CGPoint(x: 94.72, y: 82.43), controlPoint2: CGPoint(x: 96.42, y: 81.74))
             iconPath.addCurve(to: CGPoint(x: 103.25, y: 83.56), controlPoint1: CGPoint(x: 96.64, y: 81.74), controlPoint2: CGPoint(x: 99.68, y: 82.55))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Internet:
             
@@ -3054,7 +3063,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 110.79, y: 105.9), controlPoint1: CGPoint(x: 111.33, y: 106.75), controlPoint2: CGPoint(x: 111.11, y: 106.65))
             iconPath.addCurve(to: CGPoint(x: 110.5, y: 105.42), controlPoint1: CGPoint(x: 110.63, y: 105.57), controlPoint2: CGPoint(x: 110.5, y: 105.34))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Society:
             
@@ -3198,7 +3207,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 133.63, y: 119.03), controlPoint1: CGPoint(x: 137.97, y: 120.25), controlPoint2: CGPoint(x: 136.03, y: 119))
             iconPath.addCurve(to: CGPoint(x: 131.97, y: 119.22), controlPoint1: CGPoint(x: 133.04, y: 119.03), controlPoint2: CGPoint(x: 132.3, y: 119.11))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Politics:
             
@@ -3267,7 +3276,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 42.35, y: 146.35))
             iconPath.addLine(to: CGPoint(x: 42.35, y: 152.85))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Events:
             
@@ -3492,7 +3501,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 97.09, y: 128.31))
             iconPath.addLine(to: CGPoint(x: 95.89, y: 129.55))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Tech:
             
@@ -3747,7 +3756,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 158.4, y: 100.47), controlPoint1: CGPoint(x: 160.58, y: 103.39), controlPoint2: CGPoint(x: 158.4, y: 102.45))
             iconPath.addCurve(to: CGPoint(x: 162.02, y: 99.21), controlPoint1: CGPoint(x: 158.4, y: 98.5), controlPoint2: CGPoint(x: 160.72, y: 97.68))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Vehicles:
             
@@ -3801,7 +3810,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 146.15, y: 109.14), controlPoint1: CGPoint(x: 143.05, y: 102.29), controlPoint2: CGPoint(x: 146.15, y: 105.36))
             iconPath.addCurve(to: CGPoint(x: 139.23, y: 116), controlPoint1: CGPoint(x: 146.15, y: 112.93), controlPoint2: CGPoint(x: 143.05, y: 116))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Gadgets:
             
@@ -3928,7 +3937,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 54.94, y: 147.17))
             iconPath.addLine(to: CGPoint(x: 54.72, y: 147.82))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Computers:
             
@@ -3993,7 +4002,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 99.93, y: 150.69), controlPoint1: CGPoint(x: 132.83, y: 150.61), controlPoint2: CGPoint(x: 135.5, y: 150.69))
             iconPath.addCurve(to: CGPoint(x: 67.28, y: 150.96), controlPoint1: CGPoint(x: 71.66, y: 150.71), controlPoint2: CGPoint(x: 67.81, y: 150.74))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Finance:
             
@@ -4133,7 +4142,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 108.69, y: 119.17), controlPoint1: CGPoint(x: 108.78, y: 124.55), controlPoint2: CGPoint(x: 108.74, y: 119.17))
             iconPath.addCurve(to: CGPoint(x: 106.23, y: 121.53), controlPoint1: CGPoint(x: 108.62, y: 119.17), controlPoint2: CGPoint(x: 107.53, y: 120.23))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Privacy:
             
@@ -4175,7 +4184,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 156.92, y: 100), controlPoint1: CGPoint(x: 125.52, y: 128), controlPoint2: CGPoint(x: 147.36, y: 116.48))
             iconPath.addCurve(to: CGPoint(x: 129.5, y: 77.57), controlPoint1: CGPoint(x: 151.36, y: 90.42), controlPoint2: CGPoint(x: 141.65, y: 82.51))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             iconPath.lineWidth = 3
             iconPath.stroke()
             
@@ -4219,7 +4228,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 156.92, y: 100), controlPoint1: CGPoint(x: 125.52, y: 128), controlPoint2: CGPoint(x: 147.36, y: 116.48))
             iconPath.addCurve(to: CGPoint(x: 129.5, y: 77.57), controlPoint1: CGPoint(x: 151.36, y: 90.42), controlPoint2: CGPoint(x: 141.65, y: 82.51))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             iconPath.lineWidth = 3
             iconPath.stroke()
             
@@ -4373,7 +4382,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 182.87, y: 81.3))
             iconPath.addLine(to: CGPoint(x: 182.87, y: 112))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Ready_RU:
             
@@ -4480,7 +4489,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 166.37, y: 88.89), controlPoint1: CGPoint(x: 169.63, y: 86.28), controlPoint2: CGPoint(x: 167.68, y: 87.15))
             iconPath.addCurve(to: CGPoint(x: 164.39, y: 96.65), controlPoint1: CGPoint(x: 165.05, y: 90.63), controlPoint2: CGPoint(x: 164.39, y: 93.22))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
             
         case .Next_RU:
             
@@ -4568,7 +4577,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 169.83, y: 105.62))
             iconPath.addLine(to: CGPoint(x: 169.83, y: 111))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Hyperlink_RU:
             
@@ -4750,7 +4759,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 179.33, y: 155.49), controlPoint1: CGPoint(x: 183.19, y: 142.85), controlPoint2: CGPoint(x: 181.73, y: 147.72))
             iconPath.addLine(to: CGPoint(x: 188.13, y: 155.49))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
 
 
@@ -4853,7 +4862,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 158.94, y: 111))
             iconPath.addLine(to: CGPoint(x: 158.94, y: 80.3))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Title_RU:
             
@@ -4930,7 +4939,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 169.77, y: 80.86))
             iconPath.addLine(to: CGPoint(x: 169.77, y: 111.56))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Locked:
             
@@ -4975,7 +4984,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 96.04, y: 99.57), controlPoint1: CGPoint(x: 90.8, y: 103.82), controlPoint2: CGPoint(x: 92.68, y: 101.04))
             iconPath.addCurve(to: CGPoint(x: 103.58, y: 99.74), controlPoint1: CGPoint(x: 99.4, y: 98.18), controlPoint2: CGPoint(x: 100.22, y: 98.18))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Unlocked:
             
@@ -5014,7 +5023,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 95.92, y: 98.52), controlPoint1: CGPoint(x: 89.18, y: 107.76), controlPoint2: CGPoint(x: 90.5, y: 100.81))
             iconPath.addCurve(to: CGPoint(x: 103.47, y: 98.44), controlPoint1: CGPoint(x: 99.28, y: 97.05), controlPoint2: CGPoint(x: 100.02, y: 97.05))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Choose_RU:
             
@@ -5161,7 +5170,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 183.58, y: 97.42))
             iconPath.addLine(to: CGPoint(x: 183.58, y: 105.67))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Picture:
             
@@ -5269,7 +5278,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 82.78, y: 69.5))
             iconPath.addLine(to: CGPoint(x: 82.78, y: 69.5))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Plus:
             
@@ -5288,7 +5297,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 103.74, y: 64))
             iconPath.addLine(to: CGPoint(x: 103.74, y: 64))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Skip_RU:
             iconPath.move(to: CGPoint(x: 19.04, y: 106))
@@ -5440,7 +5449,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addLine(to: CGPoint(x: 186.43, y: 96.84))
             iconPath.addLine(to: CGPoint(x: 186.43, y: 102.4))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Zoom:
             
@@ -5473,7 +5482,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 55.22, y: 81.37), controlPoint1: CGPoint(x: 54.58, y: 84.59), controlPoint2: CGPoint(x: 54.66, y: 83.6))
             iconPath.addCurve(to: CGPoint(x: 92.33, y: 55.96), controlPoint1: CGPoint(x: 59.47, y: 64.35), controlPoint2: CGPoint(x: 75.44, y: 53.39))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Trash:
             
@@ -5580,7 +5589,7 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 122.21, y: 87.09), controlPoint1: CGPoint(x: 123.92, y: 87.27), controlPoint2: CGPoint(x: 123.51, y: 87.09))
             iconPath.addCurve(to: CGPoint(x: 119.56, y: 87.63), controlPoint1: CGPoint(x: 121.38, y: 87.13), controlPoint2: CGPoint(x: 120.19, y: 87.34))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
 
         case .Replace:
             
@@ -5622,7 +5631,228 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 128.84, y: 105.33), controlPoint1: CGPoint(x: 162.9, y: 128.8), controlPoint2: CGPoint(x: 129.99, y: 105.57))
             iconPath.addCurve(to: CGPoint(x: 126.92, y: 105.75), controlPoint1: CGPoint(x: 128.36, y: 105.21), controlPoint2: CGPoint(x: 127.46, y: 105.39))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
+
+        case .Answer:
+            iconPath.move(to: CGPoint(x: 82.58, y: 41.32))
+            iconPath.addCurve(to: CGPoint(x: 60.06, y: 49.85), controlPoint1: CGPoint(x: 72.24, y: 42.8), controlPoint2: CGPoint(x: 65.83, y: 45.26))
+            iconPath.addCurve(to: CGPoint(x: 54.29, y: 59.26), controlPoint1: CGPoint(x: 56.97, y: 52.26), controlPoint2: CGPoint(x: 54.94, y: 55.64))
+            iconPath.addCurve(to: CGPoint(x: 52.26, y: 62.83), controlPoint1: CGPoint(x: 53.83, y: 62.04), controlPoint2: CGPoint(x: 53.69, y: 62.27))
+            iconPath.addCurve(to: CGPoint(x: 40.95, y: 80.21), controlPoint1: CGPoint(x: 47.92, y: 64.36), controlPoint2: CGPoint(x: 43.03, y: 71.96))
+            iconPath.addCurve(to: CGPoint(x: 40.72, y: 103.62), controlPoint1: CGPoint(x: 39.57, y: 85.82), controlPoint2: CGPoint(x: 39.47, y: 97.64))
+            iconPath.addCurve(to: CGPoint(x: 53.23, y: 132.87), controlPoint1: CGPoint(x: 42.84, y: 113.36), controlPoint2: CGPoint(x: 47.97, y: 125.46))
+            iconPath.addCurve(to: CGPoint(x: 63.98, y: 137.23), controlPoint1: CGPoint(x: 56.74, y: 137.79), controlPoint2: CGPoint(x: 59.04, y: 138.71))
+            iconPath.addCurve(to: CGPoint(x: 66.8, y: 143.44), controlPoint1: CGPoint(x: 65.64, y: 136.72), controlPoint2: CGPoint(x: 66.57, y: 138.76))
+            iconPath.addCurve(to: CGPoint(x: 65.32, y: 153.08), controlPoint1: CGPoint(x: 66.94, y: 146.97), controlPoint2: CGPoint(x: 66.75, y: 148.08))
+            iconPath.addCurve(to: CGPoint(x: 63.66, y: 159.02), controlPoint1: CGPoint(x: 64.4, y: 156.19), controlPoint2: CGPoint(x: 63.66, y: 158.88))
+            iconPath.addCurve(to: CGPoint(x: 90.89, y: 159.25), controlPoint1: CGPoint(x: 63.66, y: 159.16), controlPoint2: CGPoint(x: 75.93, y: 159.25))
+            iconPath.addCurve(to: CGPoint(x: 118.12, y: 158.97), controlPoint1: CGPoint(x: 105.89, y: 159.25), controlPoint2: CGPoint(x: 118.12, y: 159.11))
+            iconPath.addCurve(to: CGPoint(x: 116.69, y: 152.76), controlPoint1: CGPoint(x: 118.12, y: 158.79), controlPoint2: CGPoint(x: 117.47, y: 156.01))
+            iconPath.addCurve(to: CGPoint(x: 122.46, y: 144.18), controlPoint1: CGPoint(x: 114.43, y: 143.72), controlPoint2: CGPoint(x: 114.98, y: 142.89))
+            iconPath.addCurve(to: CGPoint(x: 131.92, y: 142.84), controlPoint1: CGPoint(x: 127.77, y: 145.11), controlPoint2: CGPoint(x: 130.12, y: 144.74))
+            iconPath.addCurve(to: CGPoint(x: 132.66, y: 136.12), controlPoint1: CGPoint(x: 133.35, y: 141.31), controlPoint2: CGPoint(x: 133.72, y: 138.11))
+            iconPath.addCurve(to: CGPoint(x: 134.18, y: 133.2), controlPoint1: CGPoint(x: 131.78, y: 134.36), controlPoint2: CGPoint(x: 132.24, y: 133.43))
+            iconPath.addCurve(to: CGPoint(x: 136.03, y: 131.76), controlPoint1: CGPoint(x: 135.01, y: 133.1), controlPoint2: CGPoint(x: 135.61, y: 132.64))
+            iconPath.addCurve(to: CGPoint(x: 133.4, y: 126.62), controlPoint1: CGPoint(x: 137, y: 129.72), controlPoint2: CGPoint(x: 136.21, y: 128.19))
+            iconPath.addCurve(to: CGPoint(x: 134.97, y: 124.02), controlPoint1: CGPoint(x: 130.58, y: 125.09), controlPoint2: CGPoint(x: 130.72, y: 124.9))
+            iconPath.addCurve(to: CGPoint(x: 138.33, y: 123), controlPoint1: CGPoint(x: 136.49, y: 123.69), controlPoint2: CGPoint(x: 138.01, y: 123.23))
+            iconPath.addCurve(to: CGPoint(x: 138.38, y: 118.27), controlPoint1: CGPoint(x: 139.03, y: 122.4), controlPoint2: CGPoint(x: 139.07, y: 119.8))
+            iconPath.addCurve(to: CGPoint(x: 140.87, y: 113.54), controlPoint1: CGPoint(x: 137.46, y: 116.28), controlPoint2: CGPoint(x: 138.2, y: 114.89))
+            iconPath.addCurve(to: CGPoint(x: 144.1, y: 111.6), controlPoint1: CGPoint(x: 142.17, y: 112.89), controlPoint2: CGPoint(x: 143.64, y: 112.01))
+            iconPath.addCurve(to: CGPoint(x: 142.81, y: 103.62), controlPoint1: CGPoint(x: 145.49, y: 110.39), controlPoint2: CGPoint(x: 145.07, y: 107.93))
+            iconPath.addCurve(to: CGPoint(x: 137.46, y: 86.05), controlPoint1: CGPoint(x: 137.64, y: 93.89), controlPoint2: CGPoint(x: 136.53, y: 90.32))
+            iconPath.addCurve(to: CGPoint(x: 135.15, y: 66.4), controlPoint1: CGPoint(x: 138.57, y: 80.86), controlPoint2: CGPoint(x: 137.41, y: 71.03))
+            iconPath.addLine(to: CGPoint(x: 134.04, y: 64.17))
+            iconPath.addLine(to: CGPoint(x: 135.1, y: 62.46))
+            iconPath.addCurve(to: CGPoint(x: 138.24, y: 51.1), controlPoint1: CGPoint(x: 137.83, y: 58.05), controlPoint2: CGPoint(x: 138.84, y: 54.35))
+            iconPath.addLine(to: CGPoint(x: 137.97, y: 49.48))
+            iconPath.addLine(to: CGPoint(x: 134.37, y: 49.52))
+            iconPath.addCurve(to: CGPoint(x: 121.81, y: 46.93), controlPoint1: CGPoint(x: 131.37, y: 49.57), controlPoint2: CGPoint(x: 129.43, y: 49.15))
+            iconPath.addCurve(to: CGPoint(x: 99.43, y: 41.74), controlPoint1: CGPoint(x: 110.41, y: 43.64), controlPoint2: CGPoint(x: 106.07, y: 42.62))
+            iconPath.addCurve(to: CGPoint(x: 82.58, y: 41.32), controlPoint1: CGPoint(x: 94.63, y: 41.13), controlPoint2: CGPoint(x: 85.63, y: 40.9))
+            iconPath.close()
+            iconPath.move(to: CGPoint(x: 158.09, y: 113.82))
+            iconPath.addCurve(to: CGPoint(x: 143.32, y: 122.16), controlPoint1: CGPoint(x: 150.24, y: 118.13), controlPoint2: CGPoint(x: 143.6, y: 121.89))
+            iconPath.addCurve(to: CGPoint(x: 160.26, y: 117.53), controlPoint1: CGPoint(x: 142.58, y: 122.91), controlPoint2: CGPoint(x: 143.6, y: 122.63))
+            iconPath.addCurve(to: CGPoint(x: 176.04, y: 112.24), controlPoint1: CGPoint(x: 168.29, y: 115.03), controlPoint2: CGPoint(x: 175.4, y: 112.66))
+            iconPath.addCurve(to: CGPoint(x: 176.36, y: 107.79), controlPoint1: CGPoint(x: 177.38, y: 111.36), controlPoint2: CGPoint(x: 177.47, y: 110.11))
+            iconPath.addCurve(to: CGPoint(x: 158.09, y: 113.82), controlPoint1: CGPoint(x: 174.89, y: 104.73), controlPoint2: CGPoint(x: 174.1, y: 105.01))
+            iconPath.close()
+            iconPath.move(to: CGPoint(x: 157.49, y: 123.74))
+            iconPath.addCurve(to: CGPoint(x: 142.81, y: 125.46), controlPoint1: CGPoint(x: 149.6, y: 124.53), controlPoint2: CGPoint(x: 143, y: 125.32))
+            iconPath.addCurve(to: CGPoint(x: 158.04, y: 127.54), controlPoint1: CGPoint(x: 142.44, y: 125.83), controlPoint2: CGPoint(x: 143.97, y: 126.06))
+            iconPath.addCurve(to: CGPoint(x: 179.04, y: 125.92), controlPoint1: CGPoint(x: 179.09, y: 129.72), controlPoint2: CGPoint(x: 179.04, y: 129.72))
+            iconPath.addCurve(to: CGPoint(x: 157.49, y: 123.74), controlPoint1: CGPoint(x: 179.04, y: 121.56), controlPoint2: CGPoint(x: 179.09, y: 121.56))
+            iconPath.close()
+            iconPath.move(to: CGPoint(x: 142.86, y: 128.61))
+            iconPath.addCurve(to: CGPoint(x: 172.86, y: 145.81), controlPoint1: CGPoint(x: 143.97, y: 129.72), controlPoint2: CGPoint(x: 172.07, y: 145.81))
+            iconPath.addCurve(to: CGPoint(x: 175.53, y: 143.63), controlPoint1: CGPoint(x: 174.1, y: 145.81), controlPoint2: CGPoint(x: 174.66, y: 145.34))
+            iconPath.addCurve(to: CGPoint(x: 175.16, y: 139.41), controlPoint1: CGPoint(x: 176.55, y: 141.59), controlPoint2: CGPoint(x: 176.46, y: 140.48))
+            iconPath.addCurve(to: CGPoint(x: 143.04, y: 128.19), controlPoint1: CGPoint(x: 174.06, y: 138.58), controlPoint2: CGPoint(x: 144.43, y: 128.19))
+            iconPath.addCurve(to: CGPoint(x: 142.86, y: 128.61), controlPoint1: CGPoint(x: 142.63, y: 128.19), controlPoint2: CGPoint(x: 142.58, y: 128.33))
+            iconPath.close()
+            //iconPath.fill()
+
+        case .Rating:
+            iconPath.move(to: CGPoint(x: 95.37, y: 44.81))
+            iconPath.addCurve(to: CGPoint(x: 95.42, y: 63.07), controlPoint1: CGPoint(x: 87.89, y: 48.64), controlPoint2: CGPoint(x: 87.94, y: 59.4))
+            iconPath.addCurve(to: CGPoint(x: 108.35, y: 59.5), controlPoint1: CGPoint(x: 100.09, y: 65.38), controlPoint2: CGPoint(x: 105.6, y: 63.86))
+            iconPath.addCurve(to: CGPoint(x: 109.7, y: 53.63), controlPoint1: CGPoint(x: 109.7, y: 57.35), controlPoint2: CGPoint(x: 109.85, y: 56.72))
+            iconPath.addCurve(to: CGPoint(x: 100.61, y: 43.87), controlPoint1: CGPoint(x: 109.39, y: 47.8), controlPoint2: CGPoint(x: 106.17, y: 44.34))
+            iconPath.addCurve(to: CGPoint(x: 95.37, y: 44.81), controlPoint1: CGPoint(x: 98.22, y: 43.71), controlPoint2: CGPoint(x: 97.13, y: 43.87))
+            iconPath.close()
+            iconPath.move(to: CGPoint(x: 31.65, y: 51.53))
+            iconPath.addCurve(to: CGPoint(x: 31.6, y: 70.05), controlPoint1: CGPoint(x: 23.76, y: 55.2), controlPoint2: CGPoint(x: 23.7, y: 65.96))
+            iconPath.addCurve(to: CGPoint(x: 36.69, y: 70.89), controlPoint1: CGPoint(x: 33.16, y: 70.84), controlPoint2: CGPoint(x: 34.35, y: 71.05))
+            iconPath.addCurve(to: CGPoint(x: 44.79, y: 65.22), controlPoint1: CGPoint(x: 40.32, y: 70.63), controlPoint2: CGPoint(x: 42.97, y: 68.74))
+            iconPath.addCurve(to: CGPoint(x: 31.65, y: 51.53), controlPoint1: CGPoint(x: 49.05, y: 56.78), controlPoint2: CGPoint(x: 40.22, y: 47.54))
+            iconPath.close()
+            iconPath.move(to: CGPoint(x: 159.91, y: 51.27))
+            iconPath.addCurve(to: CGPoint(x: 153.94, y: 60.76), controlPoint1: CGPoint(x: 156.17, y: 52.95), controlPoint2: CGPoint(x: 153.94, y: 56.51))
+            iconPath.addCurve(to: CGPoint(x: 157.21, y: 68.21), controlPoint1: CGPoint(x: 153.94, y: 63.91), controlPoint2: CGPoint(x: 154.93, y: 66.17))
+            iconPath.addCurve(to: CGPoint(x: 169.68, y: 69.11), controlPoint1: CGPoint(x: 160.9, y: 71.47), controlPoint2: CGPoint(x: 165.83, y: 71.83))
+            iconPath.addCurve(to: CGPoint(x: 172.38, y: 55.15), controlPoint1: CGPoint(x: 174.14, y: 65.91), controlPoint2: CGPoint(x: 175.34, y: 59.5))
+            iconPath.addCurve(to: CGPoint(x: 159.91, y: 51.27), controlPoint1: CGPoint(x: 169.62, y: 51.16), controlPoint2: CGPoint(x: 164.02, y: 49.43))
+            iconPath.close()
+            iconPath.move(to: CGPoint(x: 97.75, y: 72.67))
+            iconPath.addCurve(to: CGPoint(x: 89.03, y: 88.68), controlPoint1: CGPoint(x: 97.29, y: 73.04), controlPoint2: CGPoint(x: 93.34, y: 80.23))
+            iconPath.addCurve(to: CGPoint(x: 78.96, y: 105.1), controlPoint1: CGPoint(x: 81.4, y: 103.47), controlPoint2: CGPoint(x: 81.03, y: 104.05))
+            iconPath.addCurve(to: CGPoint(x: 75.89, y: 106.15), controlPoint1: CGPoint(x: 77.76, y: 105.68), controlPoint2: CGPoint(x: 76.36, y: 106.15))
+            iconPath.addCurve(to: CGPoint(x: 59.8, y: 93.4), controlPoint1: CGPoint(x: 73.45, y: 106.15), controlPoint2: CGPoint(x: 70.54, y: 103.84))
+            iconPath.addCurve(to: CGPoint(x: 43.44, y: 78.55), controlPoint1: CGPoint(x: 44.68, y: 78.76), controlPoint2: CGPoint(x: 44.84, y: 78.87))
+            iconPath.addCurve(to: CGPoint(x: 39.44, y: 80.6), controlPoint1: CGPoint(x: 41.78, y: 78.08), controlPoint2: CGPoint(x: 39.8, y: 79.13))
+            iconPath.addCurve(to: CGPoint(x: 45.62, y: 110.66), controlPoint1: CGPoint(x: 39.23, y: 81.28), controlPoint2: CGPoint(x: 41.83, y: 93.87))
+            iconPath.addCurve(to: CGPoint(x: 57.35, y: 147.81), controlPoint1: CGPoint(x: 52.63, y: 141.77), controlPoint2: CGPoint(x: 53.41, y: 144.19))
+            iconPath.addCurve(to: CGPoint(x: 66.96, y: 153.06), controlPoint1: CGPoint(x: 60.16, y: 150.38), controlPoint2: CGPoint(x: 63.38, y: 152.16))
+            iconPath.addCurve(to: CGPoint(x: 132.7, y: 153.06), controlPoint1: CGPoint(x: 71.58, y: 154.31), controlPoint2: CGPoint(x: 127.35, y: 154.31))
+            iconPath.addCurve(to: CGPoint(x: 146.67, y: 141.72), controlPoint1: CGPoint(x: 138.83, y: 151.64), controlPoint2: CGPoint(x: 144.23, y: 147.28))
+            iconPath.addCurve(to: CGPoint(x: 160.69, y: 81.02), controlPoint1: CGPoint(x: 147.5, y: 139.83), controlPoint2: CGPoint(x: 160.69, y: 82.75))
+            iconPath.addCurve(to: CGPoint(x: 157.01, y: 78.34), controlPoint1: CGPoint(x: 160.69, y: 79.86), controlPoint2: CGPoint(x: 158.61, y: 78.34))
+            iconPath.addCurve(to: CGPoint(x: 135.66, y: 97.6), controlPoint1: CGPoint(x: 155.29, y: 78.34), controlPoint2: CGPoint(x: 156.07, y: 77.66))
+            iconPath.addCurve(to: CGPoint(x: 122.11, y: 105.68), controlPoint1: CGPoint(x: 127.25, y: 105.83), controlPoint2: CGPoint(x: 125.59, y: 106.83))
+            iconPath.addCurve(to: CGPoint(x: 119.15, y: 103.89), controlPoint1: CGPoint(x: 121.07, y: 105.31), controlPoint2: CGPoint(x: 119.72, y: 104.52))
+            iconPath.addCurve(to: CGPoint(x: 110.63, y: 88.47), controlPoint1: CGPoint(x: 118.53, y: 103.21), controlPoint2: CGPoint(x: 114.68, y: 96.28))
+            iconPath.addCurve(to: CGPoint(x: 102.27, y: 73.09), controlPoint1: CGPoint(x: 106.58, y: 80.6), controlPoint2: CGPoint(x: 102.79, y: 73.67))
+            iconPath.addCurve(to: CGPoint(x: 97.75, y: 72.67), controlPoint1: CGPoint(x: 101.23, y: 71.89), controlPoint2: CGPoint(x: 99, y: 71.73))
+            iconPath.close()
+            //iconPath.fill()
+
+        case .Poll:
+            iconPath.move(to: CGPoint(x: 61.5, y: 97.29))
+            iconPath.addLine(to: CGPoint(x: 61.5, y: 97.29))
+            iconPath.addLine(to: CGPoint(x: 61.5, y: 97.29))
+            iconPath.addLine(to: CGPoint(x: 62.28, y: 97.29))
+            iconPath.addCurve(to: CGPoint(x: 75.85, y: 106.8), controlPoint1: CGPoint(x: 68.35, y: 97.29), controlPoint2: CGPoint(x: 73.77, y: 101.09))
+            iconPath.addCurve(to: CGPoint(x: 77.01, y: 120.72), controlPoint1: CGPoint(x: 77.01, y: 110.47), controlPoint2: CGPoint(x: 77.01, y: 113.89))
+            iconPath.addLine(to: CGPoint(x: 77.01, y: 137.64))
+            iconPath.addCurve(to: CGPoint(x: 75.99, y: 143.9), controlPoint1: CGPoint(x: 77.01, y: 137.4), controlPoint2: CGPoint(x: 77.01, y: 140.82))
+            iconPath.addLine(to: CGPoint(x: 75.85, y: 144.49))
+            iconPath.addCurve(to: CGPoint(x: 62.28, y: 154), controlPoint1: CGPoint(x: 73.77, y: 150.2), controlPoint2: CGPoint(x: 68.35, y: 154))
+            iconPath.addCurve(to: CGPoint(x: 61.5, y: 154), controlPoint1: CGPoint(x: 61.5, y: 154), controlPoint2: CGPoint(x: 61.5, y: 154))
+            iconPath.addLine(to: CGPoint(x: 61.5, y: 154))
+            iconPath.addLine(to: CGPoint(x: 61.5, y: 154))
+            iconPath.addLine(to: CGPoint(x: 60.73, y: 154))
+            iconPath.addCurve(to: CGPoint(x: 47.16, y: 144.49), controlPoint1: CGPoint(x: 54.66, y: 154), controlPoint2: CGPoint(x: 49.24, y: 150.2))
+            iconPath.addCurve(to: CGPoint(x: 46, y: 130.57), controlPoint1: CGPoint(x: 46, y: 140.82), controlPoint2: CGPoint(x: 46, y: 137.4))
+            iconPath.addLine(to: CGPoint(x: 46, y: 137.64))
+            iconPath.addCurve(to: CGPoint(x: 47.02, y: 107.39), controlPoint1: CGPoint(x: 46, y: 113.89), controlPoint2: CGPoint(x: 46, y: 110.47))
+            iconPath.addLine(to: CGPoint(x: 47.16, y: 106.8))
+            iconPath.addCurve(to: CGPoint(x: 60.73, y: 97.29), controlPoint1: CGPoint(x: 49.24, y: 101.09), controlPoint2: CGPoint(x: 54.66, y: 97.29))
+            iconPath.addCurve(to: CGPoint(x: 61.5, y: 97.29), controlPoint1: CGPoint(x: 61.5, y: 97.29), controlPoint2: CGPoint(x: 61.5, y: 97.29))
+            iconPath.addLine(to: CGPoint(x: 61.5, y: 97.29))
+            iconPath.close()
+            iconPath.move(to: CGPoint(x: 100, y: 47))
+            iconPath.addLine(to: CGPoint(x: 100, y: 47))
+            iconPath.addLine(to: CGPoint(x: 100, y: 47))
+            iconPath.addLine(to: CGPoint(x: 100.78, y: 47))
+            iconPath.addCurve(to: CGPoint(x: 114.34, y: 56.51), controlPoint1: CGPoint(x: 106.85, y: 47), controlPoint2: CGPoint(x: 112.27, y: 50.8))
+            iconPath.addCurve(to: CGPoint(x: 115.5, y: 70.43), controlPoint1: CGPoint(x: 115.5, y: 60.18), controlPoint2: CGPoint(x: 115.5, y: 63.6))
+            iconPath.addLine(to: CGPoint(x: 115.5, y: 137.64))
+            iconPath.addCurve(to: CGPoint(x: 114.49, y: 143.9), controlPoint1: CGPoint(x: 115.5, y: 137.4), controlPoint2: CGPoint(x: 115.5, y: 140.82))
+            iconPath.addLine(to: CGPoint(x: 114.34, y: 144.49))
+            iconPath.addCurve(to: CGPoint(x: 100.78, y: 154), controlPoint1: CGPoint(x: 112.27, y: 150.2), controlPoint2: CGPoint(x: 106.85, y: 154))
+            iconPath.addCurve(to: CGPoint(x: 100, y: 154), controlPoint1: CGPoint(x: 100, y: 154), controlPoint2: CGPoint(x: 100, y: 154))
+            iconPath.addLine(to: CGPoint(x: 100, y: 154))
+            iconPath.addLine(to: CGPoint(x: 100, y: 154))
+            iconPath.addLine(to: CGPoint(x: 99.22, y: 154))
+            iconPath.addCurve(to: CGPoint(x: 85.66, y: 144.49), controlPoint1: CGPoint(x: 93.15, y: 154), controlPoint2: CGPoint(x: 87.73, y: 150.2))
+            iconPath.addCurve(to: CGPoint(x: 84.5, y: 130.57), controlPoint1: CGPoint(x: 84.5, y: 140.82), controlPoint2: CGPoint(x: 84.5, y: 137.4))
+            iconPath.addLine(to: CGPoint(x: 84.5, y: 137.64))
+            iconPath.addCurve(to: CGPoint(x: 85.51, y: 57.1), controlPoint1: CGPoint(x: 84.5, y: 63.6), controlPoint2: CGPoint(x: 84.5, y: 60.18))
+            iconPath.addLine(to: CGPoint(x: 85.66, y: 56.51))
+            iconPath.addCurve(to: CGPoint(x: 99.22, y: 47), controlPoint1: CGPoint(x: 87.73, y: 50.8), controlPoint2: CGPoint(x: 93.15, y: 47))
+            iconPath.addCurve(to: CGPoint(x: 100, y: 47), controlPoint1: CGPoint(x: 100, y: 47), controlPoint2: CGPoint(x: 100, y: 47))
+            iconPath.addLine(to: CGPoint(x: 100, y: 47))
+            iconPath.close()
+            iconPath.move(to: CGPoint(x: 138.5, y: 71.61))
+            iconPath.addLine(to: CGPoint(x: 138.5, y: 71.61))
+            iconPath.addLine(to: CGPoint(x: 138.5, y: 71.61))
+            iconPath.addLine(to: CGPoint(x: 139.27, y: 71.61))
+            iconPath.addCurve(to: CGPoint(x: 152.84, y: 81.12), controlPoint1: CGPoint(x: 145.34, y: 71.61), controlPoint2: CGPoint(x: 150.76, y: 75.41))
+            iconPath.addCurve(to: CGPoint(x: 154, y: 95.04), controlPoint1: CGPoint(x: 154, y: 84.79), controlPoint2: CGPoint(x: 154, y: 88.21))
+            iconPath.addLine(to: CGPoint(x: 154, y: 137.64))
+            iconPath.addCurve(to: CGPoint(x: 152.98, y: 143.9), controlPoint1: CGPoint(x: 154, y: 137.4), controlPoint2: CGPoint(x: 154, y: 140.82))
+            iconPath.addLine(to: CGPoint(x: 152.84, y: 144.49))
+            iconPath.addCurve(to: CGPoint(x: 139.27, y: 154), controlPoint1: CGPoint(x: 150.76, y: 150.2), controlPoint2: CGPoint(x: 145.34, y: 154))
+            iconPath.addCurve(to: CGPoint(x: 138.5, y: 154), controlPoint1: CGPoint(x: 138.5, y: 154), controlPoint2: CGPoint(x: 138.5, y: 154))
+            iconPath.addLine(to: CGPoint(x: 138.5, y: 154))
+            iconPath.addLine(to: CGPoint(x: 138.5, y: 154))
+            iconPath.addLine(to: CGPoint(x: 137.72, y: 154))
+            iconPath.addCurve(to: CGPoint(x: 124.15, y: 144.49), controlPoint1: CGPoint(x: 131.65, y: 154), controlPoint2: CGPoint(x: 126.23, y: 150.2))
+            iconPath.addCurve(to: CGPoint(x: 122.99, y: 130.57), controlPoint1: CGPoint(x: 122.99, y: 140.82), controlPoint2: CGPoint(x: 122.99, y: 137.4))
+            iconPath.addLine(to: CGPoint(x: 122.99, y: 137.64))
+            iconPath.addCurve(to: CGPoint(x: 124.01, y: 81.71), controlPoint1: CGPoint(x: 122.99, y: 88.21), controlPoint2: CGPoint(x: 122.99, y: 84.79))
+            iconPath.addLine(to: CGPoint(x: 124.15, y: 81.12))
+            iconPath.addCurve(to: CGPoint(x: 137.72, y: 71.61), controlPoint1: CGPoint(x: 126.23, y: 75.41), controlPoint2: CGPoint(x: 131.65, y: 71.61))
+            iconPath.addCurve(to: CGPoint(x: 138.5, y: 71.61), controlPoint1: CGPoint(x: 138.5, y: 71.61), controlPoint2: CGPoint(x: 138.5, y: 71.61))
+            iconPath.addLine(to: CGPoint(x: 138.5, y: 71.61))
+            iconPath.close()
+            //iconPath.fill()
+            
+        case .AddStar:
+            iconPath.move(to: CGPoint(x: 90.23, y: 11.84))
+            iconPath.addCurve(to: CGPoint(x: 73.18, y: 37.59), controlPoint1: CGPoint(x: 87.05, y: 15.94), controlPoint2: CGPoint(x: 79.32, y: 27.57))
+            iconPath.addLine(to: CGPoint(x: 61.59, y: 55.82))
+            iconPath.addLine(to: CGPoint(x: 33.86, y: 63.34))
+            iconPath.addCurve(to: CGPoint(x: 0, y: 79.07), controlPoint1: CGPoint(x: 5.23, y: 70.86), controlPoint2: CGPoint(x: 0, y: 73.37))
+            iconPath.addCurve(to: CGPoint(x: 19.09, y: 105.73), controlPoint1: CGPoint(x: 0, y: 80.89), controlPoint2: CGPoint(x: 8.64, y: 92.97))
+            iconPath.addLine(to: CGPoint(x: 37.95, y: 129.2))
+            iconPath.addLine(to: CGPoint(x: 36.59, y: 157.46))
+            iconPath.addCurve(to: CGPoint(x: 35.91, y: 189.59), controlPoint1: CGPoint(x: 35.68, y: 172.95), controlPoint2: CGPoint(x: 35.45, y: 187.54))
+            iconPath.addCurve(to: CGPoint(x: 72.95, y: 184.57), controlPoint1: CGPoint(x: 37.5, y: 195.97), controlPoint2: CGPoint(x: 47.27, y: 194.6))
+            iconPath.addCurve(to: CGPoint(x: 99.77, y: 175.46), controlPoint1: CGPoint(x: 85.91, y: 179.56), controlPoint2: CGPoint(x: 97.95, y: 175.46))
+            iconPath.addCurve(to: CGPoint(x: 129.32, y: 185.49), controlPoint1: CGPoint(x: 101.82, y: 175.46), controlPoint2: CGPoint(x: 115, y: 180.02))
+            iconPath.addCurve(to: CGPoint(x: 164.09, y: 189.59), controlPoint1: CGPoint(x: 155.45, y: 195.51), controlPoint2: CGPoint(x: 162.5, y: 196.42))
+            iconPath.addCurve(to: CGPoint(x: 163.41, y: 157.46), controlPoint1: CGPoint(x: 164.55, y: 187.31), controlPoint2: CGPoint(x: 164.32, y: 172.95))
+            iconPath.addLine(to: CGPoint(x: 162.05, y: 129.2))
+            iconPath.addLine(to: CGPoint(x: 180.91, y: 105.73))
+            iconPath.addCurve(to: CGPoint(x: 200, y: 79.07), controlPoint1: CGPoint(x: 191.36, y: 92.97), controlPoint2: CGPoint(x: 200, y: 80.89))
+            iconPath.addCurve(to: CGPoint(x: 166.36, y: 63.11), controlPoint1: CGPoint(x: 200, y: 73.37), controlPoint2: CGPoint(x: 195, y: 71.09))
+            iconPath.addLine(to: CGPoint(x: 138.64, y: 55.59))
+            iconPath.addLine(to: CGPoint(x: 122.05, y: 30.76))
+            iconPath.addCurve(to: CGPoint(x: 90.23, y: 11.84), controlPoint1: CGPoint(x: 103.41, y: 2.27), controlPoint2: CGPoint(x: 99.32, y: -0.24))
+            iconPath.close()
+            iconPath.move(to: CGPoint(x: 104.09, y: 73.37))
+            iconPath.addCurve(to: CGPoint(x: 106.82, y: 88.18), controlPoint1: CGPoint(x: 105.68, y: 74.96), controlPoint2: CGPoint(x: 106.82, y: 81.57))
+            iconPath.addLine(to: CGPoint(x: 106.82, y: 100.26))
+            iconPath.addLine(to: CGPoint(x: 119.09, y: 100.26))
+            iconPath.addCurve(to: CGPoint(x: 134.09, y: 110.51), controlPoint1: CGPoint(x: 132.95, y: 100.26), controlPoint2: CGPoint(x: 139.09, y: 104.59))
+            iconPath.addCurve(to: CGPoint(x: 119.09, y: 113.93), controlPoint1: CGPoint(x: 132.27, y: 112.79), controlPoint2: CGPoint(x: 127.05, y: 113.93))
+            iconPath.addLine(to: CGPoint(x: 106.82, y: 113.93))
+            iconPath.addLine(to: CGPoint(x: 106.82, y: 126.24))
+            iconPath.addCurve(to: CGPoint(x: 103.41, y: 141.28), controlPoint1: CGPoint(x: 106.82, y: 134.21), controlPoint2: CGPoint(x: 105.68, y: 139.45))
+            iconPath.addCurve(to: CGPoint(x: 93.18, y: 126.24), controlPoint1: CGPoint(x: 97.5, y: 146.29), controlPoint2: CGPoint(x: 93.18, y: 140.14))
+            iconPath.addLine(to: CGPoint(x: 93.18, y: 113.93))
+            iconPath.addLine(to: CGPoint(x: 80.91, y: 113.93))
+            iconPath.addCurve(to: CGPoint(x: 65.91, y: 110.51), controlPoint1: CGPoint(x: 72.95, y: 113.93), controlPoint2: CGPoint(x: 67.73, y: 112.79))
+            iconPath.addCurve(to: CGPoint(x: 80.91, y: 100.26), controlPoint1: CGPoint(x: 60.91, y: 104.59), controlPoint2: CGPoint(x: 67.05, y: 100.26))
+            iconPath.addLine(to: CGPoint(x: 93.18, y: 100.26))
+            iconPath.addLine(to: CGPoint(x: 93.18, y: 88.18))
+            iconPath.addCurve(to: CGPoint(x: 100, y: 70.63), controlPoint1: CGPoint(x: 93.18, y: 77.47), controlPoint2: CGPoint(x: 95.91, y: 70.63))
+            iconPath.addCurve(to: CGPoint(x: 104.09, y: 73.37), controlPoint1: CGPoint(x: 100.68, y: 70.63), controlPoint2: CGPoint(x: 102.5, y: 71.77))
+            iconPath.close()
+            //iconPath.fill()
+
 
             
         //.OutdoorOther, .HealthOther, .RelationshipOther, .LeisureOther, .SocietyOther, .TechOther, .Null:
@@ -5645,10 +5875,10 @@ class SurveyCategoryIcon: UIView {
             iconPath.addCurve(to: CGPoint(x: 60, y: 85), controlPoint1: CGPoint(x: 45, y: 91.72), controlPoint2: CGPoint(x: 51.72, y: 85))
             iconPath.addCurve(to: CGPoint(x: 75, y: 100), controlPoint1: CGPoint(x: 68.28, y: 85), controlPoint2: CGPoint(x: 75, y: 91.72))
             iconPath.close()
-            iconPath.fill()
+            //iconPath.fill()
         }
         
-        newLayer.path = iconPath.cgPath.getScaledPath(size: bounds.size)//getScaledPath(originalPath: iconPath.cgPath)
+        newLayer.path = iconPath.cgPath.getScaledPath(size: bounds.size, scaleFactor: scaleFactor)//getScaledPath(originalPath: iconPath.cgPath)
         
         return newLayer
     }

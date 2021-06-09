@@ -10,6 +10,10 @@ import UIKit
 
 class BinarySelectionViewController: UIViewController {
     
+    deinit {
+        print("***BinarySelectionViewController deinit***")
+    }
+
     enum SelectionType {
         case Anonimity, Privacy
     }
@@ -132,33 +136,36 @@ class BinarySelectionViewController: UIViewController {
             let selectedView: UIView! = v == enabledBg ? enabledBg : disabledBg
             let deselectedView: UIView! = v != enabledBg ? enabledBg : disabledBg
             
-            if isEnabled != nil, (isEnabled! && v == enabledBg) || (!isEnabled! && v == disabledBg) {
-                return
-            }
+            if isEnabled != nil, (isEnabled! && v == enabledBg) || (!isEnabled! && v == disabledBg) { return }
             
             if let selectedIcon = selectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let deselectedIcon = deselectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon {
-                
-                let enableAnim = Animations.get(property: .FillColor, fromValue: selectedIcon.iconColor.cgColor, toValue: UIColor.darkGray.cgColor, duration: 0.3, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
-                let disableAnim = Animations.get(property: .FillColor, fromValue: UIColor.darkGray.cgColor, toValue: deselectedIcon.iconColor.cgColor, duration: 0.3, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
-            
+                let enableAnim = Animations.get(property: .FillColor,
+                                                fromValue: selectedIcon.iconColor.cgColor,
+                                                toValue: UIColor.black.cgColor,
+                                                duration: 0.3,
+                                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                                delegate: nil,
+                                                isRemovedOnCompletion: false)
+                let disableAnim = Animations.get(property: .FillColor,
+                                                 fromValue: UIColor.black.cgColor,
+                                                 toValue: deselectedIcon.iconColor.cgColor,
+                                                 duration: 0.3,
+                                                 timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                                 delegate: nil,
+                                                 isRemovedOnCompletion: false)
                 selectedIcon.icon.add(enableAnim, forKey: nil)
                 
                 if !isFirstSelection { deselectedIcon.icon.add(disableAnim, forKey: nil) }
-            
             }
 
-            
             if !isSelected {
-                
                 isSelected = true
-                
                 actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Next_RU)
-                
                 UIView.animate(withDuration: 0.15, animations: {
                     self.actionButton.color = K_COLOR_RED
                 }) {
                     _ in
-                    self.actionButton.setNext(animationDelegate: self)
+                    self.actionButton.bounce(animationDelegate: self)
                 }
             }
             
@@ -168,7 +175,6 @@ class BinarySelectionViewController: UIViewController {
 
             isEnabled = v == enabledBg ? true : false
             isFirstSelection = false
-            
         }
     }
     
@@ -189,7 +195,10 @@ class BinarySelectionViewController: UIViewController {
 extension BinarySelectionViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if !isAnimationStopped {
-            actionButton.setNext(animationDelegate: self)
+            actionButton.layer.removeAllAnimations()
+            actionButton.bounce(animationDelegate: self)
+        } else {
+            actionButton.scaleColorAnim = nil
         }
     }
 }

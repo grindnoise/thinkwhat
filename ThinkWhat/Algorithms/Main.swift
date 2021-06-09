@@ -268,6 +268,15 @@ struct Segues {
         static let UserToUserFavoriteSurveys            = "USER_TO_FAVORITE_USER_SURVEYS"
         static let CategoryToSurveys                    = "CATEGORY_TO_SURVEYS"
     }
+    
+    struct NewSurvey {
+        static let Poll             = "POLL"
+        static let Rating           = "RATING"
+    }
+    
+    struct Survey {
+        static let Name             = "NAME"
+    }
 }
 ////MARK: Auth
 //let kSegueApp                                    = "APP"

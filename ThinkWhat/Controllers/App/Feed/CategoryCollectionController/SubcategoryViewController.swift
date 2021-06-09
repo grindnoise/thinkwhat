@@ -39,7 +39,7 @@ class SubcategoryViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = true
-            nc.duration = 0.4
+            nc.duration = 0.3
             nc.transitionStyle = .Icon
         }
         let navTitle = UILabel()

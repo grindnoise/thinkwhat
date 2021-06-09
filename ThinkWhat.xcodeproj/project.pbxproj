@@ -30,6 +30,8 @@
 		AB219CA22420D0400074CF9F /* SurveyYoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB219CA12420D0400074CF9F /* SurveyYoutubeCell.swift */; };
 		AB229D842464512500968D52 /* Segues.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB229D832464512400968D52 /* Segues.swift */; };
 		AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */; };
+		AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */; };
+		AB25E042265FAC0100EAA8AE /* Survey.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB25E041265FAC0100EAA8AE /* Survey.storyboard */; };
 		AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2918C7238E5B4600EF488A /* CircularTransition.swift */; };
 		AB2984FA23A79EA70086A92B /* PrivacySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */; };
 		AB2984FC23A7A2340086A92B /* AnonymitySelectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */; };
@@ -111,7 +113,7 @@
 		AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */; };
 		AB52B734240E5D4B006DBDA8 /* ReadySign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB52B733240E5D4B006DBDA8 /* ReadySign.swift */; };
 		AB54BBFA252220C500B73766 /* ThumbUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB54BBF9252220C500B73766 /* ThumbUp.swift */; };
-		AB5CA11624F53D4600F55DEC /* IconCircularTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5CA11524F53D4600F55DEC /* IconCircularTransition.swift */; };
+		AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5CA11524F53D4600F55DEC /* IconTransition.swift */; };
 		AB5CA11824F5418500F55DEC /* TransitionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5CA11724F5418500F55DEC /* TransitionCoordinator.swift */; };
 		AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5EB5FB2361DDEA000D4D96 /* CategoryTableViewCell.swift */; };
 		AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5EB5FC2361DDEA000D4D96 /* CategoryTableViewCell.xib */; };
@@ -161,7 +163,7 @@
 		AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */; };
 		AB93FD78247EA245009546DD /* EmptySurvey.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD77247EA245009546DD /* EmptySurvey.swift */; };
 		AB93FD7A247EA255009546DD /* EmptySurvey.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB93FD79247EA255009546DD /* EmptySurvey.xib */; };
-		AB988A9E254811AB00E3C39A /* CreateNewSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9D254811AB00E3C39A /* CreateNewSurveyViewController.swift */; };
+		AB988A9E254811AB00E3C39A /* NewPollController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9D254811AB00E3C39A /* NewPollController.swift */; };
 		AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */; };
 		AB99675D23D85E180037CD6C /* TextEditingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99675C23D85E180037CD6C /* TextEditingView.swift */; };
 		AB99675F23D85E6A0037CD6C /* TextEditingView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB99675E23D85E6A0037CD6C /* TextEditingView.xib */; };
@@ -180,6 +182,9 @@
 		ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F402347406F00AF212B /* ProfileViewController.swift */; };
 		ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */; };
 		ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */; };
+		ABB4AAA8266630D200D4738D /* NewSurveyTitle.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABB4AAA7266630D200D4738D /* NewSurveyTitle.xib */; };
+		ABB4AAAA2666335600D4738D /* NewSurveyTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB4AAA92666335600D4738D /* NewSurveyTitle.swift */; };
+		ABB4C3F82653C40800C2B1BF /* BasicTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB4C3F72653C40800C2B1BF /* BasicTransition.swift */; };
 		ABB8B18F2423C9DE00E8DFF3 /* SurveyImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB8B18E2423C9DE00E8DFF3 /* SurveyImageCell.swift */; };
 		ABB8B1912423D11600E8DFF3 /* Slide.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB8B1902423D11600E8DFF3 /* Slide.swift */; };
 		ABB8B1932423D13900E8DFF3 /* Slide.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABB8B1922423D13900E8DFF3 /* Slide.xib */; };
@@ -212,6 +217,7 @@
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
 		ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE43694251C7FD300C1428D /* CustomSwitch.swift */; };
+		ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */; };
 		ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */; };
 		ABEDC4E32450168D00FA9128 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEDC4E22450168D00FA9128 /* UserProfile.swift */; };
 		ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEDC4E42450608700FA9128 /* SurveyInfoCell.swift */; };
@@ -271,6 +277,8 @@
 		AB219CA12420D0400074CF9F /* SurveyYoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyYoutubeCell.swift; sourceTree = "<group>"; };
 		AB229D832464512400968D52 /* Segues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segues.swift; sourceTree = "<group>"; };
 		AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNet.mlmodel; sourceTree = "<group>"; };
+		AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveySelectionTypeController.swift; sourceTree = "<group>"; };
+		AB25E041265FAC0100EAA8AE /* Survey.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Survey.storyboard; sourceTree = "<group>"; };
 		AB2918C7238E5B4600EF488A /* CircularTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CircularTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB2984F923A79EA70086A92B /* PrivacySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacySelectionCell.swift; sourceTree = "<group>"; };
 		AB2984FB23A7A2340086A92B /* AnonymitySelectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnonymitySelectionCell.swift; sourceTree = "<group>"; };
@@ -358,7 +366,7 @@
 		AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategoryCollectionViewCell.xib; sourceTree = "<group>"; };
 		AB52B733240E5D4B006DBDA8 /* ReadySign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadySign.swift; sourceTree = "<group>"; };
 		AB54BBF9252220C500B73766 /* ThumbUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbUp.swift; sourceTree = "<group>"; };
-		AB5CA11524F53D4600F55DEC /* IconCircularTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconCircularTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB5CA11524F53D4600F55DEC /* IconTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB5CA11724F5418500F55DEC /* TransitionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionCoordinator.swift; sourceTree = "<group>"; };
 		AB5EB5FB2361DDEA000D4D96 /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
 		AB5EB5FC2361DDEA000D4D96 /* CategoryTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategoryTableViewCell.xib; sourceTree = "<group>"; };
@@ -408,7 +416,7 @@
 		AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayEncoding.swift; sourceTree = "<group>"; };
 		AB93FD77247EA245009546DD /* EmptySurvey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptySurvey.swift; sourceTree = "<group>"; };
 		AB93FD79247EA255009546DD /* EmptySurvey.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmptySurvey.xib; sourceTree = "<group>"; };
-		AB988A9D254811AB00E3C39A /* CreateNewSurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNewSurveyViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB988A9D254811AB00E3C39A /* NewPollController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 2_BinarySelectionViewController.swift; sourceTree = "<group>"; };
 		AB99675C23D85E180037CD6C /* TextEditingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditingView.swift; sourceTree = "<group>"; };
 		AB99675E23D85E6A0037CD6C /* TextEditingView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextEditingView.xib; sourceTree = "<group>"; };
@@ -427,6 +435,9 @@
 		ABB46F402347406F00AF212B /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		ABB46F42234742CA00AF212B /* ProfileSettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsTableViewController.swift; sourceTree = "<group>"; };
 		ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsSelectionTableViewController.swift; sourceTree = "<group>"; };
+		ABB4AAA7266630D200D4738D /* NewSurveyTitle.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewSurveyTitle.xib; sourceTree = "<group>"; };
+		ABB4AAA92666335600D4738D /* NewSurveyTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyTitle.swift; sourceTree = "<group>"; };
+		ABB4C3F72653C40800C2B1BF /* BasicTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTransition.swift; sourceTree = "<group>"; };
 		ABB8B18E2423C9DE00E8DFF3 /* SurveyImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyImageCell.swift; sourceTree = "<group>"; };
 		ABB8B1902423D11600E8DFF3 /* Slide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slide.swift; sourceTree = "<group>"; };
 		ABB8B1922423D13900E8DFF3 /* Slide.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Slide.xib; sourceTree = "<group>"; };
@@ -459,6 +470,7 @@
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
 		ABE43694251C7FD300C1428D /* CustomSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSwitch.swift; sourceTree = "<group>"; };
+		ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcLabel.swift; sourceTree = "<group>"; };
 		ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditingListTableViewController.swift; sourceTree = "<group>"; };
 		ABEDC4E22450168D00FA9128 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		ABEDC4E42450608700FA9128 /* SurveyInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyInfoCell.swift; sourceTree = "<group>"; };
@@ -546,27 +558,36 @@
 		AB1D7BA5248F606E00845F1C /* Transitions */ = {
 			isa = PBXGroup;
 			children = (
+				ABB4C3F72653C40800C2B1BF /* BasicTransition.swift */,
 				AB1D7BA3248F606200845F1C /* FadeTransition.swift */,
 				AB2918C7238E5B4600EF488A /* CircularTransition.swift */,
-				AB5CA11524F53D4600F55DEC /* IconCircularTransition.swift */,
+				AB5CA11524F53D4600F55DEC /* IconTransition.swift */,
 				AB5CA11724F5418500F55DEC /* TransitionCoordinator.swift */,
 				AB00FFD42587A6320071C7DE /* BlurTransition.swift */,
 			);
 			path = Transitions;
 			sourceTree = "<group>";
 		};
-		AB28E5AF2535BB6E004CC4DD /* Create */ = {
+		AB25E03E265FAB4E00EAA8AE /* Selection */ = {
+			isa = PBXGroup;
+			children = (
+				AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */,
+			);
+			path = Selection;
+			sourceTree = "<group>";
+		};
+		AB28E5AF2535BB6E004CC4DD /* New poll */ = {
 			isa = PBXGroup;
 			children = (
 				ABF01A6A25418E1F009E2BC4 /* UI */,
-				AB988A9D254811AB00E3C39A /* CreateNewSurveyViewController.swift */,
+				AB988A9D254811AB00E3C39A /* NewPollController.swift */,
 				AB868A6923EB04A3008DEB84 /* 1_CategorySelectionViewController.swift */,
 				AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */,
 				ABDAE151258211D5007DD188 /* 3_VotesCountViewController.swift */,
 				AB1F75822594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift */,
 				AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */,
 			);
-			path = Create;
+			path = "New poll";
 			sourceTree = "<group>";
 		};
 		AB2AA1AC235604A00086D16C /* InfoViewController */ = {
@@ -671,6 +692,7 @@
 		AB3C680F223FC6D700B57580 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */,
 				AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */,
 				AB3C6814223FCE2F00B57580 /* App */,
 				AB3C6813223FCE2500B57580 /* Auth */,
@@ -695,7 +717,6 @@
 				AB3C6818223FD04500B57580 /* SMSResponse.swift */,
 				AB3EF63D22F4213C004BA878 /* EmailResponse.swift */,
 				AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */,
-				ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */,
 				ABB46F362344B1F900AF212B /* Protocols.swift */,
 				AB2AA1B42359EA8A0086D16C /* Survey.swift */,
 				AB1D845124EA91D200B75929 /* SurveyCategory.swift */,
@@ -758,6 +779,7 @@
 				ABE43694251C7FD300C1428D /* CustomSwitch.swift */,
 				AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */,
 				ABCDE35E260C7D3300ACF5A6 /* VerticalTextLayer.swift */,
+				ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -834,6 +856,7 @@
 				AB3C6866223FDD9600B57580 /* Auth.storyboard */,
 				AB3C6868223FDDAF00B57580 /* App.storyboard */,
 				AB04144C244EF2F600336857 /* Controllers.storyboard */,
+				AB25E041265FAC0100EAA8AE /* Survey.storyboard */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -1113,7 +1136,8 @@
 		ABDEE859237023B7009B52F3 /* Survey */ = {
 			isa = PBXGroup;
 			children = (
-				AB28E5AF2535BB6E004CC4DD /* Create */,
+				AB25E03E265FAB4E00EAA8AE /* Selection */,
+				AB28E5AF2535BB6E004CC4DD /* New poll */,
 				AB7CE6FA23A36123006FDBD8 /* Existing */,
 				AB7CE6F923A3610E006FDBD8 /* New */,
 			);
@@ -1144,6 +1168,8 @@
 				ABFD793D25F8CD99009A2824 /* RoundIcon.swift */,
 				ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */,
 				AB2BC364264D0A31009B44BA /* ImageViewController.swift */,
+				ABB4AAA7266630D200D4738D /* NewSurveyTitle.xib */,
+				ABB4AAA92666335600D4738D /* NewSurveyTitle.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -1249,7 +1275,7 @@
 						CreatedOnToolsVersion = 10.1;
 						SystemCapabilities = {
 							com.apple.Keychain = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -1292,6 +1318,7 @@
 				AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */,
 				ABBA1989242B430100F11E0D /* AnswerHeaderCell.xib in Resources */,
 				AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */,
+				ABB4AAA8266630D200D4738D /* NewSurveyTitle.xib in Resources */,
 				AB99675F23D85E6A0037CD6C /* TextEditingView.xib in Resources */,
 				AB3C684B223FD3EE00B57580 /* OpenSans-Light.ttf in Resources */,
 				AB7599EF245B2F51008B0569 /* SurveyPreview.xib in Resources */,
@@ -1318,6 +1345,7 @@
 				ABB8B1932423D13900E8DFF3 /* Slide.xib in Resources */,
 				ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */,
 				AB04144D244EF2F600336857 /* Controllers.storyboard in Resources */,
+				AB25E042265FAC0100EAA8AE /* Survey.storyboard in Resources */,
 				AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */,
 				AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */,
 				AB3C684E223FD3EE00B57580 /* OpenSans-LightItalic.ttf in Resources */,
@@ -1498,6 +1526,7 @@
 				AB889818240FA65B0087E5AD /* CopyPasteTextField.swift in Sources */,
 				ABDA425923B3475400BAC3A5 /* AnswerCreationHeaderCell.swift in Sources */,
 				AB7F4B8A25B5D7230017573D /* 5_ImagesSelectionViewController.swift in Sources */,
+				ABB4C3F82653C40800C2B1BF /* BasicTransition.swift in Sources */,
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
 				AB0BFDF7253093B000BD5EFF /* FlameBadge.swift in Sources */,
 				AB7478C724290D8600317EB6 /* SurveyAnswerCell.swift in Sources */,
@@ -1519,7 +1548,7 @@
 				AB3C6825223FD1E900B57580 /* CustomAlertView.swift in Sources */,
 				ABB46F3E2346373700AF212B /* TabBarController.swift in Sources */,
 				AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */,
-				AB5CA11624F53D4600F55DEC /* IconCircularTransition.swift in Sources */,
+				AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */,
 				ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */,
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
 				AB19B6412432222300999917 /* SurveyResultCell.swift in Sources */,
@@ -1618,6 +1647,7 @@
 				AB2AA1B52359EA8A0086D16C /* Survey.swift in Sources */,
 				AB8C99542486760400BC517B /* SurveyClaimView.swift in Sources */,
 				AB3C685E223FD74E00B57580 /* FileStorageManager.swift in Sources */,
+				ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */,
 				AB0BFDF1252DBCD500BD5EFF /* HeartIcon.swift in Sources */,
 				AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */,
 				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
@@ -1638,7 +1668,7 @@
 				AB229D842464512500968D52 /* Segues.swift in Sources */,
 				AB29850223AA2FFC0086A92B /* LinkAttachmentCell.swift in Sources */,
 				AB29850423AA471B0086A92B /* ImageHeaderCell.swift in Sources */,
-				AB988A9E254811AB00E3C39A /* CreateNewSurveyViewController.swift in Sources */,
+				AB988A9E254811AB00E3C39A /* NewPollController.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				AB75838224E6AB8A004367DF /* CompletedSign.swift in Sources */,
 				ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */,
@@ -1659,9 +1689,11 @@
 				ABA6E18822FACAA200F8F39A /* ValidationViewController.swift in Sources */,
 				AB29850623AA4B290086A92B /* ImageSelectionCell.swift in Sources */,
 				AB9CADC125F755CE002AFD19 /* CircleButton.swift in Sources */,
+				ABB4AAAA2666335600D4738D /* NewSurveyTitle.swift in Sources */,
 				ABF20FBA24CAE8610092B223 /* UserSubscriptionCell.swift in Sources */,
 				ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */,
 				AB7478BF2428951F00317EB6 /* CircularIndicatorImageView.swift in Sources */,
+				AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */,
 				ABF20FB824C994250092B223 /* UserSurveysCell.swift in Sources */,
 				ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */,
 				AB32DA3D25D56138007AFF05 /* TextInputViewController.swift in Sources */,
@@ -1773,7 +1805,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1781,7 +1813,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0.1;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -1831,14 +1863,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0.1;
+				SWIFT_VERSION = 4.2;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -1848,7 +1880,6 @@
 			baseConfigurationReference = BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhat.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
@@ -1871,7 +1902,6 @@
 			baseConfigurationReference = C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhat.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
@@ -1895,8 +1925,8 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = YR8888VBGA;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ThinkWhatTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1905,6 +1935,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ThinkWhat.app/ThinkWhat";
@@ -1917,8 +1948,8 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = YR8888VBGA;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ThinkWhatTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1927,6 +1958,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ThinkWhat.app/ThinkWhat";
@@ -1937,8 +1969,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = YR8888VBGA;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ThinkWhatUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1947,6 +1979,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = ThinkWhat;
@@ -1957,8 +1990,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = YR8888VBGA;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = ThinkWhatUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1967,6 +2000,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = ThinkWhat;

@@ -123,12 +123,18 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                     self.presentSubview(oldIcon: nil, newIcon: .Hot)
                     self.lostConnectionView = nil
                     if let btn = self.navigationItem.rightBarButtonItem as? UIBarButtonItem {
-                        let v = Megaphone(frame: CGRect(origin: .zero, size: CGSize(width: 30, height: 30)))
-                        v.isOpaque = false
-                        v.clipsToBounds = false
+//                        let v = Megaphone(frame: CGRect(origin: .zero, size: CGSize(width: 30, height: 30)))
+//                        v.isOpaque = false
+//                        v.clipsToBounds = false
+                        let v = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: CGSize(width: 37, height: 37)))
+                        v.backgroundColor = .clear
+                        v.iconColor = K_COLOR_RED
+//                        v.scaleFactor = 0.2
+                        v.category = .AddStar
                         let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleAddTap))
                         v.addGestureRecognizer(tap)
                         btn.customView = v
+                        v.scaleFactor = 0.15
                         btn.customView?.alpha = 0
                         btn.customView?.clipsToBounds = false
                         btn.customView?.layer.masksToBounds = false
@@ -364,7 +370,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             destinationVC.parentCategory = category
             destinationVC.title = category.title
             nc.category = category
-            nc.duration = 0.4
+            nc.duration = 0.3
             nc.transitionStyle = .Icon
             destinationVC.delegate = self
         } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? SurveyViewController {
@@ -391,14 +397,9 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             destinationVC.isNavTitleEnabled = false
             nc.transitionStyle = .Icon
             nc.duration = 0.25//5.4//
-        } else if segue.identifier == Segues.App.FeedToNewSurvey { //New survey
-//            nc.setNavigationBarHidden(true, animated: false)
-//            if let _sender = sender as? EmptySurvey {
-//                nc.startingPoint = _sender.startingPoint
-//            } else {
-//                nc.startingPoint = startingPoint
-//            }
-//            nc.transitionStyle = .Circular
+        } else if segue.identifier == Segues.App.FeedToNewSurvey {
+            nc.transitionStyle = .Icon
+            nc.duration = 0.35
         } else if segue.identifier == Segues.App.FeedToUser, let userProfile = sender as? UserProfile, let destinationVC = segue.destination as? UserViewController {
             destinationVC.userProfile = userProfile
             nc.duration = 0.2
@@ -450,6 +451,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     
     @objc private func handleAddTap() {
         performSegue(withIdentifier: Segues.App.FeedToNewSurvey, sender: self)
+//        navigationItem.setRightBarButton(nil, animated: false)
     }
     
     @objc private func handleFilterTap() {

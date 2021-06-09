@@ -11,6 +11,10 @@ import SafariServices
 
 class HyperlinkSelectionViewController: UIViewController {
     
+    deinit {
+        print("***HyperlinkSelectionViewController deinit***")
+    }
+
     @IBOutlet weak var hyperlinkLabel: PaddingLabel! {
         didSet {
             hyperlinkLabel.font = font
@@ -192,7 +196,7 @@ class HyperlinkSelectionViewController: UIViewController {
             isViewSetupCompleted = true
             if hyperlink != nil {
                 delay(seconds: 0.75) {
-                    self.actionButton.setNext(animationDelegate: self)
+                    self.actionButton.bounce(animationDelegate: self)
                 }
             }
 //            trashHeight = trashSign.frame.height
@@ -216,9 +220,8 @@ class HyperlinkSelectionViewController: UIViewController {
         if let v = recognizer.view {
             switch v {
             case actionButton:
-                
+                isAnimationStopped = true
                 if hyperlink == nil {
-                    isAnimationStopped = true
                     navigationController?.popViewController(animated: true)
                 } else {
                     UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
@@ -258,7 +261,7 @@ class HyperlinkSelectionViewController: UIViewController {
                                     self.actionButton.color = K_COLOR_RED
                                 }) {
                                     _ in
-                                    self.actionButton.setNext(animationDelegate: self)
+                                    self.actionButton.bounce(animationDelegate: self)
                                 }
                             hyperlink = url
                         }
@@ -332,11 +335,20 @@ class HyperlinkSelectionViewController: UIViewController {
 extension HyperlinkSelectionViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if !isAnimationStopped {
-            actionButton.setNext(animationDelegate: self)
+            actionButton.layer.removeAllAnimations()
+            actionButton.bounce(animationDelegate: self)
         } else {
+            actionButton.scaleColorAnim = nil
             UIView.animate(withDuration: 0.15) {
                 self.actionButton.icon.backgroundColor = K_COLOR_GRAY
             }
         }
+//        if !isAnimationStopped {
+//            actionButton.bounce(animationDelegate: self)
+//        } else {
+//            UIView.animate(withDuration: 0.15) {
+//                self.actionButton.icon.backgroundColor = K_COLOR_GRAY
+//            }
+//        }
     }
 }

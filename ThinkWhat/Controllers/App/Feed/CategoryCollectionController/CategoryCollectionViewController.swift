@@ -14,7 +14,7 @@ class CategoryCollectionViewController: UICollectionViewController {
 
     let reuseIdentifier = "category"
     let itemsPerRow: CGFloat = 3
-    let sectionInsets = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+    let sectionInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 10.0)
     var categories: [SurveyCategory]!
     fileprivate var parentMode = false
     fileprivate var needsAnimation = true
@@ -101,12 +101,23 @@ class CategoryCollectionViewController: UICollectionViewController {
         if needsAnimation {
             cell.alpha = 0
             cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//            UIView.animate(
+//                withDuration: 0.6,
+//                delay: (Double(arc4random_uniform(6)) * 0.01) * Double(arc4random_uniform(5)),//Double(indexPath.row),
+//                usingSpringWithDamping: 0.6,
+//                initialSpringVelocity: 1.1,
+//                options: [.curveEaseOut],
+//                animations: {
+//                    cell.alpha = 1
+//                    cell.transform = .identity
+//            }) {
+//                _ in
+//                self.needsAnimation = (self.collectionView.visibleCells.count < (indexPath.row + 1))
+//            }
             UIView.animate(
-                withDuration: 0.6,
+                withDuration: 0.2,
                 delay: (Double(arc4random_uniform(6)) * 0.01) * Double(arc4random_uniform(5)),//Double(indexPath.row),
-                usingSpringWithDamping: 0.6,
-                initialSpringVelocity: 1.1,
-                options: [.curveEaseOut],
+                options: [.curveEaseInOut],
                 animations: {
                     cell.alpha = 1
                     cell.transform = .identity

@@ -158,7 +158,7 @@ extension UIView {
         self.layer.mask = circlePathLayer
         self.alpha = 1
         
-        let center = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
+        let center = CGPoint(x: bounds.midX, y: bounds.midY)
         
         let finalRadius = sqrt((center.x*center.x) + (center.y*center.y))
         
@@ -166,9 +166,9 @@ extension UIView {
         
         let outerRect = circleFrameTop().insetBy(dx: -radiusInset, dy: -radiusInset)
         
-        let fromPath = UIBezierPath(ovalIn: outerRect).cgPath
+        let toPath = UIBezierPath(ovalIn: outerRect).cgPath
         
-        let toPath = circlePathLayer.path
+        let fromPath = circlePathLayer.path
         
         let maskLayerAnimation = CABasicAnimation(keyPath: "path")
         
@@ -177,20 +177,24 @@ extension UIView {
         maskLayerAnimation.duration = duration
         maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         maskLayerAnimation.isRemovedOnCompletion = false
-        
-        if !completionBlocks.isEmpty {
+        if completionDelegate != nil {
             maskLayerAnimation.delegate = completionDelegate
-            maskLayerAnimation.setValue(completionBlocks, forKey: "maskCompletionBlocks")
+            //Remove mask
+            var blocks: [Closure] = []
+            blocks += completionBlocks
+            blocks.append {
+                DispatchQueue.main.async {
+                    circlePathLayer.removeFromSuperlayer()
+                }
+            }
+            maskLayerAnimation.setValue(blocks, forKey: "maskCompletionBlocks")
         }
-        
         circlePathLayer.add(maskLayerAnimation, forKey: "path")
         circlePathLayer.path = toPath
-        
     }
     
     func animateCircleLayer(shapeLayer: CAShapeLayer, reveal: Bool, duration: TimeInterval, completionBlocks: [Closure], completionDelegate: CAAnimationDelegate?) {
         self.layer.masksToBounds = true
-        
         
         func circleFrameTopCenter() -> CGRect {
             var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
@@ -239,18 +243,24 @@ extension UIView {
         maskLayerAnimation.fromValue = reveal ? startPath : fromPath//startPath//fromPath
         maskLayerAnimation.toValue = !reveal ? startPath : fromPath//fromPath//toPath
         maskLayerAnimation.duration = duration
+        maskLayerAnimation.fillMode = .forwards
         maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-        maskLayerAnimation.isRemovedOnCompletion = false
+        maskLayerAnimation.isRemovedOnCompletion = true
         
-        if !completionBlocks.isEmpty {
+        if completionDelegate != nil {
+            var blocks: [Closure] = []
+            blocks += completionBlocks
             maskLayerAnimation.delegate = completionDelegate
-            maskLayerAnimation.setValue(completionBlocks, forKey: "maskCompletionBlocks")
+            maskLayerAnimation.setValue(blocks, forKey: "circleLayerAnimCompletionBlocks")
+            maskLayerAnimation.setValue(shapeLayer, forKey: reveal ? "preserveLayer" : "removeLayer")
         }
         
-        shapeLayer.add(maskLayerAnimation, forKey: "path")
+        shapeLayer.add(maskLayerAnimation, forKey: nil)
         shapeLayer.path = !reveal ? startPath : fromPath//fromPath//toPath
         
     }
+    
+
     
 }
 
@@ -1114,7 +1124,7 @@ extension CGSize {
 }
 
 extension CGPath {
-    func getScaledPath(size: CGSize) -> CGPath {
+    func getScaledPath(size: CGSize, scaleFactor _scaleFactor: CGFloat = 1) -> CGPath {
         
         let boundingBox = self.boundingBox
         
@@ -1132,8 +1142,11 @@ extension CGPath {
         }
         
         scaleFactor /= 1.75
-        
         scaleFactor = scaleFactor == 0 ? 1 : scaleFactor
+        
+        if _scaleFactor != 1 {
+            scaleFactor = _scaleFactor
+        }
         // Scaling the path ...
         var scaleTransform = CGAffineTransform.identity
         // Scale down the path first
@@ -1153,5 +1166,45 @@ extension CGPath {
         
         let scaledPath = self.copy(using: &scaleTransform)
         return scaledPath!
+    }
+}
+
+extension UIImageView {
+    func getImageRect() -> CGRect {
+        let imageViewSize = frame.size
+        let imgSize = image?.size
+        
+        guard let imageSize = imgSize else {
+            return CGRect.zero
+        }
+        
+        let scaleWidth = imageViewSize.width / imageSize.width
+        let scaleHeight = imageViewSize.height / imageSize.height
+        let aspect = fmin(scaleWidth, scaleHeight)
+        
+        var imageRect = CGRect(x: 0, y: 0, width: imageSize.width * aspect, height: imageSize.height * aspect)
+        // Center image
+        imageRect.origin.x = (imageViewSize.width - imageRect.size.width) / 2
+        imageRect.origin.y = (imageViewSize.height - imageRect.size.height) / 2
+        
+        // Add imageView offset
+        imageRect.origin.x += frame.origin.x
+        imageRect.origin.y += frame.origin.y
+        
+        return imageRect
+    }
+}
+extension CAShapeLayer {
+    func copyLayer() -> CAShapeLayer {
+        return CAShapeLayer(layer: self)
+    }
+}
+
+extension CGPoint {
+    static func pointOnCircle(center: CGPoint, radius: CGFloat, angle: CGFloat) -> CGPoint {
+        let x = center.x + radius * cos(angle)
+        let y = center.y + radius * sin(angle)
+        
+        return CGPoint(x: x, y: y)
     }
 }

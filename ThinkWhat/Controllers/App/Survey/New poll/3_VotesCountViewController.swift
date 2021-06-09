@@ -10,6 +10,11 @@ import UIKit
 
 class VotesCountViewController: UIViewController {
 
+    deinit {
+        print("***CreateNewSurveyViewController deinit***")
+    }
+
+    
     var color: UIColor!
     var votesCount = 100 {
         didSet {

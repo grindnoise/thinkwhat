@@ -22,7 +22,7 @@ class TransitionCoordinator: NSObject, UINavigationControllerDelegate {
             case .Fade:
                 return FadeTransition(nc, operation)
             case .Icon:
-                return IconCircularTransition(nc, operation, nc.duration)//, nc.startingPoint, nc.category, nc.iconSize)
+                return IconTransition(nc, operation, nc.duration)//, nc.startingPoint, nc.category, nc.iconSize)
             case .Blur:
                 return BlurTransition(nc, operation, nc.duration)
             }

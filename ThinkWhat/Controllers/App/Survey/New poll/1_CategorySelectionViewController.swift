@@ -10,6 +10,10 @@ import UIKit
 
 class CategorySelectionViewController: UIViewController {
 
+    deinit {
+        print("***CategorySelectionViewController deinit***")
+    }
+    
     let categoryVC: CategoryCollectionViewController = {
         return Storyboards.controllers.instantiateViewController(withIdentifier: "CategoryCollectionViewController") as! CategoryCollectionViewController
     } ()
@@ -48,7 +52,7 @@ class CategorySelectionViewController: UIViewController {
                         self.actionButton.icon.backgroundColor = K_COLOR_RED
                     }) {
                         _ in
-                        self.actionButton.setNext(animationDelegate: self)
+                        self.actionButton.bounce(animationDelegate: self)
                     }
                     self.actionButton.isUserInteractionEnabled = true
                     
@@ -77,6 +81,8 @@ class CategorySelectionViewController: UIViewController {
     private var hiddenConstraintConstant: CGFloat = 0//When backButton is out of the screen
     @IBOutlet weak var actionButton: CircleButton! {
         didSet {
+            actionButton.oval.opacity = 0
+            actionButton.contentView.backgroundColor = .clear
             actionButton.lineWidth = lineWidth
             actionButton.isUserInteractionEnabled = false
             let tap = UITapGestureRecognizer(target: self, action: #selector(CategorySelectionViewController.okButtonTapped))
@@ -115,6 +121,7 @@ class CategorySelectionViewController: UIViewController {
         categoryVC.view.addEquallyTo(to: container)
         addChild(self.categoryVC)
         categoryVC.didMove(toParent: self)
+//        view.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,18 +138,18 @@ class CategorySelectionViewController: UIViewController {
             navigationItem.setHidesBackButton(true, animated: false)
             containerBg.setNeedsLayout()
             containerBg.layoutIfNeeded()
-            containerBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-            containerBg.layer.shadowPath = UIBezierPath(roundedRect: containerBg.bounds, cornerRadius: 20).cgPath
-            containerBg.layer.shadowRadius = 7
+            containerBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor//UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            containerBg.layer.shadowPath = UIBezierPath(roundedRect: containerBg.bounds, cornerRadius: 25).cgPath
+            containerBg.layer.shadowRadius = 6
             containerBg.layer.shadowOffset = .zero
             containerBg.layer.shadowOpacity = 1
             containerBg.layer.masksToBounds = false
             backButtonBg.setNeedsLayout()
             backButtonBg.layoutIfNeeded()
             backButtonFg.layer.cornerRadius = backButtonFg.frame.height / 2
-            backButtonBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-            backButtonBg.layer.shadowPath = UIBezierPath(roundedRect: backButtonBg.bounds, cornerRadius: 20).cgPath
-            backButtonBg.layer.shadowRadius = 7
+            backButtonBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor//UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            backButtonBg.layer.shadowPath = UIBezierPath(roundedRect: backButtonBg.bounds, cornerRadius: 25).cgPath
+            backButtonBg.layer.shadowRadius = 6
             backButtonBg.layer.shadowOffset = .zero
             backButtonBg.layer.shadowOpacity = 1
             backButtonBg.layer.masksToBounds = false
@@ -160,12 +167,29 @@ class CategorySelectionViewController: UIViewController {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+//        navigationController?.popViewController(animated: true)
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+            self.view.setNeedsLayout()
+            self.backButtonConstraint.constant = self.hiddenConstraintConstant
+            self.view.layoutIfNeeded()
+            self.backButton.alpha = 0
+        })
+    }
+    
+//    override func viewDidDisappear(_ animated: Bool) {
+//        actionButton.removeFromSuperview()
+//    }
+    
     @objc fileprivate func backButtonTapped() {
         parentCategory = nil
     }
     
     @objc fileprivate func okButtonTapped() {
         isAnimationStopped = true
+//        actionButton.layer.removeAllAnimations()
         navigationController?.popViewController(animated: true)
     }
 }
@@ -186,9 +210,12 @@ extension CategorySelectionViewController: CallbackDelegate {
 
 extension CategorySelectionViewController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+//        actionButton.layer.removeAllAnimations()
         if !isAnimationStopped {
-            actionButton.setNext(animationDelegate: self)
+            actionButton.layer.removeAllAnimations()
+            actionButton.bounce(animationDelegate: self)
         } else {
+            actionButton.scaleColorAnim = nil
             UIView.animate(withDuration: 0.25) {
                 self.actionButton.icon.backgroundColor = K_COLOR_GRAY
             }

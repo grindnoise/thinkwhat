@@ -10,6 +10,10 @@ import UIKit
 
 class TextInputViewController: UIViewController {
     
+    deinit {
+        print("***TextInputViewController deinit***")
+    }
+
     @IBOutlet weak var text: UITextView! {
         didSet {
             text.accessibilityIdentifier = accessibilityIdentifier
@@ -123,7 +127,7 @@ class TextInputViewController: UIViewController {
             nc.transitionStyle = .Icon
             navigationItem.setHidesBackButton(true, animated: false)
         }
-        
+        setTitle()
         NotificationCenter.default.addObserver(self, selector: #selector(TextInputViewController.keyboardWillShow(_:)),
                                                name: UIResponder.keyboardWillShowNotification, object: nil)
 //        NotificationCenter.default.addObserver(self, selector: #selector(TextInputViewController.keyboardDidShow(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
@@ -132,14 +136,7 @@ class TextInputViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        
-        delay(seconds: 0.1) {
-            self.text.becomeFirstResponder()
-        }
-        
-        DispatchQueue.main.async {
-            self.setTitle()
-        }
+        delay(seconds: 0.1) { self.text.becomeFirstResponder() }
     }
    
     override func viewDidDisappear(_ animated: Bool) {

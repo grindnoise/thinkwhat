@@ -8,24 +8,9 @@
 
 import UIKit
 
-class BlurTransition: NSObject, UIViewControllerAnimatedTransitioning {
-    var operation: UINavigationController.Operation!
-    var navigationController: NavigationControllerPreloaded!
-    var duration: TimeInterval = 0.3
+class BlurTransition: BasicTransition {
     
-    init(_ _navigationController: NavigationControllerPreloaded, _ _operation: UINavigationController.Operation, _ _duration: TimeInterval) {
-        navigationController = _navigationController
-        operation = _operation
-        duration = _duration
-    }
-    
-    weak var context: UIViewControllerContextTransitioning?
-    
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return duration
-    }
-    
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromVC = transitionContext.viewController(forKey: .from),
             let toVC = transitionContext.viewController(forKey: .to) else {
                 transitionContext.completeTransition(false)
@@ -49,7 +34,7 @@ class BlurTransition: NSObject, UIViewControllerAnimatedTransitioning {
         let delay = duration * 0.25
         
         if operation == .pop{
-            if let vc_1 = fromVC as? TextViewController, let vc_2 = toVC as? CreateNewSurveyViewController {
+            if let vc_1 = fromVC as? TextViewController, let vc_2 = toVC as? NewPollController {
                 if vc_1.accessibilityIdentifier == "Title" {
                     vc_2.questionTitle = vc_1.text.text
                 } else if vc_1.accessibilityIdentifier == "Question" {

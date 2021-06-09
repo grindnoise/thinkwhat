@@ -17,7 +17,7 @@ class CircleButton: UIView, CAAnimationDelegate {
 
     var oval: CAShapeLayer!
     var iconProportionConstraint = NSLayoutConstraint()
-    var scaleColorAnim: CAAnimationGroup!
+    var scaleColorAnim: CAAnimationGroup?
     
     private var duration = 0.6
     var state: State = .On {
@@ -286,25 +286,26 @@ class CircleButton: UIView, CAAnimationDelegate {
         }
     }
     
-    func setNext(animationDelegate: CAAnimationDelegate) {
+    func bounce(animationDelegate: CAAnimationDelegate?) {
       
         if scaleColorAnim == nil {
             let colorA = CABasicAnimation(keyPath: "backgroundColor")
             colorA.fromValue = K_COLOR_RED.cgColor
             colorA.toValue = K_COLOR_RED.darker(0.15).cgColor
-            
             let scaleA = CABasicAnimation(keyPath: "transform.scale")
             scaleA.fromValue = 1
             scaleA.toValue = CATransform3DMakeScale(1.1, 1.1, 1)
-            
             scaleColorAnim = CAAnimationGroup()
-            scaleColorAnim.animations = [colorA, scaleA]
-            scaleColorAnim.duration = 0.75
-            scaleColorAnim.autoreverses = true
-            scaleColorAnim.delegate = animationDelegate
+            scaleColorAnim?.animations = [colorA, scaleA]
+            scaleColorAnim?.duration = 0.75
+            scaleColorAnim?.isRemovedOnCompletion = true
+            scaleColorAnim?.autoreverses = true
+            scaleColorAnim?.delegate = animationDelegate
         }
         
-        self.icon.layer.add(scaleColorAnim, forKey: nil)
+        if scaleColorAnim != nil {
+            self.icon.layer.add(scaleColorAnim!, forKey: nil)
+        }
         
     }
     

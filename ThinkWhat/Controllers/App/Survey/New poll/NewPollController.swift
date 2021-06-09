@@ -9,10 +9,10 @@
 import UIKit
 import Vision
 
-class CreateNewSurveyViewController: UIViewController, UINavigationControllerDelegate {
+class NewPollController: UIViewController, UINavigationControllerDelegate {
     
     deinit {
-        print("***CreateNewSurveyViewController deinit***")
+        print("***NewPollController deinit***")
     }
     
     //Sequence of stages to post new survey
@@ -43,7 +43,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
     //MARK: - Category
     var category: SurveyCategory? {
         didSet {
-            setTitle()
+//            setTitle()
             if category != nil {
                 categoryTitle.alpha = 1
                 stage = .Anonymity
@@ -65,7 +65,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
     
     @IBOutlet weak var categoryIcon: CircleButton! {
         didSet {
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             categoryIcon.addGestureRecognizer(tap)
             //            categoryIcon.icon.isFramed = false
             categoryIcon.icon.alpha = 0
@@ -76,45 +76,46 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
         }
     }
     
-    @IBOutlet weak var categoryLabel: UILabel!
-    
-    
-    //MARK: - Anon
-    var isAnonymous = false {
+    @IBOutlet weak var categoryLabel: UILabel! {
         didSet {
-            anonTitle.alpha = 1
-            stage = .Privacy
-            anonIcon.color = selectedColor
-            anonIcon.category = isAnonymous ? SurveyCategoryIcon.Category.Anon : SurveyCategoryIcon.Category.AnonDisabled//SurveyCategoryIcon.Category(rawValue: category!.ID) ?? .Null
+            categoryLabel.alpha = 0
         }
     }
-    
-    @IBOutlet weak var anonTitle: UILabel! {
+        
+        
+        //MARK: - Anon
+        var isAnonymous = false {
         didSet {
-            anonTitle.alpha = 0
+        anonTitle.alpha = 1
+        stage = .Privacy
+        anonIcon.color = selectedColor
+        anonIcon.category = isAnonymous ? SurveyCategoryIcon.Category.Anon : SurveyCategoryIcon.Category.AnonDisabled//SurveyCategoryIcon.Category(rawValue: category!.ID) ?? .Null
+        }
+        }
+        
+        @IBOutlet weak var anonTitle: UILabel! {
+        didSet {
+        anonTitle.alpha = 0
+        }
+        }
+        
+        @IBOutlet weak var anonIcon: CircleButton! {
+        didSet {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
+        anonIcon.addGestureRecognizer(tap)
+        anonIcon.icon.alpha = 0
+        //            anonIcon.backgroundColor = .clear
+        anonIcon.state      = .Off
+        anonIcon.category   = .Anon
+        anonIcon.color      = selectedColor
+        }
+        }
+        
+        @IBOutlet weak var anonLabel: UILabel! {
+        didSet {
+        anonLabel.alpha = 0
         }
     }
-    
-    @IBOutlet weak var anonIcon: CircleButton! {
-        didSet {
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
-            anonIcon.addGestureRecognizer(tap)
-            anonIcon.icon.alpha = 0
-            //            anonIcon.backgroundColor = .clear
-            anonIcon.state      = .Off
-            anonIcon.category   = .Anon
-            anonIcon.color      = selectedColor
-        }
-    }
-    
-    @IBOutlet weak var anonLabel: UILabel! {
-        didSet {
-            anonLabel.alpha = 0
-        }
-    }
-    
-    
-    
     
     //MARK: - Privacy
     var isPrivate = false {
@@ -132,7 +133,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
     
     @IBOutlet weak var privacyIcon: CircleButton! {
         didSet {
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             privacyIcon.addGestureRecognizer(tap)
             privacyIcon.icon.alpha = 0
             //            privacyIcon.backgroundColor = .clear
@@ -164,7 +165,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
     
     @IBOutlet weak var votesIcon: CircleButton! {
         didSet {
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             votesIcon.addGestureRecognizer(tap)
             votesIcon.icon.alpha = 0
             //            votesIcon.backgroundColor = .clear
@@ -196,13 +197,18 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             titleIcon.accessibilityIdentifier   = "titleIcon"
             titleIcon.state                     = .Off
             titleIcon.color                     = selectedColor
-            titleIcon.category                  = .Title_RU
+            titleIcon.category                  = .Null//.Title_RU
             //            titleIcon.text                      = "ТИТУЛ"
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             titleIcon.addGestureRecognizer(tap)
         }
     }
     
+    @IBOutlet weak var titleArcLabel: ArcLabel!{
+        didSet {
+            titleArcLabel.alpha = 0
+        }
+    }
     @IBOutlet weak var titleLabel: PaddingLabel! {
         didSet {
             //            titleLabel.backgroundColor = .clear
@@ -210,7 +216,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             titleLabel.alpha = 0
             titleLabel.accessibilityIdentifier = "Title"
             titleLabel.isUserInteractionEnabled = true
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             titleLabel.addGestureRecognizer(tap)
         }
     }
@@ -230,19 +236,23 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             questionIcon.accessibilityIdentifier    = "questionIcon"
             questionIcon.state                      = .Off
             questionIcon.color                      = selectedColor
-            questionIcon.category                   = .Details_RU
+            questionIcon.category                   = .Null//.Details_RU
             //            questionIcon.text                       = "ВОПРОС"
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             questionIcon.addGestureRecognizer(tap)
         }
     }
-    
+    @IBOutlet weak var questionArcLabel: ArcLabel!{
+        didSet {
+            questionArcLabel.alpha = 0
+        }
+    }
     @IBOutlet weak var questionLabel: PaddingLabel! {
         didSet {
             questionLabel.alpha = 0
             //            questionLabel.textColor = .white
             questionLabel.accessibilityIdentifier = "Question"
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             questionLabel.isUserInteractionEnabled = true
             questionLabel.addGestureRecognizer(tap)
         }
@@ -264,17 +274,21 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             hyperlinkIcon.color     = selectedColor
             hyperlinkIcon.category  = .Hyperlink_RU
             //            hyperlinkIcon.text      = "ССЫЛКА"
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             hyperlinkIcon.addGestureRecognizer(tap)
         }
     }
-    
+    @IBOutlet weak var hyperlinkArcLabel: ArcLabel!{
+        didSet {
+            hyperlinkArcLabel.alpha = 0
+        }
+    }
     @IBOutlet weak var hyperlinkLabel: PaddingLabel! {
         didSet {
             hyperlinkLabel.alpha = 0
             //            hyperlinkLabel.textColor = .white
             hyperlinkLabel.accessibilityIdentifier = "Hyperlink"
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             hyperlinkLabel.isUserInteractionEnabled = true
             hyperlinkLabel.addGestureRecognizer(tap)
             hyperlinkLabel.attributedText = hyperlinkPlaceholder
@@ -290,13 +304,17 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
                 let pathAnim = Animations.get(property: .Path, fromValue: (imagesHeaderIcon.icon.icon as! CAShapeLayer).path, toValue: destinationPath, duration: 0.5, delay: 0.75, delegate: self, isRemovedOnCompletion: false)
                 pathAnim.setValue(imagesHeaderIcon.icon.icon as! CAShapeLayer, forKey: "layer")
                 pathAnim.setValue(destinationPath, forKey: "destinationPath")
-                pathAnim.setValue({ self.stage = .Answers }, forKey: "completionBlock")
+//                pathAnim.setValue({ self.stage = .Answers }, forKey: "completionBlock")
                 imagesHeaderIcon.icon.icon.add(pathAnim, forKey: nil)
             }
             //            stage = .Answers
         }
     }
-    
+    @IBOutlet weak var imagesArcLabel: ArcLabel!{
+        didSet {
+            imagesArcLabel.alpha = 0
+        }
+    }
     @IBOutlet weak var imagesHeaderIcon: CircleButton! {
         didSet {
             imagesHeaderIcon.icon.alpha = 0
@@ -304,7 +322,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             imagesHeaderIcon.state      = .Off
             imagesHeaderIcon.color      = selectedColor
             imagesHeaderIcon.category   = .Picture
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             imagesHeaderIcon.addGestureRecognizer(tap)
         }
     }
@@ -321,9 +339,9 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
     @IBOutlet weak var imagesStackViewBottom: NSLayoutConstraint!
     private var stackImages: [UIView] = []
     private var highlitedImage: [UIView: UIImageView] = [:]
-    private lazy var imageEditingList: ImageEditingListTableViewController = {
+    private lazy var imageEditingList: ImageEditingListTableViewController? = {
         let vc = Storyboards.controllers.instantiateViewController(withIdentifier: "ImageEditingListTableViewController") as! ImageEditingListTableViewController
-        let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
         tap.cancelsTouchesInView = false
         vc.view.addGestureRecognizer(tap)
         vc.delegate = self
@@ -335,8 +353,40 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
         return MobileNet()
     } ()
     
-    
-    
+    //MARK: - Answers
+    private var answers: [String] = [""] {
+        didSet {
+            if oldValue.count != answers.count {
+                UIView.animate(withDuration: 0.2) {
+                    self.tableView.setNeedsLayout()
+                    self.tableViewHeight.constant = CGFloat(self.answers.count) * self.answerRowHeight + self.answerRowHeight/2
+                    self.tableView.layoutIfNeeded()
+                }
+            }
+        }
+    }
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var tableViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var answerIcon: CircleButton! {
+        didSet {
+            answerIcon.icon.alpha = 0
+            answerIcon.state      = .Off
+            answerIcon.color      = selectedColor
+            answerIcon.category   = .Answer
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
+            answerIcon.addGestureRecognizer(tap)
+        }
+    }
+    @IBOutlet weak var answerContainer: UIView! {
+        didSet {
+            answerContainer.alpha = 0
+        }
+    }
+    @IBOutlet weak var answerArcLabel: ArcLabel!{
+        didSet {
+            answerArcLabel.alpha = 0
+        }
+    }
     //MARK: - Interface properties
     @IBInspectable var lineWidth: CGFloat = 5 {
         didSet {
@@ -364,7 +414,14 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             hyperlinkLabel.backgroundColor  = selectedColor.withAlphaComponent(0.2)
             imagesHeaderIcon.color          = selectedColor
             imagesLabel.backgroundColor     = selectedColor.withAlphaComponent(0.2)
-            lines.map({$0.layer.strokeColor = selectedColor.withAlphaComponent(0.2).cgColor})
+            answerIcon.color          = selectedColor
+            answerContainer.backgroundColor     = selectedColor.withAlphaComponent(0.2)
+//            tableView.reloadData()
+            lines.forEach { $0.layer.strokeColor = selectedColor.withAlphaComponent(0.2).cgColor }
+            badges.forEach {
+                $0.backgroundColor = selectedColor.withAlphaComponent(0.2)
+                $0.textColor = selectedColor
+            }
         }
     }
     
@@ -384,6 +441,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
     
     //Array of colored lines between stages
     private var lines: [Line] = []
+    private var badges: [UILabel] = []
     
     //Corner for labels
     private var cornerRadius: CGFloat! {
@@ -392,6 +450,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             questionLabel.layer.cornerRadius = cornerRadius
             hyperlinkLabel.layer.cornerRadius = cornerRadius
             imagesLabel.layer.cornerRadius = cornerRadius
+            answerContainer.layer.cornerRadius = cornerRadius
         }
     }
     //Get-only color
@@ -400,7 +459,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             return selectedColor
         }
     }
-    
+    private var answerRowHeight: CGFloat = 50
     private var labelTopInset: CGFloat = 0 {
         didSet {
             titleLabel.topInset = labelTopInset
@@ -413,7 +472,11 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
     private var imagePicker = UIImagePickerController ()
     
     //Where to place selected image
-    private var imagePosition = 0
+    var imagePosition = 0 {
+        didSet {
+            print(imagePosition)
+        }
+    }
     
     //Indicates if effectView is on screen
     private var effectView: UIVisualEffectView?
@@ -422,7 +485,20 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
     //MARK: - VC Functions
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+//        DispatchQueue.main.async {
+        let customTitle = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+        customTitle.backgroundColor = .clear
+        customTitle.iconColor = K_COLOR_RED
+        customTitle.scaleFactor = 0.25
+        customTitle.category = .Poll
+                //NewSurveyTitle(size: CGSize(width: self.navigationController!.navigationBar.frame.width * 0.7, height: self.navigationController!.navigationBar.frame.height), text: "Новый опрос", category: .Poll)
+            self.navigationItem.titleView = customTitle
+//        }
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
+        tableView.delegate = self as UITableViewDelegate
+        tableView.dataSource = self
+//        tableView.register(AddAnswerCell.self, forCellReuseIdentifier: "addAnswer")
+//        tableView.register(AnswerCell.self, forCellReuseIdentifier: "answer")
         imagePicker.delegate = self
         imagePicker.allowsEditing = true
         imagePicker.navigationBar.topItem?.rightBarButtonItem?.tintColor = K_COLOR_RED
@@ -430,18 +506,18 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
         if #available(iOS 13, *) {
             
         } else {
-            
-            guard let visionModel = try? VNCoreMLModel(for: imagesModel.model) else {
-                fatalError("Error")
-            }
-            
-            imageObservationRequest = VNCoreMLRequest(model: visionModel, completionHandler: {
-                request, error in
-                if let observations = request.results as? [VNClassificationObservation] {
-                    let top = observations.filter { $0.confidence >= 0.6 }.map {print("identifier: \($0.identifier), confidence: \($0.confidence)") }
-                    //                    top3.map { print("identifier: \($0.identifier), confidence: \($0.confidence)") }
+            DispatchQueue.main.async {
+                guard let visionModel = try? VNCoreMLModel(for: self.imagesModel.model) else {
+                    fatalError("Error")
                 }
-            })
+                self.imageObservationRequest = VNCoreMLRequest(model: visionModel, completionHandler: {
+                    request, error in
+                    if let observations = request.results as? [VNClassificationObservation] {
+                        let top = observations.filter { $0.confidence >= 0.6 }.map {print("identifier: \($0.identifier), confidence: \($0.confidence)") }
+                        //                    top3.map { print("identifier: \($0.identifier), confidence: \($0.confidence)") }
+                    }
+                })
+            }
         }
     }
     
@@ -449,6 +525,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = true
             nc.navigationBar.isTranslucent = false
+//            nc.transitionStyle = .Default
 //            nc.navigationBar.tintColor = .black
             //            if isNavigationBarHidden {
             //                nc.setNavigationBarHidden(true, animated: true)
@@ -456,83 +533,91 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
         }
         
         if !isViewSetupCompleted {
-            
             view.setNeedsLayout()
             view.layoutIfNeeded()
             
             lineWidth = categoryIcon.bounds.height / 11.75//0.75
-            
             isViewSetupCompleted = true
-            
             labelTopInset = categoryIcon.frame.height*0.35
             
-            imagesStackViewBottom.constant -= lineWidth
-            imagesStackView.setNeedsLayout()
-            imagesStackView.layoutIfNeeded()
-            image_1.cornerRadius = image_1.frame.width / 2
-            image_2.cornerRadius = image_1.frame.width / 2
-            image_3.cornerRadius = image_1.frame.width / 2
-            
-            stackImages = [image_1, image_2, image_3]
-            stackImages.map {
-                v in
-                let addButton = SurveyCategoryIcon.getIcon(frame: v.frame, category: .Plus, backgroundColor: .clear, pathColor: .darkGray)
-                addButton.accessibilityIdentifier = "addImage"
-                addButton.addEquallyTo(to: v, multiplier: 0.5)
-                let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
-                addButton.addGestureRecognizer(tap)
-                v.transform = CGAffineTransform.init(scaleX: 0.7, y: 0.7)
-                v.alpha = 0
+            DispatchQueue.main.async {
+                self.imagesStackViewBottom.constant -= self.lineWidth
+                self.imagesStackView.setNeedsLayout()
+                self.imagesStackView.layoutIfNeeded()
+                self.image_1.cornerRadius = self.image_1.frame.width / 2
+                self.image_2.cornerRadius = self.image_1.frame.width / 2
+                self.image_3.cornerRadius = self.image_1.frame.width / 2
+                
+                self.stackImages = [self.image_1, self.image_2, self.image_3]
+                self.stackImages.map {
+                    v in
+                    let addButton = SurveyCategoryIcon.getIcon(frame: v.frame, category: .Plus, backgroundColor: .clear, pathColor: .darkGray)
+                    addButton.accessibilityIdentifier = "addImage"
+                    addButton.addEquallyTo(to: v, multiplier: 0.5)
+                    let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
+                    addButton.addGestureRecognizer(tap)
+                    v.transform = CGAffineTransform.init(scaleX: 0.7, y: 0.7)
+                    v.alpha = 0
+                }
+                self.answerRowHeight = self.categoryIcon.frame.height
+                self.tableView.reloadData()
+                self.tableViewHeight.constant = CGFloat(self.answers.count) * self.answerRowHeight + self.answerRowHeight/2
+            }
+            delay(seconds: 0.25) {
+                self.categoryIcon.present(completionBlocks: [{
+                    self.categoryIcon.state = .On
+                    self.addBadge()
+                    }])
+                UIView.animate(withDuration: 0.4) {
+                    self.categoryLabel.alpha = 1
+                }
             }
         }
         
-        images.compactMap {
-            dict in
-            var container: UIView!
-            
-            if dict.key == 0 {
-                container = image_1
-            } else if dict.key == 1 {
-                container = image_2
-            } else if dict.key == 2 {
-                container = image_3
-            }
-            
-            if container != nil, let image = dict.value.keys.first {
+        DispatchQueue.main.async {
+            self.images.compactMap {
+                dict in
+                var container: UIView!
+                if dict.key == 0 {
+                    container = self.image_1
+                } else if dict.key == 1 {
+                    container = self.image_2
+                } else if dict.key == 2 {
+                    container = self.image_3
+                }
                 
-                let imageViews  = container.subviews.filter { $0 is UIImageView } as! [UIImageView]
-                var imagesFound     = !imageViews.isEmpty
-                
-                //Disable tap for +
-                //                container.subviews.filter { $0 is SurveyCategoryIcon }.first?.isUserInteractionEnabled = false
-                
-                if imagesFound {
-                    imageViews.map {
-                        imageView in
-                        
-                        if imageView.image != image {
-                            imageView.image = image
+                if container != nil, let image = dict.value.keys.first {
+                    let imageViews  = container.subviews.filter { $0 is UIImageView } as! [UIImageView]
+                    let imagesFound     = !imageViews.isEmpty
+                    
+                    //Disable tap for +
+                    //                container.subviews.filter { $0 is SurveyCategoryIcon }.first?.isUserInteractionEnabled = false
+                    
+                    if imagesFound {
+                        imageViews.map {
+                            imageView in
+                            
+                            if imageView.image != image {
+                                imageView.image = image
+                            }
                         }
+                    } else {
+                        let imageView = UIImageView(frame: container.frame)
+                        imageView.isUserInteractionEnabled = true
+                        imageView.image = image
+                        imageView.contentMode = UIView.ContentMode.scaleAspectFill
+                        imageView.layer.masksToBounds = true
+                        imageView.addEquallyTo(to: container, multiplier: 0.85)
+                        container.layoutSubviews()
+                        imageView.layer.cornerRadius = imageView.frame.height / 2
+                        
+                        let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
+                        imageView.addGestureRecognizer(tap)
+                        
+                        let press = UILongPressGestureRecognizer(target: self, action: #selector(NewPollController.viewPressed(gesture:)))
+                        press.minimumPressDuration = 0.25
+                        imageView.addGestureRecognizer(press)
                     }
-                    
-                } else {
-                    
-                    let imageView = UIImageView(frame: container.frame)
-                    imageView.isUserInteractionEnabled = true
-                    imageView.image = image
-                    imageView.contentMode = UIView.ContentMode.scaleAspectFill
-                    imageView.layer.masksToBounds = true
-                    imageView.addEquallyTo(to: container, multiplier: 0.85)
-                    container.layoutSubviews()
-                    imageView.layer.cornerRadius = imageView.frame.height / 2
-                    
-                    let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
-                    imageView.addGestureRecognizer(tap)
-                    
-                    let press = UILongPressGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.viewPressed(gesture:)))
-                    press.minimumPressDuration = 0.25
-                    imageView.addGestureRecognizer(press)
-                    
                 }
             }
         }
@@ -542,35 +627,80 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
         if cornerRadius == nil {
             cornerRadius = view.frame.width / 20
         }
-        scrollView.contentSize.height = 2000
-        
-        if category == nil {
-            categoryIcon.present(completionBlocks: [{
-                self.categoryIcon.state = .On
-                }])
+        scrollView.contentSize.height = 2400
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        imageEditingList?.view.removeFromSuperview()
+        imageEditingList?.removeFromParent()
+        imageEditingList = nil
+        if let selectedRow = tableView.indexPathForSelectedRow {
+            tableView.deselectRow(at: selectedRow, animated: false)
+        }
+    }
+    
+    private func addBadge() {
+        let badgeSize = CGSize(width: lineWidth*2.6, height: lineWidth*2.8)
+        var badge = UIView()
+        func getCenter(_ targetView: UIView) -> CGPoint {
+            let x = (targetView.frame.size.height/2) * CGFloat(cos(225 * Double.pi / 180)) + targetView.center.x
+            let y = (targetView.frame.size.height/2) * CGFloat(sin(225 * Double.pi / 180)) + targetView.center.y
+            return contentView.convert(CGPoint(x: x - lineWidth/2.6, y: y + lineWidth/2.6), to: scrollView)
         }
         
-        ////        delay(seconds: 3){
-        //            let icon = self.categoryIcon.icon.copyView() as! SurveyCategoryIcon
-        //            self.contentView.addSubview(icon)
-        ////
-        ////        }
-        ////
-        //
-        //        let toValue = (icon.getLayer(SurveyCategoryIcon.Category.Computers)  ! CAShapeLayer).path
-        //        delay(seconds: 0.5){
-        //
-        //
-        //            let pathAnim        = CABasicAnimation(keyPath: "path")
-        //            pathAnim.fromValue  = (icon.icon as! CAShapeLayer).path
-        //            pathAnim.toValue    = toValue
-        //            pathAnim.duration = 0.3
-        //            pathAnim.timingFunction = CAMediaTimingFunction.init(name: CAMediaTimingFunctionName.easeInEaseOut)
-        //
-        //            icon.icon.add(pathAnim, forKey: nil)
-        //            (icon.icon as! CAShapeLayer).path = toValue
-        //        }
+        func getBadge(forIcon icon: UIView, text: String) -> UIView {
+            let roundView = UIView(frame: CGRect(origin: .zero, size: badgeSize))
+            roundView.center = getCenter(icon)
+            roundView.backgroundColor = .white
+            roundView.layer.masksToBounds = true
+            roundView.cornerRadius = badgeSize.width/2
+            roundView.alpha = 0
+            let label = UILabel()
+            label.text = text
+            label.textAlignment = .center
+            label.backgroundColor = selectedColor.withAlphaComponent(0.2)
+            label.numberOfLines = 1
+            label.sizeThatFits(badgeSize)
+            label.textColor = selectedColor
+            label.addEquallyTo(to: roundView)
+            badges.append(label)
+            return roundView
+        }
         
+        switch stage {
+        case .Category:
+            badge = getBadge(forIcon: categoryIcon, text: "1")
+        case .Anonymity:
+            badge = getBadge(forIcon: anonIcon, text: "2")
+        case .Privacy:
+            badge = getBadge(forIcon: privacyIcon, text: "3")
+        case .Votes:
+            badge = getBadge(forIcon: votesIcon, text: "4")
+        case .Title:
+            badge = getBadge(forIcon: titleIcon, text: "5")
+        case .Question:
+            badge = getBadge(forIcon: questionIcon, text: "6")
+        case .Hyperlink:
+            badge = getBadge(forIcon: hyperlinkIcon, text: "7")
+        case .Images:
+            badge = getBadge(forIcon: imagesHeaderIcon, text: "8")
+        case .Answers:
+            badge = getBadge(forIcon: answerIcon, text: "9")
+        default:
+            print("")
+        }
+        contentView.addSubview(badge)
+        badge.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        UIView.animate(
+            withDuration: lineAnimationDuration,
+            delay: lineAnimationDuration/2,
+            usingSpringWithDamping: 0.6,
+            initialSpringVelocity: 0.7,
+            options: [.curveEaseInOut],
+            animations: {
+                badge.alpha = 1
+                badge.transform = .identity
+        })
     }
     
     //MARK: - UI Functions
@@ -583,10 +713,10 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
         var animationBlocks:        [Closure] = []
         var completionBlocks:       [Closure] = []
         
-        func animateTransition(initialIcon: CircleButton, destinationIcon: CircleButton, lineCompletionBlocks: [Closure], animationBlocks animations: [Closure], completionBlocks completion: [Closure], animationDuration: TimeInterval?) {
+        func animateTransition(initialIcon: CircleButton, destinationIcon: CircleButton, lineCompletionBlocks: [Closure], animationBlocks animations: [Closure], completionBlocks completion: [Closure], animationDuration: TimeInterval = 0) {
             
             let line     = drawLine(fromView: initialIcon, toView: destinationIcon, lineCap: .round)
-            let lineAnim = getLineAnimation(line: line)
+            let lineAnim = getLineAnimation(line: line, duration: animationDuration)
             let duration = animationDuration ?? lineAnimationDuration
             
             contentView.layer.insertSublayer(line.layer, at: 0)
@@ -609,10 +739,10 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             
         }
         
-        func animateTransition(lineStart: CGPoint, lineEnd: CGPoint, initialIcon: CircleButton, destinationIcon: CircleButton, lineCompletionBlocks: [Closure], animationBlocks animations: [Closure], completionBlocks completion: [Closure], animationDuration: TimeInterval?) {
+        func animateTransition(lineStart: CGPoint, lineEnd: CGPoint, initialIcon: CircleButton, destinationIcon: CircleButton, lineCompletionBlocks: [Closure], animationBlocks animations: [Closure], completionBlocks completion: [Closure], animationDuration: TimeInterval = 0) {
             
             let line     = drawLine(fromPoint: lineStart, endPoint: lineEnd, lineCap: .square)
-            let lineAnim = getLineAnimation(line: line)
+            let lineAnim = getLineAnimation(line: line, duration: animationDuration)
             let duration = animationDuration ?? lineAnimationDuration
             
             contentView.layer.insertSublayer(line.layer, at: 0)
@@ -623,16 +753,16 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             
             UIView.animate(withDuration: duration, delay: lineAnimationDuration * 0.55, options: [.curveEaseInOut], animations:
                 {
-                    animations.map { $0() }
-                    //                    destinationIcon.alpha = 1
-                    //                    destinationIcon.transform = .identity
+                    DispatchQueue.main.async {
+                        animations.map { $0() }
+                    }
             }) {
                 _ in
-                completion.map({ $0() })
+                DispatchQueue.main.async {
+                    completion.map({ $0() })
+                }
             }
-            
             line.layer.strokeEnd = 1
-            
         }
         
         func drawLine(fromView: UIView, toView: UIView, lineCap: CAShapeLayerLineCap) -> Line {
@@ -681,8 +811,8 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             return line
         }
         
-        func getLineAnimation(line: Line) -> CAAnimationGroup {
-            let strokeEndAnimation      = CABasicAnimation(path: #keyPath(CAShapeLayer.strokeEnd), fromValue: line.layer.strokeEnd, toValue: 1, duration: lineAnimationDuration)
+        func getLineAnimation(line: Line, duration: TimeInterval = 0) -> CAAnimationGroup {
+            let strokeEndAnimation      = CABasicAnimation(path: #keyPath(CAShapeLayer.strokeEnd), fromValue: line.layer.strokeEnd, toValue: 1, duration: duration == 0 ? lineAnimationDuration : duration)
             //            let strokeWidthAnimation    = CAKeyframeAnimation(keyPath:"lineWidth")
             //            strokeWidthAnimation.values   = [lineWidth * 2, lineWidth]
             //            strokeWidthAnimation.keyTimes = [0, 1]
@@ -694,7 +824,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             
             let groupAnimation = CAAnimationGroup()
             groupAnimation.animations = [strokeEndAnimation]//, strokeWidthAnimation, pathFillColorAnim]
-            groupAnimation.duration = lineAnimationDuration
+            groupAnimation.duration = duration == 0 ? lineAnimationDuration : duration
             
             return groupAnimation
         }
@@ -781,13 +911,14 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             delay(seconds: lineAnimationDuration * 0.4) {
                 self.anonIcon.present(completionBlocks: [{
                     self.anonIcon.state = .On
+                    self.addBadge()
                     //                    self.performSegue(withIdentifier: Segues.App.NewSurveyToAnonimitySelection, sender: nil)
                     }])
             }
             completionBlocks.append {
-                delay(seconds: 0.2) { self.performSegue(withIdentifier: Segues.App.NewSurveyToAnonimitySelection, sender: nil) }
+                delay(seconds: 1.05) { self.performSegue(withIdentifier: Segues.App.NewSurveyToAnonimitySelection, sender: nil) }
             }
-            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: nil)
+            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks)
             
             //            animateTransition(initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: nil)
             
@@ -806,14 +937,15 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
 //            delay(seconds: lineAnimationDuration * 0.1) {
                 self.privacyIcon.present(completionBlocks: [{
                     self.privacyIcon.state = .On
+                    self.addBadge()
                     //                    self.performSegue(withIdentifier: Segues.App.NewSurveyToPrivacySelection, sender: nil)
                     }])
 //            }
             completionBlocks.append {
                 //                delay(seconds: 0.2) { self.performSegue(withIdentifier: Segues.App.NewSurveyToPrivacySelection, sender: nil) }
-                self.performSegue(withIdentifier: Segues.App.NewSurveyToPrivacySelection, sender: nil)
+                delay(seconds: 0.85) { self.performSegue(withIdentifier: Segues.App.NewSurveyToPrivacySelection, sender: nil) }
             }
-            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: lineAnimationDuration * 1.3)
+            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks)
             
         case .Votes:
             
@@ -834,13 +966,14 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             delay(seconds: lineAnimationDuration * 0.45) {
                 self.votesIcon.present(completionBlocks: [{
                     self.votesIcon.state = .On
+                    self.addBadge()
                     //                    self.performSegue(withIdentifier: Segues.App.NewSurveyToVotesCountViewController, sender: nil)
                     }])
             }
             completionBlocks.append {
-                delay(seconds: 0.2) { self.performSegue(withIdentifier: Segues.App.NewSurveyToVotesCountViewController, sender: nil) }
+                delay(seconds: 1.05) { self.performSegue(withIdentifier: Segues.App.NewSurveyToVotesCountViewController, sender: nil) }
             }
-            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: nil)
+            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks)
             
         case .Title:
             
@@ -852,12 +985,18 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             lineCompletionBlocks.append {
                 self.scrollToPoint(y: scrollPoint, duration: 0.3, delay: 0, completionBlocks: [{ reveal(view: self.titleLabel, duration: 0.3, completionBlocks: []) }])
             }
-            delay(seconds: lineAnimationDuration * 0.4) {
-                self.titleIcon.present(completionBlocks: [{ self.titleIcon.state = .On }])
-            }
+//            lineCompletionBlocks.append {
+                UIView.animate(withDuration: 0.3) { self.titleArcLabel.alpha = 1 }
+//            }
+//            delay(seconds: lineAnimationDuration * 0.4) {
+                self.titleIcon.present(completionBlocks: [{
+                    self.titleIcon.state = .On
+                    self.addBadge()
+                    }])
+//            }
             
             completionBlocks.append {
-                delay(seconds: 0.75) { self.performSegue(withIdentifier: Segues.App.NewSurveyToTypingViewController, sender: self.titleIcon) }
+                delay(seconds: 1.05) { self.performSegue(withIdentifier: Segues.App.NewSurveyToTypingViewController, sender: self.titleIcon) }
             }
             
             var startPoint = contentView.convert(initialIcon.center, to: view)
@@ -865,7 +1004,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             startPoint.y += delta
             var endPoint = contentView.convert(destinationIcon.center, to: view)
             endPoint.y -= delta
-            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: nil)
+            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks)
             
         case .Question:
             
@@ -877,9 +1016,15 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             lineCompletionBlocks.append {
                 self.scrollToPoint(y: scrollPoint, duration: 0.3, delay: 0, completionBlocks: [{ reveal(view: self.questionLabel, duration: 0.3, completionBlocks: []) }])
             }
-            delay(seconds: lineAnimationDuration * 0.1) {
-                self.questionIcon.present(completionBlocks: [{ self.questionIcon.state = .On }])
-            }
+//            lineCompletionBlocks.append {
+                UIView.animate(withDuration: 0.3) { self.questionArcLabel.alpha = 1 }
+//            }
+//            delay(seconds: lineAnimationDuration * 0.1) {
+                self.questionIcon.present(completionBlocks: [{
+                    self.questionIcon.state = .On
+                    self.addBadge()
+                    }])
+//            }
             
             completionBlocks.append {
                 delay(seconds: 1) { self.performSegue(withIdentifier: Segues.App.NewSurveyToTypingViewController, sender: self.questionIcon) }
@@ -889,10 +1034,9 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             let delta = (initialIcon.frame.size.height / 2)
             var endPoint = contentView.convert(destinationIcon.center, to: scrollView)
             endPoint.y -= delta
-            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: nil)
+            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: lineAnimationDuration/2)
             
         case .Hyperlink:
-            
             initialIcon     = questionIcon
             destinationIcon = hyperlinkIcon
             
@@ -901,77 +1045,119 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             lineCompletionBlocks.append {
                 self.scrollToPoint(y: scrollPoint, duration: 0.3, delay: 0, completionBlocks: [{ reveal(view: self.hyperlinkLabel, duration: 0.3, completionBlocks: []) }])
             }
+//            lineCompletionBlocks.append {
+                UIView.animate(withDuration: 0.3) { self.hyperlinkArcLabel.alpha = 1 }
+//            }
 //            delay(seconds: lineAnimationDuration * 0.1) {
-                self.hyperlinkIcon.present(completionBlocks: [{ self.questionIcon.state = .On }])
+                self.hyperlinkIcon.present(completionBlocks: [{
+                    self.questionIcon.state = .On
+                    self.addBadge()
+                    }])
 //            }
             
             completionBlocks.append {
-                delay(seconds: 1.25) { self.performSegue(withIdentifier: Segues.App.NewSurveyToHyperlinkViewController, sender: nil) }
+//                delay(seconds: 1.25) { self.performSegue(withIdentifier: Segues.App.NewSurveyToHyperlinkViewController, sender: nil) }
+//                delay(seconds: 3) { self.stage = .Images }
             }
             
             let startPoint = CGPoint(x: contentView.frame.width/2, y: contentView.convert(questionLabel.frame.origin, to: scrollView).y + questionLabel.frame.height + lineWidth/2)
             let delta = (initialIcon.frame.size.height / 2)
             var endPoint = contentView.convert(destinationIcon.center, to: scrollView)
             endPoint.y -= delta
-            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: nil)
-            
+            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: lineAnimationDuration/2)
         case .Images:
-            
+            print("")
             initialIcon     = hyperlinkIcon
             destinationIcon = imagesHeaderIcon
             
             let scrollPoint = contentView.convert(destinationIcon.frame.origin, to: scrollView).y - initialIcon.bounds.height / 4.25// - navigationBarHeight / 2.5
             
             lineCompletionBlocks.append {
-                self.scrollToPoint(y: scrollPoint, duration: 0.3, delay: 0, completionBlocks: [{ reveal(view: self.imagesLabel, duration: 0.3, completionBlocks: [{
-                    delay(seconds: 0.25) {
-                        UIView.transition(with: self.imagesLabel, duration: 0.2, options: .transitionCrossDissolve, animations: {
-                            self.imagesLabel.text = ""
-                        }) {
-                            _ in
-                            self.stackImages.map {
-                                v in
-                                if let i = self.stackImages.firstIndex(of: v), let delay = Double(exactly: i) {
-                                    UIView.animate(withDuration: 0.2, delay: delay * 0.1, animations: {
-                                        v.transform = .identity
-                                        v.alpha = 1 })
-                                }
-                            }
-                            let destinationPath = (self.imagesHeaderIcon.icon.getLayer(.Skip_RU) as! CAShapeLayer).path
-                            
-                            let pathAnim = Animations.get(property: .Path, fromValue: (self.imagesHeaderIcon.icon.icon as! CAShapeLayer).path, toValue: destinationPath, duration: 0.5, delay: 0.75, delegate: self, isRemovedOnCompletion: false)
-                            pathAnim.setValue(self.imagesHeaderIcon.icon.icon as! CAShapeLayer, forKey: "layer")
-                            pathAnim.setValue(destinationPath, forKey: "destinationPath")
-                            self.imagesHeaderIcon.icon.icon.add(pathAnim, forKey: nil)
-                            UIView.animate(withDuration: 0.5, delay: 0.75, options: [], animations: {
-                                self.imagesHeaderIcon.icon.backgroundColor = K_COLOR_RED
-                            })
-                        }
-                    }
-                    }])
-                    }])
+                self.scrollToPoint(y: scrollPoint, duration: 0.3, delay: 0, completionBlocks: [{ reveal(view: self.imagesLabel, duration: 0.3, completionBlocks: []) }])//completionBlocks: [{
             }
-            delay(seconds: lineAnimationDuration * 0.4) {
-                self.imagesHeaderIcon.present(completionBlocks: [{ self.questionIcon.state = .On }])
+//            lineCompletionBlocks.append {
+                UIView.animate(withDuration: 0.3) { self.imagesArcLabel.alpha = 1 }
+//            }
+            lineCompletionBlocks.append {
+                                    delay(seconds: 0.25) {
+                                        UIView.transition(with: self.imagesLabel, duration: 0.2, options: .transitionCrossDissolve, animations: {
+                                            self.imagesLabel.text = ""
+                                        }) {
+                                            _ in
+                                            self.stackImages.map {
+                                                v in
+                                                if let i = self.stackImages.firstIndex(of: v), let delay = Double(exactly: i) {
+                                                    UIView.animate(withDuration: 0.2, delay: delay * 0.1, animations: {
+                                                        v.transform = .identity
+                                                        v.alpha = 1 })
+                                                }
+                                            }
+                //                            let destinationPath = (self.imagesHeaderIcon.icon.getLayer(.Skip_RU) as! CAShapeLayer).path
+                //                            let pathAnim = Animations.get(property: .Path, fromValue: (self.imagesHeaderIcon.icon.icon as! CAShapeLayer).path, toValue: destinationPath, duration: 0.5, delay: 0.75, delegate: self, isRemovedOnCompletion: false)
+                //                            pathAnim.setValue(self.imagesHeaderIcon.icon.icon as! CAShapeLayer, forKey: "layer")
+                //                            pathAnim.setValue(destinationPath, forKey: "destinationPath")
+                //                            self.imagesHeaderIcon.icon.icon.add(pathAnim, forKey: nil)
+                //                            UIView.animate(withDuration: 0.5, delay: 0.75, options: [], animations: {
+                //                                self.imagesHeaderIcon.icon.backgroundColor = K_COLOR_RED
+                //                            })
+                                        }
+                                    }
+                
             }
+//            delay(seconds: lineAnimationDuration * 0.2) {
+                self.imagesHeaderIcon.present(completionBlocks: [{
+                    self.imagesHeaderIcon.state = .On
+                    self.addBadge()
+                    }])
+//            }
             
-            //            completionBlocks.append {
-            //                UIView.transition(with: self.imagesLabel, duration: 0.3, options: .transitionCrossDissolve, animations: {
-            //                    self.imagesLabel.text = ""
-            //                }) {
-            //                    _ in
-            //
-            //                }
-            //            }
-            
-            let startPoint = CGPoint(x: contentView.frame.width/2, y: contentView.convert(hyperlinkLabel.frame.origin, to: scrollView).y + hyperlinkLabel.frame.height + lineWidth/2)
+            let startPoint = CGPoint(x: contentView.frame.width/2,
+                                     y: contentView.convert(hyperlinkLabel.frame.origin, to: scrollView).y + hyperlinkLabel.frame.height + lineWidth/2)
             let delta = (initialIcon.frame.size.height / 2)
             var endPoint = contentView.convert(destinationIcon.center, to: scrollView)
             endPoint.y -= delta
-            animateTransition(lineStart: startPoint, lineEnd: endPoint, initialIcon: initialIcon, destinationIcon: destinationIcon, lineCompletionBlocks: lineCompletionBlocks, animationBlocks: animationBlocks, completionBlocks: completionBlocks, animationDuration: nil)
+            animateTransition(lineStart: startPoint,
+                              lineEnd: endPoint,
+                              initialIcon: initialIcon,
+                              destinationIcon: destinationIcon,
+                              lineCompletionBlocks: lineCompletionBlocks,
+                              animationBlocks: animationBlocks,
+                              completionBlocks: completionBlocks)
             
         case .Answers:
-            print("Do nothing")
+            initialIcon     = imagesHeaderIcon
+            destinationIcon = answerIcon
+            
+            let scrollPoint = contentView.convert(destinationIcon.frame.origin, to: scrollView).y - initialIcon.bounds.height / 4.25// - navigationBarHeight / 2.5
+            
+            lineCompletionBlocks.append {
+                self.scrollToPoint(y: scrollPoint, duration: 0.3, delay: 0, completionBlocks: [{
+                    self.answerContainer.animateMaskLayer(duration: 0.3, completionBlocks: [], completionDelegate: self)
+                    }])
+            }
+//            lineCompletionBlocks.append {
+                UIView.animate(withDuration: 0.3) { self.answerArcLabel.alpha = 1 }
+//            }
+            self.answerIcon.present(completionBlocks: [{
+                self.answerIcon.state = .On
+                self.addBadge()
+                }])
+            completionBlocks.append {
+//                delay(seconds: 1.25) { self.performSegue(withIdentifier: Segues.App.NewSurveyToHyperlinkViewController, sender: nil) }
+            }
+            
+            let startPoint = CGPoint(x: contentView.frame.width/2, y: contentView.convert(imagesLabel.frame.origin, to: scrollView).y + imagesLabel.frame.height + lineWidth/2)
+            let delta = (initialIcon.frame.size.height / 2)
+            var endPoint = contentView.convert(destinationIcon.center, to: scrollView)
+            endPoint.y -= delta
+            animateTransition(lineStart: startPoint,
+                              lineEnd: endPoint,
+                              initialIcon: initialIcon,
+                              destinationIcon: destinationIcon,
+                              lineCompletionBlocks: lineCompletionBlocks,
+                              animationBlocks: animationBlocks,
+                              completionBlocks: completionBlocks)
+            
         case .Post:
             print("Do nothing")
         }
@@ -1010,6 +1196,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
                     UIView.animate(withDuration: 0.5) {
                         self.imagesHeaderIcon.icon.backgroundColor = self.color
                     }
+                    stage = .Answers
                 }
             } else if let label = v as? UILabel {
                 if label === titleLabel {
@@ -1032,8 +1219,15 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
                 }
                 
                 chooseImage()
-            } else if let v = gesture.view as? UIImageView {
-                performSegue(withIdentifier: Segues.App.NewSurveyToImagePreviewViewController, sender: v)
+            } else if let v = gesture.view as? UIImageView, let image = v.image {
+                if v.superview == image_1 {
+                    imagePosition = 0
+                } else if v.superview == image_2 {
+                    imagePosition = 1
+                } else {
+                    imagePosition = 2
+                }
+                performSegue(withIdentifier: Segues.App.NewSurveyToImagePreviewViewController, sender: image)
             } else if let v = gesture.view, v.accessibilityIdentifier == "imageEditingList" {
                 print("ImageEditingListTableViewController")
             } else if effectView != nil, let frameView = highlitedImage.keys.first as? UIView, let imageView = highlitedImage.values.first as? UIImageView, let keyWindow = navigationController?.view.window {
@@ -1063,7 +1257,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             darkEffectView.contentView.isUserInteractionEnabled = true
             effectView = darkEffectView
             
-            let tap = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.iconTapped(gesture:)))
             darkEffectView.contentView.addGestureRecognizer(tap)
             
             let copy = UIView(frame: parentView.frame)
@@ -1083,7 +1277,27 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             imageCopy.isUserInteractionEnabled = true
             copy.addSubview(imageCopy)
             
-            
+            var listPos = CGPoint.zero
+            let listSize = CGSize(width: self.view.frame.width * 0.25 * 2, height: self.view.frame.width * 0.25 * 1.3)
+            let multiplier: CGFloat = copy.center.x == view.center.x ? 1.2 : 0.9
+            if copy.center.x == view.center.x {
+                listPos.x = view.center.x - listSize.width/2
+            } else if (copy.frame.origin.x + listSize.width) > view.frame.width  {
+                listPos.x = copy.frame.origin.x - listSize.width
+            } else if (copy.frame.origin.x + listSize.width) < view.frame.width {
+                listPos.x = copy.frame.origin.x + copy.frame.width * multiplier
+            }
+            if copy.center.x == view.center.x {
+                if (copy.frame.origin.y + listSize.height) > view.frame.height  {
+                    listPos.y = copy.frame.origin.y - listSize.height * multiplier
+                } else if (copy.frame.origin.y + listSize.height) <= view.frame.height {
+                    listPos.y = copy.frame.origin.y + copy.frame.height * multiplier
+                }
+            } else if (copy.frame.origin.y + listSize.height) > view.frame.height  {
+                listPos.y = copy.frame.origin.y - listSize.height
+            } else if (copy.frame.origin.y + listSize.height) <= view.frame.height {
+                listPos.y = copy.frame.origin.y + copy.frame.height
+            }
 //            let tap_1 = UITapGestureRecognizer(target: self, action: #selector(CreateNewSurveyViewController.iconTapped(gesture:)))
 //            imageCopy.addGestureRecognizer(tap_1)
             
@@ -1117,16 +1331,15 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
                 _ in
                 self.highlitedImage.removeAll()
                 self.highlitedImage[copy] = imageCopy
-                self.navigationController!.addChild(self.imageEditingList)
-                self.imageEditingList.view.alpha = 1
-                self.imageEditingList.view.frame.size = CGSize(width: self.view.frame.width * 0.25 * 2, height: self.view.frame.width * 0.25 * 1.3)
-                self.imageEditingList.view.frame.origin = darkEffectView.contentView.center
-                darkEffectView.contentView.addSubview(self.imageEditingList.view)
-                self.imageEditingList.tableView.reloadData()
-                self.imageEditingList.didMove(toParent: self.navigationController!)
-                //                self.imageEditingList.view.layer.zPosition = 10
-                //                self.imageEditingList.view.bri
-                
+                if self.imageEditingList != nil {
+                self.navigationController!.addChild(self.imageEditingList!)
+                self.imageEditingList!.view.alpha = 1
+                self.imageEditingList!.view.frame.size = listSize
+                self.imageEditingList!.view.frame.origin = listPos
+                darkEffectView.contentView.addSubview(self.imageEditingList!.view)
+                self.imageEditingList!.tableView.reloadData()
+                self.imageEditingList!.didMove(toParent: self.navigationController!)
+                }
             }
             
         }
@@ -1207,7 +1420,7 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
             imageView.frame = destinationImageFrame
             frameView.layer.cornerRadius = frameView.frame.height / 2
             imageView.layer.cornerRadius = imageView.frame.height / 2
-            self.imageEditingList.view.alpha = 0
+            self.imageEditingList?.view.alpha = 0
         })
         
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
@@ -1215,8 +1428,8 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
         }) {
             _ in
             self.highlitedImage.removeAll()
-            self.imageEditingList.view.removeFromSuperview()
-            self.imageEditingList.removeFromParent()
+            self.imageEditingList?.view.removeFromSuperview()
+            self.imageEditingList?.removeFromParent()
             self.effectView = nil
             _effectView.removeFromSuperview()
             print(self.effectView)
@@ -1224,17 +1437,17 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
         navigationController?.setNavigationBarHidden(false, animated: true)
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.duration = 0.55
             nc.transitionStyle = .Icon
             if segue.identifier == Segues.App.NewSurveyToCategorySelection, let destinationVC = segue.destination as? CategorySelectionViewController {
-                nc.duration = 0.6
+                nc.duration = 0.5
                 //                destinationVC.category = category
                 //                destinationVC.lineWidth = lineWidth
                 destinationVC.actionButtonHeight = categoryIcon.frame.height
             } else if segue.identifier == Segues.App.NewSurveyToTypingViewController, let destinationVC = segue.destination as? TextInputViewController {
+                nc.duration = 0.47
                 if let icon = sender as? CircleButton {
                     if icon === titleIcon {
                         destinationVC.titleString = "Титул"
@@ -1242,17 +1455,16 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
                         destinationVC.textContent = questionTitle.isEmpty ? "" : questionTitle
                         //                    destinationVC.placeholder = "Введите титул.."
                         destinationVC.delegate = self
-                        destinationVC.font = titleLabel.font
-                        destinationVC.textColor = .darkGray//selectedColor//titleLabel.textColor
-                        destinationVC.textCentered = true
+                        destinationVC.font = StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 17)
+                        destinationVC.textColor = .black
                         destinationVC.accessibilityIdentifier = "Title"
                     } else if icon === questionIcon {
                         destinationVC.titleString = "Вопрос"
                         destinationVC.charactersLimit = DjangoVariables.FieldRestrictions.surveyQuestionLength
                         destinationVC.textContent = question.isEmpty ? "" : question
                         destinationVC.delegate = self
-                        destinationVC.font = StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 13)
-                        destinationVC.textColor = .darkGray//selectedColor//questionLabel.textColor
+                        destinationVC.font = StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 17)
+                        destinationVC.textColor = .black
                         destinationVC.accessibilityIdentifier = "Question"
                     }
                 }
@@ -1281,17 +1493,16 @@ class CreateNewSurveyViewController: UIViewController, UINavigationControllerDel
                 }
                 destinationVC.color = selectedColor
                 destinationVC._labelHeight = hyperlinkLabel.frame.height
-            } else if segue.identifier == Segues.App.NewSurveyToImagePreviewViewController, let destinationVC = segue.destination as? ImageViewController, let imageView = sender as? UIImageView {
-                nc.transitionStyle = .Default
-                if let image = images[imagePosition]?.keys.first {
-                    destinationVC.image = image
-                }
+            } else if segue.identifier == Segues.App.NewSurveyToImagePreviewViewController, let destinationVC = segue.destination as? ImageViewController, let image = sender as? UIImage {
+                nc.duration = 0.2
+                nc.transitionStyle = .Icon
+                destinationVC.image = image
             }
         }
     }
 }
 
-extension CreateNewSurveyViewController: CAAnimationDelegate {
+extension NewPollController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
             completionBlocks.map{ $0() }
@@ -1307,7 +1518,7 @@ extension CreateNewSurveyViewController: CAAnimationDelegate {
     }
 }
 
-extension CreateNewSurveyViewController: CallbackDelegate {
+extension NewPollController: CallbackDelegate {
     func callbackReceived(_ sender: AnyObject) {
         if let _category = sender as? SurveyCategory {
             category = _category
@@ -1342,12 +1553,19 @@ extension CreateNewSurveyViewController: CallbackDelegate {
                     self.images[self.imagePosition] = [:]
                 }
                 //                showAlert(type: .Ok, buttons: [["Удалить": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка вызова сервера, пожалуйста, обновите список")
+            } else if string == "addAnswer" {
+                if answers.count < MAX_ANSWERS_COUNT {
+                    answers.append("")
+                    tableView.insertRows(at: [IndexPath(row: self.answers.count-1, section: 0)], with: .top)
+                }
             }
+        } else if let index = sender as? IndexPath, let cell = tableView.cellForRow(at: index) as? AnswerCell {
+            
         }
     }
 }
 
-extension CreateNewSurveyViewController: UIImagePickerControllerDelegate {
+extension NewPollController: UIImagePickerControllerDelegate {
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let origImage = info[.editedImage] as? UIImage {
@@ -1402,6 +1620,93 @@ extension CreateNewSurveyViewController: UIImagePickerControllerDelegate {
                 handler = VNImageRequestHandler(cgImage: cgImage)
             }
             try? handler.perform([request])
+        }
+    }
+}
+
+extension NewPollController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return answers.count + 1
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if indexPath.row == answers.count, let cell = tableView.dequeueReusableCell(withIdentifier: "addAnswer", for: indexPath) as? AddAnswerCell {
+            cell.addButton.setTitleColor(selectedColor, for: .normal)
+            cell.delegate = self
+            return cell
+        } else if let cell = tableView.dequeueReusableCell(withIdentifier: "answer", for: indexPath) as? AnswerCell {
+            cell.setNeedsLayout()
+            cell.layoutIfNeeded()
+            cell.tagView.cornerRadius = cell.tagView.frame.height/2
+            cell.index = indexPath
+            cell.delegate = self
+            if let text = answers[indexPath.row] as? String, !text.isEmpty {
+                cell.label.text = text
+            }
+            return cell
+        }
+        return UITableViewCell()
+    }
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == answers.count {
+            return answerRowHeight/2
+        }
+        return answerRowHeight
+    }
+    
+//    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+//        let deleteAction = UIContextualAction(style: .destructive, title: "", handler: { (action, view, completion) in
+//            self.answers.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .top)
+//            completion(true)
+//        })
+//        deleteAction.backgroundColor = K_COLOR_RED
+//        deleteAction.image = UIImage(named: "trash_icon")?.resized(to: CGSize(width: 30, height: 30))
+//        return UISwipeActionsConfiguration(actions: [deleteAction])
+//    }
+//
+//    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+//        let deleteButton = UITableViewRowAction(style: .default, title: "Удалить") { (action, indexPath) in
+//            self.answers.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .bottom)
+//        }
+//        return [deleteButton]
+//    }
+}
+
+class AddAnswerCell: UITableViewCell {
+    deinit {
+        print("***AddAnswerCell deinit***")
+    }
+    weak var delegate:   CallbackDelegate?
+    @IBOutlet weak var addButton: UIButton!
+    @IBAction func addButtonTapped(_ sender: Any) {
+        delegate?.callbackReceived("addAnswer" as AnyObject)
+    }
+}
+
+class AnswerCell: UITableViewCell {
+    deinit {
+        print("***AnswerCell deinit***")
+    }
+    weak var delegate:   CallbackDelegate?
+    var index:      IndexPath!
+    @IBOutlet weak var label: UILabel! {
+        didSet {
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(AnswerCell.handleTap(recognizer:)))
+            label.addGestureRecognizer(recognizer)
+        }
+    }
+    @IBOutlet weak var tagView: UIView! {
+        didSet {
+            tagView.backgroundColor = .red
+        }
+    }
+    
+    @objc private func handleTap(recognizer: UITapGestureRecognizer) {
+        if recognizer.state == .ended {
+            delegate?.callbackReceived(index as AnyObject)
         }
     }
 }
