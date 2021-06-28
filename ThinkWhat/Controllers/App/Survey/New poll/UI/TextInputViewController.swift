@@ -54,7 +54,7 @@ class TextInputViewController: UIViewController {
     @IBOutlet weak var frameView: UIView! {
         didSet {
             frameView.cornerRadius = cornerRadius
-            frameView.backgroundColor = color.withAlphaComponent(0.2)
+            frameView.backgroundColor = color.withAlphaComponent(0.3)
 //            frameView.layer.masksToBounds = true
 //            frameView.addShadow(shadowColor: UIColor.lightGray.withAlphaComponent(0.5).cgColor, shadowOffset: .zero, shadowOpacity: 1, shadowRadius: 5)
         }
@@ -123,7 +123,7 @@ class TextInputViewController: UIViewController {
         
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.5
+            nc.duration = 0.35
             nc.transitionStyle = .Icon
             navigationItem.setHidesBackButton(true, animated: false)
         }

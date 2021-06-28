@@ -75,7 +75,7 @@ class VotesCountViewController: UIViewController {
         
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.5
+            nc.duration = 0.55
             nc.transitionStyle = .Icon
             navigationItem.setHidesBackButton(true, animated: false)
         }

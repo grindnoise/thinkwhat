@@ -82,7 +82,7 @@ class BinarySelectionViewController: UIViewController {
     }
     @IBOutlet weak var enabledBg: UIView! {
         didSet {
-            let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.viewTapped(gesture:)))
             enabledBg.addGestureRecognizer(tap)
         }
     }
@@ -93,7 +93,7 @@ class BinarySelectionViewController: UIViewController {
     }
     @IBOutlet weak var disabledBg: UIView! {
         didSet {
-            let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.iconTapped(gesture:)))
+            let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.viewTapped(gesture:)))
             disabledBg.addGestureRecognizer(tap)
         }
     }
@@ -106,7 +106,7 @@ class BinarySelectionViewController: UIViewController {
         
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.5
+            nc.duration = 0.55
             nc.transitionStyle = .Icon
             navigationItem.setHidesBackButton(true, animated: false)
         }
@@ -129,7 +129,7 @@ class BinarySelectionViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
-    @objc fileprivate func iconTapped(gesture: UITapGestureRecognizer) {
+    @objc fileprivate func viewTapped(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended, let v = gesture.view {
          
             actionButton.isUserInteractionEnabled = true

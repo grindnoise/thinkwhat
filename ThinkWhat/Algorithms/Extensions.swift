@@ -176,7 +176,7 @@ extension UIView {
         maskLayerAnimation.toValue = toPath
         maskLayerAnimation.duration = duration
         maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-        maskLayerAnimation.isRemovedOnCompletion = false
+        maskLayerAnimation.isRemovedOnCompletion = true
         if completionDelegate != nil {
             maskLayerAnimation.delegate = completionDelegate
             //Remove mask

@@ -43,7 +43,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     var color: UIColor = K_COLOR_RED {
         didSet {
             icon.backgroundColor = color
-            oval.strokeColor = color.withAlphaComponent(0.2).cgColor
+            oval.strokeColor = color.withAlphaComponent(0.3).cgColor
         }
     }
     
@@ -137,7 +137,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         if layerIds == nil || layerIds.contains("oval"){
             let oval = layers["oval"] as! CAShapeLayer
             oval.fillColor   = UIColor(red:1.00, green: 1.00, blue:1.00, alpha:1.0).cgColor
-            oval.strokeColor = color.withAlphaComponent(0.2).cgColor//UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
+            oval.strokeColor = color.withAlphaComponent(0.3).cgColor//UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             oval.lineWidth   = lineWidth
             oval.strokeStart = 1
         }
