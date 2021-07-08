@@ -134,7 +134,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                         let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleAddTap))
                         v.addGestureRecognizer(tap)
                         btn.customView = v
-                        v.scaleFactor = 0.15
+                        v.scaleMultiplicator = 0.15
                         btn.customView?.alpha = 0
                         btn.customView?.clipsToBounds = false
                         btn.customView?.layer.masksToBounds = false

@@ -546,6 +546,15 @@ extension UIImage {
         return result!
     }
     
+    func colored(in color: UIColor) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let renderedImage = renderer.image { _ in
+            color.set()
+            self.withRenderingMode(.alwaysTemplate).draw(in: CGRect(origin: .zero, size: size))
+        }
+        
+        return renderedImage
+    }
 }
 
 extension UISearchBar {
@@ -1124,7 +1133,7 @@ extension CGSize {
 }
 
 extension CGPath {
-    func getScaledPath(size: CGSize, scaleFactor _scaleFactor: CGFloat = 1) -> CGPath {
+    func getScaledPath(size: CGSize, scaleMultiplicator _scaleMultiplicator: CGFloat = 1) -> CGPath {
         
         let boundingBox = self.boundingBox
         
@@ -1141,11 +1150,11 @@ extension CGPath {
             scaleFactor = size.height/boundingBox.height
         }
         
-        scaleFactor /= 1.75
+        scaleFactor /= 2.05
         scaleFactor = scaleFactor == 0 ? 1 : scaleFactor
         
-        if _scaleFactor != 1 {
-            scaleFactor = _scaleFactor
+        if _scaleMultiplicator != 1 {
+            scaleFactor = _scaleMultiplicator
         }
         // Scaling the path ...
         var scaleTransform = CGAffineTransform.identity

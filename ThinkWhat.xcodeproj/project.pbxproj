@@ -106,12 +106,15 @@
 		AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */; };
 		AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */; };
 		AB43A56025E63BB800BF8749 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */; };
+		AB4727A9268C6444002A9563 /* UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4727A8268C6444002A9563 /* UI.swift */; };
 		AB48B90624348CDC00A27B0D /* SurveyTotalCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB48B90524348CDC00A27B0D /* SurveyTotalCell.swift */; };
 		AB4BD892244DE52100D9A3F0 /* TopIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4BD891244DE52100D9A3F0 /* TopIcon.swift */; };
 		AB51605C24EFEC79006A07B7 /* CategoryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51605B24EFEC79006A07B7 /* CategoryCollectionViewController.swift */; };
 		AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51605D24EFF610006A07B7 /* CategoryCollectionViewCell.swift */; };
 		AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */; };
 		AB52B734240E5D4B006DBDA8 /* ReadySign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB52B733240E5D4B006DBDA8 /* ReadySign.swift */; };
+		AB548662269452FE00D30235 /* NewRatingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB548661269452FE00D30235 /* NewRatingController.swift */; };
+		AB548664269724A300D30235 /* NewSurveyResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB548663269724A200D30235 /* NewSurveyResultViewController.swift */; };
 		AB54BBFA252220C500B73766 /* ThumbUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB54BBF9252220C500B73766 /* ThumbUp.swift */; };
 		AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5CA11524F53D4600F55DEC /* IconTransition.swift */; };
 		AB5CA11824F5418500F55DEC /* TransitionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5CA11724F5418500F55DEC /* TransitionCoordinator.swift */; };
@@ -359,12 +362,15 @@
 		AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationCodeTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryUserCredentials.swift; sourceTree = "<group>"; };
 		AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
+		AB4727A8268C6444002A9563 /* UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI.swift; sourceTree = "<group>"; };
 		AB48B90524348CDC00A27B0D /* SurveyTotalCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTotalCell.swift; sourceTree = "<group>"; };
 		AB4BD891244DE52100D9A3F0 /* TopIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopIcon.swift; sourceTree = "<group>"; };
 		AB51605B24EFEC79006A07B7 /* CategoryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewController.swift; sourceTree = "<group>"; };
 		AB51605D24EFF610006A07B7 /* CategoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategoryCollectionViewCell.xib; sourceTree = "<group>"; };
 		AB52B733240E5D4B006DBDA8 /* ReadySign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadySign.swift; sourceTree = "<group>"; };
+		AB548661269452FE00D30235 /* NewRatingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRatingController.swift; sourceTree = "<group>"; };
+		AB548663269724A200D30235 /* NewSurveyResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyResultViewController.swift; sourceTree = "<group>"; };
 		AB54BBF9252220C500B73766 /* ThumbUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbUp.swift; sourceTree = "<group>"; };
 		AB5CA11524F53D4600F55DEC /* IconTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB5CA11724F5418500F55DEC /* TransitionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionCoordinator.swift; sourceTree = "<group>"; };
@@ -571,12 +577,11 @@
 		AB25E03E265FAB4E00EAA8AE /* Selection */ = {
 			isa = PBXGroup;
 			children = (
-				AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */,
 			);
 			path = Selection;
 			sourceTree = "<group>";
 		};
-		AB28E5AF2535BB6E004CC4DD /* New poll */ = {
+		AB28E5AF2535BB6E004CC4DD /* Poll */ = {
 			isa = PBXGroup;
 			children = (
 				ABF01A6A25418E1F009E2BC4 /* UI */,
@@ -587,7 +592,7 @@
 				AB1F75822594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift */,
 				AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */,
 			);
-			path = "New poll";
+			path = Poll;
 			sourceTree = "<group>";
 		};
 		AB2AA1AC235604A00086D16C /* InfoViewController */ = {
@@ -721,6 +726,7 @@
 				AB2AA1B42359EA8A0086D16C /* Survey.swift */,
 				AB1D845124EA91D200B75929 /* SurveyCategory.swift */,
 				ABEDC4E22450168D00FA9128 /* UserProfile.swift */,
+				AB4727A8268C6444002A9563 /* UI.swift */,
 			);
 			path = Algorithms;
 			sourceTree = "<group>";
@@ -872,6 +878,26 @@
 			path = CategoryCollectionController;
 			sourceTree = "<group>";
 		};
+		AB54865E2694521700D30235 /* New */ = {
+			isa = PBXGroup;
+			children = (
+				AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */,
+				AB28E5AF2535BB6E004CC4DD /* Poll */,
+				AB54865F269452C200D30235 /* Rating */,
+				AB548663269724A200D30235 /* NewSurveyResultViewController.swift */,
+			);
+			name = New;
+			path = "New Group";
+			sourceTree = "<group>";
+		};
+		AB54865F269452C200D30235 /* Rating */ = {
+			isa = PBXGroup;
+			children = (
+				AB548661269452FE00D30235 /* NewRatingController.swift */,
+			);
+			path = Rating;
+			sourceTree = "<group>";
+		};
 		AB6B071D247687D90095721B /* User */ = {
 			isa = PBXGroup;
 			children = (
@@ -972,7 +998,7 @@
 			path = VoteCompletionView;
 			sourceTree = "<group>";
 		};
-		AB7CE6F923A3610E006FDBD8 /* New */ = {
+		AB7CE6F923A3610E006FDBD8 /* delNew */ = {
 			isa = PBXGroup;
 			children = (
 				AB868A7123ED8EC5008DEB84 /* ConfirmationView */,
@@ -981,7 +1007,7 @@
 				ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */,
 				ABBF848823CDB97400059BF0 /* AnonymitySettingsTableViewController.swift */,
 			);
-			path = New;
+			path = delNew;
 			sourceTree = "<group>";
 		};
 		AB7CE6FA23A36123006FDBD8 /* Existing */ = {
@@ -1136,10 +1162,10 @@
 		ABDEE859237023B7009B52F3 /* Survey */ = {
 			isa = PBXGroup;
 			children = (
+				AB54865E2694521700D30235 /* New */,
 				AB25E03E265FAB4E00EAA8AE /* Selection */,
-				AB28E5AF2535BB6E004CC4DD /* New poll */,
 				AB7CE6FA23A36123006FDBD8 /* Existing */,
-				AB7CE6F923A3610E006FDBD8 /* New */,
+				AB7CE6F923A3610E006FDBD8 /* delNew */,
 			);
 			path = Survey;
 			sourceTree = "<group>";
@@ -1529,12 +1555,14 @@
 				ABB4C3F82653C40800C2B1BF /* BasicTransition.swift in Sources */,
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
 				AB0BFDF7253093B000BD5EFF /* FlameBadge.swift in Sources */,
+				AB548664269724A300D30235 /* NewSurveyResultViewController.swift in Sources */,
 				AB7478C724290D8600317EB6 /* SurveyAnswerCell.swift in Sources */,
 				AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */,
 				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
 				ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */,
 				AB7599ED245B29FE008B0569 /* SurveyPreview.swift in Sources */,
 				AB2C03CE24407C5D001BFD75 /* LostConnectionAnimation.swift in Sources */,
+				AB548662269452FE00D30235 /* NewRatingController.swift in Sources */,
 				ABB46F43234742CA00AF212B /* ProfileSettingsTableViewController.swift in Sources */,
 				AB0BFDF5252EF20C00BD5EFF /* PieIcon.swift in Sources */,
 				AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */,
@@ -1662,6 +1690,7 @@
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
 				ABBA74002387E66F00540ECF /* CategoryIcon.swift in Sources */,
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
+				AB4727A9268C6444002A9563 /* UI.swift in Sources */,
 				ABDA424F23B0D60500BAC3A5 /* NewAnswerIcons.swift in Sources */,
 				AB48B90624348CDC00A27B0D /* SurveyTotalCell.swift in Sources */,
 				AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */,

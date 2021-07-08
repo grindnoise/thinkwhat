@@ -15,12 +15,21 @@ class BinarySelectionViewController: UIViewController {
     }
 
     enum SelectionType {
-        case Anonimity, Privacy
+        case Anonimity, Privacy, Comments
     }
     var selectionType: SelectionType = .Anonimity {
         didSet {
-            enabledString   = selectionType == .Anonimity ? "Вы будете скрыты от пользователей на протяжении всего времени существования опроса" : "Доступ к опросу осуществляется только по ссылке"
-            disabledString  = selectionType == .Anonimity ? "Вы будете видны пользователям" : "Опрос доступен всем пользователям"
+            switch selectionType {
+            case .Anonimity:
+                enabledString  = "Автор и респонденты будут скрыты"
+                disabledString = "Автор и респонденты видны"
+            case .Privacy:
+                enabledString  = "Доступ к опросу осуществляется только по приглашению"
+                disabledString = "Опрос доступен всем респондентам"
+            case .Comments:
+                enabledString  = "Респонденты могут оставлять комментарии"
+                disabledString = "Комментарии запрещены"
+            }
         }
     }
     var delegate: CallbackDelegate?
@@ -47,7 +56,7 @@ class BinarySelectionViewController: UIViewController {
             actionButton.category = .Ready_RU
             let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.okButtonTapped))
             actionButton.addGestureRecognizer(tap)
-            actionButton.isUserInteractionEnabled = false
+//            actionButton.isUserInteractionEnabled = false
             actionButton.oval.strokeStart = 1
         }
     }
@@ -60,12 +69,21 @@ class BinarySelectionViewController: UIViewController {
                 enabledIcon.category = .Anon
             case .Privacy:
                 enabledIcon.category = .Locked
+            case .Comments:
+                enabledIcon.category = .Answer
             }
         }
     }
     @IBOutlet weak var enabledLabel: UILabel! {
         didSet {
-            enabledLabel.text = selectionType == .Anonimity ? "Скрыт" : "Приватный"
+            switch selectionType {
+            case .Anonimity:
+                enabledLabel.text = "Включена"
+            case .Privacy:
+                enabledLabel.text = "Приватный"
+            case .Comments:
+                enabledLabel.text = "Разрешены"
+            }
         }
     }
     @IBOutlet weak var disabledIcon: SurveyCategoryIcon! {
@@ -74,9 +92,11 @@ class BinarySelectionViewController: UIViewController {
             disabledIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
             switch selectionType {
             case .Anonimity:
-                disabledIcon.category        = .AnonDisabled
+                disabledIcon.category = .AnonDisabled
             case .Privacy:
-                disabledIcon.category        = .Unlocked
+                disabledIcon.category = .Unlocked
+            case .Comments:
+                disabledIcon.category  = .AnswerDisabled
             }
         }
     }
@@ -88,7 +108,14 @@ class BinarySelectionViewController: UIViewController {
     }
     @IBOutlet weak var disabledLabel: UILabel! {
         didSet {
-            disabledLabel.text = selectionType == .Anonimity ? "Виден" : "Публичный"
+            switch selectionType {
+            case .Anonimity:
+                disabledLabel.text = "Выключена"
+            case .Privacy:
+                disabledLabel.text = "Публичный"
+            case .Comments:
+                disabledLabel.text = "Запрещены"
+            }
         }
     }
     @IBOutlet weak var disabledBg: UIView! {
@@ -121,12 +148,23 @@ class BinarySelectionViewController: UIViewController {
             self.lineWidth = self.actionButton.bounds.height / 10
         }
         
-        title = selectionType == .Anonimity ? "Анонимность" : "Доступность"
+        switch selectionType {
+        case .Anonimity:
+            title = "Анонимность"
+        case .Privacy:
+            title = "Приватность"
+        case .Comments:
+            title = "Комментарии"
+        }
     }
     
     @objc fileprivate func okButtonTapped() {
         isAnimationStopped = true
-        navigationController?.popViewController(animated: true)
+        if !isSelected {
+            showAlert(type: .Warning, buttons: [["Хорошо": [.Ok: nil]]], text: "Выберите вариант")
+        } else {
+            navigationController?.popViewController(animated: true)
+        }
     }
     
     @objc fileprivate func viewTapped(gesture: UITapGestureRecognizer) {

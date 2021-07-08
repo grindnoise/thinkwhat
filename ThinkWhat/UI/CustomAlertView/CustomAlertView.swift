@@ -26,8 +26,12 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         case Ok, Cancel
     }
     
-    @IBOutlet var contentView: UIView!
-    @IBOutlet weak var frameView: BorderedView!
+    @IBOutlet      var contentView: UIView!
+    @IBOutlet weak var frameView: BorderedView! {
+        didSet {
+            frameView.alpha = 0
+        }
+    }
     @IBOutlet weak var upperView: UIView!
     @IBOutlet weak var middleView: UIView!
     @IBOutlet weak var lowerView: UIView!
@@ -36,7 +40,11 @@ class CustomAlertView: UIView, CAAnimationDelegate {
     @IBOutlet weak var alertBody: UILabel!
     @IBOutlet weak var alertText: UILabel!
     @IBOutlet weak var loadingIndicator: LoadingIndicator!
-    @IBOutlet      var lightBlurView: UIVisualEffectView!
+    @IBOutlet      var blurEffectView: UIVisualEffectView! {
+        didSet {
+            blurEffectView.effect =  nil//UIBlurEffect(style: .nil)
+        }
+    }
     
     
     fileprivate var caller: UIViewController!
@@ -104,40 +112,59 @@ class CustomAlertView: UIView, CAAnimationDelegate {
     public func presentAlert() {
         layer.zPosition = 100
         UIApplication.shared.keyWindow?.addSubview(self)
-        //UIApplication.shared.keyWindow?.addSubview(self)
-        contentView.alpha = 1
-        lightBlurView.alpha = 0
-        frameView.layer.transform = CATransform3DMakeScale(0.5, 0.5, 1)
-        frameView.layer.opacity = 1
+        frameView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         
-        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
-            //self.contentView.alpha = 1
-            self.lightBlurView.alpha = 1
-        }, completion: nil)
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
+            self.blurEffectView.effect = UIBlurEffect(style: .dark)
+        }) {
+            _ in
+            alert.isActive = true
+        }
         
-        let scaleAnim       = CASpringAnimation(keyPath: "transform.scale")//CABasicAnimation(keyPath: "transform.scale")
-        let fadeAnim        = CABasicAnimation(keyPath: "opacity")
-        let groupAnim       = CAAnimationGroup()
-        groupAnim.delegate = self
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+            self.frameView.transform = .identity
+            self.frameView.alpha = 1
+        })
         
-        scaleAnim.fromValue = 0.5
-        scaleAnim.toValue   = 1.0
-        scaleAnim.duration  = 0.9
-        scaleAnim.damping   = 11
-        scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-        fadeAnim.fromValue  = 0
-        fadeAnim.toValue    = 1
         
-        //groupAnim.beginTime        += CACurrentMediaTime() + 0.2
-        groupAnim.animations        = [scaleAnim, fadeAnim]
-        groupAnim.duration          = 1.3
-        groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+//
+//        UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: <#T##CGFloat#>, initialSpringVelocity: <#T##CGFloat#>, options: <#T##UIView.AnimationOptions#>, animations: <#T##() -> Void#>, completion: <#T##((Bool) -> Void)?##((Bool) -> Void)?##(Bool) -> Void#>)
         
-        //frameView.layer.add(groupAnim, forKey: nil)
-        frameView.layer.add(scaleAnim, forKey: nil)
-        frameView.layer.opacity = Float(1)
-        frameView.layer.transform = CATransform3DMakeScale(1, 1, 1)
-        alert.isActive = true
+        
+//        //UIApplication.shared.keyWindow?.addSubview(self)
+//        contentView.alpha = 1
+//        lightBlurView.alpha = 0
+//        frameView.layer.transform = CATransform3DMakeScale(0.5, 0.5, 1)
+//        frameView.layer.opacity = 1
+//
+//        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+//            //self.contentView.alpha = 1
+//            self.lightBlurView.alpha = 1
+//        }, completion: nil)
+//
+//        let scaleAnim       = CASpringAnimation(keyPath: "transform.scale")//CABasicAnimation(keyPath: "transform.scale")
+//        let fadeAnim        = CABasicAnimation(keyPath: "opacity")
+//        let groupAnim       = CAAnimationGroup()
+//        groupAnim.delegate = self
+//
+//        scaleAnim.fromValue = 0.5
+//        scaleAnim.toValue   = 1.0
+//        scaleAnim.duration  = 0.9
+//        scaleAnim.damping   = 11
+//        scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+//        fadeAnim.fromValue  = 0
+//        fadeAnim.toValue    = 1
+//
+//        //groupAnim.beginTime        += CACurrentMediaTime() + 0.2
+//        groupAnim.animations        = [scaleAnim, fadeAnim]
+//        groupAnim.duration          = 1.3
+//        groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+//
+//        //frameView.layer.add(groupAnim, forKey: nil)
+//        frameView.layer.add(scaleAnim, forKey: nil)
+//        frameView.layer.opacity = Float(1)
+//        frameView.layer.transform = CATransform3DMakeScale(1, 1, 1)
+//        alert.isActive = true
     }
     
     private func commonInit() {
@@ -154,37 +181,50 @@ class CustomAlertView: UIView, CAAnimationDelegate {
     }
     
     public func dismissAlert() {
-        
-        let scaleAnim       = CABasicAnimation(keyPath: "transform.scale")
-        let fadeAnim        = CABasicAnimation(keyPath: "opacity")
-        let groupAnim       = CAAnimationGroup()
-        
-        scaleAnim.fromValue = 1.0
-        scaleAnim.toValue   = 0.5
-        scaleAnim.duration  = 0.6
-        scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-        fadeAnim.fromValue  = 1
-        fadeAnim.toValue    = 0
-        
-        groupAnim.animations        = [scaleAnim, fadeAnim]
-        groupAnim.duration          = 0.3
-        groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-        
-        frameView.layer.add(groupAnim, forKey: nil)
-        frameView.layer.opacity = Float(0)
-        frameView.layer.transform = CATransform3DMakeScale(0.5, 0.5, 1)
-        
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
-            //self.contentView.alpha = 0
-            self.lightBlurView.alpha = 0
-        }, completion: {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
+            self.blurEffectView.effect = nil
+        }) {
             _ in
-            self.removeFromSuperview()
             self.isActive = false
             self.loadingIndicator.removeAllAnimations()
-            self.contentView.alpha = 0
+            self.removeFromSuperview()
+        }
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+            self.frameView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+            self.frameView.alpha = 0
         })
         
+//        let scaleAnim       = CABasicAnimation(keyPath: "transform.scale")
+//        let fadeAnim        = CABasicAnimation(keyPath: "opacity")
+//        let groupAnim       = CAAnimationGroup()
+//
+//        scaleAnim.fromValue = 1.0
+//        scaleAnim.toValue   = 0.5
+////        scaleAnim.duration  = 0.6
+//        scaleAnim.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+//        fadeAnim.fromValue  = 1
+//        fadeAnim.toValue    = 0
+//
+//        groupAnim.animations        = [scaleAnim, fadeAnim]
+//        groupAnim.duration          = 0.3
+//        groupAnim.timingFunction    = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+//
+//        frameView.layer.add(groupAnim, forKey: nil)
+//        frameView.layer.opacity = Float(0)
+//        frameView.layer.transform = CATransform3DMakeScale(0.75, 0.75, 1)
+//
+//        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveLinear], animations: {
+//            //self.contentView.alpha = 0
+//            self.lightBlurView.alpha = 0
+//        }, completion: {
+//            _ in
+//            self.removeFromSuperview()
+//            self.isActive = false
+//            self.loadingIndicator.removeAllAnimations()
+//            self.contentView.alpha = 0
+//        })
+//
     }
     
     public func setupView(_ singleLabel: Bool, type:AlertType, buttons: [[String : [ButtonType : Closure?]]?], title: String?, body: String?) {
@@ -205,7 +245,7 @@ class CustomAlertView: UIView, CAAnimationDelegate {
         
         
         func setupViews(_: AlertType) {
-            frameView.borderWidth = 1.5
+            frameView.borderWidth = 0//1.5
             var img = UIView()
             
             switch type {
@@ -252,16 +292,18 @@ class CustomAlertView: UIView, CAAnimationDelegate {
             for element in buttons {
                 for button in element! {
                     let borderView = BorderedView(frame: lowerView.frame)
-                    borderView.borderColor = .black//K_COLOR_GRAY//K_COLOR_RED//.white
-                    borderView.bordered = true
+//                    borderView.borderColor = UIColor.lightGray.withAlphaComponent(0.3)//K_COLOR_RED//.white
+//                    borderView.bordered = true
+//                    borderView.lowerBordered = true
                     borderView.translatesAutoresizingMaskIntoConstraints = false
                     borderView.rounded = false
                     borderView.borderWidth = 1.5
                     borderView.alpha = 1
+                    borderView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)//buttons.count > 1 ? .white : K_COLOR_RED
                     stackView.addArrangedSubview(borderView)
                     let label = UILabel(frame: borderView.frame)
                     label.text = button.key
-                    label.textColor = button.value.keys.first == .Cancel ? K_COLOR_RED : .black//K_COLOR_RED//.white
+                    label.textColor = button.value.keys.first == .Cancel || buttons.count == 1 ? K_COLOR_RED : .black//K_COLOR_RED//.white
                     label.font = UIFont(name: "OpenSans", size: 17)
                     label.translatesAutoresizingMaskIntoConstraints = false
                     label.textAlignment = .center
@@ -290,6 +332,12 @@ class CustomAlertView: UIView, CAAnimationDelegate {
             //Установим привязки к нижней секции окна
             self.lowerView.addSubview(stackView)
             stackView.addEquallyTo(to: lowerView)
+            
+//            layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+//            layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: frameView.cornerRadius).cgPath
+//            layer.shadowRadius = 4
+//            layer.shadowOffset = .zero
+//            layer.shadowOpacity = 1
             
             if (isActive) {
                 let kDuration = 0.3

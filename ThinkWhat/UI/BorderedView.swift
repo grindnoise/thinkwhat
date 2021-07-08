@@ -14,6 +14,7 @@ import UIKit
     private var _rounded = false
     private var _bordered = false
     private var _lowerBordered = false
+    private var _upperBordered = false
     private var _borderColor = UIColor.clear
     private var _borderWidth: CGFloat = 0.0
     private var _lowerBorderColor = UIColor.clear
@@ -50,7 +51,15 @@ import UIKit
             return self._lowerBordered
         }
     }
-    
+    @IBInspectable var upperBordered: Bool {
+        set {
+            _upperBordered = newValue
+            makeUpperBorder()
+        }
+        get {
+            return self._upperBordered
+        }
+    }
     
     @IBInspectable var borderColor: UIColor {
         set {
@@ -132,6 +141,12 @@ import UIKit
         }
     }
     
+    private func makeUpperBorder() {
+        if self.bordered == true {
+            draw(frame)
+        }
+    }
+    
     private func makeLowerBorder() {
         if self.bordered == true {
             draw(frame)
@@ -165,6 +180,17 @@ import UIKit
         if _lowerBordered {
             let startingPoint   = CGPoint(x: rect.minX, y: rect.maxY)
             let endingPoint     = CGPoint(x: rect.maxX, y: rect.maxY)
+            let line = UIBezierPath()
+            line.move(to: startingPoint)
+            line.addLine(to: endingPoint)
+            line.lineWidth = _lowerBorderWidth / 2
+            line.lineCapStyle = .round
+            _borderColor.setStroke()
+            line.stroke()
+            shapeLayer.path = line.cgPath
+        } else if _upperBordered {
+            let startingPoint   = CGPoint(x: rect.minX, y: rect.minY)
+            let endingPoint     = CGPoint(x: rect.maxX, y: rect.minY)
             let line = UIBezierPath()
             line.move(to: startingPoint)
             line.addLine(to: endingPoint)

@@ -19,16 +19,11 @@ class VotesCountViewController: UIViewController {
     var votesCount = 100 {
         didSet {
             if votesCount != oldValue {
-                if votesCount == 0 {
-                    actionButton.color = K_COLOR_GRAY
-                    actionButton.text = "\(votesCount)"
-                    actionButton.isUserInteractionEnabled = false
-                } else {
-                    if actionButton != nil {
-                        actionButton.text = "\(votesCount)"
-                        actionButton.color = color//Colors.UpperButtons.Avocado
-                        actionButton.isUserInteractionEnabled = true
-                    }
+                if actionButton != nil {
+                actionButton.text = "\(votesCount)"
+                UIView.animate(withDuration: 0.3) {
+                    self.actionButton.color = self.votesCount == 0 ? K_COLOR_GRAY : self.color
+                }
                 }
             }
         }
@@ -98,12 +93,19 @@ class VotesCountViewController: UIViewController {
     }
     
     @objc fileprivate func actionButtonTapped() {
-        UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
-            self.actionButton.transform = .identity
-        }) {
-            _ in
-            self.navigationController?.popViewController(animated: true)
+        if votesCount < MIN_VOTES_COUNT {
+            view.endEditing(true)
+            showAlert(type: .Warning, buttons: [["Хорошо": [.Ok: {self.votesCountTF.becomeFirstResponder()}]]], text: "Минимально возможное количество голосов - \(MIN_VOTES_COUNT)")
+        } else if votesCount > MAX_VOTES_COUNT {
+            view.endEditing(true)
+            showAlert(type: .Warning, buttons: [["Хорошо": [.Ok: {self.votesCountTF.becomeFirstResponder()}]]], text: "Максимально возможное количество голосов - \(MAX_VOTES_COUNT)")
+        } else {
+            UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
+                self.actionButton.transform = .identity
+            }) {
+                _ in
+                self.navigationController?.popViewController(animated: true)
+            }
         }
-        
     }
 }

@@ -46,7 +46,7 @@ class NewSurveySelectionTypeController: UIViewController {
         didSet {
             ratingIcon.backgroundColor = UIColor.clear
             ratingIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
-            ratingIcon.scaleFactor     = 0.7
+//            ratingIcon.scaleMultiplicator     = 0.7
             ratingIcon.category        = .Rating
             ratingIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(NewSurveySelectionTypeController.handleTap(recognizer:))))
         }
@@ -61,7 +61,7 @@ class NewSurveySelectionTypeController: UIViewController {
         didSet {
             pollIcon.backgroundColor = UIColor.clear
             pollIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
-            pollIcon.scaleFactor     = 0.7
+            pollIcon.scaleMultiplicator     = 0.65
             pollIcon.category        = .Poll
             pollIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(NewSurveySelectionTypeController.handleTap(recognizer:))))
         }
@@ -79,7 +79,7 @@ class NewSurveySelectionTypeController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.transitionStyle = .Icon
-            nc.duration = 0.35
+            nc.duration = 0.5
             nc.isShadowed = false
         }
         if isRatingSelected == nil {

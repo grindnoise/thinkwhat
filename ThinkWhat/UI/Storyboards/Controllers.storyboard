@@ -275,17 +275,30 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JJN-eD-bmR" customClass="PanZoomImageView" customModule="ThinkWhat" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="20" width="375" height="647"/>
                             </scrollView>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Подпишите изображение" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ivG-7J-Ab7">
+                                <rect key="frame" x="16" y="621" width="343" height="30"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" returnKeyType="done"/>
+                                <connections>
+                                    <action selector="titleChanged:" destination="ZiZ-qU-VVc" eventType="editingChanged" id="vwl-Ml-cZY"/>
+                                </connections>
+                            </textField>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="ivG-7J-Ab7" secondAttribute="trailing" id="7xT-26-wbr"/>
                             <constraint firstAttribute="trailing" secondItem="JJN-eD-bmR" secondAttribute="trailing" id="CvB-pk-JNq"/>
                             <constraint firstItem="5OH-AT-97K" firstAttribute="top" secondItem="JJN-eD-bmR" secondAttribute="bottom" id="Ogq-OZ-0Yc"/>
+                            <constraint firstItem="5OH-AT-97K" firstAttribute="top" secondItem="ivG-7J-Ab7" secondAttribute="bottom" constant="16" id="TSN-hl-6g0"/>
                             <constraint firstItem="JJN-eD-bmR" firstAttribute="top" secondItem="2tH-he-SQh" secondAttribute="bottom" id="UcZ-Tn-DIw"/>
+                            <constraint firstItem="ivG-7J-Ab7" firstAttribute="leading" secondItem="AC0-tn-YSq" secondAttribute="leadingMargin" id="W25-Pb-P6z"/>
                             <constraint firstItem="JJN-eD-bmR" firstAttribute="leading" secondItem="AC0-tn-YSq" secondAttribute="leading" id="cRY-Sn-szj"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="scrollView" destination="JJN-eD-bmR" id="64A-6I-evl"/>
+                        <outlet property="titleTextField" destination="ivG-7J-Ab7" id="PnF-JC-WXK"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ea2-2r-tVM" userLabel="First Responder" sceneMemberID="firstResponder"/>

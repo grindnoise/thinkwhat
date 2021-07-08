@@ -33,7 +33,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
                 } else {
                     oval = CAShapeLayer()
                     oval.path = UIBezierPath(ovalIn: CGRect(origin: center, size: .zero)).cgPath
-                    oval.fillColor = category.parent?.tagColor?.withAlphaComponent(0.2).cgColor ?? K_COLOR_RED.withAlphaComponent(0.2).cgColor
+                    oval.fillColor = category.tagColor?.withAlphaComponent(0.2).cgColor ?? K_COLOR_RED.withAlphaComponent(0.2).cgColor
                     layer.insertSublayer(oval, at: 0)
                 }
                 contentView.animateCircleLayer(shapeLayer: oval, reveal: self.isSelected, duration: 0.3, completionBlocks: [], completionDelegate: nil)

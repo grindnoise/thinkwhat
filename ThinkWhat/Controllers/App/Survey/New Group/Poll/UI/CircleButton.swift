@@ -103,7 +103,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         icon.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         icon.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         icon.heightAnchor.constraint(equalTo: icon.widthAnchor, multiplier: 1.0/1.0).isActive = true
-        iconProportionConstraint = icon.heightAnchor.constraint(equalTo: widthAnchor, multiplier: 0.75/1.0)
+        iconProportionConstraint = icon.heightAnchor.constraint(equalTo: widthAnchor, multiplier: 0.79/1.0)
         iconProportionConstraint.isActive = true
 //        icon.text = text
 //        icon.backgroundColor = color

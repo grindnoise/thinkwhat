@@ -69,7 +69,7 @@ class ImageEditingListTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let animation = AnimationFactory.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.2, delayFactor: 0.03)
+        let animation = AnimationFactory.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 0.11, delayFactor: 0.01)
         let animator = Animator(animation: animation)
         animator.animate(cell: cell, at: indexPath, in: tableView)
     }

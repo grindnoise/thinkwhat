@@ -133,6 +133,7 @@ class TextInputViewController: UIViewController {
 //        NotificationCenter.default.addObserver(self, selector: #selector(TextInputViewController.keyboardDidShow(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(TextInputViewController.keyboardWillHide(_:)),
                                                name: UIResponder.keyboardWillHideNotification, object: nil)
+        view.subviews.map {$0.isUserInteractionEnabled = false}
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -141,6 +142,10 @@ class TextInputViewController: UIViewController {
    
     override func viewDidDisappear(_ animated: Bool) {
         accessibilityIdentifier = ""
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        view.subviews.map {$0.isUserInteractionEnabled = true}
     }
     
     private func setTitle() {
