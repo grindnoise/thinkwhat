@@ -12,6 +12,7 @@ import SwiftyJSON
 
 protocol APIManagerProtocol {
     
+    
     func cancelAllRequests()
     func login(_ auth: AuthVariant, username: String?, password: String?, token: String?, completion: @escaping (TokenState) -> ())
     func logout(completion: @escaping (TokenState) -> ())
@@ -36,7 +37,7 @@ protocol APIManagerProtocol {
     func postClaim(surveyID: Int, claimID: Int, completion: @escaping(JSON?, Error?)->())
     func getUserStats(userProfile: UserProfile, completion: @escaping(JSON?, Error?)->())
     func subsribeToUserProfile(subscribe: Bool, userprofile: UserProfile, completion: @escaping(JSON?, Error?)->())
-    
+    func getBalanceAndPrice()
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
     func downloadImage(url: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
     func downloadImage(url: String, completion: @escaping (UIImage?, Error?) -> ())
@@ -862,6 +863,7 @@ class APIManager: APIManagerProtocol {
     
     func postSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->()) {
         var dict = survey.dict
+        print(dict)
         var json: JSON?
         var error: Error?
         
@@ -884,7 +886,7 @@ class APIManager: APIManagerProtocol {
         
         func performRequest() {
             var url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS)
-            let images = dict.removeValue(forKey: "media") as? [[UIImage: String]]
+            let images = dict.removeValue(forKey: DjangoVariables.Survey.images) as? [[UIImage: String]]
             
             _performRequest(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default) {
                 _json, _error in
@@ -1189,6 +1191,23 @@ class APIManager: APIManagerProtocol {
         }
     }
     
+    func getBalanceAndPrice() {
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, _ in
+                    if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.BALANCE), httpMethod: .get, parameters: [:], encoding: URLEncoding.default) {
+                            json, error in
+                            print(json)
+                        }
+                    }
+                }
+            }
+        }
+    }
+        
     private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(JSON?, Error?)->()) {
         var json: JSON?
         var error: Error?

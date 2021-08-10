@@ -34,7 +34,7 @@ class SurveyAnswerCell: UITableViewCell {
     var answer: SurveyAnswer! {
         didSet {
             if textLabel != nil {
-                label.text = answer.text
+                label.text = answer.description
             }
 //            if textView != nil {
 //                textView.text = answer.text

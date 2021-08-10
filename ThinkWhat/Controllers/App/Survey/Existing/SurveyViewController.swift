@@ -155,7 +155,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 showClaimButton()
                 self.presentSurvey()
                 if surveyLink == nil {
-                    surveyLink = ShortSurvey(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100)
+                    surveyLink = ShortSurvey(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100, type: survey!.type)
                 }
                 if let userProfile = survey!.userProfile as? UserProfile, let image = userProfile.image as? UIImage {
                     NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: nil)
@@ -496,7 +496,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                     } else {
                         _cell.label.isSelected = false
                     }
-                    _cell.label.text = answer.text
+                    _cell.label.text = answer.description
                     _cell.percent = survey!.getAnswerVotePercentage(answer.totalVotes)
                     cell = _cell
                 }

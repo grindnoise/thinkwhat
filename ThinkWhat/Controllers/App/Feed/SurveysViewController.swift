@@ -53,14 +53,18 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                     setTitle("Разделы")
                     toggleSwitch(isOn: false)
                 case .Hot:
-                    setTitle("Горячий")
+                    setTitle("Горячие")
                     toggleSwitch(isOn: false)
                 case .New:
                     setTitle("Новые")
+                    if oldValue != .Top {
                     toggleSwitch(isOn: true)
+                    }
                 case .Top:
                     setTitle("Популярные")
+                    if oldValue != .New {
                     toggleSwitch(isOn: true)
+                    }
                 case .Unknown:
                     setTitle("Сделать")
                 }
@@ -90,6 +94,8 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     var isDataLoaded = false {
         didSet {
             if isInitialLoad, isDataLoaded {
+//                delay(seconds: 1) { Banner.shared.present() }
+//                delay(seconds: 2) { Banner.shared.dismiss()}
                 isInitialLoad = false
                 UIView.animate(withDuration: 0.2, animations: {
                     self.view.setNeedsLayout()
@@ -119,7 +125,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                     self.loadingIndicator.removeFromSuperview()
                     self.currentIcon = .Hot
                     self.hotIcon.state = .enabled
-                    self.setTitle("Горячий")
+                    self.setTitle("Горячие")
                     self.presentSubview(oldIcon: nil, newIcon: .Hot)
                     self.lostConnectionView = nil
                     if let btn = self.navigationItem.rightBarButtonItem as? UIBarButtonItem {
@@ -198,6 +204,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         }
     }
     private var loadingIndicator: LoadingIndicator!
+    @IBAction func unwindToSurveysVC(unwindSegue: UIStoryboardSegue) {}
     @IBOutlet weak var topIcon: ThumbUp! {
         didSet {
             let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleIconTap(gesture:)))
@@ -264,6 +271,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         delay(seconds: TimeIntervals.NetworkInactivity) {
             self.checkDataIsLoaded()
         }
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -399,7 +407,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             nc.duration = 0.25//5.4//
         } else if segue.identifier == Segues.App.FeedToNewSurvey {
             nc.transitionStyle = .Icon
-            nc.duration = 0.35
+            nc.duration = 0.4
         } else if segue.identifier == Segues.App.FeedToUser, let userProfile = sender as? UserProfile, let destinationVC = segue.destination as? UserViewController {
             destinationVC.userProfile = userProfile
             nc.duration = 0.2
@@ -422,8 +430,14 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         if gesture.state == .ended, let icon = gesture.view {
             var pairIcon = Icon(frame: .zero)
             if icon is NewIcon {
+                if currentIcon == FeedIcon.Top || currentIcon == FeedIcon.New {
+                    return
+                }
                 pairIcon = topIcon
             } else if icon is ThumbUp {
+                if currentIcon == FeedIcon.Top || currentIcon == FeedIcon.New {
+                    return
+                }
                 pairIcon = newIcon
             }
             for i in icons {
@@ -528,6 +542,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             })
             setTitle(v.isOn ? "Популярные" : "Новые")
             tableVC.type = v.isOn ? .Top : .New
+//            currentIcon = v.isOn ? .Top : .New
         }
         
     }
@@ -794,12 +809,17 @@ extension SurveysViewController: ServerProtocol {
                         }
                     }
                 }
-                if json != nil, !self.interruptRequests {
-                    AppData.shared.system.APIVersion = json!["api_version"].stringValue
-                    SurveyCategories.shared.importJson(json!["categories"])
-                    SurveyCategories.shared.updateCount(json!["total_count"])
-                    ClaimCategories.shared.importJson(json!["claim_categories"])
-                    Surveys.shared.importSurveys(json!["surveys"])
+                if let strongJSON = json, !self.interruptRequests {
+                    AppData.shared.system.APIVersion = strongJSON["api_version"].stringValue
+                    SurveyCategories.shared.importJson(strongJSON["categories"])
+                    SurveyCategories.shared.updateCount(strongJSON["total_count"])
+                    ClaimCategories.shared.importJson(strongJSON["claim_categories"])
+                    Surveys.shared.importSurveys(strongJSON["surveys"])
+                    ModelFieldProperties.shared.importJson(strongJSON["field_properties"])
+                    PriceList.shared.importJson(strongJSON["pricelist"])
+                    if let balance = strongJSON[DjangoVariables.UserProfile.balance].intValue as? Int {
+                        AppData.shared.userProfile.balance = balance
+                    }
                     self.tableVC.refreshControl?.endRefreshing()
 //                    self.newTableVC.needsAnimation = true
                     if self.isInitialLoad {
@@ -903,31 +923,43 @@ extension SurveysViewController: ServerProtocol {
 
 class UIAnimatedTitleView: UIView {
     private var label = UILabel()
+    var font = UIFont(name: "OpenSans-Bold", size: 19)
     
     var text: String = "" {
         didSet {
             label.text = text
             label.textColor = UIColor.black
             label.textAlignment = .center
-            label.font = UIFont(name: "OpenSans-Bold", size: 19)
-            setNeedsLayout()
+            label.font = font
+        }
+    }
+    
+    func animateTextChange(newString: String, completion: @escaping(Bool)->()) {
+        UIView.transition(with: label, duration: 0.4, options: [.transitionCrossDissolve], animations: {
+            self.label.text = newString
+        }) {
+            _ in
+            self.text = newString
+            completion(true)
         }
     }
     
     // MARK: Initializers
     init(frame: CGRect, title: String) {
         super.init(frame: frame)
-        
-        label.frame = self.frame
-        text = title
+        self.commonInit()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.commonInit()
+    }
+    
+    private func commonInit() {
+        label.addEquallyTo(to: self)
         addSubview(label)
         clipsToBounds = true
         isUserInteractionEnabled = false
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
 }
 

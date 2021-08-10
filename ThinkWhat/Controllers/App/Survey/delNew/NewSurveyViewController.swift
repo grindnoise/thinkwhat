@@ -625,7 +625,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             }
         } else if indexPath.section == 1 {
             if indexPath.row == 0, let cell = tableView.cellForRow(at: indexPath) as? QuestionTitleCreationCell {
-                textEditingView?.present(title: "Титул", textView: cell.textView, placeholder: cell.placeholder, charactersLimit: DjangoVariables.FieldRestrictions.surveyTitleLength) {
+                textEditingView?.present(title: "Титул", textView: cell.textView, placeholder: cell.placeholder, charactersLimit: 100) {
                     text in
 //                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
 //                    self.tableView.deselectRow(at: indexPath, animated: true)
@@ -634,7 +634,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
 //                self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
 //                self.tableView.deselectRow(at: indexPath, animated: true)
             } else if indexPath.row == 1, let cell = tableView.cellForRow(at: indexPath) as? QuestionCreationCell {
-                textEditingView?.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder, charactersLimit: DjangoVariables.FieldRestrictions.surveyQuestionLength) {
+                textEditingView?.present(title: "Вопрос", textView: cell.textView, placeholder: cell.placeholder, charactersLimit: 100) {
                     text in
 //                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
 //                    self.tableView.deselectRow(at: indexPath, animated: true)
@@ -645,7 +645,7 @@ extension NewSurveyViewController: UITableViewDelegate, UITableViewDataSource {
             }
         } else if indexPath.section == 5 {
             if let cell = tableView.cellForRow(at: indexPath) as? AnswerCreationCell {
-                textEditingView?.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder, charactersLimit: DjangoVariables.FieldRestrictions.surveyAnswerLength)
+                textEditingView?.present(title: "Ответ \(cell.titleLabel.text!)", textView: cell.textView, placeholder: cell.placeholder, charactersLimit: 100)
                 {
                     text in
 //                    self.tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
@@ -1118,7 +1118,7 @@ extension NewSurveyViewController: ServerProtocol {
     func postSurvey() {
         
         //Prepare new Survey w/o ID
-        if let survey = FullSurvey(new: prepareSurveyDict()) {
+        if let survey = FullSurvey(newWithoutID: prepareSurveyDict()) {
             apiManager.postSurvey(survey: survey) {
                 json, error in
                 if error != nil {
@@ -1147,7 +1147,7 @@ extension NewSurveyViewController: ServerProtocol {
                         Surveys.shared.append(object: survey, type: .Downloaded)
                         
                         //Create SurveyLink & append to own & new arrays
-                        if let surveyLink = survey.createSurveyLink() {
+                        if let surveyLink = survey.toShortSurvey() {
                             Surveys.shared.categorizedLinks[self.category!]?.append(surveyLink)
                             Surveys.shared.append(object: surveyLink, type: .OwnLinks)
                             Surveys.shared.append(object: surveyLink, type: .NewLinks)

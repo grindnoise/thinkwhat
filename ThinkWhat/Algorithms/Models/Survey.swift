@@ -17,6 +17,11 @@ enum SurveyAnonymity: Int, CaseIterable {
     case Disabled
 }
 
+enum SurveyType: String, CaseIterable {
+    case Poll = "Poll"
+    case Ranking = "Ranking"
+}
+
 enum SurveyPoints: Int {
     case Vote               = 1
     case VoteX2             = 2
@@ -128,7 +133,7 @@ class Surveys {
                 if !i.1.isEmpty {
                     for k in i.1 {
 //                        print(k)
-                        if let date = Date(dateTimeString: (k.1["added_at"].stringValue as? String)!) as? Date,
+                        if let date = Date(dateTimeString: (k.1["timestamp"].stringValue as? String)!) as? Date,
                             let survey = ShortSurvey(k.1["survey"]) {
                             if let _foundObject = allLinks.filter({ $0.hashValue == survey.hashValue}).first {
                                 favoriteLinks[_foundObject] = date
@@ -269,7 +274,7 @@ class Surveys {
     
     //Remove from lists -> post Notification
     func removeClaimSurvey(object: FullSurvey) {
-        if let surveyLink = object.createSurveyLink() as? ShortSurvey {
+        if let surveyLink = object.toShortSurvey() as? ShortSurvey {
             if contains(object: surveyLink, type: .NewLinks) {
                 newLinks.remove(object: surveyLink)
                 NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)// (kNotificationNewSurveysUpdated)
@@ -370,17 +375,19 @@ class ShortSurvey {
     var category: SurveyCategory?
     var completionPercentage: Int
     var likes: Int
+    var type: SurveyType
 //    var hashValue: Int {
 //        return ObjectIdentifier(self).hashValue
 //    }
     
-    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int) {//}, likes _likes: Int) {
+    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int, type _type: SurveyType) {//}, likes _likes: Int) {
         ID                      = _id
         title                   = _title
         category                = _category
         completionPercentage    = _completionPercentage
         startDate               = _startDate
         likes = 0
+        type                    = _type
         //likes                   = _likes
     }
     
@@ -390,13 +397,15 @@ class ShortSurvey {
             let _category               = json["category"].intValue as? Int,
             let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
             let _completionPercentage   = json["vote_capacity"].intValue as? Int,
-            let _likes                  = json["likes"].intValue as? Int {
+            let _likes                  = json["likes"].intValue as? Int,
+            let _type                   = json["type"].stringValue as? String {
             ID                      = _ID
             title                   = _title
             category                = SurveyCategories.shared[_category]
             completionPercentage    = _completionPercentage
             startDate               = _startDate
             likes                   = _likes
+            type                    = SurveyType(rawValue: _type)!
         } else {
             return nil
         }
@@ -482,12 +491,15 @@ class FullSurvey {
     var link: String?
     var voteCapacity: Int
     var isPrivate: Bool
+    var isAnonymous: Bool
+    var isCommentingAllowed: Bool
     var totalVotes: Int = 0
     var watchers: Int = 0
     var result: [Int: Date]?
     var userProfile: UserProfile?
     var likes: Int
-    
+    var type: SurveyType
+    var isHot = false
 //    var hashValue: Int {
 //        return ObjectIdentifier(self).hashValue
 //    }
@@ -500,10 +512,17 @@ class FullSurvey {
         _dict[DjangoVariables.Survey.description] = description
         _dict[DjangoVariables.Survey.voteCapacity] = voteCapacity
         _dict[DjangoVariables.Survey.isPrivate] = isPrivate
+        _dict[DjangoVariables.Survey.isAnonymous] = isAnonymous
+        _dict[DjangoVariables.Survey.isCommentingAllowed] = isCommentingAllowed
+        _dict[DjangoVariables.Survey.type] = type.rawValue
         _dict[DjangoVariables.Survey.startDate] = startDate.toDateTimeString()
+        _dict[DjangoVariables.Survey.postHot] = isHot
         var _answers: [[String: String]] = []
+        
+        
         for answer in answersWithoutID {
-            _answers.append(["text" : answer])
+//            _answers.append(["text" : answer])
+            _answers.append([DjangoVariables.SurveyAnswer.description : answer])
         }
         _dict[DjangoVariables.Survey.answers] = _answers
         
@@ -519,14 +538,18 @@ class FullSurvey {
         }
         return _dict
     }
-    init?(new dict: [String: Any]) {
+    init?(newWithoutID dict: [String: Any]) {
         //Necessary fields
         if let _title                   = dict[DjangoVariables.Survey.title] as? String,
             let _category               = dict[DjangoVariables.Survey.category] as? SurveyCategory,
             let _description            = dict[DjangoVariables.Survey.description] as? String,
             let _voteCapacity           = dict[DjangoVariables.Survey.voteCapacity] as? Int,
             let _isPrivate              = dict[DjangoVariables.Survey.isPrivate] as? Bool,
-            let _answers                = dict[DjangoVariables.Survey.answers] as? [String] {
+            let _isAnonymous            = dict[DjangoVariables.Survey.isAnonymous] as? Bool,
+            let _isHot                  = dict[DjangoVariables.Survey.postHot] as? Bool,
+            let _isCommentingAllowed    = dict[DjangoVariables.Survey.isCommentingAllowed] as? Bool,
+            let _answers                = dict[DjangoVariables.Survey.answers] as? [String],
+            let _type                   = dict[DjangoVariables.Survey.type] as? String {
             
             title               = _title
             startDate           = Date()
@@ -536,8 +559,17 @@ class FullSurvey {
             description         = _description
             voteCapacity        = _voteCapacity
             isPrivate           = _isPrivate
+            isAnonymous         = _isAnonymous
+            isCommentingAllowed = _isCommentingAllowed
             answersWithoutID    = _answers
             likes               = 0
+            type                = SurveyType(rawValue: _type)!
+            isHot               = _isHot
+            
+//            _answers.forEach {
+//                dict in
+//                dict.map { answersWithoutID.append($0.value }
+//            }
 //            userProfile         = AppData.shared.userProfile
             
             //Optional fields
@@ -556,25 +588,28 @@ class FullSurvey {
     }
     
     init?(_ json: JSON) {
-        if let _ID                      = json["id"].intValue as? Int,
-            let _title                  = json["title"].stringValue as? String,
-            let _startDate              = json["start_date"] is NSNull ? nil : Date(dateTimeString: json["start_date"].stringValue as! String),
-            var _endDate                = json["end_date"] is NSNull ? nil : Date(dateTimeString: json["end_date"].stringValue as! String),
-            var _modified               = Date(dateTimeString: json["modified_at"].stringValue as! String) as? Date,
-            let _category               = json["category"].intValue as? Int,
-            let _owner                  = json["owner"].stringValue as? String,
-            let _description            = json["description"].stringValue as? String,
-            let _link                   = json["hlink"].stringValue as? String,
-            let _voteCapacity           = json["voteCapacity"].intValue as? Int,
-            let _isPrivate              = json["is_private"].boolValue as? Bool,
-            let _answers                = json["answers"].arrayValue as? [JSON],
-            let _imageURLs              = json["mediafiles"].arrayValue as? [JSON],
-            let _watchers               = json["watchers"].intValue as? Int,
-            let _totalVotes             = json["total_votes"].intValue as? Int,
-            let _result                 = json["result"].arrayValue as? [JSON],
-            let _balance                = json["balance"].intValue as? Int,
+        if let _ID                      = json[DjangoVariables.ID].intValue as? Int,
+            let _title                  = json[DjangoVariables.Survey.title].stringValue as? String,
+            let _startDate              = json[DjangoVariables.Survey.startDate] is NSNull ? nil : Date(dateTimeString: json[DjangoVariables.Survey.startDate].stringValue as! String),
+            var _endDate                = json[DjangoVariables.Survey.endDate] is NSNull ? nil : Date(dateTimeString: json[DjangoVariables.Survey.endDate].stringValue as! String),
+            var _modified               = Date(dateTimeString: json[DjangoVariables.Survey.modifiedAt].stringValue as! String) as? Date,
+            let _category               = json[DjangoVariables.Survey.category].intValue as? Int,
+            let _owner                  = json[DjangoVariables.Survey.owner].stringValue as? String,
+            let _description            = json[DjangoVariables.Survey.description].stringValue as? String,
+            let _link                   = json[DjangoVariables.Survey.hlink].stringValue as? String,
+            let _voteCapacity           = json[DjangoVariables.Survey.voteCapacity].intValue as? Int,
+            let _isAnonymous            = json[DjangoVariables.Survey.isAnonymous].boolValue as? Bool,
+            let _isPrivate              = json[DjangoVariables.Survey.isPrivate].boolValue as? Bool,
+            let _isCommentingAllowed    = json[DjangoVariables.Survey.isCommentingAllowed].boolValue as? Bool,
+            let _answers                = json[DjangoVariables.Survey.answers].arrayValue as? [JSON],
+            let _imageURLs              = json[DjangoVariables.Survey.images].arrayValue as? [JSON],
+            let _watchers               = json[DjangoVariables.Survey.watchers].intValue as? Int,
+            let _totalVotes             = json[DjangoVariables.Survey.totalVotes].intValue as? Int,
+            let _result                 = json[DjangoVariables.Survey.result].arrayValue as? [JSON],
+//            let _balance                = json[DjangoVariables.UserProfile.balance].intValue as? Int,
             let _userProfileDict        = json[DjangoVariables.Survey.userprofile] as? JSON,
-            let _likes                  = json[DjangoVariables.Survey.likes].intValue as? Int {
+            let _likes                  = json[DjangoVariables.Survey.likes].intValue as? Int,
+            let _type                   = json[DjangoVariables.Survey.type].stringValue as? String {
             ID = _ID
             title = _title
             startDate = _startDate
@@ -586,10 +621,13 @@ class FullSurvey {
             link = _link
             voteCapacity = _voteCapacity
             isPrivate = _isPrivate
+            isAnonymous = _isAnonymous
+            isCommentingAllowed = _isCommentingAllowed
             totalVotes = _totalVotes
             watchers = _watchers
-            AppData.shared.userProfile.balance = _balance
+//            AppData.shared.userProfile.balance = _balance
             likes = _likes
+            type = SurveyType(rawValue: _type)!
             
             for _answer in _answers {
                 if let answer = SurveyAnswer(json: _answer) {
@@ -638,8 +676,8 @@ class FullSurvey {
         }
     }
     
-    func createSurveyLink() -> ShortSurvey? {
-        if ID != nil, let surveyLink = ShortSurvey(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0) as? ShortSurvey {
+    func toShortSurvey() -> ShortSurvey? {
+        if ID != nil, let surveyLink = ShortSurvey(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0, type: type) as? ShortSurvey {
             return surveyLink
         }
         return nil
@@ -666,15 +704,18 @@ extension FullSurvey: Hashable {
 
 class SurveyAnswer {
     let ID: Int
-    var text: String
+    var description: String
     var totalVotes: Int
+    var title: String
     
     init?(json: JSON) {
-        if let _text = json["text"].stringValue as? String,
+        if let _description = json["description"].stringValue as? String,
+            let _title = json["title"].stringValue as? String,
             let _ID = json["id"].intValue as? Int,
             let _totalVotes = json["votes_count"].intValue as? Int {
             ID = _ID
-            text = _text
+            description =  _description
+            title = _title
             totalVotes = _totalVotes
         } else {
             print("JSON parse error")

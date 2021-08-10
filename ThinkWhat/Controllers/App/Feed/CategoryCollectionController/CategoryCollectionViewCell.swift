@@ -13,6 +13,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var icon: SurveyCategoryIcon!
     @IBOutlet weak var total: UILabel!
+    @IBOutlet weak var constraint: NSLayoutConstraint!
     var childColor: UIColor?
     var category: SurveyCategory! {
         didSet {
@@ -26,26 +27,20 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     
     override var isSelected: Bool {
         didSet {
-            if selectionMode {
-                var oval: CAShapeLayer!
-                if let existingLayer = layer.sublayers?.filter({ $0 is CAShapeLayer }).first as? CAShapeLayer {
-                    oval = existingLayer
-                } else {
-                    oval = CAShapeLayer()
-                    oval.path = UIBezierPath(ovalIn: CGRect(origin: center, size: .zero)).cgPath
-                    oval.fillColor = category.tagColor?.withAlphaComponent(0.2).cgColor ?? K_COLOR_RED.withAlphaComponent(0.2).cgColor
-                    layer.insertSublayer(oval, at: 0)
+            if isSelected != oldValue {
+                if selectionMode {
+                    if !isSelected {
+                        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
+                            self.icon.transform = .identity
+                            self.icon.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5)
+                        })
+                    } else {
+                        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut], animations: {
+                            self.icon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+                            self.icon.backgroundColor = self.category.tagColor!
+                        })
+                    }
                 }
-                contentView.animateCircleLayer(shapeLayer: oval, reveal: self.isSelected, duration: 0.3, completionBlocks: [], completionDelegate: nil)
-                
-                
-                //                UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseOut], animations: {
-                //                    self.contentView.backgroundColor = self.isSelected ? self.category.tagColor?.withAlphaComponent(0.2) ?? K_COLOR_RED.withAlphaComponent(0.2) : .white
-                //                })
-                //                if isSelected {
-                //                    let anim = animateTransformScale(fromValue: 1, toValue: 1.1, duration: 0.12, repeatCount: 0, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeInEaseOut.rawValue,  delegate: nil)
-                //                    layer.add(anim, forKey: nil)
-                //                }
             }
         }
     }

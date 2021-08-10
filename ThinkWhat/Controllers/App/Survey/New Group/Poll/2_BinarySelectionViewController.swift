@@ -15,7 +15,7 @@ class BinarySelectionViewController: UIViewController {
     }
 
     enum SelectionType {
-        case Anonimity, Privacy, Comments
+        case Anonimity, Privacy, Comments, Hot
     }
     var selectionType: SelectionType = .Anonimity {
         didSet {
@@ -29,6 +29,9 @@ class BinarySelectionViewController: UIViewController {
             case .Comments:
                 enabledString  = "Респонденты могут оставлять комментарии"
                 disabledString = "Комментарии запрещены"
+            case .Hot:
+                enabledString  = "Опрос попадет в хот-лист, набирайте ответы быстро"
+                disabledString = "Опрос не попадет в хот-лист"
             }
         }
     }
@@ -70,7 +73,9 @@ class BinarySelectionViewController: UIViewController {
             case .Privacy:
                 enabledIcon.category = .Locked
             case .Comments:
-                enabledIcon.category = .Answer
+                enabledIcon.category = .Comment
+            case .Hot:
+                enabledIcon.category = .Hot
             }
         }
     }
@@ -83,6 +88,8 @@ class BinarySelectionViewController: UIViewController {
                 enabledLabel.text = "Приватный"
             case .Comments:
                 enabledLabel.text = "Разрешены"
+            case .Hot:
+                enabledLabel.text = "Включен"
             }
         }
     }
@@ -96,7 +103,9 @@ class BinarySelectionViewController: UIViewController {
             case .Privacy:
                 disabledIcon.category = .Unlocked
             case .Comments:
-                disabledIcon.category  = .AnswerDisabled
+                disabledIcon.category  = .CommentDisabled
+            case .Hot:
+                disabledIcon.category  = .HotDisabled
             }
         }
     }
@@ -115,6 +124,8 @@ class BinarySelectionViewController: UIViewController {
                 disabledLabel.text = "Публичный"
             case .Comments:
                 disabledLabel.text = "Запрещены"
+            case .Hot:
+                disabledLabel.text = "Выключен"
             }
         }
     }
@@ -155,6 +166,8 @@ class BinarySelectionViewController: UIViewController {
             title = "Приватность"
         case .Comments:
             title = "Комментарии"
+        case .Hot:
+            title = "Хот-лист"
         }
     }
     

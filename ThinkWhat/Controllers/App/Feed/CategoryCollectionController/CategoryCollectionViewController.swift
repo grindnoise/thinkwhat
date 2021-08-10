@@ -80,6 +80,7 @@ class CategoryCollectionViewController: UICollectionViewController {
                 cell.total.alpha = selectionMode ? 0 : 1
                 if selectionMode, (category.parent != nil || category.hasNoChildren) {
                     cell.selectionMode = true
+                    cell.icon.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5)
                 }
             }
             //            if parentMode {

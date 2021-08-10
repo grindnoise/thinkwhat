@@ -58,7 +58,7 @@ class NewIcon: Icon, CAAnimationDelegate {
     
     func setupProperties(){
         self.active = UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1)
-        self.active1 = Colors.UpperButtons.Avocado//K_COLOR_RED//K_COLOR_RED//UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
+        self.active1 = Colors.UpperButtons.VioletBlueCrayola//Colors.UpperButtons.Avocado//K_COLOR_RED//K_COLOR_RED//UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
     }
     
     func setupLayers(){

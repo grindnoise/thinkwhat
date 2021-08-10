@@ -67,10 +67,10 @@ class TextInputViewController: UIViewController {
         }
     }
     @IBAction func okTapped(_ sender: Any) {
-        if text.text.isEmpty {
+        if text.text.isEmpty || text.text.count < minCharacters {
             UIView.animate(withDuration: 0, animations: {self.view.endEditing(true)}, completion: {
                 _ in
-                showAlert(type: .Warning, buttons: [["Хорошо": [.Ok: {self.text.becomeFirstResponder()}]]], text: "Введите текст или нажмите Готово")
+                showAlert(type: .Warning, buttons: [["Хорошо": [.Ok: {self.text.becomeFirstResponder()}]]], text: "Поле должно содержать не менее \(self.minCharacters) знаков")
             })
         } else {
             //            delegate?.callbackReceived(text)
@@ -81,7 +81,8 @@ class TextInputViewController: UIViewController {
     var titleString = ""
     var textContent = ""
     var delegate: CallbackDelegate?
-    var charactersLimit = 0
+    var maxCharacters = 0
+    var minCharacters = 0
     var font: UIFont?
     var textColor: UIColor?
     var textCentered = false
@@ -154,7 +155,7 @@ class TextInputViewController: UIViewController {
         navTitle.textAlignment = .center
         let attrString = NSMutableAttributedString()
         attrString.append(NSAttributedString(string: titleString + " (", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
-        attrString.append(NSAttributedString(string: "\(text.text.count)/\(charactersLimit)", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: .gray, backgroundColor: .clear)))
+        attrString.append(NSAttributedString(string: "\(text.text.count)/\(maxCharacters)", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: .gray, backgroundColor: .clear)))
         attrString.append(NSAttributedString(string: ")", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
         navTitle.attributedText = attrString
         navigationItem.titleView = navTitle
@@ -220,7 +221,7 @@ extension TextInputViewController: UITextViewDelegate {
         let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
         
         // make sure the result is under 16 characters
-        return updatedText.count <= charactersLimit
+        return updatedText.count <= maxCharacters
     }
     
     func textViewDidChange(_ textView: UITextView) {

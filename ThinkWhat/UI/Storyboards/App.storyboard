@@ -939,7 +939,7 @@
                         <viewControllerLayoutGuide type="bottom" id="YRc-TP-01O"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="g5o-IA-4MP">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="519"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MYa-c6-Kmo">
@@ -1037,7 +1037,7 @@
                         <viewControllerLayoutGuide type="bottom" id="zYc-xZ-Ibr"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="aoa-nQ-2mI">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="519"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Yc-Te-aTy">
@@ -1157,7 +1157,7 @@
             <objects>
                 <tableViewController id="0vW-6a-SEh" customClass="SurveyViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" sectionFooterHeight="1" contentViewInsetsToSafeArea="NO" id="Nw3-e1-Uqg">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="1500"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="sectionIndexBackgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1189,14 +1189,14 @@
                                                     <rect key="frame" x="38" y="0.0" width="250" height="30"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z9f-rm-hqH">
-                                                            <rect key="frame" x="0.0" y="6" width="27" height="18"/>
+                                                            <rect key="frame" x="0.0" y="6" width="30" height="18"/>
                                                             <color key="backgroundColor" red="1" green="0.14901960780000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="11"/>
                                                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ываыва" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mu4-RI-J9j">
-                                                            <rect key="frame" x="210.5" y="6" width="39.5" height="18"/>
+                                                            <rect key="frame" x="208" y="6" width="42" height="18"/>
                                                             <color key="backgroundColor" red="1" green="0.14901960780000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="11"/>
                                                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1214,7 +1214,7 @@
                                                     </constraints>
                                                 </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kcN-a0-RgV">
-                                                    <rect key="frame" x="65" y="14.5" width="183.5" height="1"/>
+                                                    <rect key="frame" x="68" y="14.5" width="178" height="1"/>
                                                     <color key="backgroundColor" red="1" green="0.14901960780000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hJa-NP-t1q">
@@ -1298,7 +1298,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b2w-uO-lLH">
-                                            <rect key="frame" x="87" y="11" width="146" height="22"/>
+                                            <rect key="frame" x="88" y="11" width="144" height="22"/>
                                             <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="17"/>
                                             <state key="normal" title="УЗНАТЬ БОЛЬШЕ">
                                                 <color key="titleColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -1589,7 +1589,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2136 голосов" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PJz-gK-Xjk">
-                                            <rect key="frame" x="119" y="17.5" width="82" height="15.5"/>
+                                            <rect key="frame" x="118.5" y="16" width="83.5" height="18"/>
                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="13"/>
                                             <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
@@ -1614,7 +1614,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="sad-i2-3dC">
-                                            <rect key="frame" x="190" y="11" width="114" height="28"/>
+                                            <rect key="frame" x="188" y="11" width="116" height="28"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="3p8-z2-Vr9">
                                                     <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -1623,16 +1623,16 @@
                                                     </constraints>
                                                 </imageView>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="qLs-0b-OIv">
-                                                    <rect key="frame" x="30" y="0.0" width="84" height="28"/>
+                                                    <rect key="frame" x="30" y="0.0" width="86" height="28"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pavel Bukharov" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Ma-wF-2os">
-                                                            <rect key="frame" x="0.0" y="0.0" width="84" height="14"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="86" height="14"/>
                                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                                                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="18.04.2020 16:15" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cdv-xA-xa0">
-                                                            <rect key="frame" x="0.0" y="14" width="84" height="14"/>
+                                                            <rect key="frame" x="0.0" y="14" width="86" height="14"/>
                                                             <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="10"/>
                                                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
@@ -1866,22 +1866,22 @@
                                         <rect key="frame" x="0.0" y="9" width="320" height="163.5"/>
                                         <subviews>
                                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="l5G-ph-ezo">
-                                                <rect key="frame" x="105.5" y="0.0" width="109" height="109.5"/>
+                                                <rect key="frame" x="106" y="0.0" width="108" height="108"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="l5G-ph-ezo" secondAttribute="height" multiplier="1:1" id="wc8-yw-uzc"/>
                                                 </constraints>
                                             </imageView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="F09-Ez-ImL">
-                                                <rect key="frame" x="107" y="114.5" width="106" height="49"/>
+                                                <rect key="frame" x="107" y="113" width="106" height="50.5"/>
                                                 <subviews>
                                                     <textField opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Alex Turner" textAlignment="center" adjustsFontSizeToFit="NO" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="QqS-fO-Rej">
-                                                        <rect key="frame" x="0.0" y="0.0" width="106" height="24"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="106" height="25.5"/>
                                                         <nil key="textColor"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
                                                         <textInputTraits key="textInputTraits"/>
                                                     </textField>
                                                     <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="мужчина, 32 года" textAlignment="center" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="TaN-q5-kik">
-                                                        <rect key="frame" x="0.0" y="32" width="106" height="17"/>
+                                                        <rect key="frame" x="0.0" y="33.5" width="106" height="17"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                                                         <textInputTraits key="textInputTraits"/>
@@ -2401,7 +2401,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="d8f-vM-p00"/>
-        <segue reference="UIy-Ib-ofi"/>
+        <segue reference="MH9-VE-OZE"/>
         <segue reference="h0y-RE-2tK"/>
         <segue reference="jPa-cZ-lJ6"/>
     </inferredMetricsTieBreakers>

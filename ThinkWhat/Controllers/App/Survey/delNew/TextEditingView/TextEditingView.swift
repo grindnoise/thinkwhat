@@ -34,7 +34,8 @@ class TextEditingView: UIView, CAAnimationDelegate {
     }
 //    fileprivate var _stringVariablePointer: AnyObject?//UnsafeMutablePointer<String>?
     var delegate: NewSurveyViewController?
-    fileprivate var charactersLimit = 0
+    fileprivate var maxCharacters = 0
+    fileprivate var minCharacters = 0
     fileprivate var textView: UITextView? {
         didSet {
             text.text = textView!.text
@@ -102,7 +103,7 @@ class TextEditingView: UIView, CAAnimationDelegate {
 //            text.text = _textView!.text
 //            textView = _textView
 //        }
-        charactersLimit = _charactersLimit
+        maxCharacters = _charactersLimit
 //        title = _title
         constantTitle = NSMutableAttributedString(string: _title, attributes: boldAttrs)
         textView = _textView
@@ -251,7 +252,7 @@ extension TextEditingView: UITextViewDelegate {
         let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
         
         // make sure the result is under 16 characters
-        return updatedText.count <= charactersLimit
+        return updatedText.count <= maxCharacters
     }
     
     fileprivate func checkTextViewEdited(beganEditing: Bool, textView: UITextView, placeholder: String) {
@@ -270,7 +271,7 @@ extension TextEditingView: UITextViewDelegate {
     }
     
     fileprivate func setTitle(_ isInitial: Bool = false) {
-        let charactersCount       = isInitial ? " (0/\(charactersLimit))" : " (\(text.text.length)/\(charactersLimit))"
+        let charactersCount       = isInitial ? " (0/\(maxCharacters))" : " (\(text.text.length)/\(maxCharacters))"
         let charactersCountString = NSMutableAttributedString(string: charactersCount, attributes: lightAttrs)
         let labelTitle = NSMutableAttributedString(attributedString: constantTitle)
         labelTitle.append(charactersCountString)

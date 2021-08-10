@@ -95,13 +95,7 @@ enum AuthVariant: String {
     case Username   = "Username"
 }
 
-enum DjangoError: String {
-    case InvalidGrant = "invalid credentials given."
-    case AccessDenied = "access_denied"
-    enum Authentication: String {
-        case ConnectionFailed = "failed to establish a new connection"
-    }
-}
+
 
 enum ClientSettingsMode {
     case Reminder, Language
@@ -195,6 +189,7 @@ struct Notifications {
         static let FavoriteSurveysUpdated          = Notification.Name("NotificationFavoriteSurveysUpdated")
         static let UserSurveysUpdated              = Notification.Name("NotificationUserSurveysUpdated")
         static let UserFavoriteSurveysUpdated      = Notification.Name("NotificationUserFavoriteSurveysUpdated")
+        static let NewSurveyPostError              = Notification.Name("NotificationNewSurveyPostError")
     }
     
     struct UI {
@@ -222,65 +217,6 @@ struct TimeIntervals {
 
 
 
-//MARK: - Segues
-struct Segues {
-    struct Launch {
-        static let App                      = "APP"
-        static let Auth                     = "AUTH"
-    }
-    
-    struct Auth {
-        static let AppFromMailSignin        = "APP_FROM_MAIL_SIGNIN"
-        static let AppFromTerms             = "APP_FROM_TERMS"
-        static let AppFromProfile           = "APP_FROM_PROFILE"
-        static let SocialAuth               = "SOCIAL"
-        static let MailValidationFromSignup = "MAIL_VALID_SIGNUP"
-        static let MailValidationFromSignin = "MAIL_VALID_SIGNIN"
-        static let Terms                    = "TERMS"
-        static let TermsFromValidation      = "TERMS_VALID"
-        static let TermsFromStartScreen     = "TERMS_START_SCREEN"
-        static let MailAuth                 = "MAILAUTH"
-        static let PasswordRecovery         = "PWD_RECOVERY"
-        static let ProfileFromConfirmation  = "PROFILE_FROM_CONFIRMATION"
-        static let ProfileFromAuth          = "PROFILE_FROM_AUTH"
-    }
-    
-    struct App {
-        static let ProfileToSettingsSelection           = "PROFILE_SETINGS_SELECTION"
-        static let ProfileToInfo                        = "INFO"
-        static let Logout                               = "BACK_TO_AUTH"
-        static let FeedToSurveyFromTop                  = "FEED_TO_SURVEY_FROM_TOP"
-        static let FeedToSurvey                         = "FEED_TO_SURVEY"
-        static let FeedToNewSurvey                      = "FEED_TO_NEW_SURVEY"
-        static let FeedToUser                           = "FEED_TO_USER"
-        static let FeedToCategory                       = "FEED_TO_CATEGORY"
-        static let UserSurveysToSurvey                  = "USER_SURVEYS_TO_SURVEY"
-        static let UserSurveysToNewSurvey               = "OWN_TO_NEW_SURVEY"
-        static let NewSurveyToAnonymity                 = "NEW_TO_ANONYMITY"
-        static let NewSurveyToCategorySelection         = "NEW_TO_CATEGORY_SELECTION"
-        static let NewSurveyToAnonimitySelection        = "NEW_TO_ANONIMITY_SELECTION"
-        static let NewSurveyToPrivacySelection          = "NEW_TO_PRIVACY_SELECTION"
-        static let NewSurveyToCommentingSelection       = "NEW_TO_COMMENTING_SELECTION"
-        static let NewSurveyToTypingViewController      = "NEW_TO_TYPE"
-        static let NewSurveyToVotesCountViewController  = "NEW_TO_VOTES_COUNT"
-        static let NewSurveyToHyperlinkViewController   = "NEW_TO_HYPERLINK"
-        static let NewSurveyToImagePreviewViewController = "NEW_TO_IMAGES"
-        static let SurveyToUser                         = "SURVEY_TO_USER"
-        static let SurveyToClaim                        = "SURVEY_TO_CLAIM"
-        static let UserToUserSurveys                    = "USER_TO_USER_SURVEYS"
-        static let UserToUserFavoriteSurveys            = "USER_TO_FAVORITE_USER_SURVEYS"
-        static let CategoryToSurveys                    = "CATEGORY_TO_SURVEYS"
-    }
-    
-    struct NewSurvey {
-        static let Poll             = "POLL"
-        static let Rating           = "RATING"
-    }
-    
-    struct Survey {
-        static let Name             = "NAME"
-    }
-}
 ////MARK: Auth
 //let kSegueApp                                    = "APP"
 //let kSegueAppFromMailSignin                      = "APP_FROM_MAIL_SIGNIN"
@@ -725,61 +661,13 @@ struct SERVER_URLS {
     static let SURVEYS_RESULTS          = "api/survey_results/"
     
     static let CATEGORIES               = "api/categories/"
-    
+    static let BALANCE                  = "api/current_balance_price/"
     
 //    static let SMS_VALIDATION_URL   = "http://burber.pythonanywhere.com/passcode/generate/"
     
 }
 
-struct DjangoVariables {
-    static let ID                           = "id"
-    struct User {
-        static let firstName                = "first_name"
-        static let lastName                 = "last_name"
-        static let email                    = "email"
-    }
-    struct UserProfile {
-        static let owner                    = "owner"
-        static let name                     = "name"
-        static let gender                   = "gender"
-        static let birthDate                = "birth_date"
-        static let age                      = "age"
-        static let image                    = "image"
-        static let isDeleted                = "is_del"
-        static let isBanned                 = "is_banned"
-        static let credit                   = "credit"
-        static let facebookID               = "facebook_ID"
-        static let vkID                     = "vk_ID"
-        static let isEdited                 = "is_edited"
-        static let isEmailVerified          = "is_email_verified"
-        static let surveysAnsweredTotal     = "surveys_results_count"
-        static let surveysFavoriteTotal     = "favorite_surveys_count"
-        static let surveysCreatedTotal      = "surveys_count"
-        static let lastVisit                = "last_visit"
-    }
-    struct Survey {
-        static let category                 = "category"
-        static let owner                    = "owner"
-        static let title                    = "title"
-        static let description              = "description"
-        static let hlink                    = "hlink"
-        static let voteCapacity             = "vote_capacity"
-        static let isPrivate                = "is_private"
-        static let isAnonymous              = "is_anonymous"
-        static let isCommentingAllowed      = "is_commenting_allowed"
-        static let answers                  = "answers"
-        static let images                   = "media"
-        static let startDate                = "start_date"
-        static let endDate                  = "end_date"
-        static let likes                    = "likes"
-        static let userprofile              = "userprofile"
-    }
-    struct FieldRestrictions {
-        static let surveyTitleLength        = 30
-        static let surveyQuestionLength     = 10000
-        static let surveyAnswerLength       = 100
-    }
-}
+
 
 
 //MARK: - Methods

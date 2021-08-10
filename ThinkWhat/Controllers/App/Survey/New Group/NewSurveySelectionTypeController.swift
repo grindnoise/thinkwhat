@@ -10,6 +10,9 @@ import UIKit
 
 class NewSurveySelectionTypeController: UIViewController {
 
+    deinit {
+        print("DEINIT NewSurveySelectionTypeController")
+    }
     private var isFirstSelection = true {
         didSet {
             if oldValue != isFirstSelection {
@@ -79,7 +82,7 @@ class NewSurveySelectionTypeController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.transitionStyle = .Icon
-            nc.duration = 0.5
+            nc.duration = 0.3
             nc.isShadowed = false
         }
         if isRatingSelected == nil {
