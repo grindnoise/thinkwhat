@@ -815,7 +815,7 @@ extension SurveysViewController: ServerProtocol {
                     SurveyCategories.shared.updateCount(strongJSON["total_count"])
                     ClaimCategories.shared.importJson(strongJSON["claim_categories"])
                     Surveys.shared.importSurveys(strongJSON["surveys"])
-                    ModelFieldProperties.shared.importJson(strongJSON["field_properties"])
+                    ModelProperties.shared.importJson(strongJSON["field_properties"])
                     PriceList.shared.importJson(strongJSON["pricelist"])
                     if let balance = strongJSON[DjangoVariables.UserProfile.balance].intValue as? Int {
                         AppData.shared.userProfile.balance = balance

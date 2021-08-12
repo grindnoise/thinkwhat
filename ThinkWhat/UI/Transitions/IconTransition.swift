@@ -1062,7 +1062,7 @@ class IconTransition: BasicTransition {
                     icon.center = destinationPos
                     icon.frame.size = destinationSize
                     delay(seconds: self.duration * 0.33) {
-                        vc_2.votesCapacity = vc_1.votesCount
+                        vc_2.votesCapacity = vc_1.votesCapacity
                     }
                 }) }
                 

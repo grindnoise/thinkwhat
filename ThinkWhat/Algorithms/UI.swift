@@ -86,6 +86,12 @@ let K_COLOR_INDIAN_YELLOW                       = UIColor(red: 0.859, green: 0.6
 let K_COLOR_DARK_RURPLE                         = UIColor(red: 0.161, green: 0.024, blue: 0.157, alpha: 1.000)
 
 struct Colors {
+    struct Banner {
+        static let Error             = UIColor(hexString: "#DD1C1A")
+        static let Warning           = UIColor(hexString: "#FE7F2D")//UIColor(hexString: "#FCCA46")
+        static let Success           = UIColor(hexString: "#A1C181")
+        static let Info              = UIColor(hexString: "#619B8A")
+    }
     struct UpperButtons {
         static let VioletBlueCrayola = UIColor(hexString: "#7776BC")
         static let Avocado           = UIColor(hexString: "#5C8001")

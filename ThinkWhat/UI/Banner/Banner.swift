@@ -9,33 +9,50 @@
 import UIKit
 
 class Banner: UIView {
+    static let bannerWillAppearSignal       = "bannerWillAppearSignal"
+    static let bannerDidAppearSignal        = "bannerDidAppearSignal"
+    static let bannerWillDisappearSignal    = "bannerWillDisappearSignal"
+    static let bannerDidDisappearSignal     = "bannerDidDisappearSignal"
     enum ContentType: Int {
-        case None, TotaLCost
+        case None, TotaLCost, Sum, Warning
     }
+    //Use for auto dismiss
+    private var timer:  Timer?
+    private var timeElapsed: TimeInterval = 0
     
+    private var isVisible = false
+    private var isInteracting = false {
+        didSet {
+            if isInteracting {
+                stopTimer()
+            }
+        }
+    }
     static let shared = Banner()
     var contentType: ContentType = .None {
         didSet {
             if oldValue != contentType {
                 container.subviews.forEach { $0.removeFromSuperview() }
+                var _content: BannerContent!
                 switch contentType {
                 case .TotaLCost:
-                    if let subview = TotalCost.init(width: body.frame.width) as? UIView {
-                        setNeedsLayout()
-                        containerHeightConstraint.constant = subview.frame.height
-                        layoutIfNeeded()
-//                        subview.setNeedsLayout()
-//                        subview.layoutIfNeeded()
-                        subview.addEquallyTo(to: container)
-//                        container.addSubview(subview)
-                    }
+                    _content = TotalCost.init(width: container.frame.width)
+                case .Warning:
+                    _content = Warning.init(width: container.frame.width)
+                case .Sum:
+                    _content = VotesFormula.init(width: container.frame.width)
                 default:
                     print("ContentType.None")
                 }
+                container.addSubview(_content as! UIView)
+                (_content as! UIView).setNeedsLayout()
+                (_content as! UIView).layoutIfNeeded()
+                heightConstraint.constant = _content.minHeigth + topMargin*2
+                content = _content
             }
         }
     }
-    var content: UIView?
+    var content: BannerContent?
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var background: UIView! {
         didSet {
@@ -44,29 +61,25 @@ class Banner: UIView {
         }
     }
     @IBOutlet weak var body: UIView!
-    @IBOutlet weak var scrollView: UIView!
     @IBOutlet weak var container: UIView!
-    
-    
-    @IBOutlet weak var containerHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var heightConstraint: NSLayoutConstraint!
     @IBOutlet weak var topConstraint: NSLayoutConstraint! {
         didSet {
             topConstraint.constant = topMargin
         }
     }
+//    private var isFolded = false
     private let topMargin:  CGFloat = 8
     private var yOrigin:    CGFloat = 0
     private var height:     CGFloat = 0 {
         didSet {
             if oldValue != height {
                 yOrigin = -(height+topMargin)
-                heightConstraint.constant   = height
             }
         }
     }
     private var keyWindow:  UIWindow!
-    
+    private weak var delegate : CallbackDelegate?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("Not for XIB/NIB")
@@ -93,14 +106,22 @@ class Banner: UIView {
         //Set default height
         setNeedsLayout()
         height                      = content.bounds.width/3
+        heightConstraint.constant   = height
         topConstraint.constant      = -(topConstraint.constant + height)
         layoutIfNeeded()
         let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:)))
         body.addGestureRecognizer(gestureRecognizer)
     }
     
-    func present() {
-        self.alpha = 1
+    func present(shouldDismissAfter seconds: TimeInterval = 0, delegate _delegate: CallbackDelegate?) {
+        isInteracting = false
+        if seconds != 0 {
+            timeElapsed = seconds + 1
+            startTimer()
+        }
+        delegate = _delegate
+        delegate?.callbackReceived(Banner.bannerWillAppearSignal as AnyObject)
+        alpha = 1
         UIView.animate(
             withDuration: 0.4,
             delay: 0,
@@ -111,7 +132,11 @@ class Banner: UIView {
                 self.setNeedsLayout()
                 self.topConstraint.constant = self.topMargin
                 self.layoutIfNeeded()
-        })
+        }) {
+            _ in
+            self.delegate?.callbackReceived(Banner.bannerDidAppearSignal as AnyObject)
+            self.isVisible = true
+        }
         
         UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
             self.background.alpha = 1
@@ -119,15 +144,49 @@ class Banner: UIView {
     }
     
     func dismiss() {
-        UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
+        self.delegate?.callbackReceived(Banner.bannerWillDisappearSignal as AnyObject)
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
             self.setNeedsLayout()
             self.topConstraint.constant = self.yOrigin
             self.layoutIfNeeded()
             self.background.alpha = 0
-        })
+        }) {
+            _ in
+            self.delegate?.callbackReceived(Banner.bannerDidDisappearSignal as AnyObject)
+            self.delegate = nil
+            self.isVisible = false
+            self.alpha = 0
+        }
+    }
+    
+    func unfold() {
+        if let subview = container?.subviews.first as? BannerContent, subview.foldable, let maxHeight = subview.maxHeigth as? CGFloat {
+            UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+                self.setNeedsLayout()
+                self.heightConstraint.constant = maxHeight + self.topMargin*2
+                self.layoutIfNeeded()
+            }) {
+                _ in
+                self.height = self.heightConstraint.constant
+            }
+        }
+    }
+    
+    func fold() {
+        if let subview = container?.subviews.first as? BannerContent, subview.foldable, let minHeight = subview.minHeigth as? CGFloat {
+            UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+                self.setNeedsLayout()
+                self.heightConstraint.constant = minHeight + self.topMargin*2
+                self.layoutIfNeeded()
+            }) {
+                _ in
+                self.height = self.heightConstraint.constant
+            }
+        }
     }
     
     @objc private func viewPanned(recognizer: UIPanGestureRecognizer) {
+        isInteracting = true
         let minConstant = -(height+topMargin)
         guard topConstraint.constant <= topMargin else {
             return
@@ -152,6 +211,7 @@ class Banner: UIView {
         let yVelocity = recognizer.velocity(in: contentView).y
         let distance = abs(yOrigin) - abs(yPoint)
         if yVelocity < -500 {
+            delegate?.callbackReceived(Banner.bannerWillDisappearSignal as AnyObject)
             let time = TimeInterval(distance/abs(yVelocity)*2.5)
             let duration: TimeInterval = time < 0.08 ? 0.08 : time
             UIView.animate(withDuration: duration, delay: 0, options: [.curveLinear], animations: {
@@ -162,6 +222,7 @@ class Banner: UIView {
             }) {
                 _ in
                 self.alpha = 0
+                self.delegate?.callbackReceived(Banner.bannerDidDisappearSignal as AnyObject)
             }
         } else if background.alpha > 0.33 {
             UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
@@ -171,6 +232,7 @@ class Banner: UIView {
                 self.background.alpha = 1
             })
         } else {
+            delegate?.callbackReceived(Banner.bannerWillDisappearSignal as AnyObject)
             UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
                 self.setNeedsLayout()
                 self.topConstraint.constant = self.yOrigin
@@ -179,7 +241,26 @@ class Banner: UIView {
             }) {
                 _ in
                 self.alpha = 0
+                self.delegate?.callbackReceived(Banner.bannerDidDisappearSignal as AnyObject)
             }
+        }
+    }
+    
+    private func startTimer() {
+        guard timer == nil else { return }
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
+        timer?.fire()
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    @objc private func updateTimer() {
+        timeElapsed    -= 1
+        if timeElapsed <= 0 {
+            dismiss()
         }
     }
 }

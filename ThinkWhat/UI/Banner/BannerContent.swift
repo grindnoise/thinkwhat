@@ -10,5 +10,6 @@ import UIKit
 
 protocol BannerContent {
     var foldable: Bool {get set}
-    var frameRatio: CGFloat {get set}
+    var minHeigth: CGFloat {get}
+    var maxHeigth: CGFloat {get}
 }

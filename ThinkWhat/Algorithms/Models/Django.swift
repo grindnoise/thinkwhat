@@ -77,8 +77,9 @@ struct DjangoVariables {
     struct PriceList {
         static let like                     = "like"
         static let vote                     = "vote"
-        static let anonPost                 = "anonimity"
+//        static let anonPost                 = "anonimity"
         static let hotPost                  = "post_hot"
+        static let extraAnswers             = "extra_answers"
     }
 //    struct FieldRestrictions {
 //        struct Survey {
@@ -92,8 +93,8 @@ struct DjangoVariables {
 //    }
 }
 
-class ModelFieldProperties {
-    static let shared = ModelFieldProperties()
+class ModelProperties {
+    static let shared = ModelProperties()
     private init() {}
     private var _surveyTitleMinLength:       Int = 0
     private var _surveyTitleMaxLength:       Int = 0
@@ -103,6 +104,7 @@ class ModelFieldProperties {
     private var _surveyAnswerTitleMaxLength: Int = 0
     private var _surveyAnswerTextMinLength:  Int = 0
     private var _surveyAnswerTextMaxLength:  Int = 0
+    private var _surveyAnswerMaxFreeCount:   Int = 0
     
 
     var surveyTitleMinLength:       Int { return { _surveyTitleMinLength }()}
@@ -113,6 +115,7 @@ class ModelFieldProperties {
     var surveyAnswerTitleMaxLength: Int { return { _surveyAnswerTitleMaxLength }()}
     var surveyAnswerTextMinLength:  Int { return { _surveyAnswerTextMinLength }()}
     var surveyAnswerTextMaxLength:  Int { return { _surveyAnswerTextMaxLength }()}
+    var surveyAnswerMaxFreeCount:   Int { return { _surveyAnswerMaxFreeCount }()}
     
     func importJson(_ json: JSON) {
         for i in json {
@@ -134,6 +137,8 @@ class ModelFieldProperties {
                     } else if j.0 == "description", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
                         _surveyAnswerTextMinLength = dict["min_length"]!
                         _surveyAnswerTextMaxLength = dict["max_length"]!
+                    } else if j.0 == "free_count", let value = j.1.intValue as? Int {
+                        _surveyAnswerMaxFreeCount = value
                     }
                 }
             }
@@ -144,27 +149,31 @@ class ModelFieldProperties {
 class PriceList {
     static let shared = PriceList()
     private init() {}
-    private var _like:      Int = 0
-    private var _vote:      Int = 0
-    private var _anonPost:  Int = 0
-    private var _hotPost:   Int = 0
+    private var _like:              Int = 0
+    private var _vote:              Int = 0
+//    private var _anonPost:          Int = 0
+    private var _hotPost:           Int = 0
+    private var _extraAnswers:  Int = 0
     
     var like:       Int { return { _like }()}
     var vote:       Int { return { _vote }()}
-    var anonPost:       Int { return { _anonPost }()}
+//    var anonPost:       Int { return { _anonPost }()}
     var hotPost:       Int { return { _hotPost }()}
+    var extraAnswers:       Int { return { _extraAnswers }()}
     
     func importJson(_ json: JSON) {
         for i in json {
             if let dict = i.1.dictionaryObject, let key = dict["type"] as? String, let value = dict["cost"] as? Int {
                 if key == DjangoVariables.PriceList.like {
                     _like = value
-                } else if key == DjangoVariables.PriceList.anonPost {
-                    _anonPost = value
+//                } else if key == DjangoVariables.PriceList.anonPost {
+//                    _anonPost = value
                 } else if key == DjangoVariables.PriceList.vote {
                     _vote = value
                 } else if key == DjangoVariables.PriceList.hotPost {
                     _hotPost = value
+                } else if key == DjangoVariables.PriceList.extraAnswers {
+                    _extraAnswers = value
                 }
             }
         }

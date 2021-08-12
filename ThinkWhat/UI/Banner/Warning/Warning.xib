@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Regular.ttf">
+            <string>OpenSans</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="Warning" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="contentView" destination="23o-w5-FA0" id="dDi-Dt-kVB"/>
+                <outlet property="icon" destination="WzB-55-NaH" id="r54-eT-08A"/>
+                <outlet property="label" destination="YhA-yW-k4I" id="Nyl-he-zcZ"/>
+                <outlet property="topView" destination="Xzd-3C-bwm" id="bMW-vh-pbg"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="23o-w5-FA0">
+            <rect key="frame" x="0.0" y="0.0" width="300" height="200"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Xzd-3C-bwm">
+                    <rect key="frame" x="0.0" y="0.0" width="300" height="75"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WzB-55-NaH" customClass="SurveyCategoryIcon" customModule="ThinkWhat" customModuleProvider="target">
+                            <rect key="frame" x="4" y="15" width="45" height="45"/>
+                            <color key="backgroundColor" red="0.0" green="0.56904578210000001" blue="0.57461684940000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="WzB-55-NaH" secondAttribute="height" multiplier="1:1" id="We1-Q2-cwl"/>
+                            </constraints>
+                        </view>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Недостаточно средств на счете" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="YhA-yW-k4I">
+                            <rect key="frame" x="57" y="8" width="235" height="59"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="13"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="WzB-55-NaH" firstAttribute="height" secondItem="Xzd-3C-bwm" secondAttribute="height" multiplier="0.6" id="JO8-v6-Q7b"/>
+                        <constraint firstItem="WzB-55-NaH" firstAttribute="centerY" secondItem="Xzd-3C-bwm" secondAttribute="centerY" id="UKU-ur-wpa"/>
+                        <constraint firstItem="YhA-yW-k4I" firstAttribute="leading" secondItem="WzB-55-NaH" secondAttribute="trailing" constant="8" id="WlR-JG-p8u"/>
+                        <constraint firstAttribute="bottom" secondItem="YhA-yW-k4I" secondAttribute="bottom" constant="8" id="b1c-U4-Y18"/>
+                        <constraint firstItem="WzB-55-NaH" firstAttribute="leading" secondItem="Xzd-3C-bwm" secondAttribute="leading" constant="4" id="cdh-Ig-o2Z"/>
+                        <constraint firstItem="YhA-yW-k4I" firstAttribute="centerY" secondItem="WzB-55-NaH" secondAttribute="centerY" id="fWP-vh-pdB"/>
+                        <constraint firstItem="YhA-yW-k4I" firstAttribute="top" secondItem="Xzd-3C-bwm" secondAttribute="top" constant="8" id="iIG-nL-28g"/>
+                        <constraint firstAttribute="width" secondItem="Xzd-3C-bwm" secondAttribute="height" multiplier="100:25" id="moO-yE-bad"/>
+                        <constraint firstAttribute="trailing" secondItem="YhA-yW-k4I" secondAttribute="trailing" constant="8" id="stk-jh-Pou"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="Xzd-3C-bwm" firstAttribute="centerX" secondItem="23o-w5-FA0" secondAttribute="centerX" id="5Tz-iE-zzW"/>
+                <constraint firstItem="Xzd-3C-bwm" firstAttribute="top" secondItem="23o-w5-FA0" secondAttribute="top" id="PBK-pT-VHM"/>
+                <constraint firstItem="Xzd-3C-bwm" firstAttribute="width" secondItem="23o-w5-FA0" secondAttribute="width" id="WL7-NH-MkP"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="I4p-UU-VUk"/>
+            <point key="canvasLocation" x="-46.399999999999999" y="-79.160419790104953"/>
+        </view>
+    </objects>
+</document>

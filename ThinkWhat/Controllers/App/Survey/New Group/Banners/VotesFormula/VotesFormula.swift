@@ -1,57 +1,66 @@
 //
-//  TotalCost.swift
+//  VotesFormula.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 09.08.2021.
+//  Created by Pavel Bukharov on 11.08.2021.
 //  Copyright © 2021 Pavel Bukharov. All rights reserved.
 //
-
 import UIKit
 
-class TotalCost: UIView, BannerContent {
+class VotesFormula: UIView, BannerContent {
+    deinit {
+        print("VotesFormula banner deinit")
+    }
     var minHeigth: CGFloat {
         return topView.frame.height
     }
-
+    
     var maxHeigth: CGFloat {
-        return topView.frame.height + bottomView.frame.height
+        return topView.frame.height
     }
-    var foldable: Bool = true
+    var foldable: Bool = false
+    
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var topView: UIView!
-    @IBOutlet weak var bottomView: UIView!
-    @IBOutlet weak var paymentIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var icon: SurveyCategoryIcon! {
         didSet {
-            paymentIcon.backgroundColor = color
-            paymentIcon.category = .Plus
-            paymentIcon.iconColor = .white
+            icon.backgroundColor = Colors.UpperButtons.Avocado
+            icon.iconColor = .white
+            icon.category = .Balance
         }
     }
-    @IBOutlet weak var balanceLabel: UILabel! {
+    @IBOutlet weak var votesLabel: UILabel! {
         didSet {
-            balanceLabel.textColor = color
+            votesLabel.text = "\(votes)"
+        }
+    }
+    @IBOutlet weak var priceLabel: UILabel! {
+        didSet {
+            priceLabel.text = "\(price)"
         }
     }
     @IBOutlet weak var costLabel: UILabel! {
         didSet {
-            costLabel.alpha = cost == 0 ? 0 : 1
+            costLabel.text = "\(cost.formattedWithSeparator)"
         }
     }
-    weak var delegate: CallbackDelegate?
+
     var color: UIColor = Colors.UpperButtons.VioletBlueCrayola
-    var balance = 0 {
+    var votes = 0 {
         didSet {
-            if oldValue != balance, balanceLabel != nil {
-                balanceLabel.text = "$\(balance.formattedWithSeparator)"
-            }
+            cost = votes * price
+            votesLabel.text = "\(votes)"
+        }
+    }
+    var price = 1 {
+        didSet {
+            cost = votes * price
+            priceLabel.text = "\(price)"
         }
     }
     var cost    = 0 {
         didSet {
-            if oldValue != cost, costLabel != nil {
-                costLabel.alpha = cost == 0 ? 0 : 1
-                costLabel.text = "-$\(cost.formattedWithSeparator) публикация"
-            }
+            costLabel.text = "\(cost)"//".formattedWithSeparator)"
         }
     }
     override init(frame: CGRect) {
@@ -71,7 +80,7 @@ class TotalCost: UIView, BannerContent {
     }
     
     private func commonInit() {
-        Bundle.main.loadNibNamed("TotalCost", owner: self, options: nil)
+        Bundle.main.loadNibNamed("VotesFormula", owner: self, options: nil)
         guard let content = contentView else {
             return
         }
@@ -79,10 +88,5 @@ class TotalCost: UIView, BannerContent {
         content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(content)
         self.backgroundColor = .clear
-
-    }
-    
-    func callbackReceived(_ sender: AnyObject) {
-//        delegate?.callbackReceived(<#T##sender: AnyObject##AnyObject#>)
     }
 }

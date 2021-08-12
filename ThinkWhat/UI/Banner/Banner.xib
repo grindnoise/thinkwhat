@@ -5,7 +5,7 @@
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,8 +13,7 @@
             <connections>
                 <outlet property="background" destination="6vZ-LX-f1n" id="IwT-uJ-CHs"/>
                 <outlet property="body" destination="hL3-w3-LX9" id="pX0-yH-AMJ"/>
-                <outlet property="container" destination="KbU-93-Nth" id="How-6t-3Ks"/>
-                <outlet property="containerHeightConstraint" destination="Np6-h3-Hsg" id="YTa-Oz-diJ"/>
+                <outlet property="container" destination="aPj-Uf-pOh" id="LBi-ld-6pZ"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="HNw-qN-kZW"/>
                 <outlet property="heightConstraint" destination="xSa-gT-kW7" id="OvG-XC-mHT"/>
                 <outlet property="topConstraint" destination="W9C-h6-vpH" id="udf-ad-zyb"/>
@@ -34,34 +33,7 @@
                     <subviews>
                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aPj-Uf-pOh">
                             <rect key="frame" x="8" y="8" width="343" height="104"/>
-                            <subviews>
-                                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FCe-Yt-YIW">
-                                    <rect key="frame" x="0.0" y="0.0" width="343" height="104"/>
-                                    <subviews>
-                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KbU-93-Nth">
-                                            <rect key="frame" x="0.0" y="0.0" width="343" height="300"/>
-                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="300" id="Np6-h3-Hsg"/>
-                                            </constraints>
-                                        </view>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="KbU-93-Nth" firstAttribute="leading" secondItem="FCe-Yt-YIW" secondAttribute="leading" id="Sfi-Nm-xax"/>
-                                        <constraint firstItem="KbU-93-Nth" firstAttribute="top" secondItem="FCe-Yt-YIW" secondAttribute="top" id="emM-Ii-wnC"/>
-                                        <constraint firstAttribute="bottom" secondItem="KbU-93-Nth" secondAttribute="bottom" id="qHM-mD-zRW"/>
-                                        <constraint firstAttribute="trailing" secondItem="KbU-93-Nth" secondAttribute="trailing" id="qxC-Tk-6Zd"/>
-                                        <constraint firstItem="KbU-93-Nth" firstAttribute="width" secondItem="FCe-Yt-YIW" secondAttribute="width" id="vUe-kB-zNO"/>
-                                    </constraints>
-                                </scrollView>
-                            </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <constraints>
-                                <constraint firstAttribute="trailing" secondItem="FCe-Yt-YIW" secondAttribute="trailing" id="FyX-Jg-QNf"/>
-                                <constraint firstAttribute="bottom" secondItem="FCe-Yt-YIW" secondAttribute="bottom" id="gjN-cE-SW4"/>
-                                <constraint firstItem="FCe-Yt-YIW" firstAttribute="leading" secondItem="aPj-Uf-pOh" secondAttribute="leading" id="iFW-pn-XZn"/>
-                                <constraint firstItem="FCe-Yt-YIW" firstAttribute="top" secondItem="aPj-Uf-pOh" secondAttribute="top" id="kJc-eN-a1k"/>
-                            </constraints>
                         </view>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

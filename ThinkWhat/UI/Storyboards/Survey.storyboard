@@ -407,7 +407,7 @@
                                                     <constraint firstAttribute="width" secondItem="AjT-DG-Etr" secondAttribute="height" multiplier="1:1" id="fZP-87-GJV"/>
                                                 </constraints>
                                             </view>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="КОЛИЧЕСТВО" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O2g-EL-7cP" customClass="ArcLabel" customModule="ThinkWhat" customModuleProvider="target">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ЧИСЛО" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O2g-EL-7cP" customClass="ArcLabel" customModule="ThinkWhat" customModuleProvider="target">
                                                 <rect key="frame" x="88.5" y="257.5" width="143" height="142.5"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="10"/>
@@ -418,7 +418,7 @@
                                                 <rect key="frame" x="107" y="381.5" width="106" height="18.5"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </view>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ГОЛОСОВ" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wzm-bY-7Ha" customClass="ArcLabel" customModule="ThinkWhat" customModuleProvider="target">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="УЧАСТНИКОВ" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wzm-bY-7Ha" customClass="ArcLabel" customModule="ThinkWhat" customModuleProvider="target">
                                                 <rect key="frame" x="88.5" y="257.5" width="143" height="142.5"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="10"/>
@@ -468,6 +468,13 @@
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BX1-TW-ABb">
                                                 <rect key="frame" x="16" y="1132.5" width="288" height="237.5"/>
                                                 <subviews>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Voa-ee-52D" customClass="SurveyCategoryIcon" customModule="ThinkWhat" customModuleProvider="target">
+                                                        <rect key="frame" x="24" y="54.5" width="30" height="30"/>
+                                                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="Voa-ee-52D" secondAttribute="height" multiplier="1:1" id="Fp7-Fj-1MI"/>
+                                                        </constraints>
+                                                    </view>
                                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Kch-vr-c2V">
                                                         <rect key="frame" x="29" y="59.5" width="230" height="118.5"/>
                                                         <subviews>
@@ -613,11 +620,14 @@
                                                 <constraints>
                                                     <constraint firstItem="Kch-vr-c2V" firstAttribute="width" secondItem="BX1-TW-ABb" secondAttribute="width" multiplier="0.8" id="0Q3-Pa-Xlw"/>
                                                     <constraint firstItem="Kch-vr-c2V" firstAttribute="centerX" secondItem="BX1-TW-ABb" secondAttribute="centerX" id="0g1-o4-sj9"/>
+                                                    <constraint firstItem="Voa-ee-52D" firstAttribute="height" secondItem="y8L-8f-pgV" secondAttribute="height" id="6eG-EK-3yx"/>
                                                     <constraint firstItem="SJE-fK-NzC" firstAttribute="top" secondItem="Kch-vr-c2V" secondAttribute="bottom" id="FaA-ec-o2a"/>
+                                                    <constraint firstAttribute="trailing" secondItem="Voa-ee-52D" secondAttribute="trailing" constant="8" id="PEt-h8-aDj"/>
                                                     <constraint firstAttribute="bottom" secondItem="SJE-fK-NzC" secondAttribute="bottom" id="j7c-y9-Xa8"/>
                                                     <constraint firstItem="SJE-fK-NzC" firstAttribute="width" secondItem="Kch-vr-c2V" secondAttribute="width" id="npg-sf-jdk"/>
                                                     <constraint firstItem="SJE-fK-NzC" firstAttribute="centerX" secondItem="BX1-TW-ABb" secondAttribute="centerX" id="pOF-cN-on2"/>
                                                     <constraint firstItem="Kch-vr-c2V" firstAttribute="height" secondItem="BX1-TW-ABb" secondAttribute="height" multiplier="0.5" id="qsz-xZ-yZ8"/>
+                                                    <constraint firstItem="Voa-ee-52D" firstAttribute="top" secondItem="BX1-TW-ABb" secondAttribute="top" constant="8" id="rvx-qI-ejl"/>
                                                     <constraint firstItem="Kch-vr-c2V" firstAttribute="centerY" secondItem="BX1-TW-ABb" secondAttribute="centerY" id="sFE-RO-IEG"/>
                                                 </constraints>
                                             </view>
@@ -768,6 +778,13 @@
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QJd-ol-xzm">
                                                 <rect key="frame" x="16" y="1473" width="288" height="198"/>
                                                 <subviews>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RpD-x8-ft5" customClass="SurveyCategoryIcon" customModule="ThinkWhat" customModuleProvider="target">
+                                                        <rect key="frame" x="129" y="84" width="30" height="30"/>
+                                                        <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="RpD-x8-ft5" secondAttribute="height" multiplier="1:1" id="CAs-YM-FAe"/>
+                                                        </constraints>
+                                                    </view>
                                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="CSU-ho-3nz">
                                                         <rect key="frame" x="29" y="64.5" width="230" height="68.5"/>
                                                         <subviews>
@@ -819,9 +836,12 @@
                                                 <constraints>
                                                     <constraint firstItem="CSU-ho-3nz" firstAttribute="centerY" secondItem="QJd-ol-xzm" secondAttribute="centerY" id="Jwc-Tb-CcL"/>
                                                     <constraint firstAttribute="bottom" secondItem="6Rz-G3-BKA" secondAttribute="bottom" id="TIp-za-b45"/>
+                                                    <constraint firstItem="RpD-x8-ft5" firstAttribute="top" secondItem="QJd-ol-xzm" secondAttribute="top" constant="8" id="V7s-i4-agm"/>
                                                     <constraint firstItem="CSU-ho-3nz" firstAttribute="centerX" secondItem="QJd-ol-xzm" secondAttribute="centerX" id="WZB-wQ-VEL"/>
                                                     <constraint firstItem="6Rz-G3-BKA" firstAttribute="leading" secondItem="QJd-ol-xzm" secondAttribute="leading" constant="5" id="Zze-Sq-wCg"/>
                                                     <constraint firstItem="6Rz-G3-BKA" firstAttribute="top" secondItem="CSU-ho-3nz" secondAttribute="bottom" id="bG6-z6-O5a"/>
+                                                    <constraint firstItem="RpD-x8-ft5" firstAttribute="height" secondItem="0P7-ld-G9i" secondAttribute="height" id="f1l-H6-09k"/>
+                                                    <constraint firstAttribute="trailing" secondItem="RpD-x8-ft5" secondAttribute="trailing" constant="8" id="tK5-z7-PZG"/>
                                                     <constraint firstItem="6Rz-G3-BKA" firstAttribute="width" secondItem="QJd-ol-xzm" secondAttribute="width" id="vQG-k0-4MI"/>
                                                 </constraints>
                                             </view>
@@ -1049,7 +1069,7 @@
                                                         <constraint firstAttribute="width" secondItem="T94-2y-8Zt" secondAttribute="height" multiplier="5:1" id="ohY-4y-lQf"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="15"/>
-                                                    <state key="normal" title="ЗАПУСТИТЬ!">
+                                                    <state key="normal" title="ПРЕДПРОСМОТР">
                                                         <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </state>
                                                     <connections>
@@ -1117,6 +1137,7 @@
                         <outlet property="hotTitle" destination="KkK-YW-qNW" id="0nK-ba-npt"/>
                         <outlet property="hyperlinkArcLabel" destination="Z4I-Cz-lAV" id="0ss-qt-kQ1"/>
                         <outlet property="hyperlinkIcon" destination="MyL-iZ-6nQ" id="Edo-EZ-PmR"/>
+                        <outlet property="hyperlinkInfoButton" destination="Voa-ee-52D" id="nif-Ds-RsE"/>
                         <outlet property="hyperlinkLabel" destination="mRe-Dw-odV" id="75k-QB-p8U"/>
                         <outlet property="hyperlinkSkipButton" destination="y8L-8f-pgV" id="riA-Ak-6sR"/>
                         <outlet property="hyperlinkView" destination="BX1-TW-ABb" id="z30-LM-FbZ"/>
@@ -1125,6 +1146,7 @@
                         <outlet property="image_3" destination="P3U-Rm-G42" id="aFT-MO-QQh"/>
                         <outlet property="imagesArcLabel" destination="bwK-bw-dqn" id="YNw-sz-omv"/>
                         <outlet property="imagesHeaderIcon" destination="KUf-ih-5c3" id="1Rd-eb-45b"/>
+                        <outlet property="imagesInfoButton" destination="RpD-x8-ft5" id="v7y-7P-4WH"/>
                         <outlet property="imagesSkipButton" destination="0P7-ld-G9i" id="xQf-3l-Yvd"/>
                         <outlet property="imagesStackView" destination="CSU-ho-3nz" id="XpA-lX-Ipf"/>
                         <outlet property="imagesView" destination="QJd-ol-xzm" id="w79-Uu-FI0"/>
@@ -1166,10 +1188,10 @@
             </objects>
             <point key="canvasLocation" x="357" y="-1234"/>
         </scene>
-        <!--Количество голосов-->
+        <!--Число участников-->
         <scene sceneID="5en-hZ-ZDe">
             <objects>
-                <viewController storyboardIdentifier="VotesCountViewController" title="Количество голосов" id="LG0-ge-ola" customClass="VotesCountViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="VotesCountViewController" title="Число участников" id="LG0-ge-ola" customClass="VotesCountViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="SMC-fH-Vw0"/>
                         <viewControllerLayoutGuide type="bottom" id="FOA-kN-nDp"/>
@@ -1206,6 +1228,11 @@
                             <constraint firstItem="6kC-s9-Pzx" firstAttribute="centerX" secondItem="EF0-UL-Has" secondAttribute="centerX" id="vwO-ZE-PEf"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Число участников" id="DqX-ja-uFK">
+                        <barButtonItem key="rightBarButtonItem" style="plain" systemItem="add" id="Wps-fN-s7M">
+                            <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="actionButton" destination="6kC-s9-Pzx" id="Dwa-Nj-sTK"/>
                         <outlet property="actionButtonWidth" destination="qEq-Bz-Aoj" id="Of6-aX-XBA"/>
@@ -1667,6 +1694,11 @@
                             <constraint firstItem="k2g-2D-Zgf" firstAttribute="centerX" secondItem="NzM-AZ-5sl" secondAttribute="centerX" id="z6g-dQ-7OO"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Title" id="Mdw-0q-9Oi">
+                        <barButtonItem key="rightBarButtonItem" style="plain" systemItem="add" id="Cqk-uY-DtA">
+                            <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </barButtonItem>
+                    </navigationItem>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="actionButton" destination="pIz-VA-PCF" id="WAb-LQ-Qjd"/>

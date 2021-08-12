@@ -1200,7 +1200,14 @@ class APIManager: APIManagerProtocol {
                     if success {
                         self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.BALANCE), httpMethod: .get, parameters: [:], encoding: URLEncoding.default) {
                             json, error in
-                            print(json)
+                            if error != nil {
+                                print(error!.localizedDescription)
+                            } else if let strongJSON = json {
+                                PriceList.shared.importJson(strongJSON["pricelist"])
+                                if let balance = strongJSON[DjangoVariables.UserProfile.balance].intValue as? Int {
+                                    AppData.shared.userProfile.balance = balance
+                                }
+                            }
                         }
                     }
                 }

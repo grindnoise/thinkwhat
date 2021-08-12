@@ -200,7 +200,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
     }
     
     private func animateIconView() {
-        if let initialLayer = iconView.icon as? CAShapeLayer, let initialPath = initialLayer.path, let destinationLayer = iconView.getLayer(.Completed) as? CAShapeLayer, let destinationPath = destinationLayer.path {
+        if let initialLayer = iconView.icon as? CAShapeLayer, let initialPath = initialLayer.path, let destinationLayer = iconView.getLayer(.Success) as? CAShapeLayer, let destinationPath = destinationLayer.path {
             let pathAnim      = Animations.get(property: .Path,
                                                fromValue: initialPath as Any,
                                                toValue: destinationPath as Any,

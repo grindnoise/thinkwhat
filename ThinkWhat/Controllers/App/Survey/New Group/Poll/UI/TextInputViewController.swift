@@ -70,7 +70,12 @@ class TextInputViewController: UIViewController {
         if text.text.isEmpty || text.text.count < minCharacters {
             UIView.animate(withDuration: 0, animations: {self.view.endEditing(true)}, completion: {
                 _ in
-                showAlert(type: .Warning, buttons: [["Хорошо": [.Ok: {self.text.becomeFirstResponder()}]]], text: "Поле должно содержать не менее \(self.minCharacters) знаков")
+                Banner.shared.contentType = .Warning
+                if let content = Banner.shared.content as? Warning {
+                    content.level = .Warning
+                    content.text = "\(self.titleString) должен содержать не менее \(self.minCharacters) знаков"
+                }
+                Banner.shared.present(shouldDismissAfter: 2, delegate: self)
             })
         } else {
             //            delegate?.callbackReceived(text)
@@ -200,6 +205,18 @@ class TextInputViewController: UIViewController {
             self.frameHeight.constant += self.keyboardHeight
             self.view.layoutIfNeeded()
             self.keyboardHeight = 0
+        }
+    }
+}
+
+extension TextInputViewController: CallbackDelegate {
+    func callbackReceived(_ sender: AnyObject) {
+        if let identifier = sender as? String {
+            if identifier == Banner.bannerWillAppearSignal {
+                view.endEditing(true)
+            } else if identifier == Banner.bannerDidDisappearSignal {
+                text.becomeFirstResponder()
+            }
         }
     }
 }

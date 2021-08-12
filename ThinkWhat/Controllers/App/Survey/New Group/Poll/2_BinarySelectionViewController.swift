@@ -35,13 +35,27 @@ class BinarySelectionViewController: UIViewController {
             }
         }
     }
+    var cost: [String: Int]?
     var delegate: CallbackDelegate?
     private var enabledString = ""
     private var disabledString = ""
     private var isSelected = false
     private var isFirstSelection = true
+    private var isBannerShown = false
     var isAnimationStopped = false
-    var isEnabled: Bool?
+    var isEnabled: Bool? {
+        didSet {
+            if selectionType == .Hot, isEnabled == true, !isBannerShown {
+                Banner.shared.contentType = .Warning
+                if let content = Banner.shared.content as? Warning {
+                    content.level = .Warning
+                    content.text = "Платная опция, будет списано дополнительно \(PriceList.shared.hotPost) баллов"
+                }
+                Banner.shared.present(shouldDismissAfter: 3, delegate: nil)
+                isBannerShown = true
+            }
+        }
+    }
     var color: UIColor!
     var lineWidth: CGFloat = 5 {
         didSet {
@@ -168,13 +182,44 @@ class BinarySelectionViewController: UIViewController {
             title = "Комментарии"
         case .Hot:
             title = "Хот-лист"
+            if let btn = self.navigationItem.rightBarButtonItem as? UIBarButtonItem {
+                let v = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
+                v.accessibilityIdentifier = "info"
+                v.backgroundColor = .clear
+                v.iconColor = .black//Colors.UpperButtons.VioletBlueCrayola
+                v.category = .Info
+                let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.viewTapped(gesture:)))
+                v.addGestureRecognizer(tap)
+                btn.customView = v
+                v.scaleMultiplicator = 0.15
+                btn.customView?.alpha = 0
+                btn.customView?.clipsToBounds = false
+                btn.customView?.layer.masksToBounds = false
+                btn.customView?.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+                UIView.animate(
+                    withDuration: 0.4,
+                    delay: 0,
+                    usingSpringWithDamping: 0.6,
+                    initialSpringVelocity: 2.5,
+                    options: [.curveEaseInOut],
+                    animations: {
+                        btn.customView?.transform = .identity
+                        btn.customView?.alpha = 1
+                })
+                self.navigationController?.navigationBar.setNeedsLayout()
+            }
         }
     }
     
     @objc fileprivate func okButtonTapped() {
         isAnimationStopped = true
         if !isSelected {
-            showAlert(type: .Warning, buttons: [["Хорошо": [.Ok: nil]]], text: "Выберите вариант")
+            Banner.shared.contentType = .Warning
+            if let content = Banner.shared.content as? Warning {
+                content.level = .Error
+                content.text = "Необходимо выбрать опцию"
+            }
+            Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
         } else {
             navigationController?.popViewController(animated: true)
         }
@@ -182,6 +227,15 @@ class BinarySelectionViewController: UIViewController {
     
     @objc fileprivate func viewTapped(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended, let v = gesture.view {
+            if v.accessibilityIdentifier == "info" {
+                Banner.shared.contentType = .Warning
+                if let content = Banner.shared.content as? Warning {
+                    content.level = .Info
+                    content.text = "Стоимость публикации в ленте горячих составляет \(PriceList.shared.hotPost) баллов"
+                }
+                Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                return
+            }
          
             actionButton.isUserInteractionEnabled = true
             let selectedView: UIView! = v == enabledBg ? enabledBg : disabledBg

@@ -1217,3 +1217,16 @@ extension CGPoint {
         return CGPoint(x: x, y: y)
     }
 }
+
+extension Formatter {
+    static let withSeparator: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = " "
+        return formatter
+    }()
+}
+
+extension Numeric {
+    var formattedWithSeparator: String { return Formatter.withSeparator.string(for: self) ?? "" }
+}
