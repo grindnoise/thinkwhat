@@ -42,7 +42,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
     
     private var timer:  Timer?
     var iconCategory: SurveyCategoryIcon.Category = .Poll
-    weak var survey: FullSurvey?
+    weak var survey: Survey?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -153,7 +153,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
                     if let _ID = json!["id"].intValue as? Int, let _answers = json!["answers"].arrayValue as? [JSON] {
                         self.survey!.ID = _ID
                         for _answer in _answers {
-                            if let answer = SurveyAnswer(json: _answer) {
+                            if let answer = Answer(json: _answer) {
                                 self.survey!.answers.append(answer)
                             }
                         }

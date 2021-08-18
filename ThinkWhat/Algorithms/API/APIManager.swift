@@ -26,13 +26,13 @@ protocol APIManagerProtocol {
     func initialLoad(completion: @escaping(JSON?, Error?)->())
     func loadSurveyCategories(completion: @escaping(JSON?, Error?)->())
     func loadSurveys(type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
-    func loadSurvey(survey: ShortSurvey, completion: @escaping(JSON?, Error?)->())
+    func loadSurvey(survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
     func loadTotalSurveysCount(completion: @escaping(JSON?, Error?)->())
     func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->())
     func loadSurveysByOwner(userProfile: UserProfile, type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
-    func markFavorite(mark: Bool, survey: ShortSurvey, completion: @escaping(JSON?, Error?)->())
-    func postSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->())
-    func rejectSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->())
+    func markFavorite(mark: Bool, survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
+    func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
+    func rejectSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
     func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->())
     func postClaim(surveyID: Int, claimID: Int, completion: @escaping(JSON?, Error?)->())
     func getUserStats(userProfile: UserProfile, completion: @escaping(JSON?, Error?)->())
@@ -41,6 +41,8 @@ protocol APIManagerProtocol {
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
     func downloadImage(url: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
     func downloadImage(url: String, completion: @escaping (UIImage?, Error?) -> ())
+    
+    func getTikTokEmbedHTML(url: URL, completion: @escaping(JSON?, Error?)->())
     //    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
     //    func makeOrder(_ order: Order, completion: @escaping (JSON) -> ())
     //    func requestSMSValidationCode(phoneNumber: String, completion: @escaping (JSON?) -> ())
@@ -820,7 +822,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func loadSurvey(survey: ShortSurvey, completion: @escaping(JSON?, Error?)->()) {
+    func loadSurvey(survey: SurveyRef, completion: @escaping(JSON?, Error?)->()) {
         var error: Error?
         
         checkForReachability {
@@ -841,7 +843,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func markFavorite(mark: Bool, survey: ShortSurvey, completion: @escaping(JSON?, Error?)->()) {
+    func markFavorite(mark: Bool, survey: SurveyRef, completion: @escaping(JSON?, Error?)->()) {
         var error: Error?
         checkForReachability {
             reachable in
@@ -861,7 +863,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func postSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->()) {
+    func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->()) {
         var dict = survey.dict
         print(dict)
         var json: JSON?
@@ -1072,7 +1074,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func rejectSurvey(survey: FullSurvey, completion: @escaping(JSON?, Error?)->()) {
+    func rejectSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->()) {
         var parameters: [String: Any] = ["survey": survey.ID! as Any]
         if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
             let stackList = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
@@ -1212,6 +1214,13 @@ class APIManager: APIManagerProtocol {
                     }
                 }
             }
+        }
+    }
+    
+    func getTikTokEmbedHTML(url: URL, completion: @escaping(JSON?, Error?)->()) {
+        _performRequest(url: url, httpMethod: .get) {
+            json, error in
+            completion(json, error)
         }
     }
         

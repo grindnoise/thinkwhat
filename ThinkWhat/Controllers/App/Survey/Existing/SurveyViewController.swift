@@ -29,8 +29,8 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             }
         }
     }
-    var needsNavBarIconsAnimated    = true
-    var needsImageLoading           = true//True - segue from list, false - from stack
+    var shoulAnimateBarIcons    = true
+    var shouldDownloadImages           = true//True - segue from list, false - from stack
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .default
     }
@@ -140,26 +140,26 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
     fileprivate var scrollArrow: ScrollArrow!
     fileprivate var isAutoScrolling = false   //is on when scrollArrow is tapped
     
-    var surveyLink: ShortSurvey! {
+    var surveyLink: SurveyRef! {
         didSet {
             likeButton.removeAllAnimations()
-            title = surveyLink.category!.title//"Опрос №\(surveyLink.ID)"
+            title = surveyLink.category.title//"Опрос №\(surveyLink.ID)"
             likeButton.state = Array(Surveys.shared.favoriteLinks.keys).filter( {$0.ID == surveyLink.ID }).isEmpty ? .disabled : .enabled
         }
     }
     
-    var survey: FullSurvey? {
+    var survey: Survey? {
         didSet {
             if survey != nil, isInitialLoading {
                 showLikeButton()
                 showClaimButton()
                 self.presentSurvey()
                 if surveyLink == nil {
-                    surveyLink = ShortSurvey(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100, type: survey!.type)
+                    surveyLink = SurveyRef(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100, type: survey!.type)
                 }
                 if let userProfile = survey!.userProfile as? UserProfile, let image = userProfile.image as? UIImage {
                     NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: nil)
-                } else if needsImageLoading, let userProfile = survey!.userProfile as? UserProfile, let url = userProfile.imageURL as? String {
+                } else if shouldDownloadImages, let userProfile = survey!.userProfile as? UserProfile, let url = userProfile.imageURL as? String {
                     apiManager.downloadImage(url: url) {
                         image, error in
                         if error != nil {
@@ -258,7 +258,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             if claimButtonNeedsAnimation {
                 showClaimButton()
             }
-            if needsNavBarIconsAnimated {
+            if shoulAnimateBarIcons {
                 showLikeButton()
             }
             if survey?.userProfile?.image != nil {
@@ -382,13 +382,13 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                     _cell.date.attributedText = NSAttributedString(string: " \(survey!.startDate.toDateStringLiteral_dMMM())   ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
                 } else {
                     let attrString = NSMutableAttributedString()
-                    attrString.append(NSAttributedString(string: "  \(surveyLink.category?.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: "  \(surveyLink.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
                     attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
-                    attrString.append(NSAttributedString(string: "\((surveyLink.category?.parent?.title.uppercased() ?? ""))  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: "\((surveyLink.category.parent?.title.uppercased() ?? ""))  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
                     _cell.label.text = surveyLink.title
                     _cell.survey = surveyLink
                     _cell.label.text = survey!.title
-                    if let color = surveyLink.category?.parent?.tagColor {
+                    if let color = surveyLink.category.parent?.tagColor {
                         _cell.category.backgroundColor = color//.withAlphaComponent(0.5)
                         _cell.date.backgroundColor = color
                         _cell.join.backgroundColor = color
@@ -489,7 +489,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         }
         } else if indexPath.section == 1 {
             if isReadOnly {
-                if let _cell = tableView.dequeueReusableCell(withIdentifier: "result", for: indexPath) as? SurveyResultCell, let answer = survey!.answers[indexPath.row] as? SurveyAnswer {
+                if let _cell = tableView.dequeueReusableCell(withIdentifier: "result", for: indexPath) as? SurveyResultCell, let answer = survey!.answers[indexPath.row] as? Answer {
                     //Highlight user's answer
                     if let answerID = survey?.result?.keys.first, answerID == answer.ID {
                         _cell.label.isSelected = true
@@ -723,7 +723,7 @@ extension SurveyViewController {
             }
             if json != nil {
                 print(json!)
-                if let _survey = FullSurvey(json!) {
+                if let _survey = Survey(json!) {
                     Surveys.shared.append(object: _survey, type: .Downloaded)
                     self.survey = _survey
                     self.requestAttempt = 0
@@ -978,7 +978,7 @@ extension SurveyViewController {
             }
             destination.delegate = self
             destination.topConstraintConstant = tempClaimMaxY
-            needsNavBarIconsAnimated = false
+            shoulAnimateBarIcons = false
         } else if segue.identifier == Segues.App.SurveyToUser, let destination = segue.destination as? UserViewController {
             destination.userProfile = survey?.userProfile
         }
@@ -987,7 +987,7 @@ extension SurveyViewController {
     
     @objc func profileImageReceived() {
         if survey != nil {
-            needsImageLoading = false
+            shouldDownloadImages = false
             showNavTitle()
         }
     }
@@ -1010,7 +1010,7 @@ extension SurveyViewController {
     
     @objc fileprivate func showOwnerProfile() {
         performSegue(withIdentifier: Segues.App.SurveyToUser, sender: nil)
-        needsNavBarIconsAnimated = false
+        shoulAnimateBarIcons = false
         claimButtonNeedsAnimation = false
     }
     

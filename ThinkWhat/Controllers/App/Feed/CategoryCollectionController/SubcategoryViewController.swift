@@ -53,7 +53,7 @@ class SubcategoryViewController: UIViewController {
         
         if !isViewSetupCompleted {
             upperContainer.layer.shadowOpacity = 0
-            upperContainer.layer.shadowColor = parentCategory.tagColor!.withAlphaComponent(0.3).cgColor
+            upperContainer.layer.shadowColor = parentCategory.tagColor.withAlphaComponent(0.3).cgColor
             upperContainer.layer.shadowPath = UIBezierPath(rect: upperContainer.bounds).cgPath
             upperContainer.layer.masksToBounds = false
             upperContainer.layer.shadowRadius = 10

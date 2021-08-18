@@ -265,6 +265,11 @@ extension UIView {
 }
 
 extension String {
+    func fullRange() -> NSRange {
+        let str = NSString(string: self)
+        return NSRange(location: 0, length: str.length)
+    }
+    
     var hexColor: UIColor? {
         guard !isEmpty else {
             return nil
@@ -348,6 +353,28 @@ extension String {
         }
         
         return (self as NSString).substring(with: result.range)
+    }
+    
+    var isYoutubeLink: Bool {
+        
+        let youtubeRegex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?youtu(be\\.com|\\.be)(\\/watch\\?([&=a-z]{0,})(v=[\\d\\w]{1,}).+|\\/[\\d\\w]{1,})"
+        
+        let youtubeCheckResult = NSPredicate(format: "SELF MATCHES %@", youtubeRegex)
+        return youtubeCheckResult.evaluate(with: self)
+    }
+    var isTikTokLink: Bool {
+        return self.contains("https://www.tiktok.com/")
+//        let youtubeRegex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?youtu(be\\.com|\\.be)(\\/watch\\?([&=a-z]{0,})(v=[\\d\\w]{1,}).+|\\/[\\d\\w]{1,})"
+//
+//        let youtubeCheckResult = NSPredicate(format: "SELF MATCHES %@", youtubeRegex)
+//        return youtubeCheckResult.evaluate(with: self)
+    }
+    var isTikTokEmbedLink: Bool {
+        return self.contains("tiktok-embed")
+        //        let youtubeRegex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?youtu(be\\.com|\\.be)(\\/watch\\?([&=a-z]{0,})(v=[\\d\\w]{1,}).+|\\/[\\d\\w]{1,})"
+        //
+        //        let youtubeCheckResult = NSPredicate(format: "SELF MATCHES %@", youtubeRegex)
+        //        return youtubeCheckResult.evaluate(with: self)
     }
 }
 

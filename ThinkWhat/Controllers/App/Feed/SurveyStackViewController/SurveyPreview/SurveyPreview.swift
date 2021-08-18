@@ -14,7 +14,7 @@ class SurveyPreview: UIView {
         print("SurveyPreview deinit")
     }
 
-    var survey: FullSurvey! 
+    var survey: Survey! 
     weak fileprivate var delegate: CallbackDelegate?
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var userImage: UIImageView! {
@@ -42,7 +42,7 @@ class SurveyPreview: UIView {
         }
         delegate?.callbackReceived(sender as AnyObject)
     }
-    init(frame: CGRect, survey _survey: FullSurvey, delegate _delegate: CallbackDelegate) {
+    init(frame: CGRect, survey _survey: Survey, delegate _delegate: CallbackDelegate) {
         survey = _survey
         delegate = _delegate
         super.init(frame: frame)

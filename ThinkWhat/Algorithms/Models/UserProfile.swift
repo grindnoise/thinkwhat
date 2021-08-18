@@ -48,8 +48,8 @@ class UserProfile {
     var hashValue:  Int {
         return ObjectIdentifier(self).hashValue
     }
-    var surveysCreated:     [Date: [ShortSurvey]]   = [:]
-    var surveysFavorite:    [Date: [ShortSurvey]]   = [:]
+    var surveysCreated:     [Date: [SurveyRef]]   = [:]
+    var surveysFavorite:    [Date: [SurveyRef]]   = [:]
     
     init?(_ json: JSON) {
         if let _ID                      = json[DjangoVariables.ID].intValue as? Int,
@@ -103,7 +103,7 @@ class UserProfile {
             }
         }
         for i in json {
-            if let survey = ShortSurvey(i.1) {
+            if let survey = SurveyRef(i.1) {
                 if let _foundObject = Surveys.shared.allLinks.filter({ $0.hashValue == survey.hashValue}).first {
                     if type == .Own {
                         if var container = surveysCreated.values.first, container.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty, let key = surveysCreated.keys.first {

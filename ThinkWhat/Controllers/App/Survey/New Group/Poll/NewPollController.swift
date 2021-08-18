@@ -667,7 +667,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
     
     //Indicates if effectView is on screen
     private var effectView: UIVisualEffectView?
-    private var survey: FullSurvey?
+    private var survey: Survey?
     //MARK: - VC Functions
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -2270,7 +2270,7 @@ extension NewPollController: ServerProtocol {
             return dict
         }
         //Prepare new Survey w/o ID
-        if let _survey = FullSurvey(newWithoutID: getDict()) {
+        if let _survey = Survey(newWithoutID: getDict()) {
             survey = _survey
             performSegue(withIdentifier: Segues.NewSurvey.Results, sender: nil)
 //            apiManager.postSurvey(survey: survey!) {

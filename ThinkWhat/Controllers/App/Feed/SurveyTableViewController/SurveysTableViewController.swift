@@ -331,7 +331,7 @@ class SurveysTableViewController: UITableViewController {
 //        if vc.currentIcon != .Category {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell {
 
-                var dataSource: [ShortSurvey]
+                var dataSource: [SurveyRef]
 //                if vc.currentIcon == .New {
 //                    dataSource = Surveys.shared.newSurveys
 //                } else {
@@ -359,23 +359,22 @@ class SurveysTableViewController: UITableViewController {
 
                 cell.survey = survey
                 let attrString = NSMutableAttributedString()
-                attrString.append(NSAttributedString(string: "  \(survey.category!.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "  \(survey.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
                 attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
-                attrString.append(NSAttributedString(string: "\(survey.category!.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "\(survey.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
 //                attrString.append(NSAttributedString(string: " \(survey.category!.title.uppercased())", attributes: StringAttributes.Bold.red_11))
 //                attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.Regular.red_11))
 //                attrString.append(NSAttributedString(string: "\(survey.category!.parent!.title.uppercased()) ", attributes: StringAttributes.SemiBold.red_11))
                 cell.category.attributedText = attrString
                 cell.category.backgroundColor = .clear
                 cell.duration.backgroundColor = .clear
-                if let color = survey.category!.parent!.tagColor {
+                let color = survey.category.tagColor 
                     cell.category.backgroundColor = color//.withAlphaComponent(0.5)
                     cell.duration.backgroundColor = color
                     cell.join.backgroundColor = color
                     cell.join_2.backgroundColor = color
                     cell.category.cornerRadius = cell.category.frame.height / 2.5
                     cell.duration.cornerRadius = cell.duration.frame.height / 2.5
-                }
                 cell.title.text = survey.title
                 cell.duration.attributedText = NSAttributedString(string: " \(dataSource[indexPath.row].startDate.toDateStringLiteral_dMMM())   ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
                 return cell

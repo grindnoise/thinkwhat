@@ -381,7 +381,14 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             nc.duration = 0.3
             nc.transitionStyle = .Icon
             destinationVC.delegate = self
-        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? SurveyViewController {
+        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? PollController, let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+            destinationVC.surveyRef = cell.survey
+            destinationVC.apiManager = apiManager
+            tabBarController?.setTabBarVisible(visible: false, animated: true)
+        
+        
+        
+        /*else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? SurveyViewController {
             switch currentIcon {
             case .New:
                 if let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
@@ -396,10 +403,10 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             default:
                 print("s")
             }
-            tabBarController?.setTabBarVisible(visible: false, animated: true)
+            tabBarController?.setTabBarVisible(visible: false, animated: true)*/
         } else if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController, let sender = sender as? SurveyStackViewController {
             destinationVC.apiManager = apiManager
-            destinationVC.needsImageLoading = false
+            destinationVC.shouldDownloadImages = false
             destinationVC.survey = sender.surveyPreview.survey
             destinationVC.delegate = sender
             destinationVC.isNavTitleEnabled = false

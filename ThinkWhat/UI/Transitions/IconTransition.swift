@@ -892,7 +892,7 @@ class IconTransition: BasicTransition {
                 
                 vc_2.contentView.alpha = 0
                 vc_2.categoryTitle.text = ""
-                vc_2.selectedColor = vc_1.category!.tagColor!
+                vc_2.selectedColor = vc_1.category!.tagColor
                 
                 
                 let destinationSize = destinationIcon.icon.frame.size

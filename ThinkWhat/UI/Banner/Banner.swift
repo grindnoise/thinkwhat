@@ -14,12 +14,12 @@ class Banner: UIView {
     static let bannerWillDisappearSignal    = "bannerWillDisappearSignal"
     static let bannerDidDisappearSignal     = "bannerDidDisappearSignal"
     enum ContentType: Int {
-        case None, TotaLCost, Sum, Warning
+        case None, TotaLCost, Sum, Warning, Youtube
     }
     //Use for auto dismiss
     private var timer:  Timer?
     private var timeElapsed: TimeInterval = 0
-    
+    private var isModal = false
     private var isVisible = false
     private var isInteracting = false {
         didSet {
@@ -41,6 +41,8 @@ class Banner: UIView {
                     _content = Warning.init(width: container.frame.width)
                 case .Sum:
                     _content = VotesFormula.init(width: container.frame.width)
+                case .Youtube:
+                    _content = YoutubeBanner.init(width: container.frame.width)
                 default:
                     print("ContentType.None")
                 }
@@ -113,8 +115,9 @@ class Banner: UIView {
         body.addGestureRecognizer(gestureRecognizer)
     }
     
-    func present(shouldDismissAfter seconds: TimeInterval = 0, delegate _delegate: CallbackDelegate?) {
+    func present(isModal _isModal: Bool = false, shouldDismissAfter seconds: TimeInterval = 0, delegate _delegate: CallbackDelegate?) {
         isInteracting = false
+        isModal       = _isModal
         if seconds != 0 {
             timeElapsed = seconds + 1
             startTimer()
@@ -143,7 +146,7 @@ class Banner: UIView {
         })
     }
     
-    func dismiss() {
+    func dismiss(completion: @escaping (Bool) -> ()) {
         self.delegate?.callbackReceived(Banner.bannerWillDisappearSignal as AnyObject)
         UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
             self.setNeedsLayout()
@@ -156,6 +159,7 @@ class Banner: UIView {
             self.delegate = nil
             self.isVisible = false
             self.alpha = 0
+            completion(true)
         }
     }
     
@@ -186,6 +190,9 @@ class Banner: UIView {
     }
     
     @objc private func viewPanned(recognizer: UIPanGestureRecognizer) {
+        guard !isModal else {
+            return
+        }
         isInteracting = true
         let minConstant = -(height+topMargin)
         guard topConstraint.constant <= topMargin else {
@@ -260,7 +267,7 @@ class Banner: UIView {
     @objc private func updateTimer() {
         timeElapsed    -= 1
         if timeElapsed <= 0 {
-            dismiss()
+            dismiss() {_ in}
         }
     }
 }

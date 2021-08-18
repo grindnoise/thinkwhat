@@ -33,6 +33,11 @@ func delay(seconds: Double, completion:@escaping ()->()) {
     }
 }
 
+enum YoutubePlayOption: String {
+    case Embedded = "embedded"
+    case App = "app"
+}
+
 enum ImageType: String {
     case Profile = "profile"
     case Survey  = "survey"
@@ -95,7 +100,9 @@ enum AuthVariant: String {
     case Username   = "Username"
 }
 
-
+enum SocialMedia {
+    case TikTok
+}
 
 enum ClientSettingsMode {
     case Reminder, Language
@@ -288,6 +295,7 @@ struct ImageHeaderData{
 }
 
 class AppData {
+    
     static let shared = AppData()
     var user = User()
     var userProfile = UserProfile()
@@ -497,6 +505,14 @@ class AppData {
                 }
             }
         }
+        var youtubePlayOption: YoutubePlayOption? {
+            didSet {
+                if youtubePlayOption != nil, youtubePlayOption != oldValue {
+                    UserDefaults.standard.set(youtubePlayOption!.rawValue, forKey: "youtubePlayOption")
+                }
+            }
+        }
+        
 //        var emailResponseExpirationDate: Date? {
 //            didSet {
 //                if emailResponseExpirationDate != nil  {
@@ -543,6 +559,10 @@ class AppData {
             if let kAPIVersion = UserDefaults.standard.object(forKey: "APIVersion") {
                 self.APIVersion = (kAPIVersion as! String)
             }
+            if let kYoutubePlayOption = UserDefaults.standard.object(forKey: "youtubePlayOption") {
+                self.youtubePlayOption = YoutubePlayOption(rawValue: kYoutubePlayOption as! String)
+            }
+
         }
         
         mutating func eraseData() {
@@ -555,7 +575,9 @@ class AppData {
                 language = .Russian
             }
             APIVersion = ""
+            youtubePlayOption = nil
             UserDefaults.standard.removeObject(forKey: "userEmailVerified")
+            UserDefaults.standard.removeObject(forKey: "youtubePlayOption")
         }
     }
     

@@ -31,7 +31,7 @@ class SurveyAnswerCell: UITableViewCell {
 //            }
 //        }
 //    }
-    var answer: SurveyAnswer! {
+    var answer: Answer! {
         didSet {
             if textLabel != nil {
                 label.text = answer.description

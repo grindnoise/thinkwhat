@@ -39,7 +39,7 @@ class Surveys {
     
 //    var currentHotSurvey:   FullSurvey?//Add to list of hot_except
     fileprivate var timer:  Timer?
-    var rejectedSurveys:    [FullSurvey]  = [] {//Local list of rejected surveys, should be cleared periodically
+    var rejectedSurveys:    [Survey]  = [] {//Local list of rejected surveys, should be cleared periodically
         didSet {
             if !rejectedSurveys.isEmpty, rejectedSurveys.count != oldValue.count {
                 if let survey = rejectedSurveys.last {//Set(oldValue).symmetricDifference(rejectedSurveys).first {
@@ -48,9 +48,9 @@ class Surveys {
             }
         }
     }
-    var allLinks:           [ShortSurvey] = []
-    var topLinks:           [ShortSurvey] = []
-    var newLinks:           [ShortSurvey] = [] {
+    var allLinks:           [SurveyRef] = []
+    var topLinks:           [SurveyRef] = []
+    var newLinks:           [SurveyRef] = [] {
         didSet {
             if oldValue.count != newLinks.count {
                 let sorted = newLinks.sorted { $0.startDate > $1.startDate }
@@ -58,12 +58,12 @@ class Surveys {
             }
         }
     }
-    var categorizedLinks:   [SurveyCategory: [ShortSurvey]] = [:]
-    var ownLinks:           [ShortSurvey] = []
-    var favoriteLinks:      [ShortSurvey: Date] = [:]
-    var downloadedObjects:  [FullSurvey] = []
+    var categorizedLinks:   [SurveyCategory: [SurveyRef]] = [:]
+    var ownLinks:           [SurveyRef] = []
+    var favoriteLinks:      [SurveyRef: Date] = [:]
+    var downloadedObjects:  [Survey] = []
     var completedSurveyIDs: [Int] = []//Completed surveys IDs
-    var stackObjects:       [FullSurvey] = []{
+    var stackObjects:       [Survey] = []{
         didSet {
             if stackObjects.count < oldValue.count {
                 print("didSet stackObjects DECREASE \(stackObjects.count)")
@@ -72,14 +72,14 @@ class Surveys {
             }
         }
     }//Stack of hot surveys
-    var claimObjects:       [FullSurvey] = []
+    var claimObjects:       [Survey] = []
     
     func importSurveys(_ json: JSON) {
         for i in json {
             if i.0 == "top" && !i.1.isEmpty {
                 topLinks.removeAll()
                 for j in i.1 {
-                    if let survey = ShortSurvey(j.1) {
+                    if let survey = SurveyRef(j.1) {
                         append(object: survey, type: .TopLinks)
                         //topLinks.append(survey)
                     }
@@ -88,7 +88,7 @@ class Surveys {
             } else if i.0 == "new" && !i.1.isEmpty {
                 newLinks.removeAll()
                 for k in i.1 {
-                    if let survey = ShortSurvey(k.1) {
+                    if let survey = SurveyRef(k.1) {
                         append(object: survey, type: .NewLinks)
                         //newLinks.append(survey)
                     }
@@ -98,9 +98,9 @@ class Surveys {
                 categorizedLinks.removeAll()
                 for cat in i.1 {
                     let category = SurveyCategories.shared[Int(cat.0)!]
-                    var data: [ShortSurvey] = []
+                    var data: [SurveyRef] = []
                     for _survey in cat.1 {
-                        if let survey = ShortSurvey(_survey.1) {
+                        if let survey = SurveyRef(_survey.1) {
                             if let _foundObject = allLinks.filter({ $0.hashValue == survey.hashValue}).first {
                                 data.append(_foundObject)
                             } else {
@@ -121,7 +121,7 @@ class Surveys {
                 }
                 if !i.1.isEmpty {
                     for k in i.1 {
-                        if let survey = ShortSurvey(k.1) {
+                        if let survey = SurveyRef(k.1) {
                             append(object: survey, type: .OwnLinks)
                             //ownLinks.append(survey)
                         }
@@ -134,7 +134,7 @@ class Surveys {
                     for k in i.1 {
 //                        print(k)
                         if let date = Date(dateTimeString: (k.1["timestamp"].stringValue as? String)!) as? Date,
-                            let survey = ShortSurvey(k.1["survey"]) {
+                            let survey = SurveyRef(k.1["survey"]) {
                             if let _foundObject = allLinks.filter({ $0.hashValue == survey.hashValue}).first {
                                 favoriteLinks[_foundObject] = date
                             } else {
@@ -155,7 +155,7 @@ class Surveys {
             } else if i.0 == "hot" {
                 if !i.1.isEmpty {
                     for k in i.1 {
-                        if let survey = FullSurvey(k.1) {
+                        if let survey = Survey(k.1) {
                             append(object: survey, type: .Stack)
                         }
                     }
@@ -172,7 +172,7 @@ class Surveys {
     func append(object: AnyObject, type: SurveyContainerType) {
         switch type {
         case .Stack:
-            if let _object = object as? FullSurvey {
+            if let _object = object as? Survey {
                 if let _foundObject = downloadedObjects.filter({ $0.hashValue == _object.hashValue}).first {
                     if stackObjects.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty, rejectedSurveys.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
                         stackObjects.append(_foundObject)
@@ -186,7 +186,7 @@ class Surveys {
                 }
             }
         case .Downloaded:
-            if let _object = object as? FullSurvey {
+            if let _object = object as? Survey {
                 if downloadedObjects.isEmpty {
                     downloadedObjects.append(_object)
                 } else {
@@ -196,7 +196,7 @@ class Surveys {
                 }
             }
         case .NewLinks:
-            if let _object = object as? ShortSurvey {
+            if let _object = object as? SurveyRef {
                 if let _foundObject = allLinks.filter({ $0.hashValue == _object.hashValue}).first {
                     if newLinks.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
                         newLinks.append(_foundObject)
@@ -216,7 +216,7 @@ class Surveys {
 //                }
             }
         case .TopLinks:
-            if let _object = object as? ShortSurvey {
+            if let _object = object as? SurveyRef {
                 if let _foundObject = allLinks.filter({ $0.hashValue == _object.hashValue}).first {
                     if topLinks.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
                         topLinks.append(_foundObject)
@@ -236,7 +236,7 @@ class Surveys {
 //                }
             }
         case .OwnLinks:
-            if let _object = object as? ShortSurvey {
+            if let _object = object as? SurveyRef {
                 if let _foundObject = allLinks.filter({ $0.hashValue == _object.hashValue}).first {
                     if ownLinks.filter({ $0.hashValue == _foundObject.hashValue}).isEmpty {
                         ownLinks.append(_foundObject)
@@ -256,7 +256,7 @@ class Surveys {
 //                }
             }
         case .Claim:
-            if let _object = object as? FullSurvey {
+            if let _object = object as? Survey {
                 if claimObjects.isEmpty {
                     claimObjects.append(_object)
                     removeClaimSurvey(object: _object)
@@ -273,8 +273,8 @@ class Surveys {
     }
     
     //Remove from lists -> post Notification
-    func removeClaimSurvey(object: FullSurvey) {
-        if let surveyLink = object.toShortSurvey() as? ShortSurvey {
+    func removeClaimSurvey(object: Survey) {
+        if let surveyLink = object.toShortSurvey() as? SurveyRef {
             if contains(object: surveyLink, type: .NewLinks) {
                 newLinks.remove(object: surveyLink)
                 NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)// (kNotificationNewSurveysUpdated)
@@ -293,7 +293,7 @@ class Surveys {
     func contains(object: AnyObject, type: SurveyContainerType) -> Bool {
         switch type {
         case .Stack:
-            if let _object = object as? FullSurvey {
+            if let _object = object as? Survey {
                 if stackObjects.isEmpty {
                     return false
                 } else {
@@ -301,7 +301,7 @@ class Surveys {
                 }
             }
         case .Downloaded:
-            if let _object = object as? FullSurvey {
+            if let _object = object as? Survey {
                 if downloadedObjects.isEmpty {
                     return false
                 } else {
@@ -309,7 +309,7 @@ class Surveys {
                 }
             }
         case .NewLinks:
-            if let _object = object as? ShortSurvey {
+            if let _object = object as? SurveyRef {
                 if newLinks.isEmpty {
                     return false
                 } else {
@@ -317,7 +317,7 @@ class Surveys {
                 }
             }
         case .TopLinks:
-            if let _object = object as? ShortSurvey {
+            if let _object = object as? SurveyRef {
                 if topLinks.isEmpty {
                     return false
                 } else {
@@ -325,7 +325,7 @@ class Surveys {
                 }
             }
         case .OwnLinks:
-            if let _object = object as? ShortSurvey {
+            if let _object = object as? SurveyRef {
                 if ownLinks.isEmpty {
                     return false
                 } else {
@@ -349,7 +349,7 @@ class Surveys {
         rejectedSurveys.removeAll()
     }
     
-    subscript (ID: Int) -> FullSurvey? {
+    subscript (ID: Int) -> Survey? {
         if let i = downloadedObjects.first(where: {$0.ID == ID}) {
             return i
         } else {
@@ -368,11 +368,11 @@ class Surveys {
     }
 }
 
-class ShortSurvey {
+class SurveyRef {
     var ID: Int
     var title: String
     var startDate: Date
-    var category: SurveyCategory?
+    var category: SurveyCategory
     var completionPercentage: Int
     var likes: Int
     var type: SurveyType
@@ -394,14 +394,15 @@ class ShortSurvey {
     init?(_ json: JSON) {
         if  let _ID                     = json["id"].intValue as? Int,
             let _title                  = json["title"].stringValue as? String,
-            let _category               = json["category"].intValue as? Int,
+            let _categoryID             = json["category"].intValue as? Int,
+            let _category               = SurveyCategories.shared[_categoryID],
             let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
             let _completionPercentage   = json["vote_capacity"].intValue as? Int,
             let _likes                  = json["likes"].intValue as? Int,
             let _type                   = json["type"].stringValue as? String {
             ID                      = _ID
             title                   = _title
-            category                = SurveyCategories.shared[_category]
+            category                = _category
             completionPercentage    = _completionPercentage
             startDate               = _startDate
             likes                   = _likes
@@ -412,8 +413,8 @@ class ShortSurvey {
     }
 }
 
-extension ShortSurvey: Hashable {
-    static func == (lhs: ShortSurvey, rhs: ShortSurvey) -> Bool {
+extension SurveyRef: Hashable {
+    static func == (lhs: SurveyRef, rhs: SurveyRef) -> Bool {
         return lhs.hashValue == rhs.hashValue
         //        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
@@ -475,7 +476,8 @@ class ClaimCategories {
     }
 }
 
-class FullSurvey {
+class Survey {
+    //ID is nil, when client creates Survey, ID is assigned in apiMananger.postSurvey() 200 Response
     var ID: Int?
     var title: String
     var startDate: Date
@@ -486,7 +488,7 @@ class FullSurvey {
     var images: [[UIImage: String]]?//Already downloaded -> Download should begin interactively, then store data here
     var imagesURLs: [[String: String]]?//URL - key, Title - value
     var answersWithoutID: [String] = []//Array
-    var answers: [SurveyAnswer] = []
+    var answers: [Answer] = []
     var owner: String
     var link: String?
     var voteCapacity: Int
@@ -496,7 +498,7 @@ class FullSurvey {
     var totalVotes: Int = 0
     var watchers: Int = 0
     var result: [Int: Date]?
-    var userProfile: UserProfile?
+    var userProfile: UserProfile?//Owner
     var likes: Int
     var type: SurveyType
     var isHot = false
@@ -630,7 +632,7 @@ class FullSurvey {
             type = SurveyType(rawValue: _type)!
             
             for _answer in _answers {
-                if let answer = SurveyAnswer(json: _answer) {
+                if let answer = Answer(json: _answer) {
                     answers.append(answer)
                 } else {
                     return nil
@@ -676,8 +678,8 @@ class FullSurvey {
         }
     }
     
-    func toShortSurvey() -> ShortSurvey? {
-        if ID != nil, let surveyLink = ShortSurvey(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0, type: type) as? ShortSurvey {
+    func toShortSurvey() -> SurveyRef? {
+        if ID != nil, let surveyLink = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0, type: type) as? SurveyRef {
             return surveyLink
         }
         return nil
@@ -688,8 +690,8 @@ class FullSurvey {
     }
 }
 
-extension FullSurvey: Hashable {
-    static func == (lhs: FullSurvey, rhs: FullSurvey) -> Bool {
+extension Survey: Hashable {
+    static func == (lhs: Survey, rhs: Survey) -> Bool {
         return lhs.hashValue == rhs.hashValue
 //        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
@@ -702,7 +704,7 @@ extension FullSurvey: Hashable {
     }
 }
 
-class SurveyAnswer {
+class Answer {
     let ID: Int
     var description: String
     var totalVotes: Int

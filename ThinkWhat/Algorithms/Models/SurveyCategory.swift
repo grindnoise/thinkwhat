@@ -82,7 +82,7 @@ class SurveyCategory {
     let dateCreated: Date
     var parent: SurveyCategory?
     var ageRestriction: Int?
-    var tagColor: UIColor?
+    var tagColor: UIColor
     var total: Int = 0
     var active: Int = 0
     var hasNoChildren = false
@@ -106,7 +106,7 @@ class SurveyCategory {
             if _parent != nil {
                 tagColor            = parent!.tagColor
             } else {
-                tagColor            = _tagColor.hexColor
+                tagColor            = _tagColor.hexColor ?? K_COLOR_GRAY
             }
 //            if let _icon = SurveyCategoryIcons.shared.container[ID] as? UIView {
 //                icon = _icon

@@ -1118,7 +1118,7 @@ extension NewSurveyViewController: ServerProtocol {
     func postSurvey() {
         
         //Prepare new Survey w/o ID
-        if let survey = FullSurvey(newWithoutID: prepareSurveyDict()) {
+        if let survey = Survey(newWithoutID: prepareSurveyDict()) {
             apiManager.postSurvey(survey: survey) {
                 json, error in
                 if error != nil {
@@ -1131,7 +1131,7 @@ extension NewSurveyViewController: ServerProtocol {
                     if let _ID = json!["id"].intValue as? Int, let _answers = json!["answers"].arrayValue as? [JSON] {
                         survey.ID = _ID
                         for _answer in _answers {
-                            if let answer = SurveyAnswer(json: _answer) {
+                            if let answer = Answer(json: _answer) {
                                 survey.answers.append(answer)
                             }
                         }

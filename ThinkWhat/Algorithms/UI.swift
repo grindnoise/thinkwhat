@@ -126,6 +126,7 @@ struct Colors {
     }
     static let CadetBlue        = UIColor(hexString: "#699999")
     static let RussianViolet    = UIColor(hexString: "#1F2143")
+    static let Hyperlink        = UIColor(hexString: "#CAE4F1")
 }
 
 //Array of colors used for tag circles in answer cells

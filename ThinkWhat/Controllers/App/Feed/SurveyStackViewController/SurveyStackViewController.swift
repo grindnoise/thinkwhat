@@ -20,7 +20,7 @@ class SurveyStackViewController: UIViewController {
     fileprivate var timer:          Timer?
     fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     fileprivate lazy var loadingView: EmptySurvey = self.createLoadingView()
-    fileprivate var previewSurveys: [FullSurvey] = []
+    fileprivate var previewSurveys: [Survey] = []
     fileprivate var isRequestingStack = false
     fileprivate var surveyPreviewInitialRect = CGRect.zero
     fileprivate var surveyPreviewCurrentCenter = CGPoint.zero
@@ -113,7 +113,7 @@ class SurveyStackViewController: UIViewController {
                 _surveyPreview.category.attributedText = NSAttributedString(string: "  \(survey.category.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 8), foregroundColor: .white, backgroundColor: .clear))
                 _surveyPreview.parentCategory.attributedText = NSAttributedString(string: "  \(survey.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 8), foregroundColor: .white, backgroundColor: .clear))
                 _surveyPreview.icon.category = SurveyCategoryIcon.Category(rawValue: survey.category.ID) ?? .Null
-                if let color = survey.category.parent!.tagColor {
+                let color = survey.category.tagColor 
                     _surveyPreview.category.backgroundColor = color
                     _surveyPreview.parentCategory.backgroundColor = color
 //                    _surveyPreview.surveyDate.backgroundColor = color
@@ -123,7 +123,7 @@ class SurveyStackViewController: UIViewController {
                     _surveyPreview.category.cornerRadius = _surveyPreview.category.frame.height / 2.5
                     _surveyPreview.parentCategory.cornerRadius = _surveyPreview.parentCategory.frame.height / 2.5
 //                    _surveyPreview.surveyDate.cornerRadius = _surveyPreview.surveyDate.frame.height / 2.5
-                }
+                
 //                _surveyPreview.surveyDate.attributedText = NSAttributedString(string: "  \(survey.startDate.toDateStringLiteral_dMMM())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
                 
                 
@@ -316,7 +316,7 @@ extension SurveyStackViewController: CallbackDelegate {
             delay(seconds: 0.5) {
                 self.nextSurvey(self.nextPreview)
             }
-        } else if sender is FullSurvey { //Voted
+        } else if sender is Survey { //Voted
             delay(seconds: 0.4) {
                 self.removePreview = self.surveyPreview
                 self.nextSurvey(self.nextPreview)
