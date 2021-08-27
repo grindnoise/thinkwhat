@@ -373,18 +373,19 @@ class SurveyRef {
     var title: String
     var startDate: Date
     var category: SurveyCategory
-    var completionPercentage: Int
+//    var completionPercentage: Int
     var likes: Int
     var type: SurveyType
 //    var hashValue: Int {
 //        return ObjectIdentifier(self).hashValue
 //    }
     
-    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int, type _type: SurveyType) {//}, likes _likes: Int) {
+//    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int, type _type: SurveyType) {//}, likes _likes: Int) {
+        init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, type _type: SurveyType) {
         ID                      = _id
         title                   = _title
         category                = _category
-        completionPercentage    = _completionPercentage
+//        completionPercentage    = _completionPercentage
         startDate               = _startDate
         likes = 0
         type                    = _type
@@ -397,13 +398,13 @@ class SurveyRef {
             let _categoryID             = json["category"].intValue as? Int,
             let _category               = SurveyCategories.shared[_categoryID],
             let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
-            let _completionPercentage   = json["vote_capacity"].intValue as? Int,
+//            let _completionPercentage   = json["vote_capacity"].intValue as? Int,
             let _likes                  = json["likes"].intValue as? Int,
             let _type                   = json["type"].stringValue as? String {
             ID                      = _ID
             title                   = _title
             category                = _category
-            completionPercentage    = _completionPercentage
+//            completionPercentage    = _completionPercentage
             startDate               = _startDate
             likes                   = _likes
             type                    = SurveyType(rawValue: _type)!
@@ -481,10 +482,11 @@ class Survey {
     var ID: Int?
     var title: String
     var startDate: Date
-    var endDate: Date?
-    var modified: Date
+//    var endDate: Date?
+//    var modified: Date
     var category: SurveyCategory
     var description: String
+    var question: String
     var images: [[UIImage: String]]?//Already downloaded -> Download should begin interactively, then store data here
     var imagesURLs: [[String: String]]?//URL - key, Title - value
     var answersWithoutID: [String] = []//Array
@@ -512,6 +514,7 @@ class Survey {
         _dict[DjangoVariables.Survey.title] = title
         _dict[DjangoVariables.Survey.category] = category.ID
         _dict[DjangoVariables.Survey.description] = description
+        _dict[DjangoVariables.Survey.question] = question
         _dict[DjangoVariables.Survey.voteCapacity] = voteCapacity
         _dict[DjangoVariables.Survey.isPrivate] = isPrivate
         _dict[DjangoVariables.Survey.isAnonymous] = isAnonymous
@@ -535,9 +538,9 @@ class Survey {
         if link != nil {
             _dict[DjangoVariables.Survey.hlink] = link!
         }
-        if endDate != nil {
-            _dict[DjangoVariables.Survey.endDate] = endDate!.toDateTimeString()
-        }
+//        if endDate != nil {
+//            _dict[DjangoVariables.Survey.endDate] = endDate!.toDateTimeString()
+//        }
         return _dict
     }
     init?(newWithoutID dict: [String: Any]) {
@@ -545,6 +548,7 @@ class Survey {
         if let _title                   = dict[DjangoVariables.Survey.title] as? String,
             let _category               = dict[DjangoVariables.Survey.category] as? SurveyCategory,
             let _description            = dict[DjangoVariables.Survey.description] as? String,
+            let _question               = dict[DjangoVariables.Survey.question] as? String,
             let _voteCapacity           = dict[DjangoVariables.Survey.voteCapacity] as? Int,
             let _isPrivate              = dict[DjangoVariables.Survey.isPrivate] as? Bool,
             let _isAnonymous            = dict[DjangoVariables.Survey.isAnonymous] as? Bool,
@@ -555,10 +559,11 @@ class Survey {
             
             title               = _title
             startDate           = Date()
-            modified            = Date()
+//            modified            = Date()
             category            = _category
             owner               = AppData.shared.userProfile.ID!
             description         = _description
+            question            = _question
             voteCapacity        = _voteCapacity
             isPrivate           = _isPrivate
             isAnonymous         = _isAnonymous
@@ -581,9 +586,9 @@ class Survey {
             if let _link                  = dict[DjangoVariables.Survey.hlink] as? String {
                 link = _link
             }
-            if let _endDate               = dict[DjangoVariables.Survey.endDate] as? Date {
-                endDate = _endDate
-            }
+//            if let _endDate               = dict[DjangoVariables.Survey.endDate] as? Date {
+//                endDate = _endDate
+//            }
         } else {
             return nil
         }
@@ -593,11 +598,12 @@ class Survey {
         if let _ID                      = json[DjangoVariables.ID].intValue as? Int,
             let _title                  = json[DjangoVariables.Survey.title].stringValue as? String,
             let _startDate              = json[DjangoVariables.Survey.startDate] is NSNull ? nil : Date(dateTimeString: json[DjangoVariables.Survey.startDate].stringValue as! String),
-            var _endDate                = json[DjangoVariables.Survey.endDate] is NSNull ? nil : Date(dateTimeString: json[DjangoVariables.Survey.endDate].stringValue as! String),
-            var _modified               = Date(dateTimeString: json[DjangoVariables.Survey.modifiedAt].stringValue as! String) as? Date,
+//            var _endDate                = json[DjangoVariables.Survey.endDate] is NSNull ? nil : Date(dateTimeString: json[DjangoVariables.Survey.endDate].stringValue as! String),
+//            var _modified               = Date(dateTimeString: json[DjangoVariables.Survey.modifiedAt].stringValue as! String) as? Date,
             let _category               = json[DjangoVariables.Survey.category].intValue as? Int,
             let _owner                  = json[DjangoVariables.Survey.owner].stringValue as? String,
             let _description            = json[DjangoVariables.Survey.description].stringValue as? String,
+            let _question               = json[DjangoVariables.Survey.question].stringValue as? String,
             let _link                   = json[DjangoVariables.Survey.hlink].stringValue as? String,
             let _voteCapacity           = json[DjangoVariables.Survey.voteCapacity].intValue as? Int,
             let _isAnonymous            = json[DjangoVariables.Survey.isAnonymous].boolValue as? Bool,
@@ -615,10 +621,11 @@ class Survey {
             ID = _ID
             title = _title
             startDate = _startDate
-            endDate = _endDate
-            modified = _modified
+//            endDate = _endDate
+//            modified = _modified
             category = SurveyCategories.shared[_category]!
             description = _description
+            question = _question
             owner = _owner
             link = _link
             voteCapacity = _voteCapacity
@@ -679,7 +686,8 @@ class Survey {
     }
     
     func toShortSurvey() -> SurveyRef? {
-        if ID != nil, let surveyLink = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0, type: type) as? SurveyRef {
+//        if ID != nil, let surveyLink = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0, type: type) as? SurveyRef {
+        if ID != nil, let surveyLink = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, type: type) as? SurveyRef {
             return surveyLink
         }
         return nil
@@ -701,6 +709,7 @@ extension Survey: Hashable {
         hasher.combine(ID)
         hasher.combine(owner)
         hasher.combine(description)
+        hasher.combine(question)
     }
 }
 

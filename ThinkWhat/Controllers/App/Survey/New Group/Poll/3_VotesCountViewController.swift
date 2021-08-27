@@ -25,29 +25,31 @@ class VotesCountViewController: UIViewController {
         didSet {
             totalCost = 0
             if actionButton != nil {
-                actionButton.text = "\(votesCapacity)"
-                if votesCapacity > MAX_VOTES_COUNT {
+//                actionButton.text = "\(votesCapacity)"
+                if votesCapacity > MAX_VOTES_COUNT, AppData.shared.system.newPollTutorialRequired {
                     if !isMaxVotesBannerShown {
                         Banner.shared.contentType = .Warning
                         if let content = Banner.shared.content as? Warning {
                             content.level = .Warning
-                            content.text = "Максимальное число участников не более \(MAX_VOTES_COUNT)"
+                            content.text = "Максимальное число участников должно быть не более \(MAX_VOTES_COUNT)"
                         }
                         Banner.shared.present(shouldDismissAfter: 2, delegate: self)
                         isMaxVotesBannerShown = true
+                        actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Error)
                     }
                     UIView.animate(withDuration: 0.3) {
                         self.actionButton.color = K_COLOR_GRAY
                     }
-                } else if votesCapacity < MIN_VOTES_COUNT {
+                } else if votesCapacity < MIN_VOTES_COUNT, AppData.shared.system.newPollTutorialRequired {
                     if !isMinVotesBannerShown {
                         Banner.shared.contentType = .Warning
                         if let content = Banner.shared.content as? Warning {
                             content.level = .Warning
-                            content.text = "Минимальное число участников не менее \(MIN_VOTES_COUNT)"
+                            content.text = "Минимальное число участников должно быть не менее \(MIN_VOTES_COUNT)"
                         }
                         Banner.shared.present(shouldDismissAfter: 2, delegate: self)
                         isMinVotesBannerShown = true
+                        actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Error)
                     }
                     UIView.animate(withDuration: 0.3) {
                         self.actionButton.color = K_COLOR_GRAY
@@ -56,6 +58,7 @@ class VotesCountViewController: UIViewController {
                     UIView.animate(withDuration: 0.3) {
                         self.actionButton.color = self.color
                     }
+                    actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Next_RU)
                 }
 //                if cost != nil, !cost.isEmpty {
 //                    self.cost.map {
@@ -99,9 +102,9 @@ class VotesCountViewController: UIViewController {
         didSet {
             actionButton.lineWidth = lineWidth
             actionButton.state = .Off
-            actionButton.category = .Text
+            actionButton.category = .Crowd//.Text
             actionButton.color   = color//Colors.UpperButtons.Avocado
-            actionButton.text = "\(votesCapacity)"
+//            actionButton.text = "\(votesCapacity)"
             let tap = UITapGestureRecognizer(target: self, action: #selector(VotesCountViewController.actionButtonTapped))
             actionButton.addGestureRecognizer(tap)
         }
@@ -129,7 +132,7 @@ class VotesCountViewController: UIViewController {
         
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.55
+            nc.duration = 0.3
             nc.transitionStyle = .Icon
             navigationItem.setHidesBackButton(true, animated: false)
         }

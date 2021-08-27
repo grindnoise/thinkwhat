@@ -111,7 +111,7 @@ class PollController: UIViewController {
             if let strongSurvey = survey, isInitialLoading {
 //                self.presentSurvey()
                 if surveyRef == nil {
-                    surveyRef = SurveyRef(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100, type: survey!.type)
+                    surveyRef = SurveyRef(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, type: survey!.type)
                 }
                 if let owner = strongSurvey.userProfile, owner.image == nil, let url = owner.imageURL as? String {
                     apiManager.downloadImage(url: url) {
@@ -138,6 +138,7 @@ class PollController: UIViewController {
         super.viewDidLoad()
         setupViews()
         performChecks()
+        AppData.shared.system.youtubePlayOption = nil
     }
     
     private func setupViews() {
@@ -235,7 +236,7 @@ extension PollController: UITableViewDelegate, UITableViewDataSource {
                 paragraphStyle.hyphenationFactor = 1.0
                 let text = "     \(survey!.description)"
                 let attributedString = NSMutableAttributedString(string: text, attributes: [NSAttributedString.Key.paragraphStyle:paragraphStyle])
-                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 15), foregroundColor: .black, backgroundColor: .clear), range: text.fullRange())
+                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Light, size: 17), foregroundColor: .black, backgroundColor: .clear), range: text.fullRange())
                 cell.textView.attributedText = attributedString
                 return cell
             } else if indexPath.row == 3 {
@@ -311,16 +312,21 @@ extension PollController: UITableViewDelegate, UITableViewDataSource {
                     //1) YT link
                     if link.isYoutubeLink, let cell = tableView.dequeueReusableCell(withIdentifier: "youtube") as? YoutubeCell, let videoID = link.youtubeID {
                         cell.delegate = self
-                        cell.playOption = AppData.shared.system.youtubePlayOption
                         cell.videoID = videoID
                         cell.loadVideo(url: survey!.link!)
                         return cell
                     } else if link.isTikTokLink, let cell = tableView.dequeueReusableCell(withIdentifier: "embedded") as? EmbeddedURLCell {
+                        cell.app = .TikTok
+                        guard !cell.isContentLoading else {
+                            return cell
+                        }
+                        cell.isContentLoading = true
                         if link.isTikTokEmbedLink {
-                            var webContent = "<meta name='viewport' content='initial-scale=0.85, maximum-scale=0.85, user-scalable=no'/>"
+                            var webContent = "<meta name='viewport' content='initial-scale=0.8, maximum-scale=0.8, user-scalable=no'/>"
                             webContent += link
                             cell.webView.loadHTMLString(webContent, baseURL: URL(string: "http://www.tiktok.com")!)
                         } else {
+                            cell.url = URL(string: link)
                             apiManager.getTikTokEmbedHTML(url: URL(string: "https://www.tiktok.com/oembed?url=\(link)")!) {
                                 json, error in
                                 if error != nil {
@@ -334,7 +340,7 @@ extension PollController: UITableViewDelegate, UITableViewDataSource {
                                 }
                                 if let strongJSON = json {
                                     if let html = strongJSON["html"].stringValue as? String {
-                                        var webContent = "<meta name='viewport' content='initial-scale=0.85, maximum-scale=0.85, user-scalable=no'/>"
+                                        var webContent = "<meta name='viewport' content='initial-scale=0.8, maximum-scale=0.8, user-scalable=no'/>"
                                         webContent += html
                                         cell.webView.loadHTMLString(webContent, baseURL: URL(string: "http://www.tiktok.com")!)
                                     }
@@ -396,7 +402,7 @@ extension PollController: UITableViewDelegate, UITableViewDataSource {
                 } else if survey!.link!.isYoutubeLink {
                     return UIScreen.main.bounds.width/(16/9)
                 } else if survey!.link!.isTikTokLink {
-                    return 700
+                    return 650
                 } else {
                     return 60
                 }
@@ -564,7 +570,14 @@ class ImagesCell: UITableViewCell, UIScrollViewDelegate {
 import YoutubePlayer_in_WKWebView
 class YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackDelegate {
 //    private var bannerHasBeenShown = false
-    var playOption: YoutubePlayOption? = nil
+    private var tempAppPreference: SideAppPreference?
+    private var sideAppPreference: SideAppPreference? {
+        if AppData.shared.system.youtubePlayOption == nil {
+            return nil
+        } else {
+            return AppData.shared.system.youtubePlayOption
+        }
+    }
     private var isYoutubeInstalled: Bool {
         let appName = "youtube"
         let appScheme = "\(appName)://app"
@@ -621,22 +634,31 @@ class YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackDelegate {
     
     func playerView(_ playerView: WKYTPlayerView, didChangeTo state: WKYTPlayerState) {
         if state == .buffering {
-            if playOption != nil {
-                if playOption! == .Embedded {
+            if sideAppPreference != nil {
+                if sideAppPreference! == .Embedded {
                     playerView.playVideo()
                 } else {
                     if isYoutubeInstalled {
                         playInYotubeApp()
+                        playerView.stopVideo()
                     }
                 }
-            } else {
-                if isYoutubeInstalled {
+            } else if isYoutubeInstalled, tempAppPreference == nil {
                     playerView.pauseVideo()
-                    Banner.shared.contentType = .Youtube
-                    if let content = Banner.shared.content as? YoutubeBanner {
+                    Banner.shared.contentType = .SideApp
+                    if let content = Banner.shared.content as? SideApp {
+                        content.app = .Youtube
                         content.delegate = self
                     }
                     Banner.shared.present(isModal: true, delegate: nil)
+            } else {
+                if tempAppPreference == .Embedded {
+                    playerView.playVideo()
+                } else {
+                    if isYoutubeInstalled {
+                        playInYotubeApp()
+                        playerView.stopVideo()
+                    }
                 }
             }
         }
@@ -650,42 +672,53 @@ class YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackDelegate {
     }
 
     func callbackReceived(_ sender: AnyObject) {
-        if let option = sender as? YoutubePlayOption {
+        if let option = sender as? SideAppPreference {
             switch option {
             case .App:
-                playOption = .App
+                tempAppPreference = .App
                 playInYotubeApp()
                 playerView.stopVideo()
             case .Embedded:
                 playerView.playVideo()
-                playOption = .Embedded
+                tempAppPreference = .Embedded
             }
         }
     }
 }
 
-class EmbeddedURLCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate {
-    
-//    <meta name='viewport' content='initial-scale=1.0'/>
-//    <meta name='viewport' content='width=device-width'/>
-//    let webContent = """
-//<meta name='viewport' content='initial-scale=0.85, maximum-scale=0.85, user-scalable=no'/>
-//<blockquote class=\"tiktok-embed\" cite=\"https://www.tiktok.com/@scout2015/video/6718335390845095173\" data-video-id=\"6718335390845095173\" style=\"max-width: 605px;min-width: 325px;\" > <section> <a target=\"_blank\" title=\"@scout2015\" href=\"https://www.tiktok.com/@scout2015\">@scout2015</a> <p>Scramble up ur name & I’ll try to guess it😍❤️ <a title=\"foryoupage\" target=\"_blank\" href=\"https://www.tiktok.com/tag/foryoupage\">#foryoupage</a> <a title=\"petsoftiktok\" target=\"_blank\" href=\"https://www.tiktok.com/tag/petsoftiktok\">#petsoftiktok</a> <a title=\"aesthetic\" target=\"_blank\" href=\"https://www.tiktok.com/tag/aesthetic\">#aesthetic</a></p> <a target=\"_blank\" title=\"♬ original sound - 𝐇𝐚𝐰𝐚𝐢𝐢𓆉\" href=\"https://www.tiktok.com/music/original-sound-6689804660171082501\">♬ original sound - 𝐇𝐚𝐰𝐚𝐢𝐢𓆉</a> </section> </blockquote> <script async src=\"https://www.tiktok.com/embed.js\"></script>
-//"""
+class EmbeddedURLCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackDelegate {
+    private var tempAppPreference: SideAppPreference?
+    private var sideAppPreference: SideAppPreference? {
+        if app == .TikTok {
+            if AppData.shared.system.tiktokPlayOption == nil {
+                return nil
+            } else {
+                return AppData.shared.system.tiktokPlayOption
+            }
+        }
+        return nil
+    }
+    private var isTiTokInstalled: Bool {
+        let appName = "tiktok"
+        let appScheme = "\(appName)://app"
+        let appUrl = URL(string: appScheme)
+        return UIApplication.shared.canOpenURL(appUrl! as URL)
+    }
+    private var opaqueView: UIView?
+    var url: URL!
+    var isContentLoading = false
+    var app: ThirdPartyApp  = .Null
     weak var delegate: CallbackDelegate?
     @IBOutlet weak var webView: WKWebView! {
         didSet {
+            opaqueView = UIView(frame: .zero)
+            opaqueView!.backgroundColor = .clear
+            opaqueView!.addEquallyTo(to: contentView)
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(EmbeddedURLCell.viewTapped(recognizer: )))
+            opaqueView!.addGestureRecognizer(recognizer)
             webView.navigationDelegate = self
             webView.uiDelegate = self
             webView.alpha = 0
-//            let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
-//            let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-//            let wkUController = WKUserContentController()
-//            wkUController.addUserScript(userScript)
-//            let wkWebConfig = WKWebViewConfiguration()
-//            wkWebConfig.userContentController = wkUController
-//            webView.configuration = wkWebConfig
-//            webView.loadHTMLString(webContent, baseURL: URL(string: "http://www.tiktok.com")!)
         }
     }
     
@@ -693,5 +726,53 @@ class EmbeddedURLCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate {
         UIView.animate(withDuration: 0.3, delay: 1, options: [.curveEaseInOut], animations: {
             self.webView.alpha = 1
         })
+        webView.evaluateJavaScript("document.documentElement.outerHTML.toString()",
+                                   completionHandler: { (html: Any?, error: Error?) in
+                                    print(html)
+        })
+    }
+    
+    @objc private func viewTapped(recognizer: UITapGestureRecognizer) {
+        if recognizer.state == .ended {
+            switch app {
+            case .TikTok:
+                if sideAppPreference == .App || tempAppPreference == .App {
+                    if isTiTokInstalled {
+                        UIApplication.shared.open(url, options: [:], completionHandler: {_ in})
+                    }
+                } else if sideAppPreference == nil, tempAppPreference == nil, isTiTokInstalled {
+                    Banner.shared.contentType = .SideApp
+                    if let content = Banner.shared.content as? SideApp {
+                        content.app = .TikTok
+                        content.delegate = self
+                    }
+                    Banner.shared.present(isModal: true, delegate: nil)
+                }
+            default:
+                print("")
+            }
+        }
+    }
+    
+    override func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if sideAppPreference != nil {
+            return sideAppPreference == .App ? false : true
+        } else if tempAppPreference != nil {
+            return tempAppPreference == .App ? false : true
+        }
+        return true
+    }
+    
+    func callbackReceived(_ sender: AnyObject) {
+        if let option = sender as? SideAppPreference {
+            switch option {
+            case .App:
+                tempAppPreference = .App
+                UIApplication.shared.open(url, options: [:], completionHandler: {_ in})
+            case .Embedded:
+                tempAppPreference = .Embedded
+                opaqueView?.removeFromSuperview()
+            }
+        }
     }
 }

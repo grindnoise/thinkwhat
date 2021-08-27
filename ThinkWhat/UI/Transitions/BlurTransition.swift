@@ -36,12 +36,14 @@ class BlurTransition: BasicTransition {
         if operation == .pop{
             if let vc_1 = fromVC as? TextViewController, let vc_2 = toVC as? NewPollController {
                 if vc_1.accessibilityIdentifier == "Title" {
-                    vc_2.questionTitle = vc_1.text.text
+                    vc_2.pollTitle = vc_1.text.text
+                } else if vc_1.accessibilityIdentifier == "Description" {
+                    vc_2.pollDescription = vc_1.text.text
+                    vc_2.descriptionLabel.font = vc_1.font
+                    vc_2.descriptionLabel.textAlignment = .natural
+                    vc_2.descriptionLabel.numberOfLines = 0
                 } else if vc_1.accessibilityIdentifier == "Question" {
-                    vc_2.question = vc_1.text.text
-                    vc_2.questionLabel.font = vc_1.font
-                    vc_2.questionLabel.textAlignment = .natural
-                    vc_2.questionLabel.numberOfLines = 0
+                    
                 }
             }
         }

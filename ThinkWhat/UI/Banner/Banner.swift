@@ -14,7 +14,7 @@ class Banner: UIView {
     static let bannerWillDisappearSignal    = "bannerWillDisappearSignal"
     static let bannerDidDisappearSignal     = "bannerDidDisappearSignal"
     enum ContentType: Int {
-        case None, TotaLCost, Sum, Warning, Youtube
+        case None, TotaLCost, Sum, Warning, SideApp
     }
     //Use for auto dismiss
     private var timer:  Timer?
@@ -41,8 +41,8 @@ class Banner: UIView {
                     _content = Warning.init(width: container.frame.width)
                 case .Sum:
                     _content = VotesFormula.init(width: container.frame.width)
-                case .Youtube:
-                    _content = YoutubeBanner.init(width: container.frame.width)
+                case .SideApp:
+                    _content = SideApp.init(width: container.frame.width)
                 default:
                     print("ContentType.None")
                 }

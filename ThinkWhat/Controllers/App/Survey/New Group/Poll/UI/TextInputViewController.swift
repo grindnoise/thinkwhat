@@ -9,6 +9,13 @@
 import UIKit
 
 class TextInputViewController: UIViewController {
+    enum TitleType: String {
+        case Title          = "Титул"
+        case Description    = "Подробности"
+        case Question       = "Вопрос"
+        case Answer         = "Ответ"
+        case Null           = ""
+    }
     
     deinit {
         print("***TextInputViewController deinit***")
@@ -73,7 +80,7 @@ class TextInputViewController: UIViewController {
                 Banner.shared.contentType = .Warning
                 if let content = Banner.shared.content as? Warning {
                     content.level = .Warning
-                    content.text = "\(self.titleString) должен содержать не менее \(self.minCharacters) знаков"
+                    content.text = "Поле \(self.type.rawValue) должен содержать не менее \(self.minCharacters) знаков"
                 }
                 Banner.shared.present(shouldDismissAfter: 2, delegate: self)
             })
@@ -82,8 +89,9 @@ class TextInputViewController: UIViewController {
             navigationController?.popViewController(animated: true)
         }
     }
+    var type: TitleType = .Null
     var color: UIColor = .gray
-    var titleString = ""
+//    var titleString = ""
     var textContent = ""
     var delegate: CallbackDelegate?
     var maxCharacters = 0
@@ -152,6 +160,14 @@ class TextInputViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         view.subviews.map {$0.isUserInteractionEnabled = true}
+        if type == .Description, AppData.shared.system.newPollTutorialRequired {
+            Banner.shared.contentType = .Warning
+            if let content = Banner.shared.content as? Warning {
+                content.level = .Info
+                content.text = "Поле не обязательно для заполнения"
+            }
+            Banner.shared.present(shouldDismissAfter: 1, delegate: self)
+        }
     }
     
     private func setTitle() {
@@ -159,7 +175,7 @@ class TextInputViewController: UIViewController {
         navTitle.numberOfLines = 2
         navTitle.textAlignment = .center
         let attrString = NSMutableAttributedString()
-        attrString.append(NSAttributedString(string: titleString + " (", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
+        attrString.append(NSAttributedString(string: type.rawValue + " (", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
         attrString.append(NSAttributedString(string: "\(text.text.count)/\(maxCharacters)", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: .gray, backgroundColor: .clear)))
         attrString.append(NSAttributedString(string: ")", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
         navTitle.attributedText = attrString

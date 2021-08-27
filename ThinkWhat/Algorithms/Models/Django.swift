@@ -49,6 +49,7 @@ struct DjangoVariables {
         static let owner                    = "owner"
         static let title                    = "title"
         static let description              = "description"
+        static let question                 = "question"
         static let hlink                    = "hlink"
         static let voteCapacity             = "vote_capacity"
         static let isPrivate                = "is_private"
@@ -100,6 +101,8 @@ class ModelProperties {
     private var _surveyTitleMaxLength:       Int = 0
     private var _surveyDescriptionMinLength: Int = 0
     private var _surveyDescriptionMaxLength: Int = 0
+    private var _surveyQuestionMinLength:    Int = 0
+    private var _surveyQuestionMaxLength:    Int = 0
     private var _surveyAnswerTitleMinLength: Int = 0
     private var _surveyAnswerTitleMaxLength: Int = 0
     private var _surveyAnswerTextMinLength:  Int = 0
@@ -116,6 +119,8 @@ class ModelProperties {
     var surveyAnswerTextMinLength:  Int { return { _surveyAnswerTextMinLength }()}
     var surveyAnswerTextMaxLength:  Int { return { _surveyAnswerTextMaxLength }()}
     var surveyAnswerMaxFreeCount:   Int { return { _surveyAnswerMaxFreeCount }()}
+    var surveyQuestionMinLength:  Int { return { _surveyQuestionMinLength }()}
+    var surveyQuestionMaxLength:   Int { return { _surveyQuestionMaxLength }()}
     
     func importJson(_ json: JSON) {
         for i in json {
@@ -127,6 +132,9 @@ class ModelProperties {
                     } else if j.0 == "description", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
                         _surveyDescriptionMinLength = dict["min_length"]!
                         _surveyDescriptionMaxLength = dict["max_length"]!
+                    } else if j.0 == "question", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
+                        _surveyQuestionMinLength = dict["min_length"]!
+                        _surveyQuestionMaxLength = dict["max_length"]!
                     }
                 }
             } else if i.0 == "survey_answer" {

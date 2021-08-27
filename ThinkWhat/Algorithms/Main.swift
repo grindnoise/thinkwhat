@@ -33,7 +33,8 @@ func delay(seconds: Double, completion:@escaping ()->()) {
     }
 }
 
-enum YoutubePlayOption: String {
+//Open side app or embedded html
+enum SideAppPreference: String {
     case Embedded = "embedded"
     case App = "app"
 }
@@ -100,8 +101,21 @@ enum AuthVariant: String {
     case Username   = "Username"
 }
 
-enum SocialMedia {
-    case TikTok
+enum ThirdPartyApp: String {
+    case TikTok     = "TikTok"
+    case Youtube    = "Youtube"
+    case Null       = ""
+    
+    func getIcon() -> UIView {
+        switch self {
+        case .Youtube:
+            return YoutubeLogo()
+        case .TikTok:
+            return TikTokLogo()
+        default:
+            return UIView()
+        }
+    }
 }
 
 enum ClientSettingsMode {
@@ -505,10 +519,24 @@ class AppData {
                 }
             }
         }
-        var youtubePlayOption: YoutubePlayOption? {
+        var youtubePlayOption: SideAppPreference? {
             didSet {
                 if youtubePlayOption != nil, youtubePlayOption != oldValue {
                     UserDefaults.standard.set(youtubePlayOption!.rawValue, forKey: "youtubePlayOption")
+                }
+            }
+        }
+        var tiktokPlayOption: SideAppPreference? {
+            didSet {
+                if tiktokPlayOption != nil, tiktokPlayOption != oldValue {
+                    UserDefaults.standard.set(tiktokPlayOption!.rawValue, forKey: "tiktokPlayOption")
+                }
+            }
+        }
+        var newPollTutorialRequired: Bool = true {
+            didSet {
+                if newPollTutorialRequired == false {
+                    UserDefaults.standard.set(newPollTutorialRequired, forKey: "newPollTutorialRequired")
                 }
             }
         }
@@ -560,9 +588,12 @@ class AppData {
                 self.APIVersion = (kAPIVersion as! String)
             }
             if let kYoutubePlayOption = UserDefaults.standard.object(forKey: "youtubePlayOption") {
-                self.youtubePlayOption = YoutubePlayOption(rawValue: kYoutubePlayOption as! String)
+                self.youtubePlayOption = SideAppPreference(rawValue: kYoutubePlayOption as! String)
             }
-
+            if let kTiktokPlayOption = UserDefaults.standard.object(forKey: "tiktokPlayOption") {
+                self.tiktokPlayOption = SideAppPreference(rawValue: kTiktokPlayOption as! String)
+            }
+            self.newPollTutorialRequired = UserDefaults.standard.object(forKey: "newPollTutorialRequired") as? Bool ?? true
         }
         
         mutating func eraseData() {
@@ -576,8 +607,12 @@ class AppData {
             }
             APIVersion = ""
             youtubePlayOption = nil
+            tiktokPlayOption = nil
+            newPollTutorialRequired = true
             UserDefaults.standard.removeObject(forKey: "userEmailVerified")
             UserDefaults.standard.removeObject(forKey: "youtubePlayOption")
+            UserDefaults.standard.removeObject(forKey: "tiktokPlayOption")
+            UserDefaults.standard.removeObject(forKey: "newPollTutorialRequired")
         }
     }
     

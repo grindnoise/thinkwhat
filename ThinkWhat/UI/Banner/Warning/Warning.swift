@@ -74,7 +74,11 @@ class Warning: UIView, BannerContent {
     
     var text = "" {
         didSet {
-            label.text = text
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.hyphenationFactor = 1.0
+            let attributedString = NSMutableAttributedString(string: text, attributes: [NSAttributedString.Key.paragraphStyle:paragraphStyle])
+            attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .black, backgroundColor: .clear), range: text.fullRange())
+            label.attributedText = attributedString
         }
     }
     

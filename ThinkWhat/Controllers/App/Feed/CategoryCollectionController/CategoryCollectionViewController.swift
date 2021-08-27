@@ -17,7 +17,7 @@ class CategoryCollectionViewController: UICollectionViewController {
     let sectionInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 10.0)
     var categories: [SurveyCategory]!
     fileprivate var parentMode = false
-    fileprivate var needsAnimation = true
+    var needsAnimation = true
 //    fileprivate var effectView: AnimatedVisualEffectView!
     let effectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
     weak var delegate: CallbackDelegate?

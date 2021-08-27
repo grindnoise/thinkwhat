@@ -231,12 +231,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             categoryIcon.addGestureRecognizer(tap)
         }
     }
-//    @IBOutlet weak var unknownIcon: CategoryIcon! {
-//        didSet {
-//            let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleIconTap(gesture:)))
-//            unknownIcon.addGestureRecognizer(tap)
-//        }
-//    }
+
 
     fileprivate var icons: [Icon] = []
     @IBOutlet weak var container: UIView!

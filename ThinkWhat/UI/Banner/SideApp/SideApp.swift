@@ -8,7 +8,22 @@
 
 import UIKit
 
-class YoutubeBanner: UIView, BannerContent {
+class SideApp: UIView, BannerContent {
+    var app: ThirdPartyApp = .Null {
+        didSet {
+            if oldValue != app {
+                if icon != nil {
+                    icon.subviews.forEach({ $0.removeFromSuperview() })
+                    let _icon = app.getIcon()
+                    _icon.isOpaque = false
+                    _icon.addEquallyTo(to: icon)
+                }
+                if openButton != nil {
+                    openButton.setTitle("Открыть в приложении \(app.rawValue)", for: .normal)
+                }
+            }
+        }
+    }
     var foldable = false
     var minHeigth: CGFloat {
         return topView.frame.height
@@ -24,22 +39,30 @@ class YoutubeBanner: UIView, BannerContent {
     
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var topView: UIView!
-    @IBOutlet weak var icon: YoutubeLogo!
+    @IBOutlet weak var icon: UIView!
 
     @IBOutlet weak var playButton: UIButton!
     @IBAction func playEmbedded(_ sender: Any) {
         Banner.shared.dismiss() {
             _ in
-            self.delegate?.callbackReceived(YoutubePlayOption.Embedded as AnyObject)
-            AppData.shared.system.youtubePlayOption = self.defaultSwitch.isOn ? YoutubePlayOption.Embedded : AppData.shared.system.youtubePlayOption
+            self.delegate?.callbackReceived(SideAppPreference.Embedded as AnyObject)
+            if self.app == .Youtube {
+                AppData.shared.system.youtubePlayOption = self.defaultSwitch.isOn ? SideAppPreference.Embedded : AppData.shared.system.youtubePlayOption
+            } else if self.app == .TikTok {
+                AppData.shared.system.tiktokPlayOption = self.defaultSwitch.isOn ? SideAppPreference.Embedded : AppData.shared.system.tiktokPlayOption
+            }
         }
     }
     @IBOutlet weak var openButton: UIButton!
     @IBAction func openYoutubeApp(_ sender: Any) {
         Banner.shared.dismiss() {
             _ in
-            self.delegate?.callbackReceived(YoutubePlayOption.App as AnyObject)
-            AppData.shared.system.youtubePlayOption = self.defaultSwitch.isOn ? YoutubePlayOption.App : AppData.shared.system.youtubePlayOption
+            self.delegate?.callbackReceived(SideAppPreference.App as AnyObject)
+            if self.app == .Youtube {
+                AppData.shared.system.youtubePlayOption = self.defaultSwitch.isOn ? SideAppPreference.Embedded : AppData.shared.system.youtubePlayOption
+            } else if self.app == .TikTok {
+                AppData.shared.system.tiktokPlayOption = self.defaultSwitch.isOn ? SideAppPreference.Embedded : AppData.shared.system.tiktokPlayOption
+            }
         }
     }
     @IBAction func setDefault(_ sender: Any) {
@@ -71,7 +94,7 @@ class YoutubeBanner: UIView, BannerContent {
     }
     
     private func commonInit() {
-        Bundle.main.loadNibNamed("YoutubeBanner", owner: self, options: nil)
+        Bundle.main.loadNibNamed("SideApp", owner: self, options: nil)
         guard let content = contentView else {
             return
         }

@@ -45,7 +45,7 @@ class BinarySelectionViewController: UIViewController {
     var isAnimationStopped = false
     var isEnabled: Bool? {
         didSet {
-            if selectionType == .Hot, isEnabled == true, !isBannerShown {
+            if AppData.shared.system.newPollTutorialRequired, selectionType == .Hot, isEnabled == true, !isBannerShown {
                 Banner.shared.contentType = .Warning
                 if let content = Banner.shared.content as? Warning {
                     content.level = .Warning
@@ -66,11 +66,21 @@ class BinarySelectionViewController: UIViewController {
     }
     @IBOutlet weak var actionButton: CircleButton! {
         didSet {
-            actionButton.lineWidth = lineWidth
+//            actionButton.lineWidth = lineWidth
             actionButton.state = .Off
-            actionButton.text = "?"
+//            actionButton.text = "?"
             actionButton.color = K_COLOR_GRAY
-            actionButton.category = .Ready_RU
+            switch selectionType {
+            case .Anonimity:
+                actionButton.category = .Anon
+            case .Comments:
+                actionButton.category = .Comment
+            case .Hot:
+                actionButton.category = .Rocket
+            case .Privacy:
+                actionButton.category = .Locked
+            }
+//            actionButton.category = .Ready_RU
             let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.okButtonTapped))
             actionButton.addGestureRecognizer(tap)
 //            actionButton.isUserInteractionEnabled = false
@@ -79,17 +89,19 @@ class BinarySelectionViewController: UIViewController {
     }
     @IBOutlet weak var enabledIcon: SurveyCategoryIcon! {
         didSet {
+//            enabledIcon.scaleMultiplicator = 0.55
             enabledIcon.backgroundColor = UIColor.clear
             enabledIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
             switch selectionType {
             case .Anonimity:
-                enabledIcon.category = .Anon
+                enabledIcon.category = AppData.shared.userProfile.gender == Gender.Female ? .GirlFaceHidden : .ManFaceHidden
+//                enabledIcon.category = .Anon
             case .Privacy:
                 enabledIcon.category = .Locked
             case .Comments:
                 enabledIcon.category = .Comment
             case .Hot:
-                enabledIcon.category = .Hot
+                enabledIcon.category = .Rocket
             }
         }
     }
@@ -99,7 +111,7 @@ class BinarySelectionViewController: UIViewController {
             case .Anonimity:
                 enabledLabel.text = "Включена"
             case .Privacy:
-                enabledLabel.text = "Приватный"
+                enabledLabel.text = "Включена"
             case .Comments:
                 enabledLabel.text = "Разрешены"
             case .Hot:
@@ -109,17 +121,19 @@ class BinarySelectionViewController: UIViewController {
     }
     @IBOutlet weak var disabledIcon: SurveyCategoryIcon! {
         didSet {
+//            disabledIcon.scaleMultiplicator = 0.55
             disabledIcon.backgroundColor = UIColor.clear
             disabledIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
             switch selectionType {
             case .Anonimity:
-                disabledIcon.category = .AnonDisabled
+                disabledIcon.category = AppData.shared.userProfile.gender == Gender.Female ? .GirlFace : .ManFace
+//                disabledIcon.category = .AnonDisabled
             case .Privacy:
                 disabledIcon.category = .Unlocked
             case .Comments:
                 disabledIcon.category  = .CommentDisabled
             case .Hot:
-                disabledIcon.category  = .HotDisabled
+                disabledIcon.category  = .RocketOff
             }
         }
     }
@@ -135,7 +149,7 @@ class BinarySelectionViewController: UIViewController {
             case .Anonimity:
                 disabledLabel.text = "Выключена"
             case .Privacy:
-                disabledLabel.text = "Публичный"
+                disabledLabel.text = "Выключена"
             case .Comments:
                 disabledLabel.text = "Запрещены"
             case .Hot:
@@ -158,7 +172,7 @@ class BinarySelectionViewController: UIViewController {
         
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.55
+            nc.duration = 0.4
             nc.transitionStyle = .Icon
             navigationItem.setHidesBackButton(true, animated: false)
         }
@@ -181,7 +195,7 @@ class BinarySelectionViewController: UIViewController {
         case .Comments:
             title = "Комментарии"
         case .Hot:
-            title = "Хот-лист"
+            title = "Быстрый старт"
             if let btn = self.navigationItem.rightBarButtonItem as? UIBarButtonItem {
                 let v = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
                 v.accessibilityIdentifier = "info"
@@ -243,7 +257,7 @@ class BinarySelectionViewController: UIViewController {
             
             if isEnabled != nil, (isEnabled! && v == enabledBg) || (!isEnabled! && v == disabledBg) { return }
             
-            if let selectedIcon = selectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let deselectedIcon = deselectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon {
+            if let selectedIcon = selectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let deselectedIcon = deselectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let selectedLabel = selectedView.subviews.filter({ $0 is UILabel }).first as? UILabel, let deselectedLabel = deselectedView.subviews.filter({ $0 is UILabel }).first as? UILabel {
                 let enableAnim = Animations.get(property: .FillColor,
                                                 fromValue: selectedIcon.iconColor.cgColor,
                                                 toValue: UIColor.black.cgColor,
@@ -259,8 +273,25 @@ class BinarySelectionViewController: UIViewController {
                                                  delegate: nil,
                                                  isRemovedOnCompletion: false)
                 selectedIcon.icon.add(enableAnim, forKey: nil)
-                
-                if !isFirstSelection { deselectedIcon.icon.add(disableAnim, forKey: nil) }
+                UIView.animate(
+                    withDuration: 0.3,
+                    delay: 0,
+                    usingSpringWithDamping: 0.7,
+                    initialSpringVelocity: 2.5,
+                    options: [.curveEaseInOut],
+                    animations: {
+                        selectedIcon.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+                        selectedLabel.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+                        selectedLabel.textColor = .black
+                }) { _ in }
+                if !isFirstSelection {
+                    deselectedIcon.icon.add(disableAnim, forKey: nil)
+                    UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut], animations: {
+                        deselectedIcon.transform = .identity
+                        deselectedLabel.transform = .identity
+                        deselectedLabel.textColor = UIColor.lightGray.withAlphaComponent(0.75)
+                    })
+                }
             }
 
             if !isSelected {

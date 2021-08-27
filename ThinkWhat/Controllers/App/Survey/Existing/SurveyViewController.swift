@@ -155,7 +155,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 showClaimButton()
                 self.presentSurvey()
                 if surveyLink == nil {
-                    surveyLink = SurveyRef(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, completionPercentage: 100, type: survey!.type)
+                    surveyLink = SurveyRef(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, type: survey!.type)
                 }
                 if let userProfile = survey!.userProfile as? UserProfile, let image = userProfile.image as? UIImage {
                     NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: nil)
@@ -528,7 +528,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                     cell = _cell
                 }
             } else if let _cell = tableView.dequeueReusableCell(withIdentifier: "info", for: indexPath) as? SurveyInfoCell {
-                _cell.dateLabel.text = survey?.modified.toDateTimeStringWithoutSeconds()
+                _cell.dateLabel.text = survey?.startDate.toDateTimeStringWithoutSeconds()
                 if let userProfile = survey?.userProfile {
                     _cell.userLabel.text = userProfile.name
                     if userProfile.image != nil {

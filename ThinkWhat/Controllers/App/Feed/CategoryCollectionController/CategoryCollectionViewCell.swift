@@ -35,10 +35,20 @@ class CategoryCollectionViewCell: UICollectionViewCell {
                             self.icon.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5)
                         })
                     } else {
-                        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut], animations: {
-                            self.icon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
-                            self.icon.backgroundColor = self.category.tagColor
-                        })
+                        UIView.animate(
+                            withDuration: 0.3,
+                            delay: 0,
+                            usingSpringWithDamping: 0.7,
+                            initialSpringVelocity: 0.3,
+                            options: [.curveEaseInOut],
+                            animations: {
+                                self.icon.transform = CGAffineTransform(scaleX: 1.15, y: 1.15)
+                                self.icon.backgroundColor = self.category.tagColor
+                        }) { _ in }
+//                        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut], animations: {
+//                            self.icon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+//                            self.icon.backgroundColor = self.category.tagColor
+//                        })
                     }
                 }
             }

@@ -31,13 +31,13 @@ class CategorySelectionViewController: UIViewController {
         }
     }
     
-    var lineWidth: CGFloat = 5 {
-        didSet {
-            if oldValue != lineWidth, actionButton != nil {
-                actionButton.lineWidth = lineWidth
-            }
-        }
-    }
+//    var lineWidth: CGFloat = 5 {
+//        didSet {
+//            if oldValue != lineWidth, actionButton != nil {
+//                actionButton.lineWidth = lineWidth
+//            }
+//        }
+//    }
     var isAnimationStopped = false
     var category: SurveyCategory? {
         didSet {
@@ -57,9 +57,7 @@ class CategorySelectionViewController: UIViewController {
                     self.actionButton.isUserInteractionEnabled = true
                     
                 } else if category == nil, oldValue != nil {
-                    
                     actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Choose_RU)
-                    
                     isAnimationStopped = true
                     self.actionButton.isUserInteractionEnabled = false
                 }
@@ -83,14 +81,13 @@ class CategorySelectionViewController: UIViewController {
         didSet {
             actionButton.oval.opacity = 0
             actionButton.contentView.backgroundColor = .clear
-            actionButton.lineWidth = lineWidth
+//            actionButton.lineWidth = lineWidth
             actionButton.isUserInteractionEnabled = false
             let tap = UITapGestureRecognizer(target: self, action: #selector(CategorySelectionViewController.okButtonTapped))
             actionButton.addGestureRecognizer(tap)
             actionButton.state = .On
             actionButton.color = K_COLOR_GRAY
-            actionButton.text = "РАЗДЕЛ"
-            actionButton.category = .Ready_RU
+            actionButton.category = .Category_RU
             actionButton.oval.strokeStart = 1
         }
     }
@@ -121,13 +118,14 @@ class CategorySelectionViewController: UIViewController {
         categoryVC.view.addEquallyTo(to: container)
         addChild(self.categoryVC)
         categoryVC.didMove(toParent: self)
+        categoryVC.needsAnimation = false
 //        view.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.duration = 0.4
+            nc.duration = 0.3
             nc.transitionStyle = .Icon
         }
         
@@ -139,8 +137,8 @@ class CategorySelectionViewController: UIViewController {
             containerBg.setNeedsLayout()
             containerBg.layoutIfNeeded()
             containerBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor//UIColor.lightGray.withAlphaComponent(0.6).cgColor
-            containerBg.layer.shadowPath = UIBezierPath(roundedRect: containerBg.bounds, cornerRadius: 25).cgPath
-            containerBg.layer.shadowRadius = 6
+            containerBg.layer.shadowPath = UIBezierPath(roundedRect: containerBg.bounds, cornerRadius: 20).cgPath
+            containerBg.layer.shadowRadius = 7
             containerBg.layer.shadowOffset = .zero
             containerBg.layer.shadowOpacity = 1
             containerBg.layer.masksToBounds = false
@@ -148,8 +146,8 @@ class CategorySelectionViewController: UIViewController {
             backButtonBg.layoutIfNeeded()
             backButtonFg.layer.cornerRadius = backButtonFg.frame.height / 2
             backButtonBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor//UIColor.lightGray.withAlphaComponent(0.6).cgColor
-            backButtonBg.layer.shadowPath = UIBezierPath(roundedRect: backButtonBg.bounds, cornerRadius: 25).cgPath
-            backButtonBg.layer.shadowRadius = 6
+            backButtonBg.layer.shadowPath = UIBezierPath(roundedRect: backButtonBg.bounds, cornerRadius: 20).cgPath
+            backButtonBg.layer.shadowRadius = 7
             backButtonBg.layer.shadowOffset = .zero
             backButtonBg.layer.shadowOpacity = 1
             backButtonBg.layer.masksToBounds = false
@@ -163,7 +161,7 @@ class CategorySelectionViewController: UIViewController {
             actionButton.layoutIfNeeded()
             
             isViewSetupCompleted = true
-            lineWidth = actionButton.bounds.height / 10
+//            lineWidth = actionButton.bounds.height / 10
         }
     }
     
@@ -171,11 +169,17 @@ class CategorySelectionViewController: UIViewController {
 //        navigationController?.popViewController(animated: true)
     }
     override func viewWillDisappear(_ animated: Bool) {
-        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
-            self.view.setNeedsLayout()
-            self.backButtonConstraint.constant = self.hiddenConstraintConstant
-            self.view.layoutIfNeeded()
-            self.backButton.alpha = 0
+        UIView.animate(
+            withDuration: 0.4,
+            delay: 0,
+            usingSpringWithDamping: 0.7,
+            initialSpringVelocity: 0.4,
+            options: [.curveEaseInOut],
+            animations: {
+                self.view.setNeedsLayout()
+                self.backButtonConstraint.constant = self.hiddenConstraintConstant
+                self.view.layoutIfNeeded()
+                self.backButton.alpha = 0
         })
     }
     

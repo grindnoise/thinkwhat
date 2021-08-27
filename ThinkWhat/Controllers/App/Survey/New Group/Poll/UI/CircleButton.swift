@@ -19,7 +19,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     var iconProportionConstraint = NSLayoutConstraint()
     var scaleColorAnim: CAAnimationGroup?
     
-    private var duration = 0.6
+    private var duration = 0.5
     var state: State = .On {
         didSet {
             oval.strokeStart = state == .On ? 0 : 1
@@ -50,6 +50,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     var layers = [String: CALayer]()
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
     var updateLayerValueForCompletedAnimation : Bool = false
+    private var pathTransitionDuration: TimeInterval = 0.3
     
     //MARK: - Interface properties
     @IBInspectable var lineWidth: CGFloat = 5 {
@@ -103,7 +104,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         icon.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         icon.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         icon.heightAnchor.constraint(equalTo: icon.widthAnchor, multiplier: 1.0/1.0).isActive = true
-        iconProportionConstraint = icon.heightAnchor.constraint(equalTo: widthAnchor, multiplier: 0.79/1.0)
+        iconProportionConstraint = icon.heightAnchor.constraint(equalTo: widthAnchor, multiplier: 0.8/1.0)
         iconProportionConstraint.isActive = true
 //        icon.text = text
 //        icon.backgroundColor = color
@@ -265,19 +266,27 @@ class CircleButton: UIView, CAAnimationDelegate {
 
     func present(completionBlocks: [Closure]) {
         
-//        if icon != nil, state == .Off {
+        //        if icon != nil, state == .Off {
         icon.alpha = 0
-        icon.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
-        icon.backgroundColor = .lightGray
-        UIView.animate(withDuration: 0.5) {
-            self.icon.transform = .identity
+        icon.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        icon.backgroundColor = .clear
+        UIView.animate(withDuration: 0.15, delay: 0.1, options: [], animations: {
             self.icon.alpha = 1
             self.icon.backgroundColor = self.color
-        }
-        addEnableAnimation {
+        })
+        UIView.animate(
+            withDuration: 0.5,
+            delay: 0.1,
+            usingSpringWithDamping: 0.7,
+            initialSpringVelocity: 0.6,
+            options: [.curveEaseOut],
+            animations: {
+                self.icon.transform = .identity
+        }) {
             _ in
             completionBlocks.map { $0() }
         }
+        addEnableAnimation()
     }
     
     @objc private func lineWidthChanged(_ notification: Notification) {
@@ -311,7 +320,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     
     func animateIconChange(toCategory: SurveyCategoryIcon.Category) {
         
-        let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path!, toValue: (icon.getLayer(toCategory) as! CAShapeLayer).path!, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: icon, isRemovedOnCompletion: false)
+        let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path!, toValue: (icon.getLayer(toCategory) as! CAShapeLayer).path!, duration: pathTransitionDuration, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: icon, isRemovedOnCompletion: false)
         pathAnim.setValue(toCategory, forKey: "toCategory")
         icon.icon.add(pathAnim, forKey: nil)
         

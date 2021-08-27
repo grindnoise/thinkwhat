@@ -137,8 +137,8 @@
 		AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */; };
 		AB6B071F247688600095721B /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6B071E247688600095721B /* UserViewController.swift */; };
 		AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */; };
-		AB7085E726CB9A1F006F020F /* YoutubeBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7085E626CB9A1F006F020F /* YoutubeBanner.swift */; };
-		AB7085E926CB9A75006F020F /* YoutubeBanner.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7085E826CB9A75006F020F /* YoutubeBanner.xib */; };
+		AB7085E726CB9A1F006F020F /* SideApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7085E626CB9A1F006F020F /* SideApp.swift */; };
+		AB7085E926CB9A75006F020F /* SideApp.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7085E826CB9A75006F020F /* SideApp.xib */; };
 		AB72A8442418D05E005B58F1 /* SurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72A8432418D05E005B58F1 /* SurveyViewController.swift */; };
 		AB735C092418EABD00776248 /* SurveyTitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB735C082418EABD00776248 /* SurveyTitleCell.swift */; };
 		AB735C0B241902E600776248 /* SurveyQuestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB735C0A241902E600776248 /* SurveyQuestionCell.swift */; };
@@ -410,8 +410,8 @@
 		AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconsStyleKit.swift; sourceTree = "<group>"; };
 		AB6B071E247688600095721B /* UserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewController.swift; sourceTree = "<group>"; };
 		AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyIcons.swift; sourceTree = "<group>"; };
-		AB7085E626CB9A1F006F020F /* YoutubeBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeBanner.swift; sourceTree = "<group>"; };
-		AB7085E826CB9A75006F020F /* YoutubeBanner.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = YoutubeBanner.xib; sourceTree = "<group>"; };
+		AB7085E626CB9A1F006F020F /* SideApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideApp.swift; sourceTree = "<group>"; };
+		AB7085E826CB9A75006F020F /* SideApp.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SideApp.xib; sourceTree = "<group>"; };
 		AB72A8432418D05E005B58F1 /* SurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyViewController.swift; sourceTree = "<group>"; };
 		AB735C082418EABD00776248 /* SurveyTitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTitleCell.swift; sourceTree = "<group>"; };
 		AB735C0A241902E600776248 /* SurveyQuestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyQuestionCell.swift; sourceTree = "<group>"; };
@@ -611,7 +611,7 @@
 		AB21970126BC2EC7005A7BA8 /* Banner */ = {
 			isa = PBXGroup;
 			children = (
-				AB7085E526CB99EE006F020F /* Youtube */,
+				AB7085E526CB99EE006F020F /* SideApp */,
 				AB869F2126C3C660008353B3 /* Warning */,
 				AB21970226BC2EEF005A7BA8 /* Banner.swift */,
 				AB21970426BC2F0B005A7BA8 /* Banner.xib */,
@@ -990,13 +990,13 @@
 			path = Animated;
 			sourceTree = "<group>";
 		};
-		AB7085E526CB99EE006F020F /* Youtube */ = {
+		AB7085E526CB99EE006F020F /* SideApp */ = {
 			isa = PBXGroup;
 			children = (
-				AB7085E626CB9A1F006F020F /* YoutubeBanner.swift */,
-				AB7085E826CB9A75006F020F /* YoutubeBanner.xib */,
+				AB7085E626CB9A1F006F020F /* SideApp.swift */,
+				AB7085E826CB9A75006F020F /* SideApp.xib */,
 			);
-			path = Youtube;
+			path = SideApp;
 			sourceTree = "<group>";
 		};
 		AB72A8422418CF2D005B58F1 /* Cells */ = {
@@ -1476,7 +1476,7 @@
 				AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */,
 				ABDA425523B1036400BAC3A5 /* NewSurveyHeaderCell.xib in Resources */,
 				AB91195726C3AB50007ED54A /* VotesFormula.xib in Resources */,
-				AB7085E926CB9A75006F020F /* YoutubeBanner.xib in Resources */,
+				AB7085E926CB9A75006F020F /* SideApp.xib in Resources */,
 				AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */,
 				AB3C684D223FD3EE00B57580 /* OpenSans-ExtraBold.ttf in Resources */,
 				AB3C6826223FD1E900B57580 /* CustomAlertView.xib in Resources */,
@@ -1866,7 +1866,7 @@
 				ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */,
 				AB32DA3D25D56138007AFF05 /* TextInputViewController.swift in Sources */,
 				AB3C6847223FD3EE00B57580 /* Instagram.swift in Sources */,
-				AB7085E726CB9A1F006F020F /* YoutubeBanner.swift in Sources */,
+				AB7085E726CB9A1F006F020F /* SideApp.swift in Sources */,
 				AB7CE6FE23A36283006FDBD8 /* CategorySelectionCell.swift in Sources */,
 				AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */,
 			);
