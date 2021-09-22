@@ -10,8 +10,22 @@ import UIKit
 
 //MARK: - String & fonts
 struct StringAttributes {
-    
-    static func getFont(name: String, size: CGFloat) -> UIFont {
+    enum FontStyle: String {
+        case Semibold     = "OpenSans-Semibold"
+        case Bold         = "OpenSans-Bold"
+        case Regular      = "OpenSans"
+        case Light        = "OpenSans-Light"
+        case Italic       = "OpenSans-Italic"
+        case Extrabold    = "OpenSans-ExtraBold"
+        
+        func get(size: CGFloat) -> UIFont {
+            if let font = UIFont(name: self.rawValue, size: size) {
+                return font
+            }
+            return UIFont()
+        }
+    }
+    static func font(name: String, size: CGFloat) -> UIFont {
         if let font = UIFont(name: name, size: size) {
             return font
         }
@@ -30,9 +44,6 @@ struct StringAttributes {
     }
     
     struct Fonts {
-        
-        
-        
         struct Style {
             static let Semibold     = "OpenSans-Semibold"
             static let Bold         = "OpenSans-Bold"

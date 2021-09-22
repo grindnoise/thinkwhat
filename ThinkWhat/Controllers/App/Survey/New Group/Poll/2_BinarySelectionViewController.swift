@@ -94,7 +94,7 @@ class BinarySelectionViewController: UIViewController {
             enabledIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
             switch selectionType {
             case .Anonimity:
-                enabledIcon.category = AppData.shared.userProfile.gender == Gender.Female ? .GirlFaceHidden : .ManFaceHidden
+                enabledIcon.category = .Anon//AppData.shared.userProfile.gender == Gender.Female ? .GirlFaceHidden : .ManFaceHidden
 //                enabledIcon.category = .Anon
             case .Privacy:
                 enabledIcon.category = .Locked
@@ -126,7 +126,7 @@ class BinarySelectionViewController: UIViewController {
             disabledIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
             switch selectionType {
             case .Anonimity:
-                disabledIcon.category = AppData.shared.userProfile.gender == Gender.Female ? .GirlFace : .ManFace
+                disabledIcon.category = .AnonDisabled//AppData.shared.userProfile.gender == Gender.Female ? .GirlFace : .ManFace
 //                disabledIcon.category = .AnonDisabled
             case .Privacy:
                 disabledIcon.category = .Unlocked

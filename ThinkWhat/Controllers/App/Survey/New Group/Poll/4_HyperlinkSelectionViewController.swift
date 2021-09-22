@@ -39,7 +39,7 @@ class HyperlinkSelectionViewController: UIViewController {
     var isAnimationStopped = false
     lazy var placeholder: NSMutableAttributedString = {
         let attrString = NSMutableAttributedString()
-        attrString.append(NSAttributedString(string: "Вставить ссылку", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 18), foregroundColor: .darkGray, backgroundColor: .clear)))
+        attrString.append(NSAttributedString(string: "Вставить ссылку", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 18), foregroundColor: .darkGray, backgroundColor: .clear)))
 //        attrString.append(NSAttributedString(string: "\n(опционально)", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .lightGray, backgroundColor: .clear)))
         return attrString
     }()
@@ -210,7 +210,7 @@ class HyperlinkSelectionViewController: UIViewController {
 //                trashHeightConstraintNew.constant = 0
             } else {
                 hyperlinkLabel.numberOfLines = 2
-                hyperlinkLabel.attributedText = NSAttributedString(string: hyperlink!.absoluteString, attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 14), foregroundColor: .blue, backgroundColor: .clear))
+                hyperlinkLabel.attributedText = NSAttributedString(string: hyperlink!.absoluteString, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 14), foregroundColor: .blue, backgroundColor: .clear))
             }
         }
     }
@@ -244,7 +244,7 @@ class HyperlinkSelectionViewController: UIViewController {
                             
                             UIView.transition(with: hyperlinkLabel, duration: 0.3, options: .transitionCrossDissolve, animations: {
                                 self.hyperlinkLabel.numberOfLines = 2
-                                self.hyperlinkLabel.attributedText =  NSAttributedString(string: text, attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 14), foregroundColor: .blue, backgroundColor: .clear))
+                                self.hyperlinkLabel.attributedText =  NSAttributedString(string: text, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 14), foregroundColor: .blue, backgroundColor: .clear))
                             })
                             
                             self.trashSign.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)

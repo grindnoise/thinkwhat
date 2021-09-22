@@ -46,8 +46,8 @@ class SubcategoryViewController: UIViewController {
         navTitle.numberOfLines = 2
         navTitle.textAlignment = .center
         let attrString = NSMutableAttributedString()
-        attrString.append(NSAttributedString(string: parentCategory.title, attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
-        attrString.append(NSAttributedString(string: "\n(\(parentCategory.total))", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .gray, backgroundColor: .clear)))
+        attrString.append(NSAttributedString(string: parentCategory.title, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
+        attrString.append(NSAttributedString(string: "\n(\(parentCategory.total))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .gray, backgroundColor: .clear)))
         navTitle.attributedText = attrString
         navigationItem.titleView = navTitle
         

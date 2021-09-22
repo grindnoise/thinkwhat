@@ -50,6 +50,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     var layers = [String: CALayer]()
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
     var updateLayerValueForCompletedAnimation : Bool = false
+    var useAutoLayout = true
     private var pathTransitionDuration: TimeInterval = 0.3
     
     //MARK: - Interface properties
@@ -78,6 +79,12 @@ class CircleButton: UIView, CAAnimationDelegate {
         self.commonInit()
     }
     
+    init(frame: CGRect, useAutoLayout: Bool) {
+        super.init(frame: frame)
+        self.useAutoLayout = useAutoLayout
+        self.commonInit()
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.commonInit()
@@ -91,6 +98,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         }
         content.frame = self.bounds
         content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+//        content.backgroundColor = .clear
         self.addSubview(content)
         self.backgroundColor = .clear//UIColor(red:1.00, green: 1.00, blue:1.00, alpha:0.0)
         
@@ -100,12 +108,16 @@ class CircleButton: UIView, CAAnimationDelegate {
         
         icon = SurveyCategoryIcon.getIcon(frame: .zero, category: .Outdoor/*category*/, backgroundColor: color, text: text)//SurveyCategoryIcon(frame: self.bounds)//getIcon(frame: self.bounds, category: category, color: color)
         self.addSubview(icon)
-        icon.translatesAutoresizingMaskIntoConstraints = false
-        icon.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        icon.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        icon.heightAnchor.constraint(equalTo: icon.widthAnchor, multiplier: 1.0/1.0).isActive = true
-        iconProportionConstraint = icon.heightAnchor.constraint(equalTo: widthAnchor, multiplier: 0.8/1.0)
-        iconProportionConstraint.isActive = true
+        if useAutoLayout {
+            icon.translatesAutoresizingMaskIntoConstraints = false
+            icon.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+            icon.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+            icon.heightAnchor.constraint(equalTo: icon.widthAnchor, multiplier: 1.0/1.0).isActive = true
+            iconProportionConstraint = icon.heightAnchor.constraint(equalTo: widthAnchor, multiplier: 0.8/1.0)
+            iconProportionConstraint.isActive = true
+        } else {
+            icon.frame = self.frame
+        }
 //        icon.text = text
 //        icon.backgroundColor = color
 //        icon.category = category
@@ -114,7 +126,10 @@ class CircleButton: UIView, CAAnimationDelegate {
         resetLayerProperties(forLayerIdentifiers: nil)
         setupLayerFrames()
         clipsToBounds = true
-        NotificationCenter.default.addObserver(self, selector: #selector(CircleButton.lineWidthChanged(_:)), name: Notifications.UI.LineWidth, object: nil)
+        if useAutoLayout {
+            NotificationCenter.default.addObserver(self, selector: #selector(CircleButton.lineWidthChanged(_:)), name: Notifications.UI.LineWidth, object: nil)
+//            clipsToBounds = false
+        }
     }
     
     override var frame: CGRect{

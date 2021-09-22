@@ -365,9 +365,9 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
             if indexPath.row == 0, let _cell = tableView.dequeueReusableCell(withIdentifier: "title", for: indexPath) as? SurveyTitleCell {
                 if survey != nil {
                     let attrString = NSMutableAttributedString()
-                    attrString.append(NSAttributedString(string: "  \(survey!.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
-                    attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
-                    attrString.append(NSAttributedString(string: "\(survey!.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: "  \(survey!.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: "\(survey!.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
                     _cell.category.attributedText = attrString
                     _cell.survey = surveyLink
                     _cell.label.text = survey!.title
@@ -379,12 +379,12 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                         _cell.category.cornerRadius = _cell.category.frame.height / 2.5
                         _cell.date.cornerRadius = _cell.date.frame.height / 2.5
                     }
-                    _cell.date.attributedText = NSAttributedString(string: " \(survey!.startDate.toDateStringLiteral_dMMM())   ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
+                    _cell.date.attributedText = NSAttributedString(string: " \(survey!.startDate.toDateStringLiteral_dMMM())   ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
                 } else {
                     let attrString = NSMutableAttributedString()
-                    attrString.append(NSAttributedString(string: "  \(surveyLink.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
-                    attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
-                    attrString.append(NSAttributedString(string: "\((surveyLink.category.parent?.title.uppercased() ?? ""))  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: "  \(surveyLink.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                    attrString.append(NSAttributedString(string: "\((surveyLink.category.parent?.title.uppercased() ?? ""))  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
                     _cell.label.text = surveyLink.title
                     _cell.survey = surveyLink
                     _cell.label.text = survey!.title
@@ -396,7 +396,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                         _cell.category.cornerRadius = _cell.category.frame.height / 2.5
                         _cell.date.cornerRadius = _cell.date.frame.height / 2.5
                     }
-                    _cell.date.attributedText = NSAttributedString(string: " \(surveyLink.startDate.toDateStringLiteral_dMMM())   ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
+                    _cell.date.attributedText = NSAttributedString(string: " \(surveyLink.startDate.toDateStringLiteral_dMMM())   ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear))
                 }
                 cell = _cell
             } else if indexPath.row == 1, let _cell = tableView.dequeueReusableCell(withIdentifier: "question", for: indexPath) as? SurveyQuestionCell {

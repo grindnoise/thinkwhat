@@ -17,6 +17,8 @@ struct Animations {
         case Scale           = "transform.scale"
         case Path            = "path"
         case BackgroundColor = "backgroundColor"
+        case StrokeStart     = "strokeStart"
+        case LineWidth       = "lineWidth"
     }
     static func group(animations: [CAAnimation], repeatCount: Float = 0, autoreverses: Bool = false, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CAAnimationGroup {
         
@@ -34,7 +36,7 @@ struct Animations {
         
     }
     
-    static func get(property: AnimationProperty, fromValue: Any, toValue: Any, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CAAnimation {
+    static func get(property: AnimationProperty, fromValue: Any, toValue: Any, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true, completionBlocks: [Closure]? = nil) -> CAAnimation {
         
         let anim = CABasicAnimation(keyPath: property.rawValue)
         anim.fromValue = fromValue
@@ -47,6 +49,7 @@ struct Animations {
         anim.isRemovedOnCompletion = isRemovedOnCompletion
         if delegate != nil {
             anim.delegate = delegate!
+            anim.setValue(completionBlocks, forKey: "completionBlocks")
         }
         anim.timingFunction = CAMediaTimingFunction(name: timingFunction)
         

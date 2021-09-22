@@ -264,10 +264,23 @@ class IconTransition: BasicTransition {
                 let destinationPos = destinationIcon.convert(destinationIcon.icon.frame.origin, to: navigationController?.view)
                 let destinationSize = destinationIcon.icon.frame.size
                 let destinationPath = (destinationIcon.icon.icon as! CAShapeLayer).path
-                let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path as Any, toValue: destinationPath as Any, duration: duration * 0.9, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
+                let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path as Any, toValue: destinationPath as Any, duration: duration*0.8, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
                 
                 var animationBlock: [Closure] = []
-                animationBlock.append { UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.9, delay: 0, options: [.curveEaseInOut], animations: {
+                animationBlock.append {
+                    UIView.animate(
+                        withDuration: self.duration,
+                        delay: 0,
+                        usingSpringWithDamping: 0.9,
+                        initialSpringVelocity: 0.2,
+                        options: [.curveEaseInOut],
+                        animations: {
+                            vc_2.view.setNeedsLayout()
+                            vc_2.containerTopConstraint.constant -= vc_2.containerBg.frame.height
+                            vc_2.view.layoutIfNeeded()
+                    })
+                }
+                animationBlock.append { UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration*0.8, delay: 0, options: [.curveEaseInOut], animations: {
                     icon.frame.origin = destinationPos
                     icon.frame.size = destinationSize
                     icon.backgroundColor = destinationIcon.icon.backgroundColor
@@ -279,19 +292,7 @@ class IconTransition: BasicTransition {
                     icon.icon.add(pathAnim, forKey: nil)
                     (icon.icon as! CAShapeLayer).path = destinationPath
                 }
-                animationBlock.append {
-                    UIView.animate(
-                        withDuration: self.duration,
-                        delay: 0,
-                        usingSpringWithDamping: 0.7,
-                        initialSpringVelocity: 2.5,
-                        options: [.curveEaseInOut],
-                        animations: {
-                            vc_2.view.setNeedsLayout()
-                            vc_2.containerTopConstraint.constant -= vc_2.containerBg.frame.height
-                            vc_2.view.layoutIfNeeded()
-                    })
-                }
+                
                 
                 animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: animationBlock, withIncomingBlurEffect: false) {
                     _ in
@@ -351,51 +352,80 @@ class IconTransition: BasicTransition {
                     }]
                 animateIconStyleTransition(initialIcon: initialIcon.icon, destinationIcon: destinationIcon.icon, origin: vc_1.contentView.convert(initialIcon.center, to: navigationController?.view), text: text, animationBlocks: [], completionBlocks: completionBlocks)
                 
-            }  else if let vc_1 = fromVC as? NewPollController, let vc_2 = toVC as? TextInputViewController, vc_2.type != .Answer, let destinationView = vc_2.frameView, let destinationTextView = vc_2.text as? UITextView {
+            }  else if let vc_1 = fromVC as? NewPollController, let vc_2 = toVC as? TextInputViewController, vc_2.type != .Answer, let destinationView = vc_2.frameView, let destinationTextView = vc_2.textView as? UITextView {
                 var initialIcon: CircleButton!
                 var initialFrame: UIView!
                 var initialTextView: UITextView!
+                vc_2.isInputEnabled = false
+                
                 if vc_2.type == .Title {
                     initialIcon = vc_1.titleIcon
                     initialTextView = vc_1.pollTitleTextView
                     initialFrame = vc_1.pollTitleContainer
+                    destinationTextView.font = initialTextView.font
+                    destinationTextView.textAlignment = initialTextView.textAlignment
+                    destinationTextView.text = initialTextView.text
+//                    attributedText = initialTextView.attributedText as! NSAttributedString
                 } else if vc_2.type == .Description {
-//                    initialIcon = vc_1.descriptionIcon
-//                    initialFrame = vc_1.descriptionLabel
+                    initialIcon = vc_1.pollDescriptionIcon
+                    initialTextView = vc_1.pollDescriptionTextView
+                    initialFrame = vc_1.pollDescriptionContainer
+                    destinationTextView.font = StringAttributes.FontStyle.Regular.get(size: 15)
+                    destinationTextView.textAlignment = .natural
+                    destinationTextView.layoutManager.hyphenationFactor = 1
+//                    let paragraphStyle = NSMutableParagraphStyle()
+//                    paragraphStyle.hyphenationFactor = 1.0
+//                    let attributedString = NSMutableAttributedString(string: question, attributes: [NSAttributedString.Key.paragraphStyle:paragraphStyle])
+//                    attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 15), foregroundColor: .black, backgroundColor: .clear), range: question.fullRange())
+                    
+//                    attributedText = initialTextView.attributedText as! NSAttributedString
                 } else if vc_2.type == .Question {
-//                    initialIcon = vc_1.questionIcon
-//                    initialFrame = vc_1.questionLabel
+                    initialIcon = vc_1.questionIcon
+                    initialTextView = vc_1.questionTextView
+                    initialFrame = vc_1.questionContainer
+//                    destinationTextView.font = StringAttributes.FontStyle.Regular.get(size: 15)
+                    destinationTextView.textAlignment = .natural
+                    destinationTextView.layoutManager.hyphenationFactor = 1
                 }
+                let attributedText = initialTextView.attributedText as! NSAttributedString
+                vc_2.textViewWidthConstraint.constant = initialTextView.frame.width
                 toVC.view.setNeedsLayout()
                 toVC.view.layoutIfNeeded()
                 toVC.view.isUserInteractionEnabled = false
                 toVC.view.subviews.map {$0.isUserInteractionEnabled = false}
                 
-                vc_2.text.text = ""
+                vc_2.textView.becomeFirstResponder()
+                let height = vc_2.view.frame.height - vc_2.keyboardHeight - vc_2.frameToStackHeight.constant - vc_2.hideKBIcon.frame.height - 20
+                toVC.view.setNeedsLayout()
+                vc_2.frameHeight.constant = height
+                toVC.view.layoutIfNeeded()
+                
+                if vc_2.textContent.isEmpty {
+                    vc_2.textView.text = ""
+                }
+//                vc_2.text!.text = vc_2.textContent
                 destinationView.alpha = 0
                 let tempFrame = UIView(frame: CGRect(origin: initialFrame.convert(initialFrame.bounds.origin, to: navigationController?.view), size: initialFrame.frame.size))
                 tempFrame.backgroundColor = destinationView.backgroundColor
                 tempFrame.cornerRadius = initialFrame.cornerRadius
                 
-                let tempTextView = UITextView(frame: CGRect(origin: initialTextView.convert(initialTextView.bounds.origin, to: navigationController?.view), size: initialTextView.frame.size),
-                                              textContainer: initialTextView.textContainer)
-                tempTextView.backgroundColor = .clear
-                destinationTextView.font = initialTextView.font
-                destinationTextView.textAlignment = initialTextView.textAlignment
-                destinationTextView.text = initialTextView.text
-//                destinationTextView.textContainer = initialTextView.textContainer
-//                let tempLabel = PaddingLabel(frame: CGRect(origin: initialFrame.convert(initialFrame.bounds.origin, to: navigationController?.view), size: initialFrame.frame.size))
-//                tempLabel.leftInset = (initialFrame as? PaddingLabel)?.leftInset ?? 0
-//                tempLabel.rightInset = (initialFrame as? PaddingLabel)?.rightInset ?? 0
-//                tempLabel.topInset = (initialFrame as? PaddingLabel)?.topInset ?? 0
-//                tempLabel.bottomInset = (initialFrame as? PaddingLabel)?.bottomInset ?? 0
-//                tempLabel.backgroundColor = .clear
-//                tempLabel.textAlignment = initialFrame.textAlignment
-//                tempLabel.text = initialFrame.text
-//                tempLabel.font = initialFrame.font
-//                tempLabel.textColor = initialFrame.textColor
+                let tempTextView = UITextView(frame: CGRect(origin: initialTextView.convert(initialTextView.bounds.origin, to: navigationController?.view), size: initialTextView.frame.size))
+//                    ),
+//                                              textContainer: NSTextContainer(size: initialTextView.textContainer.size))
+
+//                tempTextView.font = initialTextView.font
+//                tempTextView.textAlignment = initialTextView.textAlignment
+//                tempTextView.text = initialTextView.text
+//                tempTextView.textColor = initialTextView.textColor
+                tempTextView.attributedText = attributedText
+                                tempTextView.backgroundColor = .clear
+                tempTextView.layer.masksToBounds = true
+                tempTextView.alpha = 0
+                tempTextView.layoutManager.hyphenationFactor = vc_2.type == .Title ? 0 : 1
                 containerView.addSubview(tempFrame)
                 containerView.addSubview(tempTextView)
+                tempTextView.contentOffset.y = initialTextView.contentOffset.y
+                tempTextView.alpha = 1
                 initialFrame.alpha = 0
                 
                 let icon = CircleButton(frame: CGRect(origin: vc_1.contentView.convert(initialIcon.frame.origin, to: navigationController?.view), size: initialIcon.frame.size))
@@ -409,40 +439,65 @@ class IconTransition: BasicTransition {
                 let destinationFramePos = vc_2.view.convert(destinationView.frame.origin, to: navigationController?.view)
                 let destinationFrameSize = CGSize(width: destinationView.frame.size.width, height: vc_2.frameHeight.constant)
                 let destinationTextViewPos = destinationView.convert(destinationTextView.frame.origin, to: navigationController?.view)
-                let destinationTextViewSize = CGSize(width: destinationTextView.frame.size.width, height: destinationTextView.frame.size.width)
+                let destinationTextViewSize = CGSize(width: destinationTextView.frame.size.width, height: destinationTextView.frame.size.height)
                 
                 var animationBlocks: [Closure] = []
                 
                 vc_2.hideKBIcon.alpha = 0
                 vc_2.okButton.alpha = 0
+                
+                animationBlocks.append {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.7, delay: 0, options: [.curveEaseOut], animations: {
+                        icon.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
+                    })
+                }
+                destinationTextView.text = vc_2.textContent
+                destinationTextView.scrollToBottom()
                 animationBlocks.append {
                     UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.9, delay: 0, options: [.curveEaseOut], animations: {
                         icon.frame.origin = CGPoint(x: containerView.frame.width/2 - icon.frame.width/2, y: destinationFramePos.y - icon.frame.height/2)
-                        icon.transform = CGAffineTransform(scaleX: 1, y: 0.01)
                         icon.icon.backgroundColor = icon.color.withAlphaComponent(0.3)
                         tempFrame.frame.origin = destinationFramePos
                         tempFrame.frame.size = destinationFrameSize
                         tempTextView.frame.origin = destinationTextViewPos
                         tempTextView.frame.size = destinationTextViewSize
                         tempTextView.textContainer.size = destinationTextView.textContainer.size
-//                        tempLabel.textColor = .clear
+                        tempTextView.scrollToBottom()//contentOffset.y = initialTextView.contentSize.height
+//                        destinationTextView.scrollToBottom()
                     }) {
                         _ in
                         icon.removeFromSuperview()
-                        tempTextView.removeFromSuperview()
-                        tempFrame.removeFromSuperview()
-                        destinationView.alpha = 1
-                        UIView.transition(with: vc_2.text!, duration: 0.3, options: .transitionCrossDissolve, animations: {
-                            vc_2.text!.text = vc_2.textContent
+                        initialIcon.alpha = 1
+                        UIView.animate(withDuration: 0.2, animations: {
                             vc_2.hideKBIcon.alpha = 1
                             vc_2.okButton.alpha = 1
-                        }, completion: {
+//                            vc_2.text!.text = vc_2.textContent
+                        }) {
                             _ in
-                            initialIcon.alpha = 1
-                            toVC.view.isUserInteractionEnabled = true
-                            toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-                            self.context?.completeTransition(true)
-                        })
+                            if vc_2.needsScaleAnim {
+                                UIView.animate(withDuration: 0.15, delay: 0.3, options: [.curveEaseInOut], animations: {
+                                    tempTextView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+                                    tempTextView.alpha = 0
+                                }) {
+                                    _ in
+                                    tempTextView.removeFromSuperview()
+                                    tempFrame.removeFromSuperview()
+                                    destinationView.alpha = 1
+                                    toVC.view.isUserInteractionEnabled = true
+                                    toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+                                    vc_2.isInputEnabled = true
+                                    self.context?.completeTransition(true)
+                                }
+                            } else {
+                                tempTextView.removeFromSuperview()
+                                tempFrame.removeFromSuperview()
+                                destinationView.alpha = 1
+                                toVC.view.isUserInteractionEnabled = true
+                                toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+                                vc_2.isInputEnabled = true
+                                self.context?.completeTransition(true)
+                            }
+                        }
                     }
                 }
                 animationBlocks.append {
@@ -652,50 +707,90 @@ class IconTransition: BasicTransition {
                     _ in
                     self.context?.completeTransition(true)
                 }
-            }  else if let vc_1 = fromVC as? NewPollController, let vc_2 = toVC as? TextInputViewController, let cell = vc_1.tableView.cellForRow(at: vc_1.selectedCellIndex!) as? AnswerCell, let destinationLabel = vc_2.frameView, let initialLabel = cell.contentView as? UIView{
+            }  else if let vc_1 = fromVC as? NewPollController, let vc_2 = toVC as? TextInputViewController, let cell = vc_1.tableView.cellForRow(at: vc_1.selectedCellIndex!) as? AnswerCell, let destinationView = vc_2.frameView, let destinationTextView = vc_2.textView as? UITextView, let initialView = cell.contentView as? UIView, let initialTextView = cell.textView as? UITextView {
                 
+                vc_2.isInputEnabled = false
+                
+                let attributedText = initialTextView.attributedText as! NSAttributedString
+                vc_2.textViewWidthConstraint.constant = initialTextView.frame.width
                 toVC.view.setNeedsLayout()
                 toVC.view.layoutIfNeeded()
                 toVC.view.isUserInteractionEnabled = false
                 toVC.view.subviews.map {$0.isUserInteractionEnabled = false}
                 
-                destinationLabel.alpha = 0
-                let tempFrame = UIView(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
+                vc_2.textView.becomeFirstResponder()
+                let height = vc_2.view.frame.height - vc_2.keyboardHeight - vc_2.frameToStackHeight.constant - vc_2.hideKBIcon.frame.height - 20
+                toVC.view.setNeedsLayout()
+                vc_2.frameHeight.constant = height
+                toVC.view.layoutIfNeeded()
+                
+                destinationView.alpha = 0
+                let tempFrame = UIView(frame: CGRect(origin: initialView.convert(initialView.bounds.origin, to: navigationController?.view), size: initialView.frame.size))
                 tempFrame.backgroundColor = .white
                 tempFrame.cornerRadius = cell.cornerRadius
-                let tempLabel = PaddingLabel(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
+                let tempTextView = UITextView(frame: CGRect(origin: initialTextView.convert(initialTextView.bounds.origin, to: navigationController?.view), size: initialTextView.frame.size))
+                tempTextView.attributedText = attributedText
+                tempTextView.backgroundColor = .clear
+                tempTextView.layer.masksToBounds = true
+                tempTextView.alpha = 0
+                tempTextView.layoutManager.hyphenationFactor = vc_2.type == .Title ? 0 : 1
                 containerView.addSubview(tempFrame)
-                initialLabel.alpha = 0
+                containerView.addSubview(tempTextView)
+                tempTextView.contentOffset.y = initialTextView.contentOffset.y
+                tempTextView.alpha = 1
+                initialView.alpha = 0 
                 
-                let destinationPos = vc_2.view.convert(destinationLabel.frame.origin, to: navigationController?.view)
-                let destinationSize = CGSize(width: destinationLabel.frame.size.width, height: vc_2.frameHeight.constant)
-                
+                let destinationFramePos = vc_2.view.convert(destinationView.frame.origin, to: navigationController?.view)
+                let destinationFrameSize = CGSize(width: destinationView.frame.size.width, height: vc_2.frameHeight.constant)
+                let destinationTextViewPos = destinationView.convert(destinationTextView.frame.origin, to: navigationController?.view)
+                let destinationTextViewSize = CGSize(width: destinationTextView.frame.size.width, height: destinationTextView.frame.size.height)
+                destinationTextView.font = initialTextView.font
+                destinationTextView.textAlignment = .natural
+                destinationTextView.layoutManager.hyphenationFactor = 1
                 var animationBlocks: [Closure] = []
                 
                 vc_2.hideKBIcon.alpha = 0
                 vc_2.okButton.alpha = 0
                 animationBlocks.append {
                     UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration * 0.9, delay: 0, options: [.curveEaseOut], animations: {
-                        tempFrame.cornerRadius = destinationLabel.cornerRadius
-                        tempFrame.backgroundColor = vc_1.hyperlinkView.backgroundColor
-                        tempFrame.frame.origin = destinationPos
-                        tempFrame.frame.size = destinationSize
+                        tempFrame.frame.origin = destinationFramePos
+                        tempFrame.frame.size = destinationFrameSize
+                        tempFrame.backgroundColor = destinationView.backgroundColor
+                        tempTextView.frame.origin = destinationTextViewPos
+                        tempTextView.frame.size = destinationTextViewSize
+                        tempTextView.textContainer.size = destinationTextView.textContainer.size
+                        tempTextView.scrollToBottom()
                     }) {
                         _ in
-                        tempFrame.removeFromSuperview()
-                        destinationLabel.alpha = 1
-                        if let textView = destinationLabel.subviews.first as? UITextView {
-                            textView.textColor = .clear
-                            UIView.transition(with: textView, duration: 0.3, options: .transitionCrossDissolve, animations: {
-                                textView.textColor = .black
-                                vc_2.hideKBIcon.alpha = 1
-                                vc_2.okButton.alpha = 1
-                            }, completion: {
-                                _ in
+                        UIView.animate(withDuration: 0.2, animations: {
+                            vc_2.hideKBIcon.alpha = 1
+                            vc_2.okButton.alpha = 1
+                            //                            vc_2.text!.text = vc_2.textContent
+                        }) {
+                            _ in
+                            if vc_2.needsScaleAnim {
+                                UIView.animate(withDuration: 0.15, delay: 0.3, options: [.curveEaseInOut], animations: {
+                                    tempTextView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+                                    tempTextView.alpha = 0
+                                }) {
+                                    _ in
+                                    tempTextView.removeFromSuperview()
+                                    tempFrame.removeFromSuperview()
+                                    destinationView.alpha = 1
+                                    toVC.view.isUserInteractionEnabled = true
+                                    toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+                                    self.context?.completeTransition(true)
+                                    vc_2.isInputEnabled = true
+                                }
+                            } else {
+                                tempTextView.removeFromSuperview()
+                                tempFrame.removeFromSuperview()
+                                destinationView.alpha = 1
                                 toVC.view.isUserInteractionEnabled = true
                                 toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                                 self.context?.completeTransition(true)
-                            })
+                                vc_2.isInputEnabled = true
+                            }
                         }
                     }
                 }
@@ -917,6 +1012,7 @@ class IconTransition: BasicTransition {
                 
             } else if let vc_1 = fromVC as? CategorySelectionViewController, let collectionVC = vc_1.categoryVC as? CategoryCollectionViewController, let indexPath = collectionVC.currentIndex as? IndexPath, let cell = collectionVC.collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell, let initialIcon = cell.icon, let vc_2 = toVC as? NewPollController, let destinationIcon = vc_2.categoryIcon {
                 
+                vc_2.categoryTitle.alpha = 0
                 vc_1.view.backgroundColor = .clear
 //                cell.isSelected = false
                 var origin = cell.contentView.convert(initialIcon.frame.origin, to: containerView)
@@ -926,6 +1022,7 @@ class IconTransition: BasicTransition {
                 icon.backgroundColor = cell.category.tagColor
                 containerView.addSubview(icon)
                 initialIcon.alpha = 0
+                destinationIcon.category = SurveyCategoryIcon.Category(rawValue: vc_1.category!.ID) ?? .Null
                 
                 vc_2.contentView.alpha = 0
                 vc_2.categoryTitle.text = ""
@@ -939,7 +1036,7 @@ class IconTransition: BasicTransition {
                 let pathAnim        = CABasicAnimation(keyPath: "path")
                 pathAnim.fromValue  = (icon.icon as! CAShapeLayer).path
                 pathAnim.toValue    = toValue
-                pathAnim.duration   = self.duration * 0.8
+                pathAnim.duration   = self.duration// * 0.8
                 pathAnim.timingFunction = CAMediaTimingFunction.init(name: CAMediaTimingFunctionName.easeIn)
                 
                 var effectView: UIVisualEffectView!
@@ -976,9 +1073,9 @@ class IconTransition: BasicTransition {
                     effectViewOutgoing.effect = UIBlurEffect(style: .light)
                     effectView.effect = nil
                     vc_2.view.alpha = 1
-                    delay(seconds: self.duration * 0.33) {
-                        vc_2.category = vc_1.category
-                    }
+//                    delay(seconds: self.duration * 0.33) {
+//                        vc_2.category = vc_1.category
+//                    }
                 }) {
                     _ in
                     effectViewOutgoing.removeFromSuperview()
@@ -992,6 +1089,9 @@ class IconTransition: BasicTransition {
 //                        fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
+                    delay(seconds: 0.1) {
+                        vc_2.category = vc_1.category
+                    }
                 }
                 
             } else if let vc_1 = fromVC as? BinarySelectionViewController, let vc_2 = toVC as? NewPollController {
@@ -1002,12 +1102,16 @@ class IconTransition: BasicTransition {
                 switch vc_1.selectionType {
                 case .Anonimity:
                     destinationIcon = vc_2.anonIcon
+                    vc_2.anonTitle.alpha = 0
                 case .Privacy:
                     destinationIcon = vc_2.privacyIcon
+                    vc_2.privacyTitle.alpha = 0
                 case .Comments:
                     destinationIcon = vc_2.commentsIcon
+                    vc_2.commentsTitle.alpha = 0
                 case .Hot:
                     destinationIcon = vc_2.hotIcon
+                    vc_2.hotTitle.alpha = 0
                 }
                 
                 let icon = initialIcon.copyView() as! SurveyCategoryIcon
@@ -1029,7 +1133,7 @@ class IconTransition: BasicTransition {
                         icon.frame.origin = destinationPos
                         icon.frame.size = destinationSize
                         icon.backgroundColor = vc_2.color
-                        delay(seconds: self.duration * 0.33) {
+                        delay(seconds: self.duration * 0.65) {
                             switch vc_1.selectionType {
                             case .Anonimity:
                                 vc_2.isAnonymous = vc_1.isEnabled!
@@ -1078,7 +1182,7 @@ class IconTransition: BasicTransition {
                 vc_1.actionButton.alpha = 0
                 containerView.addSubview(icon)
                 
-                let destinationPath = (icon.icon as! CAShapeLayer).path?.getScaledPath(size: destinationIcon.icon.frame.size)//(destinationIcon.icon.icon as! CAShapeLayer).path
+                let destinationPath = (destinationIcon.icon.icon as! CAShapeLayer).path?.getScaledPath(size: destinationIcon.icon.frame.size)//(destinationIcon.icon.icon as! CAShapeLayer).path
                 let pathAnim        = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path as Any, toValue: destinationPath as Any, duration: duration * 0.8, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
                 
                 destinationIcon.color    = vc_1.actionButton.color
@@ -1107,60 +1211,60 @@ class IconTransition: BasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? NewPollController, vc_1.type != .Answer, let initialLabel = vc_1.frameView {
-                var destinationLabel: UILabel!
+            } else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? NewPollController, vc_1.type != .Answer, let initialFrame = vc_1.frameView, let initialTextView = vc_1.textView as? UITextView {
+                var destinationView: UIView!
+                var destinationTextView: UITextView!
                 var destinationIcon: CircleButton!
-//                var badge = UIView()
-//                var label = UILabel()
-//                if vc_1.type == .Title {
-//                    vc_2.pollTitle = vc_1.text.text
-//                } else if vc_1.type == .Description {
-//                    vc_2.pollDescription = vc_1.text.text
-//                } else if vc_1.type == .Question {
-//                    vc_2.question = vc_1.text.text
-//                }
+
                 if vc_1.type == .Title {
-//                    destinationLabel = vc_2.pollTitleContainer
+                    destinationView = vc_2.pollTitleContainer
+                    destinationTextView = vc_2.pollTitleTextView
                     destinationIcon = vc_2.titleIcon
-//                    label = vc_2.titleLabel
-                    vc_2.pollTitle = vc_1.text.text
-//                    if let _label = vc_2.badges.filter({ $0.text == "7" }).first {
-//                        badge = _label.superview!
-//                    }
+                    vc_2.pollTitle = vc_1.textView.text
                 } else if vc_1.type == .Description {
-                    destinationLabel = vc_2.descriptionLabel
-                    destinationIcon = vc_2.descriptionIcon
-//                    label = vc_2.descriptionLabel
-                    vc_2.pollDescription = vc_1.text.text
-//                    if let _label = vc_2.badges.filter({ $0.text == "8" }).first {
-//                        badge = _label.superview!
-//                    }
+                    vc_2.pollDescription = vc_1.textView.text
+                    destinationIcon = vc_2.pollDescriptionIcon
+                    destinationView = vc_2.pollDescriptionContainer
+                    destinationTextView = vc_2.pollDescriptionTextView
+                    destinationTextView.layoutManager.hyphenationFactor = 1
+//                    destinationTextView.contentOffset = .zero
                 } else if vc_1.type == .Question {
-                    destinationLabel = vc_2.questionLabel
+                    vc_2.question = vc_1.textView.text
                     destinationIcon = vc_2.questionIcon
-//                    label = vc_2.questionLabel
-                    vc_2.question = vc_1.text.text
-//                    if let _label = vc_2.badges.filter({ $0.text == "11" }).first {
-//                        badge = _label.superview!
-//                    }
+                    destinationView = vc_2.questionContainer
+                    destinationTextView = vc_2.questionTextView
+                    destinationTextView.layoutManager.hyphenationFactor = 1
+//                    destinationTextView.contentOffset = .zero
                 }
-                toVC.view.setNeedsLayout()
-                toVC.view.layoutIfNeeded()
+//                toVC.view.setNeedsLayout()
+//                toVC.view.layoutIfNeeded()
                 
-//                label.text = vc_1.text.text
-//                badge.alpha = 0
-//                badge.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
                 toVC.view.alpha = 0
-                destinationLabel.alpha = 0
                 destinationIcon.alpha = 0
-                let tempFrame = UIView(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
-                tempFrame.backgroundColor = destinationLabel.backgroundColor
-                tempFrame.cornerRadius = initialLabel.cornerRadius
+                destinationTextView.alpha = 0
+                destinationTextView.contentOffset.y = 0
+                destinationView.alpha = 0
+                
+                let tempFrame = UIView(frame: CGRect(origin: initialFrame.convert(initialFrame.bounds.origin, to: navigationController?.view), size: initialFrame.frame.size))
+                tempFrame.backgroundColor = destinationView.backgroundColor
+                tempFrame.cornerRadius = initialFrame.cornerRadius
+                
+                let tempTextView = UITextView(frame: CGRect(origin: initialTextView.convert(initialTextView.bounds.origin, to: navigationController?.view), size: initialTextView.frame.size),
+                                              textContainer: initialTextView.textContainer)
+                tempTextView.backgroundColor = .clear
+                tempTextView.layer.masksToBounds = true
+                tempTextView.contentOffset.y = initialTextView.contentOffset.y
+                
+                destinationTextView.font = initialTextView.font
+                destinationTextView.textAlignment = initialTextView.textAlignment
+                destinationTextView.text = initialTextView.text
+                destinationTextView.textColor = .black
                 containerView.addSubview(tempFrame)
-                initialLabel.alpha = 0
+                containerView.addSubview(tempTextView)
+                initialFrame.alpha = 0
                 
                 let icon = CircleButton(frame: CGRect(origin: CGPoint(x: containerView.frame.width/2 - destinationIcon.frame.width/2,
-                                                                      y: vc_1.view.convert(initialLabel.frame.origin, to: navigationController.view).y - destinationIcon.frame.height/2),
+                                                                      y: vc_1.view.convert(initialFrame.frame.origin, to: navigationController.view).y - destinationIcon.frame.height/2),
                                                       size: destinationIcon.frame.size))
                 icon.color = destinationIcon.color
                 icon.category = destinationIcon.category
@@ -1171,50 +1275,45 @@ class IconTransition: BasicTransition {
                 icon.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
                 destinationIcon.alpha = 0
                 
-                let destinationPos = vc_2.contentView.convert(destinationLabel.frame.origin, to: navigationController?.view)
-                let destinationSize = destinationLabel.frame.size
+                let destinationFramePos = vc_2.contentView.convert(destinationView.frame.origin, to: navigationController?.view)
+                let destinationFrameSize = destinationView.frame.size
+                let destinationTextViewPos = destinationView.convert(destinationTextView.frame.origin, to: navigationController?.view)
+                let destinationTextViewSize = destinationTextView.frame.size
                 
                 var animationBlocks: [Closure] = []
                 
                 animationBlocks.append {
                     UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0/*self.duration/2*/, options: [.curveEaseOut], animations: {
-                        icon.frame.origin = CGPoint(x: containerView.frame.width/2 - icon.frame.width/2, y: destinationPos.y - icon.frame.height/2)
+                        icon.frame.origin = CGPoint(x: containerView.frame.width/2 - icon.frame.width/2, y: destinationFramePos.y - icon.frame.height/2)
                         icon.transform = .identity
                         icon.icon.backgroundColor = destinationIcon.color
-                        tempFrame.frame.origin = destinationPos
-                        tempFrame.frame.size = destinationSize
+                        tempFrame.frame.origin = destinationFramePos
+                        tempFrame.frame.size = destinationFrameSize
+                        tempTextView.frame.origin = destinationTextViewPos
+                        tempTextView.frame.size = destinationTextViewSize
+                        tempTextView.textContainer.size = destinationTextView.textContainer.size
+                        tempTextView.contentOffset.y = 0
                     }) {
                         _ in
                         tempFrame.removeFromSuperview()
+                        tempTextView.removeFromSuperview()
                         icon.removeFromSuperview()
                         destinationIcon.alpha = 1
-                        destinationLabel.alpha = 1
-//                        UIView.transition(with: label, duration: 0.15, options: .transitionCrossDissolve, animations: {
-//                        UIView.animate(withDuration: 0.15, animations: {
-////                            label.text = vc_1.text.text
-//                            badge.transform = .identity
-//                            badge.alpha = 1
-//                        }) {
-//                            _ in
-                            if vc_1.type == .Title {
-//                                vc_2.pollTitle = vc_1.text.text
-                                vc_2.stage = .Description
-                            } else if vc_1.type == .Description {
-//                                vc_2.pollDescription = vc_1.text.text
-                                vc_2.stage = .Hyperlink
-                            } else if vc_1.type == .Question {
-//                                vc_2.question = vc_1.text.text
-                                vc_2.stage = .Answers
-                            }
-//                                fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-//                                toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+                        destinationTextView.alpha = 1
+                        destinationView.alpha = 1
+                        
+                        if vc_1.type == .Title {
+                            //                                destinationTextView.attributedText = initialTextView.attributedText
+                            vc_2.stage = .Description
+                        } else if vc_1.type == .Description {
+                            vc_2.stage = .Hyperlink
+                        } else if vc_1.type == .Question {
+                            vc_2.stage = .Answers
+                        }
                         self.context?.completeTransition(true)
-//                        }
                     }
                 }
-                
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-                
             } else if let vc_1 = fromVC as? ImageViewController, let vc_2 = toVC as? NewPollController {
                 toVC.view.alpha = 1
                 var destinationImageView: UIImageView!
@@ -1404,51 +1503,73 @@ class IconTransition: BasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-            } else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? NewPollController, let indexPath = vc_2.selectedCellIndex, let cell = vc_2.tableView.cellForRow(at: indexPath) as? AnswerCell, let initialLabel = vc_1.frameView, let destinationLabel = cell.contentView as? UIView {
+            } else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? NewPollController, let indexPath = vc_2.selectedCellIndex, let cell = vc_2.tableView.cellForRow(at: indexPath) as? AnswerCell, let initialView = vc_1.frameView, let initialTextView = vc_1.textView as? UITextView, let destinationView = cell.contentView as? UIView, let destinationTextView = cell.textView as? UITextView, let text = vc_1.textView.text {
                 
-                vc_2.answers[indexPath.row] = "       \(vc_1.text.text!)"
+                vc_2.answers[indexPath.row] = text.contains("\t") ? text : "\t\(text)"
                 vc_2.tableView.reloadData()
                 vc_2.tableView.alpha = 0
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
                 toVC.view.alpha = 0
-                let tempFrame = UIView(frame: CGRect(origin: initialLabel.convert(initialLabel.bounds.origin, to: navigationController?.view), size: initialLabel.frame.size))
-                tempFrame.backgroundColor = initialLabel.backgroundColor
-                tempFrame.cornerRadius = initialLabel.cornerRadius
-                containerView.addSubview(tempFrame)
-                initialLabel.alpha = 0
+                let tempFrame = UIView(frame: CGRect(origin: initialView.convert(initialView.bounds.origin, to: navigationController?.view), size: initialView.frame.size))
+                tempFrame.backgroundColor = initialView.backgroundColor
+                tempFrame.cornerRadius = initialView.cornerRadius
                 
-                let destinationPos = destinationLabel.convert(destinationLabel.bounds.origin, to: navigationController?.view)//vc_2.contentView.convert(destinationLabel.frame.origin, to: navigationController?.view)
-                let destinationSize = destinationLabel.frame.size
+                let tempTextView = UITextView(frame: CGRect(origin: initialTextView.convert(initialTextView.bounds.origin, to: navigationController?.view),
+                                                            size: initialTextView.frame.size),
+                                              textContainer: initialTextView.textContainer)
+                tempTextView.backgroundColor = .clear
+                tempTextView.layer.masksToBounds = true
+                tempTextView.contentOffset.y = initialTextView.contentOffset.y
+                
+                destinationTextView.font = initialTextView.font
+                destinationTextView.text = initialTextView.text
+                destinationTextView.textColor = .black
+                containerView.addSubview(tempFrame)
+                containerView.addSubview(tempTextView)
+                initialView.alpha = 0
+                
+//                let destinationPos = destinationView.convert(destinationView.bounds.origin, to: navigationController?.view)
+//                let destinationSize = destinationView.frame.size
+                
+                let destinationFramePos = destinationView.convert(destinationView.frame.origin, to: navigationController?.view)
+                let destinationFrameSize = destinationView.frame.size
+                let destinationTextViewPos = destinationView.convert(destinationTextView.frame.origin, to: navigationController?.view)
+                let destinationTextViewSize = destinationTextView.frame.size
                 
                 var animationBlocks: [Closure] = []
                 
                 animationBlocks.append {
                     UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0/*self.duration/2*/, options: [.curveEaseIn], animations: {
-                        tempFrame.cornerRadius = cell.cornerRadius
-                        tempFrame.frame.origin = destinationPos
-                        tempFrame.frame.size = destinationSize
+                        tempFrame.frame.origin = destinationFramePos
+                        tempFrame.frame.size = destinationFrameSize
+                        tempTextView.frame.origin = destinationTextViewPos
+                        tempTextView.frame.size = destinationTextViewSize
+                        tempTextView.textContainer.size = destinationTextView.textContainer.size
+                        tempTextView.contentOffset.y = 0
                         tempFrame.backgroundColor = .white
                         vc_2.tableView.alpha = 1
-//                        destinationLabel.alpha = 1
                     }) {
                         _ in
-                        
-                        destinationLabel.alpha = 1
-                        //                        UIView.transition(with: label, duration: 0.15, options: .transitionCrossDissolve, animations: {
-                        UIView.animate(withDuration: 0.15, animations: {
-                            tempFrame.alpha = 0
-                        }) {
-                            _ in
+                        tempFrame.removeFromSuperview()
+                        tempTextView.removeFromSuperview()
+                        destinationTextView.alpha = 1
+                        destinationView.alpha = 1
+//                        destinationView.alpha = 1
+//                        //                        UIView.transition(with: label, duration: 0.15, options: .transitionCrossDissolve, animations: {
+//                        UIView.animate(withDuration: 0.15, animations: {
+//                            tempFrame.alpha = 0
+//                        }) {
+//                            _ in
                             vc_2.selectedCellIndex = nil
-                            tempFrame.removeFromSuperview()
+//                            tempFrame.removeFromSuperview()
 //                                fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
 //                                toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                             if vc_2.answers.count < 2 {
                                 vc_2.appendAnswer(0.1)
                             }
                             self.context?.completeTransition(true)
-                        }
+//                        }
                     }
                 }
                 

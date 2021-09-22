@@ -222,9 +222,9 @@ extension PollController: UITableViewDelegate, UITableViewDataSource {
                     cell.avatar.image = image.circularImage(size: cell.avatar.frame.size, frameColor: K_COLOR_RED)
                 }
                 let attrString = NSMutableAttributedString()
-                attrString.append(NSAttributedString(string: "  \(survey!.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Bold, size: 10), foregroundColor: survey!.category.tagColor, backgroundColor: .clear)))
-                attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Regular, size: 10), foregroundColor: survey!.category.tagColor, backgroundColor: .clear)))
-                attrString.append(NSAttributedString(string: "\(survey!.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Semibold, size: 10), foregroundColor: survey!.category.tagColor, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "  \(survey!.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 10), foregroundColor: survey!.category.tagColor, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 10), foregroundColor: survey!.category.tagColor, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "\(survey!.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 10), foregroundColor: survey!.category.tagColor, backgroundColor: .clear)))
                 cell.categoryLabel.attributedText = attrString
                 cell.userCredentials.text = survey!.userProfile?.name.replacingOccurrences(of: " ", with: "\n")//.components(separatedBy: CharacterSet.whitespaces)
                 return cell
@@ -236,7 +236,7 @@ extension PollController: UITableViewDelegate, UITableViewDataSource {
                 paragraphStyle.hyphenationFactor = 1.0
                 let text = "     \(survey!.description)"
                 let attributedString = NSMutableAttributedString(string: text, attributes: [NSAttributedString.Key.paragraphStyle:paragraphStyle])
-                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.getFont(name: StringAttributes.Fonts.Style.Light, size: 17), foregroundColor: .black, backgroundColor: .clear), range: text.fullRange())
+                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Light, size: 17), foregroundColor: .black, backgroundColor: .clear), range: text.fullRange())
                 cell.textView.attributedText = attributedString
                 return cell
             } else if indexPath.row == 3 {

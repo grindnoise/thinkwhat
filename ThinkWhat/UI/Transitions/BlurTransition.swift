@@ -39,9 +39,9 @@ class BlurTransition: BasicTransition {
                     vc_2.pollTitle = vc_1.text.text
                 } else if vc_1.accessibilityIdentifier == "Description" {
                     vc_2.pollDescription = vc_1.text.text
-                    vc_2.descriptionLabel.font = vc_1.font
-                    vc_2.descriptionLabel.textAlignment = .natural
-                    vc_2.descriptionLabel.numberOfLines = 0
+//                    vc_2.descriptionContainer.font = vc_1.font
+//                    vc_2.descriptionContainer.textAlignment = .natural
+//                    vc_2.descriptionContainer.numberOfLines = 0
                 } else if vc_1.accessibilityIdentifier == "Question" {
                     
                 }
