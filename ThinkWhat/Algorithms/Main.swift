@@ -200,8 +200,8 @@ struct Notifications {
     }
 
     struct Surveys {
-        static let TopSurveysUpdated               = Notification.Name("NotificationTopSurveysUpdated")
-        static let NewSurveysUpdated               = Notification.Name("NotificationNewSurveysUpdated")
+        static let UpdateTopSurveys               = Notification.Name("NotificationTopSurveysUpdated")
+        static let UpdateNewSurveys               = Notification.Name("NotificationNewSurveysUpdated")
         static let SurveysStackReceived            = Notification.Name("NotificationSurveysStackReceived")
         static let SurveysStackUpdated             = Notification.Name("NotificationSurveysStackUpdated")
         static let OwnSurveysUpdated               = Notification.Name("NotificationOwnSurveysUpdated")
@@ -219,6 +219,7 @@ struct Notifications {
         static let UserImageChanged                = Notification.Name("NotificationUserImageChanged")
         static let ProfileImageReceived            = Notification.Name("NotificationProfileImageReceived")
         static let LineWidth                       = Notification.Name("LineWidth")
+        static let SuveyViewsCountReceived         = Notification.Name("SuveyViewsCountReceived")
     }
 }
 
@@ -273,6 +274,7 @@ struct Storyboards {
     static let app          = UIStoryboard(name: "App", bundle: nil)
     static let auth         = UIStoryboard(name: "Auth", bundle: nil)
     static let root         = UIStoryboard(name: "Root", bundle: nil)
+    static let survey       = UIStoryboard(name: "Survey", bundle: nil)
 }
 
 
@@ -714,6 +716,7 @@ struct SERVER_URLS {
     static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
     static let SURVEYS_REJECT           = "api/surveys/reject/"
     static let SURVEYS_CLAIM            = "api/surveys/claim/"
+    static let SURVEYS_ADD_VIEW_COUNT   = "api/surveys/add_view_count/"
     
     static let SURVEYS_RESULTS          = "api/survey_results/"
     

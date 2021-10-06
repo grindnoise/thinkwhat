@@ -25,12 +25,12 @@ class IconTransition: BasicTransition {
         toVC.view.alpha = 0
         containerView.addSubview(toVC.view)
         
-        func animateIconStyleTransition(initialIcon: SurveyCategoryIcon, destinationIcon: SurveyCategoryIcon, origin: CGPoint, text: String, iconChange: Bool = false, animationBlocks: [Closure], completionBlocks: [Closure], useIncomingEffect: Bool = true, completeTransition: Bool = true) {
+        func animateIconStyleTransition(initialIcon: Icon, destinationIcon: Icon, origin: CGPoint, text: String, iconChange: Bool = false, animationBlocks: [Closure], completionBlocks: [Closure], useIncomingEffect: Bool = true, completeTransition: Bool = true) {
             if operation == .push {
                 toVC.view.setNeedsLayout()
                 toVC.view.layoutIfNeeded()
                 
-                let icon = initialIcon.copyView() as! SurveyCategoryIcon
+                let icon = initialIcon.copyView() as! Icon
                 icon.frame.origin = origin
                 containerView.addSubview(icon)
                 destinationIcon.alpha = 0
@@ -83,7 +83,7 @@ class IconTransition: BasicTransition {
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
                 
-                let icon = cell.icon.copyView() as! SurveyCategoryIcon
+                let icon = cell.icon.copyView() as! Icon
                 let origin = cell.contentView.convert(cell.icon.frame.origin, to: containerView)
                 icon.frame.origin = origin
                 collVC.returnPos = origin
@@ -249,7 +249,7 @@ class IconTransition: BasicTransition {
                 
                 //                vc_2.containerCenterYConstraint.constant += 800//vc_2.containerBg.bounds.height
                 
-                let icon = initialIcon.icon.copyView() as! SurveyCategoryIcon
+                let icon = initialIcon.icon.copyView() as! Icon
                 
                 let pos = initialIcon.convert(initialIcon.icon.frame.origin, to: navigationController?.view)
                 icon.frame.origin = pos
@@ -552,19 +552,19 @@ class IconTransition: BasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? SurveysViewController, let initialIcon = vc_1.navigationItem.rightBarButtonItem?.value(forKey: "view") as? SurveyCategoryIcon, let vc_2 = toVC as? NewSurveySelectionTypeController, let keyWindow = navigationController?.view.window {
+            } else if let vc_1 = fromVC as? SurveysViewController, let initialIcon = vc_1.navigationItem.rightBarButtonItem?.value(forKey: "view") as? Icon, let vc_2 = toVC as? NewSurveySelectionTypeController, let keyWindow = navigationController?.view.window {
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
                 vc_2.ratingIcon.alpha = 0
                 vc_2.pollIcon.alpha = 0
                 
-                let ratingIcon = SurveyCategoryIcon(frame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: keyWindow),
+                let ratingIcon = Icon(frame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: keyWindow),
                                                             size: initialIcon.frame.size))
                 ratingIcon.iconColor = initialIcon.iconColor
                 ratingIcon.backgroundColor = initialIcon.backgroundColor
                 ratingIcon.scaleMultiplicator = initialIcon.scaleMultiplicator
                 ratingIcon.category = initialIcon.category
-                let pollIcon = SurveyCategoryIcon(frame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: keyWindow),
+                let pollIcon = Icon(frame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: keyWindow),
                                                                   size: initialIcon.frame.size))
                 pollIcon.iconColor          = initialIcon.iconColor
                 pollIcon.backgroundColor    = initialIcon.backgroundColor
@@ -707,7 +707,7 @@ class IconTransition: BasicTransition {
                     _ in
                     self.context?.completeTransition(true)
                 }
-            }  else if let vc_1 = fromVC as? NewPollController, let vc_2 = toVC as? TextInputViewController, let cell = vc_1.tableView.cellForRow(at: vc_1.selectedCellIndex!) as? AnswerCell, let destinationView = vc_2.frameView, let destinationTextView = vc_2.textView as? UITextView, let initialView = cell.contentView as? UIView, let initialTextView = cell.textView as? UITextView {
+            }  else if let vc_1 = fromVC as? NewPollController, let vc_2 = toVC as? TextInputViewController, let cell = vc_1.tableView.cellForRow(at: vc_1.selectedCellIndex!) as? AnswerSelectionCell, let destinationView = vc_2.frameView, let destinationTextView = vc_2.textView as? UITextView, let initialView = cell.contentView as? UIView, let initialTextView = cell.textView as? UITextView {
                 
                 vc_2.isInputEnabled = false
                 
@@ -795,10 +795,10 @@ class IconTransition: BasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: false) { _ in }
-            } else if (fromVC is NewPollController || fromVC is NewRatingController), let initialIcon = fromVC.navigationItem.titleView as? SurveyCategoryIcon, let vc_2 = toVC as? NewSurveyResultViewController, let keyWindow = navigationController?.view.window, let destinationIcon = vc_2.iconView as? SurveyCategoryIcon {
+            } else if (fromVC is NewPollController || fromVC is NewRatingController), let initialIcon = fromVC.navigationItem.titleView as? Icon, let vc_2 = toVC as? NewSurveyResultViewController, let keyWindow = navigationController?.view.window, let destinationIcon = vc_2.iconView as? Icon {
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
-                let icon = SurveyCategoryIcon(frame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: keyWindow),
+                let icon = Icon(frame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: keyWindow),
                                                             size: initialIcon.frame.size))
                 icon.iconColor = initialIcon.iconColor
                 icon.backgroundColor = initialIcon.backgroundColor
@@ -841,11 +841,59 @@ class IconTransition: BasicTransition {
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
             }
+//            } else if let vc_1 = fromVC as? PollController, let vc_2 = toVC as? ClaimViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 0, section: 2)) as? SurveyVoteCell, let initialIcon = cell.claimIcon as? Icon, let destinationIcon = vc_2.icon as? Icon {
+//                vc_2.view.setNeedsLayout()
+//                vc_2.view.layoutIfNeeded()
+//
+//                let icon = Icon(frame: CGRect(origin: initialIcon.superview!.convert(initialIcon.frame.origin, to: navigationController.view),
+//                                              size: initialIcon.frame.size))
+//                icon.iconColor = initialIcon.iconColor
+//                icon.isRounded = false
+//                icon.backgroundColor = initialIcon.backgroundColor
+//
+//                icon.category = initialIcon.category
+//                navigationController.view.addSubview(icon)
+//                initialIcon.alpha = 0
+//                destinationIcon.alpha = 0
+//
+//                let destinationOrigin   = vc_2.view.convert(destinationIcon.frame.origin, to: navigationController.view)
+//                let destinationSize     = destinationIcon.frame.size
+//
+//                var animationBlocks: [Closure] = []
+//                animationBlocks.append {
+//                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
+//                        icon.frame.origin = destinationOrigin
+//                        icon.frame.size   = destinationSize
+//                    }) {
+//                        _ in
+//                        icon.removeFromSuperview()
+//                        destinationIcon.alpha = 1
+//                        self.context?.completeTransition(true)
+//                    }
+//                }
+//                if let destinationLayer = vc_2.icon.icon as? CAShapeLayer, let destinationPath = destinationLayer.path {
+//                    let pathAnim      = Animations.get(property: .Path,
+//                                                       fromValue: (initialIcon.icon as! CAShapeLayer).path as Any,
+//                                                       toValue: destinationPath as Any,
+//                                                       duration: duration,
+//                                                       delay: 0,
+//                                                       repeatCount: 0,
+//                                                       autoreverses: false,
+//                                                       timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                                       delegate: nil,
+//                                                       isRemovedOnCompletion: true)
+//                    animationBlocks.append {
+//                        icon.icon.add(pathAnim, forKey: nil)
+//                        (icon.icon as! CAShapeLayer).path = destinationPath
+//                    }
+//                }
+//                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
+//            }
         } else if operation == .pop {
             if let vc_1 = fromVC as? SubcategoryViewController, let initialIcon = vc_1.icon, let vc_2 = toVC as? SurveysViewController, let collVC = vc_2.categoryVC as? CategoryCollectionViewController, let indexPath = collVC.currentIndex as? IndexPath, let cell = collVC.collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell {
                 let animDuration = duration + Double(indexPath.row / 3 ) / 20
                 duration = animDuration
-                let icon = initialIcon.copyView() as! SurveyCategoryIcon
+                let icon = initialIcon.copyView() as! Icon
                 icon.frame.origin = fromVC.view.convert(initialIcon.frame.origin, to: containerView)
                 containerView.addSubview(icon)
                 initialIcon.alpha = 0
@@ -1017,12 +1065,12 @@ class IconTransition: BasicTransition {
 //                cell.isSelected = false
                 var origin = cell.contentView.convert(initialIcon.frame.origin, to: containerView)
                 
-                let icon = cell.icon.copyView() as! SurveyCategoryIcon
+                let icon = cell.icon.copyView() as! Icon
                 icon.frame.origin = origin
                 icon.backgroundColor = cell.category.tagColor
                 containerView.addSubview(icon)
                 initialIcon.alpha = 0
-                destinationIcon.category = SurveyCategoryIcon.Category(rawValue: vc_1.category!.ID) ?? .Null
+                destinationIcon.category = Icon.Category(rawValue: vc_1.category!.ID) ?? .Null
                 
                 vc_2.contentView.alpha = 0
                 vc_2.categoryTitle.text = ""
@@ -1096,7 +1144,7 @@ class IconTransition: BasicTransition {
                 
             } else if let vc_1 = fromVC as? BinarySelectionViewController, let vc_2 = toVC as? NewPollController {
                 
-                let initialIcon: SurveyCategoryIcon = vc_1.isEnabled! ? vc_1.enabledIcon : vc_1.disabledIcon
+                let initialIcon: Icon = vc_1.isEnabled! ? vc_1.enabledIcon : vc_1.disabledIcon
                 
                 var destinationIcon: CircleButton!
                 switch vc_1.selectionType {
@@ -1114,7 +1162,7 @@ class IconTransition: BasicTransition {
                     vc_2.hotTitle.alpha = 0
                 }
                 
-                let icon = initialIcon.copyView() as! SurveyCategoryIcon
+                let icon = initialIcon.copyView() as! Icon
                 icon.center = initialIcon.superview!.convert(initialIcon.center, to: containerView)
                 containerView.addSubview(icon)
                 initialIcon.alpha = 0
@@ -1177,7 +1225,7 @@ class IconTransition: BasicTransition {
                 
             } else if let vc_1 = fromVC as? VotesCountViewController, let initialIcon = vc_1.actionButton as? CircleButton, let vc_2 = toVC as? NewPollController, let destinationIcon = vc_2.votesIcon {
                 
-                let icon = initialIcon.icon.copyView() as! SurveyCategoryIcon
+                let icon = initialIcon.icon.copyView() as! Icon
                 icon.center = initialIcon.superview!.convert(initialIcon.center, to: containerView)
                 vc_1.actionButton.alpha = 0
                 containerView.addSubview(icon)
@@ -1357,16 +1405,16 @@ class IconTransition: BasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? NewSurveySelectionTypeController, let vc_2 = toVC as? SurveysViewController, let destinationIcon = vc_2.navigationItem.rightBarButtonItem?.value(forKey: "view") as? SurveyCategoryIcon, let keyWindow = navigationController?.view.window {
+            } else if let vc_1 = fromVC as? NewSurveySelectionTypeController, let vc_2 = toVC as? SurveysViewController, let destinationIcon = vc_2.navigationItem.rightBarButtonItem?.value(forKey: "view") as? Icon, let keyWindow = navigationController?.view.window {
                 
-                let ratingIcon = SurveyCategoryIcon(frame: CGRect(origin: vc_1.view.convert(vc_1.ratingIcon.frame.origin, to: keyWindow),
+                let ratingIcon = Icon(frame: CGRect(origin: vc_1.view.convert(vc_1.ratingIcon.frame.origin, to: keyWindow),
                                                                   size: vc_1.ratingIcon.frame.size))
                 ratingIcon.iconColor        = vc_1.ratingIcon.iconColor
                 ratingIcon.backgroundColor  = vc_1.ratingIcon.backgroundColor
 //                ratingIcon.scaleFactor = vc_1.ratingIcon.scaleFactor
 //                ratingIcon.category = vc_1.ratingIcon.category
                 ratingIcon.icon = vc_1.ratingIcon.icon
-                let pollIcon = SurveyCategoryIcon(frame: CGRect(origin: vc_1.view.convert(vc_1.pollIcon.frame.origin, to: keyWindow),
+                let pollIcon = Icon(frame: CGRect(origin: vc_1.view.convert(vc_1.pollIcon.frame.origin, to: keyWindow),
                                                                 size: vc_1.pollIcon.frame.size))
                 pollIcon.iconColor          = vc_1.pollIcon.iconColor
                 pollIcon.backgroundColor    = vc_1.pollIcon.backgroundColor
@@ -1456,8 +1504,8 @@ class IconTransition: BasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: true) { _ in }
-            }  else if let vc_1 = fromVC as? NewPollController, let initialIcon = vc_1.navigationItem.titleView as? SurveyCategoryIcon, let vc_2 = toVC as? NewSurveySelectionTypeController, let keyWindow = navigationController?.view.window, let destinationIcon = vc_2.isRatingSelected! ? vc_2.ratingIcon : vc_2.pollIcon {
-                let icon = SurveyCategoryIcon(frame: CGRect(origin: vc_1.view.convert(initialIcon.frame.origin, to: keyWindow),
+            }  else if let vc_1 = fromVC as? NewPollController, let initialIcon = vc_1.navigationItem.titleView as? Icon, let vc_2 = toVC as? NewSurveySelectionTypeController, let keyWindow = navigationController?.view.window, let destinationIcon = vc_2.isRatingSelected! ? vc_2.ratingIcon : vc_2.pollIcon {
+                let icon = Icon(frame: CGRect(origin: vc_1.view.convert(initialIcon.frame.origin, to: keyWindow),
                                                             size: initialIcon.frame.size))
                 icon.frame.origin.x     = keyWindow.bounds.midX - initialIcon.bounds.width/2
                 icon.iconColor          = K_COLOR_RED
@@ -1503,7 +1551,7 @@ class IconTransition: BasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-            } else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? NewPollController, let indexPath = vc_2.selectedCellIndex, let cell = vc_2.tableView.cellForRow(at: indexPath) as? AnswerCell, let initialView = vc_1.frameView, let initialTextView = vc_1.textView as? UITextView, let destinationView = cell.contentView as? UIView, let destinationTextView = cell.textView as? UITextView, let text = vc_1.textView.text {
+            } else if let vc_1 = fromVC as? TextInputViewController, let vc_2 = toVC as? NewPollController, let indexPath = vc_2.selectedCellIndex, let cell = vc_2.tableView.cellForRow(at: indexPath) as? AnswerSelectionCell, let initialView = vc_1.frameView, let initialTextView = vc_1.textView as? UITextView, let destinationView = cell.contentView as? UIView, let destinationTextView = cell.textView as? UITextView, let text = vc_1.textView.text {
                 
                 vc_2.answers[indexPath.row] = text.contains("\t") ? text : "\t\(text)"
                 vc_2.tableView.reloadData()
@@ -1574,8 +1622,8 @@ class IconTransition: BasicTransition {
                 }
                 
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-            } else if let vc_1 = fromVC as? NewSurveyResultViewController, let initialIcon = vc_1.iconView as? SurveyCategoryIcon, (toVC is NewPollController || toVC is NewRatingController), let keyWindow = navigationController?.view.window, let destinationIcon = toVC.navigationItem.titleView as? SurveyCategoryIcon {
-                let icon = SurveyCategoryIcon(frame: CGRect(origin: vc_1.view.convert(initialIcon.frame.origin, to: keyWindow),
+            } else if let vc_1 = fromVC as? NewSurveyResultViewController, let initialIcon = vc_1.iconView as? Icon, (toVC is NewPollController || toVC is NewRatingController), let keyWindow = navigationController?.view.window, let destinationIcon = toVC.navigationItem.titleView as? Icon {
+                let icon = Icon(frame: CGRect(origin: vc_1.view.convert(initialIcon.frame.origin, to: keyWindow),
                                                             size: initialIcon.frame.size))
                 icon.iconColor = initialIcon.iconColor
                 icon.backgroundColor = initialIcon.backgroundColor
@@ -1628,6 +1676,58 @@ class IconTransition: BasicTransition {
 //                        fromVC.view.transform = .identity
                         self.context?.completeTransition(true)
                 })
+//            } else if let vc_1 = fromVC as? ClaimViewController, let vc_2 = toVC as? PollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 0, section: 2)) as? SurveyVoteCell, let destinationIcon = cell.claimIcon as? Icon, let initialIcon = vc_1.icon as? Icon {
+//                vc_2.view.setNeedsLayout()
+//                vc_2.view.layoutIfNeeded()
+//
+//                let icon = Icon(frame: CGRect(origin: vc_1.view.convert(initialIcon.frame.origin, to: navigationController.view),
+//                                              size: initialIcon.frame.size))
+//                icon.iconColor = initialIcon.iconColor
+//                icon.isRounded = false
+//                icon.backgroundColor = initialIcon.backgroundColor
+//
+//                icon.category = initialIcon.category
+//                navigationController.view.addSubview(icon)
+//                initialIcon.alpha = 0
+//                destinationIcon.alpha = 0
+//
+//                let destinationOrigin   = destinationIcon.superview!.convert(destinationIcon.frame.origin, to: navigationController.view)
+//                let destinationSize     = destinationIcon.frame.size
+//
+//                var animationBlocks: [Closure] = []
+//                animationBlocks.append {
+//                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
+//                        icon.frame.origin = destinationOrigin
+//                        icon.frame.size   = destinationSize
+//                    }) {
+//                        _ in
+//                        icon.removeFromSuperview()
+//                        destinationIcon.alpha = 1
+//                        self.context?.completeTransition(true)
+//                    }
+//                }
+//                if let destinationLayer = destinationIcon.icon as? CAShapeLayer, let destinationPath = destinationLayer.path {
+//                    let pathAnim      = Animations.get(property: .Path,
+//                                                       fromValue: (initialIcon.icon as! CAShapeLayer).path as Any,
+//                                                       toValue: destinationPath as Any,
+//                                                       duration: duration,
+//                                                       delay: 0,
+//                                                       repeatCount: 0,
+//                                                       autoreverses: false,
+//                                                       timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                                       delegate: nil,
+//                                                       isRemovedOnCompletion: true)
+//                    animationBlocks.append {
+//                        icon.icon.add(pathAnim, forKey: nil)
+//                        (icon.icon as! CAShapeLayer).path = destinationPath
+//                    }
+//                }
+//                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
+            } else if let vc_1 = fromVC as? ClaimViewController, let vc_2 = toVC as? SurveysViewController {
+                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: [], withIncomingBlurEffect: false) {
+                    _ in
+                    self.context?.completeTransition(true)
+                }
             } else {
                 context?.completeTransition(true)
             }

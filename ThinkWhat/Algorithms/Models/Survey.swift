@@ -84,7 +84,7 @@ class Surveys {
                         //topLinks.append(survey)
                     }
                 }
-                NotificationCenter.default.post(name: Notifications.Surveys.TopSurveysUpdated, object: nil)
+                NotificationCenter.default.post(name: Notifications.Surveys.UpdateTopSurveys, object: nil)
             } else if i.0 == "new" && !i.1.isEmpty {
                 newLinks.removeAll()
                 for k in i.1 {
@@ -93,7 +93,7 @@ class Surveys {
                         //newLinks.append(survey)
                     }
                 }
-                NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)
+                NotificationCenter.default.post(name: Notifications.Surveys.UpdateNewSurveys, object: nil)
             }  else if i.0 == "by_category" && !i.1.isEmpty {
                 categorizedLinks.removeAll()
                 for cat in i.1 {
@@ -259,11 +259,11 @@ class Surveys {
             if let _object = object as? Survey {
                 if claimObjects.isEmpty {
                     claimObjects.append(_object)
-                    removeClaimSurvey(object: _object)
+                    banSurvey(object: _object)
                 } else {
                     if claimObjects.filter({ $0.hashValue == _object.hashValue}).isEmpty {
                         claimObjects.append(_object)
-                        removeClaimSurvey(object: _object)
+                        banSurvey(object: _object)
                     }
                 }
             }
@@ -273,15 +273,15 @@ class Surveys {
     }
     
     //Remove from lists -> post Notification
-    func removeClaimSurvey(object: Survey) {
+    func banSurvey(object: Survey) {
         if let surveyLink = object.toShortSurvey() as? SurveyRef {
             if contains(object: surveyLink, type: .NewLinks) {
                 newLinks.remove(object: surveyLink)
-                NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)// (kNotificationNewSurveysUpdated)
+                NotificationCenter.default.post(name: Notifications.Surveys.UpdateNewSurveys, object: nil)// (kNotificationNewSurveysUpdated)
             }
             if contains(object: surveyLink, type: .TopLinks) {
                 topLinks.remove(object: surveyLink)
-                NotificationCenter.default.post(name: Notifications.Surveys.TopSurveysUpdated, object: nil)// (kNotificationTopSurveysUpdated)
+                NotificationCenter.default.post(name: Notifications.Surveys.UpdateTopSurveys, object: nil)// (kNotificationTopSurveysUpdated)
             }
         }
         if contains(object: object, type: .Stack) {
@@ -375,19 +375,21 @@ class SurveyRef {
     var category: SurveyCategory
 //    var completionPercentage: Int
     var likes: Int
+    var views: Int
     var type: SurveyType
 //    var hashValue: Int {
 //        return ObjectIdentifier(self).hashValue
 //    }
     
 //    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int, type _type: SurveyType) {//}, likes _likes: Int) {
-        init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, type _type: SurveyType) {
+    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, type _type: SurveyType, likes _likes: Int = 0, views _views: Int = 0) {
         ID                      = _id
         title                   = _title
         category                = _category
 //        completionPercentage    = _completionPercentage
         startDate               = _startDate
-        likes = 0
+        likes                   = _likes
+        views                   = _views
         type                    = _type
         //likes                   = _likes
     }
@@ -400,6 +402,7 @@ class SurveyRef {
             let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
 //            let _completionPercentage   = json["vote_capacity"].intValue as? Int,
             let _likes                  = json["likes"].intValue as? Int,
+            let _views                  = json["views"].intValue as? Int,
             let _type                   = json["type"].stringValue as? String {
             ID                      = _ID
             title                   = _title
@@ -407,6 +410,7 @@ class SurveyRef {
 //            completionPercentage    = _completionPercentage
             startDate               = _startDate
             likes                   = _likes
+            views                   = _views
             type                    = SurveyType(rawValue: _type)!
         } else {
             return nil
@@ -502,6 +506,7 @@ class Survey {
     var result: [Int: Date]?
     var userProfile: UserProfile?//Owner
     var likes: Int
+    var views: Int
     var type: SurveyType
     var isHot = false
 //    var hashValue: Int {
@@ -570,6 +575,7 @@ class Survey {
             isCommentingAllowed = _isCommentingAllowed
             answersWithoutID    = _answers
             likes               = 0
+            views               = 0
             type                = SurveyType(rawValue: _type)!
             isHot               = _isHot
             
@@ -617,6 +623,7 @@ class Survey {
 //            let _balance                = json[DjangoVariables.UserProfile.balance].intValue as? Int,
             let _userProfileDict        = json[DjangoVariables.Survey.userprofile] as? JSON,
             let _likes                  = json[DjangoVariables.Survey.likes].intValue as? Int,
+            let _views                  = json[DjangoVariables.Survey.views].intValue as? Int,
             let _type                   = json[DjangoVariables.Survey.type].stringValue as? String {
             ID = _ID
             title = _title
@@ -636,6 +643,7 @@ class Survey {
             watchers = _watchers
 //            AppData.shared.userProfile.balance = _balance
             likes = _likes
+            views = _views
             type = SurveyType(rawValue: _type)!
             
             for _answer in _answers {
@@ -687,7 +695,7 @@ class Survey {
     
     func toShortSurvey() -> SurveyRef? {
 //        if ID != nil, let surveyLink = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0, type: type) as? SurveyRef {
-        if ID != nil, let surveyLink = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, type: type) as? SurveyRef {
+        if ID != nil, let surveyLink = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, type: type, likes: likes, views: views) as? SurveyRef {
             return surveyLink
         }
         return nil

@@ -112,7 +112,7 @@ class SurveyStackViewController: UIViewController {
                 
                 _surveyPreview.category.attributedText = NSAttributedString(string: "  \(survey.category.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 8), foregroundColor: .white, backgroundColor: .clear))
                 _surveyPreview.parentCategory.attributedText = NSAttributedString(string: "  \(survey.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 8), foregroundColor: .white, backgroundColor: .clear))
-                _surveyPreview.icon.category = SurveyCategoryIcon.Category(rawValue: survey.category.ID) ?? .Null
+                _surveyPreview.icon.category = Icon.Category(rawValue: survey.category.ID) ?? .Null
                 let color = survey.category.tagColor 
                     _surveyPreview.category.backgroundColor = color
                     _surveyPreview.parentCategory.backgroundColor = color

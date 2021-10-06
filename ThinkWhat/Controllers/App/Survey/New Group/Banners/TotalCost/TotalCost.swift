@@ -20,7 +20,7 @@ class TotalCost: UIView, BannerContent {
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var topView: UIView!
     @IBOutlet weak var bottomView: UIView!
-    @IBOutlet weak var paymentIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var paymentIcon: Icon! {
         didSet {
             paymentIcon.backgroundColor = color
             paymentIcon.category = .Plus

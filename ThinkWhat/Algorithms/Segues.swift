@@ -31,6 +31,12 @@ struct Segues {
     }
     
     struct App {
+        static let User                                 = "USER"
+        static let Claim                                = "CLAIM"
+        static let Poll                                 = "POLL"
+        static let Rating                               = "RATING"
+        
+        
         static let ProfileToSettingsSelection           = "PROFILE_SETINGS_SELECTION"
         static let ProfileToInfo                        = "INFO"
         static let Logout                               = "BACK_TO_AUTH"
@@ -59,11 +65,11 @@ struct Segues {
     }
     
     struct NewSurvey {
-        static let Poll             = "POLL"
-        static let Rating           = "RATING"
+        static let NewPoll          = "NEW_POLL"
+        static let NewRating        = "NEW_RATING"
         static let Results          = "RESULTS"
         static let BackToEditing    = "RESULTS_TO_NEW"
-        static let BackToSurveys    = "RESULTS_TO_SURVEYS"
+        static let BackToSurveys    = "BACK_TO_SURVEYS"
     }
     
     struct Survey {

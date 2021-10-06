@@ -1153,7 +1153,7 @@ extension NewSurveyViewController: ServerProtocol {
                             Surveys.shared.append(object: surveyLink, type: .NewLinks)
                             
                             //Send notification
-                            NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)
+                            NotificationCenter.default.post(name: Notifications.Surveys.UpdateNewSurveys, object: nil)
                             NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
                             NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
                         }

@@ -709,7 +709,7 @@ extension SurveyViewController {
     public func loadData() {
         
         requestAttempt += 1
-        apiManager.loadSurvey(survey: surveyLink) {
+        apiManager.loadSurvey(survey: surveyLink, addViewCount: true) {
             json, error in
             if error != nil {
                 if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
@@ -759,7 +759,7 @@ extension SurveyViewController {
                         
                     }
                     NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
-                    apiManager.markFavorite(mark: mark, survey: surveyLink!) {
+                    apiManager.addFavorite(mark: mark, survey: surveyLink!) {
                         _, error in
                         self.isRequesting = false
                         if error != nil {
@@ -924,7 +924,7 @@ extension SurveyViewController: CallbackDelegate {
                 }
             } else if (sender as! UIButton).accessibilityIdentifier == "PostClaim", let claimID = (sender as! UIButton).layer.value(forKey: "claimID") as? Int {
                 Surveys.shared.append(object: survey!, type: .Claim)
-                apiManager.postClaim(surveyID: survey!.ID!, claimID: claimID) { _, error in print(error?.localizedDescription) }
+//                apiManager.postClaim(surveyID: survey!.ID!, claimID: claimID) { _, error in print(error?.localizedDescription) }
                 UIView.animate(withDuration: 0.5) {
                     self.tempClaimButton?.center.y = self.view.frame.height / 3
                 }
@@ -964,25 +964,25 @@ extension SurveyViewController: CallbackDelegate {
             navigationController?.setNavigationBarHidden(true, animated: true)
             tableView.scrollToRow(at: IndexPath(row: 0, section: 1), at: .top, animated: true)
         } else if let claim = sender as? ClaimCategory {
-            apiManager.postClaim(surveyID: survey!.ID!, claimID: claim.ID) { _, error in print(error?.localizedDescription) }
+//            apiManager.postClaim(surveyID: survey!.ID!, claimID: claim.ID) { _, error in print(error?.localizedDescription) }
         }
     }
 }
 
 extension SurveyViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == Segues.App.SurveyToClaim, let destination = segue.destination as? ClaimViewController {
-//            (navigationController as! NavigationControllerPreloaded).isFadeTransition = true
-            if let nc = navigationController as? NavigationControllerPreloaded {
-                nc.transitionStyle = .Default
-            }
-            destination.delegate = self
-            destination.topConstraintConstant = tempClaimMaxY
-            shoulAnimateBarIcons = false
-        } else if segue.identifier == Segues.App.SurveyToUser, let destination = segue.destination as? UserViewController {
-            destination.userProfile = survey?.userProfile
-        }
-        tabBarController?.setTabBarVisible(visible: false, animated: true)
+//        if segue.identifier == Segues.App.SurveyToClaim, let destination = segue.destination as? ClaimViewController {
+////            (navigationController as! NavigationControllerPreloaded).isFadeTransition = true
+//            if let nc = navigationController as? NavigationControllerPreloaded {
+//                nc.transitionStyle = .Default
+//            }
+//            destination.delegate = self
+//            destination.topConstraintConstant = tempClaimMaxY
+//            shoulAnimateBarIcons = false
+//        } else if segue.identifier == Segues.App.SurveyToUser, let destination = segue.destination as? UserViewController {
+//            destination.userProfile = survey?.userProfile
+//        }
+//        tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
     @objc func profileImageReceived() {

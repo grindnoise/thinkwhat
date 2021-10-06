@@ -9,9 +9,9 @@
 import UIKit
 
 @IBDesignable
-class FlameIcon: Icon, CAAnimationDelegate {
+class FlameIcon: AnimatedIcon, CAAnimationDelegate {
     
-    override var state: Icon.State {
+    override var state: AnimatedIcon.State {
         didSet {
             if oldValue != state {
                 if state == .enabled {

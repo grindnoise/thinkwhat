@@ -14,7 +14,7 @@ class SurveyTableViewCell: UITableViewCell {
 //    @IBOutlet weak var tags: UIView!
 //    @IBOutlet weak var completionPercentage: ProgressCirle!
     @IBOutlet weak var join: UIView!
-    @IBOutlet weak var icon: SurveyCategoryIcon! {
+    @IBOutlet weak var icon: Icon! {
         didSet {
             print("icon didSet")
         }
@@ -40,7 +40,7 @@ class SurveyTableViewCell: UITableViewCell {
     var survey: SurveyRef! {
         didSet {
             icon.backgroundColor = survey.category.tagColor
-            icon.category = SurveyCategoryIcon.Category(rawValue: survey.category.ID) ?? .Null
+            icon.category = Icon.Category(rawValue: survey.category.ID) ?? .Null
             hotBadge.alpha = Surveys.shared.stackObjects.filter({ $0.ID == survey.ID }).isEmpty ? 0 : 1
         }
     }// {

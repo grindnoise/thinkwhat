@@ -11,14 +11,14 @@ import UIKit
 class CategoryCollectionViewCell: UICollectionViewCell {
 
     @IBOutlet weak var title: UILabel!
-    @IBOutlet weak var icon: SurveyCategoryIcon!
+    @IBOutlet weak var icon: Icon!
     @IBOutlet weak var total: UILabel!
     @IBOutlet weak var constraint: NSLayoutConstraint!
     var childColor: UIColor?
     var category: SurveyCategory! {
         didSet {
             icon.backgroundColor = childColor ?? category.tagColor
-            icon.category = SurveyCategoryIcon.Category(rawValue: category.ID) ?? .Null
+            icon.category = Icon.Category(rawValue: category.ID) ?? .Null
             title.attributedText = NSAttributedString(string: "\(category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 10), foregroundColor: .darkGray, backgroundColor: .clear))
             total.attributedText = NSAttributedString(string: "\(category.total)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .lightGray, backgroundColor: .clear))
         }

@@ -30,12 +30,12 @@ class CircleButton: UIView, CAAnimationDelegate {
             icon.text = text
         }
     }
-    var icon: SurveyCategoryIcon! {
+    var icon: Icon! {
         didSet {
             icon.alpha = state == .On ? 1 : 0
         }
     }
-    var category: SurveyCategoryIcon.Category = .Anon {
+    var category: Icon.Category = .Anon {
         didSet {
             icon.category = category
         }
@@ -106,7 +106,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         self.layer.insertSublayer(oval, at: 1)//(oval)
         layers["oval"] = oval
         
-        icon = SurveyCategoryIcon.getIcon(frame: .zero, category: .Outdoor/*category*/, backgroundColor: color, text: text)//SurveyCategoryIcon(frame: self.bounds)//getIcon(frame: self.bounds, category: category, color: color)
+        icon = Icon.getIcon(frame: .zero, category: .Outdoor/*category*/, backgroundColor: color, text: text)//SurveyCategoryIcon(frame: self.bounds)//getIcon(frame: self.bounds, category: category, color: color)
         self.addSubview(icon)
         if useAutoLayout {
             icon.translatesAutoresizingMaskIntoConstraints = false
@@ -333,7 +333,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         
     }
     
-    func animateIconChange(toCategory: SurveyCategoryIcon.Category) {
+    func animateIconChange(toCategory: Icon.Category) {
         
         let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path!, toValue: (icon.getLayer(toCategory) as! CAShapeLayer).path!, duration: pathTransitionDuration, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: icon, isRemovedOnCompletion: false)
         pathAnim.setValue(toCategory, forKey: "toCategory")

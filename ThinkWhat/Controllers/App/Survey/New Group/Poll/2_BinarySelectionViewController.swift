@@ -87,7 +87,7 @@ class BinarySelectionViewController: UIViewController {
             actionButton.oval.strokeStart = 1
         }
     }
-    @IBOutlet weak var enabledIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var enabledIcon: Icon! {
         didSet {
 //            enabledIcon.scaleMultiplicator = 0.55
             enabledIcon.backgroundColor = UIColor.clear
@@ -119,7 +119,7 @@ class BinarySelectionViewController: UIViewController {
             }
         }
     }
-    @IBOutlet weak var disabledIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var disabledIcon: Icon! {
         didSet {
 //            disabledIcon.scaleMultiplicator = 0.55
             disabledIcon.backgroundColor = UIColor.clear
@@ -197,7 +197,7 @@ class BinarySelectionViewController: UIViewController {
         case .Hot:
             title = "Быстрый старт"
             if let btn = self.navigationItem.rightBarButtonItem as? UIBarButtonItem {
-                let v = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
+                let v = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
                 v.accessibilityIdentifier = "info"
                 v.backgroundColor = .clear
                 v.iconColor = .black//Colors.UpperButtons.VioletBlueCrayola
@@ -205,7 +205,7 @@ class BinarySelectionViewController: UIViewController {
                 let tap = UITapGestureRecognizer(target: self, action: #selector(BinarySelectionViewController.viewTapped(gesture:)))
                 v.addGestureRecognizer(tap)
                 btn.customView = v
-                v.scaleMultiplicator = 0.15
+                v.scaleMultiplicator = 1.5
                 btn.customView?.alpha = 0
                 btn.customView?.clipsToBounds = false
                 btn.customView?.layer.masksToBounds = false
@@ -257,7 +257,7 @@ class BinarySelectionViewController: UIViewController {
             
             if isEnabled != nil, (isEnabled! && v == enabledBg) || (!isEnabled! && v == disabledBg) { return }
             
-            if let selectedIcon = selectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let deselectedIcon = deselectedView.subviews.filter({ $0 is SurveyCategoryIcon }).first as? SurveyCategoryIcon, let selectedLabel = selectedView.subviews.filter({ $0 is UILabel }).first as? UILabel, let deselectedLabel = deselectedView.subviews.filter({ $0 is UILabel }).first as? UILabel {
+            if let selectedIcon = selectedView.subviews.filter({ $0 is Icon }).first as? Icon, let deselectedIcon = deselectedView.subviews.filter({ $0 is Icon }).first as? Icon, let selectedLabel = selectedView.subviews.filter({ $0 is UILabel }).first as? UILabel, let deselectedLabel = deselectedView.subviews.filter({ $0 is UILabel }).first as? UILabel {
                 let enableAnim = Animations.get(property: .FillColor,
                                                 fromValue: selectedIcon.iconColor.cgColor,
                                                 toValue: UIColor.black.cgColor,
@@ -296,7 +296,7 @@ class BinarySelectionViewController: UIViewController {
 
             if !isSelected {
                 isSelected = true
-                actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Next_RU)
+                actionButton.animateIconChange(toCategory: Icon.Category.Next_RU)
                 UIView.animate(withDuration: 0.15, animations: {
                     self.actionButton.color = K_COLOR_RED
                 }) {

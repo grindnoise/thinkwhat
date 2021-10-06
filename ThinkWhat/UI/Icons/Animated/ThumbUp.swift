@@ -9,8 +9,8 @@
 import UIKit
 
 @IBDesignable
-class ThumbUp: Icon, CAAnimationDelegate {
-    override var state: Icon.State {
+class ThumbUp: AnimatedIcon, CAAnimationDelegate {
+    override var state: AnimatedIcon.State {
         didSet {
             if oldValue != state {
                 if state == .enabled {

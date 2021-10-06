@@ -39,20 +39,15 @@ class SurveysTableViewController: UITableViewController {
     var type: SurveyTableType = .New {
         didSet {
             if oldValue != type {
-                NotificationCenter.default.removeObserver(self)
-//                if oldValue == .Top {
-//                    tableView.reloadSections(IndexSet(arrayLiteral: 0), with: .left)
-//                } else {
-//                    tableView.reloadSections(IndexSet(arrayLiteral: 0), with: .right)
-//                }
+//                NotificationCenter.default.removeObserver(self)
                 if type == .New || type == .Top {
                     NotificationCenter.default.addObserver(self,
                                                            selector: #selector(SurveysTableViewController.updateTableView),
-                                                           name: Notifications.Surveys.NewSurveysUpdated,
+                                                           name: Notifications.Surveys.UpdateNewSurveys,
                                                            object: nil)
                     NotificationCenter.default.addObserver(self,
                                                            selector: #selector(SurveysTableViewController.updateTableView),
-                                                           name: Notifications.Surveys.TopSurveysUpdated,
+                                                           name: Notifications.Surveys.UpdateTopSurveys,
                                                            object: nil)
                     
                     //            refreshControl?.attributedTitle = NSAttributedString(string: "")
@@ -231,8 +226,8 @@ class SurveysTableViewController: UITableViewController {
             navigationItem.titleView = navTitle
         } else if type == .Category {
             navTitleImageSize = CGSize(width: 45, height: 45)
-            let icon = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: navTitleImageSize))
-            icon.category = SurveyCategoryIcon.Category(rawValue: category!.ID) ?? .Null
+            let icon = Icon(frame: CGRect(origin: .zero, size: navTitleImageSize))
+            icon.category = Icon.Category(rawValue: category!.ID) ?? .Null
             icon.isOpaque = false
             icon.backgroundColor = category?.parent?.tagColor ?? category?.tagColor
             navTitle = icon

@@ -13,7 +13,7 @@ class NewSurveyTitle: UIView {
 //    private var color: UIColor = .clear
 //    private var text: String = "String"
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var icon: SurveyCategoryIcon!
+    @IBOutlet weak var icon: Icon!
     @IBOutlet weak var label: UILabel!
     
     //MARK: - Init
@@ -40,7 +40,7 @@ class NewSurveyTitle: UIView {
         self.backgroundColor = .clear
     }
     
-    init(size: CGSize, text: String, category: SurveyCategoryIcon.Category, color: UIColor = K_COLOR_RED) {
+    init(size: CGSize, text: String, category: Icon.Category, color: UIColor = K_COLOR_RED) {
         super.init(frame: CGRect(origin: .zero, size: size))
         self.commonInit()
         icon.iconColor = color

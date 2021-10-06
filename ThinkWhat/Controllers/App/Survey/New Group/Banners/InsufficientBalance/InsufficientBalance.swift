@@ -21,14 +21,14 @@ class InsufficientBalance: UIView, BannerContent {
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var topView: UIView!
     @IBOutlet weak var bottomView: UIView!
-    @IBOutlet weak var bankruptcyIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var bankruptcyIcon: Icon! {
         didSet {
             bankruptcyIcon.backgroundColor = K_COLOR_RED
             bankruptcyIcon.iconColor = .white
             bankruptcyIcon.category = .Bankruptcy
         }
     }
-    @IBOutlet weak var paymentIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var paymentIcon: Icon! {
         didSet {
             paymentIcon.backgroundColor = color
             paymentIcon.category = .Plus

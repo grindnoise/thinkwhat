@@ -164,7 +164,7 @@ class CheckBox: UIView, CAAnimationDelegate {
         rectangleTransformAnim.values         = [NSValue(caTransform3D: CATransform3DMakeRotation(44.64 * CGFloat.pi/180, 0, 0, -1)),
                                                  NSValue(caTransform3D: CATransform3DConcat(CATransform3DMakeScale(1, 45, 10), CATransform3DMakeRotation(-44.64 * CGFloat.pi/180, -0, 0, 1)))]
         rectangleTransformAnim.keyTimes       = [0, 1]
-        rectangleTransformAnim.duration       = 0.15
+        rectangleTransformAnim.duration       = 0.1
         rectangleTransformAnim.timingFunction = CAMediaTimingFunction(name:.easeInEaseOut)
         
         let rectangleOpacityAnim            = CAKeyframeAnimation(keyPath:"opacity")
@@ -183,7 +183,7 @@ class CheckBox: UIView, CAAnimationDelegate {
         rectangle2TransformAnim.values         = [NSValue(caTransform3D: CATransform3DMakeRotation(135.09 * CGFloat.pi/180, 0, 0, -1)),
                                                   NSValue(caTransform3D: CATransform3DConcat(CATransform3DMakeScale(1, 75, 1), CATransform3DMakeRotation(-135.09 * CGFloat.pi/180, -0, 0, 1)))]
         rectangle2TransformAnim.keyTimes       = [0, 1]
-        rectangle2TransformAnim.duration       = 0.15
+        rectangle2TransformAnim.duration       = 0.1
         rectangle2TransformAnim.beginTime      = 0.155
         rectangle2TransformAnim.timingFunction = CAMediaTimingFunction(name:.easeInEaseOut)
         
@@ -201,7 +201,7 @@ class CheckBox: UIView, CAAnimationDelegate {
     func addDisableAnimation(completionBlock: ((_ finished: Bool) -> Void)? = nil){
         if completionBlock != nil{
             let completionAnim = CABasicAnimation(keyPath:"completionAnim")
-            completionAnim.duration = 0.23
+            completionAnim.duration = 0.1
             completionAnim.delegate = self
             completionAnim.setValue("disable", forKey:"animId")
             completionAnim.setValue(false, forKey:"needEndAnim")
@@ -221,12 +221,12 @@ class CheckBox: UIView, CAAnimationDelegate {
                                            NSValue(caTransform3D: CATransform3DConcat(CATransform3DMakeScale(1, 45, 10), CATransform3DMakeRotation(-44.64 * CGFloat.pi/180, -0, 0, 1))),
                                            NSValue(caTransform3D: CATransform3DMakeRotation(44.64 * CGFloat.pi/180, 0, 0, -1))]
         rectangleTransformAnim.keyTimes = [0, 0.659, 1]
-        rectangleTransformAnim.duration = 0.23
+        rectangleTransformAnim.duration = 0.1
         
         let rectangleOpacityAnim      = CAKeyframeAnimation(keyPath:"opacity")
         rectangleOpacityAnim.values   = [1, 1, 0]
         rectangleOpacityAnim.keyTimes = [0, 0.956, 1]
-        rectangleOpacityAnim.duration = 0.23
+        rectangleOpacityAnim.duration = 0.1
         
         let rectangleDisableAnim : CAAnimationGroup = QCMethod.group(animations: [rectangleTransformAnim, rectangleOpacityAnim], fillMode:fillMode)
         rectangle.add(rectangleDisableAnim, forKey:"rectangleDisableAnim")
@@ -238,12 +238,12 @@ class CheckBox: UIView, CAAnimationDelegate {
         rectangle2TransformAnim.values   = [NSValue(caTransform3D: CATransform3DConcat(CATransform3DMakeScale(1, 75, 1), CATransform3DMakeRotation(-135.09 * CGFloat.pi/180, -0, 0, 1))),
                                             NSValue(caTransform3D: CATransform3DMakeRotation(135.09 * CGFloat.pi/180, 0, 0, -1))]
         rectangle2TransformAnim.keyTimes = [0, 1]
-        rectangle2TransformAnim.duration = 0.15
+        rectangle2TransformAnim.duration = 0.1
         
         let rectangle2OpacityAnim      = CAKeyframeAnimation(keyPath:"opacity")
         rectangle2OpacityAnim.values   = [1, 1, 0]
         rectangle2OpacityAnim.keyTimes = [0, 0.691, 1]
-        rectangle2OpacityAnim.duration = 0.15
+        rectangle2OpacityAnim.duration = 0.1
         
         let rectangle2DisableAnim : CAAnimationGroup = QCMethod.group(animations: [rectangle2TransformAnim, rectangle2OpacityAnim], fillMode:fillMode)
         rectangle2.add(rectangle2DisableAnim, forKey:"rectangle2DisableAnim")

@@ -26,15 +26,16 @@ protocol APIManagerProtocol {
     func initialLoad(completion: @escaping(JSON?, Error?)->())
     func loadSurveyCategories(completion: @escaping(JSON?, Error?)->())
     func loadSurveys(type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
-    func loadSurvey(survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
+    func loadSurvey(survey: SurveyRef, addViewCount: Bool, completion: @escaping(JSON?, Error?)->())
     func loadTotalSurveysCount(completion: @escaping(JSON?, Error?)->())
     func loadSurveysByCategory(categoryID: Int, completion: @escaping(JSON?, Error?)->())
     func loadSurveysByOwner(userProfile: UserProfile, type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
-    func markFavorite(mark: Bool, survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
+    func addFavorite(mark: Bool, survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
+    func addViewCount(survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
     func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
     func rejectSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
     func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->())
-    func postClaim(surveyID: Int, claimID: Int, completion: @escaping(JSON?, Error?)->())
+    func postClaim(survey: Survey, claimCategory: ClaimCategory, completion: @escaping(JSON?, Error?)->())
     func getUserStats(userProfile: UserProfile, completion: @escaping(JSON?, Error?)->())
     func subsribeToUserProfile(subscribe: Bool, userprofile: UserProfile, completion: @escaping(JSON?, Error?)->())
     func getBalanceAndPrice()
@@ -822,7 +823,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func loadSurvey(survey: SurveyRef, completion: @escaping(JSON?, Error?)->()) {
+    func loadSurvey(survey: SurveyRef, addViewCount: Bool = false, completion: @escaping(JSON?, Error?)->()) {
         var error: Error?
         
         checkForReachability {
@@ -833,7 +834,7 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error)
                     } else if success {
-                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS + "\(survey.ID)/"), httpMethod: .get, parameters: nil, encoding: URLEncoding.default, completion: completion)
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS + "\(survey.ID)/"), httpMethod: .get, parameters: addViewCount ? ["add_view_count": true] : nil, encoding: URLEncoding.default, completion: completion)
                     }
                 }
             } else {
@@ -843,7 +844,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func markFavorite(mark: Bool, survey: SurveyRef, completion: @escaping(JSON?, Error?)->()) {
+    func addFavorite(mark: Bool, survey: SurveyRef, completion: @escaping(JSON?, Error?)->()) {
         var error: Error?
         checkForReachability {
             reachable in
@@ -854,6 +855,26 @@ class APIManager: APIManagerProtocol {
                         completion(nil, error!)
                     } else if success {
                         self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(mark ? SERVER_URLS.SURVEYS_ADD_FAVORITE : SERVER_URLS.SURVEYS_REMOVE_FAVORITE), httpMethod: .get, parameters: ["survey_id": survey.ID], encoding: URLEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
+    func addViewCount(survey: SurveyRef, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error!)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_ADD_VIEW_COUNT), httpMethod: .get, parameters: ["survey_id": survey.ID], encoding: URLEncoding.default, completion: completion)
                     }
                 }
             } else {
@@ -1111,7 +1132,11 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func postClaim(surveyID: Int, claimID: Int, completion: @escaping(JSON?, Error?)->()) {
+    func postClaim(survey: Survey, claimCategory: ClaimCategory, completion: @escaping(JSON?, Error?)->()) {
+        //Local delete
+//        delay(seconds: 1) {
+            Surveys.shared.banSurvey(object: survey)
+//        }
         var error: Error?
         checkForReachability {
             reachable in
@@ -1121,7 +1146,7 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error!)
                     } else if success {
-                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_CLAIM), httpMethod: .post, parameters: ["survey": surveyID, "claim": claimID], encoding: JSONEncoding.default, completion: completion)
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_CLAIM), httpMethod: .post, parameters: ["survey": survey.ID, "claim": claimCategory.ID], encoding: JSONEncoding.default, completion: completion)
                     }
                 }
             } else {

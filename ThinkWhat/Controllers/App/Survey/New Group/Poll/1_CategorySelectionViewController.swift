@@ -46,7 +46,7 @@ class CategorySelectionViewController: UIViewController {
                     
                     isAnimationStopped = false
                     
-                    actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Next_RU)
+                    actionButton.animateIconChange(toCategory: Icon.Category.Next_RU)
                     
                     UIView.animate(withDuration: 0.15, animations: {
                         self.actionButton.icon.backgroundColor = K_COLOR_RED
@@ -57,7 +57,7 @@ class CategorySelectionViewController: UIViewController {
                     self.actionButton.isUserInteractionEnabled = true
                     
                 } else if category == nil, oldValue != nil {
-                    actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Choose_RU)
+                    actionButton.animateIconChange(toCategory: Icon.Category.Choose_RU)
                     isAnimationStopped = true
                     self.actionButton.isUserInteractionEnabled = false
                 }

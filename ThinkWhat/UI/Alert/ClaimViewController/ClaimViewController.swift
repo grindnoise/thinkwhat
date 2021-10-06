@@ -1,0 +1,132 @@
+//
+//  ClaimViewController.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 08.06.2020.
+//  Copyright © 2020 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+
+class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    private var isViewSetupCompleted = false
+    private var claimCategory: ClaimCategory? {
+        didSet {
+            for cell in claimCells {
+                if cell.claimCategory != claimCategory {
+                    cell.isChecked = false
+                }
+            }
+            if claimCategory != nil {
+                delegate?.callbackReceived(claimCategory!)
+            }
+        }
+    }
+    
+    @IBOutlet weak var tableView: UITableView!
+    private var claimCells: [ClaimCell]    = []
+    weak var delegate: CallbackDelegate?
+    
+    deinit {
+        print("deinit")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        tableView.delegate = self as UITableViewDelegate
+        tableView.dataSource = self
+        tableView.backgroundColor = .lightGray
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return ClaimCategories.shared.container.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "claim", for: indexPath) as? ClaimCell {
+            cell.setNeedsLayout()
+            cell.layoutIfNeeded()
+            cell.claimCategory = ClaimCategories.shared.container[indexPath.row]
+            if !claimCells.contains(cell) {
+                claimCells.append(cell)
+            }
+            return cell
+        }
+        return UITableViewCell()
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let cell = tableView.cellForRow(at: indexPath) as? ClaimCell {
+            cell.isChecked = true
+            claimCategory = cell.claimCategory
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension//tableView.frame.height / CGFloat(ClaimCategories.shared.container.count)// + 1//UITableView.automaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+}
+
+class ClaimCell: UITableViewCell {
+    deinit {
+        print("***ClaimCell deinit***")
+    }
+    
+    @IBOutlet weak var checkBox: CheckBox!
+    @IBOutlet weak var frameView: UIView!
+    @IBOutlet weak var textView: UITextView! {
+        didSet {
+//            let recognizer = UITapGestureRecognizer(target: self, action: #selector(ClaimCell.handleTap(recognizer:)))
+//            textView.addGestureRecognizer(recognizer)
+            if claimCategory != nil {
+                let textContent = claimCategory.description.contains("\t") ? claimCategory.description : "\t" + claimCategory.description
+                let paragraphStyle = NSMutableParagraphStyle()
+                paragraphStyle.hyphenationFactor = 1.0
+                paragraphStyle.lineSpacing = 5
+                let attributedString = NSMutableAttributedString(string: textContent, attributes: [NSAttributedString.Key.paragraphStyle:paragraphStyle])
+                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 14), foregroundColor: isChecked ? .black : .gray, backgroundColor: .clear), range: textContent.fullRange())
+                textView.attributedText = attributedString
+                textView.textContainerInset = UIEdgeInsets(top: 3, left: textView.textContainerInset.left, bottom: 3, right: textView.textContainerInset.right)
+            }
+        }
+    }
+    var claimCategory: ClaimCategory! {
+        didSet {
+            if textView != nil {
+                let textContent = claimCategory.description.contains("\t") ? claimCategory.description : "\t" + claimCategory.description
+                let paragraphStyle = NSMutableParagraphStyle()
+                paragraphStyle.hyphenationFactor = 1.0
+                paragraphStyle.lineSpacing = 5
+                let attributedString = NSMutableAttributedString(string: textContent, attributes: [NSAttributedString.Key.paragraphStyle:paragraphStyle])
+                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 14), foregroundColor: isChecked ? .black : .gray, backgroundColor: .clear), range: textContent.fullRange())
+                textView.attributedText = attributedString
+                textView.textContainerInset = UIEdgeInsets(top: 3, left: textView.textContainerInset.left, bottom: 3, right: textView.textContainerInset.right)
+            }
+        }
+    }
+    weak var cellDelegate: CallbackDelegate?
+    var isChecked = false {
+        didSet {
+            if oldValue != isChecked, checkBox != nil {
+                checkBox.isOn = isChecked
+                UIView.transition(with: textView, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                    self.textView.textColor = self.isChecked ? .black : .gray
+                })
+            }
+        }
+    }
+//    @objc private func handleTap(recognizer: UITapGestureRecognizer) {
+//        if recognizer.state == .ended {
+//            cellDelegate?.callbackReceived(index as AnyObject)
+//        }
+//    }
+}

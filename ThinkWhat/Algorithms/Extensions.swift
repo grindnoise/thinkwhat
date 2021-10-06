@@ -1168,7 +1168,7 @@ extension CGSize {
 }
 
 extension CGPath {
-    func getScaledPath(size: CGSize, scaleMultiplicator _scaleMultiplicator: CGFloat = 1) -> CGPath {
+    func getScaledPath(size: CGSize, scaleMultiplicator _scaleMultiplicator: CGFloat = 0) -> CGPath {
         
         let boundingBox = self.boundingBox
         
@@ -1185,12 +1185,12 @@ extension CGPath {
             scaleFactor = size.height/boundingBox.height
         }
         
-        scaleFactor /= 2.05
+        scaleFactor /= _scaleMultiplicator != 0 ? _scaleMultiplicator : 2.05
         scaleFactor = scaleFactor == 0 ? 1 : scaleFactor
-        
-        if _scaleMultiplicator != 1 {
-            scaleFactor = _scaleMultiplicator
-        }
+//
+//        if _scaleMultiplicator != 1 {
+//            scaleFactor = _scaleMultiplicator
+//        }
         // Scaling the path ...
         var scaleTransform = CGAffineTransform.identity
         // Scale down the path first

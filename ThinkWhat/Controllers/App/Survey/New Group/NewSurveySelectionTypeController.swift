@@ -39,13 +39,13 @@ class NewSurveySelectionTypeController: UIViewController {
     }
     @IBAction func actionButtonTapped(_ sender: Any) {
         if isRatingSelected! {
-            performSegue(withIdentifier: Segues.NewSurvey.Rating, sender: nil)
+            performSegue(withIdentifier: Segues.NewSurvey.NewRating, sender: nil)
         } else {
-            performSegue(withIdentifier: Segues.NewSurvey.Poll, sender: nil)
+            performSegue(withIdentifier: Segues.NewSurvey.NewPoll, sender: nil)
         }
     }
     @IBOutlet weak var actionButtonTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var ratingIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var ratingIcon: Icon! {
         didSet {
             ratingIcon.backgroundColor = UIColor.clear
             ratingIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
@@ -60,11 +60,11 @@ class NewSurveySelectionTypeController: UIViewController {
             ratingLabel.alpha = 0
         }
     }
-    @IBOutlet weak var pollIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var pollIcon: Icon! {
         didSet {
             pollIcon.backgroundColor = UIColor.clear
             pollIcon.iconColor       = UIColor.lightGray.withAlphaComponent(0.75)
-            pollIcon.scaleMultiplicator     = 0.65
+            pollIcon.scaleMultiplicator     = 2.65
             pollIcon.category        = .Poll
             pollIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(NewSurveySelectionTypeController.handleTap(recognizer:))))
         }
@@ -104,9 +104,9 @@ class NewSurveySelectionTypeController: UIViewController {
     }
     
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
-        if recognizer.state == .ended, let icon = recognizer.view as? SurveyCategoryIcon {
-            let selectedIcon: SurveyCategoryIcon! = icon == ratingIcon ? ratingIcon : pollIcon
-            let deselectedIcon: SurveyCategoryIcon! = icon != ratingIcon ? ratingIcon : pollIcon
+        if recognizer.state == .ended, let icon = recognizer.view as? Icon {
+            let selectedIcon: Icon! = icon == ratingIcon ? ratingIcon : pollIcon
+            let deselectedIcon: Icon! = icon != ratingIcon ? ratingIcon : pollIcon
             
             if isRatingSelected != nil, (isRatingSelected! && icon == ratingIcon) || (!isRatingSelected! && icon == pollIcon) {
                 return

@@ -25,7 +25,7 @@ class SurveyPreview: UIView {
         }
     }
     @IBOutlet weak var userName: UILabel!
-    @IBOutlet weak var icon: SurveyCategoryIcon!
+    @IBOutlet weak var icon: Icon!
     @IBOutlet weak var category: UILabel!
     @IBOutlet weak var parentCategory: UILabel!
 //    @IBOutlet weak var surveyDate: UILabel!

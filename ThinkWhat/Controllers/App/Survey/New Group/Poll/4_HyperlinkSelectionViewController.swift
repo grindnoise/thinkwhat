@@ -256,7 +256,7 @@ class HyperlinkSelectionViewController: UIViewController {
                             })
                             
                             isAnimationStopped = false
-                                actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Skip_RU)
+                                actionButton.animateIconChange(toCategory: Icon.Category.Skip_RU)
                                 UIView.animate(withDuration: 0.15, animations: {
                                     self.actionButton.color = K_COLOR_RED
                                 }) {
@@ -300,7 +300,7 @@ class HyperlinkSelectionViewController: UIViewController {
                     self.trashSign.transform = .identity
                 }
                 
-                actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Next_RU)
+                actionButton.animateIconChange(toCategory: Icon.Category.Next_RU)
                 
                 isAnimationStopped = true
                 hyperlink = nil

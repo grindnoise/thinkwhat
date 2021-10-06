@@ -61,6 +61,7 @@ struct DjangoVariables {
         static let endDate                  = "end_date"
         static let modifiedAt               = "modified_at"
         static let likes                    = "likes"
+        static let views                    = "views"
         static let userprofile              = "userprofile"
         static let type                     = "type"
         static let watchers                 = "watchers"

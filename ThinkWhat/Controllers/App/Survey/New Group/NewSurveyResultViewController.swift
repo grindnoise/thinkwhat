@@ -14,7 +14,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
     deinit {
         print("DEINIT NewSurveyResultViewController")
     }
-    @IBOutlet weak var iconView: SurveyCategoryIcon! {
+    @IBOutlet weak var iconView: Icon! {
         didSet {
             iconView.iconColor = K_COLOR_RED
             iconView.category = iconCategory
@@ -41,7 +41,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
     @IBOutlet weak var stack: UIStackView!
     
     private var timer:  Timer?
-    var iconCategory: SurveyCategoryIcon.Category = .Poll
+    var iconCategory: Icon.Category = .Poll
     weak var survey: Survey?
     
     override func viewDidLoad() {
@@ -164,7 +164,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
                             Surveys.shared.append(object: surveyLink, type: .OwnLinks)
                             Surveys.shared.append(object: surveyLink, type: .NewLinks)
                             //                        NotificationCenter.default.removeObserver(self)
-                            NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)
+                            NotificationCenter.default.post(name: Notifications.Surveys.UpdateNewSurveys, object: nil)
                             NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
                             NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
                             self.handleSuccessResponse()

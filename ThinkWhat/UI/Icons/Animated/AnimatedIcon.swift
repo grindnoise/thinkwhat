@@ -9,7 +9,7 @@
 import UIKit
 
 @IBDesignable
-class Icon: UIView, AnimationsRemover {
+class AnimatedIcon: UIView, AnimationsRemover {
     
     enum State {
         case enabled, disabled

@@ -11,7 +11,7 @@ import UIKit
 class SurveyTitleCell: UITableViewCell {
 
     @IBOutlet weak var iconContainer: UIView!
-    @IBOutlet weak var icon: SurveyCategoryIcon!
+    @IBOutlet weak var icon: Icon!
     @IBOutlet weak var category: UILabel!
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var label: UILabel!
@@ -20,7 +20,7 @@ class SurveyTitleCell: UITableViewCell {
     var survey: SurveyRef! {
         didSet {
             icon.backgroundColor = survey.category.parent?.tagColor
-            icon.category = SurveyCategoryIcon.Category(rawValue: survey.category.ID) ?? .Null
+            icon.category = Icon.Category(rawValue: survey.category.ID) ?? .Null
         }
     }
     override func awakeFromNib() {

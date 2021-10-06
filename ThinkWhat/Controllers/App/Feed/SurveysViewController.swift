@@ -132,7 +132,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
 //                        let v = Megaphone(frame: CGRect(origin: .zero, size: CGSize(width: 30, height: 30)))
 //                        v.isOpaque = false
 //                        v.clipsToBounds = false
-                        let v = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: CGSize(width: 37, height: 37)))
+                        let v = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 37, height: 37)))
                         v.backgroundColor = .clear
                         v.iconColor = K_COLOR_RED
 //                        v.scaleFactor = 0.2
@@ -140,7 +140,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                         let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleAddTap))
                         v.addGestureRecognizer(tap)
                         btn.customView = v
-                        v.scaleMultiplicator = 0.15
+                        v.scaleMultiplicator = 1
                         btn.customView?.alpha = 0
                         btn.customView?.clipsToBounds = false
                         btn.customView?.layer.masksToBounds = false
@@ -233,7 +233,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     }
 
 
-    fileprivate var icons: [Icon] = []
+    fileprivate var icons: [AnimatedIcon] = []
     @IBOutlet weak var container: UIView!
     @IBOutlet weak var addButton: UIBarButtonItem!
     @IBOutlet weak var leftBarButton: UIBarButtonItem!
@@ -430,7 +430,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     
     @objc private func handleIconTap(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended, let icon = gesture.view {
-            var pairIcon = Icon(frame: .zero)
+            var pairIcon = AnimatedIcon(frame: .zero)
             if icon is NewIcon {
                 if currentIcon == FeedIcon.Top || currentIcon == FeedIcon.New {
                     return

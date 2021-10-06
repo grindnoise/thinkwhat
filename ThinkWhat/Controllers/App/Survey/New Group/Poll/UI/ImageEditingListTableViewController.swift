@@ -12,19 +12,19 @@ class ImageEditingListTableViewController: UITableViewController {
     
     var delegate: CallbackDelegate?
     
-    @IBOutlet weak var openIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var openIcon: Icon! {
         didSet {
             openIcon.iconColor = .black
             openIcon.category = .Zoom
         }
     }
-    @IBOutlet weak var replaceIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var replaceIcon: Icon! {
         didSet {
             replaceIcon.iconColor = .black
             replaceIcon.category = .Replace
         }
     }
-    @IBOutlet weak var deleteIcon: SurveyCategoryIcon! {
+    @IBOutlet weak var deleteIcon: Icon! {
         didSet {
             deleteIcon.iconColor = K_COLOR_RED
             deleteIcon.category = .Trash

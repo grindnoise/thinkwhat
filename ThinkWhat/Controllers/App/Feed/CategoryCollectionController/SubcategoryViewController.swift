@@ -12,7 +12,7 @@ class SubcategoryViewController: UIViewController {
 
     weak var delegate: CallbackDelegate?
     var parentCategory: SurveyCategory!
-    @IBOutlet weak var icon: SurveyCategoryIcon!
+    @IBOutlet weak var icon: Icon!
     @IBOutlet weak var upperContainer: UIView!
     @IBOutlet weak var container: UIView!
     fileprivate var categories: [SurveyCategory]!
@@ -32,7 +32,7 @@ class SubcategoryViewController: UIViewController {
         addChild(self.categoryVC)
         categoryVC.didMove(toParent: self)
         icon.backgroundColor = parentCategory.tagColor
-        icon.category = SurveyCategoryIcon.Category(rawValue: parentCategory.ID) ?? .Null
+        icon.category = Icon.Category(rawValue: parentCategory.ID) ?? .Null
         
     }
     

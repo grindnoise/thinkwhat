@@ -8,9 +8,9 @@
 import UIKit
 
 @IBDesignable
-class NewIcon: Icon, CAAnimationDelegate {
+class NewIcon: AnimatedIcon, CAAnimationDelegate {
     
-    override var state: Icon.State {
+    override var state: AnimatedIcon.State {
         didSet {
             if oldValue != state {
                 if state == .enabled {

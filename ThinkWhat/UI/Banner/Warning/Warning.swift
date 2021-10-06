@@ -24,16 +24,16 @@ class Warning: UIView, BannerContent {
                 return Colors.Banner.Error
             }
         }
-        func category() -> SurveyCategoryIcon.Category {
+        func category() -> Icon.Category {
             switch self {
             case .Info:
-                return SurveyCategoryIcon.Category.Info
+                return Icon.Category.Info
             case .Success:
-                return SurveyCategoryIcon.Category.Success
+                return Icon.Category.Success
             case .Warning:
-                return SurveyCategoryIcon.Category.Warning
+                return Icon.Category.Warning
             case .Error:
-                return SurveyCategoryIcon.Category.Error
+                return Icon.Category.Error
             }
         }
     }
@@ -58,7 +58,7 @@ class Warning: UIView, BannerContent {
     var foldable: Bool = false
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var topView: UIView!
-    @IBOutlet weak var icon: SurveyCategoryIcon! {
+    @IBOutlet weak var icon: Icon! {
         didSet {
             icon.backgroundColor = level.color()
             icon.iconColor = .white

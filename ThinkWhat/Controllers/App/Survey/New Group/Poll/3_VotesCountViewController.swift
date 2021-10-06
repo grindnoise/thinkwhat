@@ -35,7 +35,7 @@ class VotesCountViewController: UIViewController {
                         }
                         Banner.shared.present(shouldDismissAfter: 2, delegate: self)
                         isMaxVotesBannerShown = true
-                        actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Error)
+                        actionButton.animateIconChange(toCategory: Icon.Category.Error)
                     }
                     UIView.animate(withDuration: 0.3) {
                         self.actionButton.color = K_COLOR_GRAY
@@ -49,7 +49,7 @@ class VotesCountViewController: UIViewController {
                         }
                         Banner.shared.present(shouldDismissAfter: 2, delegate: self)
                         isMinVotesBannerShown = true
-                        actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Error)
+                        actionButton.animateIconChange(toCategory: Icon.Category.Error)
                     }
                     UIView.animate(withDuration: 0.3) {
                         self.actionButton.color = K_COLOR_GRAY
@@ -58,7 +58,7 @@ class VotesCountViewController: UIViewController {
                     UIView.animate(withDuration: 0.3) {
                         self.actionButton.color = self.color
                     }
-                    actionButton.animateIconChange(toCategory: SurveyCategoryIcon.Category.Next_RU)
+                    actionButton.animateIconChange(toCategory: Icon.Category.Next_RU)
                 }
 //                if cost != nil, !cost.isEmpty {
 //                    self.cost.map {
@@ -149,7 +149,7 @@ class VotesCountViewController: UIViewController {
             self.lineWidth = self.actionButton.bounds.height / 10
         }
         if let btn = self.navigationItem.rightBarButtonItem as? UIBarButtonItem {
-            let v = SurveyCategoryIcon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
+            let v = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 27, height: 27)))
             v.accessibilityIdentifier = "sum"
             v.backgroundColor = .clear
             v.iconColor = .black//Colors.UpperButtons.VioletBlueCrayola
@@ -157,7 +157,7 @@ class VotesCountViewController: UIViewController {
             let tap = UITapGestureRecognizer(target: self, action: #selector(VotesCountViewController.viewTapped(recognizer:)))
             v.addGestureRecognizer(tap)
             btn.customView = v
-            v.scaleMultiplicator = 0.15
+            v.scaleMultiplicator = 1.5
             btn.customView?.alpha = 0
             btn.customView?.clipsToBounds = false
             btn.customView?.layer.masksToBounds = false

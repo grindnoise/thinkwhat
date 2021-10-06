@@ -124,6 +124,7 @@ struct Colors {
         static let BudGreen         = UIColor(hexString: "#72BC71")
         static let Corn             = UIColor(hexString: "#F2E86D")
         static let Saffron          = UIColor(hexString: "#F8C630")
+        static let OrangeSoda       = UIColor(hexString: "#F2542D")
     }
     static func tags() -> [UIColor] {
         return [

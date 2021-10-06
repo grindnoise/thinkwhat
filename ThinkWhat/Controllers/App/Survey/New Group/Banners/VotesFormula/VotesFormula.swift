@@ -22,7 +22,7 @@ class VotesFormula: UIView, BannerContent {
     
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var topView: UIView!
-    @IBOutlet weak var icon: SurveyCategoryIcon! {
+    @IBOutlet weak var icon: Icon! {
         didSet {
             icon.backgroundColor = Colors.UpperButtons.Avocado
             icon.iconColor = .white

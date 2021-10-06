@@ -9,8 +9,8 @@
 import UIKit
 
 @IBDesignable
-class HeartIcon: Icon, CAAnimationDelegate {
-    override var state: Icon.State {
+class HeartIcon: AnimatedIcon, CAAnimationDelegate {
+    override var state: AnimatedIcon.State {
         didSet {
             if oldValue != state {
                 if state == .enabled {

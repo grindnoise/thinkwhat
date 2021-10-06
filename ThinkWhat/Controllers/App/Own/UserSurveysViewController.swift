@@ -54,7 +54,7 @@ class UserSurveysViewController: UIViewController {
     fileprivate let statisticsVC: StatisticsViewController = {
         return StatisticsViewController(nibName :"StatisticsViewController",bundle : nil)
     } ()
-    fileprivate var icons: [Icon] = []
+    fileprivate var icons: [AnimatedIcon] = []
     fileprivate var isViewSetupCompleted = false
     
     @IBOutlet weak var container: UIView!

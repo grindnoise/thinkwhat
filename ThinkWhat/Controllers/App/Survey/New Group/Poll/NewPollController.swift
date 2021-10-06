@@ -64,7 +64,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                 })
                 stage = .Anonymity
                 categoryIcon.color = category!.tagColor ?? selectedColor
-                categoryIcon.category = SurveyCategoryIcon.Category(rawValue: category!.ID) ?? .Null
+                categoryIcon.category = Icon.Category(rawValue: category!.ID) ?? .Null
                 categoryTitle.text = category!.title.uppercased()
             }
         }
@@ -111,7 +111,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
 
             stage = .Privacy
             anonIcon.color = selectedColor
-            anonIcon.category = isAnonymous ? SurveyCategoryIcon.Category.Anon : SurveyCategoryIcon.Category.AnonDisabled//SurveyCategoryIcon.Category(rawValue: category!.ID) ?? .Null
+            anonIcon.category = isAnonymous ? Icon.Category.Anon : Icon.Category.AnonDisabled//SurveyCategoryIcon.Category(rawValue: category!.ID) ?? .Null
         }
     }
     
@@ -426,7 +426,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             hyperlinkLabel.addGestureRecognizer(tap)
         }
     }
-    @IBOutlet weak var hyperlinkInfoButton: SurveyCategoryIcon! {
+    @IBOutlet weak var hyperlinkInfoButton: Icon! {
         didSet {
             hyperlinkInfoButton.backgroundColor = .clear//K_COLOR_RED
             hyperlinkInfoButton.iconColor = K_COLOR_RED
@@ -534,7 +534,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
 //            imagesLabel.attributedText = imagesPlaceholder
         }
     }
-    @IBOutlet weak var imagesInfoButton: SurveyCategoryIcon! {
+    @IBOutlet weak var imagesInfoButton: Icon! {
         didSet {
             imagesInfoButton.backgroundColor = .clear//K_COLOR_RED
             imagesInfoButton.iconColor = K_COLOR_RED
@@ -906,7 +906,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                 self.stackImages = [self.image_1, self.image_2, self.image_3]
                 self.stackImages.map {
                     v in
-                    let addButton = SurveyCategoryIcon.getIcon(frame: v.frame, category: .Plus, backgroundColor: .clear, pathColor: .darkGray)
+                    let addButton = Icon.getIcon(frame: v.frame, category: .Plus, backgroundColor: .clear, pathColor: .darkGray)
                     addButton.accessibilityIdentifier = "addImage"
                     addButton.addEquallyTo(to: v, multiplier: 0.5)
                     let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.viewTapped(gesture:)))
@@ -1987,7 +1987,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                         destinationVC.minCharacters = ModelProperties.shared.surveyQuestionMinLength
                         destinationVC.type = .Question
                     }
-                } else if let indexPath = sender as? IndexPath, let cell = tableView.cellForRow(at: indexPath) as? AnswerCell {
+                } else if let indexPath = sender as? IndexPath, let cell = tableView.cellForRow(at: indexPath) as? AnswerSelectionCell {
                     destinationVC.font = StringAttributes.font(name: StringAttributes.FontStyle.Regular.rawValue, size: 16)
                     destinationVC.needsScaleAnim = cell.textView.text!.contains("Вариант") ? true : false
                     destinationVC.type = .Answer
@@ -2133,7 +2133,7 @@ extension NewPollController: CallbackDelegate {
 //                    }
 //                }
             }
-        } else if let index = sender as? IndexPath, let cell = tableView.cellForRow(at: index) as? AnswerCell {
+        } else if let index = sender as? IndexPath, let cell = tableView.cellForRow(at: index) as? AnswerSelectionCell {
             
         }
     }
@@ -2214,7 +2214,7 @@ extension NewPollController: UITableViewDelegate, UITableViewDataSource {
             cell.backgroundColor = .clear
             cell.separatorInset = UIEdgeInsets(top: 0, left: cell.frame.width, bottom: 0, right: .greatestFiniteMagnitude)
             return cell
-        } else if let cell = tableView.dequeueReusableCell(withIdentifier: "answer", for: indexPath) as? AnswerCell {
+        } else if let cell = tableView.dequeueReusableCell(withIdentifier: "answer", for: indexPath) as? AnswerSelectionCell {
             cell.setNeedsLayout()
             cell.layoutIfNeeded()
 //            cell.frameView.cornerRadius = 15
@@ -2290,7 +2290,7 @@ extension NewPollController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if let cell = tableView.cellForRow(at: indexPath) as? AnswerCell {
+        if let cell = tableView.cellForRow(at: indexPath) as? AnswerSelectionCell {
             let sizeThatFitsTextView = cell.textView.sizeThatFits(CGSize(width: cell.textView.frame.size.width, height: CGFloat(MAXFLOAT)))
             return sizeThatFitsTextView.height + 16
 //            if let cell = tableView.cellForRow(at: indexPath) as? QuestionTitleCreationCell {
@@ -2330,16 +2330,16 @@ class AddAnswerCell: UITableViewCell {
     }
 }
 
-class AnswerCell: UITableViewCell {
+class AnswerSelectionCell: UITableViewCell {
     deinit {
-        print("***AnswerCell deinit***")
+        print("***AnswerSelectionCell deinit***")
     }
     weak var delegate:   CallbackDelegate?
     var index:      IndexPath!
 //    @IBOutlet weak var frameView: UIView!
     @IBOutlet weak var textView: UITextView! {
         didSet {
-            let recognizer = UITapGestureRecognizer(target: self, action: #selector(AnswerCell.handleTap(recognizer:)))
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(AnswerSelectionCell.handleTap(recognizer:)))
             textView.addGestureRecognizer(recognizer)
         }
     }
