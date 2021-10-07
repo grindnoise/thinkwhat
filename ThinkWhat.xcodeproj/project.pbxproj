@@ -62,7 +62,7 @@
 		AB334FB9270C423400DD7332 /* ClockIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB334FB8270C423400DD7332 /* ClockIndicator.swift */; };
 		AB334FBC270C5AF500DD7332 /* VoteView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB334FBB270C5AF500DD7332 /* VoteView.xib */; };
 		AB334FBE270C67C900DD7332 /* VoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB334FBD270C67C900DD7332 /* VoteView.swift */; };
-		AB334FC1270C6EDC00DD7332 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB334FC0270C6EDC00DD7332 /* Alert.swift */; };
+		AB334FC1270C6EDC00DD7332 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB334FC0270C6EDC00DD7332 /* AlertController.swift */; };
 		AB334FC3270C6F0400DD7332 /* Alert.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB334FC2270C6F0400DD7332 /* Alert.xib */; };
 		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
 		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
@@ -254,6 +254,8 @@
 		ABF20FBA24CAE8610092B223 /* UserSubscriptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF20FB924CAE8610092B223 /* UserSubscriptionCell.swift */; };
 		ABF20FBC24CAEB640092B223 /* UserClaimCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF20FBB24CAEB640092B223 /* UserClaimCell.swift */; };
 		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
+		ABF73549270DC1F700F7C308 /* ClaimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF73548270DC1F700F7C308 /* ClaimView.swift */; };
+		ABF7354B270DC26E00F7C308 /* ClaimView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABF7354A270DC26E00F7C308 /* ClaimView.xib */; };
 		ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFD793D25F8CD99009A2824 /* RoundIcon.swift */; };
 		ABFE1411239109FA0026D27C /* NewSurveyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */; };
 		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
@@ -334,7 +336,7 @@
 		AB334FB8270C423400DD7332 /* ClockIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockIndicator.swift; sourceTree = "<group>"; };
 		AB334FBB270C5AF500DD7332 /* VoteView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VoteView.xib; sourceTree = "<group>"; };
 		AB334FBD270C67C900DD7332 /* VoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteView.swift; sourceTree = "<group>"; };
-		AB334FC0270C6EDC00DD7332 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		AB334FC0270C6EDC00DD7332 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertController.swift; sourceTree = "<group>"; };
 		AB334FC2270C6F0400DD7332 /* Alert.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Alert.xib; sourceTree = "<group>"; };
 		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -533,6 +535,8 @@
 		ABF20FB924CAE8610092B223 /* UserSubscriptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSubscriptionCell.swift; sourceTree = "<group>"; };
 		ABF20FBB24CAEB640092B223 /* UserClaimCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserClaimCell.swift; sourceTree = "<group>"; };
 		ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysTableViewController.swift; sourceTree = "<group>"; };
+		ABF73548270DC1F700F7C308 /* ClaimView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimView.swift; sourceTree = "<group>"; };
+		ABF7354A270DC26E00F7C308 /* ClaimView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ClaimView.xib; sourceTree = "<group>"; };
 		ABFD793D25F8CD99009A2824 /* RoundIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundIcon.swift; sourceTree = "<group>"; };
 		ABFE1410239109FA0026D27C /* NewSurveyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
@@ -713,8 +717,8 @@
 		AB334FBF270C6E9F00DD7332 /* Alert */ = {
 			isa = PBXGroup;
 			children = (
-				ABDAA38C248E7D1700569F68 /* ClaimViewController */,
-				AB334FC0270C6EDC00DD7332 /* Alert.swift */,
+				ABDAA38C248E7D1700569F68 /* Claim */,
+				AB334FC0270C6EDC00DD7332 /* AlertController.swift */,
 				AB334FC2270C6F0400DD7332 /* Alert.xib */,
 			);
 			path = Alert;
@@ -1298,12 +1302,14 @@
 			path = Profile;
 			sourceTree = "<group>";
 		};
-		ABDAA38C248E7D1700569F68 /* ClaimViewController */ = {
+		ABDAA38C248E7D1700569F68 /* Claim */ = {
 			isa = PBXGroup;
 			children = (
 				ABDAA38D248E7D3600569F68 /* ClaimViewController.swift */,
+				ABF73548270DC1F700F7C308 /* ClaimView.swift */,
+				ABF7354A270DC26E00F7C308 /* ClaimView.xib */,
 			);
-			path = ClaimViewController;
+			path = Claim;
 			sourceTree = "<group>";
 		};
 		ABDEE85523702324009B52F3 /* CategoryTableViewController */ = {
@@ -1504,6 +1510,7 @@
 				AB21970526BC2F0B005A7BA8 /* Banner.xib in Resources */,
 				AB7599EF245B2F51008B0569 /* SurveyPreview.xib in Resources */,
 				AB99A95924C8154A00814F96 /* UserLogoHeader.xib in Resources */,
+				ABF7354B270DC26E00F7C308 /* ClaimView.xib in Resources */,
 				AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */,
 				ABDA425523B1036400BAC3A5 /* NewSurveyHeaderCell.xib in Resources */,
 				AB91195726C3AB50007ED54A /* VotesFormula.xib in Resources */,
@@ -1710,7 +1717,7 @@
 				AB6083B92240EA4A002C0D7E /* TermsOfUseViewController.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
 				AB868A6A23EB04A3008DEB84 /* 1_CategorySelectionViewController.swift in Sources */,
-				AB334FC1270C6EDC00DD7332 /* Alert.swift in Sources */,
+				AB334FC1270C6EDC00DD7332 /* AlertController.swift in Sources */,
 				AB75838024E5661D004367DF /* ScrollArrow.swift in Sources */,
 				AB9DBF7B26A58C8C00EFA66D /* Django.swift in Sources */,
 				AB889818240FA65B0087E5AD /* CopyPasteTextField.swift in Sources */,
@@ -1768,6 +1775,7 @@
 				AB3C6845223FD3EE00B57580 /* Facebook.swift in Sources */,
 				AB93FD78247EA245009546DD /* EmptySurvey.swift in Sources */,
 				AB3C6849223FD3EE00B57580 /* UpdateButton.swift in Sources */,
+				ABF73549270DC1F700F7C308 /* ClaimView.swift in Sources */,
 				AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */,
 				ABBA73F82383F74E00540ECF /* HeartButton.swift in Sources */,
 				AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */,

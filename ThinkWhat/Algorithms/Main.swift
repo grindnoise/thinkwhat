@@ -295,7 +295,6 @@ struct Storyboards {
 //let segueClientSettingsPicker                   = "segueClientSettingsPicker"
 let alert                                       = CustomAlertView(frame: (UIApplication.shared.keyWindow?.frame)!)
 
-
 let options: UNAuthorizationOptions             = [.alert, .sound, .badge]
 
 //HTTP request attempts before assertion

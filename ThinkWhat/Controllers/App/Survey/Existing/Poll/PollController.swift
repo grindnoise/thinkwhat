@@ -185,7 +185,7 @@ class PollController: UIViewController {
                                                selector: #selector(PollController.updateViewsCount(notification:)),
                                                name: Notifications.UI.SuveyViewsCountReceived,
                                                object: nil)
-        tableView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.08)
+        tableView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.06)
     }
     
     private func performChecks() {
@@ -660,13 +660,16 @@ extension PollController: CallbackDelegate {
             if string == "user" {
                 performSegue(withIdentifier: Segues.App.User, sender: nil)
             } else if string == "claim" {
-//                let
-                Alert.shared.icon.category = .Caution
-                Alert.shared.present(delegate: self, height: UIScreen.main.bounds.height * 0.7, contentType: .Claim, survey: survey)
+                                AlertController.shared.icon.category = .Caution
+                                AlertController.shared.present(delegate: self, height: UIScreen.main.bounds.height * 0.76, contentType: .Claim, survey: survey)
+//                Alert.shared.icon.category = .Caution
+//                Alert.shared.present(delegate: self, height: UIScreen.main.bounds.height * 0.7, contentType: .Claim, survey: survey)
 //                performSegue(withIdentifier: Segues.App.Claim, sender: nil)
             } else if string == "vote" {
                 //TODO: - Add voting algorithm
-                Alert.shared.present(delegate: self, survey: nil)
+                AlertController.shared.present(delegate: self, survey: nil)
+            } else if string == "post_claim" {
+                navigationController?.popViewController(animated: true)
             }
         }
     }
@@ -700,7 +703,7 @@ class AuthorCell: UITableViewCell {
     @IBOutlet weak var userCredentials: UILabel! {
         didSet {
             userCredentials.backgroundColor = .clear
-            userCredentials.textColor = .darkGray
+            userCredentials.textColor = .black
         }
     }
     @IBOutlet weak var categoryLabel: UILabel!
@@ -708,13 +711,13 @@ class AuthorCell: UITableViewCell {
         didSet {
             viewsIcon.scaleMultiplicator = 1.3
             viewsIcon.backgroundColor = .clear
-            viewsIcon.iconColor = .gray
+            viewsIcon.iconColor = .darkGray
             viewsIcon.category = .Eye
         }
     }
     @IBOutlet weak var viewsLabel: UILabel! {
         didSet {
-            viewsLabel.textColor = .gray
+            viewsLabel.textColor = .darkGray
         }
     }
 //    @IBOutlet weak var commentsIcon: SurveyCategoryIcon! {

@@ -36,21 +36,23 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
         super.viewDidLoad()
         tableView.delegate = self as UITableViewDelegate
         tableView.dataSource = self
-        tableView.backgroundColor = .lightGray
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return ClaimCategories.shared.container.count
+        return ClaimCategories.shared.container.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "claim", for: indexPath) as? ClaimCell {
+        if indexPath.row < ClaimCategories.shared.container.count, let cell = tableView.dequeueReusableCell(withIdentifier: "claim", for: indexPath) as? ClaimCell {
             cell.setNeedsLayout()
             cell.layoutIfNeeded()
             cell.claimCategory = ClaimCategories.shared.container[indexPath.row]
             if !claimCells.contains(cell) {
                 claimCells.append(cell)
             }
+            return cell
+        } else if let cell = tableView.dequeueReusableCell(withIdentifier: "cancel", for: indexPath) as? ClaimCancelCell {
+            cell.cellDelegate = self
             return cell
         }
         return UITableViewCell()
@@ -64,7 +66,12 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension//tableView.frame.height / CGFloat(ClaimCategories.shared.container.count)// + 1//UITableView.automaticDimension
+//        return UITableView.automaticDimension
+        if indexPath.row < ClaimCategories.shared.container.count {
+            return UITableView.automaticDimension
+        } else {
+            return 3 * CGFloat(ClaimCategories.shared.container.count)
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -129,4 +136,24 @@ class ClaimCell: UITableViewCell {
 //            cellDelegate?.callbackReceived(index as AnyObject)
 //        }
 //    }
+}
+
+extension ClaimViewController: CallbackDelegate {
+    func callbackReceived(_ sender: AnyObject) {
+        if sender is ClaimCancelCell {
+            delegate?.callbackReceived("cancel_claim" as AnyObject)
+//            dismiss(animated: true) { _ in }
+        }
+    }
+}
+
+class ClaimCancelCell: UITableViewCell {
+    weak var cellDelegate: CallbackDelegate?
+    deinit {
+        print("***ClaimCancelCell deinit***")
+    }
+    @IBOutlet weak var button: UIButton!
+    @IBAction func buttonTapped(_ sender: Any) {
+        cellDelegate?.callbackReceived(self)
+    }
 }
