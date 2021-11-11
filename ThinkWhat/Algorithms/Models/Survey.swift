@@ -62,7 +62,7 @@ class Surveys {
     var ownLinks:           [SurveyRef] = []
     var favoriteLinks:      [SurveyRef: Date] = [:]
     var downloadedObjects:  [Survey] = []
-    var completedSurveyIDs: [Int] = []//Completed surveys IDs
+//    var completedSurveyIDs: [Int] = []//Completed surveys IDs
     var stackObjects:       [Survey] = []{
         didSet {
             if stackObjects.count < oldValue.count {
@@ -145,13 +145,13 @@ class Surveys {
                     }
                 }
                 NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
-            } else if i.0 == "user_results" {
-                completedSurveyIDs.removeAll()
-                for k in i.1 {
-                    if let id = k.1["survey"].intValue as? Int {
-                        completedSurveyIDs.append(id)
-                    }
-                }
+//            } else if i.0 == "user_results" {
+//                completedSurveyIDs.removeAll()
+//                for k in i.1 {
+//                    if let id = k.1["survey"].intValue as? Int {
+//                        completedSurveyIDs.append(id)
+//                    }
+//                }
             } else if i.0 == "hot" {
                 if !i.1.isEmpty {
                     for k in i.1 {
@@ -274,7 +274,7 @@ class Surveys {
     
     //Remove from lists -> post Notification
     func banSurvey(object: Survey) {
-        if let surveyLink = object.toShortSurvey() as? SurveyRef {
+        if let surveyLink = object.getSurveyRef() as? SurveyRef {
             if contains(object: surveyLink, type: .NewLinks) {
                 newLinks.remove(object: surveyLink)
                 NotificationCenter.default.post(name: Notifications.Surveys.UpdateNewSurveys, object: nil)// (kNotificationNewSurveysUpdated)
@@ -368,118 +368,12 @@ class Surveys {
     }
 }
 
-class SurveyRef {
-    var ID: Int
-    var title: String
-    var startDate: Date
-    var category: SurveyCategory
-//    var completionPercentage: Int
-    var likes: Int
-    var views: Int
-    var type: SurveyType
-//    var hashValue: Int {
-//        return ObjectIdentifier(self).hashValue
-//    }
-    
-//    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int, type _type: SurveyType) {//}, likes _likes: Int) {
-    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, type _type: SurveyType, likes _likes: Int = 0, views _views: Int = 0) {
-        ID                      = _id
-        title                   = _title
-        category                = _category
-//        completionPercentage    = _completionPercentage
-        startDate               = _startDate
-        likes                   = _likes
-        views                   = _views
-        type                    = _type
-        //likes                   = _likes
-    }
-    
-    init?(_ json: JSON) {
-        if  let _ID                     = json["id"].intValue as? Int,
-            let _title                  = json["title"].stringValue as? String,
-            let _categoryID             = json["category"].intValue as? Int,
-            let _category               = SurveyCategories.shared[_categoryID],
-            let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
-//            let _completionPercentage   = json["vote_capacity"].intValue as? Int,
-            let _likes                  = json["likes"].intValue as? Int,
-            let _views                  = json["views"].intValue as? Int,
-            let _type                   = json["type"].stringValue as? String {
-            ID                      = _ID
-            title                   = _title
-            category                = _category
-//            completionPercentage    = _completionPercentage
-            startDate               = _startDate
-            likes                   = _likes
-            views                   = _views
-            type                    = SurveyType(rawValue: _type)!
-        } else {
-            return nil
-        }
-    }
-}
-
-extension SurveyRef: Hashable {
-    static func == (lhs: SurveyRef, rhs: SurveyRef) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-        //        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(title)
-        hasher.combine(ID)
-    }
-}
 
 
-class ClaimCategory {
-    let ID: Int
-    let description: String
-    
-    init?(_ json: JSON) {
-        if  let _ID     = json["id"].intValue as? Int,
-            let _description  = json["description"].stringValue as? String {
-            ID          = _ID
-            description = _description
-        } else {
-            return nil
-        }
-    }
-}
-
-extension ClaimCategory: Hashable {
-    static func == (lhs: ClaimCategory, rhs: ClaimCategory) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(description)
-        hasher.combine(ID)
-    }
-}
 
 
-class ClaimCategories {
-    static let shared = ClaimCategories()
-    var container: [ClaimCategory] = []
-    private init() {}
-    
-    func importJson(_ json: JSON) {
-        container.removeAll()
-        for i in json {
-            if let category = ClaimCategory(i.1) {
-                container.append(category)
-            }
-        }
-    }
-    
-    subscript (ID: Int) -> ClaimCategory? {
-        if let i = container.first(where: {$0.ID == ID}) {
-            return i
-        } else {
-            return nil
-        }
-    }
-}
+
+
 
 class Survey {
     //ID is nil, when client creates Survey, ID is assigned in apiMananger.postSurvey() 200 Response
@@ -495,6 +389,10 @@ class Survey {
     var imagesURLs: [[String: String]]?//URL - key, Title - value
     var answersWithoutID: [String] = []//Array
     var answers: [Answer] = []
+    var answersSortedByVotes: [Answer] {
+        return answers.sorted { $0.totalVotes > $1.totalVotes }
+    }
+
     var owner: String
     var link: String?
     var voteCapacity: Int
@@ -503,12 +401,39 @@ class Survey {
     var isCommentingAllowed: Bool
     var totalVotes: Int = 0
     var watchers: Int = 0
-    var result: [Int: Date]?
+    var result: [Int: Date]? {
+        didSet {
+            if let _result = result, let _oldValue = oldValue, _oldValue.isEmpty, !_result.isEmpty, let surveyRef = Surveys.shared.allLinks.filter({ $0.ID == self.ID }).first {
+                surveyRef.isComplete = true
+            }
+        }
+    }
     var userProfile: UserProfile?//Owner
     var likes: Int
     var views: Int
     var type: SurveyType
     var isHot = false
+    var isComplete: Bool {
+        get {
+            if let _result = result, !_result.isEmpty {
+                return true
+            }
+            return false
+        }
+    }
+    var isOwn: Bool {
+        get {
+            if let _userProfile = userProfile, String(_userProfile.ID) == AppData.shared.userProfile.ID {
+                return true
+            }
+            return false
+        }
+    }
+    var isFavorite: Bool {
+        get {
+            return !Surveys.shared.favoriteLinks.keys.filter({ $0.ID == self.ID }).isEmpty
+        }
+    }
 //    var hashValue: Int {
 //        return ObjectIdentifier(self).hashValue
 //    }
@@ -578,7 +503,6 @@ class Survey {
             views               = 0
             type                = SurveyType(rawValue: _type)!
             isHot               = _isHot
-            
 //            _answers.forEach {
 //                dict in
 //                dict.map { answersWithoutID.append($0.value }
@@ -620,6 +544,7 @@ class Survey {
             let _watchers               = json[DjangoVariables.Survey.watchers].intValue as? Int,
             let _totalVotes             = json[DjangoVariables.Survey.totalVotes].intValue as? Int,
             let _result                 = json[DjangoVariables.Survey.result].arrayValue as? [JSON],
+            let _resultTotal           = json["result_total"].arrayValue as? [JSON],
 //            let _balance                = json[DjangoVariables.UserProfile.balance].intValue as? Int,
             let _userProfileDict        = json[DjangoVariables.Survey.userprofile] as? JSON,
             let _likes                  = json[DjangoVariables.Survey.likes].intValue as? Int,
@@ -668,6 +593,7 @@ class Survey {
                     }
                 }
             }
+            
             if let _userProfile = UserProfile(_userProfileDict) {
 //                //TODO find else add
 //                var isFound = false
@@ -688,21 +614,49 @@ class Survey {
 //                    userProfile = _userProfile
 //                }
             }
+            if !_resultTotal.isEmpty {
+                totalVotes = 0
+                for entity in _resultTotal {
+                    if let dict = entity.dictionaryValue as? [String: JSON] {
+                        if let _userprofiles = dict["userprofiles"]?.arrayValue as? [JSON], let _answerID = dict["answer"]?.intValue as? Int, let answer = answers.filter({ $0.ID == _answerID }).first, let _total = dict["total"]?.intValue as? Int {
+                            answer.totalVotes = _total
+                            totalVotes += _total
+                            for _userprofile in _userprofiles {
+                                var userprofile: UserProfile!
+                                if let ID = _userprofile["id"].intValue as? Int, let foundValue = UserProfiles.shared.container.filter({ $0.ID == ID }).first {
+                                    userprofile = foundValue
+                                } else if let newUserprofile = UserProfile(_userprofile) {
+                                    UserProfiles.shared.container.append(newUserprofile)
+                                    userprofile = newUserprofile
+                                }
+                                answer.appendUserprofile(userprofile)
+                            }
+                        }
+                    }
+                }
+            }
         } else {
             return nil
         }
     }
     
-    func toShortSurvey() -> SurveyRef? {
+    func getSurveyRef() -> SurveyRef? {
 //        if ID != nil, let surveyLink = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, completionPercentage: 0, type: type) as? SurveyRef {
-        if ID != nil, let surveyLink = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, type: type, likes: likes, views: views) as? SurveyRef {
-            return surveyLink
+        if ID != nil, let surveyRef = SurveyRef(id: ID!, title: title, startDate: startDate, category: category, type: type, likes: likes, views: views, isOwn: isOwn, isComplete: isComplete, isFavorite: isFavorite) as? SurveyRef {
+            return surveyRef
         }
         return nil
     }
     
     func getAnswerVotePercentage(_ answerVotesCount: Int) -> Int {
         return Int((Double(answerVotesCount) * Double(100) / Double(totalVotes)).rounded())
+    }
+    
+    func getPercentForAnswer(_ answer: Answer) -> Int {
+        if let _answer = answers.filter({ $0.ID == answer.ID }).first {
+            return 100 * _answer.totalVotes / totalVotes
+        }
+        return 0
     }
 }
 
@@ -721,25 +675,5 @@ extension Survey: Hashable {
     }
 }
 
-class Answer {
-    let ID: Int
-    var description: String
-    var totalVotes: Int
-    var title: String
-    
-    init?(json: JSON) {
-        if let _description = json["description"].stringValue as? String,
-            let _title = json["title"].stringValue as? String,
-            let _ID = json["id"].intValue as? Int,
-            let _totalVotes = json["votes_count"].intValue as? Int {
-            ID = _ID
-            description =  _description
-            title = _title
-            totalVotes = _totalVotes
-        } else {
-            print("JSON parse error")
-            return nil
-        }
-    }
-}
+
 

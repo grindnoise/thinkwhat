@@ -1714,7 +1714,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                 } else {
                     imagePosition = 2
                 }
-                performSegue(withIdentifier: Segues.App.NewSurveyToImagePreviewViewController, sender: image)
+                performSegue(withIdentifier: Segues.App.Image, sender: image)
             } else if let v = gesture.view, v.accessibilityIdentifier == "imageEditingList" {
                 print("ImageEditingListTableViewController")
             } else if effectView != nil, let frameView = highlitedImage.keys.first as? UIView, let imageView = highlitedImage.values.first as? UIImageView, let keyWindow = navigationController?.view.window {
@@ -2017,7 +2017,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                 //                destinationVC.actionButton.lineWidth = lineWidth
                 destinationVC.actionButtonWidthConstant = votesIcon.frame.width
                 destinationVC.color = selectedColor
-            } else if segue.identifier == Segues.App.NewSurveyToImagePreviewViewController, let destinationVC = segue.destination as? ImageViewController, let image = sender as? UIImage {
+            } else if segue.identifier == Segues.App.Image, let destinationVC = segue.destination as? ImageViewController, let image = sender as? UIImage {
                 nc.duration = 0.25
                 nc.transitionStyle = .Icon
                 destinationVC.image = image
@@ -2099,7 +2099,7 @@ extension NewPollController: CallbackDelegate {
         } else if let string = sender as? String {
             if string == "openImage" {
                 if let image = self.highlitedImage.first?.value.image {
-                    delay(seconds: 0.3) { self.performSegue(withIdentifier: Segues.App.NewSurveyToImagePreviewViewController, sender: image) }
+                    delay(seconds: 0.3) { self.performSegue(withIdentifier: Segues.App.Image, sender: image) }
                 }
             } else if string == "replaceImage" {
                 delay(seconds: 0.3) { self.chooseImage() }

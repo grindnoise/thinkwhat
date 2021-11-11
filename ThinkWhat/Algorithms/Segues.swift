@@ -35,7 +35,7 @@ struct Segues {
         static let Claim                                = "CLAIM"
         static let Poll                                 = "POLL"
         static let Rating                               = "RATING"
-        
+        static let Image                                = "IMAGE"
         
         static let ProfileToSettingsSelection           = "PROFILE_SETINGS_SELECTION"
         static let ProfileToInfo                        = "INFO"
@@ -56,12 +56,14 @@ struct Segues {
         static let NewSurveyToTypingViewController      = "NEW_TO_TYPE"
         static let NewSurveyToVotesCountViewController  = "NEW_TO_VOTES_COUNT"
         static let NewSurveyToHyperlinkViewController   = "NEW_TO_HYPERLINK"
-        static let NewSurveyToImagePreviewViewController = "NEW_TO_IMAGES"
+        
         static let SurveyToUser                         = "SURVEY_TO_USER"
         static let SurveyToClaim                        = "SURVEY_TO_CLAIM"
         static let UserToUserSurveys                    = "USER_TO_USER_SURVEYS"
         static let UserToUserFavoriteSurveys            = "USER_TO_FAVORITE_USER_SURVEYS"
         static let CategoryToSurveys                    = "CATEGORY_TO_SURVEYS"
+        static let UsersList                            = "USERS_LIST"
+        
     }
     
     struct NewSurvey {

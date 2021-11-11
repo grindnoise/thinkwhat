@@ -362,6 +362,11 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         addChild(self.categoryVC)
         categoryVC.delegate = self
         categoryVC.didMove(toParent: self)
+        
+        if UserProfiles.shared.own == nil, let imagePath = AppData.shared.userProfile.imagePath, let ID = Int(AppData.shared.userProfile.ID!) as? Int, let firstName = AppData.shared.user.firstName, let lastName = AppData.shared.user.lastName, let birthDate = AppData.shared.userProfile.birthDate, let gender = AppData.shared.userProfile.gender {
+            UserProfiles.shared.own = UserProfile(ID: ID, name: "\(firstName) \(lastName)", age: birthDate.age, image: loadImageFromPath(path: imagePath), gender: gender)
+        }
+        
     }
     
     // MARK: - Navigation
@@ -376,8 +381,13 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             nc.duration = 0.3
             nc.transitionStyle = .Icon
             destinationVC.delegate = self
-        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? PollController, let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
-            destinationVC.surveyRef = cell.survey
+        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? PollController, let surveyRef = sender as? SurveyRef {
+//            let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+            navigationController?.setNavigationBarHidden(false, animated: true)
+            nc.duration = 0.2
+            nc.transitionStyle = .Icon
+            destinationVC.mode = surveyRef.isComplete ? .ReadOnly : .Write
+            destinationVC.surveyRef = surveyRef
             destinationVC.apiManager = apiManager
             tabBarController?.setTabBarVisible(visible: false, animated: true)
         

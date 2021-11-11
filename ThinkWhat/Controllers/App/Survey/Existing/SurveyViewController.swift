@@ -155,10 +155,10 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 showClaimButton()
                 self.presentSurvey()
                 if surveyLink == nil {
-                    surveyLink = SurveyRef(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, type: survey!.type)
+//                    surveyLink = SurveyRef(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, type: survey!.type)
                 }
                 if let userProfile = survey!.userProfile as? UserProfile, let image = userProfile.image as? UIImage {
-                    NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: nil)
+                    NotificationCenter.default.post(name: Notifications.UI.ImageReceived, object: nil)
                 } else if shouldDownloadImages, let userProfile = survey!.userProfile as? UserProfile, let url = userProfile.imageURL as? String {
                     apiManager.downloadImage(url: url) {
                         image, error in
@@ -167,7 +167,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                         }
                         if image != nil {
                             self.survey!.userProfile!.image = image!
-                            NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: nil)
+                            NotificationCenter.default.post(name: Notifications.UI.ImageReceived, object: nil)
                         }
                     }
                 }
@@ -180,7 +180,7 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(SurveyViewController.profileImageReceived),
-                                               name: Notifications.UI.ProfileImageReceived,
+                                               name: Notifications.UI.ImageReceived,
                                                object: nil)
         
         setupViews()
@@ -278,13 +278,13 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                     }
                     if image != nil {
                         self.survey!.userProfile!.image = image!
-                        NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: nil)
+                        NotificationCenter.default.post(name: Notifications.UI.ImageReceived, object: nil)
                     }
                 }
             }
         } else {
             //Check if user has already answered
-            isReadOnly = Surveys.shared.completedSurveyIDs.contains(surveyLink.ID)
+//            isReadOnly = Surveys.shared.completedSurveyIDs.contains(surveyLink.ID)
         }
         if let nav = navigationController as? NavigationControllerPreloaded {
 //            delay(seconds: 0.2) {
@@ -819,7 +819,7 @@ extension SurveyViewController {
     fileprivate func postResult() {
         voteCompletionView?.present()
         let result = ["survey": survey!.ID!, "answer": selectedAnswerID]
-        apiManager.postResult(result: result) {
+        apiManager.postVote(result: result) {
             json, error in
             if error != nil {
                 self.voteCompletionView?.dismiss() {
@@ -846,9 +846,9 @@ extension SurveyViewController {
                                         break
                                     }
                                 }
-                                if !Surveys.shared.completedSurveyIDs.contains(self.survey!.ID!) {
-                                    Surveys.shared.completedSurveyIDs.append(self.survey!.ID!)
-                                }
+//                                if !Surveys.shared.completedSurveyIDs.contains(self.survey!.ID!) {
+//                                    Surveys.shared.completedSurveyIDs.append(self.survey!.ID!)
+//                                }
                                 Surveys.shared.stackObjects.remove(object: self.survey!)
                                 //Increase user's balance
                                 //TODO: Detect, whether it's an ordinary survey

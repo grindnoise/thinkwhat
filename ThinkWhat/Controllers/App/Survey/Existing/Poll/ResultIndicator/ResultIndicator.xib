@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Regular.ttf">
+            <string>OpenSans</string>
+        </array>
+        <array key="OpenSans-Semibold.ttf">
+            <string>OpenSans-Semibold</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ResultIndicator" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="actionView" destination="WJU-wH-9E1" id="tiO-1N-x3s"/>
+                <outlet property="actionViewConstraint" destination="qjX-cb-PeB" id="dje-rY-YBQ"/>
+                <outlet property="backgroundFrame" destination="ldV-YT-jtI" id="lLT-oT-ojw"/>
+                <outlet property="contentView" destination="iN0-l3-epB" id="LB2-X8-8gm"/>
+                <outlet property="foregroundFrame" destination="eFn-cw-bv0" id="Ia8-Ic-a0j"/>
+                <outlet property="label" destination="Juc-c7-MYx" id="AEW-PH-9HI"/>
+                <outlet property="percentLabel" destination="szB-pT-O8i" id="egH-cU-wD6"/>
+                <outlet property="widthConstraint" destination="6lG-fx-cOQ" id="jTt-w0-jO0"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clipsSubviews="YES" contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="300" height="50"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ldV-YT-jtI">
+                    <rect key="frame" x="0.0" y="0.0" width="201" height="50"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eFn-cw-bv0">
+                    <rect key="frame" x="0.0" y="0.0" width="0.0" height="50"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="width" id="6lG-fx-cOQ"/>
+                    </constraints>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0%" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="szB-pT-O8i">
+                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="szB-pT-O8i" secondAttribute="height" multiplier="1:1" id="Gwh-vp-zvp"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="12"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WJU-wH-9E1">
+                    <rect key="frame" x="201" y="0.0" width="99" height="50"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Голосов нет" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Juc-c7-MYx">
+                            <rect key="frame" x="0.0" y="0.0" width="99" height="50"/>
+                            <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="10"/>
+                            <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="Juc-c7-MYx" firstAttribute="leading" secondItem="WJU-wH-9E1" secondAttribute="leading" id="QEn-F1-6YI"/>
+                        <constraint firstItem="Juc-c7-MYx" firstAttribute="top" secondItem="WJU-wH-9E1" secondAttribute="top" id="Rbf-C9-wdN"/>
+                        <constraint firstAttribute="trailing" secondItem="Juc-c7-MYx" secondAttribute="trailing" id="j8w-us-c1Z"/>
+                        <constraint firstAttribute="bottom" secondItem="Juc-c7-MYx" secondAttribute="bottom" id="pno-dj-pK6"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="WJU-wH-9E1" secondAttribute="bottom" id="0Pe-ob-AQi"/>
+                <constraint firstItem="szB-pT-O8i" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="1pm-NF-Yel"/>
+                <constraint firstAttribute="bottom" secondItem="ldV-YT-jtI" secondAttribute="bottom" id="7mU-fC-H8g"/>
+                <constraint firstAttribute="bottom" secondItem="eFn-cw-bv0" secondAttribute="bottom" id="9Go-TU-8s2"/>
+                <constraint firstItem="eFn-cw-bv0" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="C6R-Kz-Wem"/>
+                <constraint firstItem="ldV-YT-jtI" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="F1W-RM-zXg"/>
+                <constraint firstItem="WJU-wH-9E1" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Hh9-nC-79C"/>
+                <constraint firstAttribute="trailing" secondItem="WJU-wH-9E1" secondAttribute="trailing" id="IyK-mD-eNM"/>
+                <constraint firstAttribute="bottom" secondItem="szB-pT-O8i" secondAttribute="bottom" id="Rkd-HM-eh5"/>
+                <constraint firstItem="ldV-YT-jtI" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Wkb-c3-fSK"/>
+                <constraint firstItem="WJU-wH-9E1" firstAttribute="leading" secondItem="ldV-YT-jtI" secondAttribute="trailing" id="YVZ-Uc-mre"/>
+                <constraint firstItem="eFn-cw-bv0" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="gVB-vu-hJm"/>
+                <constraint firstItem="szB-pT-O8i" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="j98-Sx-hNM"/>
+                <constraint firstItem="WJU-wH-9E1" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.33" id="qjX-cb-PeB"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="52.799999999999997" y="74.662668665667169"/>
+        </view>
+    </objects>
+</document>

@@ -34,9 +34,8 @@ class NewSurveyTitle: UIView {
         }
         content.frame = self.bounds
         content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        content.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(content)
-        setNeedsLayout()
-        layoutIfNeeded()
         self.backgroundColor = .clear
     }
     

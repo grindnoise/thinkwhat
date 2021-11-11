@@ -71,7 +71,7 @@ class SurveysTableViewController: UITableViewController {
                 } else if type == .User || type == .UserFavorite {
                     NotificationCenter.default.addObserver(self,
                                                            selector: #selector(SurveysTableViewController.profileImageReceived(_:)),
-                                                           name: Notifications.UI.ProfileImageReceived,
+                                                           name: Notifications.UI.ImageReceived,
                                                            object: nil)
                     if needsAwaitForNotification {
                         NotificationCenter.default.addObserver(self,
@@ -456,8 +456,8 @@ class SurveysTableViewController: UITableViewController {
 //        } else {
 //            vc.performSegue(withIdentifier: kSegueAppFeedToSurvey, sender: nil)
 //        }
-        if delegate != nil, delegate is SurveysViewController {
-            (delegate as! SurveysViewController).performSegue(withIdentifier: Segues.App.FeedToSurvey, sender: nil)
+        if delegate != nil, delegate is SurveysViewController, let surveyRef = (tableView.cellForRow(at: indexPath) as? SurveyTableViewCell)?.survey as? SurveyRef {
+            (delegate as! SurveysViewController).performSegue(withIdentifier: Segues.App.FeedToSurvey, sender: surveyRef)
         }
     }
     

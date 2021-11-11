@@ -1147,7 +1147,7 @@ extension NewSurveyViewController: ServerProtocol {
                         Surveys.shared.append(object: survey, type: .Downloaded)
                         
                         //Create SurveyLink & append to own & new arrays
-                        if let surveyLink = survey.toShortSurvey() {
+                        if let surveyLink = survey.getSurveyRef() {
                             Surveys.shared.categorizedLinks[self.category!]?.append(surveyLink)
                             Surveys.shared.append(object: surveyLink, type: .OwnLinks)
                             Surveys.shared.append(object: surveyLink, type: .NewLinks)

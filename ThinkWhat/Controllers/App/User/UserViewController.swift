@@ -38,7 +38,7 @@ class UserViewController: UIViewController, ServerProtocol {
         setupViews()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(UserViewController.profileImageReceived(_:)),
-                                               name: Notifications.UI.ProfileImageReceived,
+                                               name: Notifications.UI.ImageReceived,
                                                object: nil)
     }
     

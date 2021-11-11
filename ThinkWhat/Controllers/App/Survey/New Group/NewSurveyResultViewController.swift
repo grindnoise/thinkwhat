@@ -159,7 +159,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
                         }
                         Surveys.shared.append(object: self.survey!, type: .Downloaded)
                         //Create SurveyLink & append to own & new arrays
-                        if let surveyLink = self.survey!.toShortSurvey() {
+                        if let surveyLink = self.survey!.getSurveyRef() {
                             Surveys.shared.categorizedLinks[strongSurvey.category]?.append(surveyLink)
                             Surveys.shared.append(object: surveyLink, type: .OwnLinks)
                             Surveys.shared.append(object: surveyLink, type: .NewLinks)

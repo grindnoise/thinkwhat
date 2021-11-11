@@ -156,7 +156,7 @@ class SurveyStackViewController: UIViewController {
                             if image != nil {
                                 userProfile.image = image!
                                 if postImageNotification {
-                                    NotificationCenter.default.post(name: Notifications.UI.ProfileImageReceived, object: image)
+                                    NotificationCenter.default.post(name: Notifications.UI.ImageReceived, object: image)
                                 }
                                 UIView.transition(with: _surveyPreview.userImage,
                                                   duration: 0.75,

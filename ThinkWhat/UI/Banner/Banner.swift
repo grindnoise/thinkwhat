@@ -255,7 +255,7 @@ class Banner: UIView {
     
     private func startTimer() {
         guard timer == nil else { return }
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
         timer?.fire()
     }
     
@@ -265,7 +265,7 @@ class Banner: UIView {
     }
     
     @objc private func updateTimer() {
-        timeElapsed    -= 1
+        timeElapsed    -= 0.5
         if timeElapsed <= 0 {
             dismiss() {_ in}
         }

@@ -24,12 +24,31 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
     
+    @IBOutlet weak var effectView: UIVisualEffectView! {
+        didSet {
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0, delay: 0, options: [], animations: {
+                self.effectView.effect = nil
+            })
+        }
+    }
+    @IBOutlet weak var feedbackLabel: UILabel! {
+        didSet {
+            let attributedText = NSMutableAttributedString()
+            attributedText.append(NSAttributedString(string: "Жалоба отправлена", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 25), foregroundColor: .black, backgroundColor: .clear)))
+            attributedText.append(NSAttributedString(string: "\n\nСпасибо за обратную поддержку!", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 19), foregroundColor: .darkGray, backgroundColor: .clear)))
+            feedbackLabel.attributedText = attributedText
+            feedbackLabel.textAlignment = .center
+            feedbackLabel.alpha = 0
+            feedbackLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        }
+    }
+    @IBOutlet weak var feedbackView: UIView!
     @IBOutlet weak var tableView: UITableView!
     private var claimCells: [ClaimCell]    = []
     weak var delegate: CallbackDelegate?
     
     deinit {
-        print("deinit")
+        print("deinit ClaimViewController")
     }
     
     override func viewDidLoad() {
@@ -80,6 +99,23 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 0
+    }
+    
+    func showFeedback(completion: @escaping(Bool)->()) {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveLinear], animations: {
+            self.feedbackView.alpha = 1
+            self.effectView.effect = UIBlurEffect(style: .light)
+        }) {
+            _ in
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+            self.effectView.effect = nil
+            self.feedbackLabel.alpha = 1
+            self.feedbackLabel.transform = .identity
+            }) {
+                _ in
+                completion(true)
+            }
+        }
     }
 }
 

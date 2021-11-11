@@ -13,7 +13,7 @@ class UserProfiles {
     static let shared = UserProfiles()
     private init() {}
     var container: [UserProfile] = []
-    
+    var own: UserProfile?
 //    func append(_ userProfile: UserProfile) {
 //        var contains = false
 //        for i in container {
@@ -62,6 +62,7 @@ class UserProfile {
             let _surveysCreatedTotal    = json[DjangoVariables.UserProfile.surveysCreatedTotal].intValue as? Int,
             let _lastVisit              = json[DjangoVariables.UserProfile.lastVisit] is NSNull ? nil : Date(dateTimeString: json[DjangoVariables.UserProfile.lastVisit].stringValue as! String),
             let _gender                 = Gender(rawValue: _genderString) {
+            
             ID = _ID
             name = _name
             age = _age
@@ -77,6 +78,22 @@ class UserProfile {
         } else {
             return nil
         }
+    }
+    
+    init(ID _ID: Int, name _name: String, age _age: Int, image _image: UIImage?, gender _gender: Gender) {
+            ID = _ID
+            name = _name
+            age = _age
+            gender = _gender
+            image = _image
+            surveysAnsweredTotal = 0
+            surveysFavoriteTotal = 0
+            surveysCreatedTotal = 0
+            surveysCreated = [Date(): []]
+            surveysFavorite = [Date(): []]
+            lastVisit = Date()
+            updatedAt = Date()
+            imageURL = ""
     }
     
     func updateStats(_ json: JSON) {

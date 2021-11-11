@@ -12,10 +12,8 @@ import UIKit
 class ClockIndicator: UIView, CAAnimationDelegate {
     
     var layers = [String: CALayer]()
-    var completionBlocks = [CAAnimation: (Bool) -> Void]()
-    var updateLayerValueForCompletedAnimation : Bool = false
     
-    var main = UIColor.darkGray
+    var main : UIColor!
     
     //MARK: - Life Cycle
     
@@ -45,7 +43,7 @@ class ClockIndicator: UIView, CAAnimationDelegate {
     }
     
     func setupProperties(){
-//        self.main = UIColor.black
+        self.main = K_COLOR_RED//UIColor.darkGray
     }
     
     func setupLayers(){
@@ -79,13 +77,13 @@ class ClockIndicator: UIView, CAAnimationDelegate {
             let path = layers["path"] as! CAShapeLayer
             path.fillRule    = .evenOdd
             path.fillColor   = self.main.cgColor
-            path.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
+            path.strokeColor = UIColor.black.cgColor
             path.lineWidth   = 0
         }
         if layerIds == nil || layerIds.contains("roundedRect"){
             let roundedRect = layers["roundedRect"] as! CAShapeLayer
             roundedRect.anchorPoint = CGPoint(x: 0.5, y: 1)
-            roundedRect.frame       = CGRect(x: 0.445 * roundedRect.superlayer!.bounds.width, y: 0.1381 * roundedRect.superlayer!.bounds.height, width: 0.1 * roundedRect.superlayer!.bounds.width, height: 0.3619 * roundedRect.superlayer!.bounds.height)
+            roundedRect.frame       = CGRect(x: 0.474 * roundedRect.superlayer!.bounds.width, y: 0.13671 * roundedRect.superlayer!.bounds.height, width: 0.052 * roundedRect.superlayer!.bounds.width, height: 0.36329 * roundedRect.superlayer!.bounds.height)
             roundedRect.setValue(-360 * CGFloat.pi/180, forKeyPath:"transform.rotation")
             roundedRect.fillColor   = self.main.cgColor
             roundedRect.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
@@ -94,7 +92,7 @@ class ClockIndicator: UIView, CAAnimationDelegate {
         if layerIds == nil || layerIds.contains("roundedRect2"){
             let roundedRect2 = layers["roundedRect2"] as! CAShapeLayer
             roundedRect2.anchorPoint = CGPoint(x: 0.5, y: 1)
-            roundedRect2.frame       = CGRect(x: 0.445 * roundedRect2.superlayer!.bounds.width, y: 0.2727 * roundedRect2.superlayer!.bounds.height, width: 0.1 * roundedRect2.superlayer!.bounds.width, height: 0.2273 * roundedRect2.superlayer!.bounds.height)
+            roundedRect2.frame       = CGRect(x: 0.474 * roundedRect2.superlayer!.bounds.width, y: 0.20185 * roundedRect2.superlayer!.bounds.height, width: 0.052 * roundedRect2.superlayer!.bounds.width, height: 0.29815 * roundedRect2.superlayer!.bounds.height)
             roundedRect2.setValue(-360 * CGFloat.pi/180, forKeyPath:"transform.rotation")
             roundedRect2.fillColor   = self.main.cgColor
             roundedRect2.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
@@ -115,26 +113,26 @@ class ClockIndicator: UIView, CAAnimationDelegate {
         CATransaction.setDisableActions(true)
         
         if let path = layers["path"] as? CAShapeLayer{
-            path.frame = CGRect(x: 0, y: 0.01 * path.superlayer!.bounds.height, width: 0.99 * path.superlayer!.bounds.width, height: 0.99 * path.superlayer!.bounds.height)
+            path.frame = CGRect(x: 0.0005 * path.superlayer!.bounds.width, y: -0.0005 * path.superlayer!.bounds.height, width: 1 * path.superlayer!.bounds.width, height: 1 * path.superlayer!.bounds.height)
             path.path  = pathPath(bounds: layers["path"]!.bounds).cgPath
         }
         
         if let roundedRect = layers["roundedRect"] as? CAShapeLayer{
             roundedRect.transform = CATransform3DIdentity
-            roundedRect.frame     = CGRect(x: 0.445 * roundedRect.superlayer!.bounds.width, y: 0.1381 * roundedRect.superlayer!.bounds.height, width: 0.1 * roundedRect.superlayer!.bounds.width, height: 0.3619 * roundedRect.superlayer!.bounds.height)
+            roundedRect.frame     = CGRect(x: 0.474 * roundedRect.superlayer!.bounds.width, y: 0.13671 * roundedRect.superlayer!.bounds.height, width: 0.052 * roundedRect.superlayer!.bounds.width, height: 0.36329 * roundedRect.superlayer!.bounds.height)
             roundedRect.setValue(-360 * CGFloat.pi/180, forKeyPath:"transform.rotation")
             roundedRect.path      = roundedRectPath(bounds: layers["roundedRect"]!.bounds).cgPath
         }
         
         if let roundedRect2 = layers["roundedRect2"] as? CAShapeLayer{
             roundedRect2.transform = CATransform3DIdentity
-            roundedRect2.frame     = CGRect(x: 0.445 * roundedRect2.superlayer!.bounds.width, y: 0.2727 * roundedRect2.superlayer!.bounds.height, width: 0.1 * roundedRect2.superlayer!.bounds.width, height: 0.2273 * roundedRect2.superlayer!.bounds.height)
+            roundedRect2.frame     = CGRect(x: 0.474 * roundedRect2.superlayer!.bounds.width, y: 0.20185 * roundedRect2.superlayer!.bounds.height, width: 0.052 * roundedRect2.superlayer!.bounds.width, height: 0.29815 * roundedRect2.superlayer!.bounds.height)
             roundedRect2.setValue(-360 * CGFloat.pi/180, forKeyPath:"transform.rotation")
             roundedRect2.path      = roundedRect2Path(bounds: layers["roundedRect2"]!.bounds).cgPath
         }
         
         if let oval3 = layers["oval3"] as? CAShapeLayer{
-            oval3.frame = CGRect(x: 0.42227 * oval3.superlayer!.bounds.width, y: 0.43227 * oval3.superlayer!.bounds.height, width: 0.14546 * oval3.superlayer!.bounds.width, height: 0.14546 * oval3.superlayer!.bounds.height)
+            oval3.frame = CGRect(x: 0.45 * oval3.superlayer!.bounds.width, y: 0.45 * oval3.superlayer!.bounds.height, width: 0.1 * oval3.superlayer!.bounds.width, height: 0.1 * oval3.superlayer!.bounds.height)
             oval3.path  = oval3Path(bounds: layers["oval3"]!.bounds).cgPath
         }
         
@@ -155,11 +153,11 @@ class ClockIndicator: UIView, CAAnimationDelegate {
         roundedRect2TransformAnim.values      = [0,
                                                  360 * CGFloat.pi/180]
         roundedRect2TransformAnim.keyTimes    = [0, 1]
-        roundedRect2TransformAnim.duration    = 20
+        roundedRect2TransformAnim.duration    = 10
         roundedRect2TransformAnim.repeatCount = Float.infinity
         
-        let roundedRect2Untitled1Anim : CAAnimationGroup = QCMethod.group(animations: [roundedRect2TransformAnim], fillMode:fillMode)
-        roundedRect2.add(roundedRect2Untitled1Anim, forKey:"roundedRect2Untitled1Anim")
+        let roundedRect2EnableAnim : CAAnimationGroup = QCMethod.group(animations: [roundedRect2TransformAnim], fillMode:fillMode)
+        roundedRect2.add(roundedRect2EnableAnim, forKey:"roundedRect2EnableAnim")
         
         let roundedRect = layers["roundedRect"] as! CAShapeLayer
         
@@ -171,34 +169,23 @@ class ClockIndicator: UIView, CAAnimationDelegate {
         roundedRectTransformAnim.duration    = 1
         roundedRectTransformAnim.repeatCount = Float.infinity
         
-        let roundedRectUntitled1Anim : CAAnimationGroup = QCMethod.group(animations: [roundedRectTransformAnim], fillMode:fillMode)
-        roundedRect.add(roundedRectUntitled1Anim, forKey:"roundedRectUntitled1Anim")
+        let roundedRectEnableAnim : CAAnimationGroup = QCMethod.group(animations: [roundedRectTransformAnim], fillMode:fillMode)
+        roundedRect.add(roundedRectEnableAnim, forKey:"roundedRectEnableAnim")
     }
     
     //MARK: - Animation Cleanup
     
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool){
-        if let completionBlock = completionBlocks[anim]{
-            completionBlocks.removeValue(forKey: anim)
-            if (flag && updateLayerValueForCompletedAnimation) || anim.value(forKey: "needEndAnim") as! Bool{
-                updateLayerValues(forAnimationId: anim.value(forKey: "animId") as! String)
-                removeAnimations(forAnimationId: anim.value(forKey: "animId") as! String)
-            }
-            completionBlock(flag)
-        }
-    }
-    
     func updateLayerValues(forAnimationId identifier: String){
-        if identifier == "Untitled1"{
-            QCMethod.updateValueFromPresentationLayer(forAnimation: layers["roundedRect2"]!.animation(forKey: "roundedRect2Untitled1Anim"), theLayer:layers["roundedRect2"]!)
-            QCMethod.updateValueFromPresentationLayer(forAnimation: layers["roundedRect"]!.animation(forKey: "roundedRectUntitled1Anim"), theLayer:layers["roundedRect"]!)
+        if identifier == "enable"{
+            QCMethod.updateValueFromPresentationLayer(forAnimation: layers["roundedRect2"]!.animation(forKey: "roundedRect2EnableAnim"), theLayer:layers["roundedRect2"]!)
+            QCMethod.updateValueFromPresentationLayer(forAnimation: layers["roundedRect"]!.animation(forKey: "roundedRectEnableAnim"), theLayer:layers["roundedRect"]!)
         }
     }
     
     func removeAnimations(forAnimationId identifier: String){
-        if identifier == "Untitled1"{
-            layers["roundedRect2"]?.removeAnimation(forKey: "roundedRect2Untitled1Anim")
-            layers["roundedRect"]?.removeAnimation(forKey: "roundedRectUntitled1Anim")
+        if identifier == "enable"{
+            layers["roundedRect2"]?.removeAnimation(forKey: "roundedRect2EnableAnim")
+            layers["roundedRect"]?.removeAnimation(forKey: "roundedRectEnableAnim")
         }
     }
     
@@ -220,24 +207,24 @@ class ClockIndicator: UIView, CAAnimationDelegate {
         pathPath.addCurve(to: CGPoint(x:minX + w, y: minY + 0.5 * h), controlPoint1:CGPoint(x:minX + 0.77614 * w, y: minY + h), controlPoint2:CGPoint(x:minX + w, y: minY + 0.77614 * h))
         pathPath.addCurve(to: CGPoint(x:minX + 0.5 * w, y: minY), controlPoint1:CGPoint(x:minX + w, y: minY + 0.22386 * h), controlPoint2:CGPoint(x:minX + 0.77614 * w, y: minY))
         pathPath.close()
-        pathPath.move(to: CGPoint(x:minX + 0.5 * w, y: minY + 0.10174 * h))
-        pathPath.addCurve(to: CGPoint(x:minX + 0.10174 * w, y: minY + 0.5 * h), controlPoint1:CGPoint(x:minX + 0.28005 * w, y: minY + 0.10174 * h), controlPoint2:CGPoint(x:minX + 0.10174 * w, y: minY + 0.28005 * h))
-        pathPath.addCurve(to: CGPoint(x:minX + 0.5 * w, y: minY + 0.89826 * h), controlPoint1:CGPoint(x:minX + 0.10174 * w, y: minY + 0.71995 * h), controlPoint2:CGPoint(x:minX + 0.28005 * w, y: minY + 0.89826 * h))
-        pathPath.addCurve(to: CGPoint(x:minX + 0.89826 * w, y: minY + 0.5 * h), controlPoint1:CGPoint(x:minX + 0.71995 * w, y: minY + 0.89826 * h), controlPoint2:CGPoint(x:minX + 0.89826 * w, y: minY + 0.71995 * h))
-        pathPath.addCurve(to: CGPoint(x:minX + 0.5 * w, y: minY + 0.10174 * h), controlPoint1:CGPoint(x:minX + 0.89826 * w, y: minY + 0.28005 * h), controlPoint2:CGPoint(x:minX + 0.71995 * w, y: minY + 0.10174 * h))
+        pathPath.move(to: CGPoint(x:minX + 0.4995 * w, y: minY + 0.05502 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.05402 * w, y: minY + 0.5005 * h), controlPoint1:CGPoint(x:minX + 0.25347 * w, y: minY + 0.05502 * h), controlPoint2:CGPoint(x:minX + 0.05402 * w, y: minY + 0.25447 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.4995 * w, y: minY + 0.94598 * h), controlPoint1:CGPoint(x:minX + 0.05402 * w, y: minY + 0.74653 * h), controlPoint2:CGPoint(x:minX + 0.25347 * w, y: minY + 0.94598 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.94498 * w, y: minY + 0.5005 * h), controlPoint1:CGPoint(x:minX + 0.74553 * w, y: minY + 0.94598 * h), controlPoint2:CGPoint(x:minX + 0.94498 * w, y: minY + 0.74653 * h))
+        pathPath.addCurve(to: CGPoint(x:minX + 0.4995 * w, y: minY + 0.05502 * h), controlPoint1:CGPoint(x:minX + 0.94498 * w, y: minY + 0.25447 * h), controlPoint2:CGPoint(x:minX + 0.74553 * w, y: minY + 0.05502 * h))
         pathPath.close()
-        pathPath.move(to: CGPoint(x:minX + 0.5 * w, y: minY + 0.10174 * h))
+        pathPath.move(to: CGPoint(x:minX + 0.4995 * w, y: minY + 0.05502 * h))
         
         return pathPath
     }
     
     func roundedRectPath(bounds: CGRect) -> UIBezierPath{
-        let roundedRectPath = UIBezierPath(roundedRect:bounds, cornerRadius:5)
+        let roundedRectPath = UIBezierPath(roundedRect:bounds, cornerRadius:26)
         return roundedRectPath
     }
     
     func roundedRect2Path(bounds: CGRect) -> UIBezierPath{
-        let roundedRect2Path = UIBezierPath(roundedRect:bounds, cornerRadius:5)
+        let roundedRect2Path = UIBezierPath(roundedRect:bounds, cornerRadius:26)
         return roundedRect2Path
     }
     
@@ -245,6 +232,4 @@ class ClockIndicator: UIView, CAAnimationDelegate {
         let oval3Path = UIBezierPath(ovalIn:bounds)
         return oval3Path
     }
-    
-    
 }

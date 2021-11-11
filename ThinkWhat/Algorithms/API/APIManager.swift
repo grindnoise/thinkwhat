@@ -34,7 +34,7 @@ protocol APIManagerProtocol {
     func addViewCount(survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
     func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
     func rejectSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
-    func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->())
+    func postVote(result: [String: Int], completion: @escaping(JSON?, Error?)->())
     func postClaim(survey: Survey, claimCategory: ClaimCategory, completion: @escaping(JSON?, Error?)->())
     func getUserStats(userProfile: UserProfile, completion: @escaping(JSON?, Error?)->())
     func subsribeToUserProfile(subscribe: Bool, userprofile: UserProfile, completion: @escaping(JSON?, Error?)->())
@@ -76,8 +76,8 @@ class APIManager: APIManagerProtocol {
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_FAVORITE)
             case .Hot:
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT)
-            case .HotExcept:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT_EXCEPT)
+//            case .HotExcept:
+//                return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT_EXCEPT)
             case .User:
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_BY_OWNER)
             case .UserFavorite:
@@ -1064,7 +1064,7 @@ class APIManager: APIManagerProtocol {
         }
     }
     
-    func postResult(result: [String: Int], completion: @escaping(JSON?, Error?)->()) {
+    func postVote(result: [String: Int], completion: @escaping(JSON?, Error?)->()) {
         var parameters: [String: Any] = result
         var error: Error?
         var dict: Parameters = [:]
@@ -1085,7 +1085,7 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         completion(nil, error!)
                     } else if success {
-                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_RESULTS), httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, completion: completion)
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.VOTE), httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, completion: completion)
                     }
                 }
             } else {

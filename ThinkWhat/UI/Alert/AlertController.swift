@@ -18,12 +18,6 @@ class AlertController: UIViewController, ServerProtocol {
         didSet {
             if oldValue == nil, claimCategory != nil {
                 if contentType == .Claim {
-                    if icon != nil {
-                        let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path!, toValue: (icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.3, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: icon, isRemovedOnCompletion: false)
-//                                            pathAnim.setValue(Icon.Category.Letter, forKey: "toCategory")
-                        icon.icon.add(pathAnim, forKey: nil)
-//                        icon.category = .Letter
-                    }
                     UIView.animate(withDuration: 0.3, animations: {
                         self.button.backgroundColor = K_COLOR_RED
                     }) {
@@ -75,9 +69,29 @@ class AlertController: UIViewController, ServerProtocol {
         }
     }
     @IBAction func buttonTapped(_ sender: Any) {
-        if contentType == .Claim, survey != nil, claimCategory != nil {
-            apiManager.postClaim(survey: survey!, claimCategory: claimCategory!) { _, _ in }
-            delegate?.callbackReceived("post_claim" as AnyObject)
+        if contentType == .Claim, survey != nil, let claimVC = currentController as? ClaimViewController {
+            if claimCategory != nil {
+                apiManager.postClaim(survey: survey!, claimCategory: claimCategory!) { _, _ in }
+                if icon != nil {
+                    let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path!, toValue: (icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: icon, isRemovedOnCompletion: false)
+                    icon.icon.add(pathAnim, forKey: nil)
+                }
+                button.setTitle("ДАЛЕЕ", for: .normal)
+                claimCategory = nil
+                claimVC.showFeedback() {
+                    _ in
+                    self.popController = true
+                    self.dismissAfter(5)
+                    //                delay(seconds: 1.5) {
+                    //                    self.delegate?.callbackReceived("post_claim" as AnyObject)
+                    //                    self.dismiss() { _ in }
+                    //                }
+                }
+            } else {
+                stopTimer()
+                dismiss() { _ in }
+            }
+        } else {
             dismiss() { _ in }
         }
     }
@@ -87,6 +101,7 @@ class AlertController: UIViewController, ServerProtocol {
     static let didAppearSignal        = "alertDidAppearSignal"
     static let willDisappearSignal    = "alertWillDisappearSignal"
     static let didDisappearSignal     = "alertDidDisappearSignal"
+    static let popController          = "popController"
     static let shared: AlertController = {
         let vc = Storyboards.controllers.instantiateViewController(withIdentifier: "AlertController") as! AlertController
         let _keyWindow = UIApplication.shared.value(forKey: "statusBarWindow") as! UIWindow
@@ -100,13 +115,15 @@ class AlertController: UIViewController, ServerProtocol {
         vc.standartHeight = vc.heightConstraint.constant
         return vc
     } ()
-    
+    private var popController = false
     private var currentController: UIViewController?
     private weak var delegate: CallbackDelegate?
     private var contentType: ContentType = .Info {
         didSet {
             if button != nil {
-                button.isUserInteractionEnabled = true; button.backgroundColor = K_COLOR_RED
+                button.isUserInteractionEnabled = true
+                button.backgroundColor = K_COLOR_RED
+                button.setTitle("ОТПРАВИТЬ", for: .normal)
             }
             container.subviews.forEach({ $0.removeFromSuperview() })
             currentController?.removeFromParent()
@@ -125,10 +142,11 @@ class AlertController: UIViewController, ServerProtocol {
     private var keyWindow:  UIWindow!
     private var color: UIColor = K_COLOR_RED
     private var standartHeight: CGFloat = 0
-    
-   
+    private var timer:  Timer?
+    private var timeElapsed: TimeInterval = 0
     
     func present(delegate _delegate: CallbackDelegate?, height: CGFloat = 0, contentType _contentType: ContentType = .Info, survey _survey: Survey?) {
+        popController = false
         contentType = _contentType
         survey = _survey
         view.setNeedsLayout()
@@ -157,6 +175,7 @@ class AlertController: UIViewController, ServerProtocol {
     }
     
     func dismiss(completion: @escaping (Bool) -> ()) {
+        delegate?.callbackReceived((self.popController ? AlertController.popController : AlertController.willDisappearSignal) as AnyObject)
         self.delegate?.callbackReceived(AlertController.willDisappearSignal as AnyObject)
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: [.curveEaseIn], animations: {
             self.effectView.effect = nil
@@ -165,7 +184,8 @@ class AlertController: UIViewController, ServerProtocol {
             self.view.layoutIfNeeded()
         }) {
             _ in
-            self.delegate?.callbackReceived(AlertController.didDisappearSignal as AnyObject)
+            self.delegate?.callbackReceived(AlertController.willDisappearSignal as AnyObject)
+            self.delegate?.callbackReceived((self.popController ? AlertController.popController : AlertController.didDisappearSignal) as AnyObject)
             self.delegate = nil
             self.view.alpha = 0
             self.yConstraint.constant = (self.view.frame.height + self.body.frame.height)/2
@@ -176,6 +196,26 @@ class AlertController: UIViewController, ServerProtocol {
         }
     }
     
+    func dismissAfter(_ _timeElapsed: TimeInterval = 0) {
+        timeElapsed = _timeElapsed
+        guard timer == nil else { return }
+        timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
+        timer?.fire()
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+        timeElapsed = 0
+    }
+    
+    @objc private func updateTimer() {
+        timeElapsed    -= 0.5
+        if timeElapsed <= 0 {
+            stopTimer()
+            dismiss() {_ in}
+        }
+    }
 }
 
 extension AlertController: CallbackDelegate {
@@ -187,6 +227,7 @@ extension AlertController: CallbackDelegate {
                 //                    self.delegate?.callbackReceived("post_claim" as AnyObject)
                 //                }
                 claimCategory = _claimCategory
+                
                 //                apiManager.postClaim(survey: survey!, claimCategory: claimCategory) { _, _ in }
             } else if let string = sender as? String, string == "cancel_claim" {
                 dismiss() { _ in }

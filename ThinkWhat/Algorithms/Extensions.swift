@@ -217,11 +217,11 @@ extension UIView {
         }
         
         shapeLayer.frame = self.bounds
-//        let startPath = circlePath().cgPath
-//        shapeLayer.path = reveal ? startPath : //circlePath().cgPath
-//        self.layer.insertSublayer(shapeLayer, at: 0)
-//        self.layer.mask = circlePathLayer
-//        self.alpha = 1
+        //        let startPath = circlePath().cgPath
+        //        shapeLayer.path = reveal ? startPath : //circlePath().cgPath
+        //        self.layer.insertSublayer(shapeLayer, at: 0)
+        //        self.layer.mask = circlePathLayer
+        //        self.alpha = 1
         
         let center = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
         
@@ -260,8 +260,20 @@ extension UIView {
         
     }
     
-
-    
+    func getAllConstraints() -> [NSLayoutConstraint] {
+        var views = [self]
+        
+        var view = self
+        while let superview = view.superview {
+            views.append(superview)
+            view = superview
+        }
+        
+        return views.flatMap({ $0.constraints }).filter { constraint in
+            return constraint.firstItem as? UIView == self ||
+                constraint.secondItem as? UIView == self
+        }
+    }
 }
 
 extension String {
@@ -391,6 +403,8 @@ public func ==(lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool
 }
 
 extension Date {
+    var age: Int { return Calendar.current.dateComponents([.year], from: self, to: Date()).year! }
+    
     init(dateString: String) {
         let dateStringFormatter = DateFormatter()
         dateStringFormatter.dateFormat = "dd.MM.yyyy"
@@ -1264,4 +1278,27 @@ extension Formatter {
 
 extension Numeric {
     var formattedWithSeparator: String { return Formatter.withSeparator.string(for: self) ?? "" }
+}
+
+extension UIApplication {
+    var statusBarView: UIView? {
+        if #available(iOS 13.0, *) {
+            //TODO: - Uncomment
+//            let tag = 38482
+//            let keyWindow = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+//
+//            if let statusBar = keyWindow?.viewWithTag(tag) {
+//                return statusBar
+//            } else {
+//                guard let statusBarFrame = keyWindow?.windowScene?.statusBarManager?.statusBarFrame else { return nil }
+//                let statusBarView = UIView(frame: statusBarFrame)
+//                statusBarView.tag = tag
+//                keyWindow?.addSubview(statusBarView)
+//                return statusBarView
+//            }
+        } else if responds(to: Selector(("statusBar"))) {
+            return value(forKey: "statusBar") as? UIView
+        }
+            return nil
+    }
 }

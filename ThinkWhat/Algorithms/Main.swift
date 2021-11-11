@@ -217,7 +217,7 @@ struct Notifications {
         static let ClaimSignAppeared               = Notification.Name("ClaimSignAppeared")
         static let CategorySelected                = Notification.Name("CategorySelected")
         static let UserImageChanged                = Notification.Name("NotificationUserImageChanged")
-        static let ProfileImageReceived            = Notification.Name("NotificationProfileImageReceived")
+        static let ImageReceived                   = Notification.Name("NotificationProfileImageReceived")
         static let LineWidth                       = Notification.Name("LineWidth")
         static let SuveyViewsCountReceived         = Notification.Name("SuveyViewsCountReceived")
     }
@@ -705,7 +705,7 @@ struct SERVER_URLS {
     static let SURVEYS_ALL              = "api/surveys/all/"
     static let SURVEYS_OWN              = "api/surveys/own/"
     static let SURVEYS_HOT              = "api/surveys/hot/"
-    static let SURVEYS_HOT_EXCEPT       = "api/surveys/hot_except/"
+//    static let SURVEYS_HOT_EXCEPT       = "api/surveys/hot_except/"
     static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
     static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
     static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
@@ -717,7 +717,7 @@ struct SERVER_URLS {
     static let SURVEYS_CLAIM            = "api/surveys/claim/"
     static let SURVEYS_ADD_VIEW_COUNT   = "api/surveys/add_view_count/"
     
-    static let SURVEYS_RESULTS          = "api/survey_results/"
+    static let VOTE                     = "api/vote/"
     
     static let CATEGORIES               = "api/categories/"
     static let BALANCE                  = "api/current_balance_price/"

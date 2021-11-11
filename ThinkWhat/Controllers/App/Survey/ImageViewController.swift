@@ -9,12 +9,38 @@
 import UIKit
 
 class ImageViewController: UIViewController {
+    enum Mode {
+        case ReadOnly, Write
+    }
     var image:              UIImage!
     var titleString:        String = ""
+    var mode: Mode = .Write
+    
     private var kbHeight:   CGFloat!
     private var isMovedUp:  Bool?
     private var textFields: [UITextField] = []
     private var offsetY:    CGFloat = 0
+    private let initialTextViewBottomConstant: CGFloat = 16
+    
+    var statusBarHidden = false {
+        didSet {
+            UIView.animate(withDuration: 0.25) {
+                self.setNeedsStatusBarAppearanceUpdate()
+            }
+        }
+    }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return .fade
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return statusBarHidden
+    }
+    
     @IBOutlet weak var scrollView: PanZoomImageView! {
         didSet {
             scrollView.image = image
@@ -22,9 +48,29 @@ class ImageViewController: UIViewController {
     }
     @IBOutlet weak var titleTextField: UITextField! {
         didSet {
+            titleTextField.alpha = 0
+            if mode == .Write {
+                titleTextField.alpha = 1
+            }
             titleTextField.text = titleString
         }
     }
+    @IBOutlet weak var titleTextView: UITextView! {
+        didSet {
+            titleTextView.textContainerInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+            titleTextView.alpha = 0
+            titleTextView.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+            if mode == .ReadOnly, !titleString.isEmpty {
+                titleTextView.alpha = 1
+                let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+                tapRecognizer.numberOfTapsRequired = 1
+                titleTextView.addGestureRecognizer(tapRecognizer)
+            }
+            titleTextView.text = titleString
+        }
+    }
+    
+    @IBOutlet weak var textViewBottomConstraint: NSLayoutConstraint!
     @IBAction func titleChanged(_ sender: UITextField) {
         titleString = sender.text!
     }
@@ -32,9 +78,9 @@ class ImageViewController: UIViewController {
         super.viewDidLoad()
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-            nc.setNavigationBarHidden(true, animated: false)
+//            nc.setNavigationBarHidden(true, animated: false)
             nc.transitionStyle = .Icon
-            nc.duration = 0.25
+            nc.duration = 0.2
         }
         titleTextField.delegate = self
         textFields.append(titleTextField)
@@ -46,12 +92,36 @@ class ImageViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(ImageViewController.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+//        UINavigationBar.appearance().backgroundColor = .black
+//        appDelegate.window?.backgroundColor = .black
+//        super.viewWillAppear(animated)
+//            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
+//                self.navigationController?.navigationBar.setNeedsLayout()
+//                self.navigationController?.navigationBar.barTintColor = .black
+//                self.navigationController?.navigationBar.tintColor = .white
+//                self.navigationController?.navigationBar.layoutIfNeeded()
+//            })
+    }
+    
+    override func willMove(toParent parent: UIViewController?) {
+        self.navigationController?.navigationBar.barTintColor = .white
+        self.navigationController?.navigationBar.tintColor = .black
+    }
+    
     @objc private func handleTap(_ sender: UITapGestureRecognizer) {
-//        if scrollView.zoomScale != 1 {
-//            scrollView.setZoomScale(1, animated: true)
-//        }
         view.endEditing(true)
         navigationController!.setNavigationBarHidden(!navigationController!.isNavigationBarHidden, animated: true)
+//        statusBarHidden = !statusBarHidden
+        
+        if mode == .ReadOnly, !titleString.isEmpty {
+//            preferredStatusBarStyle =
+            UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+                self.view.setNeedsLayout()
+                self.textViewBottomConstraint.constant = self.textViewBottomConstraint.constant > 0 ? -(self.titleTextView.frame.height + 16) : 16
+                self.view.layoutIfNeeded()
+            })
+        }
     }
 }
 

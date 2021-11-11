@@ -250,7 +250,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Extensions.swift"
-            timestampString = "654605805.462163"
+            timestampString = "658245162.955561"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "187"
@@ -266,7 +266,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Extensions.swift"
-            timestampString = "654605805.4629591"
+            timestampString = "658245162.9557281"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "184"
@@ -458,11 +458,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/App/Feed/SurveysViewController.swift"
-            timestampString = "654605805.463969"
+            timestampString = "658245162.956321"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "479"
-            endingLineNumber = "479"
+            startingLineNumber = "489"
+            endingLineNumber = "489"
             landmarkName = "toggleSwitch(isOn:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -473,24 +473,8 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/UI/Transitions/IconTransition.swift"
-            timestampString = "655310079.605847"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "21"
-            endingLineNumber = "21"
-            landmarkName = "animateTransition(using:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/App/Survey/New Group/Poll/NewPollController.swift"
-            timestampString = "655218486.354242"
+            timestampString = "655916154.766004"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2366"
@@ -522,11 +506,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/App/Feed/SurveysViewController.swift"
-            timestampString = "654605805.464456"
+            timestampString = "658245162.956581"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "822"
-            endingLineNumber = "822"
+            startingLineNumber = "832"
+            endingLineNumber = "832"
             landmarkName = "loadData()"
             landmarkType = "7">
          </BreakpointContent>
@@ -537,24 +521,8 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Controllers/App/Feed/SurveysViewController.swift"
-            timestampString = "654605805.464586"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "369"
-            endingLineNumber = "369"
-            landmarkName = "prepare(for:sender:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/App/Survey/New Group/Poll/NewPollController.swift"
-            timestampString = "655218486.35492"
+            timestampString = "655916154.766349"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2293"
@@ -570,13 +538,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/UI/Transitions/IconTransition.swift"
-            timestampString = "655310079.606126"
+            timestampString = "658245162.956748"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1554"
-            endingLineNumber = "1554"
-            landmarkName = "animateTransition(using:)"
-            landmarkType = "7">
+            startingLineNumber = "1645"
+            endingLineNumber = "1645"
+            landmarkName = "unknown"
+            landmarkType = "0">
             <Locations>
                <Location
                   shouldBeEnabled = "No"
@@ -618,11 +586,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Extensions.swift"
-            timestampString = "654605805.464803"
+            timestampString = "658245162.957323"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "646"
-            endingLineNumber = "646"
+            startingLineNumber = "660"
+            endingLineNumber = "660"
             landmarkName = "centerVertically()"
             landmarkType = "7">
          </BreakpointContent>
@@ -634,7 +602,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/App/Feed/SurveyTableViewController/SurveysTableViewController.swift"
-            timestampString = "655026686.893077"
+            timestampString = "657636644.01109"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "19"
@@ -650,7 +618,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/App/Feed/SurveyTableViewController/SurveysTableViewController.swift"
-            timestampString = "655026686.902966"
+            timestampString = "657636644.011188"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "77"
@@ -666,7 +634,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Controllers/App/Feed/SurveyTableViewController/SurveysTableViewController.swift"
-            timestampString = "655026686.9033591"
+            timestampString = "657636644.011258"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "81"
@@ -688,6 +656,22 @@
             startingLineNumber = "60"
             endingLineNumber = "60"
             landmarkName = "tableView(_:didSelectRowAt:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/App/Survey/Existing/Poll/ResultIndicator/ResultIndicator.swift"
+            timestampString = "658245162.957706"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "259"
+            endingLineNumber = "259"
+            landmarkName = "handlePan(recognizer:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
