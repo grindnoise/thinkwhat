@@ -35,7 +35,6 @@ class CategoryCollectionViewController: UICollectionViewController {
         }
         effectView.frame = collectionView.bounds
         effectView.addEquallyTo(to: collectionView)
-        
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0, delay: 0, options: [], animations: {
             self.effectView.effect = nil
         }) {

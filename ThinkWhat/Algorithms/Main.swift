@@ -715,9 +715,11 @@ struct SERVER_URLS {
     static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
     static let SURVEYS_REJECT           = "api/surveys/reject/"
     static let SURVEYS_CLAIM            = "api/surveys/claim/"
+    static let SURVEYS_UPDATE_STATS     = "api/surveys/result_updates/"
     static let SURVEYS_ADD_VIEW_COUNT   = "api/surveys/add_view_count/"
     
     static let VOTE                     = "api/vote/"
+    static let VOTERS                   = "api/surveys/voters/"
     
     static let CATEGORIES               = "api/categories/"
     static let BALANCE                  = "api/current_balance_price/"

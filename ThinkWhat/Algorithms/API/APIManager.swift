@@ -32,6 +32,7 @@ protocol APIManagerProtocol {
     func loadSurveysByOwner(userProfile: UserProfile, type: APIManager.SurveyType, completion: @escaping(JSON?, Error?)->())
     func addFavorite(mark: Bool, survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
     func addViewCount(survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
+    func updateSurveyStats(survey: SurveyRef, completion: @escaping(JSON?, Error?)->())
     func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
     func rejectSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->())
     func postVote(result: [String: Int], completion: @escaping(JSON?, Error?)->())
@@ -42,6 +43,7 @@ protocol APIManagerProtocol {
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
     func downloadImage(url: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
     func downloadImage(url: String, completion: @escaping (UIImage?, Error?) -> ())
+    func getVoters(surveyID: Int, answerID: Int, userprofiles: [Int], completion: @escaping(JSON?, Error?)->())
     
     func getTikTokEmbedHTML(url: URL, completion: @escaping(JSON?, Error?)->())
     //    func pullUserData(_ userID: String, completion: @escaping (JSON) -> ())
@@ -57,6 +59,21 @@ protocol UserDataPreparatory: class {
 }
 
 class APIManager: APIManagerProtocol {
+    struct CustomGetEncoding: ParameterEncoding {
+        func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
+            var request = try URLEncoding().encode(urlRequest, with: parameters)
+            request.url = URL(string: request.url!.absoluteString.replacingOccurrences(of: "%5B%5D=", with: "="))
+            return request
+        }
+    }
+    struct CustomPostEncoding: ParameterEncoding {
+        func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
+            var request = try URLEncoding().encode(urlRequest, with: parameters)
+            let httpBody = NSString(data: request.httpBody!, encoding: String.Encoding.utf8.rawValue)!
+            request.httpBody = httpBody.replacingOccurrences(of: "%5B%5D=", with: "=").data(using: .utf8)
+            return request
+        }
+    }
     
     public enum SurveyType: String {
         case Top,New,All,Own,Favorite, Hot, HotExcept, User, UserFavorite
@@ -884,6 +901,26 @@ class APIManager: APIManagerProtocol {
         }
     }
     
+    func updateSurveyStats(survey: SurveyRef, completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error!)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_UPDATE_STATS), httpMethod: .get, parameters: ["survey_id": survey.ID], encoding: URLEncoding.default, completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+    }
+    
     func postSurvey(survey: Survey, completion: @escaping(JSON?, Error?)->()) {
         var dict = survey.dict
         print(dict)
@@ -1247,6 +1284,28 @@ class APIManager: APIManagerProtocol {
             json, error in
             completion(json, error)
         }
+    }
+    
+    func getVoters(surveyID: Int, answerID: Int, userprofiles: [Int], completion: @escaping(JSON?, Error?)->()) {
+        var error: Error?
+        
+        checkForReachability {
+            reachable in
+            if reachable == .Reachable {
+                self.checkTokenExpired() {
+                    success, error in
+                    if error != nil {
+                        completion(nil, error)
+                    } else if success {
+                        self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.VOTERS), httpMethod: .get, parameters: ["survey": surveyID, "answer": answerID, "userprofiles": userprofiles], encoding: CustomGetEncoding(), completion: completion)
+                    }
+                }
+            } else {
+                error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Server is unreachable"]) as Error
+                completion(nil, error!)
+            }
+        }
+        
     }
         
     private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(JSON?, Error?)->()) {

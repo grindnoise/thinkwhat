@@ -9,7 +9,9 @@
 import UIKit
 
 class IconTransition: BasicTransition {
-    
+    deinit {
+        print("---\(self) deinit()")
+    }
     override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
         guard let fromVC = transitionContext.viewController(forKey: .from),
@@ -896,8 +898,71 @@ class IconTransition: BasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: false) { _ in }
-            } else if let vc_1 = fromVC as? PollController, let vc_2 = toVC as? UsersCollectionViewController {
-                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: []) { _ in self.context?.completeTransition(true) }
+            } else if let vc_1 = fromVC as? PollController, let vc_2 = toVC as? VotersViewController, let initialCell = vc_1.tableView.cellForRow(at: vc_2.initialIndex) as? ChoiceResultCell, let imageViews = initialCell.resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_2.collectionView as? UICollectionView {
+
+                vc_2.view.setNeedsLayout()
+                vc_2.view.layoutIfNeeded()
+
+                var tempImageViews: [UIImageView] = []
+                for (i, imageView) in imageViews.enumerated() {
+                    let tempImageView = UIImageView(frame: CGRect(origin: imageView.superview!.convert(imageView.frame.origin, to: containerView), size: imageView.frame.size))
+                    tempImageView.image = imageView.image
+                    tempImageView.layer.zPosition = CGFloat(100 - i)
+                    containerView.addSubview(tempImageView)
+                    tempImageViews.append(tempImageView)
+                    imageView.alpha = 0
+                }
+//                for i in 0..<imageViews.count {
+////                    let tempImageView = initialImageView.copyView() as! UIImageView
+//                    if let _cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? UserCell {
+//                        let tempImageView = UIImageView(frame: CGRect(origin: _cell.convert(_cell.imageView.frame.origin, to: containerView), size: _cell.imageView.frame.size))
+//                        tempImageView.image = _cell.imageView.image
+////                        tempImageView.frame.origin = initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView)
+//                        tempImageView.layer.zPosition = CGFloat(100 - i)
+//                        containerView.addSubview(tempImageView)
+//                        tempImageViews.append(tempImageView)
+//                        _cell.imageView.alpha = 0
+//                    }
+//                }
+
+                var destinationOrigins: [CGPoint] = []
+                var destinationSize: CGSize = .zero
+                var destinationImageViews: [UIImageView] = []
+                for i in 0..<tempImageViews.count {
+                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? UserCell, let imageView = cell.imageView as? UIImageView{
+                        if destinationSize == .zero { destinationSize = imageView.frame.size }
+                        imageView.alpha = 0
+                        destinationOrigins.append(cell.convert(imageView.frame.origin, to: containerView))
+                        destinationImageViews.append(imageView)
+                    }
+                }
+//                for (i,cell) in collectionView.visibleCells.enumerated() {
+//                    if i == tempImageViews.count { break }
+//                    if let downcastedCell = cell as? UserCell, let imageView = downcastedCell.imageView as? UIImageView {
+//                        if destinationSize == .zero { destinationSize = imageView.frame.size }
+//                        imageView.alpha = 0
+//                        destinationOrigins.append(downcastedCell.convert(imageView.frame.origin, to: containerView))
+//                        destinationImageViews.append(imageView)
+//                    }
+//                }
+
+                var animationBlocks: [Closure] = []
+                animationBlocks.append {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration*0.9, delay: 0, options: [.curveEaseInOut], animations: {
+                            tempImageViews.enumerated().forEach({
+                                (i, imageView) in
+                                imageView.frame.origin = destinationOrigins[i]
+                                imageView.frame.size = destinationSize
+                            })
+                    }) {
+                        _ in
+                        destinationImageViews.forEach({ $0.alpha = 1 })
+                        tempImageViews.forEach({ $0.removeFromSuperview() })
+                        imageViews.forEach({ $0.alpha = 1 })
+                        self.context?.completeTransition(true)
+                    }
+                }
+                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
             }
         } else if operation == .pop {
             if let vc_1 = fromVC as? SubcategoryViewController, let initialIcon = vc_1.icon, let vc_2 = toVC as? SurveysViewController, let collVC = vc_2.categoryVC as? CategoryCollectionViewController, let indexPath = collVC.currentIndex as? IndexPath, let cell = collVC.collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell {
@@ -910,7 +975,7 @@ class IconTransition: BasicTransition {
                 toVC.tabBarController?.setTabBarVisible(visible: true, animated: true)
                 
                 let destinationSize = cell.icon.frame.size
-                var destinationOrigin = collVC.returnPos
+                let destinationOrigin = collVC.returnPos
                 let destinationPath = (cell.icon.icon as! CAShapeLayer).path
                 let pathAnim = Animations.get(property: .Path,
                                               fromValue: (icon.icon as! CAShapeLayer).path as Any,
@@ -1756,6 +1821,45 @@ class IconTransition: BasicTransition {
                     _ in
                     self.context?.completeTransition(true)
                 }
+            } else if let vc_1 = fromVC as? VotersViewController, let vc_2 = toVC as? PollController, let cell = vc_2.tableView.cellForRow(at: vc_1.initialIndex) as? ChoiceResultCell, let imageViews = cell.resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_1.collectionView as? UICollectionView {
+                
+                var tempImageViews: [UIImageView] = []
+                for (i, initialImageView) in imageViews.enumerated() {
+                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? UserCell {
+                        let tempImageView = UIImageView(frame: CGRect(origin: cell.convert(cell.imageView.frame.origin, to: containerView), size: cell.imageView.frame.size))
+                        tempImageView.image = cell.imageView.image
+//                        tempImageView.frame.origin = cell.convert(cell.imageView.frame.origin, to: containerView)
+                        tempImageView.layer.zPosition = CGFloat(100 - i)
+                        containerView.addSubview(tempImageView)
+                        tempImageViews.append(tempImageView)
+                        cell.imageView.alpha = 0
+                    }
+                }
+
+
+                var destinationOrigins: [CGPoint] = []
+                var destinationSize: CGSize = .zero
+                for imageView in imageViews {
+                        if destinationSize == .zero { destinationSize = imageView.frame.size }
+                        destinationOrigins.append(imageView.superview!.convert(imageView.frame.origin, to: containerView))
+                }
+                var animationBlocks: [Closure] = []
+                animationBlocks.append {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration*0.9, delay: 0, options: [.curveEaseInOut], animations: {
+                        tempImageViews.enumerated().forEach({
+                            (i, imageView) in
+                            imageView.frame.origin = destinationOrigins[i]
+                            imageView.frame.size = destinationSize
+                        })
+                    }) {
+                        _ in
+                        imageViews.forEach({ $0.alpha = 1 })
+                        tempImageViews.forEach({ $0.removeFromSuperview() })
+                        self.context?.completeTransition(true)
+                    }
+                }
+                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
+//                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: []) { _ in self.context?.completeTransition(true) }
             } else {
                 context?.completeTransition(true)
             }

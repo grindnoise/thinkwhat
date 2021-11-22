@@ -59,18 +59,9 @@ class PollController: UIViewController {
 //        }
 //    }
     private var isLoadingImages  = true
-    private var requestAttempt = 0 {
-        didSet {
-            if oldValue != requestAttempt {
-                if requestAttempt > MAX_REQUEST_ATTEMPTS {
-                    requestAttempt = 0
-                }
-            }
-        }
-    }
+    private var requestAttempt = 0
     private let tableViewSections   = ["main", "answers", "vote"]
     private var isRequesting        = false
-    private let requestAttempts     = 3
     private var loadingIndicator:   ClockIndicator?
     private let likeButton          = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 30, height: 30)))
     private var isInitialLoading    = true {
@@ -87,6 +78,7 @@ class PollController: UIViewController {
     private var needsAnimation                      = true
     private var scrollArrow: ScrollArrow!
     private var isAutoScrolling = false   //is on when scrollArrow is tapped
+    private var updateResults = false //Update result stats
     private var selectedAnswerID = 0 {
         didSet {
             if oldValue != selectedAnswerID {
@@ -215,15 +207,53 @@ class PollController: UIViewController {
         if survey == nil, let found = Surveys.shared.downloadedObjects.filter({ $0.ID == self.surveyRef.ID }).first {
             isInitialLoading = false
             survey = found
-            apiManager.addViewCount(survey: surveyRef) {
-                json, error in
-                if error != nil {
-                    print(error.debugDescription)
+            if survey!.isComplete {
+                apiManager.updateSurveyStats(survey: surveyRef) {
+                    json, error in
+                    if error != nil {
+                        print(error.debugDescription)
+                    }
+                    if let strongJson = json, let value = strongJson["views"].intValue as? Int, let update = strongJson["result_total"].arrayValue as? [JSON] {
+                        NotificationCenter.default.post(name: Notifications.UI.SuveyViewsCountReceived, object: value)
+                        self.surveyRef.views = value
+                        self.survey!.views = value
+                        
+                        var totalVotes = 0
+                        for entity in update {
+                            if let dict = entity.dictionaryValue as? [String: JSON] {
+                                if let _userprofiles = dict["userprofiles"]?.arrayValue as? [JSON], let _answerID = dict["answer"]?.intValue as? Int, let answer = self.survey?.answers.filter({ $0.ID == _answerID }).first, let _total = dict["total"]?.intValue as? Int {
+                                    answer.totalVotes = _total
+                                    totalVotes += _total
+                                    for _userprofile in _userprofiles {
+                                        var userprofile: UserProfile!
+                                        if let ID = _userprofile["id"].intValue as? Int, let foundValue = UserProfiles.shared.container.filter({ $0.ID == ID }).first {
+                                            userprofile = foundValue
+                                        } else if let newUserprofile = UserProfile(_userprofile) {
+                                            UserProfiles.shared.container.append(newUserprofile)
+                                            userprofile = newUserprofile
+                                        }
+                                        answer.appendUserprofile(userprofile)
+                                    }
+                                }
+                            }
+                            self.survey?.totalVotes = totalVotes
+                        }
+                        //TODO: - Update UI
+                        self.updateResults = true
+                        self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .fade)
+                    }
                 }
-                if let strongJson = json, let value = strongJson["views"].intValue as? Int {
-                    NotificationCenter.default.post(name: Notifications.UI.SuveyViewsCountReceived, object: value)
-                    self.surveyRef.views = value
-                    self.survey!.views = value
+            } else {
+                apiManager.addViewCount(survey: surveyRef) {
+                    json, error in
+                    if error != nil {
+                        print(error.debugDescription)
+                    }
+                    if let strongJson = json, let value = strongJson["views"].intValue as? Int {
+                        NotificationCenter.default.post(name: Notifications.UI.SuveyViewsCountReceived, object: value)
+                        self.surveyRef.views = value
+                        self.survey!.views = value
+                    }
                 }
             }
         } else {
@@ -257,7 +287,7 @@ class PollController: UIViewController {
                 }
             }
             if json != nil {
-                print(json)
+//                print(json)
                 if let _survey = Survey(json!) {
                     Surveys.shared.append(object: _survey, type: .Downloaded)
                     self.survey = _survey
@@ -295,9 +325,33 @@ class PollController: UIViewController {
                         break
                     }
                 }
-            } else if segue.identifier == Segues.App.UsersList, let destinationVC = segue.destination as? UsersCollectionViewController, let users = sender as? [UserProfile] {
-                destinationVC.users = users
-                destinationVC.title = "Проголосовали"
+//            } else if segue.identifier == Segues.App.UsersList, let destinationVC = segue.destination as? UsersCollectionViewController, let dict = sender as? [String: AnyObject], let users = dict["users"] as? [UserProfile], let total = dict["total"] as? Int, let answerID = dict["answerID"] as? Int {
+//                nc.duration = 0.25
+//                destinationVC.users = users
+//                destinationVC.surveyID = survey!.ID
+//                destinationVC.answerID = answerID
+//                destinationVC.title = "Проголосовали"
+//                destinationVC.totalCount = total
+//                destinationVC.frameColor = survey!.category.tagColor
+//            }
+//            } else if segue.identifier == Segues.App.UsersList, let destinationVC = segue.destination as? VotersViewController, let answer = sender as? Answer {
+//                nc.duration = 0.25
+//                destinationVC.apiManager = apiManager
+//                destinationVC.surveyID = survey!.ID
+//                destinationVC.answer = answer
+//                destinationVC.title = "Проголосовали"
+//                destinationVC.frameColor = survey!.category.tagColor
+                //            }
+            } else if segue.identifier == Segues.App.UsersList, let destinationVC = segue.destination as? VotersViewController, let array = sender as? [AnyObject],
+                let answer = array.filter({ $0 is Answer}).first as? Answer,
+//                let imageViews = array.filter({ $0 is [UIImageView]}).first as? [UIImageView],
+                let indexPath = array.filter({ $0 is IndexPath}).first as? IndexPath {
+                nc.duration = 0.35
+                destinationVC.apiManager = apiManager
+                destinationVC.surveyID = survey!.ID
+                destinationVC.answer = answer
+                destinationVC.initialIndex = indexPath
+                destinationVC.frameColor = survey!.category.tagColor
             }
         }
     }
@@ -336,26 +390,42 @@ class PollController: UIViewController {
     
     @objc private func handleTap() {
         if !isRequesting {
-            isRequesting = true
-            var mark = true
-            if likeButton.state == .disabled {
-                likeButton.state = .enabled
-                mark = true
-                if Array(Surveys.shared.favoriteLinks.keys).filter( {$0.ID == surveyRef.ID }).isEmpty { Surveys.shared.favoriteLinks[self.surveyRef] = Date() }
+            if survey == nil {
+                Banner.shared.contentType = .Warning
+                if let content = Banner.shared.content as? Warning {
+                    content.level = .Error
+                    content.text = "Пожалуйста, дождитесь загрузки опроса"
+                }
+                Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+            } else if survey!.isComplete {
+                isRequesting = true
+                var mark = true
+                if likeButton.state == .disabled {
+                    likeButton.state = .enabled
+                    mark = true
+                    if Array(Surveys.shared.favoriteLinks.keys).filter( {$0.ID == surveyRef.ID }).isEmpty { Surveys.shared.favoriteLinks[self.surveyRef] = Date() }
+                } else {
+                    likeButton.state = .disabled
+                    mark = false
+                    if let key = Surveys.shared.favoriteLinks.keys.filter({ $0.ID == surveyRef.ID }).first {
+                        Surveys.shared.favoriteLinks.removeValue(forKey: key)
+                    }
+                }
+                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
+                apiManager.addFavorite(mark: mark, survey: surveyRef!) {
+                    _, error in
+                    self.isRequesting = false
+                    if error != nil {
+                        print(error!.localizedDescription)
+                    }
+                }
             } else {
-                likeButton.state = .disabled
-                mark = false
-                if let key = Surveys.shared.favoriteLinks.keys.filter({ $0.ID == surveyRef.ID }).first {
-                    Surveys.shared.favoriteLinks.removeValue(forKey: key)
+                Banner.shared.contentType = .Warning
+                if let content = Banner.shared.content as? Warning {
+                    content.level = .Info
+                    content.text = "Пройдите опрос для отслеживания результатов"
                 }
-            }
-            NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
-            apiManager.addFavorite(mark: mark, survey: surveyRef!) {
-                _, error in
-                self.isRequesting = false
-                if error != nil {
-                    print(error!.localizedDescription)
-                }
+                Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
             }
         }
     }
@@ -372,7 +442,7 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
                 cell.layoutIfNeeded()
                 cell.delegate = self
                 if let image = survey!.userProfile!.image {
-                    cell.avatar.image = image.circularImage(size: cell.avatar.frame.size, frameColor: K_COLOR_RED)
+                    cell.avatar.image = image.circularImage(size: cell.avatar.frame.size, frameColor: survey!.category.tagColor)
                 }
                 let categoryString = NSMutableAttributedString()
                 categoryString.append(NSAttributedString(string: "\(survey!.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey!.category.tagColor, backgroundColor: .clear)))
@@ -388,9 +458,9 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
             } else if indexPath.row == 2, let cell = tableView.dequeueReusableCell(withIdentifier: "description", for: indexPath) as? TextViewCell {
                 let paragraphStyle = NSMutableParagraphStyle()
                 paragraphStyle.hyphenationFactor = 1.0
-                let text = "\t\(survey!.description)"
+                let text = survey!.description//"\t\(survey!.description)"
                 let attributedString = NSMutableAttributedString(string: text, attributes: [NSAttributedString.Key.paragraphStyle:paragraphStyle])
-                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 16), foregroundColor: .darkGray, backgroundColor: .clear), range: text.fullRange())
+                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: .black, backgroundColor: .clear), range: text.fullRange())
                 cell.textView.attributedText = attributedString
                 return cell
             } else if indexPath.row == 3 {
@@ -524,9 +594,9 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
                 paragraphStyle.hyphenationFactor = 1.0
                 let text = survey!.question//"\t\(survey!.question)"
                 let attributedString = NSMutableAttributedString(string: text, attributes: [NSAttributedString.Key.paragraphStyle:paragraphStyle])
-                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 17), foregroundColor: .black, backgroundColor: .clear), range: text.fullRange())
+                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 17), foregroundColor: .lightGray, backgroundColor: .clear), range: text.fullRange())
                 cell.textView.attributedText = attributedString
-                cell.textView.textContainerInset = UIEdgeInsets(top: 20, left: cell.textView.textContainerInset.left, bottom: 20, right: cell.textView.textContainerInset.right)
+//                cell.textView.textContainerInset = UIEdgeInsets(top: 20, left: cell.textView.textContainerInset.left, bottom: 20, right: cell.textView.textContainerInset.right)
                 return cell
             }
         } else if indexPath.section == 1 {
@@ -535,6 +605,7 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
                 if let cell = tableView.dequeueReusableCell(withIdentifier: "choice", for: indexPath) as? ChoiceSelectionCell, let answer = survey?.answers[indexPath.row] {
                     cell.answer = answer
                     cell.delegate = self
+                    if answersCells.filter({ $0 == cell }).isEmpty { answersCells.append(cell) }
                     return cell
                 }
             case .ReadOnly:
@@ -547,22 +618,38 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
                         cell.resultIndicator.apiManager = (tabBarController as! TabBarController).apiManager
                         cell.resultIndicator.backgroundFrame.cornerRadius = cell.resultIndicator.backgroundFrame.frame.height/2
                         cell.resultIndicator.foregroundFrame.cornerRadius = cell.resultIndicator.backgroundFrame.frame.height/2
-                        cell.resultIndicator.color = tagColors[indexPath.row]
+                        cell.resultIndicator.frameColor = survey!.category.tagColor//tagColors[indexPath.row]
                         cell.resultIndicator.layer.masksToBounds = false
+//                        cell.resultIndicator.indexPath = indexPath
                         if let id = survey!.result!.keys.first, id == answer.ID {
                             cell.selectedResult = true
                         }
                         cell.answer = answer
                         cell.resultIndicator.delegate = self
+//                        cell.resultIndicator.answerID = answer.ID
 //                        cell.resultIndicator.imageViews.forEach({ $0.keys.first!.cornerRadius = $0.keys.first!.frame.height/2})
                         if survey!.isAnonymous {
                             cell.mode = .Anon
                         } else if answer.userprofiles.isEmpty {
                             cell.mode = .None
                         }
-                        cell.percent = survey!.getPercentForAnswer(answer)
+//                        cell.getPercentForAnswer()
+//                        cell.percent = survey!.getPercentForAnswer(answer)
                         cell.isViewSetupComplete = true
+                    } else if updateResults {
+                        if let id = survey!.result!.keys.first, id == answer.ID {
+                            cell.selectedResult = true
+                        }
+
+                        if survey!.isAnonymous {
+                            cell.mode = .Anon
+                        } else if answer.userprofiles.isEmpty {
+                            cell.mode = .None
+                        }
+//                        cell.getPercentForAnswer()
+                        cell.percent = survey!.getPercentForAnswer(answer)
                     }
+                    cell.resultIndicator.indexPath = indexPath
                     return cell
                 }
                 print("ReadOnly")
@@ -750,13 +837,13 @@ extension PollController: CallbackDelegate {
                 performSegue(withIdentifier: Segues.App.User, sender: nil)
             } else if string == "claim" {
                                 AlertController.shared.icon.category = .Caution
-                                AlertController.shared.present(delegate: self, height: UIScreen.main.bounds.height * 0.76, contentType: .Claim, survey: survey)
+                                AlertController.shared.show(delegate: self, height: UIScreen.main.bounds.height * 0.76, contentType: .Claim, survey: survey)
 //                Alert.shared.icon.category = .Caution
 //                Alert.shared.present(delegate: self, height: UIScreen.main.bounds.height * 0.7, contentType: .Claim, survey: survey)
 //                performSegue(withIdentifier: Segues.App.Claim, sender: nil)
             } else if string == "vote" {
                 AlertController.shared.icon.category = .Info
-                AlertController.shared.present(delegate: self, height: UIScreen.main.bounds.height * 0.5, contentType: .Info, survey: nil)
+                AlertController.shared.show(delegate: self, height: UIScreen.main.bounds.height * 0.5)
                 apiManager.postVote(result: ["survey": survey!.ID!, "answer": selectedAnswerID]) {
                     json, error in
                     if error != nil {
@@ -820,7 +907,7 @@ extension PollController: CallbackDelegate {
                         }
                     }
                 }
-                AlertController.shared.present(delegate: self, survey: nil)
+                AlertController.shared.show(delegate: self, survey: nil)
 //            } else if string == "post_claim" {
 //                navigationController?.popViewController(animated: true)
             } else if string == AlertController.popController {
@@ -828,9 +915,14 @@ extension PollController: CallbackDelegate {
             }
         } else if let image = sender as? UIImage {
             performSegue(withIdentifier: Segues.App.Image, sender: image)
-        } else if let users = sender as? [UserProfile] {
-            performSegue(withIdentifier: Segues.App.UsersList, sender: users)
+        } else if let array = sender as? [AnyObject], let _ = array.filter({ $0 is Answer}).first as? Answer,
+//            let _ = array.filter({ $0 is [UIImageView]}).first as? [UIImageView],
+            let _ = array.filter({ $0 is IndexPath}).first as? IndexPath {
+            performSegue(withIdentifier: Segues.App.UsersList, sender: array)
         }
+//        } else if let dict = sender as? [String: AnyObject], let _ = dict["users"] as? [UserProfile], let _ = dict["total"] as? Int, let _ = dict["answerID"] as? Int {
+//            performSegue(withIdentifier: Segues.App.UsersList, sender: dict)
+//        }
     }
 }
 
@@ -1006,7 +1098,6 @@ class ImagesCell: UITableViewCell, UIScrollViewDelegate {
             delegate?.callbackReceived(image as AnyObject)
         }
     }
-    
 }
 
 import YoutubePlayer_in_WKWebView
@@ -1300,6 +1391,7 @@ class ChoiceResultCell: UITableViewCell {
             resultIndicator.layer.masksToBounds = false
         }
     }
+    
     var selectedResult = false {
         didSet {
             if resultIndicator != nil, selectedResult {
@@ -1335,13 +1427,19 @@ class ChoiceResultCell: UITableViewCell {
                 textView.textContainerInset = UIEdgeInsets(top: 3, left: 0, bottom: 3, right: 0)
             }
             if resultIndicator != nil {
-                resultIndicator.totalCount = answer.totalVotes
-                resultIndicator.userprofiles = answer.userprofiles
+                resultIndicator.answer = answer
+//                resultIndicator.answerID = answer.ID
+//                resultIndicator.totalCount = answer.totalVotes
+//                resultIndicator.userprofiles = answer.userprofiles
 //                resultIndicator.apiManager = apiMa
             }
         }
     }
-    
+//    func getPercentForAnswer() {
+//        if resultIndicator != nil {
+//            sur
+//        }
+//    }
 //    override func layoutSubviews() {
 //        if resultIndicator != nil {
 //            resultIndicator.imageViews.forEach({ $0.keys.first!.cornerRadius = $0.keys.first!.frame.height/2})

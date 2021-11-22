@@ -32,15 +32,15 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
 //    fileprivate var timer:  Timer?//Network inactivity timeout
 //    fileprivate var loadingTitleTimer:  Timer?
     fileprivate var interruptRequests = false
-    fileprivate var requestAttempt = 0 {
-        didSet {
-            if oldValue != requestAttempt {
-                if requestAttempt > MAX_REQUEST_ATTEMPTS {
-                    requestAttempt = 0
-                }
-            }
-        }
-    }
+    fileprivate var requestAttempt = 0 //{
+//        didSet {
+//            if oldValue != requestAttempt {
+//                if requestAttempt > MAX_REQUEST_ATTEMPTS {
+//                    requestAttempt = 0
+//                }
+//            }
+//        }
+//    }
     public var startingPoint: CGPoint = CGPoint.zero
     fileprivate var lostConnectionView: LostConnectionView?
     fileprivate var isInitialLoad = true
@@ -135,6 +135,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                         let v = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 37, height: 37)))
                         v.backgroundColor = .clear
                         v.iconColor = K_COLOR_RED
+                        v.isRounded = false
 //                        v.scaleFactor = 0.2
                         v.category = .AddStar
                         let tap = UITapGestureRecognizer(target: self, action: #selector(SurveysViewController.handleAddTap))
@@ -842,27 +843,6 @@ extension SurveysViewController: ServerProtocol {
                 }
             }
         }
-    
-//        apiManager.loadSurveyCategories() {
-//            json, error in
-//            if error != nil {
-//                if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
-//                    self.presentLostConnectionView()
-//                } else {
-//                    //Retry unless successfull
-//                    self.requestAttempt += 1
-//                    if self.isInitialLoad {
-//                        self.loadData()
-//                    }
-//                }
-//            }
-//            if json != nil {
-//                SurveyCategories.shared.importJson(json!)
-//                self.updateSurveysTotalCount()
-//                self.updateSurveys(type: .All)
-//                self.requestAttempt = 0
-//            }
-//        }
     }
     
     func updateSurveysTotalCount() {

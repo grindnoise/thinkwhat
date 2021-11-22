@@ -10,7 +10,7 @@ import UIKit
 
 class AlertController: UIViewController, ServerProtocol {
     enum ContentType: Int {
-        case Info, Claim
+        case Info, Claim, Filter
     }
     
     var survey: Survey?
@@ -145,7 +145,7 @@ class AlertController: UIViewController, ServerProtocol {
     private var timer:  Timer?
     private var timeElapsed: TimeInterval = 0
     
-    func present(delegate _delegate: CallbackDelegate?, height: CGFloat = 0, contentType _contentType: ContentType = .Info, survey _survey: Survey?) {
+    func show(delegate _delegate: CallbackDelegate?, height: CGFloat = 0, contentType _contentType: ContentType = .Info, survey _survey: Survey? = nil) {
         popController = false
         contentType = _contentType
         survey = _survey

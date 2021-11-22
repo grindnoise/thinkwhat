@@ -27,15 +27,25 @@ class ResultIndicator: UIView {
             label.text = "Голосов\nнет"
         }
     }
+//    var answerID: Int!
+    var indexPath: IndexPath!
     var tapGesture: UITapGestureRecognizer!
     var panGesture: UIPanGestureRecognizer!
     var apiManager: APIManagerProtocol!
+    var frameColor: UIColor = K_COLOR_RED {
+        didSet {
+            if backgroundFrame != nil, foregroundFrame != nil {
+                backgroundFrame.backgroundColor = frameColor.withAlphaComponent(0.05)
+                foregroundFrame.backgroundColor = frameColor.withAlphaComponent(0.4)
+            }
+        }
+    }
     weak var delegate: CallbackDelegate?
     private var highlightedImageView: UIImageView? {
         didSet {
             if highlightedImageView != nil, highlightedImageView != oldValue {
                 highlightedImageView?.layer.zPosition += 10
-                let constraint = highlightedImageView?.getAllConstraints().filter({ $0.identifier == "bottom" }).first
+                let constraint = highlightedImageView?.getAllConstraints().filter({ $0.identifier == "centerY" }).first
                 UIView.animate(withDuration: 0.17, delay: 0, options: [.curveEaseInOut], animations: {
                     self.actionView.setNeedsLayout()
                     constraint?.constant -= self.actionView.frame.height * 0.9
@@ -44,7 +54,7 @@ class ResultIndicator: UIView {
                 })
 
                 if oldValue != nil {
-                    let oldConstraint = oldValue!.getAllConstraints().filter({ $0.identifier == "bottom" }).first
+                    let oldConstraint = oldValue!.getAllConstraints().filter({ $0.identifier == "centerY" }).first
                     oldValue?.layer.zPosition -= 10
                     UIView.animate(withDuration: 0.1, delay: 0, options: [.curveEaseOut], animations: {
                         self.actionView.setNeedsLayout()
@@ -55,7 +65,7 @@ class ResultIndicator: UIView {
                 }
             } else if oldValue != nil {
                 oldValue?.layer.zPosition -= 10
-                let oldConstraint = oldValue!.getAllConstraints().filter({ $0.identifier == "bottom" }).first
+                let oldConstraint = oldValue!.getAllConstraints().filter({ $0.identifier == "centerY" }).first
                 UIView.animate(withDuration: 0.1) {
                     self.actionView.setNeedsLayout()
                     oldConstraint?.constant += self.actionView.frame.height * 0.9
@@ -65,21 +75,111 @@ class ResultIndicator: UIView {
             }
         }
     }
-    private var imageViews: [UIImageView] = []
+    var imageViews: [UIImageView] = []
     private var interactionViews: [[UIView: UIImageView]] = []
-    var totalCount = 0
-    var userprofiles: [UserProfile] = [] {
+//    var totalCount = 0
+//    var userprofiles: [UserProfile] = [] {
+//        didSet {
+//            if !userprofiles.isEmpty {
+//                if isSelected {
+//                    if !userprofiles.filter({ $0.ID == UserProfiles.shared.own?.ID }).isEmpty {
+//                        if let index = userprofiles.firstIndex(where: { $0.ID == UserProfiles.shared.own?.ID }) {
+//                            if  index != 0  {
+//                                userprofiles.rearrange(from: index, to: 0)
+//                            }
+//                        }
+//                    } else {
+//                        userprofiles.insert(UserProfiles.shared.own!, at: 0)
+//                    }
+//                }
+//
+//                for i in 0..<userprofiles.count {
+//                    if i == 5 {
+//                        break
+//                    }
+//                    let imageView = UIImageView(frame: .zero)
+//                    imageView.layer.zPosition = 10 - CGFloat(i)
+//                    imageViews.append(imageView)
+//                    actionView.addSubview(imageView)
+//                    imageView.layer.masksToBounds = false
+//                    imageView.translatesAutoresizingMaskIntoConstraints = false
+//                    let centerY = imageView.centerYAnchor.constraint(equalTo: actionView.centerYAnchor)
+//                    centerY.identifier = "centerY"
+//                    centerY.isActive = true
+////                    .isActive = true
+//                    if i == 0 {
+//                        if totalCount > 5 {
+//                            imageView.leadingAnchor.constraint(equalTo: actionView.leadingAnchor, constant: 4).isActive = true
+//                        } else {
+//                            imageView.centerXAnchor.constraint(equalTo: actionView.centerXAnchor).isActive = true
+//                        }
+//                    } else {
+//                        imageView.leadingAnchor.constraint(equalTo: imageViews[i-1].leadingAnchor, constant: 8).isActive = true
+//                    }
+//                    imageView.heightAnchor.constraint(equalTo: actionView.heightAnchor, multiplier: (0.8 - 0)/1.0).isActive = true
+//                    imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
+//                    if userprofiles[i].image != nil {
+//                        imageView.image = userprofiles[i].image!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
+//                    } else if let url = userprofiles[i].imageURL as? String, !url.isEmpty {
+//                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
+//                        apiManager.downloadImage(url: url) {
+//                            image, error in
+//                            if error != nil {
+//                                print(error!.localizedDescription)
+//                            }
+//                            if image != nil {
+//                                self.userprofiles[i].image = image
+//                                UIView.transition(with: imageView,
+//                                                  duration: 0.5,
+//                                                  options: .transitionCrossDissolve,
+//                                                  animations: { imageView.image = image!.circularImage(size: imageView.frame.size, frameColor: self.frameColor) },
+//                                                  completion: nil)
+//                            }
+//                        }
+//                    } else {
+//                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
+//                    }
+//                }
+//                if totalCount > 5 {
+//                    let label = UILabel(frame: .zero)
+//                    actionView.addSubview(label)
+//                    label.translatesAutoresizingMaskIntoConstraints = false
+//                    label.numberOfLines = 0
+//                    label.text = "еще\n\(totalCount-5)"
+//                    label.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 8)
+//                    label.textColor = .darkGray
+//                    label.backgroundColor = .clear
+//                    label.textAlignment = .center
+//                    label.heightAnchor.constraint(equalTo: actionView.heightAnchor).isActive = true
+//                    label.leadingAnchor.constraint(equalTo: imageViews.last!.trailingAnchor).isActive = true
+//                    label.trailingAnchor.constraint(equalTo: actionView.trailingAnchor).isActive = true
+//                    label.layer.zPosition = 100
+//                }
+//                panGesture = UIPanGestureRecognizer(target: self, action: #selector(ResultIndicator.handlePan(recognizer:)))
+//                panGesture.delegate = self
+//                actionView.addGestureRecognizer(panGesture)
+//                tapGesture = UITapGestureRecognizer(target: self, action: #selector(ResultIndicator.handleTap(recognizer:)))
+//                tapGesture.delegate = self
+//                actionView.addGestureRecognizer(tapGesture)
+//            }
+//        }
+//    }
+    var answer: Answer! {
         didSet {
-            if !userprofiles.isEmpty {
+            if !answer.userprofiles.isEmpty {
                 if isSelected {
-                    if let index = userprofiles.firstIndex(where: { $0.ID == UserProfiles.shared.own?.ID }) {
-                        userprofiles.rearrange(from: index, to: 0)
-                    } else if UserProfiles.shared.own != nil {
-                        userprofiles.insert(UserProfiles.shared.own!, at: 0)
+                    if !answer.userprofiles.filter({ $0.ID == UserProfiles.shared.own?.ID }).isEmpty {
+                        if let index = answer.userprofiles.firstIndex(where: { $0.ID == UserProfiles.shared.own?.ID }) {
+                            if  index != 0  {
+                                answer.userprofiles.rearrange(from: index, to: 0)
+                            }
+                        }
+                    } else {
+                        answer.userprofiles.insert(UserProfiles.shared.own!, at: 0)
                     }
                 }
                 
-                for i in 0..<userprofiles.count {
+                for i in 0..<answer.userprofiles.count {
                     if i == 5 {
                         break
                     }
@@ -89,12 +189,12 @@ class ResultIndicator: UIView {
                     actionView.addSubview(imageView)
                     imageView.layer.masksToBounds = false
                     imageView.translatesAutoresizingMaskIntoConstraints = false
-                    let bottomСonstraint = imageView.bottomAnchor.constraint(equalTo: actionView.bottomAnchor)
-                    bottomСonstraint.identifier = "bottom"
-                    bottomСonstraint.isActive = true
-//                    .isActive = true
+                    let centerY = imageView.centerYAnchor.constraint(equalTo: actionView.centerYAnchor)
+                    centerY.identifier = "centerY"
+                    centerY.isActive = true
+                    //                    .isActive = true
                     if i == 0 {
-                        if totalCount > 5 {
+                        if answer.totalVotes > 5 {
                             imageView.leadingAnchor.constraint(equalTo: actionView.leadingAnchor, constant: 4).isActive = true
                         } else {
                             imageView.centerXAnchor.constraint(equalTo: actionView.centerXAnchor).isActive = true
@@ -104,34 +204,34 @@ class ResultIndicator: UIView {
                     }
                     imageView.heightAnchor.constraint(equalTo: actionView.heightAnchor, multiplier: (0.8 - 0)/1.0).isActive = true
                     imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
-                    if userprofiles[i].image != nil {
-                        imageView.image = userprofiles[i].image!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: K_COLOR_RED)
-                    } else if let url = userprofiles[i].imageURL as? String, !url.isEmpty {
-                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: K_COLOR_RED)
+                    if answer.userprofiles[i].image != nil {
+                        imageView.image = answer.userprofiles[i].image!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
+                    } else if let url = answer.userprofiles[i].imageURL as? String, !url.isEmpty {
+                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
                         apiManager.downloadImage(url: url) {
                             image, error in
                             if error != nil {
                                 print(error!.localizedDescription)
                             }
                             if image != nil {
-                                self.userprofiles[i].image = image
+                                self.answer.userprofiles[i].image = image
                                 UIView.transition(with: imageView,
                                                   duration: 0.5,
                                                   options: .transitionCrossDissolve,
-                                                  animations: { imageView.image = image!.circularImage(size: imageView.frame.size, frameColor: K_COLOR_RED) },
+                                                  animations: { imageView.image = image!.circularImage(size: imageView.frame.size, frameColor: self.frameColor) },
                                                   completion: nil)
                             }
                         }
                     } else {
-                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: K_COLOR_RED)
+                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
                     }
                 }
-                if totalCount > 5 {
+                if answer.totalVotes > 5 {
                     let label = UILabel(frame: .zero)
                     actionView.addSubview(label)
                     label.translatesAutoresizingMaskIntoConstraints = false
                     label.numberOfLines = 0
-                    label.text = "еще\n\(totalCount-5)"
+                    label.text = "еще\n\(answer.totalVotes-5)"
                     label.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 8)
                     label.textColor = .darkGray
                     label.backgroundColor = .clear
@@ -174,14 +274,14 @@ class ResultIndicator: UIView {
             }
         }
     }
-    var color: UIColor = K_COLOR_TABBAR {
-        didSet {
-            if backgroundFrame != nil, foregroundFrame != nil {
-                backgroundFrame.backgroundColor = color.withAlphaComponent(0.05)
-                foregroundFrame.backgroundColor = color.withAlphaComponent(0.4)
-            }
-        }
-    }
+//    var color: UIColor = K_COLOR_TABBAR {
+//        didSet {
+//            if backgroundFrame != nil, foregroundFrame != nil {
+//                backgroundFrame.backgroundColor = frameColor.withAlphaComponent(0.05)
+//                foregroundFrame.backgroundColor = frameColor.withAlphaComponent(0.4)
+//            }
+//        }
+//    }
     
     
     //MARK: - Init
@@ -209,8 +309,10 @@ class ResultIndicator: UIView {
     
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
         if recognizer.state == .ended {
-            if !userprofiles.isEmpty {
-                delegate?.callbackReceived(userprofiles as AnyObject)
+            if !answer.userprofiles.isEmpty {
+//                let dict = ["users": userprofiles, "total": totalCount, "answerID": answerID] as [String : Any]
+                let array = [answer as AnyObject, imageViews as AnyObject, indexPath as AnyObject]
+                delegate?.callbackReceived(array as AnyObject)
             }
         }
     }

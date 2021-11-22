@@ -33,7 +33,6 @@ class SubcategoryViewController: UIViewController {
         categoryVC.didMove(toParent: self)
         icon.backgroundColor = parentCategory.tagColor
         icon.category = Icon.Category(rawValue: parentCategory.ID) ?? .Null
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {

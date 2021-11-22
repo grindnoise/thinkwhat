@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Regular.ttf">
+            <string>OpenSans</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="userCell" id="gTV-IL-0wX" customClass="UserCell" customModule="ThinkWhat" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="80" height="80"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="oop-6f-1nf">
+                        <rect key="frame" x="12" y="0.0" width="56" height="56"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="oop-6f-1nf" secondAttribute="height" multiplier="1:1" id="mec-az-sKY"/>
+                        </constraints>
+                    </imageView>
+                    <stackView opaque="NO" contentMode="scaleToFill" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="yQw-oF-jfG">
+                        <rect key="frame" x="11.5" y="72" width="57" height="8"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="мужчина" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dDL-ho-dOH">
+                                <rect key="frame" x="0.0" y="0.0" width="35.5" height="8"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="8"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tYD-4q-2Ge" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="35.5" y="0.0" width="8" height="8"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="tYD-4q-2Ge" secondAttribute="height" multiplier="1:1" id="q1u-wq-Cai"/>
+                                </constraints>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text=", 30" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0C8-Zw-GNo">
+                                <rect key="frame" x="43.5" y="0.0" width="13.5" height="8"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="8"/>
+                                <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="tYD-4q-2Ge" firstAttribute="height" secondItem="yQw-oF-jfG" secondAttribute="height" id="A8a-Vo-IZG"/>
+                        </constraints>
+                    </stackView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Иван Иванов" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ada-3p-45r">
+                        <rect key="frame" x="0.0" y="56" width="80" height="16"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="11"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstItem="yQw-oF-jfG" firstAttribute="bottom" secondItem="ZTg-uK-7eu" secondAttribute="bottom" id="5H8-sB-Y76"/>
+                <constraint firstAttribute="bottom" secondItem="yQw-oF-jfG" secondAttribute="bottom" id="7WR-ge-QIK"/>
+                <constraint firstItem="ada-3p-45r" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="7Xo-Wt-1EP"/>
+                <constraint firstItem="oop-6f-1nf" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="98t-n3-D96"/>
+                <constraint firstItem="ada-3p-45r" firstAttribute="top" secondItem="oop-6f-1nf" secondAttribute="bottom" id="MhA-pb-2i2"/>
+                <constraint firstItem="yQw-oF-jfG" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="X1I-Yu-j6X"/>
+                <constraint firstAttribute="trailing" secondItem="ada-3p-45r" secondAttribute="trailing" id="Z47-KO-yhc"/>
+                <constraint firstItem="oop-6f-1nf" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="ZBr-0X-IHc"/>
+                <constraint firstItem="ada-3p-45r" firstAttribute="height" secondItem="gTV-IL-0wX" secondAttribute="height" multiplier="0.2" id="bO2-L9-ZiI"/>
+                <constraint firstItem="yQw-oF-jfG" firstAttribute="top" secondItem="ada-3p-45r" secondAttribute="bottom" id="oOc-Ms-1b1"/>
+                <constraint firstItem="oop-6f-1nf" firstAttribute="height" secondItem="gTV-IL-0wX" secondAttribute="height" multiplier="0.7" id="rSh-HT-MZf"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <connections>
+                <outlet property="ageLabel" destination="0C8-Zw-GNo" id="TRZ-5m-zFn"/>
+                <outlet property="genderIcon" destination="tYD-4q-2Ge" id="IHv-Rw-n72"/>
+                <outlet property="genderLabel" destination="dDL-ho-dOH" id="f0j-A5-GPB"/>
+                <outlet property="imageView" destination="oop-6f-1nf" id="Xba-Dr-4IF"/>
+                <outlet property="name" destination="ada-3p-45r" id="pfM-6y-Pxm"/>
+            </connections>
+            <point key="canvasLocation" x="172.80000000000001" y="145.72713643178412"/>
+        </collectionViewCell>
+    </objects>
+</document>
