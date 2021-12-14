@@ -19,6 +19,7 @@
 		AB0BFDF3252DC9E400BD5EFF /* MegaphoneIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */; };
 		AB0BFDF5252EF20C00BD5EFF /* PieIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */; };
 		AB0BFDF7253093B000BD5EFF /* FlameBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF6253093B000BD5EFF /* FlameBadge.swift */; };
+		AB18499D2755FEE400BEE23D /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB18499C2755FEE400BEE23D /* UserViewController.swift */; };
 		AB19B6412432222300999917 /* SurveyResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB19B6402432222300999917 /* SurveyResultCell.swift */; };
 		AB19B6432432282B00999917 /* PercentageLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB19B6422432282B00999917 /* PercentageLabel.swift */; };
 		AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */; };
@@ -28,6 +29,9 @@
 		AB1D845224EA91D200B75929 /* SurveyCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1D845124EA91D200B75929 /* SurveyCategory.swift */; };
 		AB1F75832594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1F75822594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift */; };
 		AB215DE623B39E6C0073F0CA /* AnswerCreationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB215DE523B39E6C0073F0CA /* AnswerCreationCell.swift */; };
+		AB21795B27577ED300D19567 /* InterestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB21795A27577ED300D19567 /* InterestCell.swift */; };
+		AB217963275797F700D19567 /* InterestCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB217961275797F700D19567 /* InterestCollectionCell.swift */; };
+		AB217964275797F700D19567 /* InterestCollectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB217962275797F700D19567 /* InterestCollectionCell.xib */; };
 		AB21970326BC2EEF005A7BA8 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB21970226BC2EEF005A7BA8 /* Banner.swift */; };
 		AB21970526BC2F0B005A7BA8 /* Banner.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB21970426BC2F0B005A7BA8 /* Banner.xib */; };
 		AB21970926C1163A005A7BA8 /* TotalCost.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB21970826C1163A005A7BA8 /* TotalCost.xib */; };
@@ -146,7 +150,7 @@
 		AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */; };
 		AB6083C122410131002C0D7E /* ValidSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083C022410130002C0D7E /* ValidSign.swift */; };
 		AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */; };
-		AB6B071F247688600095721B /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6B071E247688600095721B /* UserViewController.swift */; };
+		AB6B071F247688600095721B /* delUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6B071E247688600095721B /* delUserViewController.swift */; };
 		AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */; };
 		AB7085E726CB9A1F006F020F /* SideApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7085E626CB9A1F006F020F /* SideApp.swift */; };
 		AB7085E926CB9A75006F020F /* SideApp.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7085E826CB9A75006F020F /* SideApp.xib */; };
@@ -206,6 +210,9 @@
 		AB9CADC125F755CE002AFD19 /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9CADC025F755CE002AFD19 /* CircleButton.swift */; };
 		AB9DBF7826A197D600EFA66D /* Segues.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9DBF7726A197D600EFA66D /* Segues.swift */; };
 		AB9DBF7B26A58C8C00EFA66D /* Django.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9DBF7A26A58C8C00EFA66D /* Django.swift */; };
+		ABA282EA274FC8A100ED583F /* VotersFilterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA282E8274FC8A100ED583F /* VotersFilterController.swift */; };
+		ABA282ED274FD16800ED583F /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA282EC274FD16700ED583F /* RangeSlider.swift */; };
+		ABA282F0274FD93E00ED583F /* RangeSliderTrackLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA282EF274FD93E00ED583F /* RangeSliderTrackLayer.swift */; };
 		ABA6B3B223FD1A8D00335074 /* LoadingTextIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B3B123FD1A8D00335074 /* LoadingTextIndicator.swift */; };
 		ABA6E18822FACAA200F8F39A /* ValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */; };
 		ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */; };
@@ -301,6 +308,7 @@
 		AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MegaphoneIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF6253093B000BD5EFF /* FlameBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameBadge.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB18499C2755FEE400BEE23D /* UserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewController.swift; sourceTree = "<group>"; };
 		AB19B6402432222300999917 /* SurveyResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyResultCell.swift; sourceTree = "<group>"; };
 		AB19B6422432282B00999917 /* PercentageLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PercentageLabel.swift; sourceTree = "<group>"; };
 		AB1C3BC52334F8D6003895F2 /* ProfileAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAuthViewController.swift; sourceTree = "<group>"; };
@@ -310,6 +318,9 @@
 		AB1D845124EA91D200B75929 /* SurveyCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCategory.swift; sourceTree = "<group>"; };
 		AB1F75822594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 4_HyperlinkSelectionViewController.swift; sourceTree = "<group>"; };
 		AB215DE523B39E6C0073F0CA /* AnswerCreationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerCreationCell.swift; sourceTree = "<group>"; };
+		AB21795A27577ED300D19567 /* InterestCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestCell.swift; sourceTree = "<group>"; };
+		AB217961275797F700D19567 /* InterestCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestCollectionCell.swift; sourceTree = "<group>"; };
+		AB217962275797F700D19567 /* InterestCollectionCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InterestCollectionCell.xib; sourceTree = "<group>"; };
 		AB21970226BC2EEF005A7BA8 /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
 		AB21970426BC2F0B005A7BA8 /* Banner.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Banner.xib; sourceTree = "<group>"; };
 		AB21970826C1163A005A7BA8 /* TotalCost.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TotalCost.xib; sourceTree = "<group>"; };
@@ -434,7 +445,7 @@
 		AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderlinedSignTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB6083C022410130002C0D7E /* ValidSign.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidSign.swift; sourceTree = "<group>"; };
 		AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconsStyleKit.swift; sourceTree = "<group>"; };
-		AB6B071E247688600095721B /* UserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewController.swift; sourceTree = "<group>"; };
+		AB6B071E247688600095721B /* delUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delUserViewController.swift; sourceTree = "<group>"; };
 		AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyIcons.swift; sourceTree = "<group>"; };
 		AB7085E626CB9A1F006F020F /* SideApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideApp.swift; sourceTree = "<group>"; };
 		AB7085E826CB9A75006F020F /* SideApp.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SideApp.xib; sourceTree = "<group>"; };
@@ -494,6 +505,9 @@
 		AB9CADC025F755CE002AFD19 /* CircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButton.swift; sourceTree = "<group>"; };
 		AB9DBF7726A197D600EFA66D /* Segues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segues.swift; sourceTree = "<group>"; };
 		AB9DBF7A26A58C8C00EFA66D /* Django.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Django.swift; sourceTree = "<group>"; };
+		ABA282E8274FC8A100ED583F /* VotersFilterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotersFilterController.swift; sourceTree = "<group>"; };
+		ABA282EC274FD16700ED583F /* RangeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
+		ABA282EF274FD93E00ED583F /* RangeSliderTrackLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSliderTrackLayer.swift; sourceTree = "<group>"; };
 		ABA6B3B123FD1A8D00335074 /* LoadingTextIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingTextIndicator.swift; sourceTree = "<group>"; };
 		ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidationViewController.swift; sourceTree = "<group>"; };
 		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -625,6 +639,21 @@
 			path = CategoriesViewController;
 			sourceTree = "<group>";
 		};
+		AB18499B2755FD5B00BEE23D /* del */ = {
+			isa = PBXGroup;
+			children = (
+				AB99A95724C8153400814F96 /* UserLogoHeader */,
+				AB6B071E247688600095721B /* delUserViewController.swift */,
+				ABF20FB324C98ABF0092B223 /* UserFavoriteCell.swift */,
+				ABF20FB524C993D60092B223 /* UserVotesCell.swift */,
+				ABF20FB724C994250092B223 /* UserSurveysCell.swift */,
+				ABF20FB924CAE8610092B223 /* UserSubscriptionCell.swift */,
+				ABF20FBB24CAEB640092B223 /* UserClaimCell.swift */,
+				AB0980DB24CF04A100A02405 /* UserActivityCell.swift */,
+			);
+			path = del;
+			sourceTree = "<group>";
+		};
 		AB1D7BA5248F606E00845F1C /* Transitions */ = {
 			isa = PBXGroup;
 			children = (
@@ -636,6 +665,16 @@
 				AB00FFD42587A6320071C7DE /* BlurTransition.swift */,
 			);
 			path = Transitions;
+			sourceTree = "<group>";
+		};
+		AB21795927577E7B00D19567 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				AB21795A27577ED300D19567 /* InterestCell.swift */,
+				AB217961275797F700D19567 /* InterestCollectionCell.swift */,
+				AB217962275797F700D19567 /* InterestCollectionCell.xib */,
+			);
+			path = Cells;
 			sourceTree = "<group>";
 		};
 		AB21970126BC2EC7005A7BA8 /* Banner */ = {
@@ -742,6 +781,7 @@
 		AB334FBF270C6E9F00DD7332 /* Alert */ = {
 			isa = PBXGroup;
 			children = (
+				ABA282E8274FC8A100ED583F /* VotersFilterController.swift */,
 				ABDAA38C248E7D1700569F68 /* Claim */,
 				AB334FC0270C6EDC00DD7332 /* AlertController.swift */,
 				AB334FC2270C6F0400DD7332 /* Alert.xib */,
@@ -875,6 +915,7 @@
 		AB3C681F223FD1B100B57580 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				ABA282EE274FD92100ED583F /* RangeSlider */,
 				AB334FBF270C6E9F00DD7332 /* Alert */,
 				AB21970126BC2EC7005A7BA8 /* Banner */,
 				AB3C6827223FD24A00B57580 /* BorderedView.swift */,
@@ -1028,14 +1069,9 @@
 		AB6B071D247687D90095721B /* User */ = {
 			isa = PBXGroup;
 			children = (
-				AB99A95724C8153400814F96 /* UserLogoHeader */,
-				AB6B071E247688600095721B /* UserViewController.swift */,
-				ABF20FB324C98ABF0092B223 /* UserFavoriteCell.swift */,
-				ABF20FB524C993D60092B223 /* UserVotesCell.swift */,
-				ABF20FB724C994250092B223 /* UserSurveysCell.swift */,
-				ABF20FB924CAE8610092B223 /* UserSubscriptionCell.swift */,
-				ABF20FBB24CAEB640092B223 /* UserClaimCell.swift */,
-				AB0980DB24CF04A100A02405 /* UserActivityCell.swift */,
+				AB21795927577E7B00D19567 /* Cells */,
+				AB18499B2755FD5B00BEE23D /* del */,
+				AB18499C2755FEE400BEE23D /* UserViewController.swift */,
 			);
 			path = User;
 			sourceTree = "<group>";
@@ -1294,6 +1330,15 @@
 				ABEDC4E22450168D00FA9128 /* UserProfile.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		ABA282EE274FD92100ED583F /* RangeSlider */ = {
+			isa = PBXGroup;
+			children = (
+				ABA282EC274FD16700ED583F /* RangeSlider.swift */,
+				ABA282EF274FD93E00ED583F /* RangeSliderTrackLayer.swift */,
+			);
+			path = RangeSlider;
 			sourceTree = "<group>";
 		};
 		ABA6B3B023FD1A6000335074 /* LoadingTextIndicator */ = {
@@ -1563,6 +1608,7 @@
 				AB3C684A223FD3EE00B57580 /* OpenSans-Semibold.ttf in Resources */,
 				AB3C6867223FDD9600B57580 /* Auth.storyboard in Resources */,
 				AB334FC3270C6F0400DD7332 /* Alert.xib in Resources */,
+				AB217964275797F700D19567 /* InterestCollectionCell.xib in Resources */,
 				AB3C6851223FD3EF00B57580 /* OpenSans-ExtraBoldItalic.ttf in Resources */,
 				AB7AEFB8273BDB1400431E85 /* UserCell.xib in Resources */,
 				AB8C99572486789000BC517B /* SurveyClaimView.xib in Resources */,
@@ -1689,6 +1735,7 @@
 				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
+				"${BUILT_PRODUCTS_DIR}/TTRangeSlider/TTRangeSlider.framework",
 				"${BUILT_PRODUCTS_DIR}/VK-ios-sdk/VK_ios_sdk.framework",
 				"${BUILT_PRODUCTS_DIR}/YoutubePlayer-in-WKWebView/YoutubePlayer_in_WKWebView.framework",
 			);
@@ -1701,6 +1748,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTRangeSlider.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VK_ios_sdk.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/YoutubePlayer_in_WKWebView.framework",
 			);
@@ -1723,6 +1771,7 @@
 				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework",
+				"${BUILT_PRODUCTS_DIR}/TTRangeSlider/TTRangeSlider.framework",
 				"${BUILT_PRODUCTS_DIR}/VK-ios-sdk/VK_ios_sdk.framework",
 				"${BUILT_PRODUCTS_DIR}/YoutubePlayer-in-WKWebView/YoutubePlayer_in_WKWebView.framework",
 				"${BUILT_PRODUCTS_DIR}/Nimble/Nimble.framework",
@@ -1737,6 +1786,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Swinject.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTRangeSlider.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VK_ios_sdk.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/YoutubePlayer_in_WKWebView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nimble.framework",
@@ -1770,6 +1820,7 @@
 				AB0BFDF7253093B000BD5EFF /* FlameBadge.swift in Sources */,
 				AB548664269724A300D30235 /* NewSurveyResultViewController.swift in Sources */,
 				AB7478C724290D8600317EB6 /* SurveyAnswerCell.swift in Sources */,
+				ABA282F0274FD93E00ED583F /* RangeSliderTrackLayer.swift in Sources */,
 				AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */,
 				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
 				ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */,
@@ -1847,6 +1898,7 @@
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
 				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
 				ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */,
+				ABA282ED274FD16800ED583F /* RangeSlider.swift in Sources */,
 				AB1D845024EA90C200B75929 /* Icon.swift in Sources */,
 				ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */,
 				AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */,
@@ -1886,6 +1938,7 @@
 				AB1D845224EA91D200B75929 /* SurveyCategory.swift in Sources */,
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */,
+				ABA282EA274FC8A100ED583F /* VotersFilterController.swift in Sources */,
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB7478C52428D0A300317EB6 /* FilmIcon.swift in Sources */,
 				ABB8B18F2423C9DE00E8DFF3 /* SurveyImageCell.swift in Sources */,
@@ -1897,6 +1950,7 @@
 				ABDA425423B1036400BAC3A5 /* NewSurveyHeaderCell.swift in Sources */,
 				AB4BD892244DE52100D9A3F0 /* TopIcon.swift in Sources */,
 				AB2AA1B52359EA8A0086D16C /* Survey.swift in Sources */,
+				AB217963275797F700D19567 /* InterestCollectionCell.swift in Sources */,
 				AB8C99542486760400BC517B /* SurveyClaimView.swift in Sources */,
 				AB3C685E223FD74E00B57580 /* FileStorageManager.swift in Sources */,
 				ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */,
@@ -1905,7 +1959,7 @@
 				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
 				ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */,
 				ABF01A6C25418E2C009E2BC4 /* BackRoundedButton.swift in Sources */,
-				AB6B071F247688600095721B /* UserViewController.swift in Sources */,
+				AB6B071F247688600095721B /* delUserViewController.swift in Sources */,
 				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
 				AB91195526C3AB1D007ED54A /* VotesFormula.swift in Sources */,
@@ -1930,6 +1984,7 @@
 				AB75838224E6AB8A004367DF /* CompletedSign.swift in Sources */,
 				ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */,
 				AB868A6F23EC0294008DEB84 /* SubcategorySelectionTableViewCell.swift in Sources */,
+				AB18499D2755FEE400BEE23D /* UserViewController.swift in Sources */,
 				AB215DE623B39E6C0073F0CA /* AnswerCreationCell.swift in Sources */,
 				AB869F2526C3C69B008353B3 /* Warning.swift in Sources */,
 				AB041451244EFD0300336857 /* CategoriesViewController.swift in Sources */,
@@ -1941,6 +1996,7 @@
 				AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */,
 				ABB8B1912423D11600E8DFF3 /* Slide.swift in Sources */,
 				AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */,
+				AB21795B27577ED300D19567 /* InterestCell.swift in Sources */,
 				ABF20FB624C993D60092B223 /* UserVotesCell.swift in Sources */,
 				AB735C0B241902E600776248 /* SurveyQuestionCell.swift in Sources */,
 				AB99A95624C6D1C700814F96 /* HeartExpandingView.swift in Sources */,
@@ -2066,7 +2122,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -2074,7 +2130,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -2124,14 +2180,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -2145,7 +2201,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhat/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2154,7 +2210,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -2167,7 +2223,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				INFOPLIST_FILE = ThinkWhat/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2176,7 +2232,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

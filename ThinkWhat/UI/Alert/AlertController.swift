@@ -10,9 +10,20 @@ import UIKit
 
 class AlertController: UIViewController, ServerProtocol {
     enum ContentType: Int {
-        case Info, Claim, Filter
+        case Info, Claim, VotersFilter
     }
-    
+    private var filters: [String: AnyObject] = [:]
+    var voters: [UserProfile]?
+    var filtered: [UserProfile]? {
+        didSet {
+            if filtered != nil {
+                UIView.performWithoutAnimation {
+                    self.button.setTitle("ПОКАЗАТЬ \(filtered!.count)", for: .normal)
+                    self.button.layoutIfNeeded()
+                }
+            }
+        }
+    }
     var survey: Survey?
     var claimCategory: ClaimCategory? {
         didSet {
@@ -91,6 +102,14 @@ class AlertController: UIViewController, ServerProtocol {
                 stopTimer()
                 dismiss() { _ in }
             }
+        } else if contentType == .VotersFilter {
+            var dict:[String: AnyObject] = [:]
+            dict["filters"] = filters as AnyObject
+            if let _filtered = filtered, voters != nil {
+                dict["filtered"] = _filtered.count != voters!.count ? _filtered as AnyObject : [] as AnyObject
+            }
+            delegate?.callbackReceived(dict as AnyObject)
+            dismiss() { _ in }
         } else {
             dismiss() { _ in }
         }
@@ -127,6 +146,7 @@ class AlertController: UIViewController, ServerProtocol {
             }
             container.subviews.forEach({ $0.removeFromSuperview() })
             currentController?.removeFromParent()
+            currentController = nil
             if contentType == .Claim {
                 icon.category = .Caution
                 let vc = Storyboards.survey.instantiateViewController(withIdentifier: "ClaimViewController") as! ClaimViewController
@@ -136,6 +156,19 @@ class AlertController: UIViewController, ServerProtocol {
                 vc.didMove(toParent: self)
                 currentController = vc
                 if button != nil { button.isUserInteractionEnabled = false; button.backgroundColor = K_COLOR_GRAY }
+            } else if contentType == .VotersFilter, voters != nil, let vc = Storyboards.controllers.instantiateViewController(withIdentifier: "VotersFilterController") as? VotersFilterController {
+                icon.category = .Filter
+                vc.delegate = self
+                vc.voters = voters!
+                vc.filters = filters
+//                vc.filtered = filtered ?? []
+                self.addChild(vc)
+                vc.view.addEquallyTo(to: container)
+                vc.didMove(toParent: self)
+                currentController = vc
+                if filtered == nil {
+                    button.setTitle("ПОКАЗАТЬ \(voters!.count)", for: .normal)
+                }
             }
         }
     }
@@ -145,16 +178,21 @@ class AlertController: UIViewController, ServerProtocol {
     private var timer:  Timer?
     private var timeElapsed: TimeInterval = 0
     
-    func show(delegate _delegate: CallbackDelegate?, height: CGFloat = 0, contentType _contentType: ContentType = .Info, survey _survey: Survey? = nil) {
+    func show(delegate _delegate: CallbackDelegate?, height: CGFloat = 0, contentType _contentType: ContentType = .Info, survey _survey: Survey? = nil, voters _voters: [UserProfile]? = nil, filtered _filtered: [UserProfile]? = nil, filters _filters: [String: AnyObject] = [:]) {
         popController = false
-        contentType = _contentType
         survey = _survey
+        filters = _filters
+        filtered = _filtered
+        voters = _voters
+        contentType = _contentType
         view.setNeedsLayout()
         heightConstraint.constant = height == 0 ? standartHeight : height
         view.layoutIfNeeded()
         view.alpha = 1
         delegate = _delegate
         delegate?.callbackReceived(AlertController.willAppearSignal as AnyObject)
+        currentController?.view.setNeedsLayout()
+        currentController?.view.layoutIfNeeded()
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.35, delay: 0, options: [.curveLinear], animations: {
             self.effectView.effect = UIBlurEffect(style: .dark)
         })
@@ -191,7 +229,11 @@ class AlertController: UIViewController, ServerProtocol {
             self.yConstraint.constant = (self.view.frame.height + self.body.frame.height)/2
 //            self.contentType = .Info
             self.survey = nil
+            self.voters = nil
+            self.filtered = nil
+            self.filters.removeAll()
             self.claimCategory = nil
+//            self.currentController = nil
             completion(true)
         }
     }
@@ -231,6 +273,15 @@ extension AlertController: CallbackDelegate {
                 //                apiManager.postClaim(survey: survey!, claimCategory: claimCategory) { _, _ in }
             } else if let string = sender as? String, string == "cancel_claim" {
                 dismiss() { _ in }
+            }
+        } else if contentType == .VotersFilter {
+            if let dict = sender as? [String: AnyObject] {
+                if let _filtered = dict["filtered"] as? [UserProfile] {
+                    filtered = _filtered
+                }
+                if let _filters = dict["filters"] as? [String: AnyObject] {
+                    filters = _filters
+                }
             }
         }
     }

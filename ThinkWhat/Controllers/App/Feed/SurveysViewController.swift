@@ -421,7 +421,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         } else if segue.identifier == Segues.App.FeedToNewSurvey {
             nc.transitionStyle = .Icon
             nc.duration = 0.4
-        } else if segue.identifier == Segues.App.FeedToUser, let userProfile = sender as? UserProfile, let destinationVC = segue.destination as? UserViewController {
+        } else if segue.identifier == Segues.App.FeedToUser, let userProfile = sender as? UserProfile, let destinationVC = segue.destination as? delUserViewController {
             destinationVC.userProfile = userProfile
             nc.duration = 0.2
             nc.transitionStyle = .Icon

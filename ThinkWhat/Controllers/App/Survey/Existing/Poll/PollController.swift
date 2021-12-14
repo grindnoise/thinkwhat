@@ -58,7 +58,7 @@ class PollController: UIViewController {
 //            }
 //        }
 //    }
-    private var isLoadingImages  = true
+    private var shouldDownloadImages  = true
     private var requestAttempt = 0
     private let tableViewSections   = ["main", "answers", "vote"]
     private var isRequesting        = false
@@ -78,7 +78,6 @@ class PollController: UIViewController {
     private var needsAnimation                      = true
     private var scrollArrow: ScrollArrow!
     private var isAutoScrolling = false   //is on when scrollArrow is tapped
-    private var updateResults = false //Update result stats
     private var selectedAnswerID = 0 {
         didSet {
             if oldValue != selectedAnswerID {
@@ -113,6 +112,7 @@ class PollController: UIViewController {
             }
         }
     }
+    private var resultIndicators: [ResultIndicator] = []
     
     var surveyRef: SurveyRef! {
         didSet {
@@ -123,24 +123,29 @@ class PollController: UIViewController {
     //Nil if object isn't downloaded, checked in performChecks()
     var survey: Survey? {
         didSet {
-            if let strongSurvey = survey, isInitialLoading {
-//            if let strongSurvey = survey {
-                presentSurvey()
-                if surveyRef == nil {
-                    surveyRef = SurveyRef(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, type: survey!.type, isOwn: survey!.isOwn, isComplete: survey!.isComplete, isFavorite: survey!.isFavorite)
+            if let strongSurvey = survey {
+                if strongSurvey.isComplete {
+                    updateResults()
                 }
-                if let owner = strongSurvey.userProfile {
-                    if owner.image != nil {
-                        NotificationCenter.default.post(name: Notifications.UI.ImageReceived, object: nil)
-                    } else if owner.image == nil, let url = owner.imageURL as? String {
-                        apiManager.downloadImage(url: url) {
-                            image, error in
-                            if error != nil {
-                                print(error!.localizedDescription)
-                            }
-                            if image != nil {
-                                self.survey!.userProfile!.image = image!
-                                NotificationCenter.default.post(name: Notifications.UI.ImageReceived, object: nil)
+                if isInitialLoading {
+                    
+                    presentSurvey()
+                    if surveyRef == nil {
+                        surveyRef = SurveyRef(id: survey!.ID!, title: survey!.title, startDate: survey!.startDate, category: survey!.category, type: survey!.type, isOwn: survey!.isOwn, isComplete: survey!.isComplete, isFavorite: survey!.isFavorite)
+                    }
+                    if let owner = strongSurvey.userProfile {
+                        if owner.image != nil {
+                            NotificationCenter.default.post(name: Notifications.UI.ImageReceived, object: nil)
+                        } else if owner.image == nil, let url = owner.imageURL as? String {
+                            apiManager.downloadImage(url: url) {
+                                image, error in
+                                if error != nil {
+                                    print(error!.localizedDescription)
+                                }
+                                if image != nil {
+                                    self.survey!.userProfile!.image = image!
+                                    NotificationCenter.default.post(name: Notifications.UI.ImageReceived, object: nil)
+                                }
                             }
                         }
                     }
@@ -156,8 +161,9 @@ class PollController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupViews()
+        setupUI()
         performChecks()
+        //Temporary
         AppData.shared.system.youtubePlayOption = nil
     }
    
@@ -169,8 +175,7 @@ class PollController: UIViewController {
         }
     }
     
-    private func setupViews() {
-//        tableView.register(ChoiceResultCell.self, forCellReuseIdentifier: "result")
+    private func setupUI() {
         //Set icon category in title
         let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
         icon.backgroundColor = .clear
@@ -190,7 +195,6 @@ class PollController: UIViewController {
             nc.setNavigationBarHidden(false, animated: false)
 //            nc.isShadowed = true
             nc.navigationBar.isTranslucent = false
-            //            nc.transitionStyle = .Default
         }
         if !surveyRef.isOwn {
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: likeButton)]
@@ -200,6 +204,27 @@ class PollController: UIViewController {
                                                name: Notifications.UI.SuveyViewsCountReceived,
                                                object: nil)
         tableView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.06)
+    }
+    
+    private func updateResults() {
+        guard survey != nil else { return }
+        for answer in survey!.answers {
+            var resultIndicator: ResultIndicator!
+            if let found = resultIndicators.filter({ $0.answer === answer }).first {
+                resultIndicator = found
+            } else {
+                resultIndicator = ResultIndicator(delegate: self, answer: answer, apiManager: apiManager, color: survey!.category.tagColor, isSelected: answer.ID == survey!.result!.keys.first)
+                resultIndicators.append(resultIndicator)
+            }
+            resultIndicator.needsUIUpdate = true
+//            resultIndicator.isSelected = answer.ID == survey!.result!.keys.first
+            if survey!.isAnonymous {
+                resultIndicator.mode = .Anon
+            } else if answer.userprofiles.isEmpty {
+                resultIndicator.mode = .None
+            }
+            resultIndicator.value = survey!.getPercentForAnswer(answer)
+        }
     }
     
     private func performChecks() {
@@ -217,7 +242,7 @@ class PollController: UIViewController {
                         NotificationCenter.default.post(name: Notifications.UI.SuveyViewsCountReceived, object: value)
                         self.surveyRef.views = value
                         self.survey!.views = value
-                        
+
                         var totalVotes = 0
                         for entity in update {
                             if let dict = entity.dictionaryValue as? [String: JSON] {
@@ -239,7 +264,7 @@ class PollController: UIViewController {
                             self.survey?.totalVotes = totalVotes
                         }
                         //TODO: - Update UI
-                        self.updateResults = true
+                        self.updateResults()
                         self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .fade)
                     }
                 }
@@ -311,19 +336,23 @@ class PollController: UIViewController {
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.transitionStyle = .Icon
             nc.duration = 0.4
-            if segue.identifier == Segues.App.User, let destinationVC = segue.destination as? UserViewController, let userProfile = survey?.userProfile {
+            if segue.identifier == Segues.App.User, let destinationVC = segue.destination as? UserViewController, let userprofile = survey?.userProfile {
                 nc.transitionStyle = .Default
-                destinationVC.userProfile = userProfile
+                destinationVC.userprofile = userprofile
             } else if segue.identifier == Segues.App.Image, let image = sender as? UIImage, let destinationVC = segue.destination as? ImageViewController, survey != nil {
                 nc.duration = 0.25
                 nc.transitionStyle = .Icon
                 destinationVC.image = image
                 destinationVC.mode = .ReadOnly
                 for dict in survey!.images! {
-                    if let text = dict.filter({$0.key == image}).values.first {
+                    if let text = dict.value.filter({$0.key == image}).values.first {
                         destinationVC.titleString = text
                         break
                     }
+//                    if let text = dict.filter({$0.key == image}).values.first {
+//                        destinationVC.titleString = text
+//                        break
+//                    }
                 }
 //            } else if segue.identifier == Segues.App.UsersList, let destinationVC = segue.destination as? UsersCollectionViewController, let dict = sender as? [String: AnyObject], let users = dict["users"] as? [UserProfile], let total = dict["total"] as? Int, let answerID = dict["answerID"] as? Int {
 //                nc.duration = 0.25
@@ -432,6 +461,14 @@ class PollController: UIViewController {
 }
 
 extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.section == 1 {
+            if let cell = tableView.cellForRow(at: indexPath) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() {
+                resultIndicator.needsUIUpdate = false
+                resultIndicator.setPercentage(value: nil)
+            }
+        }
+    }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard survey != nil else {
             return UITableViewCell()
@@ -470,66 +507,86 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
                     cell.pageControl.cornerRadius = cell.pageControl.frame.height/4
                     cell.createSlides(count: survey!.images!.count)
                     for (i, dict) in survey!.images!.enumerated() {
-                        if let image = dict.keys.first {
+                        if let image = dict.value.keys.first {
                             cell.slides[i].imageView.image = image
                             cell.slides[i].imageView.progressIndicatorView.alpha = 0
                         }
                     }
                     cell.delegate = self
                     cell.pageControl.alpha = cell.slides.count > 1 ? 1 : 0
+                    cell.showPageControl(animated: false)
                     return cell
                 } else if survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty, let cell = tableView.dequeueReusableCell(withIdentifier: "images", for: indexPath) as? ImagesCell {
                     cell.setNeedsLayout()
                     cell.layoutIfNeeded()
                     cell.pageControl.cornerRadius = cell.pageControl.frame.height/4
                     cell.createSlides(count: survey!.imagesURLs!.count)
-                    if survey != nil, survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty, (survey!.images == nil), isLoadingImages {
-                        self.isLoadingImages = false
-                        for (i, imageURL) in survey!.imagesURLs!.enumerated() {
-                            apiManager.downloadImage(url: imageURL.keys.first!, percentageClosure: {
-                                percent in
-                                cell.slides[i].imageView.progressIndicatorView.progress = percent
-                            }) {
-                                image, error in
-                                if error != nil {
-                                    Banner.shared.contentType = .Warning
-                                    if let content = Banner.shared.content as? Warning {
-                                        content.level = .Error
-                                        content.text = "Произошла ошибка, изображение не было загружено"
-                                    }
-                                    Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
-                                    print(error!.localizedDescription)
-                                }
-                                
-                                if image != nil {
-                                    if self.survey!.images == nil {
-                                        self.survey!.images = []
+                    if survey != nil, survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty, (survey!.images == nil), shouldDownloadImages {
+                        self.shouldDownloadImages = false
+                        if self.survey!.images == nil {
+                            self.survey!.images = [:]
+                        }
+                        //                        for (i, imageURL) in survey!.imagesURLs!.enumerated() {
+                        for entry in survey!.imagesURLs! {
+                            if let url = entry.value.keys.first  {
+                                apiManager.downloadImage(url: url, percentageClosure: {
+                                    percent in
+                                    cell.slides[entry.key].imageView.progressIndicatorView.progress = percent
+                                }) {
+                                    image, error in
+                                    if error != nil {
+                                        Banner.shared.contentType = .Warning
+                                        if let content = Banner.shared.content as? Warning {
+                                            content.level = .Error
+                                            content.text = "Произошла ошибка, изображение не было загружено"
+                                        }
+                                        Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                                        print(error!.localizedDescription)
                                     }
                                     
-                                    if !self.survey!.images!.isEmpty {
-                                        self.survey!.images!.map() {
-                                            if let _image = $0.keys.first, !_image.isEqualToImage(image: image!) {
-                                                self.survey!.images!.append([image!: imageURL.values.first!])
-                                                cell.slides[i].imageView.image = image
-                                                cell.slides[i].imageView.progressIndicatorView.reveal()
-                                            }
+                                    if image != nil {
+                                        //                                    if let index = answer.userprofiles.firstIndex(where: { $0.ID == UserProfiles.shared.own?.ID }) {
+                                        //                                        if  index != 0  {
+                                        //                                            answer.userprofiles.rearrange(from: index, to: 0)
+                                        //                                        }
+                                        //                                    }
+                                        self.survey!.images![entry.key] = [image!: entry.value.first!.value]
+                                        cell.slides[entry.key].imageView.image = image
+                                        cell.slides[entry.key].imageView.progressIndicatorView.reveal()
+                                        print(entry.key)
+                                        
+                                        //                                    if !self.survey!.images!.isEmpty {
+                                        //
+                                        //
+                                        //
+                                        //                                        self.survey!.images!.forEach {
+                                        //                                            if let _description = $0.values.first {
+                                        //                                                self.survey!.images!.append([image!: imageURL.values.first!])
+                                        //                                                print(self.survey!.images!.count)
+                                        //                                            }
+                                        ////                                            if let _image = $0.keys.first, !_image.isEqualToImage(image: image!) {
+                                        ////                                                self.survey!.images!.append([image!: imageURL.values.first!])
+                                        ////                                                cell.slides[i].imageView.image = image
+                                        ////                                                cell.slides[i].imageView.progressIndicatorView.reveal()
+                                        ////                                            }
+                                        //                                        }
+                                        //                                    } else {
+                                        //                                        self.survey!.images!.append([image!: imageURL.values.first!])
+                                        //                                        cell.slides[i].imageView.image = image
+                                        //                                        cell.slides[i].imageView.progressIndicatorView.reveal()
+                                        //                                    }
+                                        if entry.key == 0 {
+                                            cell.showPageControl()
                                         }
-                                    } else {
-                                        self.survey!.images!.append([image!: imageURL.values.first!])
-                                        cell.slides[i].imageView.image = image
-                                        cell.slides[i].imageView.progressIndicatorView.reveal()
-                                    }
-                                    if i == 0 {
-                                        cell.showPageControl()
                                     }
                                 }
                             }
                         }
-                    } else if survey!.images != nil, !survey!.images!.isEmpty {
-                        for (i, dict) in survey!.images!.enumerated() {
-                            if let image = dict.keys.first {
-                                cell.slides[i].imageView.image = image
-                                cell.slides[i].imageView.progressIndicatorView.alpha = 0
+                    } else if survey!.images != nil {
+                        for entry in survey!.images! {
+                            if let image = entry.value.first?.key {
+                                cell.slides[entry.key].imageView.image = image
+                                cell.slides[entry.key].imageView.progressIndicatorView.alpha = 0
                             }
                         }
                     }
@@ -594,9 +651,9 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
                 paragraphStyle.hyphenationFactor = 1.0
                 let text = survey!.question//"\t\(survey!.question)"
                 let attributedString = NSMutableAttributedString(string: text, attributes: [NSAttributedString.Key.paragraphStyle:paragraphStyle])
-                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 17), foregroundColor: .lightGray, backgroundColor: .clear), range: text.fullRange())
+                attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 15), foregroundColor: .lightGray, backgroundColor: .clear), range: text.fullRange())
                 cell.textView.attributedText = attributedString
-//                cell.textView.textContainerInset = UIEdgeInsets(top: 20, left: cell.textView.textContainerInset.left, bottom: 20, right: cell.textView.textContainerInset.right)
+                cell.textView.textContainerInset = UIEdgeInsets(top: 25, left: cell.textView.textContainerInset.left, bottom: 30, right: cell.textView.textContainerInset.right)
                 return cell
             }
         } else if indexPath.section == 1 {
@@ -609,47 +666,18 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
                     return cell
                 }
             case .ReadOnly:
-                if let cell = tableView.dequeueReusableCell(withIdentifier: "result", for: indexPath) as? ChoiceResultCell, let answer = survey?.answersSortedByVotes[indexPath.row] {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: "result", for: indexPath) as? ChoiceResultCell, let answer = survey?.answersSortedByVotes[indexPath.row], let resultIndicator = resultIndicators.filter({ $0.answer === answer }).first {
                     if !cell.isViewSetupComplete {
                         cell.layer.masksToBounds = false
                         cell.frame.size = CGSize(width: view.frame.width, height: cell.frame.height)
                         cell.setNeedsLayout()
                         cell.layoutIfNeeded()
-                        cell.resultIndicator.apiManager = (tabBarController as! TabBarController).apiManager
-                        cell.resultIndicator.backgroundFrame.cornerRadius = cell.resultIndicator.backgroundFrame.frame.height/2
-                        cell.resultIndicator.foregroundFrame.cornerRadius = cell.resultIndicator.backgroundFrame.frame.height/2
-                        cell.resultIndicator.frameColor = survey!.category.tagColor//tagColors[indexPath.row]
-                        cell.resultIndicator.layer.masksToBounds = false
-//                        cell.resultIndicator.indexPath = indexPath
-                        if let id = survey!.result!.keys.first, id == answer.ID {
-                            cell.selectedResult = true
-                        }
-                        cell.answer = answer
-                        cell.resultIndicator.delegate = self
-//                        cell.resultIndicator.answerID = answer.ID
-//                        cell.resultIndicator.imageViews.forEach({ $0.keys.first!.cornerRadius = $0.keys.first!.frame.height/2})
-                        if survey!.isAnonymous {
-                            cell.mode = .Anon
-                        } else if answer.userprofiles.isEmpty {
-                            cell.mode = .None
-                        }
-//                        cell.getPercentForAnswer()
-//                        cell.percent = survey!.getPercentForAnswer(answer)
                         cell.isViewSetupComplete = true
-                    } else if updateResults {
-                        if let id = survey!.result!.keys.first, id == answer.ID {
-                            cell.selectedResult = true
-                        }
-
-                        if survey!.isAnonymous {
-                            cell.mode = .Anon
-                        } else if answer.userprofiles.isEmpty {
-                            cell.mode = .None
-                        }
-//                        cell.getPercentForAnswer()
-                        cell.percent = survey!.getPercentForAnswer(answer)
+                        cell.container.backgroundColor = .clear
                     }
-                    cell.resultIndicator.indexPath = indexPath
+                    resultIndicator.indexPath = indexPath
+                    cell.setResultIndicator(resultIndicator)
+                    cell.answer = answer
                     return cell
                 }
                 print("ReadOnly")
@@ -1077,14 +1105,18 @@ class ImagesCell: UITableViewCell, UIScrollViewDelegate {
         }
     }
     
-    func showPageControl() {
-        if slides.count > 1, pageControl != nil, page != nil, pageControl.alpha == 0 {
+    func showPageControl(animated: Bool = true) {
+        if slides.count > 1, pageControl != nil, page != nil {
             page.text = "\(pageIndex+1)/\(slides.count)"
-            pageControl.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-            UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseInOut, animations: {
-                self.pageControl.alpha = 1
-                self.pageControl.transform = .identity
-            })
+            if animated {
+                pageControl.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+                UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseInOut, animations: {
+                    self.pageControl.alpha = 1
+                    self.pageControl.transform = .identity
+                })
+            } else {
+                pageControl.alpha = 1
+            }
         }
     }
     
@@ -1386,31 +1418,9 @@ class ChoiceResultCell: UITableViewCell {
             }
         }
     }
-    @IBOutlet weak var resultIndicator: ResultIndicator! {
+    @IBOutlet weak var container: UIView! {
         didSet {
-            resultIndicator.layer.masksToBounds = false
-        }
-    }
-    
-    var selectedResult = false {
-        didSet {
-            if resultIndicator != nil, selectedResult {
-                resultIndicator.isSelected = selectedResult
-            }
-        }
-    }
-    var percent: Int = 0 {
-        didSet {
-            if resultIndicator != nil {
-                resultIndicator.value = percent
-            }
-        }
-    }
-    var mode: Mode = .Stock {
-        didSet {
-            if resultIndicator != nil {
-                resultIndicator.mode = mode
-            }
+            container.layer.masksToBounds = false
         }
     }
     var isViewSetupComplete = false
@@ -1426,25 +1436,31 @@ class ChoiceResultCell: UITableViewCell {
                 textView.attributedText = attributedString
                 textView.textContainerInset = UIEdgeInsets(top: 3, left: 0, bottom: 3, right: 0)
             }
+        }
+    }
+    private var resultIndicator: ResultIndicator? {
+        didSet {
             if resultIndicator != nil {
-                resultIndicator.answer = answer
-//                resultIndicator.answerID = answer.ID
-//                resultIndicator.totalCount = answer.totalVotes
-//                resultIndicator.userprofiles = answer.userprofiles
-//                resultIndicator.apiManager = apiMa
+                resultIndicator!.addEquallyTo(to: container)
+//                resultIndicator!.updateUI()
+            } else if oldValue != nil {
+                oldValue?.removeFromSuperview()
             }
         }
     }
-//    func getPercentForAnswer() {
-//        if resultIndicator != nil {
-//            sur
-//        }
-//    }
-//    override func layoutSubviews() {
-//        if resultIndicator != nil {
-//            resultIndicator.imageViews.forEach({ $0.keys.first!.cornerRadius = $0.keys.first!.frame.height/2})
-//        }
-//    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        container.subviews.forEach({ $0.removeFromSuperview() })
+    }
+    
+    func setResultIndicator(_ _resultIndicator: ResultIndicator) {
+        resultIndicator = _resultIndicator
+    }
+    
+    func getResultIndicator() -> ResultIndicator? {
+        return resultIndicator
+    }
 }
 
 class SurveyVoteCell: UITableViewCell {

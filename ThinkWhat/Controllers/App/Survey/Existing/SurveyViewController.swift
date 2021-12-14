@@ -425,10 +425,10 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
                 if survey!.images != nil, !survey!.images!.isEmpty, let _cell = tableView.dequeueReusableCell(withIdentifier: "image", for: indexPath) as? SurveyImageCell {
                     _cell.createSlides(count: survey!.images!.count)
                     for (i, dict) in survey!.images!.enumerated() {
-                        if let image = dict.keys.first {
-                            _cell.slides[i].imageView.image = image
-                            _cell.slides[i].imageView.progressIndicatorView.alpha = 0
-                        }
+//                        if let image = dict.keys.first {
+//                            _cell.slides[i].imageView.image = image
+//                            _cell.slides[i].imageView.progressIndicatorView.alpha = 0
+//                        }
                     }
                     _cell.delegate = self
                     cell = _cell
@@ -439,48 +439,48 @@ class SurveyViewController: UITableViewController, UINavigationControllerDelegat
 //                if isInitialLoading {
                 if survey != nil, survey!.imagesURLs != nil, !survey!.imagesURLs!.isEmpty, (survey!.images == nil), isLoadingImages {
                     self.isLoadingImages = false
-                    for (i, imageURL) in survey!.imagesURLs!.enumerated() {
-                        apiManager.downloadImage(url: imageURL.keys.first!, percentageClosure: {
-                            percent in
-                            _cell.slides[i].imageView.progressIndicatorView.progress = percent
-                        }) {
-                            image, error in
-                            if error != nil {
-                                showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Изображение не было загружено. \(error!.localizedDescription)")
-                            }
-                            
-                            if image != nil {
-                                if self.survey!.images == nil {
-                                    self.survey!.images = []
-                                }
-                                
-                                if !self.survey!.images!.isEmpty {
-                                    self.survey!.images!.map() {
-                                        if let _image = $0.keys.first, !_image.isEqualToImage(image: image!) {
-                                            self.survey!.images!.append([image!: imageURL.values.first!])
-                                            _cell.slides[i].imageView.image = image
-                                            _cell.slides[i].imageView.progressIndicatorView.reveal()
-                                        }
-                                    }
-                                } else {
-                                    self.survey!.images!.append([image!: imageURL.values.first!])
-                                    _cell.slides[i].imageView.image = image
-                                    _cell.slides[i].imageView.progressIndicatorView.reveal()
-                                }
-                                if self.survey!.images!.count > 1 {
-                                    UIView.animate(withDuration: 0.3, delay: 0.5, options: .curveEaseInOut, animations: {
-                                        _cell.pageControl.alpha = 1
-                                    })
-                                }
-                            }
-                        }
-                    }
+//                    for (i, imageURL) in survey!.imagesURLs!.enumerated() {
+//                        apiManager.downloadImage(url: imageURL.keys.first!, percentageClosure: {
+//                            percent in
+//                            _cell.slides[i].imageView.progressIndicatorView.progress = percent
+//                        }) {
+//                            image, error in
+//                            if error != nil {
+//                                showAlert(type: CustomAlertView.AlertType.Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], title: "Ошибка", body: "Изображение не было загружено. \(error!.localizedDescription)")
+//                            }
+//
+//                            if image != nil {
+//                                if self.survey!.images == nil {
+////                                    self.survey!.images = []
+//                                }
+//
+//                                if !self.survey!.images!.isEmpty {
+////                                    self.survey!.images!.map() {
+////                                        if let _image = $0.keys.first, !_image.isEqualToImage(image: image!) {
+////                                            self.survey!.images!.append([image!: imageURL.values.first!])
+////                                            _cell.slides[i].imageView.image = image
+////                                            _cell.slides[i].imageView.progressIndicatorView.reveal()
+////                                        }
+////                                    }
+//                                } else {
+////                                    self.survey!.images!.append([image!: imageURL.values.first!])
+//                                    _cell.slides[i].imageView.image = image
+//                                    _cell.slides[i].imageView.progressIndicatorView.reveal()
+//                                }
+//                                if self.survey!.images!.count > 1 {
+//                                    UIView.animate(withDuration: 0.3, delay: 0.5, options: .curveEaseInOut, animations: {
+//                                        _cell.pageControl.alpha = 1
+//                                    })
+//                                }
+//                            }
+//                        }
+//                    }
                 } else if survey!.images != nil, !survey!.images!.isEmpty {
                     for (i, dict) in survey!.images!.enumerated() {
-                        if let image = dict.keys.first {
-                            _cell.slides[i].imageView.image = image
-                            _cell.slides[i].imageView.progressIndicatorView.alpha = 0
-                        }
+//                        if let image = dict.keys.first {
+//                            _cell.slides[i].imageView.image = image
+//                            _cell.slides[i].imageView.progressIndicatorView.alpha = 0
+//                        }
                     }
                 }
                 _cell.delegate = self

@@ -17,22 +17,22 @@ class UserCell: UICollectionViewCell {
             ageLabel.text = ", \(age)"
         }
     }
-    @IBOutlet weak var genderLabel: UILabel! {
-        didSet {
-            genderLabel.text = gender == .Male ? "мужчина" : "женщина"
-        }
-    }
+//    @IBOutlet weak var genderLabel: UILabel! {
+//        didSet {
+//            genderLabel.text = gender == .Male ? "мужчина" : "женщина"
+//        }
+//    }
     @IBOutlet weak var genderIcon: Icon! {
         didSet {
 //            genderIcon.scaleMultiplicator = 0.8
             genderIcon.isRounded = false
             genderIcon.layer.masksToBounds = false
             genderIcon.backgroundColor = .clear
-            genderIcon.iconColor = (gender == .Male ? UIColor.blue : UIColor.red).withAlphaComponent(0.6)
+            genderIcon.iconColor = gender == .Male ? "06bac3".hexColor! : "f388a3".hexColor!//UIColor.red).withAlphaComponent(0.6)
             genderIcon.category = gender == .Male ? .MaleSign : .FemaleSign
 //            genderIcon.layer.masksToBounds = false
 //            genderIcon.clipsToBounds = false
-            genderIcon.scaleMultiplicator = 1.2
+            genderIcon.scaleMultiplicator = 1
         }
     }
     var age = 0 {
@@ -44,14 +44,15 @@ class UserCell: UICollectionViewCell {
     }
     var gender: Gender = .Male {
         didSet {
-            if genderLabel != nil, genderIcon != nil {
+            if genderIcon != nil {
+//            if genderLabel != nil, genderIcon != nil {
                 genderIcon.isRounded = false
-                genderIcon.iconColor = (gender == .Male ? UIColor.blue : UIColor.red).withAlphaComponent(0.6)
+                genderIcon.iconColor = gender == .Male ? "06bac3".hexColor! : "f388a3".hexColor!//(gender == .Male ? UIColor.blue : UIColor.red).withAlphaComponent(0.6)
                 genderIcon.category = gender == .Male ? .MaleSign : .FemaleSign
-                genderIcon.scaleMultiplicator = 1.2
+                genderIcon.scaleMultiplicator = 1
 //                genderIcon.layer.masksToBounds = false
 //                genderIcon.clipsToBounds = false
-                genderLabel.text = gender == .Male ? "мужчина" : "женщина"
+//                genderLabel.text = gender == .Male ? "мужчина" : "женщина"
             }
         }
     }

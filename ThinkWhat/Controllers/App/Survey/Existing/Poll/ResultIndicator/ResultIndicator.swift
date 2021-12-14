@@ -9,7 +9,9 @@
 import UIKit
 
 class ResultIndicator: UIView {
-    
+    enum Mode {
+        case None, Anon, Stock
+    }
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var backgroundFrame: UIView!
     @IBOutlet weak var foregroundFrame: UIView!
@@ -27,20 +29,23 @@ class ResultIndicator: UIView {
             label.text = "Голосов\nнет"
         }
     }
-//    var answerID: Int!
-    var indexPath: IndexPath!
-    var tapGesture: UITapGestureRecognizer!
-    var panGesture: UIPanGestureRecognizer!
-    var apiManager: APIManagerProtocol!
-    var frameColor: UIColor = K_COLOR_RED {
+    @IBOutlet weak var choiceBadge: Icon! {
         didSet {
-            if backgroundFrame != nil, foregroundFrame != nil {
-                backgroundFrame.backgroundColor = frameColor.withAlphaComponent(0.05)
-                foregroundFrame.backgroundColor = frameColor.withAlphaComponent(0.4)
-            }
+            choiceBadge.alpha = isSelected ? 1 : 0
+            choiceBadge.backgroundColor = .clear
+            choiceBadge.isRounded = false
+            choiceBadge.iconColor = color
+            choiceBadge.scaleMultiplicator = 1.3
+            choiceBadge.category = .Choice
         }
     }
-    weak var delegate: CallbackDelegate?
+    @IBOutlet weak var choiceBadgeTrailingConstraint: NSLayoutConstraint!
+    var indexPath: IndexPath!
+    private var tapGesture: UITapGestureRecognizer!
+    private var panGesture: UIPanGestureRecognizer!
+    private var apiManager: APIManagerProtocol!
+    private var color: UIColor = K_COLOR_RED
+    private weak var delegate: CallbackDelegate!
     private var highlightedImageView: UIImageView? {
         didSet {
             if highlightedImageView != nil, highlightedImageView != oldValue {
@@ -75,179 +80,91 @@ class ResultIndicator: UIView {
             }
         }
     }
-    var imageViews: [UIImageView] = []
+    private var imageViews: [UIImageView] = []
     private var interactionViews: [[UIView: UIImageView]] = []
-//    var totalCount = 0
-//    var userprofiles: [UserProfile] = [] {
-//        didSet {
-//            if !userprofiles.isEmpty {
-//                if isSelected {
-//                    if !userprofiles.filter({ $0.ID == UserProfiles.shared.own?.ID }).isEmpty {
-//                        if let index = userprofiles.firstIndex(where: { $0.ID == UserProfiles.shared.own?.ID }) {
-//                            if  index != 0  {
-//                                userprofiles.rearrange(from: index, to: 0)
-//                            }
-//                        }
-//                    } else {
-//                        userprofiles.insert(UserProfiles.shared.own!, at: 0)
-//                    }
-//                }
-//
-//                for i in 0..<userprofiles.count {
-//                    if i == 5 {
-//                        break
-//                    }
-//                    let imageView = UIImageView(frame: .zero)
-//                    imageView.layer.zPosition = 10 - CGFloat(i)
-//                    imageViews.append(imageView)
-//                    actionView.addSubview(imageView)
-//                    imageView.layer.masksToBounds = false
-//                    imageView.translatesAutoresizingMaskIntoConstraints = false
-//                    let centerY = imageView.centerYAnchor.constraint(equalTo: actionView.centerYAnchor)
-//                    centerY.identifier = "centerY"
-//                    centerY.isActive = true
-////                    .isActive = true
-//                    if i == 0 {
-//                        if totalCount > 5 {
-//                            imageView.leadingAnchor.constraint(equalTo: actionView.leadingAnchor, constant: 4).isActive = true
-//                        } else {
-//                            imageView.centerXAnchor.constraint(equalTo: actionView.centerXAnchor).isActive = true
-//                        }
-//                    } else {
-//                        imageView.leadingAnchor.constraint(equalTo: imageViews[i-1].leadingAnchor, constant: 8).isActive = true
-//                    }
-//                    imageView.heightAnchor.constraint(equalTo: actionView.heightAnchor, multiplier: (0.8 - 0)/1.0).isActive = true
-//                    imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
-//                    if userprofiles[i].image != nil {
-//                        imageView.image = userprofiles[i].image!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
-//                    } else if let url = userprofiles[i].imageURL as? String, !url.isEmpty {
-//                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
-//                        apiManager.downloadImage(url: url) {
-//                            image, error in
-//                            if error != nil {
-//                                print(error!.localizedDescription)
-//                            }
-//                            if image != nil {
-//                                self.userprofiles[i].image = image
-//                                UIView.transition(with: imageView,
-//                                                  duration: 0.5,
-//                                                  options: .transitionCrossDissolve,
-//                                                  animations: { imageView.image = image!.circularImage(size: imageView.frame.size, frameColor: self.frameColor) },
-//                                                  completion: nil)
-//                            }
-//                        }
-//                    } else {
-//                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
-//                    }
-//                }
-//                if totalCount > 5 {
-//                    let label = UILabel(frame: .zero)
-//                    actionView.addSubview(label)
-//                    label.translatesAutoresizingMaskIntoConstraints = false
-//                    label.numberOfLines = 0
-//                    label.text = "еще\n\(totalCount-5)"
-//                    label.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 8)
-//                    label.textColor = .darkGray
-//                    label.backgroundColor = .clear
-//                    label.textAlignment = .center
-//                    label.heightAnchor.constraint(equalTo: actionView.heightAnchor).isActive = true
-//                    label.leadingAnchor.constraint(equalTo: imageViews.last!.trailingAnchor).isActive = true
-//                    label.trailingAnchor.constraint(equalTo: actionView.trailingAnchor).isActive = true
-//                    label.layer.zPosition = 100
-//                }
-//                panGesture = UIPanGestureRecognizer(target: self, action: #selector(ResultIndicator.handlePan(recognizer:)))
-//                panGesture.delegate = self
-//                actionView.addGestureRecognizer(panGesture)
-//                tapGesture = UITapGestureRecognizer(target: self, action: #selector(ResultIndicator.handleTap(recognizer:)))
-//                tapGesture.delegate = self
-//                actionView.addGestureRecognizer(tapGesture)
-//            }
-//        }
-//    }
-    var answer: Answer! {
-        didSet {
-            if !answer.userprofiles.isEmpty {
-                if isSelected {
-                    if !answer.userprofiles.filter({ $0.ID == UserProfiles.shared.own?.ID }).isEmpty {
-                        if let index = answer.userprofiles.firstIndex(where: { $0.ID == UserProfiles.shared.own?.ID }) {
-                            if  index != 0  {
-                                answer.userprofiles.rearrange(from: index, to: 0)
-                            }
+    var answer: Answer!
+    private func setupImages() {
+        if !answer.userprofiles.isEmpty {
+            if isSelected {
+                if !answer.userprofiles.filter({ $0.ID == UserProfiles.shared.own?.ID }).isEmpty {
+                    if let index = answer.userprofiles.firstIndex(where: { $0.ID == UserProfiles.shared.own?.ID }) {
+                        if  index != 0  {
+                            answer.userprofiles.rearrange(from: index, to: 0)
                         }
-                    } else {
-                        answer.userprofiles.insert(UserProfiles.shared.own!, at: 0)
                     }
+                } else {
+                    answer.userprofiles.insert(UserProfiles.shared.own!, at: 0)
                 }
-                
-                for i in 0..<answer.userprofiles.count {
-                    if i == 5 {
-                        break
-                    }
-                    let imageView = UIImageView(frame: .zero)
-                    imageView.layer.zPosition = 10 - CGFloat(i)
-                    imageViews.append(imageView)
-                    actionView.addSubview(imageView)
-                    imageView.layer.masksToBounds = false
-                    imageView.translatesAutoresizingMaskIntoConstraints = false
-                    let centerY = imageView.centerYAnchor.constraint(equalTo: actionView.centerYAnchor)
-                    centerY.identifier = "centerY"
-                    centerY.isActive = true
-                    //                    .isActive = true
-                    if i == 0 {
-                        if answer.totalVotes > 5 {
-                            imageView.leadingAnchor.constraint(equalTo: actionView.leadingAnchor, constant: 4).isActive = true
-                        } else {
-                            imageView.centerXAnchor.constraint(equalTo: actionView.centerXAnchor).isActive = true
-                        }
-                    } else {
-                        imageView.leadingAnchor.constraint(equalTo: imageViews[i-1].leadingAnchor, constant: 8).isActive = true
-                    }
-                    imageView.heightAnchor.constraint(equalTo: actionView.heightAnchor, multiplier: (0.8 - 0)/1.0).isActive = true
-                    imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
-                    if answer.userprofiles[i].image != nil {
-                        imageView.image = answer.userprofiles[i].image!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
-                    } else if let url = answer.userprofiles[i].imageURL as? String, !url.isEmpty {
-                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
-                        apiManager.downloadImage(url: url) {
-                            image, error in
-                            if error != nil {
-                                print(error!.localizedDescription)
-                            }
-                            if image != nil {
-                                self.answer.userprofiles[i].image = image
-                                UIView.transition(with: imageView,
-                                                  duration: 0.5,
-                                                  options: .transitionCrossDissolve,
-                                                  animations: { imageView.image = image!.circularImage(size: imageView.frame.size, frameColor: self.frameColor) },
-                                                  completion: nil)
-                            }
-                        }
-                    } else {
-                        imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: frameColor)
-                    }
-                }
-                if answer.totalVotes > 5 {
-                    let label = UILabel(frame: .zero)
-                    actionView.addSubview(label)
-                    label.translatesAutoresizingMaskIntoConstraints = false
-                    label.numberOfLines = 0
-                    label.text = "еще\n\(answer.totalVotes-5)"
-                    label.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 8)
-                    label.textColor = .darkGray
-                    label.backgroundColor = .clear
-                    label.textAlignment = .center
-                    label.heightAnchor.constraint(equalTo: actionView.heightAnchor).isActive = true
-                    label.leadingAnchor.constraint(equalTo: imageViews.last!.trailingAnchor).isActive = true
-                    label.trailingAnchor.constraint(equalTo: actionView.trailingAnchor).isActive = true
-                    label.layer.zPosition = 100
-                }
-                panGesture = UIPanGestureRecognizer(target: self, action: #selector(ResultIndicator.handlePan(recognizer:)))
-                panGesture.delegate = self
-                actionView.addGestureRecognizer(panGesture)
-                tapGesture = UITapGestureRecognizer(target: self, action: #selector(ResultIndicator.handleTap(recognizer:)))
-                tapGesture.delegate = self
-                actionView.addGestureRecognizer(tapGesture)
             }
+            
+            for i in 0..<answer.userprofiles.count {
+                if i == 5 {
+                    break
+                }
+                let imageView = UIImageView(frame: .zero)
+                imageView.layer.zPosition = 10 - CGFloat(i)
+                imageViews.append(imageView)
+                actionView.addSubview(imageView)
+                imageView.layer.masksToBounds = false
+                imageView.translatesAutoresizingMaskIntoConstraints = false
+                let centerY = imageView.centerYAnchor.constraint(equalTo: actionView.centerYAnchor)
+                centerY.identifier = "centerY"
+                centerY.isActive = true
+                //                    .isActive = true
+                if i == 0 {
+                    if answer.totalVotes > 5 {
+                        imageView.leadingAnchor.constraint(equalTo: actionView.leadingAnchor, constant: 4).isActive = true
+                    } else {
+                        imageView.centerXAnchor.constraint(equalTo: actionView.centerXAnchor).isActive = true
+                    }
+                } else {
+                    imageView.leadingAnchor.constraint(equalTo: imageViews[i-1].leadingAnchor, constant: 8).isActive = true
+                }
+                imageView.heightAnchor.constraint(equalTo: actionView.heightAnchor, multiplier: (0.8 - 0)/1.0).isActive = true
+                imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
+                if answer.userprofiles[i].image != nil {
+                    imageView.image = answer.userprofiles[i].image!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: color)
+                } else if let url = answer.userprofiles[i].imageURL as? String, !url.isEmpty {
+                    imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: color)
+                    apiManager.downloadImage(url: url) {
+                        image, error in
+                        if error != nil {
+                            print(error!.localizedDescription)
+                        }
+                        if image != nil {
+                            self.answer.userprofiles[i].image = image
+                            UIView.transition(with: imageView,
+                                              duration: 0.5,
+                                              options: .transitionCrossDissolve,
+                                              animations: { imageView.image = image!.circularImage(size: imageView.frame.size, frameColor: self.color) },
+                                              completion: nil)
+                        }
+                    }
+                } else {
+                    imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: color)
+                }
+            }
+            if answer.totalVotes > 5 {
+                let label = UILabel(frame: .zero)
+                actionView.addSubview(label)
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.numberOfLines = 0
+                label.text = "еще\n\(answer.totalVotes-5)"
+                label.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 8)
+                label.textColor = .darkGray
+                label.backgroundColor = .clear
+                label.textAlignment = .center
+                label.heightAnchor.constraint(equalTo: actionView.heightAnchor).isActive = true
+                label.leadingAnchor.constraint(equalTo: imageViews.last!.trailingAnchor).isActive = true
+                label.trailingAnchor.constraint(equalTo: actionView.trailingAnchor).isActive = true
+                label.layer.zPosition = 100
+            }
+            panGesture = UIPanGestureRecognizer(target: self, action: #selector(ResultIndicator.handlePan(recognizer:)))
+            panGesture.delegate = self
+            actionView.addGestureRecognizer(panGesture)
+            tapGesture = UITapGestureRecognizer(target: self, action: #selector(ResultIndicator.handleTap(recognizer:)))
+            tapGesture.delegate = self
+            actionView.addGestureRecognizer(tapGesture)
         }
     }
     var isSelected = false {
@@ -258,11 +175,6 @@ class ResultIndicator: UIView {
     var value: Int = 0 {
         didSet {
             percentLabel.text = "\(value)%"
-            if value > 0, widthConstraint != nil {
-//                setNeedsLayout()
-                widthConstraint.constant = max(CGFloat(value)*backgroundFrame.frame.width/100, contentView.frame.height)
-//                layoutIfNeeded()
-            }
         }
     }
     var mode: ChoiceResultCell.Mode = .Stock {
@@ -274,15 +186,24 @@ class ResultIndicator: UIView {
             }
         }
     }
-//    var color: UIColor = K_COLOR_TABBAR {
-//        didSet {
-//            if backgroundFrame != nil, foregroundFrame != nil {
-//                backgroundFrame.backgroundColor = frameColor.withAlphaComponent(0.05)
-//                foregroundFrame.backgroundColor = frameColor.withAlphaComponent(0.4)
-//            }
-//        }
-//    }
+    var needsUIUpdate = true
+    private var isAnimationEnabled = true
     
+    override var frame: CGRect {
+        didSet {
+            if needsUIUpdate {
+                updateUI()
+            }
+        }
+    }
+    
+    override var bounds: CGRect {
+        didSet {
+            if needsUIUpdate {
+                updateUI()
+            }
+        }
+    }
     
     //MARK: - Init
     override init(frame: CGRect) {
@@ -295,6 +216,17 @@ class ResultIndicator: UIView {
         self.commonInit()
     }
     
+    init(delegate: CallbackDelegate, answer: Answer, apiManager: APIManagerProtocol, color: UIColor, isSelected: Bool) {
+        super.init(frame: .zero)
+        self.delegate = delegate
+        self.isSelected = isSelected
+        self.answer = answer
+        self.apiManager = apiManager
+        self.color = color
+        self.commonInit()
+        self.setupImages()
+    }
+    
     private func commonInit() {
         Bundle.main.loadNibNamed("ResultIndicator", owner: self, options: nil)
         guard let content = contentView else {
@@ -305,6 +237,24 @@ class ResultIndicator: UIView {
         content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(content)
         self.backgroundColor = .clear
+    }
+    
+    func updateUI() {
+        if backgroundFrame != nil, foregroundFrame != nil, widthConstraint != nil {
+//            contentView.backgroundColor = .clear
+            backgroundFrame.backgroundColor = color.withAlphaComponent(0.05)
+            foregroundFrame.backgroundColor = isSelected ? color.withAlphaComponent(0.65) : color.withAlphaComponent(0.35)
+            backgroundFrame.cornerRadius = contentView.frame.height / 2
+            foregroundFrame.cornerRadius = contentView.frame.height / 2
+            setPercentage(value: nil)
+//            if !isAnimationEnabled {
+//                widthConstraint.constant = value > 0 ? max(CGFloat(value)*backgroundFrame.frame.width/100, contentView.frame.height) : 0
+//            }
+            choiceBadgeTrailingConstraint.constant = -backgroundFrame.frame.height / 3
+            if isSelected {
+                choiceBadge.category = .Choice
+            }
+        }
     }
     
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
@@ -351,14 +301,33 @@ class ResultIndicator: UIView {
                         print(imageView)
                         self.highlightedImageView = imageView
                     }
-//                } else {
-//                    highlightedImageView = nil
                 }
             }
         })
         
         if recognizer.state == .ended || recognizer.state == .cancelled {
             highlightedImageView = nil
+        }
+    }
+    
+    func setPercentage(value _value: Int?, animated: Bool = false) {
+        if _value != nil {
+            value = _value!
+        }
+        if isAnimationEnabled || animated {
+            self.widthConstraint.constant = 0
+            self.foregroundFrame.setNeedsLayout()
+            self.foregroundFrame.layoutIfNeeded()
+            UIView.animate(withDuration: 0.2,
+                           delay: 0,
+                           options: [.curveEaseInOut],
+                           animations: {
+                            self.widthConstraint.constant = self.value > 0 ? max(CGFloat(self.value)*self.backgroundFrame.frame.width/100, self.contentView.frame.height) : 0
+            },
+                           completion: {
+                            _ in
+                            self.isAnimationEnabled = false
+            })
         }
     }
 }

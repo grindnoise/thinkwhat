@@ -12,9 +12,6 @@
         <array key="OpenSans-Regular.ttf">
             <string>OpenSans</string>
         </array>
-        <array key="OpenSans-Semibold.ttf">
-            <string>OpenSans-Semibold</string>
-        </array>
     </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ResultIndicator" customModule="ThinkWhat" customModuleProvider="target">
@@ -22,6 +19,8 @@
                 <outlet property="actionView" destination="WJU-wH-9E1" id="tiO-1N-x3s"/>
                 <outlet property="actionViewConstraint" destination="qjX-cb-PeB" id="dje-rY-YBQ"/>
                 <outlet property="backgroundFrame" destination="ldV-YT-jtI" id="lLT-oT-ojw"/>
+                <outlet property="choiceBadge" destination="vnN-0f-XXS" id="39p-5b-7zb"/>
+                <outlet property="choiceBadgeTrailingConstraint" destination="Jcm-r0-lOV" id="Jqt-tr-ZrH"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="LB2-X8-8gm"/>
                 <outlet property="foregroundFrame" destination="eFn-cw-bv0" id="Ia8-Ic-a0j"/>
                 <outlet property="label" destination="Juc-c7-MYx" id="AEW-PH-9HI"/>
@@ -50,8 +49,7 @@
                     <constraints>
                         <constraint firstAttribute="width" secondItem="szB-pT-O8i" secondAttribute="height" multiplier="1:1" id="Gwh-vp-zvp"/>
                     </constraints>
-                    <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="12"/>
-                    <nil key="textColor"/>
+                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WJU-wH-9E1">
@@ -72,6 +70,13 @@
                         <constraint firstAttribute="bottom" secondItem="Juc-c7-MYx" secondAttribute="bottom" id="pno-dj-pK6"/>
                     </constraints>
                 </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vnN-0f-XXS" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
+                    <rect key="frame" x="188.5" y="12.5" width="25" height="25"/>
+                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="vnN-0f-XXS" secondAttribute="height" multiplier="1:1" id="C1e-Aa-K2e"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
@@ -83,12 +88,15 @@
                 <constraint firstItem="ldV-YT-jtI" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="F1W-RM-zXg"/>
                 <constraint firstItem="WJU-wH-9E1" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Hh9-nC-79C"/>
                 <constraint firstAttribute="trailing" secondItem="WJU-wH-9E1" secondAttribute="trailing" id="IyK-mD-eNM"/>
+                <constraint firstItem="vnN-0f-XXS" firstAttribute="centerX" secondItem="ldV-YT-jtI" secondAttribute="trailing" id="Jcm-r0-lOV"/>
                 <constraint firstAttribute="bottom" secondItem="szB-pT-O8i" secondAttribute="bottom" id="Rkd-HM-eh5"/>
                 <constraint firstItem="ldV-YT-jtI" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Wkb-c3-fSK"/>
+                <constraint firstItem="vnN-0f-XXS" firstAttribute="height" secondItem="ldV-YT-jtI" secondAttribute="height" multiplier="0.5" id="Y84-gX-fhP"/>
                 <constraint firstItem="WJU-wH-9E1" firstAttribute="leading" secondItem="ldV-YT-jtI" secondAttribute="trailing" id="YVZ-Uc-mre"/>
                 <constraint firstItem="eFn-cw-bv0" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="gVB-vu-hJm"/>
                 <constraint firstItem="szB-pT-O8i" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="j98-Sx-hNM"/>
                 <constraint firstItem="WJU-wH-9E1" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.33" id="qjX-cb-PeB"/>
+                <constraint firstItem="vnN-0f-XXS" firstAttribute="centerY" secondItem="ldV-YT-jtI" secondAttribute="centerY" id="rvs-DJ-rSa"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="52.799999999999997" y="74.662668665667169"/>

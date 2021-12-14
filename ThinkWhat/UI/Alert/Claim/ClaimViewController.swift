@@ -10,7 +10,9 @@ import UIKit
 
 class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    private var isViewSetupCompleted = false
+    deinit {
+        print("---\(self) deinit()")
+    }
     private var claimCategory: ClaimCategory? {
         didSet {
             for cell in claimCells {
@@ -46,10 +48,6 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBOutlet weak var tableView: UITableView!
     private var claimCells: [ClaimCell]    = []
     weak var delegate: CallbackDelegate?
-    
-    deinit {
-        print("deinit ClaimViewController")
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

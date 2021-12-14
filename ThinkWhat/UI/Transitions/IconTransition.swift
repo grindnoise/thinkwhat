@@ -183,7 +183,7 @@ class IconTransition: BasicTransition {
 //                    toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? SurveysViewController, let stackVC = vc_1.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview, let vc_2 = toVC as? UserViewController {
+            } else if let vc_1 = fromVC as? SurveysViewController, let stackVC = vc_1.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview, let vc_2 = toVC as? delUserViewController {
                 vc_1.view.setNeedsLayout()
                 vc_1.view.layoutIfNeeded()
                 
@@ -898,7 +898,7 @@ class IconTransition: BasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: false) { _ in }
-            } else if let vc_1 = fromVC as? PollController, let vc_2 = toVC as? VotersViewController, let initialCell = vc_1.tableView.cellForRow(at: vc_2.initialIndex) as? ChoiceResultCell, let imageViews = initialCell.resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_2.collectionView as? UICollectionView {
+            } else if let vc_1 = fromVC as? PollController, let vc_2 = toVC as? VotersViewController, let initialCell = vc_1.tableView.cellForRow(at: vc_2.initialIndex) as? ChoiceResultCell, let resultIndicator = initialCell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_2.collectionView as? UICollectionView {
 
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
@@ -1073,7 +1073,7 @@ class IconTransition: BasicTransition {
                 
                 
                 //                context?.completeTransition(true)
-            } else if let vc_1 = fromVC as? UserViewController, let vc_2 = toVC as? SurveysViewController, let stackVC = vc_2.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview {
+            } else if let vc_1 = fromVC as? delUserViewController, let vc_2 = toVC as? SurveysViewController, let stackVC = vc_2.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview {
                 vc_1.view.setNeedsLayout()
                 vc_1.view.layoutIfNeeded()
                 
@@ -1821,7 +1821,7 @@ class IconTransition: BasicTransition {
                     _ in
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? VotersViewController, let vc_2 = toVC as? PollController, let cell = vc_2.tableView.cellForRow(at: vc_1.initialIndex) as? ChoiceResultCell, let imageViews = cell.resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_1.collectionView as? UICollectionView {
+            } else if let vc_1 = fromVC as? VotersViewController, let vc_2 = toVC as? PollController, let cell = vc_2.tableView.cellForRow(at: vc_1.initialIndex) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_1.collectionView as? UICollectionView {
                 
                 var tempImageViews: [UIImageView] = []
                 for (i, initialImageView) in imageViews.enumerated() {

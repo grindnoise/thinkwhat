@@ -46,6 +46,8 @@ class ProfileSettingsTableViewController: UITableViewController {
                     print("not determined, ask user for permission now")
                 }
                 self.notificationsSwitch.setOn(false, animated: false)
+            default:
+                print("")
             }
         })
     }

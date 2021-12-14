@@ -9,6 +9,10 @@
 import UIKit
 
 class SurveyClaimView: UIView, UITabBarDelegate, UITableViewDataSource {
+    
+    deinit {
+        print("---\(self) deinit()")
+    }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return ClaimCategories.shared.container.count
     }

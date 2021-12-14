@@ -385,8 +385,8 @@ class Survey {
     var category: SurveyCategory
     var description: String
     var question: String
-    var images: [[UIImage: String]]?//Already downloaded -> Download should begin interactively, then store data here
-    var imagesURLs: [[String: String]]?//URL - key, Title - value
+    var images: [Int: [UIImage: String]]?//Already downloaded -> Download should begin interactively, then store data here
+    var imagesURLs: [Int: [String: String]]?//URL - key, Title - value
     var answersWithoutID: [String] = []//Array
     var answers: [Answer] = []
     var answersSortedByVotes: [Answer] {
@@ -510,7 +510,7 @@ class Survey {
 //            userProfile         = AppData.shared.userProfile
             
             //Optional fields
-            if let _images                 = dict[DjangoVariables.Survey.images] as? [[UIImage: String]] {
+            if let _images                 = dict[DjangoVariables.Survey.images] as? [Int: [UIImage: String]] {
                 images = _images
             }
             if let _link                  = dict[DjangoVariables.Survey.hlink] as? String {
@@ -579,10 +579,10 @@ class Survey {
                 }
             }
             if _imageURLs != nil, !_imageURLs.isEmpty {
-                imagesURLs = []
+                imagesURLs = [:]
                 for _imageURL in _imageURLs {
-                    if let _url = _imageURL["image"].stringValue as? String, let _imageTitle = _imageURL["title"].stringValue as? String {
-                        imagesURLs?.append([_url: _imageTitle])
+                    if let _order = _imageURL["order"].intValue as? Int, let _url = _imageURL["image"].stringValue as? String, let _imageTitle = _imageURL["title"].stringValue as? String {
+                        imagesURLs?[_order] = [_url: _imageTitle]
                     }
                 }
             }

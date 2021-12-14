@@ -31,12 +31,21 @@ class VotersViewController: UIViewController {
     private var filterButton: Icon!
     private var needsAnimation = false
     private var requestAttempt = 0
+    private var filtered: [UserProfile] = [] {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
+    private var filters: [String: AnyObject] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.register(UINib(nibName: "UserCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
         loadData()
         setupUI()
+//        filters["lowerAge"] = 20 as AnyObject
+//        filters["upperAge"] = 30 as AnyObject
+//        filters["gender"] = Gender.Male as AnyObject
     }
     
     private func setupUI() {
@@ -65,12 +74,7 @@ class VotersViewController: UIViewController {
     
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
         if recognizer.state == .ended, recognizer.view == filterButton {
-            let anim = Animations.get(property: .FillColor, fromValue: filterButton.iconColor.cgColor, toValue: K_COLOR_RED.cgColor, duration: 0.3, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
-            AlertController.shared.icon.category = .Filter
-            AlertController.shared.show(delegate: self, height: UIScreen.main.bounds.height * 0.5, contentType: .Filter)
-            
-            filterButton.layer.add(anim, forKey: nil)
-            (filterButton.icon as! CAShapeLayer).fillColor = K_COLOR_RED.cgColor
+            AlertController.shared.show(delegate: self, height: UIScreen.main.bounds.height * 0.5, contentType: .VotersFilter, voters: answer.userprofiles, filters: filters)
         }
     }
     
@@ -121,42 +125,50 @@ class VotersViewController: UIViewController {
 
 extension VotersViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return answer.userprofiles.count//users.count
+        return filtered.isEmpty ? answer.userprofiles.count : filtered.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if let user = answer.userprofiles[indexPath.row] as? UserProfile, let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? UserCell {
-            cell.name.text   = user.name
-            cell.age = user.age
-            cell.gender = user.gender
-            if let image = user.image {
-                let circle = image.circularImage(size: cell.imageView.frame.size, frameColor: frameColor)
-                cell.imageView.image = circle
-            } else if let url = answer.userprofiles[indexPath.row].imageURL as? String, !url.isEmpty {
-                let circle = UIImage(named: "user")!.circularImage(size: cell.imageView.frame.size, frameColor: frameColor)
-                cell.imageView.image = circle
-                //Download
-                apiManager.downloadImage(url: url) {
-                    image, error in
-                    if error != nil {
-                        print(error!.localizedDescription)
-                    }
-                    if image != nil {
-                        UIView.transition(with: cell.imageView,
-                                          duration: 0.5,
-                                          options: .transitionCrossDissolve,
-                                          animations: { cell.imageView.image = image!.circularImage(size: cell.imageView.frame.size, frameColor: self.frameColor) }
-                        ) {
-                            _ in
-                            self.answer.userprofiles[indexPath.row].image = image
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? UserCell {
+            var userprofile: UserProfile?
+            if filtered.isEmpty, let user = answer.userprofiles[indexPath.row] as? UserProfile {
+                userprofile = user
+            } else if let user = filtered[indexPath.row] as? UserProfile {
+                userprofile = user
+            }
+            if userprofile != nil {
+                cell.name.text = userprofile!.name
+                cell.age = userprofile!.age
+                cell.gender = userprofile!.gender
+                if let image = userprofile!.image {
+                    let circle = image.circularImage(size: cell.imageView.frame.size, frameColor: frameColor)
+                    cell.imageView.image = circle
+                } else if let url = answer.userprofiles[indexPath.row].imageURL as? String, !url.isEmpty {
+                    let circle = UIImage(named: "user")!.circularImage(size: cell.imageView.frame.size, frameColor: frameColor)
+                    cell.imageView.image = circle
+                    //Download
+                    apiManager.downloadImage(url: url) {
+                        image, error in
+                        if error != nil {
+                            print(error!.localizedDescription)
+                        }
+                        if image != nil {
+                            UIView.transition(with: cell.imageView,
+                                              duration: 0.5,
+                                              options: .transitionCrossDissolve,
+                                              animations: { cell.imageView.image = image!.circularImage(size: cell.imageView.frame.size, frameColor: self.frameColor) }
+                            ) {
+                                _ in
+                                self.answer.userprofiles[indexPath.row].image = image
+                            }
                         }
                     }
+                } else {
+                    let circle = UIImage(named: "user")!.circularImage(size: cell.imageView.frame.size, frameColor: frameColor)
+                    cell.imageView.image = circle
                 }
-            } else {
-                let circle = UIImage(named: "user")!.circularImage(size: cell.imageView.frame.size, frameColor: frameColor)
-                cell.imageView.image = circle
-            }
             return cell
+            }
         }
         return UICollectionViewCell()
     }
@@ -194,6 +206,18 @@ extension VotersViewController: UICollectionViewDelegate, UICollectionViewDataSo
 
 extension VotersViewController: CallbackDelegate {
     func callbackReceived(_ sender: AnyObject) {
-        print(sender)
+        if let dict = sender as? [String: AnyObject] {
+            if let _filtered = dict["filtered"] as? [UserProfile] {
+                filtered = _filtered
+            }
+            if let _filters = dict["filters"] as? [String: AnyObject] {
+                filters = _filters
+            }
+        } else if let identifier = sender as? String, identifier == AlertController.didDisappearSignal {
+            let anim = Animations.get(property: .FillColor, fromValue: filterButton.iconColor.cgColor, toValue: !filters.isEmpty ? K_COLOR_RED.cgColor : UIColor.lightGray.cgColor, duration: 0.5, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
+            //            AlertController.shared.show(delegate: self, height: UIScreen.main.bounds.height * 0.4, contentType: .VotersFilter, voters: answer.userprofiles, filters: ["lowerAge": 20, "upperAge": 30])
+            filterButton.layer.add(anim, forKey: nil)
+            (filterButton.icon as! CAShapeLayer).fillColor = !filters.isEmpty ? K_COLOR_RED.cgColor : UIColor.lightGray.cgColor
+        }
     }
 }

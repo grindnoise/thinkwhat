@@ -31,24 +31,17 @@
                         </constraints>
                     </imageView>
                     <stackView opaque="NO" contentMode="scaleToFill" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="yQw-oF-jfG">
-                        <rect key="frame" x="11.5" y="72" width="57" height="8"/>
+                        <rect key="frame" x="29.5" y="72" width="21.5" height="8"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="мужчина" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dDL-ho-dOH">
-                                <rect key="frame" x="0.0" y="0.0" width="35.5" height="8"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="8"/>
-                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tYD-4q-2Ge" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="35.5" y="0.0" width="8" height="8"/>
+                                <rect key="frame" x="0.0" y="0.0" width="8" height="8"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="tYD-4q-2Ge" secondAttribute="height" multiplier="1:1" id="q1u-wq-Cai"/>
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text=", 30" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0C8-Zw-GNo">
-                                <rect key="frame" x="43.5" y="0.0" width="13.5" height="8"/>
+                                <rect key="frame" x="8" y="0.0" width="13.5" height="8"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="8"/>
                                 <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -85,7 +78,6 @@
             <connections>
                 <outlet property="ageLabel" destination="0C8-Zw-GNo" id="TRZ-5m-zFn"/>
                 <outlet property="genderIcon" destination="tYD-4q-2Ge" id="IHv-Rw-n72"/>
-                <outlet property="genderLabel" destination="dDL-ho-dOH" id="f0j-A5-GPB"/>
                 <outlet property="imageView" destination="oop-6f-1nf" id="Xba-Dr-4IF"/>
                 <outlet property="name" destination="ada-3p-45r" id="pfM-6y-Pxm"/>
             </connections>
