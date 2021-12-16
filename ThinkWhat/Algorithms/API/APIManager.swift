@@ -41,7 +41,7 @@ protocol APIManagerProtocol {
     func subsribeToUserProfile(subscribe: Bool, userprofile: UserProfile, completion: @escaping(JSON?, Error?)->())
     func getBalanceAndPrice()
     //    func requestUserData(socialNetwork: AuthVariant, completion: @escaping (JSON) -> ())
-    func downloadImage(url: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
+    func downloadImage(url: String, progressClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ())
     func downloadImage(url: String, completion: @escaping (UIImage?, Error?) -> ())
     func getVoters(surveyID: Int, answerID: Int, userprofiles: [Int], completion: @escaping(JSON?, Error?)->())
     
@@ -93,8 +93,8 @@ class APIManager: APIManagerProtocol {
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_FAVORITE)
             case .Hot:
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT)
-//            case .HotExcept:
-//                return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT_EXCEPT)
+                //            case .HotExcept:
+                //                return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT_EXCEPT)
             case .User:
                 return url.appendingPathComponent(SERVER_URLS.SURVEYS_BY_OWNER)
             case .UserFavorite:
@@ -108,52 +108,39 @@ class APIManager: APIManagerProtocol {
         didSet {
             if isProxyEnabled != nil && isProxyEnabled != oldValue {
                 if isProxyEnabled == true {
-                    self.sessionManager = proxySessionManager
+                    var proxyDictionary = [AnyHashable: Any]()
+                    proxyDictionary[kCFNetworkProxiesHTTPProxy as String] = "68.183.56.239"
+                    proxyDictionary[kCFNetworkProxiesHTTPPort as String] = 8080
+                    proxyDictionary[kCFNetworkProxiesHTTPEnable as String] = 1
+                    proxyDictionary[kCFStreamPropertyHTTPSProxyHost as String] = "68.183.56.239"
+                    proxyDictionary[kCFStreamPropertyHTTPSProxyPort as String] = 8080
+                    AF.sessionConfiguration.timeoutIntervalForRequest = 15
+                    AF.sessionConfiguration.connectionProxyDictionary = proxyDictionary
                 } else {
-                    self.sessionManager = defaultSessionManager
+                    AF.sessionConfiguration.timeoutIntervalForRequest = 10
                 }
             }
         }
     }
-    private var defaultSessionManager: Alamofire.SessionManager {
-        let configuration = Alamofire.SessionManager.default.session.configuration
-        configuration.timeoutIntervalForRequest = 10
-//        configuration.timeoutIntervalForResource = 10
-        return Alamofire.SessionManager(configuration: configuration)
-    }
-    private var proxySessionManager: Alamofire.SessionManager {
-        var proxyDictionary = [AnyHashable: Any]()
-        proxyDictionary[kCFNetworkProxiesHTTPProxy as String] = "68.183.56.239"
-        proxyDictionary[kCFNetworkProxiesHTTPPort as String] = 8080
-        proxyDictionary[kCFNetworkProxiesHTTPEnable as String] = 1
-        proxyDictionary[kCFStreamPropertyHTTPSProxyHost as String] = "68.183.56.239"
-        proxyDictionary[kCFStreamPropertyHTTPSProxyPort as String] = 8080
-        let proxyConfig = Alamofire.SessionManager.default.session.configuration
-        proxyConfig.connectionProxyDictionary = proxyDictionary
-        proxyConfig.timeoutIntervalForRequest = 10
-        return Alamofire.SessionManager(configuration: proxyConfig)
-    }
-    private var sessionManager: Alamofire.SessionManager!
     
     init() {
-        sessionManager = defaultSessionManager
+        //TODO: - Read from UserDefaults
+        isProxyEnabled = false
     }
     
     private func checkForReachability(completion: @escaping(ApiReachabilityState) -> ()) {
         let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.CURRENT_TIME)
-        Alamofire.SessionManager.default.request(url, method: .get, parameters: [:], encoding: URLEncoding(), headers: nil).responseJSON(completionHandler: {
-            response in
+        AF.request(url, method: .get, parameters: [:], encoding: URLEncoding(), headers: nil).response { response in
             var state = ApiReachabilityState.None
-            if let _error = response.result.error as? AFError {
-                if _error.responseCode == NSURLErrorTimedOut {
-                    print(_error.responseCode!)
-                }
-            } else if response.response != nil {
-                state = .Reachable
+            switch response.result {
+            case .success:
+                state = ApiReachabilityState.Reachable
+            case .failure(let error):
+                print(error.localizedDescription)
             }
             apiReachability = state
             completion(state)
-        })
+        }
     }
     
     private func parseAFError(_ error: AFError) -> Error {
@@ -180,10 +167,33 @@ class APIManager: APIManagerProtocol {
                 errorDescription += ("Response content type: \(responseContentType) was unacceptable: \(acceptableContentTypes)")
             case .unacceptableStatusCode(let code):
                 errorDescription += ("Response status code was unacceptable: \(code)")
+            case .customValidationFailed(let description):
+                errorDescription += ("Validation error: \(description.localizedDescription)")
             }
         case .responseSerializationFailed(let reason):
             errorDescription = ("Response serialization failed: \(error.localizedDescription)")
             errorDescription += ("Failure Reason: \(reason)")
+            
+            switch reason {
+            case .customSerializationFailed(let error):
+                errorDescription += ("A custom response serializer failed due to error: \(error)")
+            case .decodingFailed(let error):
+                errorDescription += ("A DataDecoder failed to decode the response due to: \(error)")
+            case .inputDataNilOrZeroLength:
+                errorDescription += ("The server response contained no data or the data was zero length")
+            case .inputFileNil:
+                errorDescription += ("The file containing the server response did not exist")
+            case .inputFileReadFailed(let url):
+                errorDescription += ("The file containing the server response could not be read from the associated URL: \(url)")
+            case .invalidEmptyResponse(let type):
+                errorDescription += ("Generic serialization failed for an empty response that wasn’t type Empty but instead the associated type: \(type)")
+            case .jsonSerializationFailed(let error):
+                errorDescription += ("JSON serialization failed with an underlying system error: \(error)")
+            case .stringSerializationFailed(let encoding):
+                errorDescription += ("String serialization failed using the provided String.Encoding: \(encoding)")
+            }
+        default:
+            errorDescription += "Error: \(error.localizedDescription)"
         }
         return NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
     }
@@ -191,8 +201,9 @@ class APIManager: APIManagerProtocol {
     private func parseDjangoError(_ json: JSON) -> TokenState {
         var _tokenState = TokenState.Unassigned
         for attr in json {
-            if attr.0 == "error_description"{
-                if let errorDesc = attr.1.stringValue.lowercased() as? String {
+            if attr.0 == "error_description" {
+//                if let errorDesc = attr.1.stringValue.lowercased() as? String {
+                let errorDesc = attr.1.stringValue.lowercased()
                     if errorDesc.contains(DjangoError.InvalidGrant.rawValue) {
                         _tokenState = .WrongCredentials
                     } else if errorDesc.contains(DjangoError.AccessDenied.rawValue) {
@@ -203,15 +214,7 @@ class APIManager: APIManagerProtocol {
                         print(attr.1.stringValue)
                         fatalError("func parseDjangoError failed to downcast attr.1.string")
                     }
-                    //            case "error_description":
-                    //                print(attr.1.stringValue)
-                    //                switch attr.1.stringValue {
-                    //                case DjangoError.InvalidGrant.rawValue:
-                    //                    _tokenState = .WrongCredentials
-                    //                default:
-                    //                    _tokenState = .Unassigned
-                    //                }
-                }
+//                }
             }
         }
         return _tokenState
@@ -224,19 +227,6 @@ class APIManager: APIManagerProtocol {
         return TokenState.Error
     }
     
-    //    private func setupProxyConfiguration() {
-    //
-    //        var proxyDictionary = [AnyHashable: Any]()
-    //        proxyDictionary[kCFNetworkProxiesHTTPProxy as String] = "45.112.126.238"
-    //        proxyDictionary[kCFNetworkProxiesHTTPPort as String] = 3128
-    //        proxyDictionary[kCFNetworkProxiesHTTPEnable as String] = 1
-    //        proxyDictionary[kCFStreamPropertyHTTPSProxyHost as String] = "45.112.126.238"
-    //        proxyDictionary[kCFStreamPropertyHTTPSProxyPort as String] = 3128
-    //        let proxyConfig = Alamofire.SessionManager.default.session.configuration
-    //        proxyConfig.connectionProxyDictionary = proxyDictionary
-    //        proxyConfig.timeoutIntervalForRequest = 10
-    //        sessionManager = Alamofire.SessionManager(configuration: proxyConfig)
-    //    }
     func getEmailConfirmationCode(completion: @escaping(JSON?, Error?)->()) {
         var error: Error?
         
@@ -309,74 +299,115 @@ class APIManager: APIManagerProtocol {
         func usernameLogin(username: String, password: String) {
             parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
             url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.TOKEN)
-            sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    _tokenState = self.parseDebugDescription(response.result.debugDescription)
-                }
-                if let error = response.result.error as? AFError {
-                    self.parseAFError(error)
-                } else {
-                    if let statusCode  = response.response?.statusCode {
-                        if 200...299 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                print(json)
+            AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
+                switch response.result {
+                case .success(let value):
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: value!, options: .mutableContainers)
+                        if let statusCode = response.response?.statusCode {
+                            if 200...299 ~= statusCode {
                                 saveTokenInKeychain(json: json, tokenState: &_tokenState)
                                 _tokenState = .Received
-                                //                                DispatchQueue.main.async {
-                                //                                    self.getUserData()
-                                //                                }
-                            } catch {
-                                print(error.localizedDescription)
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
+                            } else if 400...499 ~= statusCode {
                                 _tokenState = self.parseDjangoError(json)
-                            } catch {
-                                print(error.localizedDescription)
                             }
                         }
+                    }  catch let error {
+                        print("Error: \(error.localizedDescription)")
                     }
+                case let .failure(error):
+                    print(error)
                 }
                 completion(_tokenState)
             }
+//            AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
+//                switch response.result {
+//                case .success:
+//                    if let statusCode = response.response?.statusCode {
+//                        if 200...299 ~= statusCode {
+//                            do {
+//                                let json = try JSON(data: response.data!)
+//                                saveTokenInKeychain(json: json, tokenState: &_tokenState)
+//                                _tokenState = .Received
+//                            }
+//                        } else if 400...499 ~= statusCode {
+//                            do {
+//                                let json = try JSON(data: response.data!)
+//                                _tokenState = self.parseDjangoError(json)
+//                            } catch {
+//                                print(error.localizedDescription)
+//                            }
+//                        }
+//                    }
+//                case .failure(let error):
+//                    _tokenState = self.parseDebugDescription(error.localizedDescription)
+//                }
+//                completion(_tokenState)
+//            }
         }
         
         func socialMediaLogin(token: String) {
             parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(auth.rawValue.lowercased())", "token": "\(token)"]
             print(parameters)
             url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.TOKEN_CONVERT)
-            sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).responseJSON() {
-                response in
-                if response.result.isFailure {
-                    _tokenState = self.parseDebugDescription(response.result.debugDescription)
-                }
-                if let error = response.result.error as? AFError {
-                    self.parseAFError(error)
-                } else {
-                    if let statusCode  = response.response?.statusCode{
-                        if 200...299 ~= statusCode {
-                            if let json = try? JSON(data: response.data!) {
+            AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).response { response in
+                switch response.result {
+                case .success(let value):
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: value!, options: .mutableContainers)
+                        if let statusCode = response.response?.statusCode {
+                            if 200...299 ~= statusCode {
                                 saveTokenInKeychain(json: json, tokenState: &_tokenState)
                                 _tokenState = .Received
-                            }
-                            //                            DispatchQueue.main.async {
-                            //                                self.getUserData()
-                            //                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                print(json.stringValue)
+                            } else if 400...499 ~= statusCode {
                                 _tokenState = self.parseDjangoError(json)
-                            } catch {
-                                print(error.localizedDescription)
                             }
                         }
+                    }  catch let error {
+                        print("Error: \(error.localizedDescription)")
                     }
+//                    if let statusCode = response.response?.statusCode, let json = JSON(value!) as? JSON {
+//                        if 200...299 ~= statusCode {
+//                            saveTokenInKeychain(json: json, tokenState: &_tokenState)
+//                            _tokenState = .Received
+//                        } else if 400...499 ~= statusCode {
+//                            _tokenState = self.parseDjangoError(json)
+//                        }
+//                    }
+                case let .failure(error):
+                    print(error)
                 }
                 completion(_tokenState)
+
+//                if response.result.isFailure {
+//                    _tokenState = self.parseDebugDescription(response.result.debugDescription)
+//                }
+//                if let error = response.result.error as? AFError {
+//                    self.parseAFError(error)
+//                } else {
+//                    if let statusCode  = response.response?.statusCode{
+//                        if 200...299 ~= statusCode {
+//                            if let json = try? JSON(data: response.data!) {
+//                                saveTokenInKeychain(json: json, tokenState: &_tokenState)
+//                                _tokenState = .Received
+//                            }
+//                            //                            DispatchQueue.main.async {
+//                            //                                self.getUserData()
+//                            //                            }
+//                        } else if 400...499 ~= statusCode {
+//                            do {
+//                                let json = try JSON(data: response.data!)
+//                                print(json.stringValue)
+//                                _tokenState = self.parseDjangoError(json)
+//                            } catch {
+//                                print(error.localizedDescription)
+//                            }
+//                        }
+//                    }
+//                }
+//                completion(_tokenState)
             }
         }
     }
@@ -407,32 +438,56 @@ class APIManager: APIManagerProtocol {
                 //                Surveys.shared.eraseData()
                 //                FBManager.performLogout()
                 //                VKManager.performLogout()
-                sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON() {
-                    response in
-                    if response.result.isFailure {
-                        print(response.result.description)
-                        //                        delay(seconds: 5) { performRequest() }
-                        temporaryTokenToRevoke = ""
-                    }
-                    if let error = response.result.error as? AFError {
-                        self.parseAFError(error)
-                    } else {
-                        if let statusCode  = response.response?.statusCode {
-                            if 200...299 ~= statusCode {
-                                print("LOGGED OUT")
-                                temporaryTokenToRevoke = ""
-                                _tokenState = .Revoked
-                            } else if 400...499 ~= statusCode {
-                                do {
-                                    let json = try JSON(data: response.data!)
-                                    print(json)
-                                } catch {
-                                    print(error.localizedDescription)
+                AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
+                    switch response.result {
+                    case .success(let value):
+                        do {
+                            //TODO: Определиться с инициализацией JSON
+                            let json = try JSON(data: value!, options: .mutableContainers)
+                            if let statusCode = response.response?.statusCode {
+                                if 200...299 ~= statusCode {
+                                    print("LOGGED OUT")
+                                    temporaryTokenToRevoke = ""
+                                    _tokenState = .Revoked
+                                } else if 400...499 ~= statusCode {
+                                    _tokenState = self.parseDjangoError(json)
                                 }
                             }
+                        }  catch let error {
+                            temporaryTokenToRevoke = ""
+                            print("Error: \(error.localizedDescription)")
                         }
+                    case let .failure(error):
+                        print(self.parseAFError(error))
+                        temporaryTokenToRevoke = ""
                     }
                     completion(_tokenState)
+                    
+                    
+//                    if response.result.isFailure {
+//                        print(response.result.description)
+//                        //                        delay(seconds: 5) { performRequest() }
+//                        temporaryTokenToRevoke = ""
+//                    }
+//                    if let error = response.result.error as? AFError {
+//                        self.parseAFError(error)
+//                    } else {
+//                        if let statusCode  = response.response?.statusCode {
+//                            if 200...299 ~= statusCode {
+//                                print("LOGGED OUT")
+//                                temporaryTokenToRevoke = ""
+//                                _tokenState = .Revoked
+//                            } else if 400...499 ~= statusCode {
+//                                do {
+//                                    let json = try JSON(data: response.data!)
+//                                    print(json)
+//                                } catch {
+//                                    print(error.localizedDescription)
+//                                }
+//                            }
+//                        }
+//                    }
+//                    completion(_tokenState)
                 }
             }
         }
@@ -454,42 +509,65 @@ class APIManager: APIManagerProtocol {
         func performRequest() {
             let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "grant_type": "password", "email": "\(email)", "password": "\(password)", "username": "\(username)"]
             let url =  URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SIGNUP)
-            sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON() {
-                response in
-                //                var success = false
-                if response.result.isFailure {
-                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
-                }
-                if let _error = response.result.error as? AFError {
-                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: self.parseAFError(_error)]) as Error
-                } else {
-                    let statusCode  = response.response?.statusCode
-                    if 200...299 ~= statusCode! {
-                        do {
-                            let json = try JSON(data: response.data!)
-                            //                            TemporaryUserCredentials.shared.importJson(json)
-                            self.login(.Username, username: username, password: password, token: nil, completion: { (state) in
-                                tokenState = state
-                            })
-                        } catch {
-                            print(error.localizedDescription)
+            AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
+                switch response.result {
+                case .success(let value):
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: value!, options: .mutableContainers)
+                        if let statusCode = response.response?.statusCode {
+                            if 200...299 ~= statusCode {
+                                self.login(.Username, username: username, password: password, token: nil, completion: { (state) in
+                                    tokenState = state
+                                })
+                            } else if 400...499 ~= statusCode, let errorDescription = json.rawString() {
+                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
+                            }
                         }
-                        //                        success = true
-                        //                        if login {
-                        //                            self.login(.Mail, username: username, password: password, token: nil, completion: { (state) in
-                        //                                tokenState = state
-                        //                            })
-                        //                        }
-                    } else if 400...499 ~= statusCode! {
-                        do {
-                            let json = try JSON(data: response.data!)
-                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: json.rawString()]) as Error
-                        } catch let _error {
-                            error = _error
-                        }
+                    }  catch let _error {
+                        error = _error
+                        print(_error.localizedDescription)
                     }
+                case let .failure(_error):
+                    error = _error
                 }
                 completion(error)
+                
+                
+                
+//                if response.result.isFailure {
+//                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
+//                }
+//                if let _error = response.result.error as? AFError {
+//                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: self.parseAFError(_error)]) as Error
+//                } else {
+//                    let statusCode  = response.response?.statusCode
+//                    if 200...299 ~= statusCode! {
+//                        do {
+//                            let json = try JSON(data: response.data!)
+//                            //                            TemporaryUserCredentials.shared.importJson(json)
+//                            self.login(.Username, username: username, password: password, token: nil, completion: { (state) in
+//                                tokenState = state
+//                            })
+//                        } catch {
+//                            print(error.localizedDescription)
+//                        }
+//                        //                        success = true
+//                        //                        if login {
+//                        //                            self.login(.Mail, username: username, password: password, token: nil, completion: { (state) in
+//                        //                                tokenState = state
+//                        //                            })
+//                        //                        }
+//                    } else if 400...499 ~= statusCode! {
+//                        do {
+//                            let json = try JSON(data: response.data!)
+//                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: json.rawString()]) as Error
+//                        } catch let _error {
+//                            error = _error
+//                        }
+//                    }
+//                }
+//                completion(error)
             }
         }
     }
@@ -560,7 +638,6 @@ class APIManager: APIManagerProtocol {
         }
         
         func performRequest() {
-            
             let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.PROFILES + AppData.shared.userProfile.ID! + "/")
             let headers: HTTPHeaders = [
                 "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
@@ -568,7 +645,7 @@ class APIManager: APIManagerProtocol {
             ]
             if let image = data["image"] as? UIImage {
                 dict.removeValue(forKey: "image")
-                Alamofire.upload(multipartFormData: { multipartFormData in
+                AF.upload(multipartFormData: { multipartFormData in
                     var imgExt: FileFormat = .Unknown
                     var imageData: Data?
                     if let data = image.jpegData(compressionQuality: 1) {
@@ -584,47 +661,96 @@ class APIManager: APIManagerProtocol {
                             multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
                         }
                     }
-                }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .patch, headers: headers) {
-                    result in
-                    switch result {
-                    case .failure(let _error):
-                        error = _error
-                        completion(json, error)
-                    case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
-                        upload.uploadProgress(closure: { (progress) in
-                            print("Upload Progress: \(progress.fractionCompleted)")
-                        })
-                        upload.responseJSON(completionHandler: { (response) in
-                            if response.result.isFailure {
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
-                            }
-                            if let _error = response.result.error as? AFError {
-                                error = self.parseAFError(_error)
-                            } else {
-                                if let statusCode  = response.response?.statusCode{
-                                    if 200...299 ~= statusCode {
-                                        do {
-                                            json = try JSON(data: response.data!)
-                                        } catch let _error {
-                                            error = _error
-                                        }
-                                    } else if 400...499 ~= statusCode {
-                                        do {
-                                            let errorJSON = try JSON(data: response.data!)
-                                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()]) as Error
-                                        } catch let _error {
-                                            error = _error
-                                        }
-                                    }
+                }, to: url, method: HTTPMethod.patch, headers: headers).uploadProgress(queue: .main, closure: { progress in
+                    print("Upload Progress: \(progress.fractionCompleted)")
+                }).response { response in
+                    switch response.result {
+                    case .success(let value):
+                        do {
+                            //TODO: Определиться с инициализацией JSON
+                            json = try JSON(data: value!, options: .mutableContainers)
+                            if let statusCode = response.response?.statusCode {
+                                if 200...299 ~= statusCode {
+                                    print("Upload complete: \(json)")
+                                } else if 400...499 ~= statusCode, let errorDescription = json?.rawString() {
+                                    error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
                                 }
-                                completion(json, error)
                             }
-                        })
+                            completion(json, error)
+                        }  catch let _error {
+                            error = _error
+                            print(_error.localizedDescription)
+                        }
+                    case let .failure(_error):
+                        error = _error
+                        completion(nil, error)
                     }
                 }
             } else {
                 _performRequest(url: url, httpMethod: .patch, parameters: data, encoding: JSONEncoding.default, completion: completion)
             }
+            
+            
+                
+                
+                
+//                AF.upload(multipartFormData: { multipartFormData in
+//                    var imgExt: FileFormat = .Unknown
+//                    var imageData: Data?
+//                    if let data = image.jpegData(compressionQuality: 1) {
+//                        imageData = data
+//                        imgExt = .JPEG
+//                    } else if let data = image.pngData() {
+//                        imageData = data
+//                        imgExt = .PNG
+//                    }
+//                    multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
+//                    for (key, value) in dict {
+//                        if value is String || value is Int {
+//                            multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
+//                        }
+//                    }
+//                }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .patch, headers: headers) {
+//                    result in
+//                    switch result {
+//                    case .failure(let _error):
+//                        error = _error
+//                        completion(json, error)
+//                    case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
+//                        upload.uploadProgress(closure: { (progress) in
+//                            print("Upload Progress: \(progress.fractionCompleted)")
+//                        })
+//                        upload.responseJSON(completionHandler: { (response) in
+//                            if response.result.isFailure {
+//                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
+//                            }
+//                            if let _error = response.result.error as? AFError {
+//                                error = self.parseAFError(_error)
+//                            } else {
+//                                if let statusCode  = response.response?.statusCode{
+//                                    if 200...299 ~= statusCode {
+//                                        do {
+//                                            json = try JSON(data: response.data!)
+//                                        } catch let _error {
+//                                            error = _error
+//                                        }
+//                                    } else if 400...499 ~= statusCode {
+//                                        do {
+//                                            let errorJSON = try JSON(data: response.data!)
+//                                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()]) as Error
+//                                        } catch let _error {
+//                                            error = _error
+//                                        }
+//                                    }
+//                                }
+//                                completion(json, error)
+//                            }
+//                        })
+//                    }
+//                }
+//            } else {
+//                _performRequest(url: url, httpMethod: .patch, parameters: data, encoding: JSONEncoding.default, completion: completion)
+//            }
         }
     }
     
@@ -683,34 +809,60 @@ class APIManager: APIManagerProtocol {
         }
         
         func performRequest() {
-            
             let refresh_token = KeychainService.loadRefreshToken()! as String
             let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refresh_token)"]
             let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.TOKEN)
-            sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
-                response in
+            
+            AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
                 var _tokenState = TokenState.Error
-                if let _error = response.result.error as? AFError {
-                    let error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: self.parseAFError(_error)]) as Error
-                    print(error.localizedDescription)
-                } else {
-                    let statusCode  = response.response?.statusCode
-                    if 200...299 ~= statusCode! {
-                        if let json = try? JSON(data: response.data!) {
-                            for attr in json {
-                                print("\(attr.0): \(attr.1.stringValue)")
+                switch response.result {
+                case .success(let value):
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: value!, options: .mutableContainers)
+                        if let statusCode = response.response?.statusCode {
+                            if 200...299 ~= statusCode {
+                                saveTokenInKeychain(json: json, tokenState: &tokenState)
+                                _tokenState = TokenState.Received
+                            } else if 400...499 ~= statusCode, let errorDescription = json.rawString() {
+                                print(NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error)
                             }
-                            saveTokenInKeychain(json: json, tokenState: &tokenState)
-                            _tokenState = TokenState.Received
-                        } else {
-                            _tokenState = .Error
                         }
-                    } else if 400...499 ~= statusCode! {
-                        _tokenState = .Error
+                    }  catch let _error {
+                        print(_error.localizedDescription)
                     }
-                    completion(_tokenState)
+                case let .failure(_error):
+                    print(_error.localizedDescription)
                 }
-            })
+                completion(_tokenState)
+            }
+            
+            
+            
+//            session.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).responseJSON(completionHandler: {
+//                response in
+//                var _tokenState = TokenState.Error
+//                if let _error = response.result.error as? AFError {
+//                    let error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: self.parseAFError(_error)]) as Error
+//                    print(error.localizedDescription)
+//                } else {
+//                    let statusCode  = response.response?.statusCode
+//                    if 200...299 ~= statusCode! {
+//                        if let json = try? JSON(data: response.data!) {
+//                            for attr in json {
+//                                print("\(attr.0): \(attr.1.stringValue)")
+//                            }
+//                            saveTokenInKeychain(json: json, tokenState: &tokenState)
+//                            _tokenState = TokenState.Received
+//                        } else {
+//                            _tokenState = .Error
+//                        }
+//                    } else if 400...499 ~= statusCode! {
+//                        _tokenState = .Error
+//                    }
+//                    completion(_tokenState)
+//                }
+//            })
         }
     }
     
@@ -739,7 +891,7 @@ class APIManager: APIManagerProtocol {
         var error: Error?
         var httpMethod: HTTPMethod = .get
         var url: URL = type.getURL()
-//        var encoding
+        //        var encoding
         
         checkForReachability {
             reachable in
@@ -751,20 +903,20 @@ class APIManager: APIManagerProtocol {
                     } else if success {
                         var parameters: [String: [Any]]?
                         if type == .Hot {
-//                            var list: [Int] = []
-//                            if !Surveys.shared.stackObjects.isEmpty {
-//                                list = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
-//                            }
-//                            if let _id = Surveys.shared.currentHotSurvey?.ID {
-//                                list.append(_id)
-//                            }
-//                            if !list.isEmpty {
-//                                parameters = list.asParameters(arrayParametersKey: "ids") as! [String : [Any]]//["ids": ["df", "sdf"]]
-//                                httpMethod = .post
-//                                url = APIManager.SurveyType.HotExcept.getURL()
-//                            }
+                            //                            var list: [Int] = []
+                            //                            if !Surveys.shared.stackObjects.isEmpty {
+                            //                                list = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+                            //                            }
+                            //                            if let _id = Surveys.shared.currentHotSurvey?.ID {
+                            //                                list.append(_id)
+                            //                            }
+                            //                            if !list.isEmpty {
+                            //                                parameters = list.asParameters(arrayParametersKey: "ids") as! [String : [Any]]//["ids": ["df", "sdf"]]
+                            //                                httpMethod = .post
+                            //                                url = APIManager.SurveyType.HotExcept.getURL()
+                            //                            }
                         }
-//                        parameters = nil
+                        //                        parameters = nil
                         self._performRequest(url: url, httpMethod: httpMethod, parameters: parameters, encoding: JSONEncoding.default, completion: completion)
                     }
                 }
@@ -774,10 +926,10 @@ class APIManager: APIManagerProtocol {
             }
         }
     }
-   
+    
     
     func loadSurveyCategories(completion: @escaping(JSON?, Error?)->()) {
-//        var json: JSON?
+        //        var json: JSON?
         var error: Error?
         
         checkForReachability {
@@ -965,9 +1117,8 @@ class APIManager: APIManagerProtocol {
                         ]
                         url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_MEDIA)
                         var uploadError: Error?
-                        for image in images! {
-                            Alamofire.upload(multipartFormData: { multipartFormData in
-                                //                            for image in images! {
+                        for (index, image) in images!.enumerated() {
+                            AF.upload(multipartFormData: { multipartFormData in
                                 var imgExt: FileFormat = .Unknown
                                 var imageData: Data?
                                 if let data = image.keys.first!.jpegData(compressionQuality: 1) {
@@ -979,125 +1130,177 @@ class APIManager: APIManagerProtocol {
                                 }
                                 multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
                                 multipartFormData.append("\(surveyID)".data(using: .utf8)!, withName: "survey")
+                                multipartFormData.append("\(index)".data(using: .utf8)!, withName: "order")
                                 if !(image.values.first?.isEmpty)! {
                                     multipartFormData.append(image.values.first!.data(using: .utf8)!, withName: "title")
                                 }
-                            }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .post, headers: headers) {
-                                result in
-                                switch result {
-                                case .failure(let _error):
-                                    uploadError = _error
-                                //                                completion(json, error)
-                                case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
-                                    upload.uploadProgress(closure: { (progress) in
-                                        print("Upload Progress: \(progress.fractionCompleted)")
-                                    })
-                                    upload.responseJSON(completionHandler: { (response) in
-                                        if response.result.isFailure {
-                                            uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
-                                        }
-                                        if let _error = response.result.error as? AFError {
-                                            uploadError = self.parseAFError(_error)
-                                        } else {
-                                            if let statusCode  = response.response?.statusCode{
-                                                if 200...299 ~= statusCode {
-                                                    do {
-                                                        json = try JSON(data: response.data!)
-                                                    } catch let _error {
-                                                        uploadError = _error
-                                                    }
-                                                    
-                                                    //TODO save local
-                                                } else if 400...499 ~= statusCode {
-                                                    do {
-                                                        let errorJSON = try JSON(data: response.data!)
-                                                        uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
-                                                        print(uploadError!)
-                                                    } catch let _error {
-                                                        uploadError = _error
-                                                    }
-                                                }
+                            }, to: url, method: HTTPMethod.patch, headers: headers).uploadProgress(queue: .main, closure: { progress in
+                                print("Upload Progress: \(progress.fractionCompleted)")
+                            }).response { response in
+                                switch response.result {
+                                case .success(let value):
+                                    do {
+                                        //TODO: Определиться с инициализацией JSON
+                                        json = try JSON(data: value!, options: .mutableContainers)
+                                        if let statusCode = response.response?.statusCode {
+                                            if 200...299 ~= statusCode {
+                                                print("Upload complete: \(String(describing: json))")
+                                            } else if 400...499 ~= statusCode, let errorDescription = json?.rawString() {
+                                                uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
+                                                print(uploadError!)
                                             }
                                         }
-                                    })
+                                        completion(json, error)
+                                    }  catch let _error {
+                                        uploadError = _error
+                                        print(_error.localizedDescription)
+                                    }
+                                case let .failure(_error):
+                                    uploadError = _error
+                                    completion(nil, error)
                                 }
                             }
                         }
-                        error = uploadError
-                        completion(json, error)
+                        completion(json, uploadError)
                     } else {
                         completion(json, error)
                     }
+//
+//
+//
+//
+//                            Alamofire.upload(multipartFormData: { multipartFormData in
+//                                //                            for image in images! {
+//                                var imgExt: FileFormat = .Unknown
+//                                var imageData: Data?
+//                                if let data = image.keys.first!.jpegData(compressionQuality: 1) {
+//                                    imageData = data
+//                                    imgExt = .JPEG
+//                                } else if let data = image.keys.first!.pngData() {
+//                                    imageData = data
+//                                    imgExt = .PNG
+//                                }
+//                                multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
+//                                multipartFormData.append("\(surveyID)".data(using: .utf8)!, withName: "survey")
+//                                if !(image.values.first?.isEmpty)! {
+//                                    multipartFormData.append(image.values.first!.data(using: .utf8)!, withName: "title")
+//                                }
+//                            }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .post, headers: headers) {
+//                                result in
+//                                switch result {
+//                                case .failure(let _error):
+//                                    uploadError = _error
+//                                    //                                completion(json, error)
+//                                case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
+//                                    upload.uploadProgress(closure: { (progress) in
+//                                        print("Upload Progress: \(progress.fractionCompleted)")
+//                                    })
+//                                    upload.responseJSON(completionHandler: { (response) in
+//                                        if response.result.isFailure {
+//                                            uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
+//                                        }
+//                                        if let _error = response.result.error as? AFError {
+//                                            uploadError = self.parseAFError(_error)
+//                                        } else {
+//                                            if let statusCode  = response.response?.statusCode{
+//                                                if 200...299 ~= statusCode {
+//                                                    do {
+//                                                        json = try JSON(data: response.data!)
+//                                                    } catch let _error {
+//                                                        uploadError = _error
+//                                                    }
+//
+//                                                    //TODO save local
+//                                                } else if 400...499 ~= statusCode {
+//                                                    do {
+//                                                        let errorJSON = try JSON(data: response.data!)
+//                                                        uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
+//                                                        print(uploadError!)
+//                                                    } catch let _error {
+//                                                        uploadError = _error
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                    })
+//                                }
+//                            }
+//                        }
+//                        error = uploadError
+//                        completion(json, error)
+//                    } else {
+//                        completion(json, error)
+//                    }
                 }
             }
-
-
-
-//
-//
-//            if let images = dict["media"] as? [[UIImage: String]], images.count != 0 {
-//                dict.removeValue(forKey: "images")
-//                Alamofire.upload(multipartFormData: { multipartFormData in
-//                    for image in images {
-//                        var imgExt: FileFormat = .Unknown
-//                        var imageData: Data?
-//                        if let data = image.keys.first!.jpegData(compressionQuality: 1) {
-//                            imageData = data
-//                            imgExt = .JPEG
-//                        } else if let data = image.keys.first!.pngData() {
-//                            imageData = data
-//                            imgExt = .PNG
-//                        }
-//                        multipartFormData.append(imageData!, withName: "media.image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
-//                        multipartFormData.append("\(image.values.first!)".data(using: .utf8)!, withName: "media.title")
-//                    }
-//
-//                    for (key, value) in dict {
-//                        if value is String || value is Int {
-//                            multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
-//                        }
-//                    }
-//                }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .patch, headers: headers) {
-//                    result in
-//                    switch result {
-//                    case .failure(let _error):
-//                        error = _error
-//                        completion(json, error)
-//                    case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
-//                        upload.uploadProgress(closure: { (progress) in
-//                            print("Upload Progress: \(progress.fractionCompleted)")
-//                        })
-//                        upload.responseJSON(completionHandler: { (response) in
-//                            if response.result.isFailure {
-//                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
-//                            }
-//                            if let _error = response.result.error as? AFError {
-//                                error = self.parseAFError(_error)
-//                            } else {
-//                                if let statusCode  = response.response?.statusCode{
-//                                    if 200...299 ~= statusCode {
-//                                        do {
-//                                            json = try JSON(data: response.data!)
-//                                        } catch let _error {
-//                                            error = _error
-//                                        }
-//                                    } else if 400...499 ~= statusCode {
-//                                        do {
-//                                            let errorJSON = try JSON(data: response.data!)
-//                                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()]) as Error
-//                                        } catch let _error {
-//                                            error = _error
-//                                        }
-//                                    }
-//                                }
-//                                completion(json, error)
-//                            }
-//                        })
-//                    }
-//                }
-//            } else {
-//                _performRequest(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default, completion: completion)
-//            }
+            
+            
+            
+            //
+            //
+            //            if let images = dict["media"] as? [[UIImage: String]], images.count != 0 {
+            //                dict.removeValue(forKey: "images")
+            //                Alamofire.upload(multipartFormData: { multipartFormData in
+            //                    for image in images {
+            //                        var imgExt: FileFormat = .Unknown
+            //                        var imageData: Data?
+            //                        if let data = image.keys.first!.jpegData(compressionQuality: 1) {
+            //                            imageData = data
+            //                            imgExt = .JPEG
+            //                        } else if let data = image.keys.first!.pngData() {
+            //                            imageData = data
+            //                            imgExt = .PNG
+            //                        }
+            //                        multipartFormData.append(imageData!, withName: "media.image", fileName: "\(AppData.shared.userProfile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
+            //                        multipartFormData.append("\(image.values.first!)".data(using: .utf8)!, withName: "media.title")
+            //                    }
+            //
+            //                    for (key, value) in dict {
+            //                        if value is String || value is Int {
+            //                            multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
+            //                        }
+            //                    }
+            //                }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .patch, headers: headers) {
+            //                    result in
+            //                    switch result {
+            //                    case .failure(let _error):
+            //                        error = _error
+            //                        completion(json, error)
+            //                    case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
+            //                        upload.uploadProgress(closure: { (progress) in
+            //                            print("Upload Progress: \(progress.fractionCompleted)")
+            //                        })
+            //                        upload.responseJSON(completionHandler: { (response) in
+            //                            if response.result.isFailure {
+            //                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
+            //                            }
+            //                            if let _error = response.result.error as? AFError {
+            //                                error = self.parseAFError(_error)
+            //                            } else {
+            //                                if let statusCode  = response.response?.statusCode{
+            //                                    if 200...299 ~= statusCode {
+            //                                        do {
+            //                                            json = try JSON(data: response.data!)
+            //                                        } catch let _error {
+            //                                            error = _error
+            //                                        }
+            //                                    } else if 400...499 ~= statusCode {
+            //                                        do {
+            //                                            let errorJSON = try JSON(data: response.data!)
+            //                                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()]) as Error
+            //                                        } catch let _error {
+            //                                            error = _error
+            //                                        }
+            //                                    }
+            //                                }
+            //                                completion(json, error)
+            //                            }
+            //                        })
+            //                    }
+            //                }
+            //            } else {
+            //                _performRequest(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default, completion: completion)
+            //            }
         }
     }
     
@@ -1151,15 +1354,15 @@ class APIManager: APIManagerProtocol {
                     if error != nil {
                         print(error!)
                     } else if success {
-//                        var parameters: [String: Any] = ["survey": survey.ID! as Any]
-////                        print("Surveys.shared.stackObjects.count \(Surveys.shared.stackObjects.count)")
-//                        if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
-//                            var list = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
-//                            if !list.isEmpty {
-//                                let dict = list.asParameters(arrayParametersKey: "ids") as! [String : Any]
-//                                parameters.merge(dict) {(current, _) in current}
-//                            }
-//                        }
+                        //                        var parameters: [String: Any] = ["survey": survey.ID! as Any]
+                        ////                        print("Surveys.shared.stackObjects.count \(Surveys.shared.stackObjects.count)")
+                        //                        if Surveys.shared.stackObjects.count <= MIN_STACK_SIZE {
+                        //                            var list = Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+                        //                            if !list.isEmpty {
+                        //                                let dict = list.asParameters(arrayParametersKey: "ids") as! [String : Any]
+                        //                                parameters.merge(dict) {(current, _) in current}
+                        //                            }
+                        //                        }
                         self._performRequest(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_REJECT), httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, completion: completion)
                     }
                 }
@@ -1171,9 +1374,9 @@ class APIManager: APIManagerProtocol {
     
     func postClaim(survey: Survey, claimCategory: ClaimCategory, completion: @escaping(JSON?, Error?)->()) {
         //Local delete
-//        delay(seconds: 1) {
-            Surveys.shared.banSurvey(object: survey)
-//        }
+        //        delay(seconds: 1) {
+        Surveys.shared.banSurvey(object: survey)
+        //        }
         var error: Error?
         checkForReachability {
             reachable in
@@ -1307,7 +1510,7 @@ class APIManager: APIManagerProtocol {
         }
         
     }
-        
+    
     private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(JSON?, Error?)->()) {
         var json: JSON?
         var error: Error?
@@ -1315,37 +1518,60 @@ class APIManager: APIManagerProtocol {
             "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
             "Content-Type": "application/json"
         ]
-
-        sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseJSON() {
-            response in
-            if response.result.isFailure {
-                print(response.result.debugDescription)
-                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
-            } else {
-                if let _error = response.result.error as? AFError {
-                    error = self.parseAFError(_error)
-                } else {
-                    if let statusCode  = response.response?.statusCode{
+        
+        AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).response { response in
+            switch response.result {
+            case .success(let value):
+                do {
+                    //TODO: Определиться с инициализацией JSON
+                    json = try JSON(data: value!, options: .mutableContainers)
+                    if let statusCode = response.response?.statusCode {
                         if 200...299 ~= statusCode {
-                            do {
-                                json = try JSON(data: response.data!)
-                            } catch let _error {
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
-                            }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let errorJSON = try JSON(data: response.data!)
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
-                                print(error!.localizedDescription)
-                            } catch let _error {
-                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
-                            }
+                            
+                        } else if 400...499 ~= statusCode, let errorDescription = json?.rawString() {
+                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
                         }
                     }
+                }  catch let _error {
+                    error = _error
                 }
+            case let .failure(_error):
+                error = self.parseAFError(_error)
+                debugPrint(error!)
             }
             completion(json, error)
         }
+        
+//        session.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseJSON() {
+//            response in
+//            if response.result.isFailure {
+//                print(response.result.debugDescription)
+//                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
+//            } else {
+//                if let _error = response.result.error as? AFError {
+//                    error = self.parseAFError(_error)
+//                } else {
+//                    if let statusCode  = response.response?.statusCode{
+//                        if 200...299 ~= statusCode {
+//                            do {
+//                                json = try JSON(data: response.data!)
+//                            } catch let _error {
+//                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
+//                            }
+//                        } else if 400...499 ~= statusCode {
+//                            do {
+//                                let errorJSON = try JSON(data: response.data!)
+//                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
+//                                print(error!.localizedDescription)
+//                            } catch let _error {
+//                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            completion(json, error)
+//        }
     }
     
     private func _performRequest(url: URL, searchString: String, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(Bool?, Error?)->()) {
@@ -1355,46 +1581,77 @@ class APIManager: APIManagerProtocol {
             "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
             "Content-Type": "application/json"
         ]
-    
-        sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseJSON() {
-            response in
-            if response.result.isFailure {
-                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.description]) as Error
-            } else {
-                if let _error = response.result.error as? AFError {
-                    error = self.parseAFError(_error)
-                } else {
-                    if let statusCode  = response.response?.statusCode{
+        
+        AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).response { response in
+            switch response.result {
+            case .success(let value):
+                do {
+                    //TODO: Определиться с инициализацией JSON
+                    let json = try JSON(data: value!, options: .mutableContainers)
+                    if let statusCode = response.response?.statusCode {
                         if 200...299 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                for attr in json {
-                                    if attr.0 ==  searchString {
-                                        flag = attr.1.boolValue
-                                    }
-                                    if attr.0 ==  "error" {
-                                        error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: attr.1.stringValue]) as Error
-                                    }
+                            for attr in json {
+                                if attr.0 ==  searchString {
+                                    flag = attr.1.boolValue
                                 }
-                            } catch let _error {
-                                error = _error
+                                if attr.0 ==  "error" {
+                                    error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: attr.1.stringValue]) as Error
+                                }
                             }
-                        } else if 400...499 ~= statusCode {
-                            do {
-                                let json = try JSON(data: response.data!)
-                                error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: json.rawString()!]) as Error
-                            } catch let _error {
-                                error = _error
-                            }
+                        } else if 400...499 ~= statusCode, let errorDescription = json.rawString() {
+                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
                         }
                     }
+                }  catch let _error {
+                    error = _error
                 }
+            case let .failure(_error):
+                error = self.parseAFError(_error)
+                debugPrint(error!)
             }
             completion(flag, error)
         }
+        
+        
+        
+//        session.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseJSON() {
+//            response in
+//            if response.result.isFailure {
+//                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.description]) as Error
+//            } else {
+//                if let _error = response.result.error as? AFError {
+//                    error = self.parseAFError(_error)
+//                } else {
+//                    if let statusCode  = response.response?.statusCode{
+//                        if 200...299 ~= statusCode {
+//                            do {
+//                                let json = try JSON(data: response.data!)
+//                                for attr in json {
+//                                    if attr.0 ==  searchString {
+//                                        flag = attr.1.boolValue
+//                                    }
+//                                    if attr.0 ==  "error" {
+//                                        error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: attr.1.stringValue]) as Error
+//                                    }
+//                                }
+//                            } catch let _error {
+//                                error = _error
+//                            }
+//                        } else if 400...499 ~= statusCode {
+//                            do {
+//                                let json = try JSON(data: response.data!)
+//                                error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: json.rawString()!]) as Error
+//                            } catch let _error {
+//                                error = _error
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            completion(flag, error)
     }
     
-    func downloadImage(url urlString: String, percentageClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ()) {
+    func downloadImage(url urlString: String, progressClosure: @escaping (CGFloat) -> (), completion: @escaping (UIImage?, Error?) -> ()) {
         
         var error: Error?
         var url: URL!
@@ -1423,25 +1680,41 @@ class APIManager: APIManagerProtocol {
         }
         
         func performRequest() {
-            sessionManager.request(url).downloadProgress(closure: {
-                progress in
-                let prog = CGFloat(progress.fractionCompleted)
-                percentageClosure(prog)
-            }).response(completionHandler: {
-                response in
-                if let data = response.data { response.request?.url
-                    if let image = UIImage(data: data) {
+            AF.download(url)
+                .downloadProgress { progress in
+                    print("Download Progress: \(progress.fractionCompleted)")
+                    progressClosure(CGFloat(progress.fractionCompleted))
+                }
+                .responseData { response in
+                    if let data = response.value {
+                        let image = UIImage(data: data)
                         completion(image, nil)
                     } else {
-                        //Image init failure
                         error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image initialization failure"]) as Error
                         completion(nil, error)
                     }
-                } else {
-                    error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image data error during download"]) as Error
-                    completion(nil, error)
                 }
-            })
+            
+            
+//            session.request(url).downloadProgress(closure: {
+//                progress in
+//                let prog = CGFloat(progress.fractionCompleted)
+//                percentageClosure(prog)
+//            }).response(completionHandler: {
+//                response in
+//                if let data = response.data { response.request?.url
+//                    if let image = UIImage(data: data) {
+//                        completion(image, nil)
+//                    } else {
+//                        //Image init failure
+//                        error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image initialization failure"]) as Error
+//                        completion(nil, error)
+//                    }
+//                } else {
+//                    error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image data error during download"]) as Error
+//                    completion(nil, error)
+//                }
+//            })
         }
     }
     
@@ -1473,61 +1746,74 @@ class APIManager: APIManagerProtocol {
         }
         
         func performRequest() {
-            sessionManager.request(url).response(completionHandler: {
-                response in
-                if let data = response.data { response.request?.url
-                    if let image = UIImage(data: data) {
+            AF.download(url).responseData { response in
+                    if let data = response.value {
+                        let image = UIImage(data: data)
                         completion(image, nil)
                     } else {
-                        //Image init failure
                         error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image initialization failure"]) as Error
                         completion(nil, error)
                     }
-                } else {
-                    error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image data error during download"]) as Error
-                    completion(nil, error)
                 }
-            })
+            
+//            session.request(url).response(completionHandler: {
+//                response in
+//                if let data = response.data { response.request?.url
+//                    if let image = UIImage(data: data) {
+//                        completion(image, nil)
+//                    } else {
+//                        //Image init failure
+//                        error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image initialization failure"]) as Error
+//                        completion(nil, error)
+//                    }
+//                } else {
+//                    error = NSError(domain:"", code:523, userInfo:[ NSLocalizedDescriptionKey: "Image data error during download"]) as Error
+//                    completion(nil, error)
+//                }
+//            })
         }
     }
     
-//    private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(Error?)->()) {
-//        var error: Error?
-//        let headers: HTTPHeaders = [
-//            "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-//            "Content-Type": "application/json"
-//        ]
-//
-//        sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).response() {
-//            response in
-//            if response.result.isFailure {
-//                print(response.result.debugDescription)
-//            }
-//            if let _error = response.result.error as? AFError {
-//                error = self.parseAFError(_error)
-//            } else {
-//                if let statusCode  = response.response?.statusCode{
-//                    if 400...499 ~= statusCode {
-//                        do {
-//                            let errorJSON = try JSON(data: response.data!)
-//                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
-//                        } catch let _error {
-//                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
-//                        }
-//                    }
-//                }
-//            }
-//            completion(error)
-//        }
-//    }
+    //    private func _performRequest(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(Error?)->()) {
+    //        var error: Error?
+    //        let headers: HTTPHeaders = [
+    //            "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
+    //            "Content-Type": "application/json"
+    //        ]
+    //
+    //        session.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).response() {
+    //            response in
+    //            if response.result.isFailure {
+    //                print(response.result.debugDescription)
+    //            }
+    //            if let _error = response.result.error as? AFError {
+    //                error = self.parseAFError(_error)
+    //            } else {
+    //                if let statusCode  = response.response?.statusCode{
+    //                    if 400...499 ~= statusCode {
+    //                        do {
+    //                            let errorJSON = try JSON(data: response.data!)
+    //                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
+    //                        } catch let _error {
+    //                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: _error.localizedDescription]) as Error
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //            completion(error)
+    //        }
+    //    }
     
     func cancelAllRequests() {
-        self.sessionManager.session.getTasksWithCompletionHandler {
-            (sessionDataTask, uploadData, downloadData) in
-            sessionDataTask.forEach { $0.cancel() }
-            uploadData.forEach { $0.cancel() }
-            downloadData.forEach { $0.cancel() }
-        }
+        AF.session.getAllTasks { (tasks) in
+                    tasks.forEach {$0.cancel() }
+                }
+//        self.session.session.getTasksWithCompletionHandler {
+//            (sessionDataTask, uploadData, downloadData) in
+//            sessionDataTask.forEach { $0.cancel() }
+//            uploadData.forEach { $0.cancel() }
+//            downloadData.forEach { $0.cancel() }
+//        }
     }
 }
 

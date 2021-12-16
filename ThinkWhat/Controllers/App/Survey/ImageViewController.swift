@@ -9,6 +9,9 @@
 import UIKit
 
 class ImageViewController: UIViewController {
+    deinit {
+        debugPrint("---\(self) deinit")
+    }
     enum Mode {
         case ReadOnly, Write
     }
@@ -16,6 +19,16 @@ class ImageViewController: UIViewController {
     var titleString:        String = ""
     var mode: Mode = .Write
     
+    private var tapRecognizer: UITapGestureRecognizer! {
+        didSet {
+            tapRecognizer.delegate = self
+        }
+    }
+    private var doubleTapRecognizer: UITapGestureRecognizer! {
+        didSet {
+            doubleTapRecognizer.delegate = self
+        }
+    }
     private var kbHeight:   CGFloat!
     private var isMovedUp:  Bool?
     private var textFields: [UITextField] = []
@@ -24,9 +37,8 @@ class ImageViewController: UIViewController {
     
     var statusBarHidden = false {
         didSet {
-            UIView.animate(withDuration: 0.25) {
                 self.setNeedsStatusBarAppearanceUpdate()
-            }
+            
         }
     }
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -34,9 +46,9 @@ class ImageViewController: UIViewController {
     }
     
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        return .fade
+        return .slide
     }
-    
+
     override var prefersStatusBarHidden: Bool {
         return statusBarHidden
     }
@@ -78,31 +90,57 @@ class ImageViewController: UIViewController {
         super.viewDidLoad()
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.isShadowed = false
-//            nc.setNavigationBarHidden(true, animated: false)
             nc.transitionStyle = .Icon
             nc.duration = 0.2
+            self.navigationController?.navigationBar.barTintColor = .black
         }
         titleTextField.delegate = self
         textFields.append(titleTextField)
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         tapRecognizer.numberOfTapsRequired = 1
         scrollView.addGestureRecognizer(tapRecognizer)
         NotificationCenter.default.addObserver(self, selector: #selector(ImageViewController.applicationWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: UIApplication.shared)
         NotificationCenter.default.addObserver(self, selector: #selector(ImageViewController.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ImageViewController.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ImageViewController.handleDoubleTap(_:)))
+        doubleTapRecognizer.numberOfTapsRequired = 2
+        scrollView.addGestureRecognizer(doubleTapRecognizer)
     }
     
     override func viewWillAppear(_ animated: Bool) {
-//        UINavigationBar.appearance().backgroundColor = .black
-//        appDelegate.window?.backgroundColor = .black
 //        super.viewWillAppear(animated)
-//            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
-//                self.navigationController?.navigationBar.setNeedsLayout()
-//                self.navigationController?.navigationBar.barTintColor = .black
-//                self.navigationController?.navigationBar.tintColor = .white
-//                self.navigationController?.navigationBar.layoutIfNeeded()
-//            })
+//        self.navigationController?.navigationBar.barStyle = .black
+//        navigationController?.setNeedsStatusBarAppearanceUpdate()
+//        tabBarController?.setNeedsStatusBarAppearanceUpdate()
+        setNeedsStatusBarAppearanceUpdate()
     }
+    
+//    override func viewDidAppear(_ animated: Bool) {
+//        delay(seconds: 2) {
+//            self.navigationController?.navigationBar.barStyle = .black
+//            self.navigationController?.setNeedsStatusBarAppearanceUpdate()
+//            self.tabBarController?.setNeedsStatusBarAppearanceUpdate()
+//            self.setNeedsStatusBarAppearanceUpdate()
+//        }
+//    }
+//        super.viewWillAppear(animated)
+////        if #available(iOS 13, *) {
+////        tabBarController?.navigationController?.navigationBar.barStyle = .default
+////            navigationController?.navigationBar.barStyle = .black
+////            setNeedsStatusBarAppearanceUpdate()
+////            self.navigationController?.navigationBar.backgroundColor = .black
+////            self.navigationController?.navigationBar.tintColor = .black
+////        }
+////        UINavigationBar.appearance().backgroundColor = .black
+////        appDelegate.window?.backgroundColor = .black
+////        super.viewWillAppear(animated)
+////            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
+////                self.navigationController?.navigationBar.setNeedsLayout()
+////                self.navigationController?.navigationBar.barTintColor = .black
+////                self.navigationController?.navigationBar.tintColor = .white
+////                self.navigationController?.navigationBar.layoutIfNeeded()
+////            })
+//    }
     
     override func willMove(toParent parent: UIViewController?) {
         self.navigationController?.navigationBar.barTintColor = .white
@@ -112,15 +150,28 @@ class ImageViewController: UIViewController {
     @objc private func handleTap(_ sender: UITapGestureRecognizer) {
         view.endEditing(true)
         navigationController!.setNavigationBarHidden(!navigationController!.isNavigationBarHidden, animated: true)
-//        statusBarHidden = !statusBarHidden
+        navigationController?.setNeedsStatusBarAppearanceUpdate()
+        tabBarController?.setNeedsStatusBarAppearanceUpdate()
+        setNeedsStatusBarAppearanceUpdate()
+//        setNeedsStatusBarAppearanceUpdate()
+//        if #available(iOS 13, *) {
+            statusBarHidden = !statusBarHidden
+//        }
         
         if mode == .ReadOnly, !titleString.isEmpty {
-//            preferredStatusBarStyle =
             UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
                 self.view.setNeedsLayout()
                 self.textViewBottomConstraint.constant = self.textViewBottomConstraint.constant > 0 ? -(self.titleTextView.frame.height + 16) : 16
                 self.view.layoutIfNeeded()
             })
+        }
+    }
+    
+    @objc fileprivate func handleDoubleTap(_ sender: UITapGestureRecognizer) {
+        if scrollView.zoomScale == 1 {
+            scrollView.setZoomScale(2, animated: true)
+        } else {
+            scrollView.setZoomScale(1, animated: true)
         }
     }
 }
@@ -211,7 +262,7 @@ extension ImageViewController: UITextFieldDelegate {
 }
 
 class PanZoomImageView: UIScrollView {
-    
+//    var doubleTapRecognizer: UITapGestureRecognizer!
     var image: UIImage! {
         didSet {
             imageView.image = image
@@ -252,19 +303,19 @@ class PanZoomImageView: UIScrollView {
         showsHorizontalScrollIndicator = false
         showsVerticalScrollIndicator = false
         delegate = self
-    
-        let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
-        doubleTapRecognizer.numberOfTapsRequired = 2
-        addGestureRecognizer(doubleTapRecognizer)
+////        doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
+//        doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ImageViewController.handleDoubleTap(_:)))
+//        doubleTapRecognizer.numberOfTapsRequired = 2
+//        addGestureRecognizer(doubleTapRecognizer)
     }
     
-    @objc private func handleDoubleTap(_ sender: UITapGestureRecognizer) {
-        if zoomScale == 1 {
-            setZoomScale(2, animated: true)
-        } else {
-            setZoomScale(1, animated: true)
-        }
-    }
+//    @objc private func handleDoubleTap(_ sender: UITapGestureRecognizer) {
+//        if zoomScale == 1 {
+//            setZoomScale(2, animated: true)
+//        } else {
+//            setZoomScale(1, animated: true)
+//        }
+//    }
     
 }
 
@@ -274,4 +325,18 @@ extension PanZoomImageView: UIScrollViewDelegate {
         return imageView
     }
     
+}
+
+extension ImageViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == self.tapRecognizer &&
+            otherGestureRecognizer == self.doubleTapRecognizer {
+            return true
+        }
+        return false
+    }
 }

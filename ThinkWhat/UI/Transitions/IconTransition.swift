@@ -580,9 +580,16 @@ class IconTransition: BasicTransition {
                 
                 UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
                     self.navigationController?.navigationBar.setNeedsLayout()
-                    self.navigationController?.navigationBar.barTintColor = .black
-                    self.navigationController?.navigationBar.tintColor = .white
-                    UIApplication.shared.statusBarView?.backgroundColor = .black
+                    if #available(iOS 13, *) {
+                        self.navigationController?.navigationBar.backgroundColor = .black
+                        self.navigationController?.navigationBar.tintColor = .white
+                        self.navigationController?.tabBarController?.view.backgroundColor = .black
+                        toVC.navigationController?.navigationBar.barStyle = .black
+                    } else {
+                        self.navigationController?.navigationBar.barTintColor = .black
+                        self.navigationController?.navigationBar.tintColor = .white
+                        UIApplication.shared.statusBarView?.backgroundColor = .black
+                    }
                     self.navigationController?.navigationBar.layoutIfNeeded()
                     imageView.frame.origin = destinationOrigin
                     imageView.frame.size = destinationSize
@@ -1515,7 +1522,13 @@ class IconTransition: BasicTransition {
                     imageView.frame.origin = destinationOrigin
                     imageView.frame.size = destinationSize
                     imageView.cornerRadius = destinationView.cornerRadius
-                                        self.navigationController?.navigationBar.barTintColor = .white
+                    if #available(iOS 13, *) {
+                        self.navigationController?.navigationBar.backgroundColor = .white
+                        self.navigationController?.navigationBar.tintColor = .black
+                        self.navigationController?.tabBarController?.view.backgroundColor = .white
+                    } else {
+                        self.navigationController?.navigationBar.barTintColor = .white
+                    }
                     blackScreen.alpha = 0
                 }) {
                     _ in

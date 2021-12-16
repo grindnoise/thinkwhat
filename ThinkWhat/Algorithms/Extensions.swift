@@ -1303,3 +1303,13 @@ extension UIApplication {
             return nil
     }
 }
+
+//extension UINavigationController {
+//    override open var childForStatusBarStyle: UIViewController? {
+//        return topViewController
+//    }
+//
+//    open override var preferredStatusBarStyle: UIStatusBarStyle {
+//        return topViewController?.preferredStatusBarStyle ?? .default
+//    }
+//}

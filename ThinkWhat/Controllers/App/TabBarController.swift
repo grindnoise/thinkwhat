@@ -10,15 +10,27 @@ import UIKit
 import UserNotifications
 
 class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return selectedViewController?.preferredStatusBarStyle ?? .lightContent
+    }
+    override var childForStatusBarStyle: UIViewController? {
+        return selectedViewController
+    }
     
-//    public lazy var serverAPI:     APIServerProtocol          = self.initializeServerAPI()
+//    override var viewControllers: [UIViewController]? {
+//        didSet { setNeedsStatusBarAppearanceUpdate() }
+//    }
+    
+    //    public lazy var serverAPI:     APIServerProtocol          = self.initializeServerAPI()
 //    public lazy var fileStorageAPI: FileStoringProtocol       = self.initializeFileStoringAPI()
     let sdelegate = ScrollingTabBarControllerDelegate()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        appDelegate.window?.rootViewController = self
 //        UITabBar.appearance().layer.borderWidth = 1.0
 //        UITabBar.appearance().clipsToBounds = true
+        tabBar.backgroundColor = .white
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "OpenSans-Semibold", size: 11)!], for: .normal)
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "OpenSans-Light", size: 11)!], for: .selected)
 //        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "OpenSans-Bold", size: 12)!], for: .focused)
@@ -47,6 +59,7 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
                 print("Something went wrong")
             }
         }
+        
     }
 
     
@@ -59,6 +72,13 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
             performSegue(withIdentifier: Segues.App.Logout, sender: nil)
         }
     }
+    
+    override func present(_ viewControllerToPresent: UIViewController,
+                            animated flag: Bool,
+                            completion: (() -> Void)? = nil) {
+        viewControllerToPresent.modalPresentationStyle = .fullScreen
+        super.present(viewControllerToPresent, animated: flag, completion: completion)
+      }
     
 //    private func initializeServerAPI() -> APIServerProtocol {
 //        return appDelegate.container.resolve(APIServerProtocol.self)!

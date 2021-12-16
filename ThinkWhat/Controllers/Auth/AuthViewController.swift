@@ -263,19 +263,13 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                     response in
                                     if response != nil {
                                         var fbData = response!.dictionaryObject!
-                                        if let pictureData = JSON(fbData.removeValue(forKey: "picture")) as? JSON {
+                                        if let pictureData = JSON(fbData.removeValue(forKey: "picture") as Any) as? JSON {
                                             if let is_silhouette = pictureData["data"]["is_silhouette"].bool {
                                                 if !is_silhouette {
                                                     if let pictureURL = URL(string: pictureData["data"]["url"].string!) {
-                                                        Alamofire.request(pictureURL).responseData {
-                                                            response in
-                                                            if response.result.isFailure {
-                                                                print(response.result.debugDescription)
-                                                            }
-                                                            if let error = response.result.error as? AFError {
-                                                                print(error.localizedDescription)
-                                                            }
-                                                            if let data = response.result.value {
+                                                        AF.request(pictureURL).responseData { response in
+                                                            switch response.result {
+                                                            case .success(let data):
                                                                 if let image = UIImage(data: data) {
                                                                     imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
                                                                     fbData["image"] = image
@@ -291,7 +285,34 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                                         }
                                                                     }
                                                                 }
+                                                            case .failure(let error):
+                                                                print(error.localizedDescription)
                                                             }
+//
+//
+//                                                            if response.result.isFailure {
+//                                                                print(response.result.debugDescription)
+//                                                            }
+//                                                            if let error = response.result.error as? AFError {
+//                                                                print(error.localizedDescription)
+//                                                            }
+//                                                            if let data = response.result.value {
+//                                                                if let image = UIImage(data: data) {
+//                                                                    imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
+//                                                                    fbData["image"] = image
+//                                                                    let data = FBManager.prepareUserData(fbData)
+//                                                                    self.apiManager.updateUserProfile(data: data) {
+//                                                                        json, error in
+//                                                                        if error != nil {
+//                                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
+//                                                                        }
+//                                                                        if json != nil {
+//                                                                            AppData.shared.importUserData(json!, imagePath)
+//                                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
+//                                                                        }
+//                                                                    }
+//                                                                }
+//                                                            }
                                                         }
                                                     } else {
                                                         print(pictureData["data"]["url"].error!)
@@ -334,32 +355,56 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
                                                 if dict.count != 0 { vkData = dict.first! }
                                                 if let pictureKey = dict.first?.keys.filter( { $0.lowercased().contains("photo")} ).first, let value = vkData[pictureKey] as? String {
                                                     if let pictureURL = URL(string: value) {
-                                                        Alamofire.request(pictureURL).responseData {
-                                                            response in
-                                                            if response.result.isFailure {
-                                                                print(response.result.debugDescription)
-                                                            }
-                                                            if let error = response.result.error as? AFError {
-                                                                print(error.localizedDescription)
-                                                            }
-                                                            if let imgData = response.result.value {
-                                                                if let image = UIImage(data: imgData) {
-                                                                    imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: imgData).fileFormat, surveyID: nil)
-                                                                    vkData["image"] = image
-                                                                    vkData.removeValue(forKey: pictureKey)
-                                                                    let data = VKManager.prepareUserData(vkData)
-                                                                    self.apiManager.updateUserProfile(data: data) {
-                                                                        response, error in
-                                                                        if error != nil {
-                                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
-                                                                        }
-                                                                        if response != nil {
-                                                                            AppData.shared.importUserData(response!, imagePath)
-                                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
+                                                        AF.request(pictureURL).responseData { response in
+                                                               switch response.result {
+                                                               case .success(let data):
+                                                                   if let image = UIImage(data: data) {
+                                                                       imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
+                                                                       vkData["image"] = image
+                                                                       vkData.removeValue(forKey: pictureKey)
+                                                                       let data = VKManager.prepareUserData(vkData)
+                                                                       self.apiManager.updateUserProfile(data: data) {
+                                                                           response, error in
+                                                                           if error != nil {
+                                                                               showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
+                                                                           }
+                                                                           if response != nil {
+                                                                               AppData.shared.importUserData(response!, imagePath)
+                                                                               self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
+                                                                           }
+                                                                       }
+                                                                   }
+                                                               case .failure(let error):
+                                                                   print(error.localizedDescription)
+                                                               }
+                                                            
+                                                            
+                                                            
+                                                            
+//                                                            if response.result.isFailure {
+//                                                                print(response.result.debugDescription)
+//                                                            }
+//                                                            if let error = response.result.error as? AFError {
+//                                                                print(error.localizedDescription)
+//                                                            }
+//                                                            if let imgData = response.result.value {
+//                                                                if let image = UIImage(data: imgData) {
+//                                                                    imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: imgData).fileFormat, surveyID: nil)
+//                                                                    vkData["image"] = image
+//                                                                    vkData.removeValue(forKey: pictureKey)
+//                                                                    let data = VKManager.prepareUserData(vkData)
+//                                                                    self.apiManager.updateUserProfile(data: data) {
+//                                                                        response, error in
+//                                                                        if error != nil {
+//                                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
+//                                                                        }
+//                                                                        if response != nil {
+//                                                                            AppData.shared.importUserData(response!, imagePath)
+//                                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
+//                                                                        }
+//                                                                    }
+//                                                                }
+//                                                            }
                                                         }
                                                     }
                                                 } else {

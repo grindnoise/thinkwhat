@@ -8,7 +8,7 @@ target 'ThinkWhat' do
     pod 'FacebookCore', '0.9.0'
     pod 'FacebookLogin', '0.9.0'
     pod 'Swinject', '2.7.1'
-    pod 'Alamofire', '4.7.2'
+    pod 'Alamofire', '~> 5.5'
     pod 'VK-ios-sdk'
     pod "YoutubePlayer-in-WKWebView", "~> 0.3.0"
     target 'ThinkWhatTests' do

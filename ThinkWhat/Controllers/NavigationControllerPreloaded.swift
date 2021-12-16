@@ -9,6 +9,16 @@
 import UIKit
 
 class NavigationControllerPreloaded: UINavigationController {
+        override var preferredStatusBarStyle: UIStatusBarStyle {
+                print(type(of: self), #function)
+                let style = super.preferredStatusBarStyle
+                print(type(of: self), style.rawValue)
+                return style
+            }
+    
+    override var childForStatusBarStyle: UIViewController? {
+        return topViewController
+    }
     
     enum TransitionStyle {
         case Icon, Default, Blur, Circular, Fade
@@ -18,10 +28,8 @@ class NavigationControllerPreloaded: UINavigationController {
         didSet {
             if oldValue != isShadowed {
                 navigationBar.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
-                let shadowSize: CGFloat = 5
-//                let contactRectTB = CGRect(x: -shadowSize, y: -shadowSize, width: tbView.frame.width + shadowSize * 2, height: shadowSize)
                 let anim = Animations.get(property: .ShadowOpacity, fromValue: isShadowed ? 0 : 1, toValue: isShadowed ? 1 : 0, duration: 0.2, delay: 0, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: true, completionBlocks: nil)
-                navigationBar.layer.shadowPath = UIBezierPath(rect: navigationBar.bounds).cgPath//contactRect).cgPath
+                navigationBar.layer.shadowPath = UIBezierPath(rect: CGRect(origin: CGPoint(x: 0, y: navigationBar.bounds.height - navigationBar.bounds.height/3), size: CGSize(width: navigationBar.bounds.width, height: navigationBar.bounds.height/3))).cgPath
                 navigationBar.layer.shadowRadius = 5
                 navigationBar.layer.shadowOffset = .zero
                 navigationBar.layer.zPosition = 100
@@ -61,9 +69,14 @@ class NavigationControllerPreloaded: UINavigationController {
             self.viewControllers.forEach { $0.view }
             
         }
-        print("Testing")
         delegate = appDelegate.transitionCoordinator
+        navigationBar.backgroundColor = .white
     }
     
-    
+    override func present(_ viewControllerToPresent: UIViewController,
+                            animated flag: Bool,
+                            completion: (() -> Void)? = nil) {
+        viewControllerToPresent.modalPresentationStyle = .fullScreen
+        super.present(viewControllerToPresent, animated: flag, completion: completion)
+      }
 }

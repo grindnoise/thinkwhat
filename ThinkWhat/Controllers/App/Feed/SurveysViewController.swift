@@ -28,7 +28,13 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             }
         }
     }
+    override var childForStatusBarStyle: UIViewController? {
+        return children.first
+    }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return children.first?.preferredStatusBarStyle ?? .lightContent
+    }
 //    fileprivate var timer:  Timer?//Network inactivity timeout
 //    fileprivate var loadingTitleTimer:  Timer?
     fileprivate var interruptRequests = false

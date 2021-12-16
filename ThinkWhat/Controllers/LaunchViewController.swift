@@ -12,6 +12,14 @@ class LaunchViewController: UIViewController {
     
     @IBOutlet weak var logo: LogoAnimView!
     
+//    override var preferredStatusBarStyle: UIStatusBarStyle {
+//        return .lightContent
+//    }
+//    
+//    override var childForStatusBarStyle: UIViewController? {
+//        return tabBarController?.viewControllers
+//    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -27,6 +35,12 @@ class LaunchViewController: UIViewController {
                 }
 //                self.performSegue(withIdentifier: kSegueApp, sender: nil)
             }
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == Segues.Launch.App {
+            segue.destination.modalPresentationStyle = .fullScreen
         }
     }
 }

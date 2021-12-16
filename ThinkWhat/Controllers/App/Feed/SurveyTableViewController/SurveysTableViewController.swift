@@ -27,6 +27,18 @@ class SurveysTableViewController: UITableViewController {
 //            }
 //        }
 //    }
+//    override var preferredStatusBarStyle: UIStatusBarStyle {
+//        if #available(iOS 13.0, *) {
+//            return .darkContent
+//        } else {
+//            return .lightContent
+//        }
+//    }
+    
+    override var childForStatusBarStyle: UIViewController? {
+        return children.first
+    }
+    
     enum SurveyTableType {
         case New, Top, User, UserFavorite, Own, Favorite, Category
     }

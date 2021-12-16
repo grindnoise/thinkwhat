@@ -529,7 +529,7 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
                         //                        for (i, imageURL) in survey!.imagesURLs!.enumerated() {
                         for entry in survey!.imagesURLs! {
                             if let url = entry.value.keys.first  {
-                                apiManager.downloadImage(url: url, percentageClosure: {
+                                apiManager.downloadImage(url: url, progressClosure: {
                                     percent in
                                     cell.slides[entry.key].imageView.progressIndicatorView.progress = percent
                                 }) {

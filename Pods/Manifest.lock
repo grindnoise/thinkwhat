@@ -1,5 +1,5 @@
 PODS:
-  - Alamofire (4.7.2)
+  - Alamofire (5.5.0)
   - FacebookCore (0.9.0):
     - FBSDKCoreKit (~> 5.0)
   - FacebookLogin (0.9.0):
@@ -25,7 +25,7 @@ PODS:
   - YoutubePlayer-in-WKWebView (0.3.4)
 
 DEPENDENCIES:
-  - Alamofire (= 4.7.2)
+  - Alamofire (~> 5.5)
   - FacebookCore (= 0.9.0)
   - FacebookLogin (= 0.9.0)
   - Nimble
@@ -36,8 +36,23 @@ DEPENDENCIES:
   - VK-ios-sdk
   - YoutubePlayer-in-WKWebView (~> 0.3.0)
 
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Alamofire
+    - FacebookCore
+    - FacebookLogin
+    - FBSDKCoreKit
+    - FBSDKLoginKit
+    - Nimble
+    - Quick
+    - SwiftyJSON
+    - Swinject
+    - TTRangeSlider
+    - VK-ios-sdk
+    - YoutubePlayer-in-WKWebView
+
 SPEC CHECKSUMS:
-  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
+  Alamofire: 1c4fb5369c3fe93d2857c780d8bbe09f06f97e7c
   FacebookCore: ba86524b66cfa86d0f8e65d08faa8504a9f732dd
   FacebookLogin: 6cee9fd6e1fe976fe8f7eec199e27b28b14f5d63
   FBSDKCoreKit: 1d5acf7c9d7a2f92bb1a242dc60cae5b7adb91df
@@ -50,6 +65,6 @@ SPEC CHECKSUMS:
   VK-ios-sdk: 62a10b6571fbcda0657f455fedce7fedf55b4cd0
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: 51ac2471780e2ad7c6c57aa404169506eee07389
+PODFILE CHECKSUM: 2fbfab348fa03aee70ae977ec368c52fce34f891
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.11.2
