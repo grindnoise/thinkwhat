@@ -253,7 +253,7 @@ class TextInputViewController: UIViewController {
 }
 
 extension TextInputViewController: CallbackDelegate {
-    func callbackReceived(_ sender: AnyObject) {
+    func callbackReceived(_ sender: Any) {
         if let identifier = sender as? String {
             if identifier == Banner.bannerWillAppearSignal {
                 view.endEditing(true)

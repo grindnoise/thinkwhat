@@ -133,118 +133,118 @@ class IconTransition: BasicTransition {
                     self.context?.completeTransition(true)
                 }
                 
-            } else if let vc_1 = fromVC as? SurveysViewController, let stackVC = vc_1.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview, let vc_2 = toVC as? SurveyViewController {
-                vc_1.view.setNeedsLayout()
-                vc_1.view.layoutIfNeeded()
-                
-                vc_2.view.setNeedsLayout()
-                vc_2.view.layoutIfNeeded()
-                
-                let userImage = UIImageView(frame: CGRect(origin: .zero, size: surveyPreview.userImage.frame.size))
-                userImage.image = surveyPreview.userImage.image
-                var pos = CGPoint.zero
-                pos.x = surveyPreview.userImage.center.x + surveyPreview.frame.origin.x
-                pos.y = surveyPreview.userImage.frame.origin.y + surveyPreview.frame.origin.y + surveyPreview.convert(surveyPreview.frame.origin, to: fromVC.view).y + (navigationController?.navigationBar.subviews.first!.frame.height)! + UIApplication.shared.statusBarFrame.height
-                userImage.center = pos
-                
-                toVC.view.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-                UIApplication.shared.keyWindow?.addSubview(userImage)
-                surveyPreview.userImage.alpha = 0
-                let userImageDestinationSize = vc_2.navTitleSize//vc_2.navTitle.frame.size
-                var userImageDestinationPos = navigationController.navigationBar.center
-                userImageDestinationPos.x -= userImageDestinationSize.width / 2 - userImage.frame.size.width / 2
-                userImageDestinationPos.y -= userImageDestinationSize.height / 2 - userImage.frame.size.height / 2
-                
-                UIView.animate(withDuration: duration * 0.8, delay: 0, options: .curveEaseInOut, animations: {
-                    vc_1.buttonsContainer.alpha = 0
-                    surveyPreview.transform = CGAffineTransform(scaleX: 1.15, y: 1.15)
-                    surveyPreview.alpha = 0
-                })
-                
-                UIView.animate(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
-                    userImage.center = userImageDestinationPos
-                    userImage.frame.size = userImageDestinationSize
-                })
-                
-                UIView.animate(withDuration: duration * 1.2, delay: duration/3, options: [.curveEaseOut], animations: {
-                    toVC.view.transform = .identity
-                    toVC.view.alpha = 1
-                }) {
-                    _ in
-                    vc_2.navTitle = userImage.copyView()
-                    userImage.removeFromSuperview()
-                    fromVC.view.removeFromSuperview()
-                    surveyPreview.userImage.alpha = 1
-                    surveyPreview.icon.alpha = 1
-                    surveyPreview.transform = .identity
-                    surveyPreview.alpha = 1
-                    vc_1.buttonsContainer.alpha = 1
-//                    fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-//                    toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-                    self.context?.completeTransition(true)
-                }
-            } else if let vc_1 = fromVC as? SurveysViewController, let stackVC = vc_1.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview, let vc_2 = toVC as? delUserViewController {
-                vc_1.view.setNeedsLayout()
-                vc_1.view.layoutIfNeeded()
-                
-                vc_2.view.setNeedsLayout()
-                vc_2.view.layoutIfNeeded()
-                
-                let userImage = UIImageView(frame: CGRect(origin: .zero, size: surveyPreview.userImage.frame.size))
-                userImage.image = vc_2.header.imageView.image
-                var pos = CGPoint.zero
-                pos.x = surveyPreview.userImage.center.x + surveyPreview.frame.origin.x
-                pos.y = surveyPreview.userImage.frame.origin.y + surveyPreview.frame.origin.y + surveyPreview.convert(surveyPreview.frame.origin, to: fromVC.view).y + (navigationController?.navigationBar.subviews.first!.frame.height)! + UIApplication.shared.statusBarFrame.height
-                userImage.center = pos
-                
-                UIApplication.shared.keyWindow?.addSubview(userImage)
-                surveyPreview.userImage.alpha = 0
-                vc_2.header.imageView.alpha = 0
-                let userImageDestinationSize = vc_2.header.imageView.frame.size
-                
-                var userImageDestinationPos = UIApplication.shared.keyWindow!.convert(vc_2.header.imageView.center, from: vc_2.view)
-                userImageDestinationPos.x -= userImageDestinationSize.width / 2 - userImage.frame.size.width / 2
-                userImageDestinationPos.y -= userImageDestinationSize.height / 2 - userImage.frame.size.height / 2
-                
-                let effectViewOutgoing = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-                effectViewOutgoing.frame = vc_1.view.bounds
-                effectViewOutgoing.addEquallyTo(to: vc_1.view)
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0, delay: 0, options: [], animations: {
-                    effectViewOutgoing.effect = nil
-                })
-                let effectViewIncoming = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
-                effectViewIncoming.frame = vc_2.view.bounds
-                effectViewIncoming.addEquallyTo(to: vc_2.view)
-                
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration * 1.3 + duration * 0.25, delay: 0, options: [.curveEaseInOut], animations: {
-                    userImage.center = userImageDestinationPos
-                    userImage.frame.size = userImageDestinationSize
-                })
-                
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
-                    effectViewOutgoing.effect = UIBlurEffect(style: .prominent)
-                    vc_1.view.alpha = 0
-                }) {
-                    _ in
-                    effectViewOutgoing.removeFromSuperview()
-                }
-                
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration * 1.3, delay: duration * 0.25, options: [.curveLinear], animations: {
-                    effectViewIncoming.effect = nil
-                    vc_2.view.alpha = 1
-                }) {
-                    _ in
-                    vc_2.header.imageView.alpha = 1
-                    userImage.removeFromSuperview()
-                    fromVC.view.removeFromSuperview()
-                    surveyPreview.userImage.alpha = 1
-                    effectViewIncoming.removeFromSuperview()
-//                    fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-//                    toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-                    self.context?.completeTransition(true)
-                }
-                
-            } else if let vc_1 = fromVC as? NewPollController, let initialIcon = vc_1.categoryIcon, let vc_2 = toVC as? CategorySelectionViewController, let destinationIcon = vc_2.actionButton {
+//            } else if let vc_1 = fromVC as? SurveysViewController, let stackVC = vc_1.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview, let vc_2 = toVC as? SurveyViewController {
+//                vc_1.view.setNeedsLayout()
+//                vc_1.view.layoutIfNeeded()
+//
+//                vc_2.view.setNeedsLayout()
+//                vc_2.view.layoutIfNeeded()
+//
+//                let userImage = UIImageView(frame: CGRect(origin: .zero, size: surveyPreview.userImage.frame.size))
+//                userImage.image = surveyPreview.userImage.image
+//                var pos = CGPoint.zero
+//                pos.x = surveyPreview.userImage.center.x + surveyPreview.frame.origin.x
+//                pos.y = surveyPreview.userImage.frame.origin.y + surveyPreview.frame.origin.y + surveyPreview.convert(surveyPreview.frame.origin, to: fromVC.view).y + (navigationController?.navigationBar.subviews.first!.frame.height)! + UIApplication.shared.statusBarFrame.height
+//                userImage.center = pos
+//
+//                toVC.view.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+//                UIApplication.shared.keyWindow?.addSubview(userImage)
+//                surveyPreview.userImage.alpha = 0
+//                let userImageDestinationSize = vc_2.navTitleSize//vc_2.navTitle.frame.size
+//                var userImageDestinationPos = navigationController.navigationBar.center
+//                userImageDestinationPos.x -= userImageDestinationSize.width / 2 - userImage.frame.size.width / 2
+//                userImageDestinationPos.y -= userImageDestinationSize.height / 2 - userImage.frame.size.height / 2
+//
+//                UIView.animate(withDuration: duration * 0.8, delay: 0, options: .curveEaseInOut, animations: {
+//                    vc_1.buttonsContainer.alpha = 0
+//                    surveyPreview.transform = CGAffineTransform(scaleX: 1.15, y: 1.15)
+//                    surveyPreview.alpha = 0
+//                })
+//
+//                UIView.animate(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
+//                    userImage.center = userImageDestinationPos
+//                    userImage.frame.size = userImageDestinationSize
+//                })
+//
+//                UIView.animate(withDuration: duration * 1.2, delay: duration/3, options: [.curveEaseOut], animations: {
+//                    toVC.view.transform = .identity
+//                    toVC.view.alpha = 1
+//                }) {
+//                    _ in
+//                    vc_2.navTitle = userImage.copyView()
+//                    userImage.removeFromSuperview()
+//                    fromVC.view.removeFromSuperview()
+//                    surveyPreview.userImage.alpha = 1
+//                    surveyPreview.icon.alpha = 1
+//                    surveyPreview.transform = .identity
+//                    surveyPreview.alpha = 1
+//                    vc_1.buttonsContainer.alpha = 1
+////                    fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+////                    toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+//                    self.context?.completeTransition(true)
+//                }
+//            } else if let vc_1 = fromVC as? SurveysViewController, let stackVC = vc_1.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview, let vc_2 = toVC as? delUserViewController {
+//                vc_1.view.setNeedsLayout()
+//                vc_1.view.layoutIfNeeded()
+//
+//                vc_2.view.setNeedsLayout()
+//                vc_2.view.layoutIfNeeded()
+//
+//                let userImage = UIImageView(frame: CGRect(origin: .zero, size: surveyPreview.userImage.frame.size))
+//                userImage.image = vc_2.header.imageView.image
+//                var pos = CGPoint.zero
+//                pos.x = surveyPreview.userImage.center.x + surveyPreview.frame.origin.x
+//                pos.y = surveyPreview.userImage.frame.origin.y + surveyPreview.frame.origin.y + surveyPreview.convert(surveyPreview.frame.origin, to: fromVC.view).y + (navigationController?.navigationBar.subviews.first!.frame.height)! + UIApplication.shared.statusBarFrame.height
+//                userImage.center = pos
+//
+//                UIApplication.shared.keyWindow?.addSubview(userImage)
+//                surveyPreview.userImage.alpha = 0
+//                vc_2.header.imageView.alpha = 0
+//                let userImageDestinationSize = vc_2.header.imageView.frame.size
+//
+//                var userImageDestinationPos = UIApplication.shared.keyWindow!.convert(vc_2.header.imageView.center, from: vc_2.view)
+//                userImageDestinationPos.x -= userImageDestinationSize.width / 2 - userImage.frame.size.width / 2
+//                userImageDestinationPos.y -= userImageDestinationSize.height / 2 - userImage.frame.size.height / 2
+//
+//                let effectViewOutgoing = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+//                effectViewOutgoing.frame = vc_1.view.bounds
+//                effectViewOutgoing.addEquallyTo(to: vc_1.view)
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0, delay: 0, options: [], animations: {
+//                    effectViewOutgoing.effect = nil
+//                })
+//                let effectViewIncoming = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
+//                effectViewIncoming.frame = vc_2.view.bounds
+//                effectViewIncoming.addEquallyTo(to: vc_2.view)
+//
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration * 1.3 + duration * 0.25, delay: 0, options: [.curveEaseInOut], animations: {
+//                    userImage.center = userImageDestinationPos
+//                    userImage.frame.size = userImageDestinationSize
+//                })
+//
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
+//                    effectViewOutgoing.effect = UIBlurEffect(style: .prominent)
+//                    vc_1.view.alpha = 0
+//                }) {
+//                    _ in
+//                    effectViewOutgoing.removeFromSuperview()
+//                }
+//
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration * 1.3, delay: duration * 0.25, options: [.curveLinear], animations: {
+//                    effectViewIncoming.effect = nil
+//                    vc_2.view.alpha = 1
+//                }) {
+//                    _ in
+//                    vc_2.header.imageView.alpha = 1
+//                    userImage.removeFromSuperview()
+//                    fromVC.view.removeFromSuperview()
+//                    surveyPreview.userImage.alpha = 1
+//                    effectViewIncoming.removeFromSuperview()
+////                    fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+////                    toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+//                    self.context?.completeTransition(true)
+//                }
+//
+            } else if let vc_1 = fromVC as? NewPollController, let initialIcon = vc_1.topicIcon, let vc_2 = toVC as? CategorySelectionViewController, let destinationIcon = vc_2.actionButton {
                 
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
@@ -343,17 +343,17 @@ class IconTransition: BasicTransition {
                     }]
                 animateIconStyleTransition(initialIcon: initialIcon.icon, destinationIcon: destinationIcon.icon, origin: initialIcon.convert(initialIcon.icon.frame.origin, to: navigationController?.view), text: "?", iconChange: false, animationBlocks: [], completionBlocks: completionBlocks)//, useIncomingEffect: false)
                 
-            } else if let vc_1 = fromVC as? NewPollController, let initialIcon = vc_1.imagesIcon, let vc_2 = toVC as? ImagesSelectionViewController, let destinationIcon = vc_2.actionButton {
-                
-                let text = vc_1.images.isEmpty ? "?" : "OK"
-                let tempIconText = vc_1.images.isEmpty ? "ПРОПУСТИТЬ" : "OK"
-                let tempIconTextSize: CGFloat = vc_1.images.isEmpty ? 26 : 43
-                let completionBlocks = [{
-//                    fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-//                    toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-                    }]
-                animateIconStyleTransition(initialIcon: initialIcon.icon, destinationIcon: destinationIcon.icon, origin: vc_1.contentView.convert(initialIcon.center, to: navigationController?.view), text: text, animationBlocks: [], completionBlocks: completionBlocks)
-                
+//            } else if let vc_1 = fromVC as? NewPollController, let initialIcon = vc_1.imagesIcon, let vc_2 = toVC as? ImagesSelectionViewController, let destinationIcon = vc_2.actionButton {
+//
+//                let text = vc_1.images.isEmpty ? "?" : "OK"
+//                let tempIconText = vc_1.images.isEmpty ? "ПРОПУСТИТЬ" : "OK"
+//                let tempIconTextSize: CGFloat = vc_1.images.isEmpty ? 26 : 43
+//                let completionBlocks = [{
+////                    fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+////                    toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+//                    }]
+//                animateIconStyleTransition(initialIcon: initialIcon.icon, destinationIcon: destinationIcon.icon, origin: vc_1.contentView.convert(initialIcon.center, to: navigationController?.view), text: text, animationBlocks: [], completionBlocks: completionBlocks)
+//
             }  else if let vc_1 = fromVC as? NewPollController, let vc_2 = toVC as? TextInputViewController, vc_2.type != .Answer, let destinationView = vc_2.frameView, let destinationTextView = vc_2.textView as? UITextView {
                 var initialIcon: CircleButton!
                 var initialFrame: UIView!
@@ -580,16 +580,10 @@ class IconTransition: BasicTransition {
                 
                 UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
                     self.navigationController?.navigationBar.setNeedsLayout()
-                    if #available(iOS 13, *) {
-                        self.navigationController?.navigationBar.backgroundColor = .black
-                        self.navigationController?.navigationBar.tintColor = .white
-                        self.navigationController?.tabBarController?.view.backgroundColor = .black
-                        toVC.navigationController?.navigationBar.barStyle = .black
-                    } else {
-                        self.navigationController?.navigationBar.barTintColor = .black
-                        self.navigationController?.navigationBar.tintColor = .white
-                        UIApplication.shared.statusBarView?.backgroundColor = .black
-                    }
+                    self.navigationController?.navigationBar.backgroundColor = .black
+                    self.navigationController?.navigationBar.tintColor = .white
+                    self.navigationController?.tabBarController?.view.backgroundColor = .black
+                    toVC.navigationController?.navigationBar.barStyle = .black
                     self.navigationController?.navigationBar.layoutIfNeeded()
                     imageView.frame.origin = destinationOrigin
                     imageView.frame.size = destinationSize
@@ -846,7 +840,7 @@ class IconTransition: BasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: false) { _ in }
-            } else if (fromVC is NewPollController || fromVC is NewRatingController), let initialIcon = fromVC.navigationItem.titleView as? Icon, let vc_2 = toVC as? NewSurveyResultViewController, let keyWindow = navigationController?.view.window, let destinationIcon = vc_2.iconView as? Icon {
+            } else if (fromVC is NewPollController || fromVC is NewRatingController), let initialIcon = fromVC.navigationItem.titleView as? Icon, let vc_2 = toVC as? NewPollResultViewController, let keyWindow = navigationController?.view.window, let destinationIcon = vc_2.iconView as? Icon {
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
                 let icon = Icon(frame: CGRect(origin: initialIcon.convert(initialIcon.frame.origin, to: keyWindow),
@@ -970,6 +964,33 @@ class IconTransition: BasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
+            } else if let vc_1 = fromVC as? PollController, let vc_2 = toVC as? UserViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = cell.avatar, let destinationImageView = vc_2.imageView {
+                let imageView = UIImageView(frame: CGRect(origin: initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView), size: initialImageView.frame.size))
+                if let image = vc_1.survey?.owner.image {
+                    imageView.image = image.circularImage(size: initialImageView.frame.size, frameColor: vc_1.survey?.topic.tagColor ?? K_COLOR_RED)
+                }
+                initialImageView.alpha = 0
+                destinationImageView.alpha = 0
+                containerView.addSubview(imageView)
+                
+                let destinationOrigin = destinationImageView.superview!.convert(destinationImageView.frame.origin, to: containerView)
+                let destinationSize = destinationImageView.frame.size
+                
+                var animationBlocks: [Closure] = []
+                animationBlocks.append {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: .curveEaseInOut) {
+                        imageView.frame.origin = destinationOrigin
+                        imageView.frame.size = destinationSize
+                    } completion: {
+                        _ in
+                        imageView.removeFromSuperview()
+                        destinationImageView.alpha = 1
+                        self.context?.completeTransition(true)
+                    }
+                }
+                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: animationBlocks) { _ in }
+            } else {
+                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: []) { _ in self.context?.completeTransition(true)}
             }
         } else if operation == .pop {
             if let vc_1 = fromVC as? SubcategoryViewController, let initialIcon = vc_1.icon, let vc_2 = toVC as? SurveysViewController, let collVC = vc_2.categoryVC as? CategoryCollectionViewController, let indexPath = collVC.currentIndex as? IndexPath, let cell = collVC.collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell {
@@ -1018,131 +1039,131 @@ class IconTransition: BasicTransition {
                     self.context?.completeTransition(true)
                 }
                 
-            } else if let vc_1 = fromVC as? SurveyViewController, let vc_2 = toVC as? SurveysViewController, let stackVC = vc_2.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview {
+//            } else if let vc_1 = fromVC as? SurveyViewController, let vc_2 = toVC as? SurveysViewController, let stackVC = vc_2.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview {
+//
+//                vc_2.view.setNeedsLayout()
+//                vc_2.view.layoutIfNeeded()
+//                vc_2.buttonsContainer.alpha = 0
+//                let userImage = UIImageView(frame: CGRect(origin: vc_1.navigationController!.navigationBar.center, size: vc_1.navTitleSize))//surveyPreview.userImage.frame.size))
+//                userImage.center = navigationController.navigationBar.center
+//                userImage.image = vc_1.navTitle.image
+//                vc_1.navigationController!.navigationItem.titleView = nil
+//                toVC.view.alpha = 0
+//                containerView.addSubview(toVC.view)
+//                UIApplication.shared.keyWindow?.addSubview(userImage)
+//
+//                surveyPreview.alpha = 0
+//                surveyPreview.userImage.alpha = 0
+//                surveyPreview.transform = CGAffineTransform(scaleX: 1.4, y: 1.4)
+//
+//                let userImageDestinationSize = surveyPreview.userImage.frame.size//vc_2.navTitle.frame.size
+//                var userImageDestinationPos = UIApplication.shared.keyWindow!.convert(surveyPreview.userImage.center, from: vc_2.surveyStackVC.view)//navigationController.navigationBar.center
+//                userImageDestinationPos.x += userImageDestinationSize.width / 4 - userImage.frame.size.width / 4
+//                userImageDestinationPos.y += userImageDestinationSize.height / 2 - userImage.frame.size.height / 2
+//
+//                UIView.animate(withDuration: duration / 2, delay: 0, options: .curveEaseInOut, animations: {
+//                    vc_2.buttonsContainer.alpha = 1
+//                    vc_1.view.alpha = 0
+//                    vc_1.view.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+//                })
+//
+//                UIView.animate(withDuration: duration, delay: 0, options: [.curveEaseOut], animations: {
+//                    userImage.center = userImageDestinationPos
+//                    userImage.frame.size = userImageDestinationSize
+//                    surveyPreview.transform = .identity
+//                    surveyPreview.alpha = 1
+//                })
+//
+//                UIView.animate(withDuration: self.duration * 1.4, delay: 0, options: [.curveEaseInOut], animations: {
+//                    toVC.view.transform = .identity
+//                    toVC.view.alpha = 1
+//                }) {
+//                    _ in
+//                    userImage.removeFromSuperview()
+//                    fromVC.view.removeFromSuperview()
+//                    surveyPreview.userImage.alpha = 1
+//                    vc_1.view.transform = .identity
+//                    //                    surveyPreview.icon.alpha = 1
+//                    //                    surveyPreview.transform = .identity
+//                    //                    surveyPreview.alpha = 1
+//                    //                    vc_1.buttonsContainer.alpha = 1
+////                        fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+////                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+//                    self.context?.completeTransition(true)
+//                }
+//
+//                //                var pos = CGPoint.zero
+//                //                pos.x = surveyPreview.userImage.center.x + surveyPreview.frame.origin.x
+//                //                pos.y = surveyPreview.userImage.frame.origin.y + surveyPreview.frame.origin.y + surveyPreview.convert(surveyPreview.frame.origin, to: fromVC.view).y + (navigationController?.navigationBar.subviews.first!.frame.height)! + UIApplication.shared.statusBarFrame.height
+//                //                userImage.center = pos
+//
+//
+//
+//
+//                //                context?.completeTransition(true)
+//            } else if let vc_1 = fromVC as? delUserViewController, let vc_2 = toVC as? SurveysViewController, let stackVC = vc_2.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview {
+//                vc_1.view.setNeedsLayout()
+//                vc_1.view.layoutIfNeeded()
+//                
+//                vc_2.view.setNeedsLayout()
+//                vc_2.view.layoutIfNeeded()
+//                
+//                let userImage = UIImageView(frame: CGRect(origin: containerView.convert(vc_1.header.imageView.frame.origin, from: vc_1.header), size: vc_1.header.imageView.frame.size))
+//                userImage.image = vc_1.header.imageView.image
+//                
+//                toVC.view.alpha = 0
+//                containerView.addSubview(toVC.view)
+//                containerView.addSubview(userImage)
+//                vc_1.header.imageView.alpha = 0
+//                surveyPreview.userImage.alpha = 0
+//                //                toVC.tabBarController?.setTabBarVisible(visible: true, animated: true)
+//                let destinationSize = surveyPreview.userImage.frame.size
+//                var destinationPos = containerView.convert(surveyPreview.userImage.center, from: surveyPreview)
+//                destinationPos.x += userImage.frame.size.width / 2 - destinationSize.width / 2
+//                destinationPos.y += userImage.frame.size.height / 2 - destinationSize.height / 2
+//                
+//                
+//                let effectViewOutgoing = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+//                effectViewOutgoing.frame = vc_1.view.bounds
+//                effectViewOutgoing.addEquallyTo(to: vc_1.view)
+//                toVC.tabBarController?.setTabBarVisible(visible: true, animated: true)
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0, delay: 0, options: [], animations: {
+//                    effectViewOutgoing.effect = nil
+//                })
+//                let effectViewIncoming = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
+//                effectViewIncoming.frame = vc_2.view.bounds
+//                effectViewIncoming.addEquallyTo(to: vc_2.view)
+//                
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration * 1.3 + duration * 0.25, delay: 0, options: [.curveEaseInOut], animations: {
+//                    userImage.center = destinationPos
+//                    userImage.frame.size = destinationSize
+//                })
+//                
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
+//                    effectViewOutgoing.effect = UIBlurEffect(style: .prominent)
+//                    vc_1.view.alpha = 0
+//                }) {
+//                    _ in
+//                    effectViewOutgoing.removeFromSuperview()
+//                }
+//                
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration * 1.3, delay: duration * 0.25, options: [.curveEaseOut], animations: {
+//                    effectViewIncoming.effect = nil
+//                    vc_2.view.alpha = 1
+//                }) {
+//                    _ in
+//                    userImage.removeFromSuperview()
+//                    fromVC.view.removeFromSuperview()
+//                    surveyPreview.userImage.alpha = 1
+//                    effectViewIncoming.removeFromSuperview()
+////                        fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+////                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
+//                    self.context?.completeTransition(true)
+//                }
+//                
+            } else if let vc_1 = fromVC as? CategorySelectionViewController, let collectionVC = vc_1.categoryVC as? CategoryCollectionViewController, let indexPath = collectionVC.currentIndex as? IndexPath, let cell = collectionVC.collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell, let initialIcon = cell.icon, let vc_2 = toVC as? NewPollController, let destinationIcon = vc_2.topicIcon {
                 
-                vc_2.view.setNeedsLayout()
-                vc_2.view.layoutIfNeeded()
-                vc_2.buttonsContainer.alpha = 0
-                let userImage = UIImageView(frame: CGRect(origin: vc_1.navigationController!.navigationBar.center, size: vc_1.navTitleSize))//surveyPreview.userImage.frame.size))
-                userImage.center = navigationController.navigationBar.center
-                userImage.image = vc_1.navTitle.image
-                vc_1.navigationController!.navigationItem.titleView = nil
-                toVC.view.alpha = 0
-                containerView.addSubview(toVC.view)
-                UIApplication.shared.keyWindow?.addSubview(userImage)
-                
-                surveyPreview.alpha = 0
-                surveyPreview.userImage.alpha = 0
-                surveyPreview.transform = CGAffineTransform(scaleX: 1.4, y: 1.4)
-                
-                let userImageDestinationSize = surveyPreview.userImage.frame.size//vc_2.navTitle.frame.size
-                var userImageDestinationPos = UIApplication.shared.keyWindow!.convert(surveyPreview.userImage.center, from: vc_2.surveyStackVC.view)//navigationController.navigationBar.center
-                userImageDestinationPos.x += userImageDestinationSize.width / 4 - userImage.frame.size.width / 4
-                userImageDestinationPos.y += userImageDestinationSize.height / 2 - userImage.frame.size.height / 2
-                
-                UIView.animate(withDuration: duration / 2, delay: 0, options: .curveEaseInOut, animations: {
-                    vc_2.buttonsContainer.alpha = 1
-                    vc_1.view.alpha = 0
-                    vc_1.view.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-                })
-                
-                UIView.animate(withDuration: duration, delay: 0, options: [.curveEaseOut], animations: {
-                    userImage.center = userImageDestinationPos
-                    userImage.frame.size = userImageDestinationSize
-                    surveyPreview.transform = .identity
-                    surveyPreview.alpha = 1
-                })
-                
-                UIView.animate(withDuration: self.duration * 1.4, delay: 0, options: [.curveEaseInOut], animations: {
-                    toVC.view.transform = .identity
-                    toVC.view.alpha = 1
-                }) {
-                    _ in
-                    userImage.removeFromSuperview()
-                    fromVC.view.removeFromSuperview()
-                    surveyPreview.userImage.alpha = 1
-                    vc_1.view.transform = .identity
-                    //                    surveyPreview.icon.alpha = 1
-                    //                    surveyPreview.transform = .identity
-                    //                    surveyPreview.alpha = 1
-                    //                    vc_1.buttonsContainer.alpha = 1
-//                        fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-//                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-                    self.context?.completeTransition(true)
-                }
-                
-                //                var pos = CGPoint.zero
-                //                pos.x = surveyPreview.userImage.center.x + surveyPreview.frame.origin.x
-                //                pos.y = surveyPreview.userImage.frame.origin.y + surveyPreview.frame.origin.y + surveyPreview.convert(surveyPreview.frame.origin, to: fromVC.view).y + (navigationController?.navigationBar.subviews.first!.frame.height)! + UIApplication.shared.statusBarFrame.height
-                //                userImage.center = pos
-                
-                
-                
-                
-                //                context?.completeTransition(true)
-            } else if let vc_1 = fromVC as? delUserViewController, let vc_2 = toVC as? SurveysViewController, let stackVC = vc_2.surveyStackVC as? SurveyStackViewController, let surveyPreview = stackVC.surveyPreview as? SurveyPreview {
-                vc_1.view.setNeedsLayout()
-                vc_1.view.layoutIfNeeded()
-                
-                vc_2.view.setNeedsLayout()
-                vc_2.view.layoutIfNeeded()
-                
-                let userImage = UIImageView(frame: CGRect(origin: containerView.convert(vc_1.header.imageView.frame.origin, from: vc_1.header), size: vc_1.header.imageView.frame.size))
-                userImage.image = vc_1.header.imageView.image
-                
-                toVC.view.alpha = 0
-                containerView.addSubview(toVC.view)
-                containerView.addSubview(userImage)
-                vc_1.header.imageView.alpha = 0
-                surveyPreview.userImage.alpha = 0
-                //                toVC.tabBarController?.setTabBarVisible(visible: true, animated: true)
-                let destinationSize = surveyPreview.userImage.frame.size
-                var destinationPos = containerView.convert(surveyPreview.userImage.center, from: surveyPreview)
-                destinationPos.x += userImage.frame.size.width / 2 - destinationSize.width / 2
-                destinationPos.y += userImage.frame.size.height / 2 - destinationSize.height / 2
-                
-                
-                let effectViewOutgoing = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-                effectViewOutgoing.frame = vc_1.view.bounds
-                effectViewOutgoing.addEquallyTo(to: vc_1.view)
-                toVC.tabBarController?.setTabBarVisible(visible: true, animated: true)
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0, delay: 0, options: [], animations: {
-                    effectViewOutgoing.effect = nil
-                })
-                let effectViewIncoming = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
-                effectViewIncoming.frame = vc_2.view.bounds
-                effectViewIncoming.addEquallyTo(to: vc_2.view)
-                
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration * 1.3 + duration * 0.25, delay: 0, options: [.curveEaseInOut], animations: {
-                    userImage.center = destinationPos
-                    userImage.frame.size = destinationSize
-                })
-                
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
-                    effectViewOutgoing.effect = UIBlurEffect(style: .prominent)
-                    vc_1.view.alpha = 0
-                }) {
-                    _ in
-                    effectViewOutgoing.removeFromSuperview()
-                }
-                
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration * 1.3, delay: duration * 0.25, options: [.curveEaseOut], animations: {
-                    effectViewIncoming.effect = nil
-                    vc_2.view.alpha = 1
-                }) {
-                    _ in
-                    userImage.removeFromSuperview()
-                    fromVC.view.removeFromSuperview()
-                    surveyPreview.userImage.alpha = 1
-                    effectViewIncoming.removeFromSuperview()
-//                        fromVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-//                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
-                    self.context?.completeTransition(true)
-                }
-                
-            } else if let vc_1 = fromVC as? CategorySelectionViewController, let collectionVC = vc_1.categoryVC as? CategoryCollectionViewController, let indexPath = collectionVC.currentIndex as? IndexPath, let cell = collectionVC.collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell, let initialIcon = cell.icon, let vc_2 = toVC as? NewPollController, let destinationIcon = vc_2.categoryIcon {
-                
-                vc_2.categoryTitle.alpha = 0
+                vc_2.topicTitle.alpha = 0
                 vc_1.view.backgroundColor = .clear
 //                cell.isSelected = false
                 var origin = cell.contentView.convert(initialIcon.frame.origin, to: containerView)
@@ -1152,10 +1173,10 @@ class IconTransition: BasicTransition {
                 icon.backgroundColor = cell.category.tagColor
                 containerView.addSubview(icon)
                 initialIcon.alpha = 0
-                destinationIcon.category = Icon.Category(rawValue: vc_1.category!.ID) ?? .Null
+                destinationIcon.category = Icon.Category(rawValue: vc_1.category!.id) ?? .Null
                 
                 vc_2.contentView.alpha = 0
-                vc_2.categoryTitle.text = ""
+                vc_2.topicTitle.text = ""
                 vc_2.selectedColor = vc_1.category!.tagColor
                 
                 
@@ -1220,7 +1241,7 @@ class IconTransition: BasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                     delay(seconds: 0.1) {
-                        vc_2.category = vc_1.category
+                        vc_2.topic = vc_1.category
                     }
                 }
                 
@@ -1522,13 +1543,9 @@ class IconTransition: BasicTransition {
                     imageView.frame.origin = destinationOrigin
                     imageView.frame.size = destinationSize
                     imageView.cornerRadius = destinationView.cornerRadius
-                    if #available(iOS 13, *) {
-                        self.navigationController?.navigationBar.backgroundColor = .white
-                        self.navigationController?.navigationBar.tintColor = .black
-                        self.navigationController?.tabBarController?.view.backgroundColor = .white
-                    } else {
-                        self.navigationController?.navigationBar.barTintColor = .white
-                    }
+                    self.navigationController?.navigationBar.backgroundColor = .white
+                    self.navigationController?.navigationBar.tintColor = .black
+                    self.navigationController?.tabBarController?.view.backgroundColor = .white
                     blackScreen.alpha = 0
                 }) {
                     _ in
@@ -1756,7 +1773,7 @@ class IconTransition: BasicTransition {
                 }
                 
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-            } else if let vc_1 = fromVC as? NewSurveyResultViewController, let initialIcon = vc_1.iconView as? Icon, (toVC is NewPollController || toVC is NewRatingController), let keyWindow = navigationController?.view.window, let destinationIcon = toVC.navigationItem.titleView as? Icon {
+            } else if let vc_1 = fromVC as? NewPollResultViewController, let initialIcon = vc_1.iconView as? Icon, (toVC is NewPollController || toVC is NewRatingController), let keyWindow = navigationController?.view.window, let destinationIcon = toVC.navigationItem.titleView as? Icon {
                 let icon = Icon(frame: CGRect(origin: vc_1.view.convert(initialIcon.frame.origin, to: keyWindow),
                                                             size: initialIcon.frame.size))
                 icon.iconColor = initialIcon.iconColor
@@ -1800,7 +1817,7 @@ class IconTransition: BasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: vc_1.view, toView: toVC.view, animationBlocks: animationBlocks) { _ in }
-            } else if fromVC is NewSurveyResultViewController, toVC is SurveysViewController {
+            } else if fromVC is NewPollResultViewController, toVC is SurveysViewController {
                 toVC.view.transform = CGAffineTransform.init(scaleX: 0.7, y: 0.7)
                 animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: [{
                     toVC.view.transform = .identity
@@ -1873,6 +1890,31 @@ class IconTransition: BasicTransition {
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
 //                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: []) { _ in self.context?.completeTransition(true) }
+            } else if let vc_1 = fromVC as? UserViewController, let vc_2 = toVC as? PollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = vc_1.imageView, let destinationImageView = cell.avatar {
+                let imageView = UIImageView(frame: CGRect(origin: initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView), size: initialImageView.frame.size))
+                if let image = vc_1.userprofile.image {
+                    imageView.image = image.circularImage(size: initialImageView.frame.size, frameColor: vc_1.color)
+                }
+                initialImageView.alpha = 0
+                destinationImageView.alpha = 0
+                containerView.addSubview(imageView)
+                
+                let destinationOrigin = destinationImageView.superview!.convert(destinationImageView.frame.origin, to: containerView)
+                let destinationSize = destinationImageView.frame.size
+                
+                var animationBlocks: [Closure] = []
+                animationBlocks.append {
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: .curveEaseInOut) {
+                        imageView.frame.origin = destinationOrigin
+                        imageView.frame.size = destinationSize
+                    } completion: {
+                        _ in
+                        imageView.removeFromSuperview()
+                        destinationImageView.alpha = 1
+                        self.context?.completeTransition(true)
+                    }
+                }
+                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: animationBlocks) { _ in }
             } else {
                 context?.completeTransition(true)
             }

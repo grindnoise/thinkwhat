@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigationControllerDelegate {
 
@@ -39,21 +40,22 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
             }
         }
     }
-    private var validationCode: Int!    = 0000 {
+    private var validationCode: Int! = 0000 {
         didSet {
             if oldValue != validationCode {
                 if !EmailResponse.shared.isEmpty && EmailResponse.shared.isActive {
                     print(EmailResponse.shared.getConfirmationCode()!)
                     if validationCode == EmailResponse.shared.getConfirmationCode()! {
-                        let owner = [DjangoVariables.User.email : AppData.shared.user.email!]
+                        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else { return }
+                        let owner = [DjangoVariables.User.email : AppData.shared.profile.email!]
                         var data:[String: Any] = [DjangoVariables.UserProfile.isEmailVerified : true]
                         data["owner"] = owner
-                        apiManager.updateUserProfile(data: data) {
-                            json, error in
-                            if error != nil {
-                                self.simpleAlert(error!.localizedDescription)
-                            } else {
+                        API.shared.request(url: url, httpMethod: .post, parameters: data, encoding: JSONEncoding.default) { result in
+                            switch result {
+                            case .success:
                                 self.performSegue(withIdentifier: Segues.Auth.TermsFromValidation, sender: nil)
+                            case .failure(let error):
+                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                             }
                         }
                     } else {
@@ -80,7 +82,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
             }
         }
     }
-    fileprivate lazy var apiManager: APIManagerProtocol = initializeServerAPI()
+//    fileprivate lazy var apiManager: APIManagerProtocol = initializeServerAPI()
     var phoneNumber:                    String!
     var phoneNumberFormatted:           String!
     var username                        = ""
@@ -193,8 +195,8 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
     }
 }
 
-extension ValidationViewController: ServerInitializationProtocol {
-    func initializeServerAPI() -> APIManagerProtocol {
-        return (self.navigationController as! AuthNavigationController).apiManager
-    }
-}
+//extension ValidationViewController: ServerInitializationProtocol {
+//    func initializeServerAPI() -> APIManagerProtocol {
+//        return (self.navigationController as! AuthNavigationController).apiManager
+//    }
+//}

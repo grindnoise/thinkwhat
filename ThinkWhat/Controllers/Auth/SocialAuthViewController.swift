@@ -12,7 +12,7 @@ class SocialAuthViewController: UIViewController, UIWebViewDelegate, UINavigatio
     
     @IBOutlet weak var spinner:         LoadingIndicator!
     @IBOutlet weak var loginWebView:    UIWebView!
-    open           var authVariant:     AuthVariant!
+    open           var authVariant:     AuthProvider!
     open           var navTitle:        UIView!
     
     override func viewDidLoad() {

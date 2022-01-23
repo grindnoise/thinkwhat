@@ -11,11 +11,11 @@ import UIKit
 class SubcategoryViewController: UIViewController {
 
     weak var delegate: CallbackDelegate?
-    var parentCategory: SurveyCategory!
+    var parentCategory: Topic!
     @IBOutlet weak var icon: Icon!
     @IBOutlet weak var upperContainer: UIView!
     @IBOutlet weak var container: UIView!
-    fileprivate var categories: [SurveyCategory]!
+    fileprivate var categories: [Topic]!
     fileprivate let categoryVC: CategoryCollectionViewController = {
         return Storyboards.controllers.instantiateViewController(withIdentifier: "CategoryCollectionViewController") as! CategoryCollectionViewController
     } ()
@@ -24,7 +24,7 @@ class SubcategoryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 //        container.alpha = 0
-        categories = SurveyCategories.shared.categories.filter { $0.parent == parentCategory }.sorted { $0.total > $1.total }
+        categories = Topics.shared.all.filter { $0.parent == parentCategory }.sorted { $0.totalCount > $1.totalCount }
         categoryVC.delegate = self
         categoryVC.categories = categories
         categoryVC.childColor = parentCategory.tagColor
@@ -32,7 +32,7 @@ class SubcategoryViewController: UIViewController {
         addChild(self.categoryVC)
         categoryVC.didMove(toParent: self)
         icon.backgroundColor = parentCategory.tagColor
-        icon.category = Icon.Category(rawValue: parentCategory.ID) ?? .Null
+        icon.category = Icon.Category(rawValue: parentCategory.id) ?? .Null
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -46,7 +46,7 @@ class SubcategoryViewController: UIViewController {
         navTitle.textAlignment = .center
         let attrString = NSMutableAttributedString()
         attrString.append(NSAttributedString(string: parentCategory.title, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
-        attrString.append(NSAttributedString(string: "\n(\(parentCategory.total))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .gray, backgroundColor: .clear)))
+        attrString.append(NSAttributedString(string: "\n(\(parentCategory.totalCount))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .gray, backgroundColor: .clear)))
         navTitle.attributedText = attrString
         navigationItem.titleView = navTitle
         
@@ -67,7 +67,7 @@ class SubcategoryViewController: UIViewController {
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == Segues.App.CategoryToSurveys, let destinationVC = segue.destination as? SurveysTableViewController, let category = sender as? SurveyCategory {
+        if segue.identifier == Segues.App.CategoryToSurveys, let destinationVC = segue.destination as? SurveysTableViewController, let category = sender as? Topic {
             destinationVC.category = category
         }
     }
@@ -87,8 +87,8 @@ class SubcategoryViewController: UIViewController {
 }
 
 extension SubcategoryViewController: CallbackDelegate {
-    func callbackReceived(_ sender: AnyObject) {
-        if sender is SurveyCategory {
+    func callbackReceived(_ sender: Any) {
+        if sender is Topic {
             if let nc = navigationController as? NavigationControllerPreloaded {
                 nc.transitionStyle = .Default
             }

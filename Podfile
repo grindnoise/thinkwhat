@@ -1,12 +1,13 @@
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '10.0' # or platform :osx, '10.10' if your target is OS X.
-use_frameworks!
+platform :ios, '13.0' # or platform :osx, '10.10' if your target is OS X.
 
 target 'ThinkWhat' do
+    use_frameworks!
     pod "TTRangeSlider"
     pod 'SwiftyJSON'
-    pod 'FacebookCore', '0.9.0'
-    pod 'FacebookLogin', '0.9.0'
+    pod 'FBSDKCoreKit'
+    pod 'FBSDKLoginKit'
+  pod 'FBSDKShareKit'
     pod 'Swinject', '2.7.1'
     pod 'Alamofire', '~> 5.5'
     pod 'VK-ios-sdk'

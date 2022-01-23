@@ -10,7 +10,7 @@ import UIKit
 
 class ClaimView: UIView {
     private var claimCells: [ClaimCell]    = []
-    private var claimCategory: ClaimCategory? {
+    private var claimCategory: Claim? {
         didSet {
             for cell in claimCells {
                 if cell.claimCategory != claimCategory {
@@ -59,12 +59,12 @@ class ClaimView: UIView {
 
 extension ClaimView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return ClaimCategories.shared.container.count
+        return Claims.shared.all.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = ClaimCell(frame: CGRect(origin: .zero, size: CGSize(width: tableView.frame.width, height: 50)))
-            cell.claimCategory = ClaimCategories.shared.container[indexPath.row]
+            cell.claimCategory = Claims.shared.all[indexPath.row]
             if !claimCells.contains(cell) {
                 claimCells.append(cell)
             }
@@ -80,7 +80,7 @@ extension ClaimView: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return tableView.frame.height / CGFloat(ClaimCategories.shared.container.count)// + 1//UITableView.automaticDimension
+        return tableView.frame.height / CGFloat(Claims.shared.all.count)// + 1//UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {

@@ -10,7 +10,7 @@ import UIKit
 
 class LoginButton: StateButton {
     
-    var authVariant: AuthVariant!
+    var authVariant: AuthProvider!
 }
 
 class StateButton: UIView, AnimationsRemover, StateSwitchable {

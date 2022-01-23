@@ -49,10 +49,10 @@ class SurveyYoutubeCell: UITableViewCell, WKYTPlayerViewDelegate {
         // Configure the view for the selected state
     }
     
-    func loadVideo(url: String) {
+    func loadVideo(url: URL) {
         if !isVideoLoaded {
             isVideoLoaded = true
-            if let id = url.youtubeID {
+            if let id = url.absoluteString.youtubeID {
                 playerView.load(withVideoId: id)
             }
         }

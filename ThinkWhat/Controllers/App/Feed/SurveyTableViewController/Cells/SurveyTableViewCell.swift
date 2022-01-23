@@ -37,11 +37,11 @@ class SurveyTableViewCell: UITableViewCell {
 //    @IBOutlet weak var subCategory: UILabel!
     @IBOutlet weak var duration: UILabel!
     @IBOutlet weak var hotBadge: FlameBadge!
-    var survey: SurveyRef! {
+    var survey: SurveyReference! {
         didSet {
-            icon.backgroundColor = survey.category.tagColor
-            icon.category = Icon.Category(rawValue: survey.category.ID) ?? .Null
-            hotBadge.alpha = Surveys.shared.stackObjects.filter({ $0.ID == survey.ID }).isEmpty ? 0 : 1
+            icon.backgroundColor = survey.topic.tagColor
+            icon.category = Icon.Category(rawValue: survey.topic.id) ?? .Null
+            hotBadge.alpha = Surveys.shared.hot.filter({ $0.id == survey.id }).isEmpty ? 0 : 1
         }
     }// {
 //        didSet {

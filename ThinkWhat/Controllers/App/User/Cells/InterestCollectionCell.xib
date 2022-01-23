@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -24,25 +22,26 @@
                 <rect key="frame" x="0.0" y="0.0" width="100" height="20"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="82C-3x-Fub">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="82C-3x-Fub" customClass="InsetLabel" customModule="ThinkWhat" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="100" height="20"/>
                         <color key="backgroundColor" red="0.63441143129999999" green="0.066465257309999998" blue="0.035541682079999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
+                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="14"/>
                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
             </view>
+            <viewLayoutGuide key="safeArea" id="hMo-HB-s9H"/>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="82C-3x-Fub" secondAttribute="bottom" id="7CA-FE-18i"/>
-                <constraint firstItem="82C-3x-Fub" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="deY-rZ-0KV"/>
-                <constraint firstAttribute="trailing" secondItem="82C-3x-Fub" secondAttribute="trailing" id="j3G-xs-fPY"/>
-                <constraint firstItem="82C-3x-Fub" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="uuN-7L-WUP"/>
+                <constraint firstItem="82C-3x-Fub" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="ORy-y5-yMi"/>
+                <constraint firstItem="82C-3x-Fub" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="Vjo-R1-jHm"/>
+                <constraint firstAttribute="trailing" secondItem="82C-3x-Fub" secondAttribute="trailing" id="bkX-aX-F4V"/>
+                <constraint firstAttribute="bottom" secondItem="82C-3x-Fub" secondAttribute="bottom" id="gJX-hc-5W6"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <connections>
                 <outlet property="categoryLabel" destination="82C-3x-Fub" id="4Xt-Qh-P6q"/>
             </connections>
+            <point key="canvasLocation" x="1.6000000000000001" y="12.593703148425789"/>
         </collectionViewCell>
     </objects>
 </document>

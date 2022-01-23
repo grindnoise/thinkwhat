@@ -8,4 +8,4 @@
 
 import UIKit
 
-class AuthNavigationController: NavigationControllerPreloaded, ServerProtocol, StorageProtocol {}
+class AuthNavigationController: NavigationControllerPreloaded, StorageProtocol {}

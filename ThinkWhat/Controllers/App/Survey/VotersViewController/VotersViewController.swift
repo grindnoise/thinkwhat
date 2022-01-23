@@ -24,14 +24,13 @@ class VotersViewController: UIViewController {
     let itemsPerRow: CGFloat = 3
     let sectionInsets = UIEdgeInsets(top: 10.0, left: 12.0, bottom: 10.0, right: 12.0)
     var frameColor: UIColor = K_COLOR_RED
-    var surveyID: Int!
     var answer: Answer!
-    var apiManager: APIManagerProtocol!
+//    var apiManager: APIManagerProtocol!
     var initialIndex: IndexPath!
     private var filterButton: Icon!
     private var needsAnimation = false
     private var requestAttempt = 0
-    private var filtered: [UserProfile] = [] {
+    private var filtered: [Userprofile] = [] {
         didSet {
             collectionView.reloadData()
         }
@@ -74,50 +73,53 @@ class VotersViewController: UIViewController {
     
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
         if recognizer.state == .ended, recognizer.view == filterButton {
-            AlertController.shared.show(delegate: self, height: UIScreen.main.bounds.height * 0.5, contentType: .VotersFilter, voters: answer.userprofiles, filters: filters)
+            AlertController.shared.show(delegate: self, height: UIScreen.main.bounds.height * 0.5, contentType: .VotersFilter, voters: answer.voters, filters: filters)
+        }
+    }
+    
+    private func loadDataAsync() {
+        requestAttempt += 1
+        guard requestAttempt <= MAX_REQUEST_ATTEMPTS else {
+            //MARK TODO: - Show failure warning
+            return
+        }
+        Task {
+            do {
+                let data = try await API.shared.getVotersAsync(answer: answer)
+            } catch {
+                //MARK TODO: - Show failure warning
+                fatalError(error.localizedDescription)
+            }
         }
     }
     
     private func loadData() {
         self.requestAttempt += 1
-        apiManager.getVoters(surveyID: surveyID, answerID: answer.ID, userprofiles: answer.userprofiles.compactMap({ $0.ID })) {
-            json, error in
-            if error != nil {
-                if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
-                    Banner.shared.contentType = .Warning
-                    if let content = Banner.shared.content as? Warning {
-                        content.level = .Error
-                        content.text = "Произошла ошибка, повторите попытку позже"
-                    }
-                    Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
-                    self.requestAttempt = 0
-                } else {
-                    //Retry
-                    self.loadData()
-                }
-            }
-            if json != nil {
-                if let _userprofiles = json!["userprofiles"].arrayValue as? [JSON] {
-                    for (i, _userprofile) in _userprofiles.enumerated() {
-                        var userprofile: UserProfile!
-                        if let ID = _userprofile["id"].intValue as? Int, let foundValue = UserProfiles.shared.container.filter({ $0.ID == ID }).first {
-                            userprofile = foundValue
-                        } else if let newUserprofile = UserProfile(_userprofile) {
-                            UserProfiles.shared.container.append(newUserprofile)
-                            userprofile = newUserprofile
-                        }
-                        self.answer.appendUserprofile(userprofile)
+        API.shared.getVoters(answer: answer, users: answer.voters) { result in
+            switch result {
+            case .success(let json):
+                do {
+                    let data = try json.rawData()
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .formatted(.dateTimeFormatter)
+                    let instances = try decoder.decode([Userprofile].self, from: data)
+                    instances.enumerated().forEach { (index, instance) in
+                        ///Add voter for an answer
+                        self.answer.addVoter(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
                         self.needsAnimation = true
-                        self.collectionView.insertItems(at: [IndexPath(row: self.answer.userprofiles.count - 1, section: 0)])
-                        //                        self.collectionView.reloadItems(at: [IndexPath(row: self.answer.userprofiles.count - 1, section: 0)])
-                        if i == _userprofiles.count - 1 {
+                        self.collectionView.insertItems(at: [IndexPath(row: self.answer.voters.count - 1, section: 0)])
+                        if index == instances.count - 1 {
                             delay(seconds: 0.5) {
                                 self.needsAnimation = false
                             }
                         }
                     }
+                    self.requestAttempt = 0
+                } catch {
+                    print(error.localizedDescription)
                 }
-                self.requestAttempt = 0
+            case .failure(let error):
+                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
             }
         }
     }
@@ -125,47 +127,50 @@ class VotersViewController: UIViewController {
 
 extension VotersViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return filtered.isEmpty ? answer.userprofiles.count : filtered.count
+        return filtered.isEmpty ? answer.voters.count : filtered.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? UserCell {
-            var userprofile: UserProfile?
-            if filtered.isEmpty, let user = answer.userprofiles[indexPath.row] as? UserProfile {
+            var userprofile: Userprofile!
+            if filtered.isEmpty, let user = answer.voters[indexPath.row] as? Userprofile {
                 userprofile = user
-            } else if let user = filtered[indexPath.row] as? UserProfile {
+            } else if let user = filtered[indexPath.row] as? Userprofile {
                 userprofile = user
             }
+            
             if userprofile != nil {
-                cell.name.text = userprofile!.name
-                cell.age = userprofile!.age
-                cell.gender = userprofile!.gender
-                if let image = userprofile!.image {
+                cell.userprofile = userprofile
+                cell.name.text = userprofile.name
+                cell.age = userprofile.age
+                cell.gender = userprofile.gender
+                if let image = userprofile.image {
                     let circle = image.circularImage(size: cell.imageView.frame.size, frameColor: frameColor)
                     cell.imageView.image = circle
-                } else if let url = answer.userprofiles[indexPath.row].imageURL as? String, !url.isEmpty {
-                    let circle = UIImage(named: "user")!.circularImage(size: cell.imageView.frame.size, frameColor: frameColor)
-                    cell.imageView.image = circle
-                    //Download
-                    apiManager.downloadImage(url: url) {
-                        image, error in
-                        if error != nil {
-                            print(error!.localizedDescription)
-                        }
-                        if image != nil {
-                            UIView.transition(with: cell.imageView,
-                                              duration: 0.5,
-                                              options: .transitionCrossDissolve,
-                                              animations: { cell.imageView.image = image!.circularImage(size: cell.imageView.frame.size, frameColor: self.frameColor) }
-                            ) {
-                                _ in
-                                self.answer.userprofiles[indexPath.row].image = image
-                            }
-                        }
-                    }
                 } else {
                     let circle = UIImage(named: "user")!.circularImage(size: cell.imageView.frame.size, frameColor: frameColor)
                     cell.imageView.image = circle
+//                    if #available(iOS 13.0.0, *) {
+                        Task {
+                            do {
+                                let image = try await cell.userprofile!.downloadImageAsync()
+                                animateImageChange(image: image, imageView: cell.imageView)
+                            } catch {
+                                print(error)
+                            }
+                        }
+//                    } else {
+//                        userprofile.downloadImage() { [weak cell, self] (image, error) in
+//                            guard let cell = cell else { return }
+//                            if let image = image {
+//                                UIView.transition(with: cell, duration: 0.3, options: [.transitionCrossDissolve]) {
+//                                    cell.imageView.image = image.circularImage(size: cell.imageView.frame.size, frameColor: self.frameColor)
+//                                } completion: { _ in}
+//                            } else {
+//
+//                            }
+//                        }
+//                    }
                 }
             return cell
             }
@@ -175,6 +180,12 @@ extension VotersViewController: UICollectionViewDelegate, UICollectionViewDataSo
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         return true
+    }
+    
+    @MainActor func animateImageChange(image: UIImage, imageView: UIImageView) {
+        UIView.transition(with: imageView, duration: 0.3, options: [.transitionCrossDissolve]) {
+            imageView.image = image.circularImage(size: imageView.frame.size, frameColor: self.frameColor)
+        } completion: { _ in}
     }
     
     //1 collectionView(_:layout:sizeForItemAt:) is responsible for telling the layout the size of a given cell
@@ -205,9 +216,9 @@ extension VotersViewController: UICollectionViewDelegate, UICollectionViewDataSo
 }
 
 extension VotersViewController: CallbackDelegate {
-    func callbackReceived(_ sender: AnyObject) {
+    func callbackReceived(_ sender: Any) {
         if let dict = sender as? [String: AnyObject] {
-            if let _filtered = dict["filtered"] as? [UserProfile] {
+            if let _filtered = dict["filtered"] as? [Userprofile] {
                 filtered = _filtered
             }
             if let _filters = dict["filters"] as? [String: AnyObject] {

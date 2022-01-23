@@ -9,7 +9,7 @@
 import UIKit
 import UserNotifications
 
-class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
+class TabBarController: UITabBarController, StorageProtocol {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return selectedViewController?.preferredStatusBarStyle ?? .lightContent
     }
@@ -27,7 +27,7 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        appDelegate.window?.rootViewController = self
+//        appDelegate.window?.rootViewController = self
 //        UITabBar.appearance().layer.borderWidth = 1.0
 //        UITabBar.appearance().clipsToBounds = true
         tabBar.backgroundColor = .white
@@ -68,9 +68,7 @@ class TabBarController: UITabBarController, ServerProtocol, StorageProtocol {
     }
     
     @objc private func handleTokenState() {
-        if tokenState == .Revoked {
-            performSegue(withIdentifier: Segues.App.Logout, sender: nil)
-        }
+        performSegue(withIdentifier: Segues.App.Logout, sender: nil)
     }
     
     override func present(_ viewControllerToPresent: UIViewController,

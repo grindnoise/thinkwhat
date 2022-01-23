@@ -37,8 +37,9 @@ class ImageViewController: UIViewController {
     
     var statusBarHidden = false {
         didSet {
+            UIView.animate(withDuration: 0.3) {
                 self.setNeedsStatusBarAppearanceUpdate()
-            
+            }
         }
     }
     override var preferredStatusBarStyle: UIStatusBarStyle {

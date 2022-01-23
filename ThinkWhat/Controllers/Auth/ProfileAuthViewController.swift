@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class ProfileAuthViewController: UIViewController, UINavigationControllerDelegate, UITextFieldDelegate {
     
@@ -65,7 +66,7 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
                 separated.enumerated().map {
                     (index, value) in
                     if index == 0 {
-                        if String(value) != AppData.shared.user.firstName {
+                        if String(value) != AppData.shared.profile.firstName {
                             owner[DjangoVariables.User.firstName] = String(value)
                         }
                     } else {
@@ -73,15 +74,15 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
                     }
                 }
                 
-                if lastName != AppData.shared.user.lastName {
+                if lastName != AppData.shared.profile.lastName {
                     owner[DjangoVariables.User.lastName] = lastName
                     
                 }
                 
-                if Date(dateString: birthDateTF.text!) != AppData.shared.userProfile.birthDate {
+                if Date(dateString: birthDateTF.text!) != AppData.shared.profile.birthDate {
                     userProfile[DjangoVariables.UserProfile.birthDate] = birthDateTF.text!
                 }
-                if Gender(rawValue: dataModel[genderTF.text!]!) != AppData.shared.userProfile.gender {
+                if Gender(rawValue: dataModel[genderTF.text!]!) != AppData.shared.profile.gender {
                     userProfile[DjangoVariables.UserProfile.gender] = dataModel[genderTF.text!]//allKeys(forValue: genderTF.text!).first!
                 }
                 if !owner.isEmpty {
@@ -91,15 +92,19 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
                     performSegue(withIdentifier: Segues.Auth.AppFromProfile, sender: nil)
                 } else {
                     showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
-                    apiManager.updateUserProfile(data: userProfile) {
-                        json, error in
-                        if error != nil {
-                            showAlert(type: .WrongCredentials, buttons: [["Хорошо": [CustomAlertView.ButtonType.Ok: nil]]], text: error!.localizedDescription)
-                        }
-                        if json != nil {
-                            AppData.shared.importUserData(json!)
+                    guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else {
+                        hideAlert()
+                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка входа")
+                        return
+                    }
+                    API.shared.request(url: url, httpMethod: .patch, parameters: userProfile, encoding: JSONEncoding.default) { result in
+                        switch result {
+                        case .success(let json):
+                            AppData.shared.importUserData(json)
                             hideAlert()
                             self.performSegue(withIdentifier: Segues.Auth.AppFromProfile, sender: nil)
+                        case .failure(let error):
+                            showAlert(type: .WrongCredentials, buttons: [["Хорошо": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                         }
                     }
                 }
@@ -125,7 +130,7 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
         style.alignment = .center
         return style
     }
-    private lazy var apiManager:   APIManagerProtocol = self.initializeServerAPI()
+//    private lazy var apiManager:   APIManagerProtocol = self.initializeServerAPI()
     private lazy var storeManager: FileStorageProtocol = self.initializeStorageManager()
     private let normalAttrs     = [NSAttributedString.Key.font : UIFont(name: "OpenSans-Light", size: 17),
                                    NSAttributedString.Key.foregroundColor: K_COLOR_RED,
@@ -199,8 +204,8 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
         if !isViewSetupCompleted {
             self.view.setNeedsLayout()
             self.view.layoutIfNeeded()
-            if let imagePath = AppData.shared.userProfile.imagePath {
-                if let image = loadImageFromPath(path: imagePath) {
+            if let imagePath = AppData.shared.profile.imagePath {
+                if let image = UIImage(contentsOfFile: imagePath) {
                     circularImage = image.circularImage(size: userImage.frame.size, frameColor: K_COLOR_RED)
                     userImage.image = circularImage
                     isImageChanged = true
@@ -210,17 +215,17 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
                 circularImage = pic.circularImage(size: userImage.frame.size, frameColor: K_COLOR_RED)
                 userImage.image = circularImage
             }
-            if let firstName = AppData.shared.user.firstName {
+            if let firstName = AppData.shared.profile.firstName {
                 firstNameTF.text = firstName
             }
-            if let lastName = AppData.shared.user.lastName {
+            if let lastName = AppData.shared.profile.lastName {
                 firstNameTF.text = "\(String(describing: firstNameTF.text!)) \(lastName)"
             }
-            if let birthDate = AppData.shared.userProfile.birthDate {
+            if let birthDate = AppData.shared.profile.birthDate {
                 let strDate = dateFormatter.string(for: birthDate)
                 birthDateTF.text = strDate == "01.01.0001" ? "" : strDate
             }
-            if let gender = AppData.shared.userProfile.gender {
+            if let gender = AppData.shared.profile.gender {
                 genderTF.text = dataModel.allKeys(forValue: gender.rawValue).first
             }
 //            let pic = UIImage(named: "default_avatar")!
@@ -451,13 +456,19 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
             }
         })
     }
+    
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if let nav = navigationController as? AuthNavigationController {
+//            nav.transitionStyle = .Default
+//        }
+//    }
 }
 
-extension ProfileAuthViewController: ServerInitializationProtocol {
-    func initializeServerAPI() -> APIManagerProtocol {
-        return (self.navigationController as! AuthNavigationController).apiManager
-    }
-}
+//extension ProfileAuthViewController: ServerInitializationProtocol {
+//    func initializeServerAPI() -> APIManagerProtocol {
+//        return (self.navigationController as! AuthNavigationController).apiManager
+//    }
+//}
 
 extension ProfileAuthViewController: StorageInitializationProtocol {
     func initializeStorageManager() -> FileStorageProtocol {
@@ -516,18 +527,23 @@ extension ProfileAuthViewController: UIImagePickerControllerDelegate {
             let imageData = resizedImage.jpegData(compressionQuality: 0.4)
             let image = UIImage(data: imageData!)
             
-            self.apiManager.updateUserProfile(data: ["image" : image]) {
-                json, error in
-                if error != nil {
-                    showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка при загрузке изображения: \(error!.localizedDescription)")
-                }
-                if json != nil {
-                    AppData.shared.userProfile.imagePath = self.storeManager.storeImage(type: .Profile, image: image!, fileName: nil, fileFormat: NSData(data: image!.jpeg!).fileFormat, surveyID: nil)
+            guard let  url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.PROFILES + String(describing: AppData.shared.userprofile.id) + "/") else { return }
+            let multipartFormData = MultipartFormData()
+            multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
+            
+            API.shared.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData) { progress in
+                print(progress)
+            } completion: { result in
+                switch result {
+                case .success:
+                    AppData.shared.profile.imagePath = self.storeManager.storeImage(type: .Profile, image: image!, fileName: nil, fileFormat: .JPEG, surveyID: nil)
                     showAlert(type: .Warning, buttons: [["Готово": [CustomAlertView.ButtonType.Ok: {
                         self.isImageChanged = true
                         self.circularImage = image!.circularImage(size: self.userImage.frame.size, frameColor: K_COLOR_RED)
                         animateImageChange(imageView: self.userImage, fromImage: self.userImage.image!, toImage: self.circularImage, duration: 0.2)
                         }]]], text: "Загружено")
+                case .failure(let error):
+                    showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка при загрузке изображения: \(error.localizedDescription)")
                 }
             }
         }

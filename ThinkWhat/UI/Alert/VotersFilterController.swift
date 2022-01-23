@@ -14,8 +14,8 @@ class VotersFilterController: UITableViewController {
         print("---\(self) deinit()")
     }
     var filters: [String: AnyObject]? = [:]
-    var voters: [UserProfile]? = []
-    var filtered: [UserProfile]? = []
+    var voters: [Userprofile]? = []
+    var filtered: [Userprofile]? = []
     private var minAge = 18
     private var maxAge = 99
     var gender: Gender = .Unassigned {
@@ -111,7 +111,7 @@ class VotersFilterController: UITableViewController {
     
     private func setupUI() {
         if rangeSlider != nil {
-            if let sorted = voters!.sorted(by: { $0.age < $1.age }) as? [UserProfile], let minValue = sorted.first as? UserProfile, let maxValue = sorted.last as? UserProfile {
+            if let sorted = voters!.sorted(by: { $0.age < $1.age }) as? [Userprofile], let minValue = sorted.first as? Userprofile, let maxValue = sorted.last as? Userprofile {
                 minAge = minValue.age
                 maxAge = maxValue.age
                 rangeSlider.minValue = Float(minAge)
@@ -153,7 +153,7 @@ class VotersFilterController: UITableViewController {
     
     private func fetchData() {
         guard isViewSetupComplete, voters != nil, rangeSlider != nil else { return }
-        var _filtered: [UserProfile] = []
+        var _filtered: [Userprofile] = []
         if gender != .Unassigned {
             _filtered = voters!.filter({ $0.age >= Int(rangeSlider.selectedMinimum)}).filter({$0.age <= Int(rangeSlider.selectedMaximum)}).filter({$0.gender == gender})
         } else {

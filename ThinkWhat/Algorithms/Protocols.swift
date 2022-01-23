@@ -8,17 +8,17 @@
 
 import Foundation
 
-protocol ServerProtocol {
-    var apiManager: APIManagerProtocol { get }
-}
-
-extension ServerProtocol {
-    var apiManager: APIManagerProtocol {
-        get {
-            return appDelegate.container.resolve(APIManagerProtocol.self)!
-        }
-    }
-}
+//protocol ServerProtocol {
+//    var apiManager: APIManagerProtocol { get }
+//}
+//
+//extension ServerProtocol {
+//    var apiManager: APIManagerProtocol {
+//        get {
+//            return appDelegate.container.resolve(APIManagerProtocol.self)!
+//        }
+//    }
+//}
 
 protocol StorageProtocol {
     var storeManager: FileStorageProtocol { get }
@@ -32,9 +32,9 @@ extension StorageProtocol {
     }
 }
 
-protocol ServerInitializationProtocol {
-    func initializeServerAPI() -> APIManagerProtocol
-}
+//protocol ServerInitializationProtocol {
+//    func initializeServerAPI() -> APIManagerProtocol
+//}
 
 protocol StorageInitializationProtocol {
     func initializeStorageManager() -> FileStorageProtocol
@@ -42,5 +42,5 @@ protocol StorageInitializationProtocol {
 
 import UIKit
 protocol CallbackDelegate: class {
-    func callbackReceived(_ sender: AnyObject)
+    func callbackReceived(_ sender: Any)
 }

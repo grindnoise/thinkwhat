@@ -15,7 +15,7 @@ class CategoryCollectionViewController: UICollectionViewController {
     let reuseIdentifier = "category"
     let itemsPerRow: CGFloat = 3
     let sectionInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 10.0)
-    var categories: [SurveyCategory]!
+    var categories: [Topic]!
     fileprivate var parentMode = false
     var needsAnimation = true
 //    fileprivate var effectView: AnimatedVisualEffectView!
@@ -31,7 +31,7 @@ class CategoryCollectionViewController: UICollectionViewController {
         self.collectionView?.register(UINib(nibName: "CategoryCollectionViewCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
         if categories == nil {
             parentMode = true
-            categories = SurveyCategories.shared.categories.filter { $0.parent == nil }.sorted { $0.total > $1.total }
+            categories = Topics.shared.all.filter { $0.parent == nil }.sorted { $0.totalCount > $1.totalCount }
         }
         effectView.frame = collectionView.bounds
         effectView.addEquallyTo(to: collectionView)
@@ -73,7 +73,7 @@ class CategoryCollectionViewController: UICollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? CategoryCollectionViewCell {
-            if let category = categories[indexPath.row] as? SurveyCategory {
+            if let category = categories[indexPath.row] as? Topic {
                 cell.childColor = childColor
                 cell.category = category
                 cell.total.alpha = selectionMode ? 0 : 1

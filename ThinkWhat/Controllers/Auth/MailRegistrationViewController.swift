@@ -101,7 +101,7 @@ class MailRegistrationViewController: UIViewController {
             }
         }
     }
-    fileprivate lazy var apiManager: APIManagerProtocol! = initializeServerAPI()
+//    fileprivate lazy var apiManager: APIManagerProtocol! = initializeServerAPI()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -156,21 +156,20 @@ class MailRegistrationViewController: UIViewController {
     }
     
     private func performSignup() {
-        self.apiManager.signUp(email: mailTF.text!, password: pwdTF.text!, username: loginTF.text!) {
-            error in
-            if error != nil {
-                self.simpleAlert(error!.localizedDescription)
-            } else {
-                self.apiManager.getEmailConfirmationCode() {
-                    json, error in
-                    if error != nil {
-                        self.simpleAlert(error!.localizedDescription)
-                    }
-                    if json != nil {
-                        EmailResponse.shared.importJson(json!)
+        API.shared.signup(email: mailTF.text ?? "", password: pwdTF.text ?? "", username: loginTF.text ?? "") { result in
+            switch result {
+            case .success:
+                API.shared.getEmailConfirmationCode() { result in
+                    switch result {
+                    case .success(let json):
+                        EmailResponse.shared.importJson(json)
                         self.performSegue(withIdentifier: Segues.Auth.MailValidationFromSignup, sender: nil)
+                    case .failure(let error):
+                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                     }
                 }
+            case .failure(let error):
+                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
             }
         }
     }
@@ -218,11 +217,11 @@ class MailRegistrationViewController: UIViewController {
 //    }
 }
 
-extension MailRegistrationViewController: ServerInitializationProtocol {
-    func initializeServerAPI() -> APIManagerProtocol{
-        return (self.navigationController as! AuthNavigationController).apiManager
-    }
-}
+//extension MailRegistrationViewController: ServerInitializationProtocol {
+//    func initializeServerAPI() -> APIManagerProtocol{
+//        return (self.navigationController as! AuthNavigationController).apiManager
+//    }
+//}
 
 extension MailRegistrationViewController: UITextFieldDelegate {
     private func findFirstResponder() -> UITextField? {
@@ -310,20 +309,19 @@ extension MailRegistrationViewController: UITextFieldDelegate {
                 isLoginFilled = false
             } else if sender.text!.count >= 4 {
                 //                    runTimer()
-                apiManager.isUsernameEmailAvailable(email: "", username: sender.text!) {
-                    exists, error in
-                    if error != nil {
-                        self.simpleAlert(error!.localizedDescription)
-                    }
-                    if exists != nil {
-                        if exists! {
-                            self.loginTF.showSign(state: .UsernameExists)
-                            self.isLoginFilled = false
-                        } else {
+                API.shared.isUsernameEmailAvailable(email: "", username: sender.text!) { result in
+                    switch result {
+                    case .success(let isUsernameEmailAvailable):
+                        if isUsernameEmailAvailable {
                             if self.loginTF.text!.count >= 4 {
                                 self.isLoginFilled = true
                             }
+                        } else {
+                            self.loginTF.showSign(state: .UsernameExists)
+                            self.isLoginFilled = false
                         }
+                    case .failure(let error):
+                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                     }
                 }
             } else {
@@ -335,18 +333,19 @@ extension MailRegistrationViewController: UITextFieldDelegate {
                 mailTF.hideSign()
                 isMailFilled = false
             } else if isValidEmail(sender.text!) {
-                apiManager.isUsernameEmailAvailable(email: sender.text!, username: "") {
-                    exists, error in
-                    if error != nil {
-                        self.simpleAlert(error!.localizedDescription)
-                    }
-                    if exists != nil {
-                        if exists! {
-                            self.mailTF.showSign(state: .EmailExists)
-                            self.isMailFilled = false
+                API.shared.isUsernameEmailAvailable(email: sender.text!, username: "") { result in
+                    switch result {
+                    case .success(let isUsernameEmailAvailable):
+                        if isUsernameEmailAvailable {
+                            if self.loginTF.text!.count >= 4 {
+                                self.isLoginFilled = true
+                            }
                         } else {
-                            self.isMailFilled = true
+                            self.mailTF.showSign(state: .EmailExists)
+                            self.isLoginFilled = false
                         }
+                    case .failure(let error):
+                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                     }
                 }
             } else {

@@ -17,7 +17,7 @@ class CategorySelectionViewController: UIViewController {
     let categoryVC: CategoryCollectionViewController = {
         return Storyboards.controllers.instantiateViewController(withIdentifier: "CategoryCollectionViewController") as! CategoryCollectionViewController
     } ()
-    private var parentCategory: SurveyCategory? {
+    private var parentCategory: Topic? {
         didSet {
             category = nil
 //            backButton.color = parentCategory?.tagColor
@@ -27,7 +27,7 @@ class CategorySelectionViewController: UIViewController {
                 self.view.layoutIfNeeded()
                 self.backButton.alpha = self.parentCategory == nil ? 0 : 1
             })
-            dataSource = SurveyCategories.shared.categories.filter { $0.parent == parentCategory }
+            dataSource = Topics.shared.all.filter { $0.parent == parentCategory }
         }
     }
     
@@ -39,7 +39,7 @@ class CategorySelectionViewController: UIViewController {
 //        }
 //    }
     var isAnimationStopped = false
-    var category: SurveyCategory? {
+    var category: Topic? {
         didSet {
             if actionButton != nil {
                 if category != nil, oldValue == nil {
@@ -65,7 +65,7 @@ class CategorySelectionViewController: UIViewController {
         }
     }
     var actionButtonHeight: CGFloat = 0
-    private var dataSource: [SurveyCategory]! {
+    private var dataSource: [Topic]! {
         didSet {
             if oldValue != dataSource {
                 categoryVC.categories = dataSource
@@ -114,7 +114,7 @@ class CategorySelectionViewController: UIViewController {
         super.viewDidLoad()
         categoryVC.delegate = self
         categoryVC.selectionMode = true
-        categoryVC.categories = SurveyCategories.shared.categories.filter { $0.parent == parentCategory }
+        categoryVC.categories = Topics.shared.all.filter { $0.parent == parentCategory }
         categoryVC.view.addEquallyTo(to: container)
         addChild(self.categoryVC)
         categoryVC.didMove(toParent: self)
@@ -199,8 +199,8 @@ class CategorySelectionViewController: UIViewController {
 }
 
 extension CategorySelectionViewController: CallbackDelegate {
-    func callbackReceived(_ sender: AnyObject) {
-        if let _category = sender as? SurveyCategory {
+    func callbackReceived(_ sender: Any) {
+        if let _category = sender as? Topic {
             if _category.hasNoChildren {
                 category = _category
             } else if parentCategory == nil {

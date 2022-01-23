@@ -75,7 +75,7 @@ class SurveyPreview: UIView {
         if recognizer.state == .ended {
 //            _view.setValue("", forKey: "userProfile")
 //            _view.setValue("123", forUndefinedKey: "test")
-            delegate?.callbackReceived(survey.userProfile as AnyObject)
+            delegate?.callbackReceived(survey.owner as AnyObject)
         }
     }
 }

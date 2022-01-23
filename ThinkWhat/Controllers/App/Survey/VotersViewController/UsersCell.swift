@@ -56,6 +56,7 @@ class UserCell: UICollectionViewCell {
             }
         }
     }
+    weak var userprofile: Userprofile?
     override func awakeFromNib() {
         super.awakeFromNib()
     }

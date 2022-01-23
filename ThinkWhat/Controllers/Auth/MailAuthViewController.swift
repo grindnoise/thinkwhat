@@ -101,7 +101,7 @@ class MailAuthViewController: UIViewController {
         }
     }
     
-    internal lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
+//    internal lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -112,8 +112,8 @@ class MailAuthViewController: UIViewController {
         for tf in textFields {
             tf.delegate = self
         }
-        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleTokenState), name: Notifications.OAuth.TokenReceived, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleTokenState), name: Notifications.OAuth.TokenWrongCredentials, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleSuccessfulLogin), name: Notifications.OAuth.TokenReceived, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleWrongCredentials), name: Notifications.OAuth.TokenWrongCredentials, object: nil)
 //        NotificationCenter.default.addObserver(self,
 //                                       selector: #selector(AuthViewController.handleReachabilitySignal),
 //                                       name: kNotificationApiNotReachable,
@@ -173,44 +173,41 @@ class MailAuthViewController: UIViewController {
 //                }
 //            }
 //        }
-        self.apiManager.login(.Username, username: self.loginTF.text!, password: self.pwdTF.text!, token: nil) {
-            state in
-            tokenState = state
+        API.shared.loginViaMail(username: self.loginTF.text ?? "", password: self.pwdTF.text ?? "") { result in
+            switch result {
+            case .success:
+                NotificationCenter.default.post(name: Notifications.OAuth.TokenReceived, object: nil)
+            case .failure(let error):
+                NotificationCenter.default.post(name: Notifications.OAuth.TokenWrongCredentials, object: nil)
+                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+            }
         }
     }
     
-    @objc fileprivate func handleTokenState() {
-        if tokenState == .WrongCredentials {
-            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: "Неверный логип/пароль")
-//            self.simpleAlert("Wrong credentials")
-        } else {
-            apiManager.getUserData() {
-                json, error in
-                if error != nil {
-                    print(error!.localizedDescription)
-                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error!.localizedDescription)
-//                    self.simpleAlert(error!.localizedDescription)
-                }
-                if json != nil {
-                    AppData.shared.importUserData(json!)
-                    assert(AppData.shared.userProfile.isEmailVerified! != nil ||  AppData.shared.userProfile.isEdited! != nil, "MailAuthViewController.handleTokenState error (AppData.shared.userProfile.isEmailVerified == nil || AppData.shared.userProfile.isEdited == nil)")
-                    if AppData.shared.userProfile.isEmailVerified! && AppData.shared.userProfile.isEdited! {
-                        self.performSegue(withIdentifier: Segues.Auth.AppFromMailSignin, sender: nil)
-                    } else if AppData.shared.userProfile.isEmailVerified! && !AppData.shared.userProfile.isEdited! {
+    @objc fileprivate func handleWrongCredentials() {
+        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: "Неверный логип/пароль")
+    }
+    
+    @objc fileprivate func handleSuccessfulLogin() {
+            API.shared.getUserData() { resut in
+                switch resut {
+                case .success(let json):
+                    AppData.shared.importUserData(json)
+                    if AppData.shared.profile.isEmailVerified! {
                             self.performSegue(withIdentifier: Segues.Auth.ProfileFromAuth, sender: nil)
                     } else {
-                        self.apiManager.getEmailConfirmationCode() {
-                            json, error in
-                            if error != nil {
-                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error!.localizedDescription)
-//                                self.simpleAlert(error!.localizedDescription)
-                            }
-                            if json != nil {
-                                EmailResponse.shared.importJson(json!)
+                        API.shared.getEmailConfirmationCode() { resut in
+                            switch resut {
+                            case .success(let json):
+                                EmailResponse.shared.importJson(json)
                                 self.performSegue(withIdentifier: Segues.Auth.MailValidationFromSignin, sender: nil)
+                            case .failure(let error):
+                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error.localizedDescription)
                             }
                         }
                     }
+                case .failure(let error):
+                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error.localizedDescription)
                 }
             }
             
@@ -260,12 +257,12 @@ class MailAuthViewController: UIViewController {
     }
     */
 
-}
+
 
 extension MailAuthViewController: UITextFieldDelegate {
-    private func initializeServerAPI() -> APIManagerProtocol{
-        return (self.navigationController as! AuthNavigationController).apiManager
-    }
+//    private func initializeServerAPI() -> APIManagerProtocol{
+//        return (self.navigationController as! AuthNavigationController).apiManager
+//    }
     
     private func findFirstResponder() -> UITextField? {
         

@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-class NewSurveyResultViewController: UIViewController, ServerProtocol {
+class NewPollResultViewController: UIViewController {
 
     deinit {
         print("DEINIT NewSurveyResultViewController")
@@ -39,18 +39,18 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var dots: UILabel!
     @IBOutlet weak var stack: UIStackView!
-    
+
     private var timer:  Timer?
     var iconCategory: Icon.Category = .Poll
     weak var survey: Survey?
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.setHidesBackButton(true, animated: false)
 //        NotificationCenter.default.addObserver(self, selector: #selector(NewSurveyResultViewController.handleSuccessResponse), name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
 //        NotificationCenter.default.addObserver(self, selector: #selector(NewSurveyResultViewController.handleErrorResponse(notification:)), name: Notifications.Surveys.NewSurveyPostError, object: nil)
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
 //        navigationController?.setNavigationBarHidden(true, animated: false)
         super.viewWillAppear(animated)
@@ -64,9 +64,9 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
         actionButton.layoutIfNeeded()
         actionButton.cornerRadius       = actionButton.frame.height/2
         actionButtonConstraint.constant += actionButton.frame.height*2
-        postSurvey()
+        postPoll()
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         actionButton.cornerRadius = actionButton.frame.height/2
@@ -80,7 +80,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
         timer = nil
         survey = nil
     }
-    
+
     @objc private func handleSuccessResponse() {
         delay(seconds: 0.5) {
             self.stopTimer()
@@ -106,7 +106,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
             }
         }
     }
-    
+
     @objc private func handleErrorResponse(error: Error) {
 //        delay(seconds: 0.5) {
 //        if let dict = notification.object as? Dictionary<String, Any>, let error = dict["error"] as? String {
@@ -120,20 +120,20 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
             }) {
                 _ in
                 self.indicator.stopAnimating()
-                
-                
+
+
                 }
                 delay(seconds: 0.5) {
                     [weak self] in
         showAlert(type: .Warning,
-                  buttons: [["К опросу": [CustomAlertView.ButtonType.Cancel: { self?.navigationController?.popViewController(animated: true)/*self.navigationController?.popViewController(animated: false)*/ }]], ["Повторить": [CustomAlertView.ButtonType.Ok: { self?.postSurvey() } ]]],
+                  buttons: [["К опросу": [CustomAlertView.ButtonType.Cancel: { self?.navigationController?.popViewController(animated: true)/*self.navigationController?.popViewController(animated: false)*/ }]], ["Повторить": [CustomAlertView.ButtonType.Ok: { self?.postPoll() } ]]],
                   title: "Ошибка",
                   body: error.localizedDescription)
             }
 //        }
     }
-    
-    private func postSurvey() {
+
+    private func postPoll() {
         UIView.transition(with: self.label, duration: 0.1, options:
             [.transitionCrossDissolve], animations: {
                 self.indicator.alpha = 0
@@ -143,53 +143,52 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
             self.startTimer()
         }
 
-        if let strongSurvey = survey {
-            apiManager.postSurvey(survey: strongSurvey) {
-                json, error in
-                if error != nil {
-                    self.handleErrorResponse(error: error!)
-//                    NotificationCenter.default.post(name: Notifications.Surveys.NewSurveyPostError, object: ["error": error!.localizedDescription])
-                } else if json != nil {
-                    if let _ID = json!["id"].intValue as? Int, let _answers = json!["answers"].arrayValue as? [JSON] {
-                        self.survey!.ID = _ID
-                        for _answer in _answers {
-                            if let answer = Answer(json: _answer) {
-                                self.survey!.answers.append(answer)
-                            }
+        guard survey != nil else { return }
+        API.shared.postPoll(survey: survey!, uploadProgress: { uploadProgress in
+            print(uploadProgress)
+        }) { result in
+            switch result {
+            case .success(let json):
+                if let id = json["id"].int, let _answers = json["answers"].array, let _media = json["media"].array {
+                    self.survey!.id = id
+                    Surveys.shared.all.append(self.survey!)
+                    Surveys.shared.newReferences.append(self.survey!.reference)
+                    Surveys.shared.ownReferences.append(self.survey!.reference)
+
+                    for _answer in _answers {
+                        if let answer = self.survey!.answers.filter({ $0.title == _answer[DjangoVariables.SurveyAnswer.title].stringValue }).first {
+                            answer.id = _answer[DjangoVariables.ID].intValue
                         }
-                        Surveys.shared.append(object: self.survey!, type: .Downloaded)
-                        //Create SurveyLink & append to own & new arrays
-                        if let surveyLink = self.survey!.getSurveyRef() {
-                            Surveys.shared.categorizedLinks[strongSurvey.category]?.append(surveyLink)
-                            Surveys.shared.append(object: surveyLink, type: .OwnLinks)
-                            Surveys.shared.append(object: surveyLink, type: .NewLinks)
-                            //                        NotificationCenter.default.removeObserver(self)
-                            NotificationCenter.default.post(name: Notifications.Surveys.UpdateNewSurveys, object: nil)
-                            NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
-                            NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
-                            self.handleSuccessResponse()
-                        }
-                    } else {
-                        showAlert(type: .Warning,
-                                  buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { self.navigationController?.popViewController(animated: false) }]], ["Повторить": [CustomAlertView.ButtonType.Ok: { self.postSurvey() } ]]],
-                                  text: "Не удалось прочитать данные")
                     }
+                    for _mediafile in _media {
+                        if let media = self.survey!.media.filter({ $0.order == _mediafile["order"].intValue }).first {
+                            media.id = _mediafile[DjangoVariables.ID].intValue
+                            media.imageURL = URL(string: _mediafile["image"].stringValue)
+                        }
+                    }
+                    NotificationCenter.default.post(name: Notifications.Surveys.UpdateNewSurveys, object: nil)
+                    NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
+                    NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
+                } else {
+                    NotificationCenter.default.post(name: Notifications.Surveys.NewSurveyPostError, object: ["error": "Не удалось прочитать данные"])
                 }
+            case .failure(let error):
+                NotificationCenter.default.post(name: Notifications.Surveys.NewSurveyPostError, object: ["error": error.localizedDescription])
             }
         }
     }
-    
+
     private func startTimer() {
         guard timer == nil else { return }
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(NewSurveyResultViewController.updateTimer), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(NewPollResultViewController.updateTimer), userInfo: nil, repeats: true)
         timer?.fire()
     }
-    
+
     private func stopTimer() {
         timer?.invalidate()
         timer = nil
     }
-    
+
     @objc private func updateTimer() {
         if let text = dots.text, text.filter({ $0 == "."}).count < 3 {
             let _text = text + "."
@@ -198,7 +197,7 @@ class NewSurveyResultViewController: UIViewController, ServerProtocol {
             dots.text = ""
         }
     }
-    
+
     private func animateIconView() {
         if let initialLayer = iconView.icon as? CAShapeLayer, let initialPath = initialLayer.path, let destinationLayer = iconView.getLayer(.Success) as? CAShapeLayer, let destinationPath = destinationLayer.path {
             let pathAnim      = Animations.get(property: .Path,

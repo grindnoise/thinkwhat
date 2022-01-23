@@ -18,7 +18,7 @@ class SurveyStackViewController: UIViewController {
     fileprivate var removePreview:  SurveyPreview!
     fileprivate var nextPreview:    SurveyPreview?
     fileprivate var timer:          Timer?
-    fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
+//    fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     fileprivate lazy var loadingView: EmptySurvey = self.createLoadingView()
     fileprivate var previewSurveys: [Survey] = []
     fileprivate var isRequestingStack = false
@@ -29,7 +29,7 @@ class SurveyStackViewController: UIViewController {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(SurveyStackViewController.generatePreviews),
-                                               name: Notifications.Surveys.SurveysStackReceived,
+                                               name: Notifications.Surveys.UpdateHotSurveys,
                                                object: nil)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(SurveyStackViewController.didBecomeActive),
@@ -62,7 +62,7 @@ class SurveyStackViewController: UIViewController {
     }
     
     @objc fileprivate func didBecomeActive() {
-        if Surveys.shared.stackObjects.isEmpty {
+        if Surveys.shared.hot.isEmpty {
             startTimer()
         }
     }
@@ -86,10 +86,10 @@ class SurveyStackViewController: UIViewController {
     }
     
     @objc fileprivate func createSurveyPreview() -> SurveyPreview? {
-        if !Surveys.shared.stackObjects.isEmpty {
+        if !Surveys.shared.hot.isEmpty {
 //            if let survey = Surveys.shared.stackObjects.remove(at: 0) as? FullSurvey {
             
-            if let survey = Surveys.shared.stackObjects.filter({$0 != self.previewSurveys.map({$0}).last}).first {//Set(Surveys.shared.stackObjects).symmetricDifference(Set(previewSurveys)).first {//zip(Surveys.shared.stackObjects, previewSurveys).filter({ $0.0.hashValue != $0.1.hashValue}).fir {//Surveys.shared.stackObjects.//.filter({$0.hashValue != self.previewSurveys.map({$0.hashValue}).f}).first {
+            if let survey = Surveys.shared.hot.filter({$0 != self.previewSurveys.map({$0}).last}).first {//Set(Surveys.shared.stackObjects).symmetricDifference(Set(previewSurveys)).first {//zip(Surveys.shared.stackObjects, previewSurveys).filter({ $0.0.hashValue != $0.1.hashValue}).fir {//Surveys.shared.stackObjects.//.filter({$0.hashValue != self.previewSurveys.map({$0.hashValue}).f}).first {
 //                previewSurveys.addUnique(object: survey)
                 if previewSurveys.filter({ $0.hashValue == survey.hashValue }).isEmpty {
                     previewSurveys.append(survey)
@@ -110,10 +110,10 @@ class SurveyStackViewController: UIViewController {
                 _surveyPreview.center = view.center
                 _surveyPreview.center.x += view.frame.width
                 
-                _surveyPreview.category.attributedText = NSAttributedString(string: "  \(survey.category.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 8), foregroundColor: .white, backgroundColor: .clear))
-                _surveyPreview.parentCategory.attributedText = NSAttributedString(string: "  \(survey.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 8), foregroundColor: .white, backgroundColor: .clear))
-                _surveyPreview.icon.category = Icon.Category(rawValue: survey.category.ID) ?? .Null
-                let color = survey.category.tagColor 
+                _surveyPreview.category.attributedText = NSAttributedString(string: "  \(survey.topic.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 8), foregroundColor: .white, backgroundColor: .clear))
+                _surveyPreview.parentCategory.attributedText = NSAttributedString(string: "  \(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 8), foregroundColor: .white, backgroundColor: .clear))
+                _surveyPreview.icon.category = Icon.Category(rawValue: survey.topic.id) ?? .Null
+                let color = survey.topic.tagColor 
                     _surveyPreview.category.backgroundColor = color
                     _surveyPreview.parentCategory.backgroundColor = color
 //                    _surveyPreview.surveyDate.backgroundColor = color
@@ -141,28 +141,30 @@ class SurveyStackViewController: UIViewController {
                 _surveyPreview.voteButton.layer.shadowOffset = .zero
                 _surveyPreview.voteButton.layer.shadowOpacity = 1
 
-                if let userProfile = survey.userProfile {
-                    _surveyPreview.userName.text = userProfile.name
-                    if userProfile.image != nil {
-                        _surveyPreview.userImage.image = userProfile.image!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED)
+                if let userprofile = survey.owner as? Userprofile {
+                    _surveyPreview.userName.text = userprofile.name
+                    if userprofile.image != nil {
+                        _surveyPreview.userImage.image = userprofile.image!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED)
                     } else {
                         let postImageNotification = self.nextPreview === _surveyPreview//Notify only if current preview is on screen
                         _surveyPreview.userImage.image = UIImage(named: "user")!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED)
-                        apiManager.downloadImage(url: userProfile.imageURL) {
-                            image, error in
-                            if error != nil {
-                                print(error!.localizedDescription)
-                            }
-                            if image != nil {
-                                userProfile.image = image!
+                        guard let url = userprofile.imageURL else { return _surveyPreview }
+                        API.shared.downloadImage(url: url) { progress in
+                            print(progress)
+                        } completion: { result in
+                            switch result {
+                            case .success(let image):
+                                userprofile.image = image
                                 if postImageNotification {
                                     NotificationCenter.default.post(name: Notifications.UI.ImageReceived, object: image)
                                 }
                                 UIView.transition(with: _surveyPreview.userImage,
                                                   duration: 0.75,
                                                   options: .transitionCrossDissolve,
-                                                  animations: { _surveyPreview.userImage.image = userProfile.image!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED) },
+                                                  animations: { _surveyPreview.userImage.image = userprofile.image!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED) },
                                                   completion: nil)
+                            case .failure(let error):
+                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                             }
                         }
                     }
@@ -174,7 +176,7 @@ class SurveyStackViewController: UIViewController {
         return nil
     }
     
-    fileprivate func createLoadingView() -> EmptySurvey {
+    private func createLoadingView() -> EmptySurvey {
         let multiplier: CGFloat = 0.95
         let loadingView = EmptySurvey(frame: CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier)), delegate: self)
         loadingView.alpha = 0
@@ -243,7 +245,7 @@ class SurveyStackViewController: UIViewController {
                 self.removePreview.removeFromSuperview()
                 self.surveyPreview.removeFromSuperview()
                 self.surveyPreview = nil
-                Surveys.shared.stackObjects.removeAll()
+                Surveys.shared.hot.removeAll()
                 self.startTimer()
                 self.loadingView.setEnabled(true) {
                     completed in
@@ -269,32 +271,40 @@ class SurveyStackViewController: UIViewController {
     }
     
      // MARK: - Navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController {
-            destinationVC.delegate = self
+//     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController {
+//            destinationVC.delegate = self
+//        }
+//     }
+    
+    @objc fileprivate func requestSurveys() {
+        API.shared.downloadSurveys(type: .Hot) { result in
+            switch result {
+            case .success(let json):
+                Surveys.shared.load(json)
+            case .failure(let error):
+                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+            }
         }
-     }
+    }
 }
 
 
 
 
 extension SurveyStackViewController: CallbackDelegate {
-    func callbackReceived(_ sender: AnyObject) {
+    func callbackReceived(_ sender: Any) {
         if let button = sender as? UIButton, let accessibilityIdentifier = button.accessibilityIdentifier {
             if accessibilityIdentifier == "Vote" {//Vote
                 delegate.performSegue(withIdentifier: Segues.App.FeedToSurveyFromTop, sender: self)
             } else if accessibilityIdentifier == "Reject" {//Reject
-                Surveys.shared.rejectedSurveys.append(surveyPreview.survey)
-                apiManager.rejectSurvey(survey: surveyPreview.survey) {
-                    json, error in
-                    if error != nil {
-                        print(error.debugDescription)
-                    }
-                    if json != nil {
-                        Surveys.shared.importSurveys(json!)
-//                        print("Surveys.shared.stackObjects \(Surveys.shared.stackObjects.count)")
-//                        if Surveys.shared.stackObjects.isEmpty { self.startTimer() }
+                Surveys.shared.rejected.append(surveyPreview.survey)
+                API.shared.rejectSurvey(survey: surveyPreview.survey) { result in
+                    switch result {
+                    case .success(let json):
+                        Surveys.shared.load(json)
+                    case .failure(let error):
+                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                     }
                 }
                 removePreview = surveyPreview
@@ -304,14 +314,14 @@ extension SurveyStackViewController: CallbackDelegate {
 //                removePreview = surveyPreview
 //                nextSurvey(nextPreview)
 //            }
-        } else if sender is UserProfile {
+        } else if sender is Userprofile {
             delegate.performSegue(withIdentifier: Segues.App.FeedToUser, sender: sender)
         } else if let _view = sender as? EmptySurvey  {
             isPause = true
             _view.startingPoint = view.convert(_view.createButton.center, to: tabBarController?.view)
 
             delegate.performSegue(withIdentifier: Segues.App.FeedToNewSurvey, sender: _view)
-        } else if sender is ClaimCategory { //Claim
+        } else if sender is Claim { //Claim
             removePreview = surveyPreview
             delay(seconds: 0.5) {
                 self.nextSurvey(self.nextPreview)
@@ -325,20 +335,20 @@ extension SurveyStackViewController: CallbackDelegate {
     }
 }
 
-extension SurveyStackViewController: ServerInitializationProtocol {
-    func initializeServerAPI() -> APIManagerProtocol {
-        return (tabBarController as! TabBarController).apiManager
-    }
-    
-    @objc fileprivate func requestSurveys() {
-        apiManager.loadSurveys(type: .Hot) {
-            json, error in
-            if error != nil {
-                print(error.debugDescription)
-            }
-            if json != nil {
-                Surveys.shared.importSurveys(json!)
-            }
-        }
-    }
-}
+//extension SurveyStackViewController: ServerInitializationProtocol {
+//    func initializeServerAPI() -> APIManagerProtocol {
+//        return (tabBarController as! TabBarController).apiManager
+//    }
+//
+//    @objc fileprivate func requestSurveys() {
+//        apiManager.loadSurveys(type: .Hot) {
+//            json, error in
+//            if error != nil {
+//                print(error.debugDescription)
+//            }
+//            if json != nil {
+//                Surveys.shared.importSurveys(json!)
+//            }
+//        }
+//    }
+//}

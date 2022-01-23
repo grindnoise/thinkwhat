@@ -15,12 +15,12 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var total: UILabel!
     @IBOutlet weak var constraint: NSLayoutConstraint!
     var childColor: UIColor?
-    var category: SurveyCategory! {
+    var category: Topic! {
         didSet {
             icon.backgroundColor = childColor ?? category.tagColor
-            icon.category = Icon.Category(rawValue: category.ID) ?? .Null
+            icon.category = Icon.Category(rawValue: category.id) ?? .Null
             title.attributedText = NSAttributedString(string: "\(category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 10), foregroundColor: .darkGray, backgroundColor: .clear))
-            total.attributedText = NSAttributedString(string: "\(category.total)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .lightGray, backgroundColor: .clear))
+            total.attributedText = NSAttributedString(string: "\(category.totalCount)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .lightGray, backgroundColor: .clear))
         }
     }
     var selectionMode = false

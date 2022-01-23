@@ -13,38 +13,30 @@ import Alamofire
 
 class VKManager {
     let shared = VKManager()
-    
     private init() {}
     
-    public class func getUserData(completionHandler: @escaping(JSON?, Error?) -> Void) {
-        var json: JSON?
-        var error: Error?
-        VKRequest(method: "users.get", parameters: ["user_ids": VKSdk.accessToken()?.userId, "fields":"first_name, last_name, photo_200_orig, sex, bdate"])?.execute(resultBlock: { (response) in
-            guard response != nil else { return }
-            do {
-                json =  JSON(parseJSON: response!.responseString)
-                completionHandler(json, error)
-            } catch let _error {
-                print(error!.localizedDescription)
-                error = _error
-                completionHandler(json, error)
-            }
-        }, errorBlock: { (error) in
-            completionHandler(json, error!)
-        })
+    public class func getUserData(completion: @escaping(Result<JSON, Error>) -> ()) {
+        guard let token = VKSdk.accessToken() else { completion(.failure("VK token is nil")); return }
+        VKRequest(method: "users.get", parameters: ["user_ids": token.userId, "fields":"first_name, last_name, photo_200_orig, sex, bdate"]).execute { _response in
+            guard let response = _response else { completion(.failure("Error retrieving VK ")); return }
+            completion(.success(JSON(parseJSON: response.responseString)))
+        } errorBlock: { _error in
+            guard let error = _error else { completion(.failure("Error retrieving VK ")); return }
+            completion(.failure(error))
+        }
     }
     
     public class func performLogout() {
         VKSdk.forceLogout()
     }
-}
-
-extension VKManager: UserDataPreparatory {
+//}
+//
+//extension VKManager: UserDataPreparatory {
     static func prepareUserData(_ data: [String : Any]) -> [String : Any] {
         var userProfile = [String: Any]()
-        var nestedDict = data.filter{ $0.key == "image" }.isEmpty
+        let nestedDict = data.filter{ $0.key == "image" }.isEmpty
         var owner: [String: Any] = [:]
-        var ownerPrefix = nestedDict ? "" : "owner."
+        let ownerPrefix = nestedDict ? "" : "owner."
         
         for (key, value) in data {
             if key == "first_name" || key == "last_name" {

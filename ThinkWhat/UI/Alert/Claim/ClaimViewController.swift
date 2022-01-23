@@ -13,7 +13,7 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     deinit {
         print("---\(self) deinit()")
     }
-    private var claimCategory: ClaimCategory? {
+    private var claimCategory: Claim? {
         didSet {
             for cell in claimCells {
                 if cell.claimCategory != claimCategory {
@@ -56,14 +56,14 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return ClaimCategories.shared.container.count + 1
+        return Claims.shared.all.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.row < ClaimCategories.shared.container.count, let cell = tableView.dequeueReusableCell(withIdentifier: "claim", for: indexPath) as? ClaimCell {
+        if indexPath.row < Claims.shared.all.count, let cell = tableView.dequeueReusableCell(withIdentifier: "claim", for: indexPath) as? ClaimCell {
             cell.setNeedsLayout()
             cell.layoutIfNeeded()
-            cell.claimCategory = ClaimCategories.shared.container[indexPath.row]
+            cell.claimCategory = Claims.shared.all[indexPath.row]
             if !claimCells.contains(cell) {
                 claimCells.append(cell)
             }
@@ -84,10 +84,10 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 //        return UITableView.automaticDimension
-        if indexPath.row < ClaimCategories.shared.container.count {
+        if indexPath.row < Claims.shared.all.count {
             return UITableView.automaticDimension
         } else {
-            return 3 * CGFloat(ClaimCategories.shared.container.count)
+            return 3 * CGFloat(Claims.shared.all.count)
         }
     }
     
@@ -140,7 +140,7 @@ class ClaimCell: UITableViewCell {
             }
         }
     }
-    var claimCategory: ClaimCategory! {
+    var claimCategory: Claim! {
         didSet {
             if textView != nil {
                 let textContent = claimCategory.description.contains("\t") ? claimCategory.description : "\t" + claimCategory.description
@@ -173,7 +173,7 @@ class ClaimCell: UITableViewCell {
 }
 
 extension ClaimViewController: CallbackDelegate {
-    func callbackReceived(_ sender: AnyObject) {
+    func callbackReceived(_ sender: Any) {
         if sender is ClaimCancelCell {
             delegate?.callbackReceived("cancel_claim" as AnyObject)
 //            dismiss(animated: true) { _ in }

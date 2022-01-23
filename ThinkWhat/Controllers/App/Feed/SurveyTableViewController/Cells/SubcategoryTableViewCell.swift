@@ -11,7 +11,7 @@ import UIKit
 class SubcategoryTableViewCell: UITableViewCell {
 
     @IBOutlet weak var title: UILabel!
-    var category: SurveyCategory!
+    var category: Topic!
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

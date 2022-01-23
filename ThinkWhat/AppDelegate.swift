@@ -45,8 +45,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        VKSdk.processOpen(url, fromApplication: options[.sourceApplication] as? String)
-        ApplicationDelegate.shared.application(app, open: url, sourceApplication: options[.sourceApplication] as? String, annotation: options[.annotation])
+        VKSdk.processOpen(url,
+                          fromApplication: options[.sourceApplication] as? String)
+        ApplicationDelegate.shared.application(
+                    app,
+                    open: url,
+                    sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+                    annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+                )
         return true
     }
     
@@ -64,12 +70,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
     }
 
-    func applicationDidBecomeActive(_ application: UIApplication) {
-        AppEvents.activateApp()
-    }
+//    func applicationDidBecomeActive(_ application: UIApplication) {
+//        AppEvents.activateApp()
+//    }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        apiManager.cancelAllRequests()
+        API.shared.cancelAllRequests()
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
@@ -121,9 +127,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func registerContainers() {
-        container.register(APIManagerProtocol.self) {
-            _ in APIManager()
-        }
+//        container.register(APIManagerProtocol.self) {
+//            _ in APIManager()
+//        }
         container.register(FileStorageProtocol.self) {
             _ in FileStorageManager()
         }
@@ -140,7 +146,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
-extension AppDelegate: ServerProtocol {
-    
-}
+//extension AppDelegate: ServerProtocol {
+//
+//}
 

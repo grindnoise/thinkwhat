@@ -138,14 +138,11 @@ class Icon: UIView {
     }
     
     override func encode(with aCoder: NSCoder) {
-        
-        if #available(iOS 11.0, *) {
-            do {
-                let colorData = try NSKeyedArchiver.archivedData(withRootObject: backgroundColor as Any, requiringSecureCoding: false)
-                aCoder.encode(colorData, forKey: "backgroundColor")
-            } catch {
-                print(error.localizedDescription)
-            }
+        do {
+            let colorData = try NSKeyedArchiver.archivedData(withRootObject: backgroundColor as Any, requiringSecureCoding: false)
+            aCoder.encode(colorData, forKey: "backgroundColor")
+        } catch {
+            print(error.localizedDescription)
         }
         aCoder.encode(category.rawValue, forKey: "categoryID")
         aCoder.encode(frame, forKey: "frame")

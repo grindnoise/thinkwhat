@@ -52,43 +52,43 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
     
     
     //MARK: - Category
-    var category: SurveyCategory? {
+    var topic: Topic? {
         didSet {
 //            setTitle()
-            if category != nil {
-                categoryTitle.alpha = 0
-                categoryTitle.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            if topic != nil {
+                topicTitle.alpha = 0
+                topicTitle.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
                 UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
-                    self.categoryTitle.alpha = 1
-                    self.categoryTitle.transform = .identity
+                    self.topicTitle.alpha = 1
+                    self.topicTitle.transform = .identity
                 })
                 stage = .Anonymity
-                categoryIcon.color = category!.tagColor ?? selectedColor
-                categoryIcon.category = Icon.Category(rawValue: category!.ID) ?? .Null
-                categoryTitle.text = category!.title.uppercased()
+                topicIcon.color = topic!.tagColor
+                topicIcon.category = Icon.Category(rawValue: topic!.id) ?? .Null
+                topicTitle.text = topic!.title.uppercased()
             }
         }
     }
     
-    @IBOutlet weak var categoryTitle: UILabel! {
+    @IBOutlet weak var topicTitle: UILabel! {
         didSet {
-            categoryTitle.alpha = 0
-            if category == nil {
-                categoryTitle.text = "РАЗДЕЛ"
+            topicTitle.alpha = 0
+            if topic == nil {
+                topicTitle.text = "РАЗДЕЛ"
             }
         }
     }
     
-    @IBOutlet weak var categoryIcon: CircleButton! {
+    @IBOutlet weak var topicIcon: CircleButton! {
         didSet {
             let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.viewTapped(gesture:)))
-            categoryIcon.addGestureRecognizer(tap)
+            topicIcon.addGestureRecognizer(tap)
             //            categoryIcon.icon.isFramed = false
-            categoryIcon.icon.alpha = 0
-            categoryIcon.state = .Off
-            categoryIcon.color = selectedColor
-            categoryIcon.text = "РАЗДЕЛ"
-            categoryIcon.category = .Category_RU
+            topicIcon.icon.alpha = 0
+            topicIcon.state = .Off
+            topicIcon.color = selectedColor
+            topicIcon.text = "РАЗДЕЛ"
+            topicIcon.category = .Category_RU
         }
     }
     
@@ -725,7 +725,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
     //Color based on selected category
     var selectedColor = K_COLOR_RED {
         didSet {
-            categoryIcon.color              = selectedColor
+            topicIcon.color              = selectedColor
             anonIcon.color                  = selectedColor
             privacyIcon.color               = selectedColor
             votesIcon.color                 = selectedColor
@@ -814,7 +814,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
     //MARK: - VC Functions
     override func viewDidLoad() {
         super.viewDidLoad()
-        apiManager.getBalanceAndPrice()
+        API.shared.getBalanceAndPrice()
 //        DispatchQueue.main.async {
         let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: false)
         customTitle.color = .white
@@ -892,7 +892,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             view.layoutIfNeeded()
             self.view.isUserInteractionEnabled = false
             self.view.subviews.map { $0.isUserInteractionEnabled = false }
-            lineWidth = categoryIcon.bounds.height / 18//0.75
+            lineWidth = topicIcon.bounds.height / 18//0.75
             isViewSetupCompleted = true
 
             DispatchQueue.main.async {
@@ -926,8 +926,8 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             postButtonShadow.layer.shadowOffset = .zero
             delay(seconds: 0.25) {
 //                self.addBadge()
-                self.categoryIcon.present(completionBlocks: [{
-                    self.categoryIcon.state = .On
+                self.topicIcon.present(completionBlocks: [{
+                    self.topicIcon.state = .On
                      self.performSegue(withIdentifier: Segues.App.NewSurveyToCategorySelection, sender: nil)
                     }])
                 UIView.animate(withDuration: 0.4) {
@@ -1282,7 +1282,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
         case .Category:
             print("Do nothing")
         case .Anonymity:
-            initialView     = categoryTitle
+            initialView     = topicTitle
             destinationView = anonLabel
 //            destinationView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             animationBlocks.append {
@@ -1644,7 +1644,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
     @objc fileprivate func viewTapped(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended, let v = gesture.view {
             if let icon = v as? CircleButton {
-                if icon === categoryIcon {
+                if icon === topicIcon {
                     //                    currentStage = .Category
                     performSegue(withIdentifier: Segues.App.NewSurveyToCategorySelection, sender: nil)
                 } else if icon === anonIcon {
@@ -1722,7 +1722,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             } else if v.accessibilityIdentifier == "balance" {
                 Banner.shared.contentType = .TotaLCost
                 if let content = Banner.shared.content as? TotalCost {
-                    content.balance = AppData.shared.userProfile.balance
+                    content.balance = AppData.shared.profile.balance
                 }
                 Banner.shared.present(shouldDismissAfter: 5, delegate: nil)
             } else if v == hyperlinkInfoButton {
@@ -1867,9 +1867,9 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
         navTitle.textAlignment = .center
         let attrString = NSMutableAttributedString()
         attrString.append(NSAttributedString(string: title!, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
-        if category != nil {
+        if topic != nil {
             //MARK: TODO - Fatal error when parent is nil
-            attrString.append(NSAttributedString(string: "\n\(category!.parent!.title)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 13), foregroundColor: .darkGray, backgroundColor: .clear)))
+            attrString.append(NSAttributedString(string: "\n\(topic!.parent!.title)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 13), foregroundColor: .darkGray, backgroundColor: .clear)))
         }
         navTitle.attributedText = attrString
         navigationItem.titleView = navTitle
@@ -1957,7 +1957,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             nc.transitionStyle = .Icon
             if segue.identifier == Segues.App.NewSurveyToCategorySelection, let destinationVC = segue.destination as? CategorySelectionViewController {
                 nc.duration = 0.45
-                destinationVC.actionButtonHeight = categoryIcon.frame.height
+                destinationVC.actionButtonHeight = topicIcon.frame.height
             } else if segue.identifier == Segues.App.NewSurveyToTypingViewController, let destinationVC = segue.destination as? TextInputViewController {
                 nc.duration = 0.35
                 destinationVC.delegate = self
@@ -2026,8 +2026,8 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                         destinationVC.titleString = dict.first!.value
                     }
                 }
-            } else if segue.identifier == Segues.NewSurvey.Results, let destinationVC = segue.destination as? NewSurveyResultViewController, survey != nil {
-                destinationVC.survey = survey!
+//            } else if segue.identifier == Segues.NewSurvey.Results, let destinationVC = segue.destination as? NewSurveyResultViewController, survey != nil {
+//                destinationVC.survey = survey!
             }
         }
     }
@@ -2085,9 +2085,9 @@ extension NewPollController: CAAnimationDelegate {
 }
 
 extension NewPollController: CallbackDelegate {
-    func callbackReceived(_ sender: AnyObject) {
-        if let _category = sender as? SurveyCategory {
-            category = _category
+    func callbackReceived(_ sender: Any) {
+        if let _category = sender as? Topic {
+            topic = _category
         } else if let textView = sender as? UITextView, let accessibilityIdentifier = textView.accessibilityIdentifier {
             if accessibilityIdentifier == "Title" {
                 pollTitle = textView.text
@@ -2317,6 +2317,145 @@ extension NewPollController: UITableViewDelegate, UITableViewDataSource {
         }
         return UITableView.automaticDimension
     }
+    
+    private func postSurvey() {
+        survey = Survey(type: Survey.SurveyType.Poll,
+                        title: pollTitle,
+                        topic: topic!,
+                        description: pollDescription,
+                        question: question,
+                        answers: answers,
+                        media: images,
+                        url: hyperlink,
+                        voteCapacity: votesCapacity,
+                        isPrivate: isPrivate,
+                        isAnonymous: isAnonymous,
+                        isCommentingAllowed: isCommentingAllowed,
+                        isHot: isHot)
+        
+        performSegue(withIdentifier: Segues.NewSurvey.Results, sender: nil)
+        
+        
+        
+        func getDict() -> [String: Any] {
+            var dict: [String: Any] = [:]
+
+            dict[DjangoVariables.Survey.type]                   = Survey.SurveyType.Poll.rawValue
+            dict[DjangoVariables.Survey.isAnonymous]            = isAnonymous
+            dict[DjangoVariables.Survey.category]               = topic!
+            dict[DjangoVariables.Survey.title]                  = pollTitle
+            dict[DjangoVariables.Survey.description]            = pollDescription
+            dict[DjangoVariables.Survey.isPrivate]              = isPrivate
+            dict[DjangoVariables.Survey.voteCapacity]           = votesCapacity
+            dict[DjangoVariables.Survey.isCommentingAllowed]    = isCommentingAllowed
+            dict[DjangoVariables.Survey.answers]                = answers//answersArray
+            dict[DjangoVariables.Survey.postHot]                = isHot
+            
+            //            var _answers: [[String: String]] = []
+            //            answers.forEach {
+//                description in
+//                _answers.append([DjangoVariables.SurveyAnswer.description: description.trimmingCharacters(in: .whitespaces)])
+//            }
+//            dict[DjangoVariables.Survey.answers] = _answers
+            
+            var _images: [[UIImage: String]] = []
+            images.forEach {
+                (index, dict) in
+                if let key = dict.keys.first,let value = dict.values.first {
+                    _images.append([key: value])
+                }
+            }
+            dict[DjangoVariables.Survey.images] = _images
+            if hyperlink != nil {
+                dict[DjangoVariables.Survey.hlink] = hyperlink!.absoluteString
+            }
+            return dict
+        }
+        
+        survey = Survey(type: .Poll, title: pollTitle, topic: topic!, description: pollDescription, question: question, answers: answers, media: images, url: hyperlink, voteCapacity: votesCapacity, isPrivate: isPrivate, isAnonymous: isAnonymous, isCommentingAllowed: isCommentingAllowed, isHot: isHot)
+        performSegue(withIdentifier: Segues.NewSurvey.Results, sender: nil)
+        
+        
+        
+//        API.shared.postSurvey(survey: survey!) {
+//            json, error in
+//            if error != nil {
+//                NotificationCenter.default.post(name: Notifications.Surveys.NewSurveyPostError, object: ["error": error!.localizedDescription])
+//            } else if json != nil {
+//                //Attach ID to survey and append to existing array
+//                if let id = json!["id"].intValue as? Int, let _answers = json!["answers"].arrayValue as? [JSON], let _media = json!["media"].arrayValue as? [JSON] {
+//                    self.survey!.id = id
+//                    Surveys.shared.all.append(self.survey!)
+//                    Surveys.shared.newReferences.append(self.survey!.reference)
+//                    Surveys.shared.ownReferences.append(self.survey!.reference)
+//
+//                    for _answer in _answers {
+//                        if let answer = self.survey!.answers.filter({ $0.title == _answer[DjangoVariables.SurveyAnswer.title].stringValue }).first {
+//                            answer.id = _answer[DjangoVariables.ID].intValue
+//                        }
+//                    }
+//
+//                    for _mediafile in _media {
+//                        if let media = self.survey!.media.filter({ $0.order == _mediafile["order"].intValue }).first {
+//                            media.id = _mediafile[DjangoVariables.ID].intValue
+//                            media.imageURL = URL(string: _mediafile["image"].stringValue)
+//                        }
+//                    }
+//
+//                    NotificationCenter.default.post(name: Notifications.Surveys.UpdateNewSurveys, object: nil)
+//                    NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
+//                    NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
+//                } else {
+//                    NotificationCenter.default.post(name: Notifications.Surveys.NewSurveyPostError, object: ["error": "Не удалось прочитать данные"])
+//                }
+//            }
+//        }
+
+        
+        
+//        //Prepare new Survey w/o ID
+//        if let _survey = Survey(newWithoutID: getDict()) {
+//            survey = _survey
+//            performSegue(withIdentifier: Segues.NewSurvey.Results, sender: nil)
+//            apiManager.postSurvey(survey: survey!) {
+//                json, error in
+//                if error != nil {
+//                    NotificationCenter.default.post(name: Notifications.Surveys.NewSurveyPostError, object: ["error": error!.localizedDescription])
+//                } else if json != nil {
+//                    //Attach ID to survey and append to existing array
+//                    if let _ID = json!["id"].intValue as? Int, let _answers = json!["answers"].arrayValue as? [JSON] {
+//                        self.survey!.ID = _ID
+//                        for _answer in _answers {
+//                            if let answer = SurveyAnswer(json: _answer) {
+//                                self.survey!.answers.append(answer)
+//                            }
+//                        }
+//                        Surveys.shared.append(object: self.survey!, type: .Downloaded)
+//                        //Create SurveyLink & append to own & new arrays
+//                        if let surveyLink = self.survey!.toShortSurvey() {
+//                            Surveys.shared.categorizedLinks[self.category!]?.append(surveyLink)
+//                            Surveys.shared.append(object: surveyLink, type: .OwnLinks)
+//                            Surveys.shared.append(object: surveyLink, type: .NewLinks)
+//                            //Send notification
+//                            NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)
+//                            NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
+//                            NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
+//                        }
+//                    } else {
+//                        NotificationCenter.default.post(name: Notifications.Surveys.NewSurveyPostError, object: ["error": "Не удалось прочитать данные"])
+//                    }
+//                }
+//            }
+//
+//        } else {
+//            //Print error
+//            showAlert(type: .Warning, buttons:
+//                [["Закрыть": [CustomAlertView.ButtonType.Ok: { self.navigationController?.popViewController(animated: false) } ]],
+//                 ["К опросу": [CustomAlertView.ButtonType.Ok: nil]]],
+//                      title: "Ошибка",
+//                      body: "Вернуться к созданию опроса?")
+//        }
+    }
 }
 
 class AddAnswerCell: UITableViewCell {
@@ -2354,85 +2493,10 @@ class AnswerSelectionCell: UITableViewCell {
             delegate?.callbackReceived(index as AnyObject)
         }
     }
+    
+    
 }
 
-extension NewPollController: ServerProtocol {
-    private func postSurvey() {
-        func getDict() -> [String: Any] {
-            var dict: [String: Any] = [:]
-
-            dict[DjangoVariables.Survey.type]                   = SurveyType.Poll.rawValue
-            dict[DjangoVariables.Survey.isAnonymous]            = isAnonymous
-            dict[DjangoVariables.Survey.category]               = category!
-            dict[DjangoVariables.Survey.title]                  = pollTitle
-            dict[DjangoVariables.Survey.description]            = pollDescription
-            dict[DjangoVariables.Survey.isPrivate]              = isPrivate
-            dict[DjangoVariables.Survey.voteCapacity]           = votesCapacity
-            dict[DjangoVariables.Survey.isCommentingAllowed]    = isCommentingAllowed
-            dict[DjangoVariables.Survey.answers]                = answers//answersArray
-            dict[DjangoVariables.Survey.postHot]                = isHot
-            
-            //            var _answers: [[String: String]] = []
-            //            answers.forEach {
-//                description in
-//                _answers.append([DjangoVariables.SurveyAnswer.description: description.trimmingCharacters(in: .whitespaces)])
-//            }
-//            dict[DjangoVariables.Survey.answers] = _answers
-            
-            var _images: [[UIImage: String]] = []
-            images.forEach {
-                (index, dict) in
-                if let key = dict.keys.first,let value = dict.values.first {
-                    _images.append([key: value])
-                }
-            }
-            dict[DjangoVariables.Survey.images] = _images
-            if hyperlink != nil {
-                dict[DjangoVariables.Survey.hlink] = hyperlink!.absoluteString
-            }
-            return dict
-        }
-        //Prepare new Survey w/o ID
-        if let _survey = Survey(newWithoutID: getDict()) {
-            survey = _survey
-            performSegue(withIdentifier: Segues.NewSurvey.Results, sender: nil)
-//            apiManager.postSurvey(survey: survey!) {
-//                json, error in
-//                if error != nil {
-//                    NotificationCenter.default.post(name: Notifications.Surveys.NewSurveyPostError, object: ["error": error!.localizedDescription])
-//                } else if json != nil {
-//                    //Attach ID to survey and append to existing array
-//                    if let _ID = json!["id"].intValue as? Int, let _answers = json!["answers"].arrayValue as? [JSON] {
-//                        self.survey!.ID = _ID
-//                        for _answer in _answers {
-//                            if let answer = SurveyAnswer(json: _answer) {
-//                                self.survey!.answers.append(answer)
-//                            }
-//                        }
-//                        Surveys.shared.append(object: self.survey!, type: .Downloaded)
-//                        //Create SurveyLink & append to own & new arrays
-//                        if let surveyLink = self.survey!.toShortSurvey() {
-//                            Surveys.shared.categorizedLinks[self.category!]?.append(surveyLink)
-//                            Surveys.shared.append(object: surveyLink, type: .OwnLinks)
-//                            Surveys.shared.append(object: surveyLink, type: .NewLinks)
-//                            //Send notification
-//                            NotificationCenter.default.post(name: Notifications.Surveys.NewSurveysUpdated, object: nil)
-//                            NotificationCenter.default.post(name: Notifications.Surveys.SurveysByCategoryUpdated, object: nil)
-//                            NotificationCenter.default.post(name: Notifications.Surveys.OwnSurveysUpdated, object: nil)
-//                        }
-//                    } else {
-//                        NotificationCenter.default.post(name: Notifications.Surveys.NewSurveyPostError, object: ["error": "Не удалось прочитать данные"])
-//                    }
-//                }
-//            }
-            
-        } else {
-            //Print error
-            showAlert(type: .Warning, buttons:
-                [["Закрыть": [CustomAlertView.ButtonType.Ok: { self.navigationController?.popViewController(animated: false) } ]],
-                 ["К опросу": [CustomAlertView.ButtonType.Ok: nil]]],
-                      title: "Ошибка",
-                      body: "Вернуться к созданию опроса?")
-        }
-    }
-}
+//extension NewPollController: ServerProtocol {
+//
+//}

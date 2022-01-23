@@ -249,7 +249,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         setupViews()
 //        startTimer()
         
-        loadData()
+        loadDataAsync()
         tabBarController?.tabBar.isUserInteractionEnabled = false
         tabBarController?.tabBar.tintColor = .lightGray
     }
@@ -369,11 +369,6 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         addChild(self.categoryVC)
         categoryVC.delegate = self
         categoryVC.didMove(toParent: self)
-        
-        if UserProfiles.shared.own == nil, let imagePath = AppData.shared.userProfile.imagePath, let ID = Int(AppData.shared.userProfile.ID!) as? Int, let firstName = AppData.shared.user.firstName, let lastName = AppData.shared.user.lastName, let birthDate = AppData.shared.userProfile.birthDate, let gender = AppData.shared.userProfile.gender {
-            UserProfiles.shared.own = UserProfile(ID: ID, name: "\(firstName) \(lastName)", age: birthDate.age, image: loadImageFromPath(path: imagePath), gender: gender)
-        }
-        
     }
     
     // MARK: - Navigation
@@ -381,21 +376,20 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
         let nc = navigationController as! NavigationControllerPreloaded
         nc.transitionStyle = .Default
         tabBarController?.setTabBarVisible(visible: false, animated: true)
-        if segue.identifier == Segues.App.FeedToCategory, let destinationVC = segue.destination as? SubcategoryViewController, let category = sender as? SurveyCategory {
+        if segue.identifier == Segues.App.FeedToCategory, let destinationVC = segue.destination as? SubcategoryViewController, let category = sender as? Topic {
             destinationVC.parentCategory = category
             destinationVC.title = category.title
             nc.category = category
             nc.duration = 0.3
             nc.transitionStyle = .Icon
             destinationVC.delegate = self
-        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? PollController, let surveyRef = sender as? SurveyRef {
+        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? PollController, let surveyRef = sender as? SurveyReference {
 //            let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
             navigationController?.setNavigationBarHidden(false, animated: true)
             nc.duration = 0.2
             nc.transitionStyle = .Icon
             destinationVC.mode = surveyRef.isComplete ? .ReadOnly : .Write
             destinationVC.surveyRef = surveyRef
-            destinationVC.apiManager = apiManager
             tabBarController?.setTabBarVisible(visible: false, animated: true)
         
         
@@ -416,21 +410,16 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
                 print("s")
             }
             tabBarController?.setTabBarVisible(visible: false, animated: true)*/
-        } else if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController, let sender = sender as? SurveyStackViewController {
-            destinationVC.apiManager = apiManager
-            destinationVC.shouldDownloadImages = false
-            destinationVC.survey = sender.surveyPreview.survey
-            destinationVC.delegate = sender
-            destinationVC.isNavTitleEnabled = false
-            nc.transitionStyle = .Icon
-            nc.duration = 0.25//5.4//
+//        } else if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController, let sender = sender as? SurveyStackViewController {
+//            destinationVC.shouldDownloadImages = false
+//            destinationVC.survey = sender.surveyPreview.survey
+//            destinationVC.delegate = sender
+//            destinationVC.isNavTitleEnabled = false
+//            nc.transitionStyle = .Icon
+//            nc.duration = 0.25//5.4//
         } else if segue.identifier == Segues.App.FeedToNewSurvey {
             nc.transitionStyle = .Icon
             nc.duration = 0.4
-        } else if segue.identifier == Segues.App.FeedToUser, let userProfile = sender as? UserProfile, let destinationVC = segue.destination as? delUserViewController {
-            destinationVC.userProfile = userProfile
-            nc.duration = 0.2
-            nc.transitionStyle = .Icon
         }
     }
     
@@ -442,7 +431,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     
     @objc fileprivate func applicationDidEnterBackground() {
         //TODD: Cancel requests?
-        apiManager.cancelAllRequests()
+        API.shared.cancelAllRequests()
     }
     
     @objc private func handleIconTap(gesture: UITapGestureRecognizer) {
@@ -782,94 +771,141 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             }
         }
     }
-}
-
-extension SurveysViewController: CallbackDelegate {
-    func callbackReceived(_ sender: AnyObject) {
-        if sender is LostConnectionView {
-            delay(seconds: TimeIntervals.NetworkInactivity) {
-                self.checkDataIsLoaded()
-            }
-            interruptRequests = false
-            loadData()
-            UIView.animate(withDuration: 0.3, animations: {
-                self.lostConnectionView?.alpha = 0
-            }) {
-                _ in
-                UIView.animate(withDuration: 0.3) {
-                self.setTitle("")
-                self.loadingIndicator.alpha = 1
-                }
-            }
-        } else if let category = sender as? SurveyCategory {//let dict = sender as? [String: Any], let startingPoint = dict["startingPoint"] as? CGPoint, let category = dict["category"] as? SurveyCategory, let size = dict["size"] as? CGSize {//if sender is SurveyCategory {
-            performSegue(withIdentifier: Segues.App.FeedToCategory, sender: sender)
+    
+    private func loadDataAsync() {
+        requestAttempt += 1
+        guard requestAttempt <= MAX_REQUEST_ATTEMPTS else {
+            presentLostConnectionView()
+            return
         }
-    }
-}
-
-
-extension SurveysViewController: ServerProtocol {
-    func loadData() {
-        if !interruptRequests {
-            
-            //                delay(seconds: 3) {
-            //                    self.presentLostConnectionView()
-            //                }
-            apiManager.initialLoad() {
-                json, error in
-                if error != nil {
-                    if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
-                        self.presentLostConnectionView()
-                    } else {
-                        //Retry unless successfull
-                        self.requestAttempt += 1
-                        if self.isInitialLoad {
-                            self.loadData()
-                        }
-                    }
-                }
-                if let strongJSON = json, !self.interruptRequests {
-                    AppData.shared.system.APIVersion = strongJSON["api_version"].stringValue
-                    SurveyCategories.shared.importJson(strongJSON["categories"])
-                    SurveyCategories.shared.updateCount(strongJSON["total_count"])
-                    ClaimCategories.shared.importJson(strongJSON["claim_categories"])
-                    Surveys.shared.importSurveys(strongJSON["surveys"])
-                    ModelProperties.shared.importJson(strongJSON["field_properties"])
-                    PriceList.shared.importJson(strongJSON["pricelist"])
-                    if let balance = strongJSON[DjangoVariables.UserProfile.balance].intValue as? Int {
-                        AppData.shared.userProfile.balance = balance
-                    }
-                    self.tableVC.refreshControl?.endRefreshing()
-//                    self.newTableVC.needsAnimation = true
-                    if self.isInitialLoad {
-                        self.tableVC.tableView.isUserInteractionEnabled = true
-                        self.isDataLoaded = true
-                    }
-                    self.requestAttempt = 0
-                }
+        Task {
+            do {
+                print(self.categoryVC)
+                print("requestAttempt \(requestAttempt)")
+                try await appLaunch()
+            } catch {
+                loadDataAsync()
             }
         }
     }
     
+//    func loadData() {
+//        if !interruptRequests {
+//
+//            //                delay(seconds: 3) {
+//            //                    self.presentLostConnectionView()
+//            //                }
+//            API.shared.initialLoad() {
+//                json, error in
+//                if error != nil {
+//                    if self.requestAttempt > MAX_REQUEST_ATTEMPTS {
+//                        self.presentLostConnectionView()
+//                    } else {
+//                        //Retry unless successfull
+//                        self.requestAttempt += 1
+//                        if self.isInitialLoad {
+//                            self.loadData()
+//                        }
+//                    }
+//                }
+//                if let strongJSON = json, !self.interruptRequests {
+//                    do {
+//                        let categories = try strongJSON["categories"].rawData()
+//                        let claims     = try strongJSON["claim_categories"].rawData()
+//                        let surveys    = try strongJSON["surveys"]
+//                        Topics.shared.load(categories)
+//                        Claims.shared.load(claims)
+//                        Surveys.shared.load(surveys)
+//                        AppData.shared.system.APIVersion = strongJSON["api_version"].stringValue
+//                    } catch {
+//                        print(error.localizedDescription)
+//                    }
+//
+//
+////                    AppData.shared.system.APIVersion = strongJSON["api_version"].stringValue
+////                    Topics.shared.importJson(strongJSON["categories"])
+//                    Topics.shared.updateCount(strongJSON["total_count"])
+////                    Claims.shared.importJson(strongJSON["claim_categories"])
+////                    Surveys.shared.importSurveys(strongJSON["surveys"])
+//                    ModelProperties.shared.importJson(strongJSON["field_properties"])
+//                    PriceList.shared.importJson(strongJSON["pricelist"])
+//                    if let balance = strongJSON[DjangoVariables.UserProfile.balance].intValue as? Int {
+//                        AppData.shared.profile.balance = balance
+//                    }
+//                    self.tableVC.refreshControl?.endRefreshing()
+//                    //                    self.newTableVC.needsAnimation = true
+//                    if self.isInitialLoad {
+//                        self.tableVC.tableView.isUserInteractionEnabled = true
+//                        self.isDataLoaded = true
+//                    }
+//                    self.requestAttempt = 0
+//                }
+//            }
+//        }
+//    }
+    
     func updateSurveysTotalCount() {
-        self.apiManager.loadTotalSurveysCount() {
-            json, error in
-            if error != nil {
-                print(error!.localizedDescription)
+        API.shared.downloadTotalSurveysCount() { result in
+            switch result {
+            case .success(let json):
+                Topics.shared.updateCount(json)
+            case .failure(let error):
+                print(error.localizedDescription)
                 //Retry unless successfull
                 if self.isInitialLoad {
                     self.updateSurveysTotalCount()
                 }
-            } else if json != nil {
-                SurveyCategories.shared.updateCount(json!)
             }
         }
     }
     
-    func updateSurveys(type: APIManager.SurveyType) {
-        self.apiManager.loadSurveys(type: type) {
-            json, error in
-            if error != nil {
+    func appLaunch() async throws {
+        do {
+            let json = try await API.shared.appLaunch()
+            AppData.shared.system.APIVersion = json["api_version"].stringValue
+            ModelProperties.shared.importJson(json["field_properties"])
+            PriceList.shared.importJson(json["pricelist"])
+            if let balance = json[DjangoVariables.UserProfile.balance].intValue as? Int {
+                AppData.shared.profile.balance = balance
+            }
+            await MainActor.run {
+                do {
+                    let topics      = try json["categories"].rawData()
+                    let claims      = try json["claim_categories"].rawData()
+                    let surveys     = json["surveys"]
+                    Topics.shared.load(topics)
+                    Claims.shared.load(claims)
+                    Surveys.shared.load(surveys)
+                    self.tableVC.refreshControl?.endRefreshing()
+                    if self.isInitialLoad {
+                        self.tableVC.tableView.isUserInteractionEnabled = true
+                        self.isDataLoaded = true
+                    }
+                } catch {
+                    print(error.localizedDescription)
+                }
+                requestAttempt = 0
+            }
+          } catch {
+            throw error
+          }
+        
+    }
+    
+    func updateSurveys(type: API.SurveyType) {
+        API.shared.downloadSurveys(type: type) { result in
+            switch result {
+            case .success(let json):
+                Surveys.shared.load(json)
+                self.tableVC.refreshControl?.endRefreshing()
+//                self.newTableVC.needsAnimation = true
+                if self.isInitialLoad {
+                    self.tableVC.tableView.isUserInteractionEnabled = true
+                    self.isDataLoaded = true
+//                    self.isInitialLoad = false
+                }
+            case .failure(let error):
+                print(error.localizedDescription)
                 //Retry unless successfull
                 if self.isInitialLoad {
                     self.updateSurveys(type: .All)
@@ -881,18 +917,49 @@ extension SurveysViewController: ServerProtocol {
                     }
                 }
             }
-            if json != nil {
-                Surveys.shared.importSurveys(json!)
-                self.tableVC.refreshControl?.endRefreshing()
-//                self.newTableVC.needsAnimation = true
-                if self.isInitialLoad {
-                    self.tableVC.tableView.isUserInteractionEnabled = true
-                    self.isDataLoaded = true
-//                    self.isInitialLoad = false
-                }
-            }
         }
     }
+    
+    private func checkDataIsLoaded() {
+        if !isDataLoaded {
+            interruptRequests = true
+            requestAttempt = 0
+            Surveys.shared.eraseData()
+            API.shared.cancelAllRequests()
+            presentLostConnectionView()
+            tabBarController?.setTabBarVisible(visible: false, animated: true)
+        }
+    }
+    
+}
+
+extension SurveysViewController: CallbackDelegate {
+    func callbackReceived(_ sender: Any) {
+        if sender is LostConnectionView {
+            delay(seconds: TimeIntervals.NetworkInactivity) {
+                self.checkDataIsLoaded()
+            }
+            interruptRequests = false
+            requestAttempt = 0
+            loadDataAsync()
+            UIView.animate(withDuration: 0.3, animations: {
+                self.lostConnectionView?.alpha = 0
+            }) {
+                _ in
+                UIView.animate(withDuration: 0.3) {
+                self.setTitle("")
+                self.loadingIndicator.alpha = 1
+                }
+            }
+        } else if let category = sender as? Topic {//let dict = sender as? [String: Any], let startingPoint = dict["startingPoint"] as? CGPoint, let category = dict["category"] as? SurveyCategory, let size = dict["size"] as? CGSize {//if sender is SurveyCategory {
+            performSegue(withIdentifier: Segues.App.FeedToCategory, sender: sender)
+        }
+    }
+}
+
+
+//extension SurveysViewController: ServerProtocol {
+    
     
 //    fileprivate func startTimer() {
 //        guard timer == nil else { return }
@@ -900,17 +967,8 @@ extension SurveysViewController: ServerProtocol {
 //        timer?.fire()
 //    }
     
-    fileprivate func checkDataIsLoaded() {
-        if !isDataLoaded {
-            interruptRequests = true
-            requestAttempt = 0
-            Surveys.shared.eraseData()
-            apiManager.cancelAllRequests()
-            presentLostConnectionView()
-            tabBarController?.setTabBarVisible(visible: false, animated: true)
-        }
-    }
-}
+    
+//}
 
     
     

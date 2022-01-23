@@ -1,0 +1,148 @@
+//
+//  SurveyRef.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 28.10.2021.
+//  Copyright © 2021 Pavel Bukharov. All rights reserved.
+//
+
+import Foundation
+import SwiftyJSON
+
+class SurveyReference: Decodable {
+
+    private enum CodingKeys: String, CodingKey {
+        case id, type, title, category, likes, views,
+             startDate = "start_date",
+             isComplete = "is_complete",
+             isOwn = "is_own",
+             isFavorite = "is_favorite",
+             owner = "userprofile"
+    }
+    var id: Int
+    var title: String
+    var startDate: Date
+    var topic: Topic
+    //    var completionPercentage: Int
+    var likes: Int
+    var views: Int {
+        didSet {
+            guard survey != nil else { return }
+            survey!.views = views
+        }
+    }
+    var type: Survey.SurveyType
+    var isComplete: Bool
+    var isOwn: Bool
+    var isFavorite: Bool
+    var owner: Userprofile
+    var survey: Survey? {
+        return Surveys.shared.all.filter{ $0.hashValue == hashValue }.first
+    }
+    
+    required init(from decoder: Decoder) throws {
+        do {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            guard let topicId = try container.decode(Int.self, forKey: .category) as? Int, let _topic = Topics.shared.all.filter({ $0.id == topicId }).first else {
+                throw "Topic not found"
+            }
+            guard let _type = Survey.SurveyType(rawValue: try container.decode(String.self, forKey: .type)) else {
+                throw "Type not defined"
+            }
+            id      = try container.decode(Int.self, forKey: .id)
+            title   = try container.decode(String.self, forKey: .title)
+            topic   = _topic
+            type    = _type
+            let _owner  = try container.decode(Userprofile.self, forKey: .owner)
+            owner       = Userprofiles.shared.all.filter({ $0.id == _owner.id }).first ?? _owner
+            likes       = try container.decode(Int.self, forKey: .likes)
+            views       = try container.decode(Int.self, forKey: .views)
+            startDate   = try container.decode(Date.self, forKey: .startDate)
+            isComplete  = try container.decode(Bool.self, forKey: .isComplete)
+            isOwn       = try container.decode(Bool.self, forKey: .isOwn)
+            isFavorite  = try container.decode(Bool.self, forKey: .isFavorite)
+            ///Check for existing instance by hashValue
+            if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
+                SurveyReferences.shared.all.append(self)
+            }
+        } catch {
+            throw error
+        }
+    }
+    
+    init(id _id: Int, title _title: String, startDate _startDate: Date, topic _topic: Topic, type _type: Survey.SurveyType, likes _likes: Int = 0, views _views: Int = 0, isOwn _isOwn: Bool, isComplete _isComplete: Bool, isFavorite _isFavorite: Bool, survey _survey: Survey, owner _owner: Userprofile) {
+        id                      = _id
+        title                   = _title
+        topic                   = _topic
+        startDate               = _startDate
+        likes                   = _likes
+        views                   = _views
+        type                    = _type
+        isOwn                   = _isOwn
+        isComplete              = _isComplete
+        isFavorite              = _isFavorite
+//        survey                  = _survey
+        owner                   = _owner
+        if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
+            SurveyReferences.shared.all.append(self)
+        }
+    }
+//    //    var survey
+//    //    var hashValue: Int {
+//    //        return ObjectIdentifier(self).hashValue
+//    //    }
+//
+    //    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int, type _type: SurveyType) {//}, likes _likes: Int) {
+    
+//
+//    init?(_ json: JSON) {
+//        if  let _ID                     = json["id"].intValue as? Int,
+//            let _title                  = json["title"].stringValue as? String,
+//            let _categoryID             = json["category"].intValue as? Int,
+//            let _category               = Topics.shared[_categoryID],
+//            let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
+//            //            let _completionPercentage   = json["vote_capacity"].intValue as? Int,
+//            let _likes                  = json["likes"].intValue as? Int,
+//            let _views                  = json["views"].intValue as? Int,
+//            let _isOwn                  = json["is_own"].boolValue as? Bool,
+//            let _isComplete             = json["is_complete"].boolValue as? Bool,
+//            let _isFavorite             = json["is_favorite"].boolValue as? Bool,
+//            let _type                   = json["type"].stringValue as? String {
+//            id                      = _ID
+//            title                   = _title
+//            category                = _category
+//            //            completionPercentage    = _completionPercentage
+//            startDate               = _startDate
+//            likes                   = _likes
+//            views                   = _views
+//            isOwn                   = _isOwn
+//            isComplete              = _isComplete
+//            isFavorite              = _isFavorite
+//            type                    = Survey.SurveyType(rawValue: _type)!
+//        } else {
+//            return nil
+//        }
+//    }
+}
+
+extension SurveyReference: Hashable {
+    static func == (lhs: SurveyReference, rhs: SurveyReference) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(title)
+        hasher.combine(id)
+        hasher.combine(topic)
+    }
+}
+
+class SurveyReferences {
+    static let shared = SurveyReferences()
+    private init() {}
+    var all: [SurveyReference] = []
+    
+    public func eraseData() {
+        all.removeAll()
+    }
+}

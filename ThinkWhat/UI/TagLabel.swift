@@ -10,7 +10,7 @@ import UIKit
 
 class TagLabel: UILabel {
 
-    public var surveyCategory: SurveyCategory?
+    public var surveyCategory: Topic?
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
@@ -23,7 +23,7 @@ class TagLabel: UILabel {
 //        self.commonInit()
 //    }
     
-    init(frame: CGRect, surveyCategory: SurveyCategory?) {
+    init(frame: CGRect, surveyCategory: Topic?) {
         self.surveyCategory = surveyCategory
         super.init(frame: frame)
         if surveyCategory?.parent == nil {

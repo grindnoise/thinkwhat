@@ -14,12 +14,12 @@ class SurveyClaimView: UIView, UITabBarDelegate, UITableViewDataSource {
         print("---\(self) deinit()")
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return ClaimCategories.shared.container.count
+        return Claims.shared.all.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
-        cell.textLabel?.text = ClaimCategories.shared.container[indexPath.row].description
+        cell.textLabel?.text = Claims.shared.all[indexPath.row].description
         return cell
     }
     

@@ -43,7 +43,7 @@ class ResultIndicator: UIView {
     var indexPath: IndexPath!
     private var tapGesture: UITapGestureRecognizer!
     private var panGesture: UIPanGestureRecognizer!
-    private var apiManager: APIManagerProtocol!
+//    private var apiManager: APIManagerProtocol!
     private var color: UIColor = K_COLOR_RED
     private weak var delegate: CallbackDelegate!
     private var highlightedImageView: UIImageView? {
@@ -84,20 +84,20 @@ class ResultIndicator: UIView {
     private var interactionViews: [[UIView: UIImageView]] = []
     var answer: Answer!
     private func setupImages() {
-        if !answer.userprofiles.isEmpty {
+        if !answer.voters.isEmpty {
             if isSelected {
-                if !answer.userprofiles.filter({ $0.ID == UserProfiles.shared.own?.ID }).isEmpty {
-                    if let index = answer.userprofiles.firstIndex(where: { $0.ID == UserProfiles.shared.own?.ID }) {
+                if !answer.voters.filter({ $0 == AppData.shared.userprofile }).isEmpty {
+                    if let index = answer.voters.firstIndex(where: { $0 == AppData.shared.userprofile/*Userprofiles.shared.own?.id*/ }) {
                         if  index != 0  {
-                            answer.userprofiles.rearrange(from: index, to: 0)
+                            answer.voters.rearrange(from: index, to: 0)
                         }
                     }
                 } else {
-                    answer.userprofiles.insert(UserProfiles.shared.own!, at: 0)
+                    answer.voters.insert(AppData.shared.userprofile, at: 0)//(Userprofiles.shared.own!, at: 0)
                 }
             }
             
-            for i in 0..<answer.userprofiles.count {
+            for i in 0..<answer.voters.count {
                 if i == 5 {
                     break
                 }
@@ -122,22 +122,23 @@ class ResultIndicator: UIView {
                 }
                 imageView.heightAnchor.constraint(equalTo: actionView.heightAnchor, multiplier: (0.8 - 0)/1.0).isActive = true
                 imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
-                if answer.userprofiles[i].image != nil {
-                    imageView.image = answer.userprofiles[i].image!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: color)
-                } else if let url = answer.userprofiles[i].imageURL as? String, !url.isEmpty {
+                if answer.voters[i].image != nil {
+                    imageView.image = answer.voters[i].image!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: color)
+                } else if let url = answer.voters[i].imageURL {
                     imageView.image = UIImage(named: "user")!.circularImage(size: CGSize(width: actionView.frame.height, height: actionView.frame.height), frameColor: color)
-                    apiManager.downloadImage(url: url) {
-                        image, error in
-                        if error != nil {
-                            print(error!.localizedDescription)
-                        }
-                        if image != nil {
-                            self.answer.userprofiles[i].image = image
+                    API.shared.downloadImage(url: url) { progress in
+                        print(progress)
+                    } completion: { result in
+                        switch result {
+                        case .success(let image):
+                            self.answer.voters[i].image = image
                             UIView.transition(with: imageView,
                                               duration: 0.5,
                                               options: .transitionCrossDissolve,
-                                              animations: { imageView.image = image!.circularImage(size: imageView.frame.size, frameColor: self.color) },
+                                              animations: { imageView.image = image.circularImage(size: imageView.frame.size, frameColor: self.color) },
                                               completion: nil)
+                        case .failure(let error):
+                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                         }
                     }
                 } else {
@@ -216,12 +217,12 @@ class ResultIndicator: UIView {
         self.commonInit()
     }
     
-    init(delegate: CallbackDelegate, answer: Answer, apiManager: APIManagerProtocol, color: UIColor, isSelected: Bool) {
+    init(delegate: CallbackDelegate, answer: Answer, color: UIColor, isSelected: Bool) {
         super.init(frame: .zero)
         self.delegate = delegate
         self.isSelected = isSelected
         self.answer = answer
-        self.apiManager = apiManager
+//        self.apiManager = apiManager
         self.color = color
         self.commonInit()
         self.setupImages()
@@ -259,7 +260,7 @@ class ResultIndicator: UIView {
     
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
         if recognizer.state == .ended {
-            if !answer.userprofiles.isEmpty {
+            if !answer.voters.isEmpty {
 //                let dict = ["users": userprofiles, "total": totalCount, "answerID": answerID] as [String : Any]
                 let array = [answer as AnyObject, imageViews as AnyObject, indexPath as AnyObject]
                 delegate?.callbackReceived(array as AnyObject)

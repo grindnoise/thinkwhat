@@ -43,7 +43,7 @@ class SurveysTableViewController: UITableViewController {
         case New, Top, User, UserFavorite, Own, Favorite, Category
     }
     
-    var category: SurveyCategory? {
+    var category: Topic? {
         didSet {
             type = .Category
         }
@@ -145,7 +145,7 @@ class SurveysTableViewController: UITableViewController {
             }
         }
     }
-    weak var userProfile: UserProfile?
+    weak var userprofile: Userprofile?
     
     class var surveyNib: UINib {
         return UINib(nibName: "SurveyTableViewCell", bundle: nil)
@@ -239,7 +239,7 @@ class SurveysTableViewController: UITableViewController {
         } else if type == .Category {
             navTitleImageSize = CGSize(width: 45, height: 45)
             let icon = Icon(frame: CGRect(origin: .zero, size: navTitleImageSize))
-            icon.category = Icon.Category(rawValue: category!.ID) ?? .Null
+            icon.category = Icon.Category(rawValue: category!.id) ?? .Null
             icon.isOpaque = false
             icon.backgroundColor = category?.parent?.tagColor ?? category?.tagColor
             navTitle = icon
@@ -249,7 +249,7 @@ class SurveysTableViewController: UITableViewController {
         } else if type == .Own || type == .Favorite {
             navTitleImageSize = CGSize(width: 45, height: 45)
             navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
-            if let imagePath = AppData.shared.userProfile.imagePath, let image = loadImageFromPath(path: imagePath) {
+            if let imagePath = AppData.shared.profile.imagePath, let image = UIImage(contentsOfFile: imagePath) {
                 (navTitle! as! UIImageView).image = image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
             } else if let _image = UIImage(named: "user") {
                 (navTitle! as! UIImageView).image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
@@ -293,30 +293,30 @@ class SurveysTableViewController: UITableViewController {
 //        if vc.currentIcon == .New {
         switch type {
         case .New:
-            return Surveys.shared.newLinks.count
+            return Surveys.shared.newReferences.count
         case .Top:
-            return Surveys.shared.topLinks.count
+            return Surveys.shared.topReferences.count
         case .User:
             if !needsAwaitForNotification || userSurveysReceived {
-                return userProfile?.surveysCreated.values.first?.count ?? 0
+                return AppData.shared.userprofile.surveys.count
             } else {
                 return 0
             }
         case .UserFavorite:
             if !needsAwaitForNotification ||  userSurveysReceived {
-                return userProfile?.surveysFavorite.values.first?.count ?? 0
+                return AppData.shared.userprofile.favoritesTotal
             } else {
                 return 0
             }
         case .Category:
-            return Surveys.shared.allLinks.filter({ $0.category == self.category }).count
+            return SurveyReferences.shared.all.filter({ $0.topic == self.category }).count
 //        default:
 //            print("default")
             //return Surveys.shared.topLinks.count
         case .Own:
-            return Surveys.shared.ownLinks.count
+            return Surveys.shared.ownReferences.count
         case .Favorite:
-            return Surveys.shared.favoriteLinks.count
+            return Surveys.shared.favoriteReferences.count
         }
         
         
@@ -338,7 +338,7 @@ class SurveysTableViewController: UITableViewController {
 //        if vc.currentIcon != .Category {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell {
 
-                var dataSource: [SurveyRef]
+                var dataSource: [SurveyReference]
 //                if vc.currentIcon == .New {
 //                    dataSource = Surveys.shared.newSurveys
 //                } else {
@@ -346,36 +346,36 @@ class SurveysTableViewController: UITableViewController {
 //                }
                 switch type {
                 case .New:
-                    dataSource = Surveys.shared.newLinks
+                    dataSource = Surveys.shared.newReferences
                 case .Top:
-                    dataSource = Surveys.shared.topLinks
+                    dataSource = Surveys.shared.topReferences
                 case .User:
-                    dataSource = userProfile?.surveysCreated.values.first ?? []//userProfile!.surveysCreated
+                    dataSource = AppData.shared.userprofile.surveys//userProfile!.surveysCreated
                 case .UserFavorite:
-                    dataSource = userProfile?.surveysFavorite.values.first ?? []//userProfile!.surveysFavorite
+                    dataSource = AppData.shared.userprofile.favorites.values.first ?? []//userProfile!.surveysFavorite
 //                case .Category:
 //                    dataSource = Surveys.shared.allLinks.filter { $0.category == self.category }
                 case .Own:
-                    dataSource = Surveys.shared.ownLinks
+                    dataSource = Surveys.shared.ownReferences
                 case .Favorite:
-                    dataSource = Surveys.shared.favoriteLinks.keys.compactMap({ $0 })
+                    dataSource = Surveys.shared.favoriteReferences.keys.compactMap({ $0 })
                 default:
-                    dataSource = Surveys.shared.topLinks
+                    dataSource = Surveys.shared.topReferences
                 }
                 let survey = dataSource[indexPath.row]
 
                 cell.survey = survey
                 let attrString = NSMutableAttributedString()
-                attrString.append(NSAttributedString(string: "  \(survey.category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "  \(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
                 attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .white, backgroundColor: .clear)))
-                attrString.append(NSAttributedString(string: "\(survey.category.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .white, backgroundColor: .clear)))
 //                attrString.append(NSAttributedString(string: " \(survey.category!.title.uppercased())", attributes: StringAttributes.Bold.red_11))
 //                attrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.Regular.red_11))
 //                attrString.append(NSAttributedString(string: "\(survey.category!.parent!.title.uppercased()) ", attributes: StringAttributes.SemiBold.red_11))
                 cell.category.attributedText = attrString
                 cell.category.backgroundColor = .clear
                 cell.duration.backgroundColor = .clear
-                let color = survey.category.tagColor 
+                let color = survey.topic.tagColor 
                     cell.category.backgroundColor = color//.withAlphaComponent(0.5)
                     cell.duration.backgroundColor = color
                     cell.join.backgroundColor = color
@@ -425,6 +425,45 @@ class SurveysTableViewController: UITableViewController {
         }
 //        updateSurveys(type: vc.currentIcon == .New ? .New : .Top)
     }
+    
+    private func loadSurveys() {
+        func stopRefreshing(error: Error) {
+            refreshControl?.attributedTitle = NSAttributedString(string: "Ошибка, повторите позже", attributes: StringAttributes.SemiBold.red_12)//semiboldAttrs_red_12)
+            refreshControl?.endRefreshing()
+            delay(seconds: 0.5) {
+                self.refreshControl?.attributedTitle = NSAttributedString(string: "")
+            }
+            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+        }
+        
+        var _type: API.SurveyType!
+        if type == .User {
+            _type = API.SurveyType.User
+        } else if type == .UserFavorite {
+            _type = API.SurveyType.UserFavorite
+        }
+        API.shared.loadSurveysByOwner(user: AppData.shared.userprofile, type: _type) { result in
+            switch result {
+            case .success(let json):
+                //TODO: - поместить в json с ключом
+                var _type: Userprofile.UserSurveyType!
+                if self.type == .User {
+                    _type = Userprofile.UserSurveyType.Own
+                } else if self.type == .UserFavorite {
+                    _type = Userprofile.UserSurveyType.Favorite
+                }
+                do {
+                    AppData.shared.userprofile.loadSurveys(data: try json.rawData())//importSurveys(_type, json: json!)
+                    self.refreshControl?.endRefreshing()
+                    self.tableView.reloadData()
+                } catch (let error) {
+                    stopRefreshing(error: error)
+                }
+            case .failure(let error):
+                stopRefreshing(error: error)
+            }
+        }
+    }
 
 //    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
 //        if vc.currentIcon == .Category, let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell") as? CategoryTableViewCell {
@@ -468,7 +507,7 @@ class SurveysTableViewController: UITableViewController {
 //        } else {
 //            vc.performSegue(withIdentifier: kSegueAppFeedToSurvey, sender: nil)
 //        }
-        if delegate != nil, delegate is SurveysViewController, let surveyRef = (tableView.cellForRow(at: indexPath) as? SurveyTableViewCell)?.survey as? SurveyRef {
+        if delegate != nil, delegate is SurveysViewController, let surveyRef = (tableView.cellForRow(at: indexPath) as? SurveyTableViewCell)?.survey as? SurveyReference {
             (delegate as! SurveysViewController).performSegue(withIdentifier: Segues.App.FeedToSurvey, sender: surveyRef)
         }
     }
@@ -519,6 +558,8 @@ final class Animator {
         
         hasAnimatedAllCells = (tableView.visibleCells.last != nil)//tableView.isLastVisibleCell(at: indexPath)
     }
+    
+    
 }
 
 enum AnimationFactory {
@@ -596,37 +637,10 @@ enum AnimationFactory {
             })
         }
     }
+    
+    
 }
 
-extension SurveysTableViewController: ServerProtocol {
-    fileprivate func loadSurveys() {
-//        NotificationCenter.default.removeObserver(self)
-        var _type: APIManager.SurveyType!
-        if type == .User {
-            _type = APIManager.SurveyType.User
-        } else if type == .UserFavorite {
-            _type = APIManager.SurveyType.UserFavorite
-        }
-        apiManager.loadSurveysByOwner(userProfile: userProfile!, type: _type) {
-            json, error in
-            if error != nil {
-                self.refreshControl?.attributedTitle = NSAttributedString(string: "Ошибка, повторите позже", attributes: StringAttributes.SemiBold.red_12)//semiboldAttrs_red_12)
-                self.refreshControl?.endRefreshing()
-                delay(seconds: 0.5) {
-                    self.refreshControl?.attributedTitle = NSAttributedString(string: "")
-                }
-            }
-            if json != nil {
-                var _type: UserProfile.UserSurveyType!
-                if self.type == .User {
-                    _type = UserProfile.UserSurveyType.Own
-                } else if self.type == .UserFavorite {
-                    _type = UserProfile.UserSurveyType.Favorite
-                }
-                self.userProfile?.importSurveys(_type, json: json!)
-                self.refreshControl?.endRefreshing()
-                self.tableView.reloadData()
-            }
-        }
-    }
-}
+//extension SurveysTableViewController: ServerProtocol {
+//    file
+//}

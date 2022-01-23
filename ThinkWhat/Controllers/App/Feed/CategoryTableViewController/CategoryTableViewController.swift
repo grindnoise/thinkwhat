@@ -7,10 +7,11 @@
 //
 
 import UIKit
+import SwiftyJSON
 
 class CategoryTableViewController: UITableViewController {
 
-    var category: SurveyCategory!// {
+    var topic: Topic!// {
 //        didSet {
 //            if category != nil && oldValue != category {
 //                self.updateSurveys()
@@ -18,6 +19,7 @@ class CategoryTableViewController: UITableViewController {
 //        }
 //    }
     public var needsAnimation = true
+    private var surveyReferences: [SurveyReference] = []
     private var isViewSetupCompleted = false
     private var loadingIndicator: LoadingIndicator!
     private var isInitialLoad = true
@@ -30,6 +32,7 @@ class CategoryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        surveyReferences = SurveyReferences.shared.all.filter { $0.topic == topic }
         self.tableView.register(CategoryTableViewController.surveyNib, forCellReuseIdentifier: "topSurveyCell")
         setupViews()
         if tableView.numberOfRows(inSection: 0) == 0 {
@@ -85,11 +88,11 @@ class CategoryTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return Surveys.shared.categorizedLinks[category]?.count ?? 0
+        return surveyReferences.count//Surveys.shared.categorizedLinks[category]?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell, let dataSource = Surveys.shared.categorizedLinks[category] {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "topSurveyCell", for: indexPath) as? SurveyTableViewCell {//}, let dataSource = Surveys.shared.categorizedLinks[category] {
 //                cell.title.text = dataSource[indexPath.row].title
 //                for view in cell.tags.subviews {
 //                    view.removeFromSuperview()
@@ -126,33 +129,12 @@ class CategoryTableViewController: UITableViewController {
             needsAnimation = (tableView.visibleCells.count < (indexPath.row + 1))
         }
     }
-}
-
-extension CategoryTableViewController: ServerInitializationProtocol {
-    func initializeServerAPI() -> APIManagerProtocol {
-        return ((self.navigationController as! NavigationControllerPreloaded).parent as! TabBarController).apiManager
-    }
-}
-
-extension CategoryTableViewController: ServerProtocol {
+    
     private func updateSurveys() {
-        self.apiManager.loadSurveysByCategory(categoryID: category.ID) {
-            json, error in
-            if error != nil {
-                //Retry unless successfull
-                if self.isInitialLoad {
-                    self.updateSurveys()
-                } else {
-                    self.refreshControl?.attributedTitle = NSAttributedString(string: "Ошибка, повторите позже", attributes: self.semiboldAttrs)
-                    self.refreshControl?.endRefreshing()
-                    delay(seconds: 0.5) {
-                        self.refreshControl?.attributedTitle = NSAttributedString(string: "")
-                    }
-                }
-            }
-            if json != nil {
-                print(json!)
-                Surveys.shared.importSurveys(json!)
+        API.shared.downloadSurveys(topic: topic) { result in
+            switch result {
+            case .success(let json):
+                Surveys.shared.load(JSON(["by_category": json]))
                 self.refreshControl?.endRefreshing()
                 self.needsAnimation = true
                 if self.isInitialLoad {
@@ -165,7 +147,28 @@ extension CategoryTableViewController: ServerProtocol {
                         self.isInitialLoad = false
                     }
                 }
+            case .failure(let error):
+                print(error)
+                if self.isInitialLoad {
+                    self.updateSurveys()
+                } else {
+                    self.refreshControl?.attributedTitle = NSAttributedString(string: "Ошибка, повторите позже", attributes: self.semiboldAttrs)
+                    self.refreshControl?.endRefreshing()
+                    delay(seconds: 0.5) {
+                        self.refreshControl?.attributedTitle = NSAttributedString(string: "")
+                    }
+                }
             }
         }
     }
 }
+
+//extension CategoryTableViewController: ServerInitializationProtocol {
+//    func initializeServerAPI() -> APIManagerProtocol {
+//        return ((self.navigationController as! NavigationControllerPreloaded).parent as! TabBarController).apiManager
+//    }
+//}
+//
+//extension CategoryTableViewController: ServerProtocol {
+    
+//}

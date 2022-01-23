@@ -597,6 +597,14 @@ extension UIImage {
         
         return renderedImage
     }
+    
+    @available(iOS 15, *)
+    var thumbnail: UIImage? {
+        get async {
+            let size = CGSize(width: 80, height: 40)
+            return await self.byPreparingThumbnail(ofSize: size)
+        }
+    }
 }
 
 extension UISearchBar {
@@ -1285,22 +1293,22 @@ extension UIApplication {
     var statusBarView: UIView? {
         if #available(iOS 13.0, *) {
             //TODO: - Uncomment
-//            let tag = 38482
-//            let keyWindow = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
-//
-//            if let statusBar = keyWindow?.viewWithTag(tag) {
-//                return statusBar
-//            } else {
-//                guard let statusBarFrame = keyWindow?.windowScene?.statusBarManager?.statusBarFrame else { return nil }
-//                let statusBarView = UIView(frame: statusBarFrame)
-//                statusBarView.tag = tag
-//                keyWindow?.addSubview(statusBarView)
-//                return statusBarView
-//            }
+            let tag = 38482
+            let keyWindow = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+            
+            if let statusBar = keyWindow?.viewWithTag(tag) {
+                return statusBar
+            } else {
+                guard let statusBarFrame = keyWindow?.windowScene?.statusBarManager?.statusBarFrame else { return nil }
+                let statusBarView = UIView(frame: statusBarFrame)
+                statusBarView.tag = tag
+                keyWindow?.addSubview(statusBarView)
+                return statusBarView
+            }
         } else if responds(to: Selector(("statusBar"))) {
             return value(forKey: "statusBar") as? UIView
         }
-            return nil
+        return nil
     }
 }
 
@@ -1313,3 +1321,42 @@ extension UIApplication {
 //        return topViewController?.preferredStatusBarStyle ?? .default
 //    }
 //}
+public extension CollectionCellAutoLayout where Self: UICollectionViewCell {
+    func preferredLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+        setNeedsLayout()
+        layoutIfNeeded()
+        let size = contentView.systemLayoutSizeFitting(layoutAttributes.size)
+        var newFrame = layoutAttributes.frame
+        newFrame.size.width = CGFloat(ceilf(Float(size.width)))
+        newFrame.size.height = size.height
+        layoutAttributes.frame = newFrame
+        cachedSize = newFrame.size
+        return layoutAttributes
+    }
+}
+
+extension DateFormatter {
+    static let dateTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy HH:mm:ss"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+    
+    static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+}
+
+extension Sequence where Element: Hashable {
+    func uniqued() -> [Element] {
+        var set = Set<Element>()
+        return filter { set.insert($0).inserted }
+    }
+}
+
+/// Easily throw generic errors with a text description.
+extension String: Error { }

@@ -97,7 +97,7 @@ class FileStorageManager: FileStorageProtocol {
                     fatalError(error.localizedDescription)
                 }
             default:
-                print("default")
+                fatalError()
             }
         default:
             print("TODO Store survey images")

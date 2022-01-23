@@ -36,7 +36,7 @@ class BlurTransition: BasicTransition {
         if operation == .pop{
             if let vc_1 = fromVC as? TextViewController, let vc_2 = toVC as? NewPollController {
                 if vc_1.accessibilityIdentifier == "Title" {
-                    vc_2.pollTitle = vc_1.text.text
+                    vc_2.title = vc_1.text.text
                 } else if vc_1.accessibilityIdentifier == "Description" {
                     vc_2.pollDescription = vc_1.text.text
 //                    vc_2.descriptionContainer.font = vc_1.font

@@ -34,6 +34,8 @@
 	<string>1</string>
 	<key>FacebookAppID</key>
 	<string>818984988459464</string>
+    <key>FacebookClientToken</key>
+    <string>792b8f684fc7c9d72884f89687a81b40</string>
 	<key>FacebookDisplayName</key>
 	<string>ThinkWhat</string>
 	<key>LSApplicationCategoryType</key>

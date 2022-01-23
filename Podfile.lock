@@ -1,21 +1,15 @@
 PODS:
   - Alamofire (5.5.0)
-  - FacebookCore (0.9.0):
-    - FBSDKCoreKit (~> 5.0)
-  - FacebookLogin (0.9.0):
-    - FacebookCore (~> 0.9.0)
-    - FBSDKCoreKit (~> 5.0)
-    - FBSDKLoginKit (~> 5.0)
-  - FBSDKCoreKit (5.15.1):
-    - FBSDKCoreKit/Basics (= 5.15.1)
-    - FBSDKCoreKit/Core (= 5.15.1)
-  - FBSDKCoreKit/Basics (5.15.1)
-  - FBSDKCoreKit/Core (5.15.1):
-    - FBSDKCoreKit/Basics
-  - FBSDKLoginKit (5.15.1):
-    - FBSDKLoginKit/Login (= 5.15.1)
-  - FBSDKLoginKit/Login (5.15.1):
-    - FBSDKCoreKit (~> 5.0)
+  - FBAEMKit (12.3.1):
+    - FBSDKCoreKit_Basics (= 12.3.1)
+  - FBSDKCoreKit (12.3.1):
+    - FBAEMKit (= 12.3.1)
+    - FBSDKCoreKit_Basics (= 12.3.1)
+  - FBSDKCoreKit_Basics (12.3.1)
+  - FBSDKLoginKit (12.3.1):
+    - FBSDKCoreKit (= 12.3.1)
+  - FBSDKShareKit (12.3.1):
+    - FBSDKCoreKit (= 12.3.1)
   - Nimble (8.1.1)
   - Quick (3.0.0)
   - SwiftyJSON (5.0.0)
@@ -26,8 +20,9 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire (~> 5.5)
-  - FacebookCore (= 0.9.0)
-  - FacebookLogin (= 0.9.0)
+  - FBSDKCoreKit
+  - FBSDKLoginKit
+  - FBSDKShareKit
   - Nimble
   - Quick
   - SwiftyJSON
@@ -39,10 +34,11 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - Alamofire
-    - FacebookCore
-    - FacebookLogin
+    - FBAEMKit
     - FBSDKCoreKit
+    - FBSDKCoreKit_Basics
     - FBSDKLoginKit
+    - FBSDKShareKit
     - Nimble
     - Quick
     - SwiftyJSON
@@ -53,10 +49,11 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   Alamofire: 1c4fb5369c3fe93d2857c780d8bbe09f06f97e7c
-  FacebookCore: ba86524b66cfa86d0f8e65d08faa8504a9f732dd
-  FacebookLogin: 6cee9fd6e1fe976fe8f7eec199e27b28b14f5d63
-  FBSDKCoreKit: 1d5acf7c9d7a2f92bb1a242dc60cae5b7adb91df
-  FBSDKLoginKit: f1ea8026a58b52d30c9f2e6a58ca7d813619fb83
+  FBAEMKit: 98e4afc9f867c6db3d1c0e7e3727d94a630b5f59
+  FBSDKCoreKit: 4f348872eae956c922aca1a13771b9c2d4602088
+  FBSDKCoreKit_Basics: b832439de7a8262ee17495889264e75785af54de
+  FBSDKLoginKit: 4adb764028103621b48dfd601b08b03fe2114cdf
+  FBSDKShareKit: c09900fc885130c009194ef35992cbdcad47fe27
   Nimble: 5f8a2fb6fa343a7242dfdd9d42f7267419d464b2
   Quick: 6d9559f40647bc4d510103842ef2fdd882d753e2
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
@@ -65,6 +62,6 @@ SPEC CHECKSUMS:
   VK-ios-sdk: 62a10b6571fbcda0657f455fedce7fedf55b4cd0
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: 2fbfab348fa03aee70ae977ec368c52fce34f891
+PODFILE CHECKSUM: a110cd1312189bf1270227bbb15ff310996aa31b
 
 COCOAPODS: 1.11.2

@@ -8,13 +8,13 @@
 
 import UIKit
 
-class AlertController: UIViewController, ServerProtocol {
+class AlertController: UIViewController {
     enum ContentType: Int {
         case Info, Claim, VotersFilter
     }
     private var filters: [String: AnyObject] = [:]
-    var voters: [UserProfile]?
-    var filtered: [UserProfile]? {
+    var voters: [Userprofile]?
+    var filtered: [Userprofile]? {
         didSet {
             if filtered != nil {
                 UIView.performWithoutAnimation {
@@ -25,7 +25,7 @@ class AlertController: UIViewController, ServerProtocol {
         }
     }
     var survey: Survey?
-    var claimCategory: ClaimCategory? {
+    var claimCategory: Claim? {
         didSet {
             if oldValue == nil, claimCategory != nil {
                 if contentType == .Claim {
@@ -82,7 +82,7 @@ class AlertController: UIViewController, ServerProtocol {
     @IBAction func buttonTapped(_ sender: Any) {
         if contentType == .Claim, survey != nil, let claimVC = currentController as? ClaimViewController {
             if claimCategory != nil {
-                apiManager.postClaim(survey: survey!, claimCategory: claimCategory!) { _, _ in }
+                API.shared.postClaim(survey: survey!, reason: claimCategory!) { _ in }
                 if icon != nil {
                     let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path!, toValue: (icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: icon, isRemovedOnCompletion: false)
                     icon.icon.add(pathAnim, forKey: nil)
@@ -123,8 +123,7 @@ class AlertController: UIViewController, ServerProtocol {
     static let popController          = "popController"
     static let shared: AlertController = {
         let vc = Storyboards.controllers.instantiateViewController(withIdentifier: "AlertController") as! AlertController
-        let _keyWindow = UIApplication.shared.value(forKey: "statusBarWindow") as! UIWindow
-        vc.view.addEquallyTo(to: _keyWindow)
+        vc.view.addEquallyTo(to: UIApplication.shared.statusBarView!)
         vc.view.setNeedsLayout()
         vc.yConstraint.constant = (vc.view.frame.height + vc.body.frame.height)/2
         vc.view.layoutIfNeeded()
@@ -178,7 +177,7 @@ class AlertController: UIViewController, ServerProtocol {
     private var timer:  Timer?
     private var timeElapsed: TimeInterval = 0
     
-    func show(delegate _delegate: CallbackDelegate?, height: CGFloat = 0, contentType _contentType: ContentType = .Info, survey _survey: Survey? = nil, voters _voters: [UserProfile]? = nil, filtered _filtered: [UserProfile]? = nil, filters _filters: [String: AnyObject] = [:]) {
+    func show(delegate _delegate: CallbackDelegate?, height: CGFloat = 0, contentType _contentType: ContentType = .Info, survey _survey: Survey? = nil, voters _voters: [Userprofile]? = nil, filtered _filtered: [Userprofile]? = nil, filters _filters: [String: AnyObject] = [:]) {
         popController = false
         survey = _survey
         filters = _filters
@@ -261,9 +260,9 @@ class AlertController: UIViewController, ServerProtocol {
 }
 
 extension AlertController: CallbackDelegate {
-    func callbackReceived(_ sender: AnyObject) {
+    func callbackReceived(_ sender: Any) {
         if contentType == .Claim {
-            if let _claimCategory =  sender as? ClaimCategory, survey != nil {
+            if let _claimCategory =  sender as? Claim, survey != nil {
                 //                dismiss() {
                 //                    _ in
                 //                    self.delegate?.callbackReceived("post_claim" as AnyObject)
@@ -276,7 +275,7 @@ extension AlertController: CallbackDelegate {
             }
         } else if contentType == .VotersFilter {
             if let dict = sender as? [String: AnyObject] {
-                if let _filtered = dict["filtered"] as? [UserProfile] {
+                if let _filtered = dict["filtered"] as? [Userprofile] {
                     filtered = _filtered
                 }
                 if let _filters = dict["filters"] as? [String: AnyObject] {

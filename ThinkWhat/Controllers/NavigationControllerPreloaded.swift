@@ -9,12 +9,12 @@
 import UIKit
 
 class NavigationControllerPreloaded: UINavigationController {
-        override var preferredStatusBarStyle: UIStatusBarStyle {
-                print(type(of: self), #function)
-                let style = super.preferredStatusBarStyle
-                print(type(of: self), style.rawValue)
-                return style
-            }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        print(type(of: self), #function)
+        let style = super.preferredStatusBarStyle
+        print(type(of: self), style.rawValue)
+        return style
+    }
     
     override var childForStatusBarStyle: UIViewController? {
         return topViewController
@@ -40,7 +40,7 @@ class NavigationControllerPreloaded: UINavigationController {
             }
         }
     }
-    var category: SurveyCategory!
+    var category: Topic!
     var transitionStyle: TransitionStyle = .Icon {
         didSet {
             print(transitionStyle)

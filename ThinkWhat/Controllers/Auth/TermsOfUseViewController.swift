@@ -15,35 +15,35 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
 //    }
 //
 //    var termsRoute: TermsRoute!                         = .App
-    var launchApp                                       = false
+//    var launchApp                                       = false
     var isBackButtonHidden                              = true
     var isStackViewHidden                               = false
     var stackViewHeightConstraintDefaultValue: CGFloat  = 0
     var isFirstLaunch                                   = true
     var username                                        = ""
-    fileprivate lazy var apiManager = initializeServerAPI()
+//    fileprivate lazy var apiManager = initializeServerAPI()
     @IBOutlet weak var spinner:         LoadingIndicator!
     @IBOutlet weak var webView:         UIWebView!
     @IBOutlet weak var stackView:       UIStackView!
     @IBOutlet weak var stackViewHeightConstraint: NSLayoutConstraint!
     @IBAction func buttonTapped(_ sender: UIButton) {
         if sender.tag == 0 {
-            if launchApp, let _ = AppData.shared.userProfile.isEdited {
-                performSegue(withIdentifier: Segues.Auth.AppFromTerms, sender: nil)
-            } else {
+//            if launchApp {//, let _ = AppData.shared.profile.isEdited {
+//                performSegue(withIdentifier: Segues.Auth.AppFromTerms, sender: nil)
+//            } else {
                 performSegue(withIdentifier: Segues.Auth.ProfileFromConfirmation, sender: nil)
-            }
+//            }
         } else {
             //            if let authVC = navigationController?.viewControllers[0] as? AuthViewController {
             //                self.dismiss(animated: true, completion: {})
             if let token = KeychainService.loadAccessToken() as String?, !token.isEmpty {
-                apiManager.logout() {
-                    state in
-                    tokenState = state
+                API.shared.logout() { _ in
+                    NotificationCenter.default.post(name: Notifications.OAuth.TokenRevoked, object: nil)
+                    self.navigationController?.popViewController(animated: true)
                 }
+                
             }
             //                self.navigationController?.viewControllers = [authVC]
-            self.navigationController?.popViewController(animated: true)
             //            }
         }
     }
@@ -70,6 +70,7 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         if isFirstLaunch {
             view.setNeedsLayout()
             stackViewHeightConstraintDefaultValue = stackViewHeightConstraint.multiplier
@@ -120,8 +121,8 @@ class TermsOfUseViewController: UIViewController, UIWebViewDelegate, UIGestureRe
 //    }
 }
 
-extension TermsOfUseViewController: ServerInitializationProtocol {
-    func initializeServerAPI() -> APIManagerProtocol {
-        return (self.navigationController as! AuthNavigationController).apiManager
-    }
-}
+//extension TermsOfUseViewController: ServerInitializationProtocol {
+//    func initializeServerAPI() -> APIManagerProtocol {
+//        return (self.navigationController as! AuthNavigationController).apiManager
+//    }
+//}

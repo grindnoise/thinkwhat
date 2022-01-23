@@ -43,6 +43,11 @@ struct DjangoVariables {
         static let surveysCreatedTotal      = "surveys_count"
         static let lastVisit                = "last_visit"
         static let balance                  = "balance"
+        static let topPublicationCategories = "top_pub_categories"
+        static let tiktokURL                = "tiktok_url"
+        static let instagramURL             = "instagram_url"
+        static let facebookURL              = "facebook_url"
+        static let vkURL                    = "vk_url"
     }
     struct Survey {
         static let category                 = "category"
@@ -72,9 +77,10 @@ struct DjangoVariables {
     struct SurveyAnswer {
         static let title                    = "title"
         static let description              = "description"
-        static let hlink                    = "hlink"
+        static let url                      = "hlink"
         static let file                     = "file"
         static let image                    = "image"
+        static let totalVotes               = "total_votes"
     }
     struct PriceList {
         static let like                     = "like"

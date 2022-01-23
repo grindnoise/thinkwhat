@@ -33,7 +33,7 @@ class PasswordRecoveryViewController: UIViewController {
             }
         }
     }
-    internal lazy var apiManager: APIManagerProtocol = self.initializeAPIManagerProtocol()
+//    internal lazy var apiManager: APIManagerProtocol = self.initializeAPIManagerProtocol()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,9 +83,9 @@ class PasswordRecoveryViewController: UIViewController {
 }
 
 extension PasswordRecoveryViewController: UITextFieldDelegate {
-    private func initializeAPIManagerProtocol() -> APIManagerProtocol {
-        return (self.navigationController as! AuthNavigationController).apiManager
-    }
+//    private func initializeAPIManagerProtocol() -> APIManagerProtocol {
+//        return (self.navigationController as! AuthNavigationController).apiManager
+//    }
     
     private func findFirstResponder() -> UITextField? {
         
