@@ -21,7 +21,6 @@ class UnderlinedTextField: UITextField {
             if let strokeColor = activeLine.layer.strokeColor {
                 return UIColor(cgColor: strokeColor)
             }
-            
             return .clear
         } set {
             activeLine.layer.strokeColor = newValue.cgColor
@@ -38,7 +37,7 @@ class UnderlinedTextField: UITextField {
     
     @IBInspectable public var animationDuration: Double = 0.25
     
-    private var activeLine = Line()
+    public var activeLine = Line()
     
     @IBInspectable public var lineColor: UIColor {
         get {
@@ -60,7 +59,7 @@ class UnderlinedTextField: UITextField {
         }
     }
     
-    private var line                = Line()
+    public var line = Line()
     
     public override init(frame: CGRect) {
         super.init(frame: frame)

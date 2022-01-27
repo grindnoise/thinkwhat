@@ -8,7 +8,7 @@
 
 import UIKit
 import CoreData
-import Swinject
+//import Swinject
 import UserNotifications
 import FBSDKCoreKit
 import VK_ios_sdk
@@ -18,29 +18,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     let transitionCoordinator   = TransitionCoordinator()
-    let container               = Container()
+//    let container               = Container()
     let center                  = UNUserNotificationCenter.current()
     let notificationDelegate    = CustomNotificationDelegate()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        center.delegate                         = notificationDelegate
-        let rootStoryboard                      = UIStoryboard(name: "Root", bundle: nil)
-        let launchViewController                = rootStoryboard.instantiateViewController(withIdentifier: "Launch") as! LaunchViewController
-        self.window                             = UIWindow(frame: UIScreen.main.bounds)
-        self.window!.rootViewController         = launchViewController
         
-        self.registerContainers()
+        let controller = GetStartedViewController()
+        let view = WelcomeView()
+//        controller.welcomeView = view
+//        controller.welcomeView?.controller = controller
+
+        window = UIWindow()
+        window?.rootViewController = CustomNavigationController(rootViewController: controller)
+        window?.makeKeyAndVisible()
         
-//        _ = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.checkInternetConnection), userInfo: nil, repeats: true)
-        
-        self.window?.backgroundColor = .white
-        self.window!.makeKeyAndVisible()
-        
-        
-        let statusBarFrame = UIView(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: (UIApplication.shared.keyWindow?.bounds.width)!, height: UIApplication.shared.statusBarFrame.height)))
-        statusBarFrame.backgroundColor = UIColor.white
-        UIApplication.shared.keyWindow?.addSubview(statusBarFrame)
-        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }
 
@@ -126,14 +118,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func registerContainers() {
-//        container.register(APIManagerProtocol.self) {
-//            _ in APIManager()
+//    func registerContainers() {
+////        container.register(APIManagerProtocol.self) {
+////            _ in APIManager()
+////        }
+//        container.register(FileStorageProtocol.self) {
+//            _ in FileStorageManager()
 //        }
-        container.register(FileStorageProtocol.self) {
-            _ in FileStorageManager()
-        }
-    }
+//    }
     
     @objc func checkInternetConnection() {
         

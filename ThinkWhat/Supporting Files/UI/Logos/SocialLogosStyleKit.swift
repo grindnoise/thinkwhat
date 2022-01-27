@@ -313,7 +313,14 @@ public class SocialLogosStyleKit : NSObject {
 
 
             //// Color Declarations
+            let white = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
             let fb = UIColor(red: 0.224, green: 0.459, blue: 0.918, alpha: 1.000)
+
+            //// Oval Drawing
+            let ovalPath = UIBezierPath(ovalIn: CGRect(x: 127.47, y: 131.2, width: 553.53, height: 551))
+            white.setFill()
+            ovalPath.fill()
+
 
             //// Bezier Drawing
             let bezierPath = UIBezierPath()

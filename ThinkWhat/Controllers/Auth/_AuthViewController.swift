@@ -13,7 +13,7 @@ import SwiftyJSON
 import Alamofire
 import simd
 
-class AuthViewController: UIViewController, UINavigationControllerDelegate {
+class _AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     @IBOutlet weak var termsOfUseButton: UIButton!
     @IBOutlet weak var vkButton:                    VKButtonView!
@@ -56,7 +56,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
             self.buttons = [self.fbButton, self.vkButton, self.mailButton]
             self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
             for button in self.buttons {
-                let tap = UITapGestureRecognizer(target: self, action: #selector(AuthViewController.handleTap(gesture:)))
+                let tap = UITapGestureRecognizer(target: self, action: #selector(_AuthViewController.handleTap(gesture:)))
                 button.addGestureRecognizer(tap)
             }
             
@@ -96,7 +96,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
         self.view.layoutIfNeeded()
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self,
-                                       selector: #selector(AuthViewController.getUserDataFromProvider),
+                                       selector: #selector(_AuthViewController.getUserDataFromProvider),
                                        name: Notifications.OAuth.TokenReceived,
                                        object: nil)
 //        notificationCenter.addObserver(self,
@@ -104,7 +104,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
 //                                       name: Notifications.OAuth.TokenConnectionError,
 //                                       object: nil)
         notificationCenter.addObserver(self,
-                                       selector: #selector(AuthViewController.getUserDataFromProvider),
+                                       selector: #selector(_AuthViewController.getUserDataFromProvider),
                                        name: Notifications.OAuth.TokenError,
                                        object: nil)
         if !isViewSetupCompleted {
@@ -125,7 +125,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
 //    }
     
     private func setupGestures() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(AuthViewController.showTermsOfUse(gesture:)))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(_AuthViewController.showTermsOfUse(gesture:)))
         termsOfUseButton.addGestureRecognizer(tapGesture)
     }
     
@@ -852,7 +852,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate {
 }
 
 
-extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
+extension _AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
     
     func vkSdkAccessAuthorizationFinished(with result: VKAuthorizationResult!) {
         if let error = result.error {
@@ -938,7 +938,7 @@ extension AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
 //    }
 //}
 
-extension AuthViewController: StorageInitializationProtocol {
+extension _AuthViewController: StorageInitializationProtocol {
     func initializeStorageManager() -> FileStorageProtocol {
         return (self.navigationController as! AuthNavigationController).storeManager
     }

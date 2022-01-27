@@ -114,7 +114,7 @@
 		AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6864223FDC5200B57580 /* Root.storyboard */; };
 		AB3C6867223FDD9600B57580 /* Auth.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6866223FDD9600B57580 /* Auth.storyboard */; };
 		AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6868223FDDAF00B57580 /* App.storyboard */; };
-		AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C686A223FDEEA00B57580 /* AuthViewController.swift */; };
+		AB3C686B223FDEEA00B57580 /* _AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C686A223FDEEA00B57580 /* _AuthViewController.swift */; };
 		AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C686C223FDF3D00B57580 /* AppLogo.swift */; };
 		AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF63D22F4213C004BA878 /* EmailResponse.swift */; };
 		AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */; };
@@ -180,6 +180,18 @@
 		AB8C99522485322000BC517B /* ClaimBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8C99512485321F00BC517B /* ClaimBarButton.swift */; };
 		AB8C99542486760400BC517B /* SurveyClaimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8C99532486760400BC517B /* SurveyClaimView.swift */; };
 		AB8C99572486789000BC517B /* SurveyClaimView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB8C99562486789000BC517B /* SurveyClaimView.xib */; };
+		AB8DA31727A0325D00F92C18 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB8DA31927A0325D00F92C18 /* Localizable.strings */; };
+		AB8DA31C27A1464F00F92C18 /* CustomNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA31B27A1464F00F92C18 /* CustomNavigationController.swift */; };
+		AB8DA32C27A1591300F92C18 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA32B27A1591300F92C18 /* Auth.swift */; };
+		AB8DA32E27A15BAD00F92C18 /* Basic.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA32D27A15BAD00F92C18 /* Basic.swift */; };
+		AB8DA33527A17F0E00F92C18 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA33327A17F0E00F92C18 /* GetStartedViewController.swift */; };
+		AB8DA33627A17F0E00F92C18 /* GetStartedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB8DA33427A17F0E00F92C18 /* GetStartedViewController.xib */; };
+		AB8DA33F27A182D300F92C18 /* SignupContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA33B27A182D300F92C18 /* SignupContract.swift */; };
+		AB8DA34127A182D300F92C18 /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA33D27A182D300F92C18 /* SignupView.swift */; };
+		AB8DA34227A182D300F92C18 /* SignupModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA33E27A182D300F92C18 /* SignupModel.swift */; };
+		AB8DA34527A1836900F92C18 /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA34327A1836900F92C18 /* SignupViewController.swift */; };
+		AB8DA34627A1836900F92C18 /* SignupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB8DA34427A1836900F92C18 /* SignupViewController.xib */; };
+		AB8DA34827A1839000F92C18 /* SignupView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB8DA34727A1839000F92C18 /* SignupView.xib */; };
 		AB8DAB5423BA2A790089E25F /* PlainIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DAB5323BA2A790089E25F /* PlainIcons.swift */; };
 		AB8FD485241F761F00BB74EF /* SurveyLinkCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8FD484241F761F00BB74EF /* SurveyLinkCell.swift */; };
 		AB91195526C3AB1D007ED54A /* VotesFormula.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB91195426C3AB1D007ED54A /* VotesFormula.swift */; };
@@ -212,10 +224,13 @@
 		ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */; };
 		ABB4AAA8266630D200D4738D /* NewSurveyTitle.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABB4AAA7266630D200D4738D /* NewSurveyTitle.xib */; };
 		ABB4AAAA2666335600D4738D /* NewSurveyTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB4AAA92666335600D4738D /* NewSurveyTitle.swift */; };
-		ABB4C3F82653C40800C2B1BF /* BasicTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB4C3F72653C40800C2B1BF /* BasicTransition.swift */; };
+		ABB4C3F82653C40800C2B1BF /* delBasic.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB4C3F72653C40800C2B1BF /* delBasic.swift */; };
 		ABB8B18F2423C9DE00E8DFF3 /* SurveyImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB8B18E2423C9DE00E8DFF3 /* SurveyImageCell.swift */; };
 		ABB8B1912423D11600E8DFF3 /* Slide.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB8B1902423D11600E8DFF3 /* Slide.swift */; };
 		ABB8B1932423D13900E8DFF3 /* Slide.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABB8B1922423D13900E8DFF3 /* Slide.xib */; };
+		ABB9E885279EA6510018BB2E /* WelcomeContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB9E881279EA6510018BB2E /* WelcomeContract.swift */; };
+		ABB9E887279EA6510018BB2E /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB9E883279EA6510018BB2E /* WelcomeView.swift */; };
+		ABB9E89227A003540018BB2E /* WelcomeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABB9E89127A003540018BB2E /* WelcomeView.xib */; };
 		ABBA1988242B430100F11E0D /* AnswerHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA1986242B430100F11E0D /* AnswerHeaderCell.swift */; };
 		ABBA1989242B430100F11E0D /* AnswerHeaderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABBA1987242B430100F11E0D /* AnswerHeaderCell.xib */; };
 		ABBA198B242B915200F11E0D /* SurveyVoteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA198A242B915200F11E0D /* SurveyVoteCell.swift */; };
@@ -393,7 +408,7 @@
 		AB3C6864223FDC5200B57580 /* Root.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Root.storyboard; sourceTree = "<group>"; };
 		AB3C6866223FDD9600B57580 /* Auth.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Auth.storyboard; sourceTree = "<group>"; };
 		AB3C6868223FDDAF00B57580 /* App.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = App.storyboard; sourceTree = "<group>"; };
-		AB3C686A223FDEEA00B57580 /* AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB3C686A223FDEEA00B57580 /* _AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _AuthViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3C686C223FDF3D00B57580 /* AppLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogo.swift; sourceTree = "<group>"; };
 		AB3EF63D22F4213C004BA878 /* EmailResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailResponse.swift; sourceTree = "<group>"; };
 		AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailValidationViewController.swift; sourceTree = "<group>"; };
@@ -460,6 +475,21 @@
 		AB8C99512485321F00BC517B /* ClaimBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimBarButton.swift; sourceTree = "<group>"; };
 		AB8C99532486760400BC517B /* SurveyClaimView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyClaimView.swift; sourceTree = "<group>"; };
 		AB8C99562486789000BC517B /* SurveyClaimView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyClaimView.xib; sourceTree = "<group>"; };
+		AB8DA31527A01CC500F92C18 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
+		AB8DA31627A01CC500F92C18 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		AB8DA31827A0325D00F92C18 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		AB8DA31A27A0326100F92C18 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		AB8DA31B27A1464F00F92C18 /* CustomNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavigationController.swift; sourceTree = "<group>"; };
+		AB8DA32B27A1591300F92C18 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
+		AB8DA32D27A15BAD00F92C18 /* Basic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Basic.swift; sourceTree = "<group>"; };
+		AB8DA33327A17F0E00F92C18 /* GetStartedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetStartedViewController.swift; sourceTree = "<group>"; };
+		AB8DA33427A17F0E00F92C18 /* GetStartedViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GetStartedViewController.xib; sourceTree = "<group>"; };
+		AB8DA33B27A182D300F92C18 /* SignupContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupContract.swift; sourceTree = "<group>"; };
+		AB8DA33D27A182D300F92C18 /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupView.swift; sourceTree = "<group>"; };
+		AB8DA33E27A182D300F92C18 /* SignupModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupModel.swift; sourceTree = "<group>"; };
+		AB8DA34327A1836900F92C18 /* SignupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupViewController.swift; sourceTree = "<group>"; };
+		AB8DA34427A1836900F92C18 /* SignupViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SignupViewController.xib; sourceTree = "<group>"; };
+		AB8DA34727A1839000F92C18 /* SignupView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SignupView.xib; sourceTree = "<group>"; };
 		AB8DAB5323BA2A790089E25F /* PlainIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainIcons.swift; sourceTree = "<group>"; };
 		AB8FD484241F761F00BB74EF /* SurveyLinkCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyLinkCell.swift; sourceTree = "<group>"; };
 		AB91195426C3AB1D007ED54A /* VotesFormula.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotesFormula.swift; sourceTree = "<group>"; };
@@ -492,10 +522,13 @@
 		ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsSelectionTableViewController.swift; sourceTree = "<group>"; };
 		ABB4AAA7266630D200D4738D /* NewSurveyTitle.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewSurveyTitle.xib; sourceTree = "<group>"; };
 		ABB4AAA92666335600D4738D /* NewSurveyTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyTitle.swift; sourceTree = "<group>"; };
-		ABB4C3F72653C40800C2B1BF /* BasicTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTransition.swift; sourceTree = "<group>"; };
+		ABB4C3F72653C40800C2B1BF /* delBasic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delBasic.swift; sourceTree = "<group>"; };
 		ABB8B18E2423C9DE00E8DFF3 /* SurveyImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyImageCell.swift; sourceTree = "<group>"; };
 		ABB8B1902423D11600E8DFF3 /* Slide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slide.swift; sourceTree = "<group>"; };
 		ABB8B1922423D13900E8DFF3 /* Slide.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Slide.xib; sourceTree = "<group>"; };
+		ABB9E881279EA6510018BB2E /* WelcomeContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeContract.swift; sourceTree = "<group>"; };
+		ABB9E883279EA6510018BB2E /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		ABB9E89127A003540018BB2E /* WelcomeView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WelcomeView.xib; sourceTree = "<group>"; };
 		ABBA1986242B430100F11E0D /* AnswerHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerHeaderCell.swift; sourceTree = "<group>"; };
 		ABBA1987242B430100F11E0D /* AnswerHeaderCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AnswerHeaderCell.xib; sourceTree = "<group>"; };
 		ABBA198A242B915200F11E0D /* SurveyVoteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyVoteCell.swift; sourceTree = "<group>"; };
@@ -627,12 +660,10 @@
 		AB1D7BA5248F606E00845F1C /* Transitions */ = {
 			isa = PBXGroup;
 			children = (
-				ABB4C3F72653C40800C2B1BF /* BasicTransition.swift */,
-				AB1D7BA3248F606200845F1C /* FadeTransition.swift */,
-				AB2918C7238E5B4600EF488A /* CircularTransition.swift */,
-				AB5CA11524F53D4600F55DEC /* IconTransition.swift */,
 				AB5CA11724F5418500F55DEC /* TransitionCoordinator.swift */,
-				AB00FFD42587A6320071C7DE /* BlurTransition.swift */,
+				AB8DA32A27A1578A00F92C18 /* old */,
+				AB8DA32B27A1591300F92C18 /* Auth.swift */,
+				AB8DA32D27A15BAD00F92C18 /* Basic.swift */,
 			);
 			path = Transitions;
 			sourceTree = "<group>";
@@ -777,6 +808,8 @@
 		AB3C67DD223FBB6400B57580 /* ThinkWhat */ = {
 			isa = PBXGroup;
 			children = (
+				ABB9E88C279FD59C0018BB2E /* Supporting Files */,
+				ABB9E86B279E9E420018BB2E /* Modules */,
 				ABB46F3C2345DDA000AF212B /* API */,
 				AB3C6810223FC6F500B57580 /* Algorithms */,
 				AB238D1D279058A0009E49C2 /* AppData.swift */,
@@ -787,7 +820,6 @@
 				AB9DBF7926A58C5F00EFA66D /* Models */,
 				ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */,
 				AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */,
-				AB3C681F223FD1B100B57580 /* UI */,
 			);
 			path = ThinkWhat;
 			sourceTree = "<group>";
@@ -849,7 +881,7 @@
 			children = (
 				ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */,
 				AB6083B62240E77B002C0D7E /* SocialAuthViewController.swift */,
-				AB3C686A223FDEEA00B57580 /* AuthViewController.swift */,
+				AB3C686A223FDEEA00B57580 /* _AuthViewController.swift */,
 				AB6083BA2240F761002C0D7E /* MailAuthViewController.swift */,
 				AB798C242248DB730042BC7C /* PasswordRecoveryViewController.swift */,
 				AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */,
@@ -878,8 +910,6 @@
 			isa = PBXGroup;
 			children = (
 				AB3C67EA223FBB6600B57580 /* LaunchScreen.storyboard */,
-				AB3C67E2223FBB6400B57580 /* Main.storyboard */,
-				AB3C67E8223FBB6600B57580 /* Assets.xcassets */,
 				ABA282EE274FD92100ED583F /* RangeSlider */,
 				AB334FBF270C6E9F00DD7332 /* Alert */,
 				AB21970126BC2EC7005A7BA8 /* Banner */,
@@ -1204,6 +1234,39 @@
 			path = Claim;
 			sourceTree = "<group>";
 		};
+		AB8DA31D27A1465700F92C18 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				AB8DA31B27A1464F00F92C18 /* CustomNavigationController.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		AB8DA31E27A1487500F92C18 /* Sign Up */ = {
+			isa = PBXGroup;
+			children = (
+				AB8DA33B27A182D300F92C18 /* SignupContract.swift */,
+				AB8DA33D27A182D300F92C18 /* SignupView.swift */,
+				AB8DA34727A1839000F92C18 /* SignupView.xib */,
+				AB8DA33E27A182D300F92C18 /* SignupModel.swift */,
+				AB8DA34327A1836900F92C18 /* SignupViewController.swift */,
+				AB8DA34427A1836900F92C18 /* SignupViewController.xib */,
+			);
+			path = "Sign Up";
+			sourceTree = "<group>";
+		};
+		AB8DA32A27A1578A00F92C18 /* old */ = {
+			isa = PBXGroup;
+			children = (
+				ABB4C3F72653C40800C2B1BF /* delBasic.swift */,
+				AB1D7BA3248F606200845F1C /* FadeTransition.swift */,
+				AB2918C7238E5B4600EF488A /* CircularTransition.swift */,
+				AB5CA11524F53D4600F55DEC /* IconTransition.swift */,
+				AB00FFD42587A6320071C7DE /* BlurTransition.swift */,
+			);
+			path = old;
+			sourceTree = "<group>";
+		};
 		AB91195326C3AACC007ED54A /* VotesFormula */ = {
 			isa = PBXGroup;
 			children = (
@@ -1298,6 +1361,55 @@
 				ABB46F44234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift */,
 			);
 			path = Profile;
+			sourceTree = "<group>";
+		};
+		ABB9E86B279E9E420018BB2E /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				ABB9E88B279FD55D0018BB2E /* Controllers */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		ABB9E86C279E9E6B0018BB2E /* Authorization */ = {
+			isa = PBXGroup;
+			children = (
+				AB8DA31E27A1487500F92C18 /* Sign Up */,
+				ABB9E880279EA6090018BB2E /* Welcome */,
+			);
+			path = Authorization;
+			sourceTree = "<group>";
+		};
+		ABB9E880279EA6090018BB2E /* Welcome */ = {
+			isa = PBXGroup;
+			children = (
+				ABB9E881279EA6510018BB2E /* WelcomeContract.swift */,
+				ABB9E883279EA6510018BB2E /* WelcomeView.swift */,
+				ABB9E89127A003540018BB2E /* WelcomeView.xib */,
+				AB8DA33327A17F0E00F92C18 /* GetStartedViewController.swift */,
+				AB8DA33427A17F0E00F92C18 /* GetStartedViewController.xib */,
+			);
+			path = Welcome;
+			sourceTree = "<group>";
+		};
+		ABB9E88B279FD55D0018BB2E /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				AB8DA31D27A1465700F92C18 /* Navigation */,
+				ABB9E86C279E9E6B0018BB2E /* Authorization */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		ABB9E88C279FD59C0018BB2E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				AB3C681F223FD1B100B57580 /* UI */,
+				AB3C67E2223FBB6400B57580 /* Main.storyboard */,
+				AB3C67E8223FBB6600B57580 /* Assets.xcassets */,
+				AB8DA31927A0325D00F92C18 /* Localizable.strings */,
+			);
+			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		ABDAA38C248E7D1700569F68 /* Claim */ = {
@@ -1455,6 +1567,7 @@
 				TargetAttributes = {
 					AB3C67DA223FBB6400B57580 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1320;
 						SystemCapabilities = {
 							com.apple.Keychain = {
 								enabled = 0;
@@ -1478,6 +1591,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = AB3C67D2223FBB6400B57580;
 			productRefGroup = AB3C67DC223FBB6400B57580 /* Products */;
@@ -1505,10 +1619,12 @@
 				AB21970526BC2F0B005A7BA8 /* Banner.xib in Resources */,
 				AB7599EF245B2F51008B0569 /* SurveyPreview.xib in Resources */,
 				AB99A95924C8154A00814F96 /* UserLogoHeader.xib in Resources */,
+				AB8DA31727A0325D00F92C18 /* Localizable.strings in Resources */,
 				ABF7354B270DC26E00F7C308 /* ClaimView.xib in Resources */,
 				AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */,
 				AB91195726C3AB50007ED54A /* VotesFormula.xib in Resources */,
 				AB7085E926CB9A75006F020F /* SideApp.xib in Resources */,
+				AB8DA34827A1839000F92C18 /* SignupView.xib in Resources */,
 				AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */,
 				AB3C684D223FD3EE00B57580 /* OpenSans-ExtraBold.ttf in Resources */,
 				AB3C6826223FD1E900B57580 /* CustomAlertView.xib in Resources */,
@@ -1532,6 +1648,7 @@
 				ABB8B1932423D13900E8DFF3 /* Slide.xib in Resources */,
 				ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */,
 				AB334FBC270C5AF500DD7332 /* VoteView.xib in Resources */,
+				ABB9E89227A003540018BB2E /* WelcomeView.xib in Resources */,
 				AB04144D244EF2F600336857 /* Controllers.storyboard in Resources */,
 				AB25E042265FAC0100EAA8AE /* Survey.storyboard in Resources */,
 				AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */,
@@ -1540,8 +1657,10 @@
 				AB3C684E223FD3EE00B57580 /* OpenSans-LightItalic.ttf in Resources */,
 				AB93FD7A247EA255009546DD /* EmptySurvey.xib in Resources */,
 				AB3C6852223FD3EF00B57580 /* OpenSans-Regular.ttf in Resources */,
+				AB8DA34627A1836900F92C18 /* SignupViewController.xib in Resources */,
 				AB3C6850223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf in Resources */,
 				AB21970926C1163A005A7BA8 /* TotalCost.xib in Resources */,
+				AB8DA33627A17F0E00F92C18 /* GetStartedViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1649,7 +1768,7 @@
 				AB9DBF7B26A58C8C00EFA66D /* Django.swift in Sources */,
 				AB889818240FA65B0087E5AD /* CopyPasteTextField.swift in Sources */,
 				AB7F4B8A25B5D7230017573D /* 5_ImagesSelectionViewController.swift in Sources */,
-				ABB4C3F82653C40800C2B1BF /* BasicTransition.swift in Sources */,
+				ABB4C3F82653C40800C2B1BF /* delBasic.swift in Sources */,
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
 				AB0BFDF7253093B000BD5EFF /* FlameBadge.swift in Sources */,
 				AB548664269724A300D30235 /* NewPollResultViewController.swift in Sources */,
@@ -1671,6 +1790,7 @@
 				ABF1F19F22C253A6008913C3 /* FBManager.swift in Sources */,
 				AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */,
 				AB3C6825223FD1E900B57580 /* CustomAlertView.swift in Sources */,
+				AB8DA34227A182D300F92C18 /* SignupModel.swift in Sources */,
 				ABB46F3E2346373700AF212B /* TabBarController.swift in Sources */,
 				AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */,
 				AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */,
@@ -1685,6 +1805,7 @@
 				AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */,
 				AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */,
 				AB869F2826C53313008353B3 /* PollController.swift in Sources */,
+				ABB9E885279EA6510018BB2E /* WelcomeContract.swift in Sources */,
 				ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */,
 				AB00FFD52587A6320071C7DE /* BlurTransition.swift in Sources */,
 				ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */,
@@ -1721,11 +1842,13 @@
 				ABBA73FC2386ECC200540ECF /* AnimatedIcon.swift in Sources */,
 				AB99676123D9AA210037CD6C /* HideKeyboardIcon.swift in Sources */,
 				ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */,
+				AB8DA34127A182D300F92C18 /* SignupView.swift in Sources */,
 				ABA6B3B223FD1A8D00335074 /* LoadingTextIndicator.swift in Sources */,
 				ABF20FB424C98AC00092B223 /* UserFavoriteCell.swift in Sources */,
 				AB54BBFA252220C500B73766 /* ThumbUp.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
 				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
+				AB8DA34527A1836900F92C18 /* SignupViewController.swift in Sources */,
 				ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */,
 				AB61BA2F2782DDA200F89C4C /* Media.swift in Sources */,
 				ABA282ED274FD16800ED583F /* RangeSlider.swift in Sources */,
@@ -1751,6 +1874,7 @@
 				ABBA73FE2387C5A200540ECF /* FlameIcon.swift in Sources */,
 				AB8C99522485322000BC517B /* ClaimBarButton.swift in Sources */,
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
+				AB8DA31C27A1464F00F92C18 /* CustomNavigationController.swift in Sources */,
 				AB72A8442418D05E005B58F1 /* SurveyViewController.swift in Sources */,
 				AB1F75832594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift in Sources */,
 				AB2AA1B32359E9D30086D16C /* SurveysTableViewController.swift in Sources */,
@@ -1762,6 +1886,7 @@
 				AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */,
 				AB19B6432432282B00999917 /* PercentageLabel.swift in Sources */,
 				AB8FD485241F761F00BB74EF /* SurveyLinkCell.swift in Sources */,
+				AB8DA32E27A15BAD00F92C18 /* Basic.swift in Sources */,
 				AB1D845224EA91D200B75929 /* Topic.swift in Sources */,
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */,
@@ -1772,6 +1897,7 @@
 				AB3260122746266100C5D100 /* VotersViewController.swift in Sources */,
 				AB51605C24EFEC79006A07B7 /* CategoryCollectionViewController.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
+				AB8DA32C27A1591300F92C18 /* Auth.swift in Sources */,
 				AB8994F326C2BE6900F03375 /* InsufficientBalance.swift in Sources */,
 				AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */,
 				AB4BD892244DE52100D9A3F0 /* TopIcon.swift in Sources */,
@@ -1781,8 +1907,10 @@
 				AB3C685E223FD74E00B57580 /* FileStorageManager.swift in Sources */,
 				ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */,
 				AB0BFDF1252DBCD500BD5EFF /* HeartIcon.swift in Sources */,
+				AB8DA33F27A182D300F92C18 /* SignupContract.swift in Sources */,
 				AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */,
-				AB3C686B223FDEEA00B57580 /* AuthViewController.swift in Sources */,
+				ABB9E887279EA6510018BB2E /* WelcomeView.swift in Sources */,
+				AB3C686B223FDEEA00B57580 /* _AuthViewController.swift in Sources */,
 				ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */,
 				ABF01A6C25418E2C009E2BC4 /* BackRoundedButton.swift in Sources */,
 				AB6B071F247688600095721B /* delUserViewController.swift in Sources */,
@@ -1801,6 +1929,7 @@
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				AB4727A9268C6444002A9563 /* UI.swift in Sources */,
 				ABDA424F23B0D60500BAC3A5 /* NewAnswerIcons.swift in Sources */,
+				AB8DA33527A17F0E00F92C18 /* GetStartedViewController.swift in Sources */,
 				AB48B90624348CDC00A27B0D /* SurveyTotalCell.swift in Sources */,
 				AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */,
 				AB229D842464512500968D52 /* del_Segues.swift in Sources */,
@@ -1878,6 +2007,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				AB3C67E3223FBB6400B57580 /* Base */,
+				AB8DA31527A01CC500F92C18 /* ru */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -1886,8 +2016,18 @@
 			isa = PBXVariantGroup;
 			children = (
 				AB3C67EB223FBB6600B57580 /* Base */,
+				AB8DA31627A01CC500F92C18 /* ru */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		AB8DA31927A0325D00F92C18 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AB8DA31827A0325D00F92C18 /* en */,
+				AB8DA31A27A0326100F92C18 /* ru */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -1898,6 +2038,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1964,6 +2105,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -2025,6 +2167,7 @@
 			baseConfigurationReference = BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
@@ -2043,6 +2186,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -2053,6 +2197,7 @@
 			baseConfigurationReference = C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;

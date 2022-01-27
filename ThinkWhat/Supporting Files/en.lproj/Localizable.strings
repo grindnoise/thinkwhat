@@ -1,0 +1,23 @@
+/* 
+  Localizable.strings
+  ThinkWhat
+
+  Created by Pavel Bukharov on 25.01.2022.
+  Copyright © 2022 Pavel Bukharov. All rights reserved.
+*/
+
+//Welcome VC
+"get_started" = "Get started!";
+//Signup VC
+"continue_with_provider" = "or continue with";
+"already_registered" = "Already have account?";
+"login" = "Login";
+"sign_up" = "Sign up";
+"username_is_busy" = "Username is already used";
+"username_is_empty" = "Username is not filled";
+"username_is_short" = "Username is too short";
+"email_is_busy" = "Email is already used";
+"email_is_empty" = "Email is incorrect";
+"password_is_short" = "Password is too short";
+
+

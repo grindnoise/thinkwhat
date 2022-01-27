@@ -12,12 +12,16 @@ class UnderlinedSignTextField: UnderlinedTextField {
     
     enum SignState: String {
         case Approved
-        case UsernameExists         =   "Username is already used"
-        case UsernameNotFilled      =   "Username is not filled"
-        case UsernameIsShort        =   "Username is too short"
-        case EmailExists            =   "Email is already used"
-        case EmailIsIncorrect       =   "Email is incorrect"
-        case PasswordIsShort        =   "Password is too short"
+        case UsernameExists         =   "username_is_busy"
+        case UsernameNotFilled      =   "username_is_empty"
+        case UsernameIsShort        =   "username_is_short"
+        case EmailExists            =   "email_is_busy"
+        case EmailIsIncorrect       =   "email_is_empty"
+        case PasswordIsShort        =   "password_is_short"
+        
+        func localizedString() -> String {
+            return NSLocalizedString(self.rawValue, comment: "")
+        }
     }
 
     private var checkSign:      ValidSign!
@@ -85,7 +89,7 @@ class UnderlinedSignTextField: UnderlinedTextField {
             UIView.animate(withDuration: 0.15, animations: {
                 self.checkSign.alpha = 0
             }) { _ in
-                self.lowerTextView.text = state.rawValue
+                self.lowerTextView.text = state.localizedString()
                 UIView.animate(withDuration: 0.15) {
                     self.lowerTextView.alpha = 1
                     self.warningSign.alpha = 1

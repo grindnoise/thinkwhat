@@ -14,7 +14,7 @@ class PasswordRecoveryViewController: UIViewController {
     @IBOutlet weak var mailTF:          UnderlinedSignTextField!
     
     @IBAction func textFieldChanged(_ sender: Any) {
-        isMailFilled = isValidEmail(mailTF.text!) ? true : false
+        isMailFilled = mailTF.text!.isValidEmail
     }
     private var textFields              = [UnderlinedTextField]()
     private var isViewSetupCompleted    = false

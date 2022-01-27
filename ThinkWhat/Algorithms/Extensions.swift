@@ -389,6 +389,12 @@ extension String {
         //        let youtubeCheckResult = NSPredicate(format: "SELF MATCHES %@", youtubeRegex)
         //        return youtubeCheckResult.evaluate(with: self)
     }
+    
+    var isValidEmail: Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: self)
+    }
 }
 
 extension CLLocationCoordinate2D: Hashable {
@@ -1360,3 +1366,15 @@ extension Sequence where Element: Hashable {
 
 /// Easily throw generic errors with a text description.
 extension String: Error { }
+
+extension UIView {
+    /// Eventhough we already set the file owner in the xib file, where we are setting the file owner again because sending nil will set existing file owner to nil.
+    @discardableResult
+    func fromNib<T : UIView>() -> T? {
+        guard let contentView = Bundle(for: type(of: self))
+            .loadNibNamed(String(describing: type(of: self)), owner: self, options: nil)?.first as? T else {
+                return nil
+        }
+        return contentView
+    }
+}

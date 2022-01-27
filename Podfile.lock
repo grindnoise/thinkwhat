@@ -13,6 +13,7 @@ PODS:
   - Nimble (8.1.1)
   - Quick (3.0.0)
   - SwiftyJSON (5.0.0)
+  - SwiftyVK (3.4.2)
   - Swinject (2.7.1)
   - TTRangeSlider (1.0.6)
   - VK-ios-sdk (1.5.1)
@@ -26,6 +27,7 @@ DEPENDENCIES:
   - Nimble
   - Quick
   - SwiftyJSON
+  - SwiftyVK
   - Swinject (= 2.7.1)
   - TTRangeSlider
   - VK-ios-sdk
@@ -42,6 +44,7 @@ SPEC REPOS:
     - Nimble
     - Quick
     - SwiftyJSON
+    - SwiftyVK
     - Swinject
     - TTRangeSlider
     - VK-ios-sdk
@@ -57,11 +60,12 @@ SPEC CHECKSUMS:
   Nimble: 5f8a2fb6fa343a7242dfdd9d42f7267419d464b2
   Quick: 6d9559f40647bc4d510103842ef2fdd882d753e2
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
+  SwiftyVK: 5005dac6e85f7b0fd44e21ed2f021a397dff4cab
   Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
   TTRangeSlider: 78188bea83f6471a06f75adbc88da5e990baeafe
   VK-ios-sdk: 62a10b6571fbcda0657f455fedce7fedf55b4cd0
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: a110cd1312189bf1270227bbb15ff310996aa31b
+PODFILE CHECKSUM: 778e2133e26322b3a23d80e685bf0d056ac57e11
 
 COCOAPODS: 1.11.2

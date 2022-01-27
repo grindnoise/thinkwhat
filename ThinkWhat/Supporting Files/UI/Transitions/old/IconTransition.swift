@@ -8,7 +8,7 @@
 
 import UIKit
 
-class IconTransition: BasicTransition {
+class IconTransition: delBasicTransition {
     deinit {
         print("---\(self) deinit()")
     }

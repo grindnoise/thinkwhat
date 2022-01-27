@@ -1,0 +1,19 @@
+/* 
+  Localizable.strings
+  ThinkWhat
+
+  Created by Pavel Bukharov on 25.01.2022.
+  Copyright © 2022 Pavel Bukharov. All rights reserved.
+*/
+
+"get_started" = "Начать!";
+"continue_with_provider" = "или продолжить с";
+"already_registered" = "Уже зарегистрированы?";
+"login" = "Войти";
+"sign_up" = "Создать аккаунт";
+"username_is_busy" = "Пользователь существует";
+"username_is_empty" = "Поле пустое";
+"username_is_short" = "Недостаточно символов";
+"email_is_busy" = "Электронная почта уже используется";
+"email_is_empty" = "Некорректный формат";
+"password_is_short" = "Слишком короткий пароль";

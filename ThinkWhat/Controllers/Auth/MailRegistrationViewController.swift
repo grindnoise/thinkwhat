@@ -332,7 +332,7 @@ extension MailRegistrationViewController: UITextFieldDelegate {
             if sender.text!.isEmpty {
                 mailTF.hideSign()
                 isMailFilled = false
-            } else if isValidEmail(sender.text!) {
+            } else if sender.text!.isValidEmail {
                 API.shared.isUsernameEmailAvailable(email: sender.text!, username: "") { result in
                     switch result {
                     case .success(let isUsernameEmailAvailable):

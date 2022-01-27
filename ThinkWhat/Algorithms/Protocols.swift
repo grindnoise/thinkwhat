@@ -27,7 +27,7 @@ protocol StorageProtocol {
 extension StorageProtocol {
     var storeManager: FileStorageProtocol {
         get {
-            return appDelegate.container.resolve(FileStorageProtocol.self)!
+            return FileStorageProtocol.self as! FileStorageProtocol//appDelegate.container.resolve(FileStorageProtocol.self)!
         }
     }
 }

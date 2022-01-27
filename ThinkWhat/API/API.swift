@@ -384,9 +384,10 @@ class API {
     }
     
     func isUsernameEmailAvailable(email: String, username: String, completion: @escaping(Result<Bool, Error>)->()) {
-        self.request(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(email.isEmpty ? SERVER_URLS.USERNAME_EXISTS : SERVER_URLS.EMAIL_EXISTS), httpMethod: .get) { result in
+        self.request(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(email.isEmpty ? SERVER_URLS.USERNAME_EXISTS : SERVER_URLS.EMAIL_EXISTS), httpMethod: .get, parameters: email.isEmpty ? ["username": username] : ["email": email], encoding: URLEncoding.default) { result in
             switch result {
             case .success(let json):
+                print(json)
                 completion(.success(json["exists"].boolValue))
             case .failure(let error):
                 completion(.failure(error))

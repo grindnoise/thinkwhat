@@ -402,11 +402,6 @@ struct SERVER_URLS {
 
 
 //MARK: - Methods
-func isValidEmail(_ testStr:String) -> Bool {
-    let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-    let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-    return emailTest.evaluate(with: testStr)
-}
 
 func saveTokenInKeychain(json: JSON) -> Result<Bool, Error> {//}, tokenState: inout TokenState) {
     var success = false

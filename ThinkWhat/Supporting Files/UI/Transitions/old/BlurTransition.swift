@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BlurTransition: BasicTransition {
+class BlurTransition: delBasicTransition {
     
     override func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let fromVC = transitionContext.viewController(forKey: .from),

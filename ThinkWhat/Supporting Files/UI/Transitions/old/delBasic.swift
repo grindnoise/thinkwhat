@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BasicTransition: NSObject, UIViewControllerAnimatedTransitioning {
+class delBasicTransition: NSObject, UIViewControllerAnimatedTransitioning {
     
     var operation: UINavigationController.Operation!
     var navigationController: NavigationControllerPreloaded!
