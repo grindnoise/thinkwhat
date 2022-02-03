@@ -1,0 +1,66 @@
+//
+//  Urls.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 01.02.2022.
+//  Copyright © 2022 Pavel Bukharov. All rights reserved.
+//
+
+import Foundation
+
+struct API_URLS {
+    static let BASE                     = localhost ? "http://127.0.0.1:8000/" : "https://damp-oasis-64585.herokuapp.com/"////
+    static let CLIENT_ID                = localhost ? "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS" : "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
+    static let CLIENT_SECRET            = localhost ? "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH" : "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
+    static let SIGNUP                   = "api/sign_up/"
+    static let CURRENT_TIME             = "api/current_time/"
+    static let TOKEN                    = "auth/token/"
+    static let TOKEN_CONVERT            = "auth/convert-token/"
+    static let TOKEN_REVOKE             = "auth/revoke-token/"
+    
+    
+    static let APP_LAUNCH               = "api/app_launch/load/"
+    //Profiles
+    static let USERS                    = "api/users/"
+    static let USERNAME_EXISTS          = "api/profiles/username_exists"
+    static let EMAIL_EXISTS             = "api/profiles/email_exists"
+    static let GET_CONFIRMATION_CODE    = "api/profiles/send_confirmation_code/"
+    static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified/"
+    static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_update/"
+    static let PROFILES                 = "api/profiles/"
+    static let CURRENT_USER             = "api/profiles/current/"
+    static let USER_PROFILE_STATS       = "api/profiles/get_profile_stats/"
+    static let USER_PROFILE_TOP_PUBS    = "api/profiles/get_top_active_publications/"
+    static let USERPOFILE_SUBSCRIBE     = "api/profiles/subscribe/"
+    static let USERPOFILE_UNSUBSCRIBE   = "api/profiles/unsubscribe/"
+
+    //Surveys
+    static let SURVEYS                  = "api/surveys/"
+    static let SURVEYS_MEDIA            = "api/media/"
+    static let SURVEYS_TOP              = "api/surveys/top/"
+    static let SURVEYS_NEW              = "api/surveys/new/"
+    static let SURVEYS_ALL              = "api/surveys/all/"
+    static let SURVEYS_OWN              = "api/surveys/own/"
+    static let SURVEYS_HOT              = "api/surveys/hot/"
+//    static let SURVEYS_HOT_EXCEPT       = "api/surveys/hot_except/"
+    static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
+    static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
+    static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
+    static let SURVEYS_BY_OWNER         = "api/surveys/by_owner/"
+    static let SURVEYS_FAVORITE_LIST_BY_OWNER = "api/surveys/favorite_surveys_list_by_user/"
+    static let SURVEYS_ADD_FAVORITE     = "api/surveys/add_favorite/"
+    static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
+    static let SURVEYS_REJECT           = "api/surveys/reject/"
+    static let SURVEYS_CLAIM            = "api/surveys/claim/"
+    static let SURVEYS_UPDATE_STATS     = "api/surveys/result_updates/"
+    static let SURVEYS_ADD_VIEW_COUNT   = "api/surveys/add_view_count/"
+    
+    static let VOTE                     = "api/vote/"
+    static let VOTERS                   = "api/surveys/voters/"
+    
+    static let CATEGORIES               = "api/categories/"
+    static let BALANCE                  = "api/current_balance_price/"
+    
+//    static let SMS_VALIDATION_URL   = "http://burber.pythonanywhere.com/passcode/generate/"
+    
+}

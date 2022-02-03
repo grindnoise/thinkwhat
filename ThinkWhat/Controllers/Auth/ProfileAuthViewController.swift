@@ -92,7 +92,7 @@ class ProfileAuthViewController: UIViewController, UINavigationControllerDelegat
                     performSegue(withIdentifier: Segues.Auth.AppFromProfile, sender: nil)
                 } else {
                     showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
-                    guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else {
+                    guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else {
                         hideAlert()
                         showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка входа")
                         return
@@ -527,7 +527,7 @@ extension ProfileAuthViewController: UIImagePickerControllerDelegate {
             let imageData = resizedImage.jpegData(compressionQuality: 0.4)
             let image = UIImage(data: imageData!)
             
-            guard let  url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.PROFILES + String(describing: AppData.shared.userprofile.id) + "/") else { return }
+            guard let  url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + String(describing: AppData.shared.userprofile.id) + "/") else { return }
             let multipartFormData = MultipartFormData()
             multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
             

@@ -155,7 +155,7 @@ extension ProfileViewController: UIImagePickerControllerDelegate {
             let resizedImage = origImage.resized(to: CGSize(width: 200, height: 200))
             let imageData = resizedImage.jpegData(compressionQuality: 0.4)
             let image = UIImage(data: imageData!)
-            guard let  url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.PROFILES + String(describing: AppData.shared.userprofile.id) + "/") else { return }
+            guard let  url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + String(describing: AppData.shared.userprofile.id) + "/") else { return }
             let multipartFormData = MultipartFormData()
             multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
             

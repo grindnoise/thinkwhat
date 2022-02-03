@@ -36,14 +36,60 @@ class SignupView: UIView {
         }
     }
     @IBAction func signupTapped(_ sender: Any) {
-        if isCorrect {
-            viewInput?.onSignupTap()
-        } else {
+        guard isCorrect, !isPerformingChecks, let username = usernameTF.text, let email = mailTF.text, let password = passwordTF.text else {
             showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Проверьте корректность заполненных полей")
+            return
+        }
+        signupButton.setTitle("", for: .normal)
+        let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                              size: CGSize(width: signupButton.frame.height,
+                                                                           height: signupButton.frame.height)))
+        indicator.alpha = 0
+        indicator.layoutCentered(in: signupButton)
+        indicator.startAnimating()
+        indicator.color = .white
+        UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
+        isUserInteractionEnabled = false
+        viewInput?.onCaptchaValidation { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                self.viewInput?.onSignup(username: username, email: email, password: password) { [weak self] result in
+                    guard let self = self else { return }
+                    self.isUserInteractionEnabled = false
+                    UIView.animate(withDuration: 0.2,
+                                   delay: 0,
+                                   options: [.curveEaseInOut]) {
+                        indicator.alpha = 0
+                    } completion: { _ in
+                        indicator.stopAnimating()
+                        indicator.removeFromSuperview()
+                        self.isUserInteractionEnabled = true
+                        switch result  {
+                        case .success:
+                            self.signupButton.setTitle(NSLocalizedString("success", comment: ""), for: .normal)
+                        case .failure(let error):
+                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+                        }
+                    }
+                }
+            case .failure(let error):
+                self.isUserInteractionEnabled = true
+                UIView.animate(withDuration: 0.2,
+                               delay: 0,
+                               options: [.curveEaseInOut]) {
+                    indicator.alpha = 0
+                } completion: { _ in
+                    indicator.stopAnimating()
+                    indicator.removeFromSuperview()
+                    self.signupButton.setTitle(NSLocalizedString("sign_up", comment: ""), for: .normal)
+                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+                }
+            }
         }
     }
     @IBOutlet weak var signupButtonTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var signupButtonBottomConstraint: NSLayoutConstraint!
+//    @IBOutlet weak var signupButtonBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var usernameTF: UnderlinedSignTextField! {
         didSet {
             setTextFieldColors(textField: usernameTF)
@@ -67,8 +113,18 @@ class SignupView: UIView {
     @IBOutlet weak var providerStackView: UIStackView!
     @IBOutlet weak var providerStackViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var providerStackViewBottomConstraint: NSLayoutConstraint!
-    @IBOutlet weak var facebook: FacebookLogo!
-    @IBOutlet weak var vk: VKLogo!
+    @IBOutlet weak var facebook: FacebookLogo! {
+        didSet {
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(SignupView.onFacebookTap))
+            facebook.addGestureRecognizer(recognizer)
+        }
+    }
+    @IBOutlet weak var vk: VKLogo! {
+        didSet {
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(SignupView.onVKTap))
+            vk.addGestureRecognizer(recognizer)
+        }
+    }
     @IBOutlet weak var haveAccountLabel: UILabel! {
         didSet {
             haveAccountLabel.text = NSLocalizedString("already_registered", comment: "")
@@ -80,25 +136,16 @@ class SignupView: UIView {
         }
     }
     @IBAction func loginTapped(_ sender: Any) {
-        viewInput?.onLoginTap()
+        authorize(provider: .Mail)
     }
     @IBOutlet weak var loginButonTopConstraint: NSLayoutConstraint!
     
-    private var isCorrect = false {
+    private var isPerformingChecks = false {
         didSet {
-            if isCorrect != oldValue {
-                if isCorrect {
-                    UIView.animate(withDuration: 0.2) {
-                        self.signupButton.backgroundColor = K_COLOR_RED
-                    }
-                } else {
-                    UIView.animate(withDuration: 0.2) {
-                        self.signupButton.backgroundColor = K_COLOR_GRAY
-                    }
-                }
-            }
+            
         }
     }
+    private var isCorrect = false
     private var isMailFilled = false {
         didSet {
             if isMailFilled {
@@ -175,7 +222,7 @@ class SignupView: UIView {
         guard signupButton != nil else { return }
         signupButton.cornerRadius = signupButton.frame.height/2.25
         signupButtonTopConstraint.constant = signupButton.frame.height/2
-        signupButtonBottomConstraint.constant = signupButton.frame.height/2
+//        signupButtonBottomConstraint.constant = signupButton.frame.height/2
 //        providerStackViewBottomConstraint.constant = haveAccountLabel.frame.height
 //        providerStackViewTopConstraint.constant = providerLabel.frame.height
     }
@@ -185,15 +232,7 @@ class SignupView: UIView {
 }
 
 // MARK: - Controller Output
-extension SignupView: SignupControllerOutput {
-    func onSignupFailure(error: Error) {
-        
-    }
-    
-    func onSignupSuccess() {
-        
-    }
-}
+extension SignupView: SignupControllerOutput {}
 
 // MARK: - UI Setup
 extension SignupView {
@@ -201,23 +240,34 @@ extension SignupView {
         signupButton.backgroundColor = UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
-                if self.isCorrect {
-                    return UIColor.systemBlue
-                }
-                return K_COLOR_GRAY
+                return UIColor.systemBlue
             default:
-                if self.isCorrect {
-                    return K_COLOR_RED
-                }
-                return K_COLOR_GRAY
+                return K_COLOR_RED
             }
         }
-        loginButton.tintColor = signupButton.backgroundColor
+        
+        loginButton.tintColor = UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return UIColor.systemBlue
+            default:
+                return K_COLOR_RED
+            }
+        }
         let touch = UITapGestureRecognizer(target:self, action:#selector(SignupView.hideKeyboard))
         self.addGestureRecognizer(touch)
+//        usernameTF.isShowingSpinner = true
     }
     
     private func setTextFieldColors(textField: UnderlinedSignTextField) {
+        let tfWarningColor = UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return UIColor.systemYellow
+            default:
+                return K_COLOR_RED
+            }
+        }
         let color: UIColor = UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -229,13 +279,15 @@ extension SignupView {
         textField.delegate = self
         textField.tintColor = color
         textField.line.layer.strokeColor = color.cgColor
+        textField.color = tfWarningColor
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         var logoAnimation: CAAnimation!
         var initialColor: UIColor!
         var destinationColor: UIColor!
-        let textFields: [UnderlinedTextField] = textFieldsStackView.arrangedSubviews.compactMap{ view in
+        var tfWarningColor = K_COLOR_RED
+        let textFields: [UnderlinedSignTextField] = textFieldsStackView.arrangedSubviews.compactMap{ view in
             guard let tf = view as? UnderlinedSignTextField else { return nil }
             return tf
         }
@@ -243,13 +295,17 @@ extension SignupView {
         case .dark:
             initialColor = UIColor.black
             destinationColor = UIColor.systemBlue
+            tfWarningColor = .systemYellow
         default:
             initialColor = UIColor.systemBlue
             destinationColor = K_COLOR_RED
+//            tfWarningColor = K_COLOR_RED
         }
         textFields.forEach {
             $0.line.layer.strokeColor = destinationColor.cgColor
             $0.tintColor = destinationColor
+            $0.color = tfWarningColor
+            $0.keyboardType = .asciiCapable
         }
         logoAnimation = Animations.get(property: .FillColor,
                                        fromValue: initialColor.cgColor,
@@ -285,7 +341,7 @@ extension SignupView: UITextFieldDelegate {
         } else {
             textField.resignFirstResponder()
             if isCorrect {
-                viewInput?.onSignupTap()
+//                viewInput?.onSignupTap()
             }
         }
         return true
@@ -296,7 +352,8 @@ extension SignupView: UITextFieldDelegate {
     }
     
     private func checkTextField(sender: UITextField) {
-        if sender === passwordTF {
+        guard let textField = sender as? UnderlinedSignTextField else { return }
+        if textField === passwordTF {
             if passwordTF.text!.isEmpty {
                 isPwdFilled = false
                 passwordTF.hideSign()
@@ -306,20 +363,21 @@ extension SignupView: UITextFieldDelegate {
             } else {
                 isPwdFilled = true
             }
-        } else if sender === usernameTF {
-            if !sender.text!.isEmpty && sender.text!.count < 4 {
+        } else if textField === usernameTF {
+            if !textField.text!.isEmpty && textField.text!.count < 4 {
                 usernameTF.showSign(state: .UsernameIsShort)
                 isLoginFilled = false
-            } else if sender.text!.count >= 4 {
-                //                    runTimer()
-                API.shared.isUsernameEmailAvailable(email: "", username: sender.text!) { result in
+            } else if textField.text!.count >= 4 {
+                isPerformingChecks = true
+                textField.isShowingSpinner = true
+                viewInput?.checkCredentials(username: textField.text!, email: "") { [weak self] result in
+                    guard let self = self else { return }
                     switch result {
                     case .success(let exists):
                         if !exists {
                             if self.usernameTF.text!.count >= 4 {
                                 self.isLoginFilled = true
                             }
-                            self.isLoginFilled = true
                         } else {
                             self.usernameTF.showSign(state: .UsernameExists)
                             self.isLoginFilled = false
@@ -327,17 +385,24 @@ extension SignupView: UITextFieldDelegate {
                     case .failure(let error):
                         showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                     }
+                    self.isPerformingChecks = false
+                    textField.isShowingSpinner = false
                 }
+            } else if textField.text!.isEmpty {
+                usernameTF.hideSign()
             } else {
                 isLoginFilled = true
                 usernameTF.hideSign()
             }
-        } else if sender === mailTF {
-            if sender.text!.isEmpty {
+        } else if textField === mailTF {
+            if textField.text!.isEmpty {
                 mailTF.hideSign()
                 isMailFilled = false
-            } else if sender.text!.isValidEmail {
-                API.shared.isUsernameEmailAvailable(email: sender.text!, username: "") { result in
+            } else if textField.text!.isValidEmail {
+                isPerformingChecks = true
+                textField.isShowingSpinner = true
+                viewInput?.checkCredentials(username: "", email: textField.text!) {  [weak self] result in
+                    guard let self = self else { return }
                     switch result {
                     case .success(let exists):
                         if !exists {
@@ -349,10 +414,37 @@ extension SignupView: UITextFieldDelegate {
                     case .failure(let error):
                         showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                     }
+                    self.isPerformingChecks = false
+                    textField.isShowingSpinner = false
                 }
             } else {
                 isMailFilled = false
                 mailTF.showSign(state: .EmailIsIncorrect)
+            }
+        }
+    }
+    
+    @objc
+    private func onFacebookTap() {
+        authorize(provider: .VK)
+    }
+    
+    @objc
+    private func onVKTap() {
+        authorize(provider: .VK)
+    }
+    
+    private func authorize(provider: AuthProvider) {
+        isUserInteractionEnabled = false
+        Task {
+            do {
+                try await viewInput?.onProviderAuth(provider: provider)
+                isUserInteractionEnabled = true
+            } catch let error {
+                isUserInteractionEnabled = true
+#if DEBUG
+                fatalError(error.localizedDescription)
+#endif
             }
         }
     }

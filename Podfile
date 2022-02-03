@@ -3,6 +3,7 @@ platform :ios, '13.0' # or platform :osx, '10.10' if your target is OS X.
 
 target 'ThinkWhat' do
     use_frameworks!
+    pod 'ReCaptcha'
     pod 'SwiftyVK'
     pod "TTRangeSlider"
     pod 'SwiftyJSON'

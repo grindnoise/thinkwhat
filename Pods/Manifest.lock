@@ -12,6 +12,9 @@ PODS:
     - FBSDKCoreKit (= 12.3.1)
   - Nimble (8.1.1)
   - Quick (3.0.0)
+  - ReCaptcha (1.6.0):
+    - ReCaptcha/Core (= 1.6.0)
+  - ReCaptcha/Core (1.6.0)
   - SwiftyJSON (5.0.0)
   - SwiftyVK (3.4.2)
   - Swinject (2.7.1)
@@ -26,6 +29,7 @@ DEPENDENCIES:
   - FBSDKShareKit
   - Nimble
   - Quick
+  - ReCaptcha
   - SwiftyJSON
   - SwiftyVK
   - Swinject (= 2.7.1)
@@ -43,6 +47,7 @@ SPEC REPOS:
     - FBSDKShareKit
     - Nimble
     - Quick
+    - ReCaptcha
     - SwiftyJSON
     - SwiftyVK
     - Swinject
@@ -59,6 +64,7 @@ SPEC CHECKSUMS:
   FBSDKShareKit: c09900fc885130c009194ef35992cbdcad47fe27
   Nimble: 5f8a2fb6fa343a7242dfdd9d42f7267419d464b2
   Quick: 6d9559f40647bc4d510103842ef2fdd882d753e2
+  ReCaptcha: d493ed256054a7b6a7eabcaf0b47ec9a8f42a16e
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
   SwiftyVK: 5005dac6e85f7b0fd44e21ed2f021a397dff4cab
   Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
@@ -66,6 +72,6 @@ SPEC CHECKSUMS:
   VK-ios-sdk: 62a10b6571fbcda0657f455fedce7fedf55b4cd0
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: 778e2133e26322b3a23d80e685bf0d056ac57e11
+PODFILE CHECKSUM: 4d5aa430e1e13875bb2de95304f93e44fd5774ec
 
 COCOAPODS: 1.11.2

@@ -12,6 +12,9 @@ import CoreData
 import UserNotifications
 import FBSDKCoreKit
 import VK_ios_sdk
+import SwiftyVK
+
+var vkDelegateReference : SwiftyVKDelegate?
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -25,26 +28,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         let controller = GetStartedViewController()
-        let view = WelcomeView()
-//        controller.welcomeView = view
-//        controller.welcomeView?.controller = controller
-
         window = UIWindow()
         window?.rootViewController = CustomNavigationController(rootViewController: controller)
         window?.makeKeyAndVisible()
-        
+        vkDelegateReference = VKDelegate()
+        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        VKSdk.processOpen(url,
-                          fromApplication: options[.sourceApplication] as? String)
+//        VKSdk.processOpen(url,
+        //                          fromApplication: options[.sourceApplication] as? String)
+        
         ApplicationDelegate.shared.application(
-                    app,
-                    open: url,
-                    sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
-                    annotation: options[UIApplication.OpenURLOptionsKey.annotation]
-                )
+            app,
+            open: url,
+            sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+            annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+        )
+        let app = options[.sourceApplication] as? String
+        VK.handle(url: url, sourceApplication: app)
         return true
     }
     

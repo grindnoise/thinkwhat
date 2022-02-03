@@ -32,7 +32,8 @@ class Userprofile: Decodable {
              favoritesTotal = "favorite_surveys_count",
              publicationsTotal = "surveys_count",
              lastVisit = "last_visit",
-             topPublicationCategories = "top_pub_categories"
+             topPublicationCategories = "top_pub_categories",
+             isEdited = "is_edited"
     }
     enum UserSurveyType {
         case Own, Favorite
@@ -52,6 +53,7 @@ class Userprofile: Decodable {
     var favoritesTotal:     Int = 0
     var publicationsTotal:  Int = 0
     var lastVisit:          Date
+    var isEdited:           Bool?
     var hashValue: Int {
         return ObjectIdentifier(self).hashValue
     }
@@ -102,6 +104,7 @@ class Userprofile: Decodable {
             instagramURL        = URL(string: try container.decodeIfPresent(String.self, forKey: .instagramURL) ?? "")
             facebookURL         = URL(string: try container.decodeIfPresent(String.self, forKey: .facebookURL) ?? "")
             vkURL               = URL(string: try container.decodeIfPresent(String.self, forKey: .vkURL) ?? "")
+            isEdited            = try container.decodeIfPresent(Bool.self, forKey: .isEdited)
             gender              = Gender(rawValue: try container.decode(String.self, forKey: .gender)) ?? .Unassigned
             topPublicationCategories.removeAll()
             let topics          = try container.decode([String: Int].self, forKey: .topPublicationCategories)

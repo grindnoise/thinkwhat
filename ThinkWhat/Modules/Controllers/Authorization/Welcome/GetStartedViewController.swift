@@ -40,18 +40,13 @@ class GetStartedViewController: UIViewController {
 // MARK: - View Input
 extension GetStartedViewController: WelcomeViewInput {
     func onGetStartedTap() {
-        let controller = SignupViewController()
-//        let view = SignupView()
-//
-//        controller.controllerOutput = view
-//        controller.controllerOutput?.viewInput = controller
         if let nav = navigationController as? CustomNavigationController {
             nav.transitionStyle = .Auth
             nav.duration = 0.5
         }
-        
         navigationController?
-            .pushViewController(controller, animated: true)
+            .pushViewController(SignupViewController(),
+                                animated: true)
     }
 }
 

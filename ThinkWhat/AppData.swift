@@ -89,13 +89,13 @@ class AppData {
                 }
             }
         }
-//        var isEdited: Bool? {
-//            didSet {
-//                if isEdited != nil {
-//                    UserDefaults.standard.set(isEdited!, forKey: "userProfileEdited")
-//                }
-//            }
-//        }
+        var isEdited: Bool? {
+            didSet {
+                if isEdited != nil {
+                    UserDefaults.standard.set(isEdited!, forKey: "userProfileEdited")
+                }
+            }
+        }
         var isBanned: Bool? {
             didSet {
                 if isBanned != nil {
@@ -160,7 +160,7 @@ class AppData {
             imagePath       = UserDefaults.standard.string(forKey: "userImagePath")
             birthDate       = UserDefaults.standard.object(forKey: "birthDate") as? Date
             gender          = Gender(rawValue: UserDefaults.standard.string(forKey: "userGender") ?? "") ?? .Unassigned
-//            isEdited        = UserDefaults.standard.bool(forKey: "userProfileEdited")
+            isEdited        = UserDefaults.standard.bool(forKey: "userProfileEdited")
             isBanned        = UserDefaults.standard.bool(forKey: "userProfileBanned")
             isEmailVerified = UserDefaults.standard.bool(forKey: "userEmailVerified")
             imageURL        = UserDefaults.standard.url(forKey: "imageURL")
@@ -178,7 +178,7 @@ class AppData {
             birthDate       = nil
             gender          = nil
             id              = nil
-//            isEdited        = nil
+            isEdited        = nil
             isBanned        = nil
             isEmailVerified = nil
             imageURL        = nil
@@ -346,7 +346,7 @@ class AppData {
         self.profile.birthDate          = data["birth_date"] is NSNull ? nil : Date(dateString:data["birth_date"] as! String)
         self.profile.gender             = data["gender"] is NSNull ? Gender.Unassigned : Gender(rawValue: data["gender"] as! String)
         self.profile.isBanned           = data["is_banned"] is NSNull ? false : data["is_banned"] as! Bool
-//        self.profile.isEdited           = data["is_edited"] is NSNull ? false : data["is_edited"] as! Bool
+        self.profile.isEdited           = data["is_edited"] is NSNull ? false : data["is_edited"] as! Bool
         self.profile.isEmailVerified    = data["is_email_verified"] is NSNull ? false : data["is_email_verified"] as! Bool
         
         if imagePath != nil {

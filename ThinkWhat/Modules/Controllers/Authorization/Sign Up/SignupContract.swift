@@ -16,10 +16,10 @@ protocol SignupViewInput: class {
     var controllerOutput: SignupControllerOutput? { get set }
     var controllerInput: SignupControllerInput? { get set }
     
-    func onFacebookTap()
-    func onVkTap()
-    func onLoginTap()
-    func onSignupTap()
+    func onProviderAuth(provider: AuthProvider) async throws
+    func onSignup(username: String, email: String, password: String, completion: @escaping(Result<Bool,Error>)->())
+    func checkCredentials(username: String, email: String, completion: @escaping(Result<Bool,Error>)->())
+    func onCaptchaValidation(completion: @escaping(Result<Bool,Error>)->())
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -45,6 +45,7 @@ protocol SignupModelOutput: class {
 protocol SignupControllerOutput: class {
     var viewInput: SignupViewInput? { get set }
     
-    func onSignupFailure(error: Error)
-    func onSignupSuccess()
+//    func onSignupFailure(error: Error)
+//    func onSignupSuccess()
+//    func onCaptchaValidation(completion: @escaping(Result<Bool,Error>)->())
 }

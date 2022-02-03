@@ -46,7 +46,7 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
                 if !EmailResponse.shared.isEmpty && EmailResponse.shared.isActive {
                     print(EmailResponse.shared.getConfirmationCode()!)
                     if validationCode == EmailResponse.shared.getConfirmationCode()! {
-                        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else { return }
+                        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else { return }
                         let owner = [DjangoVariables.User.email : AppData.shared.profile.email!]
                         var data:[String: Any] = [DjangoVariables.UserProfile.isEmailVerified : true]
                         data["owner"] = owner

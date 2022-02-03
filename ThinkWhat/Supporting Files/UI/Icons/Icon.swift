@@ -135,6 +135,7 @@ class Icon: UIView {
         case Filter = 10052
         case Choice = 10053
         case Follow = 10054
+        case Valid = 10055
     }
     
     override func encode(with aCoder: NSCoder) {
@@ -8698,6 +8699,9 @@ class Icon: UIView {
             iconPath.addCurve(to: CGPoint(x: 159.56, y: 122.09), controlPoint1: CGPoint(x: 165.84, y: 124.42), controlPoint2: CGPoint(x: 161.21, y: 122.09))
             iconPath.addCurve(to: CGPoint(x: 155.57, y: 123.52), controlPoint1: CGPoint(x: 158.98, y: 122.09), controlPoint2: CGPoint(x: 157.17, y: 122.73))
             iconPath.close()
+//        case .Valid:
+            
+            
         default:
             iconPath.move(to: CGPoint(x: 115, y: 100))
             iconPath.addCurve(to: CGPoint(x: 100, y: 115), controlPoint1: CGPoint(x: 115, y: 108.28), controlPoint2: CGPoint(x: 108.28, y: 115))

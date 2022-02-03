@@ -115,28 +115,28 @@ class API {
         case Top,New,All,Own,Favorite, Hot, HotExcept, User, UserFavorite
         
         func getURL() -> URL {
-            let url = URL(string: SERVER_URLS.BASE)!//.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE)
+            let url = URL(string: API_URLS.BASE)!//.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE)
             switch self {
             case .Top:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_TOP)
+                return url.appendingPathComponent(API_URLS.SURVEYS_TOP)
             case .New:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_NEW)
+                return url.appendingPathComponent(API_URLS.SURVEYS_NEW)
             case .All:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_ALL)
+                return url.appendingPathComponent(API_URLS.SURVEYS_ALL)
             case .Own:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_OWN)
+                return url.appendingPathComponent(API_URLS.SURVEYS_OWN)
             case .Favorite:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_FAVORITE)
+                return url.appendingPathComponent(API_URLS.SURVEYS_FAVORITE)
             case .Hot:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT)
+                return url.appendingPathComponent(API_URLS.SURVEYS_HOT)
                 //            case .HotExcept:
                 //                return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT_EXCEPT)
             case .User:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_BY_OWNER)
+                return url.appendingPathComponent(API_URLS.SURVEYS_BY_OWNER)
             case .UserFavorite:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_FAVORITE_LIST_BY_OWNER)
+                return url.appendingPathComponent(API_URLS.SURVEYS_FAVORITE_LIST_BY_OWNER)
             default:
-                return url.appendingPathComponent(SERVER_URLS.SURVEYS_ALL)
+                return url.appendingPathComponent(API_URLS.SURVEYS_ALL)
             }
         }
     }
@@ -160,7 +160,7 @@ class API {
     }
     
     private func checkForReachability(completion: @escaping(ApiReachabilityState) -> ()) {
-        let url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.CURRENT_TIME)
+        let url = URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.CURRENT_TIME)
         AF.request(url, method: .get, parameters: [:], encoding: URLEncoding(), headers: nil).response { response in
             var state = ApiReachabilityState.None
             switch response.result {
@@ -259,16 +259,25 @@ class API {
 //    }
     
     public func getEmailConfirmationCode(completion: @escaping(Result<JSON, Error>)->()) {
-        self.request(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
+        self.request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.GET_CONFIRMATION_CODE), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
     }
     
     func getUserData(completion: @escaping(Result<JSON, Error>)->()) {
-        request(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.CURRENT_USER), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
+        request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.CURRENT_USER), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
+    }
+    
+    func getUserDataAsync() async throws -> JSON {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CURRENT_USER) else { throw APIError.invalidURL }
+        do {
+            return try await JSON(requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: headers()))
+        } catch {
+            throw error
+        }
     }
     
     func loginViaMail(username: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.TOKEN) else { completion(.failure(APIError.invalidURL)); return }
-        let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { completion(.failure(APIError.invalidURL)); return }
+        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
         AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
             switch response.result {
             case .success(let value):
@@ -291,9 +300,10 @@ class API {
         }
     }
     
+    ///Auhorize and store access token locally
     func loginViaProvider(provider: AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.TOKEN_CONVERT) else { completion(.failure(APIError.invalidURL)); return }
-        let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { completion(.failure(APIError.invalidURL)); return }
+        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
         AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).response { response in
             switch response.result {
             case .success(let value):
@@ -302,7 +312,7 @@ class API {
                 do {
                     //TODO: Определиться с инициализацией JSON
                     let json = try JSON(data: data, options: .mutableContainers)
-                    guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+                guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
                     completion(saveTokenInKeychain(json: json))
                 } catch let error {
                     completion(.failure(error))
@@ -313,8 +323,20 @@ class API {
         }
     }
     
+    func loginViaProviderAsync(provider: AuthProvider, token: String) async throws  {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { throw APIError.invalidURL }
+        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
+        do {
+            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding())
+            let json = try JSON(data: data, options: .mutableContainers)
+            saveTokenInKeychain(json: json)
+        } catch let error {
+            throw error
+        }
+    }
+    
     func logout(completion: @escaping (Result<Bool, Error>) -> ()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.TOKEN_REVOKE) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_REVOKE) else { completion(.failure(APIError.invalidURL)); return }
         guard let token = KeychainService.loadAccessToken() as String?, !token.isEmpty else {
             AppData.shared.eraseData()
             Surveys.shared.eraseData()
@@ -325,7 +347,7 @@ class API {
             completion(.success(true))
             return
         }
-        let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "token": token]
+        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "token": token]
         
         AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default).response { response in
             switch response.result {
@@ -351,8 +373,8 @@ class API {
     }
     
     func signup(email: String, password: String, username: String, completion: @escaping (Result<Bool,Error>) -> ()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SIGNUP) else { completion(.failure(APIError.invalidURL)); return }
-        let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "grant_type": "password", "email": "\(email)", "password": "\(password)", "username": "\(username)"]
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SIGNUP) else { completion(.failure(APIError.invalidURL)); return }
+        let parameters = ["client_id": API_URLS.CLIENT_ID, "grant_type": "password", "email": "\(email)", "password": "\(password)", "username": "\(username)"]
         AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default).response { response in
             switch response.result {
             case .success(let value):
@@ -372,19 +394,34 @@ class API {
         }
     }
     
-    func getProfileNeedsSocialUpdate(completion: @escaping(Result<Bool, Error>)->()) {
-        request(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.PROFILE_NEEDS_UPDATE), httpMethod: .get) { result in
+    func getProfileNeedsUpdate(completion: @escaping(Result<Bool, Error>)->()) {
+        request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.PROFILE_NEEDS_UPDATE), httpMethod: .get) { result in
             switch result {
             case .success(let json):
-                completion(.success(json["needs_update"].boolValue))
+                guard let id = json["userprofile_id"].int, let needsUpdate = json["needs_update"].bool else { completion(.failure("User id is not found in response")); return }
+                AppData.shared.profile.id = id
+                completion(.success(needsUpdate))
             case .failure(let error):
                 completion(.failure(error))
             }
         }
     }
     
+    func getProfileNeedsUpdateAsync() async throws -> Bool {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILE_NEEDS_UPDATE) else { throw APIError.invalidURL }
+        do {
+            let data = try await requestAsync(url: url, httpMethod: .get, headers: headers())
+            let json = try JSON(data: data, options: .mutableContainers)
+            guard let id = json["userprofile_id"].int, let needsUpdate = json["needs_update"].bool else { throw "Invalid JSON data" }
+            AppData.shared.profile.id = id
+            return needsUpdate
+        } catch let error {
+            throw error
+        }
+    }
+    
     func isUsernameEmailAvailable(email: String, username: String, completion: @escaping(Result<Bool, Error>)->()) {
-        self.request(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(email.isEmpty ? SERVER_URLS.USERNAME_EXISTS : SERVER_URLS.EMAIL_EXISTS), httpMethod: .get, parameters: email.isEmpty ? ["username": username] : ["email": email], encoding: URLEncoding.default) { result in
+        self.request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(email.isEmpty ? API_URLS.USERNAME_EXISTS : API_URLS.EMAIL_EXISTS), httpMethod: .get, parameters: email.isEmpty ? ["username": username] : ["email": email], encoding: URLEncoding.default) { result in
             switch result {
             case .success(let json):
                 print(json)
@@ -397,7 +434,7 @@ class API {
     
     
     func updateUserprofile(user: Userprofile, uploadProgress: @escaping(Double) -> (), completion: @escaping(Result<JSON, Error>) -> ()) {
-            guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else {
                 completion(.failure(APIError.invalidURL))
                 return
             }
@@ -540,7 +577,7 @@ class API {
     }
     
     func updateUserprofile(data: [String: Any], uploadProgress: @escaping(Double) -> (), completion: @escaping(Result<JSON, Error>) -> ()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else {
             completion(.failure(APIError.invalidURL))
             return
         }
@@ -560,7 +597,7 @@ class API {
                 fileFormat = .PNG
             }
             guard imageData != nil, fileFormat != .Unknown else { completion(.failure(APIError.badData)); return }
-            guard imageData != nil else { completion(.failure(APIError.badData)); return }
+//            guard imageData != nil else { completion(.failure(APIError.badData)); return }
             multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(fileFormat)", mimeType: "jpg/png")
             for (key, value) in dict {
                 if value is String || value is Int {
@@ -573,8 +610,47 @@ class API {
         }
     }
     
+    func updateUserprofileAsync(data: [String: Any], uploadProgress: @escaping(Double) -> ()) async throws -> JSON {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else { throw APIError.invalidURL
+        }
+        
+        var dict = data
+        if let image = dict.removeValue(forKey: "image") as? UIImage {
+            assert(dict["image"] == nil)
+            let multipartFormData = MultipartFormData()
+            var fileFormat: FileFormat = .Unknown
+            var imageData: Data!
+            if let data = image.jpegData(compressionQuality: 1) {
+                imageData = data
+                fileFormat = .JPEG
+            } else if let data = image.pngData() {
+                imageData = data
+                fileFormat = .PNG
+            }
+            guard imageData != nil, fileFormat != .Unknown else { throw APIError.badData }
+            multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(fileFormat)", mimeType: "jpg/png")
+            for (key, value) in dict {
+                if value is String || value is Int {
+                    multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
+                }
+            }
+            do {
+                return try await uploadMultipartFormDataAsync(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) })
+            } catch {
+                throw error
+            }
+        } else {
+            do {
+            let responseData = try await requestAsync(url: url, httpMethod: .patch, parameters: dict, encoding: JSONEncoding.default)
+                return try JSON(data: responseData, options: .mutableContainers)
+            } catch {
+                throw error
+            }
+        }
+    }
+    
     func getEmailVerification(completion: @escaping (Result<Bool, Error>) -> ()) {
-        request(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.GET_EMAIL_VERIFIED), httpMethod: .get) { result in
+        request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.GET_EMAIL_VERIFIED), httpMethod: .get) { result in
                     switch result {
                     case .success(let json):
                         completion(.success(json[DjangoVariables.UserProfile.isEmailVerified].boolValue))
@@ -583,6 +659,8 @@ class API {
                     }
                 }
     }
+    
+    
     
     ///Check token expiration time, refresh if needed
     private func accessControl(completion: @escaping (Result<Bool, Error>) -> ()) {
@@ -604,8 +682,8 @@ class API {
             completion(.failure("Error occured while retrieving refresh token from KeychainService"))
             return
         }
-        let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refreshToken)"]
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.TOKEN) else {
+        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refreshToken)"]
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else {
             completion(.failure(APIError.invalidURL))
             return
         }
@@ -632,8 +710,8 @@ class API {
         guard let refreshToken = (KeychainService.loadRefreshToken() as String?) else {
             throw "Error occured while retrieving refresh token from KeychainService"
         }
-        let parameters = ["client_id": SERVER_URLS.CLIENT_ID, "client_secret": SERVER_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refreshToken)"]
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.TOKEN) else {
+        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refreshToken)"]
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else {
             throw APIError.invalidURL
         }
         
@@ -648,7 +726,7 @@ class API {
     }
     
     func initialLoad(completion: @escaping(Result<JSON,Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.APP_LAUNCH) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { result in
             completion(result)
         }
@@ -657,14 +735,14 @@ class API {
     
     func downloadSurveys(type: SurveyType, completion: @escaping(Result<JSON, Error>)->()) {
         //TODO: - Add survey type
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.APP_LAUNCH) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { result in
             completion(result)
         }
     }
     
     func appLaunch() async throws -> JSON {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.APP_LAUNCH) else {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else {
             throw APIError.notFound
         }
         do {
@@ -713,7 +791,7 @@ class API {
     }
     
     func downloadTopics(completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.CATEGORIES) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CATEGORIES) else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { result in
             completion(result)
         }
@@ -721,49 +799,49 @@ class API {
 
 
     func downloadTotalSurveysCount(completion: @escaping(Result<JSON, Error>)->()) {
-                guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SURVEYS_TOTAL_COUNT) else { completion(.failure(APIError.invalidURL)); return }
+                guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_TOTAL_COUNT) else { completion(.failure(APIError.invalidURL)); return }
                 self.request(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { result in
                     completion(result)
                 }
     }
     
     func downloadSurveys(topic: Topic, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SURVEYS_BY_CATEGORY) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_BY_CATEGORY) else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: ["category_id": topic.id], encoding: URLEncoding.default) { result in
             completion(result)
         }
     }
     
     func downloadSurvey(surveyReference: SurveyReference, incrementCounter: Bool = false, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SURVEYS + "\(surveyReference.id)/") else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS + "\(surveyReference.id)/") else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: incrementCounter ? ["add_view_count": true] : nil, encoding: URLEncoding.default) { result in
             completion(result)
         }
     }
     
     func markFavorite(mark: Bool, surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(mark ? SERVER_URLS.SURVEYS_ADD_FAVORITE : SERVER_URLS.SURVEYS_REMOVE_FAVORITE) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(mark ? API_URLS.SURVEYS_ADD_FAVORITE : API_URLS.SURVEYS_REMOVE_FAVORITE) else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { result in
             completion(result)
         }
     }
     
     func incrementViewCounter(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SURVEYS_ADD_VIEW_COUNT) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_ADD_VIEW_COUNT) else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { result in
             completion(result)
         }
     }
     
     func getSurveyStats(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SURVEYS_UPDATE_STATS) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_UPDATE_STATS) else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { completion($0) }
     }
     
     func postPoll(survey: Survey, uploadProgress: @escaping(Double)->()?, completion: @escaping(Result<JSON, Error>)->()) {
         //TODO: - postSurvey replace dict()
         var dict: [String: AnyObject] = [:]//survey.dict
-            guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SURVEYS) else { completion(.failure(APIError.invalidURL)); return }
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS) else { completion(.failure(APIError.invalidURL)); return }
             request(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default) { result in
                 switch result {
                 case .success(let json):
@@ -1051,7 +1129,7 @@ class API {
     }
     
     public func postVote(answer: Answer, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SURVEYS) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS) else { completion(.failure(APIError.invalidURL)); return }
         var parameters: [String: Any] = ["survey": answer.survey!.id, "answer": answer.id]
         if Surveys.shared.hot.count <= MIN_STACK_SIZE {
             let stackList = Surveys.shared.hot.map { $0.id }
@@ -1103,7 +1181,7 @@ class API {
 //    }
 //
     public func rejectSurvey(survey: Survey, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SURVEYS_REJECT) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_REJECT) else { completion(.failure(APIError.invalidURL)); return }
         var parameters: [String: Any] = ["survey": survey.id as Any]
         if Surveys.shared.hot.count <= MIN_STACK_SIZE {
             let stackList = Surveys.shared.hot.map { $0.id }
@@ -1118,14 +1196,14 @@ class API {
     }
     
     public func postClaim(survey: Survey, reason: Claim, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.SURVEYS_REJECT) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_REJECT) else { completion(.failure(APIError.invalidURL)); return }
         let parameters: Parameters = ["survey": survey.id, "claim": reason.id]
         Surveys.shared.banSurvey(object: survey)
         request(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default) { completion($0) }
     }
     
     public func getUserStats(user: Userprofile, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.USER_PROFILE_STATS) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.USER_PROFILE_STATS) else { completion(.failure(APIError.invalidURL)); return }
         let parameters = ["userprofile_id": user.id]
         request(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
     }
@@ -1136,13 +1214,13 @@ class API {
     }
     
     public func subsribeToUser(subscribe: Bool, user: Userprofile, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(subscribe ? SERVER_URLS.USERPOFILE_SUBSCRIBE : SERVER_URLS.USERPOFILE_UNSUBSCRIBE) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(subscribe ? API_URLS.USERPOFILE_SUBSCRIBE : API_URLS.USERPOFILE_UNSUBSCRIBE) else { completion(.failure(APIError.invalidURL)); return }
         let parameters: Parameters = ["userprofile_id": user.id]
         request(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
     }
     
     public func getBalanceAndPrice() {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.BALANCE) else { fatalError() }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.BALANCE) else { fatalError() }
         request(url: url, httpMethod: .get, encoding: URLEncoding.default) { result in
             switch result {
             case .success(let json):
@@ -1161,14 +1239,14 @@ class API {
     }
     
     public func getVoters(answer: Answer, users: [Userprofile], completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.VOTERS) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTERS) else { completion(.failure(APIError.invalidURL)); return }
         guard let survey = answer.survey else { fatalError("answer.survey is nil") }
         let parameters: Parameters = ["survey": survey.id, "answer": answer.id, "userprofiles": users.map { $0.id }]
         request(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding()) { completion($0) }
     }
     
     public func getVotersAsync(answer: Answer) async throws -> Data {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.VOTERS) else {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTERS) else {
             throw APIError.notFound
         }
         let parameters: Parameters = ["survey": answer.surveyID, "answer": answer.id, "userprofiles": answer.voters.map({ return $0.id })]
@@ -1434,6 +1512,43 @@ class API {
 //        }
     }
     
+    public func uploadMultipartFormDataAsync(url: URL, method: HTTPMethod, multipartDataForm: MultipartFormData, uploadProgress: @escaping (Double) -> ()?) async throws -> JSON {
+        try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<JSON, Error>) in
+        AF.upload(multipartFormData: multipartDataForm, to: url, method: method, headers: headers())
+            .uploadProgress(closure: { prog in
+                uploadProgress(prog.fractionCompleted)
+            }).response { response in
+                switch response.result {
+                case .success(let value):
+                    guard let statusCode = response.response?.statusCode else {
+                        continuation.resume(throwing:APIError.httpStatusCodeMissing)
+                        return
+                    }
+                    guard let data = value else {
+                        continuation.resume(throwing: APIError.badData)
+                        return
+                    }
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: data, options: .mutableContainers)
+                        guard 200...299 ~= statusCode else {
+                            continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString()))
+                            return
+                        }
+                        continuation.resume(returning: json)
+                        return
+                    } catch let error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
+                case let .failure(error):
+                    continuation.resume(throwing: error)
+                    return
+                }
+            }
+        }
+    }
+    
     public func downloadImageAsync(from url: URL) async throws -> UIImage {
         if #available(iOS 15.0, *) {
             let request = URLRequest.init(url:url)
@@ -1469,9 +1584,9 @@ class API {
     }
     
     public func getUserTopPublications(user: Userprofile, completion: @escaping(Result<JSON,Error>)->()) {
-        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.USER_PROFILE_TOP_PUBS) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.USER_PROFILE_TOP_PUBS) else { completion(.failure(APIError.invalidURL)); return }
         let parameters: Parameters = ["userprofile_id": user.id]
-        request(url: URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.USER_PROFILE_TOP_PUBS), httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
+        request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.USER_PROFILE_TOP_PUBS), httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
     }
     
     func cancelAllRequests() {

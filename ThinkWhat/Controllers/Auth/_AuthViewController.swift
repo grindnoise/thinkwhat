@@ -277,7 +277,7 @@ class _AuthViewController: UIViewController, UINavigationControllerDelegate {
             case .success(let json):
                 AppData.shared.profile.id = json["id"].int
                 let auth = self.getAuthCase()
-                API.shared.getProfileNeedsSocialUpdate { resultNeedsSocialUpdate in
+                API.shared.getProfileNeedsUpdate { resultNeedsSocialUpdate in
                     switch resultNeedsSocialUpdate {
                     case .success(let needsUpdateFromSocialMedia):
                         if needsUpdateFromSocialMedia {

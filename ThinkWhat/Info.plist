@@ -23,6 +23,8 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleURLName</key>
+			<string>vk7043775</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>vk7043775</string>
@@ -32,10 +34,10 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>FacebookClientToken</key>
+	<string>792b8f684fc7c9d72884f89687a81b40</string>
 	<key>FacebookAppID</key>
 	<string>818984988459464</string>
-    <key>FacebookClientToken</key>
-    <string>792b8f684fc7c9d72884f89687a81b40</string>
 	<key>FacebookDisplayName</key>
 	<string>ThinkWhat</string>
 	<key>LSApplicationCategoryType</key>
@@ -51,6 +53,7 @@
 		<string>vk</string>
 		<string>vk-share</string>
 		<string>vkauthorize</string>
+		<string>vk7043775</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -85,6 +88,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string></string>
+	<key>ReCaptchaDomain</key>
+	<string>https://thinkwhat.app</string>
+	<key>ReCaptchaKey</key>
+	<string>6LcFd0UeAAAAADYslKFQeYeAL8_aLmSRGP80qAP5</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>OpenSans-Semibold.ttf</string>

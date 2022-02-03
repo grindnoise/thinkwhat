@@ -19,5 +19,6 @@
 "email_is_busy" = "Email is already used";
 "email_is_empty" = "Email is incorrect";
 "password_is_short" = "Password is too short";
+"success" = "Success!";
 
 

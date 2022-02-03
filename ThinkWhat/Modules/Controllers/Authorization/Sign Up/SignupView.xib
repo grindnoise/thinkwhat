@@ -23,17 +23,16 @@
                 <outlet property="contentView" destination="iN0-l3-epB" id="wYI-Aj-Qu0"/>
                 <outlet property="facebook" destination="2Dm-bo-gDv" id="hmd-3N-o1B"/>
                 <outlet property="haveAccountLabel" destination="Y0p-gl-T77" id="WJi-6f-AI0"/>
-                <outlet property="loginButonTopConstraint" destination="5QD-jR-lwA" id="dPG-iu-M4j"/>
+                <outlet property="loginButonTopConstraint" destination="wiW-4L-tBB" id="1xO-DT-J3Q"/>
                 <outlet property="loginButton" destination="Heu-37-xXO" id="chX-WW-PAg"/>
                 <outlet property="logo" destination="2Io-od-Vv1" id="cge-mv-GpB"/>
                 <outlet property="mailTF" destination="nWa-Zg-7nQ" id="fDu-ow-1cC"/>
                 <outlet property="passwordTF" destination="qPX-fD-QqY" id="EOQ-Hj-h4u"/>
                 <outlet property="providerLabel" destination="biD-mW-UEK" id="vGe-AV-YWe"/>
                 <outlet property="providerStackView" destination="3KY-3h-QJ7" id="oAm-Bs-QGf"/>
-                <outlet property="providerStackViewBottomConstraint" destination="hPu-pa-B3I" id="GvQ-Gp-OR5"/>
-                <outlet property="providerStackViewTopConstraint" destination="OaY-hB-Gv1" id="xYx-GQ-ceh"/>
+                <outlet property="providerStackViewBottomConstraint" destination="wgE-Cb-Seq" id="YRo-FZ-Vm0"/>
+                <outlet property="providerStackViewTopConstraint" destination="wCo-U3-E21" id="3BU-Xy-djm"/>
                 <outlet property="signupButton" destination="I0I-51-zea" id="w4R-F2-svZ"/>
-                <outlet property="signupButtonBottomConstraint" destination="bdm-uZ-z5y" id="CUy-gI-8MT"/>
                 <outlet property="signupButtonTopConstraint" destination="wL3-Uo-yKN" id="TPx-Hp-z0k"/>
                 <outlet property="textFieldsStackView" destination="hoU-Xh-7bV" id="wLp-oI-QnX"/>
                 <outlet property="usernameTF" destination="dhW-ry-Op1" id="iyr-9O-HJs"/>
@@ -52,7 +51,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="290" height="56"/>
                             <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
-                            <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" returnKeyType="next" textContentType="nickname"/>
+                            <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="alphabet" returnKeyType="next" textContentType="nickname"/>
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
                                     <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -72,7 +71,7 @@
                             <rect key="frame" x="0.0" y="64" width="290" height="56"/>
                             <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
-                            <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" returnKeyType="next" textContentType="email"/>
+                            <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="alphabet" returnKeyType="next" textContentType="email"/>
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
                                     <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -92,7 +91,7 @@
                             <rect key="frame" x="0.0" y="128" width="290" height="56"/>
                             <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
-                            <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" returnKeyType="go" secureTextEntry="YES"/>
+                            <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="alphabet" returnKeyType="go" secureTextEntry="YES"/>
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
                                     <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -111,9 +110,9 @@
                     </subviews>
                 </stackView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="I0I-51-zea">
-                    <rect key="frame" x="62" y="473" width="290" height="72.5"/>
+                    <rect key="frame" x="91" y="473" width="232" height="58"/>
                     <color key="backgroundColor" systemColor="systemBlueColor"/>
-                    <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="21"/>
+                    <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="20"/>
                     <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                     <state key="normal" title="Создать аккаунт"/>
@@ -121,50 +120,6 @@
                         <action selector="signupTapped:" destination="-1" eventType="touchUpInside" id="8JW-fb-OMm"/>
                     </connections>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Heu-37-xXO">
-                    <rect key="frame" x="179" y="665" width="56" height="36"/>
-                    <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="17"/>
-                    <color key="tintColor" systemColor="linkColor"/>
-                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                    <state key="normal" title="Войти"/>
-                    <connections>
-                        <action selector="loginTapped:" destination="-1" eventType="touchUpInside" id="cty-51-lqZ"/>
-                    </connections>
-                </button>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ИЛИ ПРОДОЛЖИТЬ С" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="biD-mW-UEK">
-                    <rect key="frame" x="118.5" y="545.5" width="177.5" height="23.5"/>
-                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
-                    <color key="textColor" systemColor="systemGrayColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
-                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="3KY-3h-QJ7">
-                    <rect key="frame" x="129.5" y="569" width="155" height="72.5"/>
-                    <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Dm-bo-gDv" customClass="FacebookLogo" customModule="ThinkWhat" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="0.0" width="72.5" height="72.5"/>
-                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            <constraints>
-                                <constraint firstAttribute="width" secondItem="2Dm-bo-gDv" secondAttribute="height" multiplier="1:1" id="oR0-F1-cRW"/>
-                            </constraints>
-                        </view>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aXW-0s-PPj" customClass="VKLogo" customModule="ThinkWhat" customModuleProvider="target">
-                            <rect key="frame" x="82.5" y="0.0" width="72.5" height="72.5"/>
-                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            <constraints>
-                                <constraint firstAttribute="width" secondItem="aXW-0s-PPj" secondAttribute="height" multiplier="1:1" id="n6V-I1-Rl1"/>
-                            </constraints>
-                        </view>
-                    </subviews>
-                    <constraints>
-                        <constraint firstItem="aXW-0s-PPj" firstAttribute="width" secondItem="aXW-0s-PPj" secondAttribute="height" multiplier="1:1" id="AJB-l6-IMe"/>
-                    </constraints>
-                </stackView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Уже зарегистрированы?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y0p-gl-T77">
-                    <rect key="frame" x="106.5" y="641.5" width="201" height="23.5"/>
-                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
-                    <color key="textColor" systemColor="systemGrayColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kk7-QX-SaI">
                     <rect key="frame" x="0.0" y="44" width="414" height="225"/>
                     <subviews>
@@ -183,26 +138,82 @@
                         <constraint firstItem="2Io-od-Vv1" firstAttribute="height" secondItem="kk7-QX-SaI" secondAttribute="height" multiplier="0.7" id="EL9-jK-uqv"/>
                     </constraints>
                 </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="waI-By-pTe">
+                    <rect key="frame" x="0.0" y="531" width="414" height="331"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ИЛИ ПРОДОЛЖИТЬ С" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="biD-mW-UEK">
+                            <rect key="frame" x="116" y="79.5" width="182.5" height="20"/>
+                            <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
+                            <color key="textColor" systemColor="systemGrayColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="3KY-3h-QJ7">
+                            <rect key="frame" x="144" y="107.5" width="126" height="58"/>
+                            <subviews>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Dm-bo-gDv" customClass="FacebookLogo" customModule="ThinkWhat" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="58" height="58"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="2Dm-bo-gDv" secondAttribute="height" multiplier="1:1" id="oR0-F1-cRW"/>
+                                    </constraints>
+                                </view>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aXW-0s-PPj" customClass="VKLogo" customModule="ThinkWhat" customModuleProvider="target">
+                                    <rect key="frame" x="68" y="0.0" width="58" height="58"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="aXW-0s-PPj" secondAttribute="height" multiplier="1:1" id="n6V-I1-Rl1"/>
+                                    </constraints>
+                                </view>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="aXW-0s-PPj" firstAttribute="width" secondItem="aXW-0s-PPj" secondAttribute="height" multiplier="1:1" id="AJB-l6-IMe"/>
+                            </constraints>
+                        </stackView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Уже зарегистрированы?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y0p-gl-T77">
+                            <rect key="frame" x="108.5" y="202" width="197.5" height="20"/>
+                            <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
+                            <color key="textColor" systemColor="systemGrayColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Heu-37-xXO">
+                            <rect key="frame" x="182.5" y="222" width="49" height="32"/>
+                            <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="17"/>
+                            <color key="tintColor" systemColor="linkColor"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Войти"/>
+                            <connections>
+                                <action selector="loginTapped:" destination="-1" eventType="touchUpInside" id="cty-51-lqZ"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="3KY-3h-QJ7" firstAttribute="centerX" secondItem="waI-By-pTe" secondAttribute="centerX" id="3pp-XQ-S2f"/>
+                        <constraint firstItem="Heu-37-xXO" firstAttribute="centerX" secondItem="waI-By-pTe" secondAttribute="centerX" id="MaM-Df-vUB"/>
+                        <constraint firstItem="Y0p-gl-T77" firstAttribute="centerX" secondItem="waI-By-pTe" secondAttribute="centerX" id="NOh-AQ-cWI"/>
+                        <constraint firstItem="3KY-3h-QJ7" firstAttribute="bottom" secondItem="waI-By-pTe" secondAttribute="centerY" id="YxW-MP-9Ox"/>
+                        <constraint firstItem="biD-mW-UEK" firstAttribute="centerX" secondItem="waI-By-pTe" secondAttribute="centerX" id="bk4-1z-9Rq"/>
+                        <constraint firstItem="3KY-3h-QJ7" firstAttribute="top" secondItem="biD-mW-UEK" secondAttribute="bottom" constant="8" symbolic="YES" id="wCo-U3-E21"/>
+                        <constraint firstItem="Y0p-gl-T77" firstAttribute="top" secondItem="3KY-3h-QJ7" secondAttribute="bottom" constant="36.5" id="wgE-Cb-Seq"/>
+                        <constraint firstItem="Heu-37-xXO" firstAttribute="top" secondItem="Y0p-gl-T77" secondAttribute="bottom" id="wiW-4L-tBB"/>
+                    </constraints>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="Heu-37-xXO" firstAttribute="top" secondItem="Y0p-gl-T77" secondAttribute="bottom" id="5QD-jR-lwA"/>
-                <constraint firstItem="I0I-51-zea" firstAttribute="width" secondItem="hoU-Xh-7bV" secondAttribute="width" id="6VQ-yq-7bX"/>
+                <constraint firstItem="waI-By-pTe" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="2Fk-WO-8Xp"/>
+                <constraint firstItem="I0I-51-zea" firstAttribute="width" secondItem="hoU-Xh-7bV" secondAttribute="width" multiplier="0.8" id="6VQ-yq-7bX"/>
                 <constraint firstItem="hoU-Xh-7bV" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.7" id="Dp5-Hl-i9u"/>
                 <constraint firstItem="kk7-QX-SaI" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="KGd-Sg-1qv"/>
-                <constraint firstItem="Y0p-gl-T77" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="Ldv-Y0-y3i"/>
-                <constraint firstItem="biD-mW-UEK" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="O24-IJ-PIq"/>
-                <constraint firstItem="3KY-3h-QJ7" firstAttribute="top" secondItem="biD-mW-UEK" secondAttribute="bottom" id="OaY-hB-Gv1"/>
+                <constraint firstItem="3KY-3h-QJ7" firstAttribute="height" secondItem="I0I-51-zea" secondAttribute="height" id="LKg-2Q-nMK"/>
                 <constraint firstItem="hoU-Xh-7bV" firstAttribute="height" secondItem="vUN-kp-3ea" secondAttribute="height" multiplier="0.225" id="Qnp-Rb-o24"/>
                 <constraint firstItem="hoU-Xh-7bV" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="URX-ra-gVE"/>
                 <constraint firstItem="kk7-QX-SaI" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="Ugq-eP-t5M"/>
-                <constraint firstItem="3KY-3h-QJ7" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="ZkJ-a2-fzk"/>
-                <constraint firstItem="biD-mW-UEK" firstAttribute="top" secondItem="I0I-51-zea" secondAttribute="bottom" id="bdm-uZ-z5y"/>
-                <constraint firstItem="Heu-37-xXO" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="cYI-CY-60T"/>
+                <constraint firstItem="waI-By-pTe" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="VV8-js-NLO"/>
                 <constraint firstItem="I0I-51-zea" firstAttribute="width" secondItem="I0I-51-zea" secondAttribute="height" multiplier="4:1" id="eCn-WU-7sq"/>
-                <constraint firstItem="Y0p-gl-T77" firstAttribute="top" secondItem="3KY-3h-QJ7" secondAttribute="bottom" id="hPu-pa-B3I"/>
-                <constraint firstItem="3KY-3h-QJ7" firstAttribute="height" secondItem="I0I-51-zea" secondAttribute="height" id="nte-P9-2g1"/>
+                <constraint firstItem="waI-By-pTe" firstAttribute="top" secondItem="I0I-51-zea" secondAttribute="bottom" id="nJE-W6-uqS"/>
+                <constraint firstItem="waI-By-pTe" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="noj-dy-eGO"/>
                 <constraint firstItem="I0I-51-zea" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="oem-f0-DHi"/>
                 <constraint firstItem="hoU-Xh-7bV" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="pNI-Iw-TO3"/>
                 <constraint firstItem="hoU-Xh-7bV" firstAttribute="top" secondItem="kk7-QX-SaI" secondAttribute="bottom" id="sVf-OT-TFH"/>
@@ -214,13 +225,13 @@
     </objects>
     <designables>
         <designable name="dhW-ry-Op1">
-            <size key="intrinsicContentSize" width="89.5" height="27.5"/>
+            <size key="intrinsicContentSize" width="86" height="24"/>
         </designable>
         <designable name="nWa-Zg-7nQ">
-            <size key="intrinsicContentSize" width="211.5" height="27.5"/>
+            <size key="intrinsicContentSize" width="205" height="24"/>
         </designable>
         <designable name="qPX-fD-QqY">
-            <size key="intrinsicContentSize" width="102" height="26"/>
+            <size key="intrinsicContentSize" width="99" height="23"/>
         </designable>
     </designables>
     <resources>
