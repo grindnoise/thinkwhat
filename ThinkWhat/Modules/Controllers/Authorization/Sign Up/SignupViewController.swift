@@ -183,8 +183,8 @@ extension SignupViewController: SignupViewInput {
             ///2. Login into our API
             try await API.shared.loginViaProviderAsync(provider: provider, token: providerToken)
             ///3. Check if profile was edited manually
-            let needsUpdate = try await API.shared.getProfileNeedsUpdateAsync()
-            if needsUpdate {
+            let userData = try await API.shared.getUserDataOrNilAsync()
+            if userData == nil {
                 ///3a. Get user's profile from provider
                 let data = try await getProviderData()
                 ///4a. Feed data to our API
@@ -197,12 +197,28 @@ extension SignupViewController: SignupViewInput {
                 //TODO: Store image
                 AppData.shared.importUserData(json, nil)
             } else {
-                let json = try await API.shared.getUserDataAsync()
-#if DEBUG
-                print(json)
-#endif
-                AppData.shared.importUserData(json, nil)
+                AppData.shared.importUserData(JSON(userData), nil)
             }
+//            let needsUpdate = try await API.shared.getProfileNeedsUpdateAsync()
+//            if needsUpdate {
+//                ///3a. Get user's profile from provider
+//                let data = try await getProviderData()
+//                ///4a. Feed data to our API
+//                let json = try await API.shared.updateUserprofileAsync(data: data) { progress in
+//                    print(progress)
+//                }
+//#if DEBUG
+//                print(json)
+//#endif
+//                //TODO: Store image
+//                AppData.shared.importUserData(json, nil)
+//            } else {
+//                let json = try await API.shared.getUserDataAsync()
+//#if DEBUG
+//                print(json)
+//#endif
+//                AppData.shared.importUserData(json, nil)
+//            }
         } catch let error {
 #if DEBUG
             print(error.localizedDescription)

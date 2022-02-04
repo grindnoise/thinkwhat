@@ -364,3 +364,48 @@ class AppData {
     private init() {}
 }
 
+extension UserDefaults {
+    
+    struct User {
+        
+    }
+    
+    
+    @UserDefault(key: "has_seen_app_introduction", defaultValue: false)
+    static var hasSeenAppIntroduction: Bool
+}
+
+@propertyWrapper
+struct UserDefault<T> {
+    let key: String
+    let defaultValue: T
+    var container: UserDefaults = .standard
+
+    var wrappedValue: T {
+        get {
+            return container.object(forKey: key) as? T ?? defaultValue
+        }
+        set {
+            container.set(newValue, forKey: key)
+        }
+    }
+}
+
+extension UserDefault where T: ExpressibleByNilLiteral {
+    
+    /// Creates a new User Defaults property wrapper for the given key.
+    /// - Parameters:
+    ///   - key: The key to use with the user defaults store.
+    init(key: String, _ container: UserDefaults = .standard) {
+        self.init(key: key, defaultValue: nil, container: container)
+    }
+}
+
+/// Allows to match for optionals with generics that are defined as non-optional.
+public protocol AnyOptional {
+    /// Returns `true` if `nil`, otherwise `false`.
+    var isNil: Bool { get }
+}
+extension Optional: AnyOptional {
+    public var isNil: Bool { self == nil }
+}

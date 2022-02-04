@@ -29,6 +29,7 @@ struct API_URLS {
     static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_update/"
     static let PROFILES                 = "api/profiles/"
     static let CURRENT_USER             = "api/profiles/current/"
+    static let CURRENT_USER_OR_NULL     = "api/profiles/current_or_null/"
     static let USER_PROFILE_STATS       = "api/profiles/get_profile_stats/"
     static let USER_PROFILE_TOP_PUBS    = "api/profiles/get_top_active_publications/"
     static let USERPOFILE_SUBSCRIBE     = "api/profiles/subscribe/"

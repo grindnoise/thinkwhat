@@ -275,6 +275,15 @@ class API {
         }
     }
     
+    func getUserDataOrNilAsync() async -> Data? {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CURRENT_USER_OR_NULL) else { fatalError(APIError.invalidURL.localizedDescription) }
+        do {
+            return try await requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: headers())
+        } catch {
+            return nil
+        }
+    }
+    
     func loginViaMail(username: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { completion(.failure(APIError.invalidURL)); return }
         let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
