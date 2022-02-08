@@ -593,8 +593,8 @@
             timestampString = "660233322.611492"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "675"
-            endingLineNumber = "675"
+            startingLineNumber = "677"
+            endingLineNumber = "677"
             landmarkName = "centerVertically()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1143,8 +1143,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "366"
-            endingLineNumber = "366"
+            startingLineNumber = "383"
+            endingLineNumber = "383"
             landmarkName = "SignupViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -1159,8 +1159,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "381"
-            endingLineNumber = "381"
+            startingLineNumber = "398"
+            endingLineNumber = "398"
             landmarkName = "SignupViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -1175,8 +1175,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "386"
-            endingLineNumber = "386"
+            startingLineNumber = "403"
+            endingLineNumber = "403"
             landmarkName = "SignupViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -1207,8 +1207,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "334"
-            endingLineNumber = "334"
+            startingLineNumber = "351"
+            endingLineNumber = "351"
             landmarkName = "SignupViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -1223,104 +1223,10 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "246"
-            endingLineNumber = "246"
+            startingLineNumber = "263"
+            endingLineNumber = "263"
             landmarkName = "SignupViewController"
             landmarkType = "21">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "DCBC818E-F14D-4ACE-A8B5-925160A0D0B9"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "220"
-            endingLineNumber = "220"
-            landmarkName = "onProviderAuth(provider:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "DCBC818E-F14D-4ACE-A8B5-925160A0D0B9 - 390b3e0d04cb83e2"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) await resume partial function for ThinkWhat.SignupViewController.onProviderAuth(provider: ThinkWhat.AuthProvider) async throws -&gt; ()"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/Authorization/Sign%20Up/SignupViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "224"
-                  endingLineNumber = "224"
-                  offsetFromSymbolStart = "684">
-               </Location>
-               <Location
-                  uuid = "DCBC818E-F14D-4ACE-A8B5-925160A0D0B9 - 6065ceccc7452ce1"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) await resume partial function for ThinkWhat.SignupViewController.onProviderAuth(provider: ThinkWhat.AuthProvider) async throws -&gt; ()"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/Authorization/Sign%20Up/SignupViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "224"
-                  endingLineNumber = "224"
-                  offsetFromSymbolStart = "660">
-               </Location>
-               <Location
-                  uuid = "DCBC818E-F14D-4ACE-A8B5-925160A0D0B9 - 9322ef4947a66ee7"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(4) await resume partial function for ThinkWhat.SignupViewController.onProviderAuth(provider: ThinkWhat.AuthProvider) async throws -&gt; ()"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/Authorization/Sign%20Up/SignupViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "224"
-                  endingLineNumber = "224"
-                  offsetFromSymbolStart = "748">
-               </Location>
-               <Location
-                  uuid = "DCBC818E-F14D-4ACE-A8B5-925160A0D0B9 - da7d7f0806110fe6"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(5) await resume partial function for ThinkWhat.SignupViewController.onProviderAuth(provider: ThinkWhat.AuthProvider) async throws -&gt; ()"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/Authorization/Sign%20Up/SignupViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "224"
-                  endingLineNumber = "224"
-                  offsetFromSymbolStart = "1036">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "0C6715FB-6BB2-4310-86F6-D5E718583892"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "187"
-            endingLineNumber = "187"
-            landmarkName = "onProviderAuth(provider:)"
-            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1336,6 +1242,38 @@
             startingLineNumber = "283"
             endingLineNumber = "283"
             landmarkName = "getUserDataOrNilAsync()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E1886722-390E-42AE-9120-97CD8A2A013E"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Controllers/App/Feed/SurveysViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "865"
+            endingLineNumber = "865"
+            landmarkName = "appLaunch()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0F6016A8-0CC2-42B4-8707-A935A2BF2C1E"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Managers/REST/API.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "785"
+            endingLineNumber = "785"
+            landmarkName = "requestAsync(url:httpMethod:parameters:encoding:headers:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

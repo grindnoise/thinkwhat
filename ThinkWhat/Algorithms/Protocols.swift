@@ -20,25 +20,25 @@ import Foundation
 //    }
 //}
 
-protocol StorageProtocol {
-    var storeManager: FileStorageProtocol { get }
-}
-
-extension StorageProtocol {
-    var storeManager: FileStorageProtocol {
-        get {
-            return FileStorageProtocol.self as! FileStorageProtocol//appDelegate.container.resolve(FileStorageProtocol.self)!
-        }
-    }
-}
+//protocol StorageProtocol {
+//    var storeManager: FileStorageProtocol { get }
+//}
+//
+//extension StorageProtocol {
+//    var storeManager: FileStorageProtocol {
+//        get {
+//            return FileStorageProtocol.self as! FileStorageProtocol//appDelegate.container.resolve(FileStorageProtocol.self)!
+//        }
+//    }
+//}
 
 //protocol ServerInitializationProtocol {
 //    func initializeServerAPI() -> APIManagerProtocol
 //}
 
-protocol StorageInitializationProtocol {
-    func initializeStorageManager() -> FileStorageProtocol
-}
+//protocol StorageInitializationProtocol {
+//    func initializeStorageManager() -> FileStorageProtocol
+//}
 
 import UIKit
 protocol CallbackDelegate: class {

@@ -142,7 +142,7 @@ class SurveyStackViewController: UIViewController {
                 _surveyPreview.voteButton.layer.shadowOpacity = 1
 
                 if let userprofile = survey.owner as? Userprofile {
-                    _surveyPreview.userName.text = userprofile.name
+                    _surveyPreview.userName.text = "\(userprofile.firstName) \(userprofile.lastName)"
                     if userprofile.image != nil {
                         _surveyPreview.userImage.image = userprofile.image!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED)
                     } else {

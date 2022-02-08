@@ -86,14 +86,14 @@ class ResultIndicator: UIView {
     private func setupImages() {
         if !answer.voters.isEmpty {
             if isSelected {
-                if !answer.voters.filter({ $0 == AppData.shared.userprofile }).isEmpty {
-                    if let index = answer.voters.firstIndex(where: { $0 == AppData.shared.userprofile/*Userprofiles.shared.own?.id*/ }) {
+                if !answer.voters.filter({ $0 == Userprofiles.shared.current! }).isEmpty {
+                    if let index = answer.voters.firstIndex(where: { $0 == Userprofiles.shared.current!/*Userprofiles.shared.own?.id*/ }) {
                         if  index != 0  {
                             answer.voters.rearrange(from: index, to: 0)
                         }
                     }
                 } else {
-                    answer.voters.insert(AppData.shared.userprofile, at: 0)//(Userprofiles.shared.own!, at: 0)
+                    answer.voters.insert(Userprofiles.shared.current!, at: 0)//(Userprofiles.shared.own!, at: 0)
                 }
             }
             

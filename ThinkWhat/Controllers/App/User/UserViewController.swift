@@ -104,7 +104,7 @@ class UserViewController: UIViewController {
         
         view.setNeedsLayout()
         view.layoutIfNeeded()
-        usernameLabel.text = userprofile.name.replacingOccurrences(of: " ", with: "\n")
+        usernameLabel.text = "\(userprofile.firstName) \(userprofile.lastName)"
         genderAgeLabel.text = "\(userprofile.gender == .Male ? "мужчина" : "женщина"), \(userprofile.age)"
         subscriptionButton.cornerRadius = subscriptionButton.frame.height / 2
         subscriptionBackground.addShadow(shadowPath: UIBezierPath(roundedRect: subscriptionBackground.bounds,

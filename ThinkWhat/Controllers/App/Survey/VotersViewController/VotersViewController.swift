@@ -141,7 +141,7 @@ extension VotersViewController: UICollectionViewDelegate, UICollectionViewDataSo
             
             if userprofile != nil {
                 cell.userprofile = userprofile
-                cell.name.text = userprofile.name
+                cell.name.text = "\(userprofile.firstName) \(userprofile.lastName)"//userprofile.name
                 cell.age = userprofile.age
                 cell.gender = userprofile.gender
                 if let image = userprofile.image {

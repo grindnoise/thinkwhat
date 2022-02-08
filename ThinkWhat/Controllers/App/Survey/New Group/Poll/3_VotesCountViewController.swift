@@ -26,7 +26,7 @@ class VotesCountViewController: UIViewController {
             totalCost = 0
             if actionButton != nil {
 //                actionButton.text = "\(votesCapacity)"
-                if votesCapacity > MAX_VOTES_COUNT, AppData.shared.system.newPollTutorialRequired {
+                if votesCapacity > MAX_VOTES_COUNT {//, UserDefaults.App.hasSeenPollCreationIntroduction {
                     if !isMaxVotesBannerShown {
                         Banner.shared.contentType = .Warning
                         if let content = Banner.shared.content as? Warning {
@@ -40,7 +40,7 @@ class VotesCountViewController: UIViewController {
                     UIView.animate(withDuration: 0.3) {
                         self.actionButton.color = K_COLOR_GRAY
                     }
-                } else if votesCapacity < MIN_VOTES_COUNT, AppData.shared.system.newPollTutorialRequired {
+                } else if votesCapacity < MIN_VOTES_COUNT {//}, UserDefaults.App.hasSeenPollCreationIntroduction {
                     if !isMinVotesBannerShown {
                         Banner.shared.contentType = .Warning
                         if let content = Banner.shared.content as? Warning {

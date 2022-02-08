@@ -13,6 +13,7 @@ import Alamofire
 
 final class VKWorker {
     class func authorize(completion: @escaping(Result<Token,Error>)->()) {
+//        VK.setUp(appId: <#T##String#>, delegate: <#T##SwiftyVKDelegate#>, bundleName: <#T##String?#>, configPath: <#T##String?#>)
         guard VK.sessions.default.accessToken == nil else { completion(.success(VK.sessions.default.accessToken!)); return }
         VK.sessions.default.logIn(
             onSuccess: { info in
@@ -50,6 +51,7 @@ final class VKWorker {
     
     class func logout() {
         VK.sessions.default.logOut()
+        VK.release()
         print("SwiftyVK: LogOut")
     }
     

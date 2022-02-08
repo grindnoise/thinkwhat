@@ -153,7 +153,7 @@ class PollController: UIViewController {
         performChecks()
         
         //Temporary
-        AppData.shared.system.youtubePlayOption = nil
+        UserDefaults.App.youtubePlay = nil
     }
    
     override func viewWillAppear(_ animated: Bool) {
@@ -826,7 +826,7 @@ extension PollController: CallbackDelegate {
                                           let timestamp = Date(dateTimeString: timeString) as? Date else { break }
                                     self.survey!.result = [answerId: timestamp]
                                     Surveys.shared.hot.remove(object: self.survey!)
-                                    AppData.shared.profile.balance += 1
+                                    Userprofiles.shared.current!.balance += 1
                                 }
                                 self.surveyRef.isComplete = true
                                 self.mode = .ReadOnly
@@ -1069,10 +1069,10 @@ class YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackDelegate {
 //    private var bannerHasBeenShown = false
     private var tempAppPreference: SideAppPreference?
     private var sideAppPreference: SideAppPreference? {
-        if AppData.shared.system.youtubePlayOption == nil {
+        if UserDefaults.App.youtubePlay == nil {
             return nil
         } else {
-            return AppData.shared.system.youtubePlayOption
+            return UserDefaults.App.youtubePlay
         }
     }
     private var isYoutubeInstalled: Bool {
@@ -1188,10 +1188,10 @@ class EmbeddedURLCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, Call
     private var tempAppPreference: SideAppPreference?
     private var sideAppPreference: SideAppPreference? {
         if app == .TikTok {
-            if AppData.shared.system.tiktokPlayOption == nil {
+            if UserDefaults.App.tiktokPlay == nil {
                 return nil
             } else {
-                return AppData.shared.system.tiktokPlayOption
+                return UserDefaults.App.tiktokPlay
             }
         }
         return nil

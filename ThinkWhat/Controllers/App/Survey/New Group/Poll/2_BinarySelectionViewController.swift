@@ -45,7 +45,7 @@ class BinarySelectionViewController: UIViewController {
     var isAnimationStopped = false
     var isEnabled: Bool? {
         didSet {
-            if AppData.shared.system.newPollTutorialRequired, selectionType == .Hot, isEnabled == true, !isBannerShown {
+            if UserDefaults.App.hasSeenPollCreationIntroduction, selectionType == .Hot, isEnabled == true, !isBannerShown {
                 Banner.shared.contentType = .Warning
                 if let content = Banner.shared.content as? Warning {
                     content.level = .Warning

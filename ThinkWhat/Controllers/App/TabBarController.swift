@@ -9,7 +9,7 @@
 import UIKit
 import UserNotifications
 
-class TabBarController: UITabBarController, StorageProtocol {
+class TabBarController: UITabBarController {//}, StorageProtocol {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return selectedViewController?.preferredStatusBarStyle ?? .lightContent
     }

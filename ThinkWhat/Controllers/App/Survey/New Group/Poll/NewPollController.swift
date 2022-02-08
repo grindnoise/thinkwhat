@@ -1471,7 +1471,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                 self.view.isUserInteractionEnabled = true
                 self.view.subviews.map { $0.isUserInteractionEnabled = true }
             }
-            if AppData.shared.system.newPollTutorialRequired {
+            if UserDefaults.App.hasSeenPollCreationIntroduction {
                 delay(seconds: 1) {
                     Banner.shared.contentType = .Warning
                     if let content = Banner.shared.content as? Warning {
@@ -1513,7 +1513,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                 }
                 
             }
-            if AppData.shared.system.newPollTutorialRequired {
+            if UserDefaults.App.hasSeenPollCreationIntroduction {
                 delay(seconds: 1) {
                     Banner.shared.contentType = .Warning
                     if let content = Banner.shared.content as? Warning {
@@ -1722,7 +1722,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             } else if v.accessibilityIdentifier == "balance" {
                 Banner.shared.contentType = .TotaLCost
                 if let content = Banner.shared.content as? TotalCost {
-                    content.balance = AppData.shared.profile.balance
+                    content.balance = Userprofiles.shared.current!.balance
                 }
                 Banner.shared.present(shouldDismissAfter: 5, delegate: nil)
             } else if v == hyperlinkInfoButton {

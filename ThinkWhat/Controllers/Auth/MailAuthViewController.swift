@@ -112,7 +112,7 @@ class MailAuthViewController: UIViewController {
         for tf in textFields {
             tf.delegate = self
         }
-        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleSuccessfulLogin), name: Notifications.OAuth.TokenReceived, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleSuccessfulLogin), name: Notifications.OAuth.TokenReceived, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(MailAuthViewController.handleWrongCredentials), name: Notifications.OAuth.TokenWrongCredentials, object: nil)
 //        NotificationCenter.default.addObserver(self,
 //                                       selector: #selector(AuthViewController.handleReachabilitySignal),
@@ -188,56 +188,56 @@ class MailAuthViewController: UIViewController {
         showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: "Неверный логип/пароль")
     }
     
-    @objc fileprivate func handleSuccessfulLogin() {
-            API.shared.getUserData() { resut in
-                switch resut {
-                case .success(let json):
-                    AppData.shared.importUserData(json)
-                    if AppData.shared.profile.isEmailVerified! {
-                            self.performSegue(withIdentifier: Segues.Auth.ProfileFromAuth, sender: nil)
-                    } else {
-                        API.shared.getEmailConfirmationCode() { resut in
-                            switch resut {
-                            case .success(let json):
-                                EmailResponse.shared.importJson(json)
-                                self.performSegue(withIdentifier: Segues.Auth.MailValidationFromSignin, sender: nil)
-                            case .failure(let error):
-                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error.localizedDescription)
-                            }
-                        }
-                    }
-                case .failure(let error):
-                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error.localizedDescription)
-                }
-            }
-            
-//            apiManager.getEmailVerified() {
-//                _isEmailVerified, error in
-//                if error != nil {
-//                    print(error!.localizedDescription)
-//                    self.simpleAlert(error!.localizedDescription)
-//                } else {
-//                    if let isEmailVerified = _isEmailVerified {
-//                        switch isEmailVerified {
-//                        case true:
-//                            self.performSegue(withIdentifier: kSegueAppFromMailSignin, sender: nil)
-//                        case false:
-//                            self.apiManager.getEmailConfirmationCode() {
-//                                json, error in
-//                                if error != nil {
-//                                    self.simpleAlert(error!.localizedDescription)
-//                                }
-//                                if json != nil {
-//                                    EmailResponse.shared.importJson(json!)
-//                                    self.performSegue(withIdentifier: kSegueMailValidationFromSignin, sender: nil)
-//                                }
+//    @objc fileprivate func handleSuccessfulLogin() {
+//            API.shared.getUserData() { resut in
+//                switch resut {
+//                case .success(let json):
+//                    AppData.shared.importUserData(json)
+//                    if AppData.shared.profile.isEmailVerified! {
+//                            self.performSegue(withIdentifier: Segues.Auth.ProfileFromAuth, sender: nil)
+//                    } else {
+//                        API.shared.getEmailConfirmationCode() { resut in
+//                            switch resut {
+//                            case .success(let json):
+//                                EmailResponse.shared.importJson(json)
+//                                self.performSegue(withIdentifier: Segues.Auth.MailValidationFromSignin, sender: nil)
+//                            case .failure(let error):
+//                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error.localizedDescription)
 //                            }
 //                        }
 //                    }
+//                case .failure(let error):
+//                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]]], text: error.localizedDescription)
 //                }
 //            }
-        }
-    }
+//            
+////            apiManager.getEmailVerified() {
+////                _isEmailVerified, error in
+////                if error != nil {
+////                    print(error!.localizedDescription)
+////                    self.simpleAlert(error!.localizedDescription)
+////                } else {
+////                    if let isEmailVerified = _isEmailVerified {
+////                        switch isEmailVerified {
+////                        case true:
+////                            self.performSegue(withIdentifier: kSegueAppFromMailSignin, sender: nil)
+////                        case false:
+////                            self.apiManager.getEmailConfirmationCode() {
+////                                json, error in
+////                                if error != nil {
+////                                    self.simpleAlert(error!.localizedDescription)
+////                                }
+////                                if json != nil {
+////                                    EmailResponse.shared.importJson(json!)
+////                                    self.performSegue(withIdentifier: kSegueMailValidationFromSignin, sender: nil)
+////                                }
+////                            }
+////                        }
+////                    }
+////                }
+////            }
+//        }
+//    }
     
 //    private func simpleAlert(_ message: String) {
 //        let alertController = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
@@ -256,7 +256,7 @@ class MailAuthViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
-
+}
 
 
 extension MailAuthViewController: UITextFieldDelegate {
@@ -288,9 +288,3 @@ extension MailAuthViewController: UITextFieldDelegate {
         return true
     }
 }
-
-//extension MailAuthViewController: ApiReachability {
-//    func handleReachabilitySignal() {
-//        showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: {self.isLoadingViewVisible = false}]], text: "Сервер недоступен")
-//    }
-//}

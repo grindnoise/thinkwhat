@@ -347,12 +347,12 @@ class API {
     func logout(completion: @escaping (Result<Bool, Error>) -> ()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_REVOKE) else { completion(.failure(APIError.invalidURL)); return }
         guard let token = KeychainService.loadAccessToken() as String?, !token.isEmpty else {
-            AppData.shared.eraseData()
+            UserDefaults.clear()
             Surveys.shared.eraseData()
             Userprofiles.shared.eraseData()
             SurveyReferences.shared.eraseData()
-            FBManager.performLogout()
-            VKManager.performLogout()
+            FBWorker.logout()
+            VKWorker.logout()
             completion(.success(true))
             return
         }
@@ -362,12 +362,12 @@ class API {
             switch response.result {
             case .success(let value):
                 guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
-                AppData.shared.eraseData()
+                UserDefaults.clear()
                 Surveys.shared.eraseData()
                 Userprofiles.shared.eraseData()
                 SurveyReferences.shared.eraseData()
-                FBManager.performLogout()
-                VKManager.performLogout()
+                FBWorker.logout()
+                VKWorker.logout()
                 completion(.success(true))
 //                if 200...299 ~= statusCode {
 //                    completion(saveTokenInKeychain(json: json))
@@ -408,7 +408,7 @@ class API {
             switch result {
             case .success(let json):
                 guard let id = json["userprofile_id"].int, let needsUpdate = json["needs_update"].bool else { completion(.failure("User id is not found in response")); return }
-                AppData.shared.profile.id = id
+                UserDefaults.Profile.id = id
                 completion(.success(needsUpdate))
             case .failure(let error):
                 completion(.failure(error))
@@ -422,7 +422,7 @@ class API {
             let data = try await requestAsync(url: url, httpMethod: .get, headers: headers())
             let json = try JSON(data: data, options: .mutableContainers)
             guard let id = json["userprofile_id"].int, let needsUpdate = json["needs_update"].bool else { throw "Invalid JSON data" }
-            AppData.shared.profile.id = id
+            UserDefaults.Profile.id = id
             return needsUpdate
         } catch let error {
             throw error
@@ -443,7 +443,7 @@ class API {
     
     
     func updateUserprofile(user: Userprofile, uploadProgress: @escaping(Double) -> (), completion: @escaping(Result<JSON, Error>) -> ()) {
-            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/") else {
                 completion(.failure(APIError.invalidURL))
                 return
             }
@@ -465,7 +465,7 @@ class API {
                     imgExt = .PNG
                 }
                 guard imageData != nil else { completion(.failure(APIError.badData)); return }
-                multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(imgExt.rawValue)", mimeType: "jpg/png")
+                multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(imgExt.rawValue)", mimeType: "jpg/png")
                 for (key, value) in dict {
                     if value is String || value is Int {
                         multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
@@ -586,7 +586,7 @@ class API {
     }
     
     func updateUserprofile(data: [String: Any], uploadProgress: @escaping(Double) -> (), completion: @escaping(Result<JSON, Error>) -> ()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/") else {
             completion(.failure(APIError.invalidURL))
             return
         }
@@ -607,7 +607,7 @@ class API {
             }
             guard imageData != nil, fileFormat != .Unknown else { completion(.failure(APIError.badData)); return }
 //            guard imageData != nil else { completion(.failure(APIError.badData)); return }
-            multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(fileFormat)", mimeType: "jpg/png")
+            multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(fileFormat)", mimeType: "jpg/png")
             for (key, value) in dict {
                 if value is String || value is Int {
                     multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
@@ -619,8 +619,8 @@ class API {
         }
     }
     
-    func updateUserprofileAsync(data: [String: Any], uploadProgress: @escaping(Double) -> ()) async throws -> JSON {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else { throw APIError.invalidURL
+    func updateUserprofileAsync(data: [String: Any], uploadProgress: @escaping(Double) -> ()) async throws -> Data {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/") else { throw APIError.invalidURL
         }
         
         var dict = data
@@ -637,7 +637,7 @@ class API {
                 fileFormat = .PNG
             }
             guard imageData != nil, fileFormat != .Unknown else { throw APIError.badData }
-            multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(fileFormat)", mimeType: "jpg/png")
+            multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(fileFormat)", mimeType: "jpg/png")
             for (key, value) in dict {
                 if value is String || value is Int {
                     multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
@@ -650,8 +650,7 @@ class API {
             }
         } else {
             do {
-            let responseData = try await requestAsync(url: url, httpMethod: .patch, parameters: dict, encoding: JSONEncoding.default)
-                return try JSON(data: responseData, options: .mutableContainers)
+            return try await requestAsync(url: url, httpMethod: .patch, parameters: dict, encoding: JSONEncoding.default)//JSON(data: responseData, options: .mutableContainers)
             } catch {
                 throw error
             }
@@ -867,7 +866,7 @@ class API {
                                 imageData = data
                                 imgExt = .PNG
                             }
-                            multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
+                            multipartFormData.append(imageData!, withName: "image", fileName: "\(UserDefaults.Profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
                             multipartFormData.append("\(survey.id)".data(using: .utf8)!, withName: "survey")
                             multipartFormData.append("\(mediafile.order)".data(using: .utf8)!, withName: "order")
                             multipartFormData.append("\(mediafile.title)".data(using: .utf8)!, withName: "title")
@@ -1235,7 +1234,7 @@ class API {
             case .success(let json):
                 PriceList.shared.importJson(json["pricelist"])
                 if let balance = json[DjangoVariables.UserProfile.balance].int {
-                    AppData.shared.profile.balance = balance
+                    Userprofiles.shared.current!.balance = balance
                 }
             case .failure(let error):
                 fatalError(error.localizedDescription)
@@ -1521,8 +1520,8 @@ class API {
 //        }
     }
     
-    public func uploadMultipartFormDataAsync(url: URL, method: HTTPMethod, multipartDataForm: MultipartFormData, uploadProgress: @escaping (Double) -> ()?) async throws -> JSON {
-        try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<JSON, Error>) in
+    public func uploadMultipartFormDataAsync(url: URL, method: HTTPMethod, multipartDataForm: MultipartFormData, uploadProgress: @escaping (Double) -> ()?) async throws -> Data {
+        try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data, Error>) in
         AF.upload(multipartFormData: multipartDataForm, to: url, method: method, headers: headers())
             .uploadProgress(closure: { prog in
                 uploadProgress(prog.fractionCompleted)
@@ -1544,7 +1543,7 @@ class API {
                             continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString()))
                             return
                         }
-                        continuation.resume(returning: json)
+                        continuation.resume(returning: data)
                         return
                     } catch let error {
                         continuation.resume(throwing: error)

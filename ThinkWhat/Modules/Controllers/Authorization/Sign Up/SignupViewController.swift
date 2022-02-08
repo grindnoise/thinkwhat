@@ -35,6 +35,11 @@ class SignupViewController: UIViewController {
         }
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        controllerOutput?.onDidDisappear()
+    }
+    
     func validate(completion: @escaping(Result<Bool,Error>)->()) {
         recaptcha?.validate(on: view) { [weak self] (result: ReCaptchaResult) in
             switch result {
@@ -55,6 +60,10 @@ class SignupViewController: UIViewController {
 
 // MARK: - View Input
 extension SignupViewController: SignupViewInput {
+    func onSignupSuccess() {
+        print("onSignupSuccess")
+    }
+    
     func onCaptchaValidation(completion: @escaping(Result<Bool,Error>)->()) {
         validate{ completion($0) }
     }
@@ -75,42 +84,57 @@ extension SignupViewController: SignupViewInput {
         }
     }
     
-    func onFacebookTap(fbCompletion: @escaping(Result<Bool,Error>)->()) {
-        if AccessToken.current == nil || AccessToken.current!.expirationDate < Date() {
-            FBManager.performLogin(viewController: self) { success in
-                if success {
-                    guard let token = AccessToken.current?.tokenString else { fatalError() }
-                    API.shared.loginViaProvider(provider: .Facebook, token: token) { result in
-                        switch result {
-                        case .success:
-                            NotificationCenter.default.post(name: Notifications.OAuth.TokenReceived, object: nil)
-                        case .failure(let error):
-                            
-                            NotificationCenter.default.post(name: Notifications.OAuth.TokenError, object: nil)
-                        }
-                    }
-                } else {
-                    fatalError("Facebook login ERROR")
-                }
-            }
-        }
-    }
+//    func onFacebookTap(fbCompletion: @escaping(Result<Bool,Error>)->()) {
+//        if AccessToken.current == nil || AccessToken.current!.expirationDate < Date() {
+//            FBWorker.performLogin(viewController: self) { success in
+//                if success {
+//                    guard let token = AccessToken.current?.tokenString else { fatalError() }
+//                    API.shared.loginViaProvider(provider: .Facebook, token: token) { result in
+//                        switch result {
+//                        case .success:
+//                            NotificationCenter.default.post(name: Notifications.OAuth.TokenReceived, object: nil)
+//                        case .failure(let error):
+//                            
+//                            NotificationCenter.default.post(name: Notifications.OAuth.TokenError, object: nil)
+//                        }
+//                    }
+//                } else {
+//                    fatalError("Facebook login ERROR")
+//                }
+//            }
+//        }
+//    }
     
     func onProviderAuth(provider: AuthProvider) async throws {
         
-        func getProviderToken() async throws -> String {
+        func providerLogout() {
             switch provider {
             case .VK:
-                guard let providerToken = try await VKWorker.authorizeAsync().get() else { throw "VK token error" }
-                return providerToken
+                VKWorker.logout()
             case .Facebook:
-                print("")
+                FBWorker.logout()
             default:
 #if DEBUG
                 fatalError("Not implemented")
 #endif
             }
-            throw "Method failure"
+        }
+        
+        var providerImage: UIImage?
+        func getProviderToken() async throws -> String {
+            switch provider {
+            case .VK:
+                vkDelegateReference = VKDelegate()
+                guard let providerToken = try await VKWorker.authorizeAsync().get() else { throw "VK token not available" }
+                return providerToken
+            case .Facebook:
+                guard let providerToken = try await FBWorker.authorizeAsync(viewController: self).tokenString as? String else { throw "Facebook token not available" }
+                return providerToken
+            default:
+#if DEBUG
+                fatalError("Not implemented")
+#endif
+            }
         }
         
         func getProviderData() async throws -> [String: Any] {
@@ -128,7 +152,7 @@ extension SignupViewController: SignupViewInput {
                     let birthDate = json[0]["bdate"].string
                     if let pictureURL = json[0]["photo_400_orig"].string, let url = URL(string: pictureURL) {
                         do {
-                            let image = try await API.shared.downloadImageAsync(from: url)
+                            providerImage = try await API.shared.downloadImageAsync(from: url)
                             return VKWorker.prepareDjangoData(id: id,
                                                               firstName: firstName,
                                                               lastName: lastName,
@@ -136,7 +160,7 @@ extension SignupViewController: SignupViewInput {
                                                               gender: gender,
                                                               domain: domain,
                                                               birthDate: birthDate,
-                                                              image: image)
+                                                              image: providerImage)
                         } catch {
                             return VKWorker.prepareDjangoData(id: id,
                                                               firstName: firstName,
@@ -168,7 +192,8 @@ extension SignupViewController: SignupViewInput {
                     let json = try await VKWorker.accountInfoAsync()
                     return try await prepareData(json: json)
                 case .Facebook:
-                    throw "Not implemented"
+                    let json = try await FBWorker.accountInfoAsync()
+                    return try await prepareData(json: json)
                 default:
                     throw "Not implemented"
                 }
@@ -180,61 +205,53 @@ extension SignupViewController: SignupViewInput {
         do {
             ///1. Request provider for an access token
             let providerToken = try await getProviderToken()
+            ///Perform animations
+            await MainActor.run {
+                controllerOutput?.onProviderControllerDisappear(provider: provider)
+            }
             ///2. Login into our API
             try await API.shared.loginViaProviderAsync(provider: provider, token: providerToken)
-            ///3. Check if profile was edited manually
-            let userData = try await API.shared.getUserDataOrNilAsync()
-            if userData == nil {
-                ///3a. Get user's profile from provider
-                let data = try await getProviderData()
-                ///4a. Feed data to our API
-                let json = try await API.shared.updateUserprofileAsync(data: data) { progress in
-                    print(progress)
+            
+            ///3. Get profile from API
+            let userData = await API.shared.getUserDataOrNilAsync()
+            do {
+                ///4. If Profile was edited by user - no need to get data from provider
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .formatted(.dateTimeFormatter)
+                Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: userData!)
+            } catch {
+                ///5. Profile wasn't edited - we need to update it with provider data
+                do {
+                    let json = try JSON(data: userData!, options: .mutableContainers)
+                    guard let id = json["id"].int else { throw "User ID not found" }
+                    UserDefaults.Profile.id = id
+                    ///5.1. Get user's profile from provider
+                    let providerData = try await getProviderData()
+                    ///5.2. Feed data to our API
+                    let data = try await API.shared.updateUserprofileAsync(data: providerData) { progress in
+                        print(progress)
+                    }
+                    ///5.3. Import data
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                               DateFormatter.dateTimeFormatter,
+                                                               DateFormatter.dateFormatter ]
+                    Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: data)
+                    Userprofiles.shared.current?.image = providerImage
+    #if DEBUG
+                    print(Userprofiles.shared.current)
+    #endif
+                    providerLogout()
+                } catch {
+                    providerLogout()
+                    throw error
                 }
-#if DEBUG
-                print(json)
-#endif
-                //TODO: Store image
-                AppData.shared.importUserData(json, nil)
-            } else {
-                AppData.shared.importUserData(JSON(userData), nil)
             }
-//            let needsUpdate = try await API.shared.getProfileNeedsUpdateAsync()
-//            if needsUpdate {
-//                ///3a. Get user's profile from provider
-//                let data = try await getProviderData()
-//                ///4a. Feed data to our API
-//                let json = try await API.shared.updateUserprofileAsync(data: data) { progress in
-//                    print(progress)
-//                }
-//#if DEBUG
-//                print(json)
-//#endif
-//                //TODO: Store image
-//                AppData.shared.importUserData(json, nil)
-//            } else {
-//                let json = try await API.shared.getUserDataAsync()
-//#if DEBUG
-//                print(json)
-//#endif
-//                AppData.shared.importUserData(json, nil)
-//            }
         } catch let error {
 #if DEBUG
             print(error.localizedDescription)
 #endif
-            switch provider {
-            case .VK:
-                VKWorker.logout()
-            case .Facebook:
-#if DEBUG
-                fatalError("Not implemented")
-#endif
-            default:
-#if DEBUG
-                fatalError("Not implemented")
-#endif
-            }
+            providerLogout()
             throw error
         }
     }

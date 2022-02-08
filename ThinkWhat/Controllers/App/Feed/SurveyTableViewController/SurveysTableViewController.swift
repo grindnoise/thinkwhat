@@ -249,7 +249,7 @@ class SurveysTableViewController: UITableViewController {
         } else if type == .Own || type == .Favorite {
             navTitleImageSize = CGSize(width: 45, height: 45)
             navTitle = UIImageView(frame: CGRect(origin: .zero, size: navTitleImageSize))
-            if let imagePath = AppData.shared.profile.imagePath, let image = UIImage(contentsOfFile: imagePath) {
+            if let imagePath = UserDefaults.Profile.imagePath, let image = UIImage(contentsOfFile: imagePath) {
                 (navTitle! as! UIImageView).image = image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
             } else if let _image = UIImage(named: "user") {
                 (navTitle! as! UIImageView).image = _image.circularImage(size: navTitleImageSize, frameColor: K_COLOR_RED)
@@ -298,13 +298,13 @@ class SurveysTableViewController: UITableViewController {
             return Surveys.shared.topReferences.count
         case .User:
             if !needsAwaitForNotification || userSurveysReceived {
-                return AppData.shared.userprofile.surveys.count
+                return Userprofiles.shared.current?.surveys.count ?? 0
             } else {
                 return 0
             }
         case .UserFavorite:
             if !needsAwaitForNotification ||  userSurveysReceived {
-                return AppData.shared.userprofile.favoritesTotal
+                return Userprofiles.shared.current?.favoritesTotal ?? 0
             } else {
                 return 0
             }
@@ -350,9 +350,9 @@ class SurveysTableViewController: UITableViewController {
                 case .Top:
                     dataSource = Surveys.shared.topReferences
                 case .User:
-                    dataSource = AppData.shared.userprofile.surveys//userProfile!.surveysCreated
+                    dataSource = Userprofiles.shared.current!.surveys//userProfile!.surveysCreated
                 case .UserFavorite:
-                    dataSource = AppData.shared.userprofile.favorites.values.first ?? []//userProfile!.surveysFavorite
+                    dataSource = Userprofiles.shared.current!.favorites.values.first ?? []//userProfile!.surveysFavorite
 //                case .Category:
 //                    dataSource = Surveys.shared.allLinks.filter { $0.category == self.category }
                 case .Own:
@@ -442,27 +442,27 @@ class SurveysTableViewController: UITableViewController {
         } else if type == .UserFavorite {
             _type = API.SurveyType.UserFavorite
         }
-        API.shared.loadSurveysByOwner(user: AppData.shared.userprofile, type: _type) { result in
-            switch result {
-            case .success(let json):
-                //TODO: - поместить в json с ключом
-                var _type: Userprofile.UserSurveyType!
-                if self.type == .User {
-                    _type = Userprofile.UserSurveyType.Own
-                } else if self.type == .UserFavorite {
-                    _type = Userprofile.UserSurveyType.Favorite
-                }
-                do {
-                    AppData.shared.userprofile.loadSurveys(data: try json.rawData())//importSurveys(_type, json: json!)
-                    self.refreshControl?.endRefreshing()
-                    self.tableView.reloadData()
-                } catch (let error) {
-                    stopRefreshing(error: error)
-                }
-            case .failure(let error):
-                stopRefreshing(error: error)
-            }
-        }
+//        API.shared.loadSurveysByOwner(user: Userprofiles.shared.current!, type: _type) { result in
+//            switch result {
+//            case .success(let json):
+//                //TODO: - поместить в json с ключом
+//                var _type: Userprofile.UserSurveyType!
+//                if self.type == .User {
+//                    _type = Userprofile.UserSurveyType.Own
+//                } else if self.type == .UserFavorite {
+//                    _type = Userprofile.UserSurveyType.Favorite
+//                }
+//                do {
+//                    AppData.shared.userprofile.loadSurveys(data: try json.rawData())//importSurveys(_type, json: json!)
+//                    self.refreshControl?.endRefreshing()
+//                    self.tableView.reloadData()
+//                } catch (let error) {
+//                    stopRefreshing(error: error)
+//                }
+//            case .failure(let error):
+//                stopRefreshing(error: error)
+//            }
+//        }
     }
 
 //    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

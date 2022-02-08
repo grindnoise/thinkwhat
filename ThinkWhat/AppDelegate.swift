@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow()
         window?.rootViewController = CustomNavigationController(rootViewController: controller)
         window?.makeKeyAndVisible()
-        vkDelegateReference = VKDelegate()
+//        vkDelegateReference = VKDelegate()
         ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }

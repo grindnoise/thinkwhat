@@ -25,7 +25,7 @@ class _AuthViewController: UIViewController, UINavigationControllerDelegate {
     private var isViewSetupCompleted                = false
     private var vk_sdkInstance:                     VKSdk!
 //    private lazy var apiManager:   APIManagerProtocol = self.initializeServerAPI()
-    private lazy var storeManager: FileStorageProtocol = self.initializeStorageManager()
+//    private lazy var storeManager: FileStorageProtocol = self.initializeStorageManager()
     @IBOutlet weak var stackView: UIStackView!
     
     
@@ -169,27 +169,27 @@ class _AuthViewController: UIViewController, UINavigationControllerDelegate {
                 //                self.isLoadingViewVisible = true
                 //                showAlert(type: .Loading, buttons: nil, text: "Вход в систему..")
                 if AccessToken.current == nil || AccessToken.current!.expirationDate < Date() {
-                    FBManager.performLogin(viewController: self) { success in
-                        if success {
-                            delay(seconds: 0.2) {
-                                showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
-                            }
-                            guard let token = AccessToken.current?.tokenString else { fatalError() }
-                            API.shared.loginViaProvider(provider: .Facebook, token: token) { result in
-                                switch result {
-                                case .success:
-                                    NotificationCenter.default.post(name: Notifications.OAuth.TokenReceived, object: nil)
-                                case .failure(let error):
-                                    
-                                    NotificationCenter.default.post(name: Notifications.OAuth.TokenError, object: nil)
-                                }
-                            }
-                        } else {
-                            //TODO: - Throw alert
-                            //showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Facebook login ERROR")
-                            fatalError("Facebook login ERROR")
-                        }
-                    }
+//                    FBWorker.performLogin(viewController: self) { success in
+//                        if success {
+//                            delay(seconds: 0.2) {
+//                                showAlert(type: .Loading, buttons: [nil], text: "Вход в систему..")
+//                            }
+//                            guard let token = AccessToken.current?.tokenString else { fatalError() }
+//                            API.shared.loginViaProvider(provider: .Facebook, token: token) { result in
+//                                switch result {
+//                                case .success:
+//                                    NotificationCenter.default.post(name: Notifications.OAuth.TokenReceived, object: nil)
+//                                case .failure(let error):
+//                                    
+//                                    NotificationCenter.default.post(name: Notifications.OAuth.TokenError, object: nil)
+//                                }
+//                            }
+//                        } else {
+//                            //TODO: - Throw alert
+//                            //showAlert(type: .Warning, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Facebook login ERROR")
+//                            fatalError("Facebook login ERROR")
+//                        }
+//                    }
                 } else {
                     guard let token = AccessToken.current?.tokenString else { fatalError() }
                     API.shared.loginViaProvider(provider: .Facebook, token: token) { result in
@@ -272,144 +272,144 @@ class _AuthViewController: UIViewController, UINavigationControllerDelegate {
     
     @objc private func getUserDataFromProvider() {
         var imagePath: String?
-        API.shared.getUserData { result in
-            switch result {
-            case .success(let json):
-                AppData.shared.profile.id = json["id"].int
-                let auth = self.getAuthCase()
-                API.shared.getProfileNeedsUpdate { resultNeedsSocialUpdate in
-                    switch resultNeedsSocialUpdate {
-                    case .success(let needsUpdateFromSocialMedia):
-                        if needsUpdateFromSocialMedia {
-                            switch auth {
-                            case .Facebook:
-                                FBManager.getUserData() {
-                                    response in
-                                    guard var json = response,
-                                          var fbData = json.dictionaryObject,
-                                          let pictureData = JSON(fbData.removeValue(forKey: "picture") as Any) as? JSON,
-                                          let is_silhouette = pictureData["data"]["is_silhouette"].bool else {
-                                              AppData.shared.eraseData()
-                                              hideAlert()
-                                              return }
-                                    if !is_silhouette {
-                                        guard let pictureURL = URL(string: pictureData["data"]["url"].string!) else {
-                                                  AppData.shared.eraseData()
-                                                  hideAlert()
-                                                  return }
-                                        API.shared.downloadFile(url: pictureURL) { progress in
-                                            print("Downloading FB avatar: \(progress)")
-                                        } completion: { pictureDownload in
-                                            switch pictureDownload {
-                                            case .success(let data):
-                                                guard let image = UIImage(data: data) else {
-                                                    AppData.shared.eraseData()
-                                                    hideAlert()
-                                                    return
-                                                }
-                                                var fileFormat: FileFormat = FileFormat.Unknown
-                                                if image.png != nil {
-                                                    fileFormat = .PNG
-                                                } else if image.jpeg != nil {
-                                                    fileFormat = .JPEG
-                                                }
-                                                imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: fileFormat, surveyID: nil)
-                                                fbData["image"] = image
-                                                API.shared.updateUserprofile(data: FBManager.prepareUserData(fbData)) { uploadProgress in
-                                                    print(uploadProgress)
-                                                } completion: { result in
-                                                    switch result {
-                                                    case .success(let json):
-                                                        AppData.shared.importUserData(json, imagePath)
-                                                        self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
-                                                    case .failure(let error):
-                                                        AppData.shared.eraseData()
-                                                        hideAlert()
-                                                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-                                                    }
-                                                }
-                                            case .failure(let error):
-                                                AppData.shared.eraseData()
-                                                hideAlert()
-                                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-                                            }
-                                        }
-                                    }
-                                }
-                            case .VK:
-                                print("")
-//                                VKManager.getUserData() { vkResult in
-//                                    switch vkResult {
-//                                    case .success(let vkJson):
-//                                        guard var vkData = json.dictionaryObject?["response"] else { return }
-//                                        guard let vkImage = json.dictionaryObject?.removeValue(forKey: "picture") as? JSON else { return }
-//
-//
-//
-//                                        
-//                                        if let array = vkJson.dictionaryObject!["response"] {
-//                                            if array is Array<[String: Any]> {
-//                                                let dict = array as! Array<[String: Any]>
-//                                                var vkData = [String: Any]()
-//                                                if dict.count != 0 { vkData = dict.first! }
-//                                                if let pictureKey = dict.first?.keys.filter( { $0.lowercased().contains("photo")} ).first, let value = vkData[pictureKey] as? String {
-//                                                    if let pictureURL = URL(string: value) {
-//                                                        AF.request(pictureURL).responseData { response in
-//                                                            switch response.result {
-//                                                            case .success(let data):
-//                                                                if let image = UIImage(data: data) {
-//                                                                    imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
-//                                                                    vkData["image"] = image
-//                                                                    vkData.removeValue(forKey: pictureKey)
-//                                                                    let data = VKManager.prepareUserData(vkData)
-//                                                                    API.shared.updateUserProfile(data: data) {
-//                                                                        response, error in
-//                                                                        if error != nil {
-//                                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
-//                                                                        }
-//                                                                        if response != nil {
-//                                                                            AppData.shared.importUserData(response!, imagePath)
-//                                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
-//                                                                        }
-//                                                                    }
-//                                                                }
-//                                                            case .failure(let error):
-//                                                                print(error.localizedDescription)
-//                                                            }
-//                                                        }
-//                                                    }
-//                                                } else {
-//                                                    API.shared.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
-//                                                        response, error in
-//                                                        if error != nil {
-//                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
-//                                                        }
-//                                                        if response != nil {
-//                                                            AppData.shared.importUserData(response!)
-//                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
-//                                                        }
+//        API.shared.getUserData { result in
+//            switch result {
+//            case .success(let json):
+//                AppData.shared.profile.id = json["id"].int
+//                let auth = self.getAuthCase()
+//                API.shared.getProfileNeedsUpdate { resultNeedsSocialUpdate in
+//                    switch resultNeedsSocialUpdate {
+//                    case .success(let needsUpdateFromSocialMedia):
+//                        if needsUpdateFromSocialMedia {
+//                            switch auth {
+//                            case .Facebook:
+//                                FBManager.getUserData() {
+//                                    response in
+//                                    guard var json = response,
+//                                          var fbData = json.dictionaryObject,
+//                                          let pictureData = JSON(fbData.removeValue(forKey: "picture") as Any) as? JSON,
+//                                          let is_silhouette = pictureData["data"]["is_silhouette"].bool else {
+//                                              AppData.shared.eraseData()
+//                                              hideAlert()
+//                                              return }
+//                                    if !is_silhouette {
+//                                        guard let pictureURL = URL(string: pictureData["data"]["url"].string!) else {
+//                                                  AppData.shared.eraseData()
+//                                                  hideAlert()
+//                                                  return }
+//                                        API.shared.downloadFile(url: pictureURL) { progress in
+//                                            print("Downloading FB avatar: \(progress)")
+//                                        } completion: { pictureDownload in
+//                                            switch pictureDownload {
+//                                            case .success(let data):
+//                                                guard let image = UIImage(data: data) else {
+//                                                    AppData.shared.eraseData()
+//                                                    hideAlert()
+//                                                    return
+//                                                }
+//                                                var fileFormat: FileFormat = FileFormat.Unknown
+//                                                if image.png != nil {
+//                                                    fileFormat = .PNG
+//                                                } else if image.jpeg != nil {
+//                                                    fileFormat = .JPEG
+//                                                }
+////                                                imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: fileFormat, surveyID: nil)
+//                                                fbData["image"] = image
+//                                                API.shared.updateUserprofile(data: FBManager.prepareUserData(fbData)) { uploadProgress in
+//                                                    print(uploadProgress)
+//                                                } completion: { result in
+//                                                    switch result {
+//                                                    case .success(let json):
+//                                                        AppData.shared.importUserData(json, imagePath)
+//                                                        self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
+//                                                    case .failure(let error):
+//                                                        AppData.shared.eraseData()
+//                                                        hideAlert()
+//                                                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
 //                                                    }
 //                                                }
+//                                            case .failure(let error):
+//                                                AppData.shared.eraseData()
+//                                                hideAlert()
+//                                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
 //                                            }
 //                                        }
-//                                    case .failure(let vkError):
-//                                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: vkError.localizedDescription)
 //                                    }
 //                                }
-                            default:
-                                print("")
-                            }
-                        } else {
-                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
-                        }
-                    case .failure(let error):
-                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-                    }
-                }
-            case .failure(let error):
-                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-            }
-        }
+//                            case .VK:
+//                                print("")
+////                                VKManager.getUserData() { vkResult in
+////                                    switch vkResult {
+////                                    case .success(let vkJson):
+////                                        guard var vkData = json.dictionaryObject?["response"] else { return }
+////                                        guard let vkImage = json.dictionaryObject?.removeValue(forKey: "picture") as? JSON else { return }
+////
+////
+////
+////                                        
+////                                        if let array = vkJson.dictionaryObject!["response"] {
+////                                            if array is Array<[String: Any]> {
+////                                                let dict = array as! Array<[String: Any]>
+////                                                var vkData = [String: Any]()
+////                                                if dict.count != 0 { vkData = dict.first! }
+////                                                if let pictureKey = dict.first?.keys.filter( { $0.lowercased().contains("photo")} ).first, let value = vkData[pictureKey] as? String {
+////                                                    if let pictureURL = URL(string: value) {
+////                                                        AF.request(pictureURL).responseData { response in
+////                                                            switch response.result {
+////                                                            case .success(let data):
+////                                                                if let image = UIImage(data: data) {
+////                                                                    imagePath = self.storeManager.storeImage(type: .Profile, image: image, fileName: nil, fileFormat: NSData(data: data).fileFormat, surveyID: nil)
+////                                                                    vkData["image"] = image
+////                                                                    vkData.removeValue(forKey: pictureKey)
+////                                                                    let data = VKManager.prepareUserData(vkData)
+////                                                                    API.shared.updateUserProfile(data: data) {
+////                                                                        response, error in
+////                                                                        if error != nil {
+////                                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
+////                                                                        }
+////                                                                        if response != nil {
+////                                                                            AppData.shared.importUserData(response!, imagePath)
+////                                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
+////                                                                        }
+////                                                                    }
+////                                                                }
+////                                                            case .failure(let error):
+////                                                                print(error.localizedDescription)
+////                                                            }
+////                                                        }
+////                                                    }
+////                                                } else {
+////                                                    API.shared.updateUserProfile(data: VKManager.prepareUserData(vkData)) {
+////                                                        response, error in
+////                                                        if error != nil {
+////                                                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: { for btn in self.buttons { btn.state = .disabled; hideAlert() }; AppData.shared.eraseData() }]]], text: error!.localizedDescription)
+////                                                        }
+////                                                        if response != nil {
+////                                                            AppData.shared.importUserData(response!)
+////                                                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
+////                                                        }
+////                                                    }
+////                                                }
+////                                            }
+////                                        }
+////                                    case .failure(let vkError):
+////                                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: vkError.localizedDescription)
+////                                    }
+////                                }
+//                            default:
+//                                print("")
+//                            }
+//                        } else {
+//                            self.performSegue(withIdentifier: Segues.Auth.TermsFromStartScreen, sender: nil)
+//                        }
+//                    case .failure(let error):
+//                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+//                    }
+//                }
+//            case .failure(let error):
+//                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+//            }
+//        }
     }
                         
 
@@ -938,11 +938,11 @@ extension _AuthViewController: VKSdkDelegate, VKSdkUIDelegate {
 //    }
 //}
 
-extension _AuthViewController: StorageInitializationProtocol {
-    func initializeStorageManager() -> FileStorageProtocol {
-        return (self.navigationController as! AuthNavigationController).storeManager
-    }
-}
+//extension _AuthViewController: StorageInitializationProtocol {
+//    func initializeStorageManager() -> FileStorageProtocol {
+//        return (self.navigationController as! AuthNavigationController).storeManager
+//    }
+//}
 
 
 

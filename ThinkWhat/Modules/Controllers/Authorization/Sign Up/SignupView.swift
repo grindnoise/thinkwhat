@@ -140,6 +140,7 @@ class SignupView: UIView {
     }
     @IBOutlet weak var loginButonTopConstraint: NSLayoutConstraint!
     
+    private var isAnimationStopped = false
     private var isPerformingChecks = false {
         didSet {
             
@@ -183,6 +184,14 @@ class SignupView: UIView {
             }
         }
     }
+    private var blurEffectView: UIVisualEffectView?
+    private var providerProgressIndicator: UIView? {
+        didSet {
+            providerProgressIndicator?.isOpaque = false
+        }
+    }
+    private var progressLabel: UIStackView?
+    private var bounceAnim: CABasicAnimation?
     
     override var frame: CGRect {
         didSet {
@@ -232,7 +241,71 @@ class SignupView: UIView {
 }
 
 // MARK: - Controller Output
-extension SignupView: SignupControllerOutput {}
+extension SignupView: SignupControllerOutput {
+    func onDidDisappear() {
+        removeBlur()
+    }
+    
+    func onProviderControllerDisappear(provider: AuthProvider) {
+        blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
+        blurEffectView?.effect = nil
+        blurEffectView?.addEquallyTo(to: self)
+        switch provider {
+        case .VK:
+            providerProgressIndicator = VKLogo(frame: CGRect(origin: vk.superview!.convert(vk.frame.origin, to: self),
+                                                             size: vk.frame.size))
+            addSubview(providerProgressIndicator!)
+            vk.alpha = 0
+        case .Facebook:
+            providerProgressIndicator = FacebookLogo(frame: CGRect(origin: facebook.superview!.convert(facebook.frame.origin, to: self),
+                                                             size: facebook.frame.size))
+            addSubview(providerProgressIndicator!)
+            facebook.alpha = 0
+        default:
+            fatalError("Not implemented")
+        }
+        let destinationSize = CGSize(width: 0.4 * frame.width,
+                                     height: 0.4 * frame.width)
+        let destinationOrigin = CGPoint(x: bounds.midX - destinationSize.width/2,
+                                        y: bounds.midY - destinationSize.width/2)
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+            self.blurEffectView?.effect = UIBlurEffect(style: .prominent)
+            self.providerProgressIndicator?.frame.size   = destinationSize
+            self.providerProgressIndicator?.frame.origin = destinationOrigin
+        }) { _ in
+            self.bounce()
+            self.progressLabel = UIStackView()
+//            self.progressLabel?.alignment = .center
+            self.progressLabel?.axis = .vertical
+            self.progressLabel?.spacing = 8
+            self.addSubview(self.progressLabel!)
+            let spinner = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                                size: CGSize(width: 30, height: 30)))
+            spinner.color = UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return UIColor.white
+                default:
+                    return UIColor.black
+                }
+            }
+            spinner.startAnimating()
+            let label = UILabel()
+            label.font = UIFont(name: StringAttributes.Fonts.Style.Regular, size: 17)
+            label.minimumScaleFactor = 0.1
+            label.text = NSLocalizedString("provider_authorization_progress", comment: "")
+            label.textAlignment = .center
+            label.textColor = .label
+            self.progressLabel?.addArrangedSubview(label)
+            self.progressLabel?.addArrangedSubview(spinner)
+            self.progressLabel?.frame.size = CGSize(width: self.providerProgressIndicator!.bounds.width, height: 50)
+            self.progressLabel?.frame.origin = CGPoint(x: self.bounds.midX - self.progressLabel!.bounds.width/2,
+                                                       y: self.providerProgressIndicator!.frame.maxY)
+        }
+    }
+    
+    
+}
 
 // MARK: - UI Setup
 extension SignupView {
@@ -316,6 +389,28 @@ extension SignupView {
                                        isRemovedOnCompletion: false)
         logo.icon.add(logoAnimation, forKey: nil)
         (logo.icon as! CAShapeLayer).fillColor = destinationColor.cgColor
+    }
+    
+    private func bounce() {
+        if bounceAnim == nil {
+            bounceAnim = CABasicAnimation(keyPath: "transform.scale")
+            bounceAnim?.fromValue = 1
+            bounceAnim?.toValue = CATransform3DMakeScale(1.05, 1.05, 1)
+            bounceAnim?.duration = 0.75
+            bounceAnim?.isRemovedOnCompletion = true
+            bounceAnim?.autoreverses = true
+            bounceAnim?.delegate = self
+        }
+        if bounceAnim != nil {
+            providerProgressIndicator!.layer.add(bounceAnim!, forKey: nil)
+        }
+    }
+    
+    private func removeBlur() {
+        providerProgressIndicator?.layer.removeAllAnimations()
+        providerProgressIndicator?.removeFromSuperview()
+        progressLabel?.removeFromSuperview()
+        blurEffectView?.removeFromSuperview()
     }
 }
 
@@ -426,7 +521,7 @@ extension SignupView: UITextFieldDelegate {
     
     @objc
     private func onFacebookTap() {
-        authorize(provider: .VK)
+        authorize(provider: .Facebook)
     }
     
     @objc
@@ -435,18 +530,72 @@ extension SignupView: UITextFieldDelegate {
     }
     
     private func authorize(provider: AuthProvider) {
+        @Sendable @MainActor func onError() {
+            var destinationSize: CGSize!
+            var destinationOrigin: CGPoint!
+            var destinationLogo: UIView!
+            switch provider {
+            case .VK:
+                destinationSize     = vk.bounds.size
+                destinationOrigin   = vk.superview!.convert(vk.frame.origin, to: self)
+                destinationLogo     = vk
+            case .Facebook:
+                destinationSize     = facebook.bounds.size
+                destinationOrigin   = facebook.superview!.convert(facebook.frame.origin, to: self)
+                destinationLogo     = facebook
+            default:
+                fatalError("Not implemented")
+            }
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 1, options: [.curveEaseInOut], animations: {
+                self.progressLabel?.alpha = 0
+            }) { _ in
+                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+                    self.blurEffectView?.effect = nil
+                    self.providerProgressIndicator?.frame.size   = destinationSize
+                    self.providerProgressIndicator?.frame.origin = destinationOrigin
+                }) { _ in
+                    destinationLogo.alpha = 1
+                    self.removeBlur()
+                }
+            }
+        }
+        
         isUserInteractionEnabled = false
         Task {
             do {
                 try await viewInput?.onProviderAuth(provider: provider)
+                isAnimationStopped = true
                 isUserInteractionEnabled = true
+                guard let label = progressLabel?.subviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel,
+                      let spinner = progressLabel?.subviews.filter({ $0.isKind(of: UIActivityIndicatorView.self) }).first as? UIActivityIndicatorView else { return }
+                UIView.transition(with: label, duration: 0.2, options: [.transitionCrossDissolve]) {
+                    label.text = NSLocalizedString("provider_authorization_success", comment: "")
+                    spinner.alpha = 0
+                } completion: { [weak self] _ in
+                    guard `self` == self else { return }
+                    self!.viewInput?.onSignupSuccess()
+                }
             } catch let error {
                 isUserInteractionEnabled = true
+                isAnimationStopped = true
+                guard let label = progressLabel?.subviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel,
+                      let spinner = progressLabel?.subviews.filter({ $0.isKind(of: UIActivityIndicatorView.self) }).first as? UIActivityIndicatorView else { return }
+                UIView.transition(with: label, duration: 0.2, options: [.transitionCrossDissolve]) {
+                    label.text = NSLocalizedString("provider_authorization_failure", comment: "")
+                    spinner.alpha = 0
+                } completion: { _ in onError() }
 #if DEBUG
-                fatalError(error.localizedDescription)
+                print(error.localizedDescription)
 #endif
             }
         }
     }
 }
 
+extension SignupView: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        guard !isAnimationStopped else { return }
+        providerProgressIndicator?.layer.removeAllAnimations()
+        bounce()
+    }
+}

@@ -46,18 +46,18 @@ class ValidationViewController: UIViewController, UITextFieldDelegate, UINavigat
                 if !EmailResponse.shared.isEmpty && EmailResponse.shared.isActive {
                     print(EmailResponse.shared.getConfirmationCode()!)
                     if validationCode == EmailResponse.shared.getConfirmationCode()! {
-                        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else { return }
-                        let owner = [DjangoVariables.User.email : AppData.shared.profile.email!]
-                        var data:[String: Any] = [DjangoVariables.UserProfile.isEmailVerified : true]
-                        data["owner"] = owner
-                        API.shared.request(url: url, httpMethod: .post, parameters: data, encoding: JSONEncoding.default) { result in
-                            switch result {
-                            case .success:
-                                self.performSegue(withIdentifier: Segues.Auth.TermsFromValidation, sender: nil)
-                            case .failure(let error):
-                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-                            }
-                        }
+//                        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(AppData.shared.profile.id!)" + "/") else { return }
+//                        let owner = [DjangoVariables.User.email : AppData.shared.profile.email!]
+//                        var data:[String: Any] = [DjangoVariables.UserProfile.isEmailVerified : true]
+//                        data["owner"] = owner
+//                        API.shared.request(url: url, httpMethod: .post, parameters: data, encoding: JSONEncoding.default) { result in
+//                            switch result {
+//                            case .success:
+//                                self.performSegue(withIdentifier: Segues.Auth.TermsFromValidation, sender: nil)
+//                            case .failure(let error):
+//                                showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+//                            }
+//                        }
                     } else {
                         simpleAlert("Неверный код подтверждения")
                         //                            showAlert(type: .WrongCredentials, buttons: ["Ок": [CustomAlertView.ButtonType.Ok: nil]], text: "Неверный код подтверждения")

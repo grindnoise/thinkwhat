@@ -71,7 +71,7 @@ class Survey: Decodable {
         return false
     }
     var isOwn: Bool {
-        return owner.id == AppData.shared.profile.id
+        return owner.id == UserDefaults.Profile.id
     }
     var isFavorite: Bool {
         return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
@@ -124,7 +124,7 @@ class Survey: Decodable {
     }
     
     init(type _type: SurveyType, title _title: String, topic _topic: Topic, description _description: String, question _question: String, answers _answers: [String], media _media: [Int: [UIImage: String]], url _url: URL?, voteCapacity _voteCapacity: Int, isPrivate _isPrivate: Bool, isAnonymous _isAnonymous: Bool, isCommentingAllowed _isCommentingAllowed: Bool, isHot _isHot: Bool) {
-        owner               = AppData.shared.userprofile
+        owner               = Userprofiles.shared.current!
         topic               = _topic
         active              = true
         id                  = tempId

@@ -47,9 +47,9 @@ class SideApp: UIView, BannerContent {
             _ in
             self.delegate?.callbackReceived(SideAppPreference.Embedded as AnyObject)
             if self.app == .Youtube {
-                AppData.shared.system.youtubePlayOption = self.defaultSwitch.isOn ? SideAppPreference.Embedded : AppData.shared.system.youtubePlayOption
+                UserDefaults.App.youtubePlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.youtubePlay
             } else if self.app == .TikTok {
-                AppData.shared.system.tiktokPlayOption = self.defaultSwitch.isOn ? SideAppPreference.Embedded : AppData.shared.system.tiktokPlayOption
+                UserDefaults.App.tiktokPlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.tiktokPlay
             }
         }
     }
@@ -59,9 +59,9 @@ class SideApp: UIView, BannerContent {
             _ in
             self.delegate?.callbackReceived(SideAppPreference.App as AnyObject)
             if self.app == .Youtube {
-                AppData.shared.system.youtubePlayOption = self.defaultSwitch.isOn ? SideAppPreference.Embedded : AppData.shared.system.youtubePlayOption
+                UserDefaults.App.youtubePlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.youtubePlay
             } else if self.app == .TikTok {
-                AppData.shared.system.tiktokPlayOption = self.defaultSwitch.isOn ? SideAppPreference.Embedded : AppData.shared.system.tiktokPlayOption
+                UserDefaults.App.tiktokPlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.tiktokPlay
             }
         }
     }

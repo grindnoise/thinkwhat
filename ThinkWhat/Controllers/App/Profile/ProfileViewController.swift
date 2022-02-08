@@ -26,7 +26,7 @@ class ProfileViewController: UIViewController, UINavigationControllerDelegate {
     fileprivate lazy var settingsVC: ProfileSettingsTableViewController = self.initializeSettingsVC()
 //    public var state: ClientSettingsMode!
 //    internal lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
-    private lazy var storeManager: FileStorageProtocol = self.initializeStorageManager()
+//    private lazy var storeManager: FileStorageProtocol = self.initializeStorageManager()
     private var locale: String      = "en-US"
     private var selectedImage:      UIImage?
     private var imagePicker         = UIImagePickerController()
@@ -75,7 +75,7 @@ class ProfileViewController: UIViewController, UINavigationControllerDelegate {
         }
         
         DispatchQueue.main.async {
-            var image = UIImage(contentsOfFile: AppData.shared.profile.imagePath ?? "") ?? UIImage(named: "anon")!
+            var image = UIImage(contentsOfFile: UserDefaults.Profile.imagePath ?? "") ?? UIImage(named: "anon")!
 //            if let path = AppData.shared.profile.imagePath  {
 //                if let imageFromAppData =  path) {
 //                    image = imageFromAppData
@@ -84,14 +84,13 @@ class ProfileViewController: UIViewController, UINavigationControllerDelegate {
 //                image = UIImage(named: "default_avatar")!
 //            }
             self.circularImage     = image.circularImage(size: self.userImage.frame.size, frameColor: K_COLOR_RED)
-            self.usernameTF.text   = AppData.shared.profile.firstName
+            self.usernameTF.text   = UserDefaults.Profile.firstName
 //            self.phoneTF.text      = appData.phone
         }
         
         DispatchQueue.main.async {
-            assert(AppData.shared.profile.firstName != nil || AppData.shared.profile.birthDate != nil || AppData.shared.profile.id != nil || AppData.shared.profile.gender != nil, "ProfileViewController.setupViews error (AppData.shared.userprofile.ID == nil || AppData.shared.userprofile.gender == nil)")
-            self.usernameTF.text = ("\(AppData.shared.profile.firstName!) " + (AppData.shared.profile.lastName ?? "")).trimmingTrailingSpaces
-            self.genderTF.text = "\(yearsBetweenDate(startDate: AppData.shared.profile.birthDate!, endDate: Date())), \(AppData.shared.profile.gender!.rawValue)"
+            self.usernameTF.text = ("\(UserDefaults.Profile.firstName) " + (UserDefaults.Profile.lastName ?? "")).trimmingTrailingSpaces
+            self.genderTF.text = "\(UserDefaults.Profile.birthDate?.age ?? 18), \(UserDefaults.Profile.gender!.rawValue)"
         }
 
         DispatchQueue.main.async {
@@ -155,16 +154,21 @@ extension ProfileViewController: UIImagePickerControllerDelegate {
             let resizedImage = origImage.resized(to: CGSize(width: 200, height: 200))
             let imageData = resizedImage.jpegData(compressionQuality: 0.4)
             let image = UIImage(data: imageData!)
-            guard let  url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + String(describing: AppData.shared.userprofile.id) + "/") else { return }
+            guard let  url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + String(describing: UserDefaults.Profile.id) + "/") else { return }
             let multipartFormData = MultipartFormData()
-            multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
+            multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id)).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
             
             API.shared.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData) { progress in
                 print(progress)
             } completion: { result in
                 switch result {
                 case .success:
-                    AppData.shared.profile.imagePath = self.storeManager.storeImage(type: .Profile, image: image!, fileName: nil, fileFormat: NSData(data: image!.jpeg!).fileFormat, surveyID: nil)
+                    do {
+                        UserDefaults.Profile.imagePath = try FileIOController.write(data: imageData!, toPath: .Profiles, ofType: .Images, id: String(UserDefaults.Profile.id!), toDocumentNamed: "profile\(NSData(data: imageData!).fileFormat)").absoluteString
+                    } catch {
+                        showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка при загрузке изображения: \(error.localizedDescription)")
+                    }
+//                    AppData.shared.profile.imagePath = self.storeManager.storeImage(type: .Profile, image: image!, fileName: nil, fileFormat: NSData(data: image!.jpeg!).fileFormat, surveyID: nil)
                     showAlert(type: .Warning, buttons: [["Готово": [CustomAlertView.ButtonType.Ok: {
                         self.circularImage = image!.circularImage(size: self.userImage.frame.size, frameColor: K_COLOR_RED)
                         animateImageChange(imageView: self.userImage, fromImage: self.userImage.image!, toImage: self.circularImage, duration: 0.2)
@@ -180,18 +184,6 @@ extension ProfileViewController: UIImagePickerControllerDelegate {
 
 extension ProfileViewController: UITextFieldDelegate {
 
-}
-
-//extension ProfileViewController: ServerInitializationProtocol {
-//    func initializeServerAPI() -> APIManagerProtocol {
-//        return ((self.navigationController as! NavigationControllerPreloaded).parent as! TabBarController).apiManager
-//    }
-//}
-
-extension ProfileViewController: StorageInitializationProtocol {
-    func initializeStorageManager() -> FileStorageProtocol {
-        return ((self.navigationController as! NavigationControllerPreloaded).parent as! TabBarController).storeManager
-    }
 }
 
 

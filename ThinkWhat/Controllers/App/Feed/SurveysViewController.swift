@@ -862,11 +862,11 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     func appLaunch() async throws {
         do {
             let json = try await API.shared.appLaunch()
-            AppData.shared.system.APIVersion = json["api_version"].stringValue
+            UserDefaults.App.minAPIVersion = json["api_version"].double
             ModelProperties.shared.importJson(json["field_properties"])
             PriceList.shared.importJson(json["pricelist"])
             if let balance = json[DjangoVariables.UserProfile.balance].intValue as? Int {
-                AppData.shared.profile.balance = balance
+                Userprofiles.shared.current!.balance = balance
             }
             await MainActor.run {
                 do {

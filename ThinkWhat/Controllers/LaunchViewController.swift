@@ -28,12 +28,12 @@ class LaunchViewController: UIViewController {
         delay(seconds: 1) {
             self.logo.addUntitled1Animation() { (completed) in
                 //TODO: переделать на проверку наличия токена и его срока годности, обновить данные с сервера
-                if AppData.shared.system.session == .unauthorized {
-                    self.performSegue(withIdentifier: Segues.Launch.Auth, sender: nil)
-                } else {
-                    self.performSegue(withIdentifier: Segues.Launch.App, sender: nil)
-                }
-//                self.performSegue(withIdentifier: kSegueApp, sender: nil)
+//                if AppData.shared.system.session == .unauthorized {
+//                    self.performSegue(withIdentifier: Segues.Launch.Auth, sender: nil)
+//                } else {
+//                    self.performSegue(withIdentifier: Segues.Launch.App, sender: nil)
+//                }
+////                self.performSegue(withIdentifier: kSegueApp, sender: nil)
             }
         }
     }
