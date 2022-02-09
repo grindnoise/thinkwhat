@@ -13,7 +13,6 @@ import Alamofire
 
 final class VKWorker {
     class func authorize(completion: @escaping(Result<Token,Error>)->()) {
-//        VK.setUp(appId: <#T##String#>, delegate: <#T##SwiftyVKDelegate#>, bundleName: <#T##String?#>, configPath: <#T##String?#>)
         guard VK.sessions.default.accessToken == nil else { completion(.success(VK.sessions.default.accessToken!)); return }
         VK.sessions.default.logIn(
             onSuccess: { info in
@@ -62,27 +61,27 @@ final class VKWorker {
             .send()
     }
     
-    class func validation() {
-        VK.API.Custom.method(name: "account.testValidation")
-            .onSuccess { print("SwiftyVK: account.testValidation successed with \n \(JSON($0))") }
-            .onError { print("SwiftyVK: account.testValidation failed with \n \($0)") }
-            .send()
-    }
-    
-    class func usersGet() {
-        VK.API.Users.get(.empty)
-            .configure(with: Config.init(httpMethod: .POST))
-            .onSuccess { print("SwiftyVK: users.get successed with \n \(JSON($0))") }
-            .onError { print("SwiftyVK: friends.get fail \n \($0)") }
-            .send()
-    }
-//
-    class func friendsGet() {
-//        VK.API.Friends.get(.empty)
-//            .onSuccess { print("SwiftyVK: friends.get successed with \n \(JSON($0))") }
-//            .onError { print("SwiftyVK: friends.get failed with \n \($0)") }
+//    class func validation() {
+//        VK.API.Custom.method(name: "account.testValidation")
+//            .onSuccess { print("SwiftyVK: account.testValidation successed with \n \(JSON($0))") }
+//            .onError { print("SwiftyVK: account.testValidation failed with \n \($0)") }
 //            .send()
-    }
+//    }
+//
+//    class func usersGet() {
+//        VK.API.Users.get(.empty)
+//            .configure(with: Config.init(httpMethod: .POST))
+//            .onSuccess { print("SwiftyVK: users.get successed with \n \(JSON($0))") }
+//            .onError { print("SwiftyVK: friends.get fail \n \($0)") }
+//            .send()
+//    }
+////
+//    class func friendsGet() {
+////        VK.API.Friends.get(.empty)
+////            .onSuccess { print("SwiftyVK: friends.get successed with \n \(JSON($0))") }
+////            .onError { print("SwiftyVK: friends.get failed with \n \($0)") }
+////            .send()
+//    }
     
     class func accountInfo(completion: @escaping(Result<JSON,Error>)->()) {
         guard let id = VK.sessions.default.accessToken?.info["user_id"] else { fatalError() }
@@ -91,9 +90,6 @@ final class VKWorker {
             .onSuccess {
                 var json = JSON($0)
                 json.appendIfArray(json: JSON(["user_id": id, "email": email]))
-//                json = JSON(json.arrayObject!.append(emailJSON))
-//                try! json.merge(with: emailJSON)
-//                try? json.merged(with: JSON(["email": email]))
                 completion(.success(json))
             }
             .onError {
@@ -130,9 +126,9 @@ final class VKWorker {
     class func prepareDjangoData(id: String, firstName: String, lastName: String, email: String, gender: Int, domain: String, birthDate: String?, image: UIImage? = nil) -> [String: Any] {
         
         var parameters = [String: Any]()
-        parameters[DjangoVariables.User.firstName] = firstName
-        parameters[DjangoVariables.User.lastName] = lastName
-        parameters[DjangoVariables.User.email] = email
+        parameters["owner.\(DjangoVariables.User.firstName)"] = firstName
+        parameters["owner.\(DjangoVariables.User.lastName)"] = lastName
+        parameters["owner.\(DjangoVariables.User.email)"] = email
         parameters[DjangoVariables.UserProfile.gender] = gender == 1 ? Gender.Female.rawValue : Gender.Male.rawValue
         parameters[DjangoVariables.UserProfile.birthDate] = birthDate
         parameters[DjangoVariables.UserProfile.vkID] = id

@@ -1932,7 +1932,7 @@
          contextName = "prepareData #1 (json:) in getProviderData #1 () in SignupViewController.onProviderAuth(provider:):SignupViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "AccessToken">
+               value = "json[&quot;picture&quot;][&quot;data&quot;][&quot;url&quot;].string">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -2993,6 +2993,11 @@
       </ContextState>
       <ContextState
          contextName = "SignupViewController.onProviderAuth(provider:):SignupViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Userprofiles.shared.current">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "LaunchViewController.childForStatusBarStyle.getter:LaunchViewController.swift">
@@ -4440,6 +4445,9 @@
                value = "UIScreen.main.bounds.width">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in static FBWorker.authorizeAsync(viewController:):FBWorker.swift">
       </ContextState>
       <ContextState
          contextName = "UIImage.circularImage(size:frameColor:):Extensions.swift">

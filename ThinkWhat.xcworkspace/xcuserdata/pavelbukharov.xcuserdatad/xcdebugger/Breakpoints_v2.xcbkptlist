@@ -1143,8 +1143,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "383"
-            endingLineNumber = "383"
+            startingLineNumber = "407"
+            endingLineNumber = "407"
             landmarkName = "SignupViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -1159,8 +1159,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "398"
-            endingLineNumber = "398"
+            startingLineNumber = "422"
+            endingLineNumber = "422"
             landmarkName = "SignupViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -1175,8 +1175,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "403"
-            endingLineNumber = "403"
+            startingLineNumber = "427"
+            endingLineNumber = "427"
             landmarkName = "SignupViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -1207,8 +1207,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "351"
-            endingLineNumber = "351"
+            startingLineNumber = "375"
+            endingLineNumber = "375"
             landmarkName = "SignupViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -1223,8 +1223,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "263"
-            endingLineNumber = "263"
+            startingLineNumber = "287"
+            endingLineNumber = "287"
             landmarkName = "SignupViewController"
             landmarkType = "21">
          </BreakpointContent>
@@ -1274,6 +1274,22 @@
             startingLineNumber = "785"
             endingLineNumber = "785"
             landmarkName = "requestAsync(url:httpMethod:parameters:encoding:headers:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7B6EFE6B-EF2C-4EC6-988F-2E81B0D1ED67"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "268"
+            endingLineNumber = "268"
+            landmarkName = "onProviderAuth(provider:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

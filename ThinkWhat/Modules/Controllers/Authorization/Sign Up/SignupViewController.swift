@@ -106,7 +106,6 @@ extension SignupViewController: SignupViewInput {
 //    }
     
     func onProviderAuth(provider: AuthProvider) async throws {
-        
         func providerLogout() {
             switch provider {
             case .VK:
@@ -180,7 +179,32 @@ extension SignupViewController: SignupViewInput {
                                                           birthDate: birthDate)
                     }
                 case .Facebook:
-                    throw "Not implemented"
+                    guard let id = json["id"].string,
+                          let email = json["email"].string,
+                          let firstName = json["first_name"].string,
+                          let lastName = json["last_name"].string else {
+                              throw "VK json serialization failure"
+                          }
+                    if let pictureURL = json["picture"]["data"]["url"].string, let url = URL(string: pictureURL) {
+                        do {
+                            providerImage = try await API.shared.downloadImageAsync(from: url)
+                            return FBWorker.prepareDjangoData(id: id,
+                                                              firstName: firstName,
+                                                              lastName: lastName,
+                                                              email: email,
+                                                              image: providerImage)
+                        } catch {
+                            return FBWorker.prepareDjangoData(id: id,
+                                                              firstName: firstName,
+                                                              lastName: lastName,
+                                                              email: email)
+                        }
+                    } else {
+                        return FBWorker.prepareDjangoData(id: id,
+                                                          firstName: firstName,
+                                                          lastName: lastName,
+                                                          email: email)
+                    }
                 default:
                     throw "Not implemented"
                 }
@@ -211,7 +235,7 @@ extension SignupViewController: SignupViewInput {
             }
             ///2. Login into our API
             try await API.shared.loginViaProviderAsync(provider: provider, token: providerToken)
-            
+        
             ///3. Get profile from API
             let userData = await API.shared.getUserDataOrNilAsync()
             do {

@@ -29,7 +29,8 @@ class FBWorker {
                     continuation.resume(throwing: error)
                     return
                 }
-                fatalError("shouldn't get here")
+                continuation.resume(throwing: "Facebook error")
+                return
             }
         }
     }
@@ -53,12 +54,38 @@ class FBWorker {
         }
     }
     
-//    public class func performLogin(viewController: UIViewController, completionHandler: @escaping(Bool) -> Void) {
-//
-//        shared.logIn(permissions: ["public_profile", "email"],
-//                               from: viewController) { (result, error) in
-//                                if error == nil {
-//                                    completionHandler(true)
+    static func prepareDjangoData(id: String, firstName: String, lastName: String, email: String, image: UIImage? = nil) -> [String: Any] {
+        var parameters = [String: Any]()
+        parameters["owner.\(DjangoVariables.User.firstName)"] = firstName
+        parameters["owner.\(DjangoVariables.User.lastName)"] = lastName
+        parameters["owner.\(DjangoVariables.User.email)"] = email
+        parameters[DjangoVariables.UserProfile.facebookID] = id
+        if let image = image {
+            parameters[DjangoVariables.UserProfile.image] = image
+        }
+        return parameters
+    }
+    
+    //    static func _prepareDjangoData(_ data: [String : Any]) -> [String : Any] {
+    //        var userProfile = [String: Any]()
+    //        for (key, value) in data {
+    //            if key == "first_name" || key == "last_name" || key == "email" {
+    //                userProfile["owner."+key] = value
+    //            } else if key == "id" {
+    //                userProfile["facebook_ID"] = value
+    //            } else if key == "image" {
+    //                userProfile[key] = value
+    //            }
+    //        }
+    //        return userProfile
+    //    }
+    
+    //    public class func performLogin(viewController: UIViewController, completionHandler: @escaping(Bool) -> Void) {
+    //
+    //        shared.logIn(permissions: ["public_profile", "email"],
+    //                               from: viewController) { (result, error) in
+    //                                if error == nil {
+    //                                    completionHandler(true)
 //                                } else {
 //                                    print(error!.localizedDescription)
 //                                    completionHandler(false)
@@ -95,23 +122,7 @@ class FBWorker {
 //    }
 }
 
-extension FBWorker: UserDataPreparatory {
-    static func prepareUserData(_ data: [String : Any]) -> [String : Any] {
-        var userProfile = [String: Any]()
-        for (key, value) in data {
-            if key == "first_name" || key == "last_name" || key == "email" {
-                userProfile["owner."+key] = value
-            } else if key == "id" {
-                userProfile["facebook_ID"] = value
-            } else if key == "image" {
-                userProfile[key] = value
-            }
-        }
-        print(userProfile)
-        return userProfile
-    }
     
-}
 
 
 func convertImageToBase64(image: UIImage) -> String {
