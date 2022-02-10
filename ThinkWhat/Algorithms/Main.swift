@@ -103,7 +103,7 @@ enum InternetConnection {
 enum AuthProvider: String {
     case VK         = "vk-oauth2"
     case Facebook   = "Facebook"
-    case Google     = "Google"
+    case Google     = "google-oauth2"
     case Phone      = "Phone"
     case Mail       = "Mail"
     case Username   = "Username"

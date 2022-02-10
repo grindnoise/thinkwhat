@@ -13,6 +13,10 @@ import SwiftyJSON
 class FBWorker {
     static let shared = LoginManager()
     
+    class func wakeUp() {
+        ApplicationDelegate.shared.application(UIApplication.shared, didFinishLaunchingWithOptions: nil)
+        Settings.shared.isAdvertiserTrackingEnabled = false
+    }
 //    private init() {}
     
     class func authorizeAsync(viewController: UIViewController) async throws -> AccessToken {
@@ -54,7 +58,7 @@ class FBWorker {
         }
     }
     
-    static func prepareDjangoData(id: String, firstName: String, lastName: String, email: String, image: UIImage? = nil) -> [String: Any] {
+    class func prepareDjangoData(id: String, firstName: String, lastName: String, email: String, image: UIImage? = nil) -> [String: Any] {
         var parameters = [String: Any]()
         parameters["owner.\(DjangoVariables.User.firstName)"] = firstName
         parameters["owner.\(DjangoVariables.User.lastName)"] = lastName

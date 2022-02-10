@@ -13,8 +13,9 @@ import UserNotifications
 import FBSDKCoreKit
 import VK_ios_sdk
 import SwiftyVK
+import GoogleSignIn
 
-var vkDelegateReference : SwiftyVKDelegate?
+//var vkDelegateReference : SwiftyVKDelegate?
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,22 +33,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = CustomNavigationController(rootViewController: controller)
         window?.makeKeyAndVisible()
 //        vkDelegateReference = VKDelegate()
-        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+//        GIDSignIn.sharedInstance.restorePreviousSignIn()
+//        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+//        Settings.shared.isAdvertiserTrackingEnabled = false
         return true
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-//        VKSdk.processOpen(url,
-        //                          fromApplication: options[.sourceApplication] as? String)
-        
+        ///FB
         ApplicationDelegate.shared.application(
             app,
             open: url,
             sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
             annotation: options[UIApplication.OpenURLOptionsKey.annotation]
         )
+        ///VK
         let app = options[.sourceApplication] as? String
         VK.handle(url: url, sourceApplication: app)
+        ///Google
+        return GIDSignIn.sharedInstance.handle(url)
         return true
     }
     

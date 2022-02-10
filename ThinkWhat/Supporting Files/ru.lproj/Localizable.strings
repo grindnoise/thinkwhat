@@ -21,3 +21,4 @@
 "provider_authorization_progress" = "Авторизация";
 "provider_authorization_success" = "Успех!";
 "provider_authorization_failure" = "Ошибка";
+"timeout_error" = "Превышено время ожидания";

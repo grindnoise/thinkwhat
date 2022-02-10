@@ -169,7 +169,7 @@ class Userprofile: Decodable {
             vkURL               = URL(string: try container.decodeIfPresent(String.self, forKey: .vkURL) ?? "")
             wasEdited           = try container.decodeIfPresent(Bool.self, forKey: .wasEdited)
             isBanned            = try container.decode(Bool.self, forKey: .isBanned)
-            gender              = Gender(rawValue: try container.decode(String.self, forKey: .gender)) ?? .Unassigned
+            gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
             topPublicationCategories.removeAll()
             let topics          = try container.decode([String: Int].self, forKey: .topPublicationCategories)
             topics.forEach { dict in

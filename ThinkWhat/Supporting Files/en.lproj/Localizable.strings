@@ -23,7 +23,7 @@
 "provider_authorization_progress" = "Authorization";
 "provider_authorization_success" = "Success";
 "provider_authorization_failure" = "Error";
-
+"timeout_error" = "Timeout exceeded";
 
 
 

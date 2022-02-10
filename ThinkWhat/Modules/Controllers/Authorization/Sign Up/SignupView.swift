@@ -125,6 +125,12 @@ class SignupView: UIView {
             vk.addGestureRecognizer(recognizer)
         }
     }
+    @IBOutlet weak var google: GoogleLogo! {
+        didSet {
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(SignupView.onGoogleTap))
+            google.addGestureRecognizer(recognizer)
+        }
+    }
     @IBOutlet weak var haveAccountLabel: UILabel! {
         didSet {
             haveAccountLabel.text = NSLocalizedString("already_registered", comment: "")
@@ -243,68 +249,8 @@ class SignupView: UIView {
 // MARK: - Controller Output
 extension SignupView: SignupControllerOutput {
     func onDidDisappear() {
-        removeBlur()
+//        removeBlur()
     }
-    
-    func onProviderControllerDisappear(provider: AuthProvider) {
-        blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
-        blurEffectView?.effect = nil
-        blurEffectView?.addEquallyTo(to: self)
-        switch provider {
-        case .VK:
-            providerProgressIndicator = VKLogo(frame: CGRect(origin: vk.superview!.convert(vk.frame.origin, to: self),
-                                                             size: vk.frame.size))
-            addSubview(providerProgressIndicator!)
-            vk.alpha = 0
-        case .Facebook:
-            providerProgressIndicator = FacebookLogo(frame: CGRect(origin: facebook.superview!.convert(facebook.frame.origin, to: self),
-                                                             size: facebook.frame.size))
-            addSubview(providerProgressIndicator!)
-            facebook.alpha = 0
-        default:
-            fatalError("Not implemented")
-        }
-        let destinationSize = CGSize(width: 0.4 * frame.width,
-                                     height: 0.4 * frame.width)
-        let destinationOrigin = CGPoint(x: bounds.midX - destinationSize.width/2,
-                                        y: bounds.midY - destinationSize.width/2)
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
-            self.blurEffectView?.effect = UIBlurEffect(style: .prominent)
-            self.providerProgressIndicator?.frame.size   = destinationSize
-            self.providerProgressIndicator?.frame.origin = destinationOrigin
-        }) { _ in
-            self.bounce()
-            self.progressLabel = UIStackView()
-//            self.progressLabel?.alignment = .center
-            self.progressLabel?.axis = .vertical
-            self.progressLabel?.spacing = 8
-            self.addSubview(self.progressLabel!)
-            let spinner = UIActivityIndicatorView(frame: CGRect(origin: .zero,
-                                                                size: CGSize(width: 30, height: 30)))
-            spinner.color = UIColor { traitCollection in
-                switch traitCollection.userInterfaceStyle {
-                case .dark:
-                    return UIColor.white
-                default:
-                    return UIColor.black
-                }
-            }
-            spinner.startAnimating()
-            let label = UILabel()
-            label.font = UIFont(name: StringAttributes.Fonts.Style.Regular, size: 17)
-            label.minimumScaleFactor = 0.1
-            label.text = NSLocalizedString("provider_authorization_progress", comment: "")
-            label.textAlignment = .center
-            label.textColor = .label
-            self.progressLabel?.addArrangedSubview(label)
-            self.progressLabel?.addArrangedSubview(spinner)
-            self.progressLabel?.frame.size = CGSize(width: self.providerProgressIndicator!.bounds.width, height: 50)
-            self.progressLabel?.frame.origin = CGPoint(x: self.bounds.midX - self.progressLabel!.bounds.width/2,
-                                                       y: self.providerProgressIndicator!.frame.maxY)
-        }
-    }
-    
-    
 }
 
 // MARK: - UI Setup
@@ -412,6 +358,70 @@ extension SignupView {
         progressLabel?.removeFromSuperview()
         blurEffectView?.removeFromSuperview()
     }
+    
+    private func blur(provider: AuthProvider) {
+        blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
+        blurEffectView?.effect = nil
+        blurEffectView?.addEquallyTo(to: self)
+        switch provider {
+        case .VK:
+            providerProgressIndicator = VKLogo(frame: CGRect(origin: vk.superview!.convert(vk.frame.origin, to: self),
+                                                             size: vk.frame.size))
+            addSubview(providerProgressIndicator!)
+            vk.alpha = 0
+        case .Facebook:
+            providerProgressIndicator = FacebookLogo(frame: CGRect(origin: facebook.superview!.convert(facebook.frame.origin, to: self),
+                                                             size: facebook.frame.size))
+            addSubview(providerProgressIndicator!)
+            facebook.alpha = 0
+        default:
+            providerProgressIndicator = GoogleLogo(frame: CGRect(origin: google.superview!.convert(google.frame.origin, to: self),
+                                                             size: google.frame.size))
+            addSubview(providerProgressIndicator!)
+            google.alpha = 0
+        }
+        let destinationSize = CGSize(width: 0.4 * frame.width,
+                                     height: 0.4 * frame.width)
+        let destinationOrigin = CGPoint(x: bounds.midX - destinationSize.width/2,
+                                        y: bounds.midY - destinationSize.width/2)
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+            self.blurEffectView?.effect = UIBlurEffect(style: .prominent)
+            self.providerProgressIndicator?.frame.size   = destinationSize
+            self.providerProgressIndicator?.frame.origin = destinationOrigin
+        }) { _ in
+            self.bounce()
+            self.progressLabel = UIStackView()
+//            self.progressLabel?.alignment = .center
+            self.progressLabel?.axis = .vertical
+            self.progressLabel?.spacing = 8
+            self.addSubview(self.progressLabel!)
+            let spinner = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                                size: CGSize(width: 30, height: 30)))
+            spinner.color = UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return UIColor.white
+                default:
+                    return UIColor.black
+                }
+            }
+            spinner.startAnimating()
+            let label = UILabel()
+            label.font = UIFont(name: StringAttributes.Fonts.Style.Regular, size: 17)
+            label.minimumScaleFactor = 0.1
+            label.text = NSLocalizedString("provider_authorization_progress", comment: "")
+            label.textAlignment = .center
+            label.textColor = .label
+            self.progressLabel?.addArrangedSubview(label)
+            self.progressLabel?.addArrangedSubview(spinner)
+            self.progressLabel?.frame.size = CGSize(width: self.providerProgressIndicator!.bounds.width, height: 50)
+            self.progressLabel?.frame.origin = CGPoint(x: self.bounds.midX - self.progressLabel!.bounds.width/2,
+                                                       y: self.providerProgressIndicator!.frame.maxY)
+            DispatchQueue.main.async {
+                self.authorize(provider: provider)
+            }
+        }
+    }
 }
 
 // MARK: - Text fields handling
@@ -423,7 +433,7 @@ extension SignupView: UITextFieldDelegate {
 //            return true
 //        }.first as? UITextField
 //    }
-    
+    //2334
     @objc private func hideKeyboard() {
         endEditing(true)
     }
@@ -521,12 +531,20 @@ extension SignupView: UITextFieldDelegate {
     
     @objc
     private func onFacebookTap() {
-        authorize(provider: .Facebook)
+        blur(provider: .Facebook)
+//        authorize(provider: .Facebook)
     }
     
     @objc
     private func onVKTap() {
-        authorize(provider: .VK)
+        blur(provider: .VK)
+//        authorize(provider: .VK)
+    }
+    
+    @objc
+    private func onGoogleTap() {
+        blur(provider: .Google)
+//        authorize(provider: .Google)
     }
     
     private func authorize(provider: AuthProvider) {
@@ -543,6 +561,10 @@ extension SignupView: UITextFieldDelegate {
                 destinationSize     = facebook.bounds.size
                 destinationOrigin   = facebook.superview!.convert(facebook.frame.origin, to: self)
                 destinationLogo     = facebook
+            case .Google:
+                destinationSize     = google.bounds.size
+                destinationOrigin   = google.superview!.convert(google.frame.origin, to: self)
+                destinationLogo     = google
             default:
                 fatalError("Not implemented")
             }
@@ -563,7 +585,7 @@ extension SignupView: UITextFieldDelegate {
         isUserInteractionEnabled = false
         Task {
             do {
-                try await viewInput?.onProviderAuth(provider: provider)
+                try await viewInput?.onProviderAuth(provider: provider, timeout: 6)
                 isAnimationStopped = true
                 isUserInteractionEnabled = true
                 guard let label = progressLabel?.subviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel,

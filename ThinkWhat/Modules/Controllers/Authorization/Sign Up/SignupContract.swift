@@ -16,7 +16,7 @@ protocol SignupViewInput: class {
     var controllerOutput: SignupControllerOutput? { get set }
     var controllerInput: SignupControllerInput? { get set }
     
-    func onProviderAuth(provider: AuthProvider) async throws
+    func onProviderAuth(provider: AuthProvider, timeout: Double) async throws
     func onSignup(username: String, email: String, password: String, completion: @escaping(Result<Bool,Error>)->())
     func checkCredentials(username: String, email: String, completion: @escaping(Result<Bool,Error>)->())
     func onCaptchaValidation(completion: @escaping(Result<Bool,Error>)->())
@@ -46,7 +46,7 @@ protocol SignupModelOutput: class {
 protocol SignupControllerOutput: class {
     var viewInput: SignupViewInput? { get set }
     
-    func onProviderControllerDisappear(provider: AuthProvider)
+//    func onProviderControllerDisappear(provider: AuthProvider)
     func onDidDisappear()
 //    func onSignupFailure(error: Error)
 //    func onSignupSuccess()

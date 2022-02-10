@@ -22,6 +22,7 @@
             <connections>
                 <outlet property="contentView" destination="iN0-l3-epB" id="wYI-Aj-Qu0"/>
                 <outlet property="facebook" destination="2Dm-bo-gDv" id="hmd-3N-o1B"/>
+                <outlet property="google" destination="PLQ-mR-Ez2" id="GRp-qf-ITZ"/>
                 <outlet property="haveAccountLabel" destination="Y0p-gl-T77" id="WJi-6f-AI0"/>
                 <outlet property="loginButonTopConstraint" destination="wiW-4L-tBB" id="1xO-DT-J3Q"/>
                 <outlet property="loginButton" destination="Heu-37-xXO" id="chX-WW-PAg"/>
@@ -142,13 +143,13 @@
                     <rect key="frame" x="0.0" y="531" width="414" height="331"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ИЛИ ПРОДОЛЖИТЬ С" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="biD-mW-UEK">
-                            <rect key="frame" x="116" y="79.5" width="182.5" height="20"/>
+                            <rect key="frame" x="118.5" y="76" width="177.5" height="23.5"/>
                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
                             <color key="textColor" systemColor="systemGrayColor"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="3KY-3h-QJ7">
-                            <rect key="frame" x="144" y="107.5" width="126" height="58"/>
+                            <rect key="frame" x="110" y="107.5" width="194" height="58"/>
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Dm-bo-gDv" customClass="FacebookLogo" customModule="ThinkWhat" customModuleProvider="target">
                                     <rect key="frame" x="0.0" y="0.0" width="58" height="58"/>
@@ -157,8 +158,15 @@
                                         <constraint firstAttribute="width" secondItem="2Dm-bo-gDv" secondAttribute="height" multiplier="1:1" id="oR0-F1-cRW"/>
                                     </constraints>
                                 </view>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aXW-0s-PPj" customClass="VKLogo" customModule="ThinkWhat" customModuleProvider="target">
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PLQ-mR-Ez2" customClass="GoogleLogo" customModule="ThinkWhat" customModuleProvider="target">
                                     <rect key="frame" x="68" y="0.0" width="58" height="58"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="PLQ-mR-Ez2" secondAttribute="height" multiplier="1:1" id="Djl-vT-QMk"/>
+                                    </constraints>
+                                </view>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aXW-0s-PPj" customClass="VKLogo" customModule="ThinkWhat" customModuleProvider="target">
+                                    <rect key="frame" x="136" y="0.0" width="58" height="58"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="aXW-0s-PPj" secondAttribute="height" multiplier="1:1" id="n6V-I1-Rl1"/>
@@ -167,16 +175,17 @@
                             </subviews>
                             <constraints>
                                 <constraint firstItem="aXW-0s-PPj" firstAttribute="width" secondItem="aXW-0s-PPj" secondAttribute="height" multiplier="1:1" id="AJB-l6-IMe"/>
+                                <constraint firstItem="PLQ-mR-Ez2" firstAttribute="width" secondItem="PLQ-mR-Ez2" secondAttribute="height" multiplier="1:1" id="NIc-Dq-xyW"/>
                             </constraints>
                         </stackView>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Уже зарегистрированы?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y0p-gl-T77">
-                            <rect key="frame" x="108.5" y="202" width="197.5" height="20"/>
+                            <rect key="frame" x="106.5" y="202" width="201" height="23.5"/>
                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
                             <color key="textColor" systemColor="systemGrayColor"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Heu-37-xXO">
-                            <rect key="frame" x="182.5" y="222" width="49" height="32"/>
+                            <rect key="frame" x="179" y="225.5" width="56" height="36"/>
                             <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="17"/>
                             <color key="tintColor" systemColor="linkColor"/>
                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
@@ -225,13 +234,13 @@
     </objects>
     <designables>
         <designable name="dhW-ry-Op1">
-            <size key="intrinsicContentSize" width="86" height="24"/>
+            <size key="intrinsicContentSize" width="89.5" height="27.5"/>
         </designable>
         <designable name="nWa-Zg-7nQ">
-            <size key="intrinsicContentSize" width="205" height="24"/>
+            <size key="intrinsicContentSize" width="211.5" height="27.5"/>
         </designable>
         <designable name="qPX-fD-QqY">
-            <size key="intrinsicContentSize" width="99" height="23"/>
+            <size key="intrinsicContentSize" width="102" height="26"/>
         </designable>
     </designables>
     <resources>

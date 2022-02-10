@@ -12,6 +12,13 @@ import SwiftyJSON
 import Alamofire
 
 final class VKWorker {
+    
+    static var vkDelegateReference : SwiftyVKDelegate?
+    
+    class func wakeUp() {
+        vkDelegateReference = VKDelegate()
+    }
+    
     class func authorize(completion: @escaping(Result<Token,Error>)->()) {
         guard VK.sessions.default.accessToken == nil else { completion(.success(VK.sessions.default.accessToken!)); return }
         VK.sessions.default.logIn(
@@ -25,6 +32,7 @@ final class VKWorker {
         )
     }
     
+    @MainActor
     class func authorizeAsync() async throws -> Token {
         try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Token, Error>) in
             if let token = VK.sessions.default.accessToken {

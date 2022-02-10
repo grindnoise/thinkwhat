@@ -24,9 +24,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>vk7043775</string>
+			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>com.googleusercontent.apps.387854804440-gapr02s785r7vvuudqi1bpn2rb34gvtn</string>
 				<string>vk7043775</string>
 				<string>fb818984988459464</string>
 			</array>
@@ -40,6 +41,8 @@
 	<string>818984988459464</string>
 	<key>FacebookDisplayName</key>
 	<string>ThinkWhat</string>
+	<key>GoogleAppID</key>
+	<string>387854804440-gapr02s785r7vvuudqi1bpn2rb34gvtn.apps.googleusercontent.com</string>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>LSApplicationQueriesSchemes</key>
@@ -124,5 +127,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+    <key>FacebookAutoLogAppEventsEnabled</key>
+    <false/>
 </dict>
 </plist>

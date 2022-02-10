@@ -15,6 +15,13 @@
 		AB04144F244EF3A600336857 /* SurveyStackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB04144E244EF3A600336857 /* SurveyStackViewController.swift */; };
 		AB041451244EFD0300336857 /* CategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB041450244EFD0300336857 /* CategoriesViewController.swift */; };
 		AB0980DC24CF04A100A02405 /* UserActivityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0980DB24CF04A100A02405 /* UserActivityCell.swift */; };
+		AB0AB63227B3DF2B006FD33F /* GoogleWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63127B3DF2B006FD33F /* GoogleWorker.swift */; };
+		AB0AB63527B4E37C006FD33F /* TimeoutTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63427B4E37C006FD33F /* TimeoutTask.swift */; };
+		AB0AB63B27B5001F006FD33F /* AgreementContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63727B5001F006FD33F /* AgreementContract.swift */; };
+		AB0AB63C27B5001F006FD33F /* AgreementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63827B5001F006FD33F /* AgreementViewController.swift */; };
+		AB0AB63D27B5001F006FD33F /* AgreementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63927B5001F006FD33F /* AgreementView.swift */; };
+		AB0AB64027B506C6006FD33F /* AgreementView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB0AB63F27B506C6006FD33F /* AgreementView.xib */; };
+		AB0AB64227B507AB006FD33F /* AgreementViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB0AB64127B507AB006FD33F /* AgreementViewController.xib */; };
 		AB0BFDF1252DBCD500BD5EFF /* HeartIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF0252DBCD500BD5EFF /* HeartIcon.swift */; };
 		AB0BFDF3252DC9E400BD5EFF /* MegaphoneIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */; };
 		AB0BFDF5252EF20C00BD5EFF /* PieIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */; };
@@ -309,6 +316,13 @@
 		AB04144E244EF3A600336857 /* SurveyStackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyStackViewController.swift; sourceTree = "<group>"; };
 		AB041450244EFD0300336857 /* CategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewController.swift; sourceTree = "<group>"; };
 		AB0980DB24CF04A100A02405 /* UserActivityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserActivityCell.swift; sourceTree = "<group>"; };
+		AB0AB63127B3DF2B006FD33F /* GoogleWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleWorker.swift; sourceTree = "<group>"; };
+		AB0AB63427B4E37C006FD33F /* TimeoutTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeoutTask.swift; sourceTree = "<group>"; };
+		AB0AB63727B5001F006FD33F /* AgreementContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgreementContract.swift; sourceTree = "<group>"; };
+		AB0AB63827B5001F006FD33F /* AgreementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgreementViewController.swift; sourceTree = "<group>"; };
+		AB0AB63927B5001F006FD33F /* AgreementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgreementView.swift; sourceTree = "<group>"; };
+		AB0AB63F27B506C6006FD33F /* AgreementView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AgreementView.xib; sourceTree = "<group>"; };
+		AB0AB64127B507AB006FD33F /* AgreementViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AgreementViewController.xib; sourceTree = "<group>"; };
 		AB0BFDF0252DBCD500BD5EFF /* HeartIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MegaphoneIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieIcon.swift; sourceTree = "<group>"; };
@@ -656,6 +670,36 @@
 			path = CategoriesViewController;
 			sourceTree = "<group>";
 		};
+		AB0AB63027B3DF1B006FD33F /* Google */ = {
+			isa = PBXGroup;
+			children = (
+				AB0AB63127B3DF2B006FD33F /* GoogleWorker.swift */,
+			);
+			path = Google;
+			sourceTree = "<group>";
+		};
+		AB0AB63327B4E346006FD33F /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				AB309C7827ADB4E1005BBCB4 /* UserDefaults.swift */,
+				AB3C6819223FD04500B57580 /* KeychainService.swift */,
+				AB0AB63427B4E37C006FD33F /* TimeoutTask.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		AB0AB63627B4FFF2006FD33F /* Agreement */ = {
+			isa = PBXGroup;
+			children = (
+				AB0AB63727B5001F006FD33F /* AgreementContract.swift */,
+				AB0AB63827B5001F006FD33F /* AgreementViewController.swift */,
+				AB0AB63927B5001F006FD33F /* AgreementView.swift */,
+				AB0AB63F27B506C6006FD33F /* AgreementView.xib */,
+				AB0AB64127B507AB006FD33F /* AgreementViewController.xib */,
+			);
+			path = Agreement;
+			sourceTree = "<group>";
+		};
 		AB18499B2755FD5B00BEE23D /* del */ = {
 			isa = PBXGroup;
 			children = (
@@ -779,6 +823,7 @@
 		AB309C7F27B280BA005BBCB4 /* OAuth */ = {
 			isa = PBXGroup;
 			children = (
+				AB0AB63027B3DF1B006FD33F /* Google */,
 				AB309C8027B280C9005BBCB4 /* Facebook */,
 				ABAEEE5827A5D48500E4EF29 /* VK */,
 			);
@@ -1231,6 +1276,7 @@
 		AB8238F727A913F70061F7C6 /* REST */ = {
 			isa = PBXGroup;
 			children = (
+				AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */,
 				AB37B9B12774BF3A00C7DEBC /* API.swift */,
 				AB8238F827A914100061F7C6 /* Urls.swift */,
 			);
@@ -1401,7 +1447,6 @@
 			children = (
 				AB309C7F27B280BA005BBCB4 /* OAuth */,
 				AB8238F727A913F70061F7C6 /* REST */,
-				AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */,
 				AB3C685A223FD74D00B57580 /* FileIOController.swift */,
 			);
 			path = Managers;
@@ -1421,6 +1466,7 @@
 		ABB9E86B279E9E420018BB2E /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				AB0AB63327B4E346006FD33F /* Helpers */,
 				ABB46F3C2345DDA000AF212B /* Managers */,
 				ABB9E88B279FD55D0018BB2E /* Controllers */,
 			);
@@ -1430,6 +1476,7 @@
 		ABB9E86C279E9E6B0018BB2E /* Authorization */ = {
 			isa = PBXGroup;
 			children = (
+				AB0AB63627B4FFF2006FD33F /* Agreement */,
 				AB8DA31E27A1487500F92C18 /* Sign Up */,
 				ABB9E880279EA6090018BB2E /* Welcome */,
 			);
@@ -1465,8 +1512,6 @@
 				AB3C67E2223FBB6400B57580 /* Main.storyboard */,
 				AB3C67E8223FBB6600B57580 /* Assets.xcassets */,
 				AB8DA31927A0325D00F92C18 /* Localizable.strings */,
-				AB309C7827ADB4E1005BBCB4 /* UserDefaults.swift */,
-				AB3C6819223FD04500B57580 /* KeychainService.swift */,
 			);
 			path = "Supporting Files";
 			sourceTree = "<group>";
@@ -1682,7 +1727,9 @@
 				AB791D85243B70D00085E00E /* VoteCompletionView.xib in Resources */,
 				AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */,
 				ABBA1989242B430100F11E0D /* AnswerHeaderCell.xib in Resources */,
+				AB0AB64027B506C6006FD33F /* AgreementView.xib in Resources */,
 				AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */,
+				AB0AB64227B507AB006FD33F /* AgreementViewController.xib in Resources */,
 				ABB4AAA8266630D200D4738D /* NewSurveyTitle.xib in Resources */,
 				AB3C684B223FD3EE00B57580 /* OpenSans-Light.ttf in Resources */,
 				AB21970526BC2F0B005A7BA8 /* Banner.xib in Resources */,
@@ -1845,6 +1892,7 @@
 				AB7478C724290D8600317EB6 /* SurveyAnswerCell.swift in Sources */,
 				ABA282F0274FD93E00ED583F /* RangeSliderTrackLayer.swift in Sources */,
 				AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */,
+				AB0AB63D27B5001F006FD33F /* AgreementView.swift in Sources */,
 				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
 				ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */,
 				AB7599ED245B29FE008B0569 /* SurveyPreview.swift in Sources */,
@@ -1875,6 +1923,7 @@
 				AB2BC365264D0A31009B44BA /* ImageViewController.swift in Sources */,
 				AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */,
 				AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */,
+				AB0AB63C27B5001F006FD33F /* AgreementViewController.swift in Sources */,
 				AB869F2826C53313008353B3 /* PollController.swift in Sources */,
 				ABB9E885279EA6510018BB2E /* WelcomeContract.swift in Sources */,
 				AB8238F927A914100061F7C6 /* Urls.swift in Sources */,
@@ -1900,6 +1949,7 @@
 				AB6083C122410131002C0D7E /* ValidSign.swift in Sources */,
 				AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
+				AB0AB63227B3DF2B006FD33F /* GoogleWorker.swift in Sources */,
 				AB0980DC24CF04A100A02405 /* UserActivityCell.swift in Sources */,
 				AB04144F244EF3A600336857 /* SurveyStackViewController.swift in Sources */,
 				AB5CA11824F5418500F55DEC /* TransitionCoordinator.swift in Sources */,
@@ -1934,6 +1984,7 @@
 				AB3C6848223FD3EE00B57580 /* Buttons.swift in Sources */,
 				AB334FBE270C67C900DD7332 /* VoteView.swift in Sources */,
 				AB21970E26C11ACA005A7BA8 /* BannerContent.swift in Sources */,
+				AB0AB63B27B5001F006FD33F /* AgreementContract.swift in Sources */,
 				AB219CA22420D0400074CF9F /* SurveyYoutubeCell.swift in Sources */,
 				AB30A4F9272AAD5300A7DCC0 /* Claim.swift in Sources */,
 				AB52B734240E5D4B006DBDA8 /* ReadySign.swift in Sources */,
@@ -2009,6 +2060,7 @@
 				AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */,
 				AB229D842464512500968D52 /* del_Segues.swift in Sources */,
 				AB988A9E254811AB00E3C39A /* NewPollController.swift in Sources */,
+				AB0AB63527B4E37C006FD33F /* TimeoutTask.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				AB75838224E6AB8A004367DF /* CompletedSign.swift in Sources */,
 				ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */,
