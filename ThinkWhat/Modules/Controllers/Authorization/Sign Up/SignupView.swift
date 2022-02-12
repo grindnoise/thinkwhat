@@ -37,7 +37,7 @@ class SignupView: UIView {
     }
     @IBAction func signupTapped(_ sender: Any) {
         guard isCorrect, !isPerformingChecks, let username = usernameTF.text, let email = mailTF.text, let password = passwordTF.text else {
-            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Проверьте корректность заполненных полей")
+            showAlert(type: .Warning, buttons: [[NSLocalizedString("ok", comment: ""): [CustomAlertView.ButtonType.Ok: nil]]], text: NSLocalizedString("check_fields", comment: ""))
             return
         }
         signupButton.setTitle("", for: .normal)
@@ -138,11 +138,11 @@ class SignupView: UIView {
     }
     @IBOutlet weak var loginButton: UIButton! {
         didSet {
-            loginButton.setTitle(NSLocalizedString("login", comment: ""), for: .normal)
+            loginButton.setTitle(NSLocalizedString("log_in", comment: ""), for: .normal)
         }
     }
     @IBAction func loginTapped(_ sender: Any) {
-        authorize(provider: .Mail)
+        viewInput?.onLogin()
     }
     @IBOutlet weak var loginButonTopConstraint: NSLayoutConstraint!
     
@@ -548,7 +548,7 @@ extension SignupView: UITextFieldDelegate {
     }
     
     private func authorize(provider: AuthProvider) {
-        @Sendable @MainActor func onError() {
+        @Sendable @MainActor func onExit() {
             var destinationSize: CGSize!
             var destinationOrigin: CGPoint!
             var destinationLogo: UIView!
@@ -595,7 +595,9 @@ extension SignupView: UITextFieldDelegate {
                     spinner.alpha = 0
                 } completion: { [weak self] _ in
                     guard `self` == self else { return }
+                    sleep(1)
                     self!.viewInput?.onSignupSuccess()
+                    onExit()
                 }
             } catch let error {
                 isUserInteractionEnabled = true
@@ -605,7 +607,7 @@ extension SignupView: UITextFieldDelegate {
                 UIView.transition(with: label, duration: 0.2, options: [.transitionCrossDissolve]) {
                     label.text = NSLocalizedString("provider_authorization_failure", comment: "")
                     spinner.alpha = 0
-                } completion: { _ in onError() }
+                } completion: { _ in onExit() }
 #if DEBUG
                 print(error.localizedDescription)
 #endif

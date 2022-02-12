@@ -266,10 +266,10 @@ class API {
         request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.CURRENT_USER), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
     }
     
-    func getUserDataAsync() async throws -> JSON {
+    func getUserDataAsync() async throws -> Data {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CURRENT_USER) else { throw APIError.invalidURL }
         do {
-            return try await JSON(requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: headers()))
+            return try await requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: headers())
         } catch {
             throw error
         }
@@ -309,7 +309,20 @@ class API {
         }
     }
     
-    ///Auhorize and store access token locally
+    ///Email/username auhorization. Store access token if finished successful
+    func loginAsync(username: String, password: String) async throws  {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { throw APIError.invalidURL }
+        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
+        do {
+            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding())
+            let json = try JSON(data: data, options: .mutableContainers)
+            saveTokenInKeychain(json: json)
+        } catch let error {
+            throw error
+        }
+    }
+    
+    ///Third-party auhorization. Store access token if finished successful
     func loginViaProvider(provider: AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { completion(.failure(APIError.invalidURL)); return }
         let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]

@@ -214,7 +214,9 @@ class Surveys {
     func load(_ json: JSON) {
         let decoder                                 = JSONDecoder()
         var notifications: [NSNotification.Name]    = []
-        decoder.dateDecodingStrategy                = .formatted(.dateTimeFormatter)
+        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                   DateFormatter.dateTimeFormatter,
+                                                   DateFormatter.dateFormatter ]
 //        decoder.keyDecodingStrategy                 = .convertFromSnakeCase
         do {
             for (key, value) in json {

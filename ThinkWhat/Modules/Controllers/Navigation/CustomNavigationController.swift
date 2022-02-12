@@ -58,6 +58,9 @@ class CustomNavigationController: UINavigationController {
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = appDelegate.transitionCoordinator
+        navigationBar.titleTextAttributes = [NSAttributedString.Key.font: UIFont(name: StringAttributes.Fonts.Style.Bold, size: 20)!
+        ]
+        navigationBar.tintColor = .label
     }
     
     override func present(_ viewControllerToPresent: UIViewController,

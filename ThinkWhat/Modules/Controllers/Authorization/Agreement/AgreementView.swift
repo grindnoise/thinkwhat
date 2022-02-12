@@ -7,43 +7,129 @@
 //
 
 import UIKit
+import WebKit
 
 class AgreementView: UIView {
     
-    @IBOutlet weak var textView: UITextView!
-    @IBOutlet weak var agreeButton: UIButton!
+    // MARK: - IB outlets
+    @IBOutlet var contentView: UIView!
+    @IBOutlet weak var webView: WKWebView! {
+        didSet {
+            webView.scrollView.delegate = self
+            webView.navigationDelegate = self
+        }
+    }
+    @IBOutlet weak var acceptButton: UIButton! {
+        didSet {
+            acceptButton.setTitle("", for: .normal)
+            let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                                  size: CGSize(width: acceptButton.frame.height,
+                                                                               height: acceptButton.frame.height)))
+            indicator.alpha = 0
+            indicator.layoutCentered(in: acceptButton)
+            indicator.startAnimating()
+            indicator.color = .white
+            UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
+//            agreeButton.setTitle(NSLocalizedString("accept", comment: ""), for: .normal)
+        }
+    }
     @IBAction func agreeButtonTapped(_ sender: Any) {
-        
+        if agreementIsLoading {
+            viewInput?.onAcceptTappedWhileLoading()
+        } else {
+            switch hasReadAgreement {
+            case true:
+                viewInput?.onAcceptTappedWithSuccess()
+            case false:
+                viewInput?.onAcceptTappedWithError()
+            }
+        }
     }
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupUI()
+        commonInit()
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: coder)
+        commonInit()
+    }
+    
+    private func commonInit() {
+        guard let contentView = self.fromNib()
+                    else { fatalError("View could not load from nib") }
+                addSubview(contentView)
+
+        contentView.frame = self.bounds
+        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        self.addSubview(contentView)
+        setupUI()
     }
     
     override func layoutSubviews() {
-        
+        guard acceptButton != nil else { return }
+        acceptButton.cornerRadius = acceptButton.frame.height/2.25
     }
     
     // MARK: - Properties
-    weak var viewInput: AgreementViewInput?
+    weak var viewInput: ConditionsViewInput?
+    private var agreementIsLoading = true
+    private var hasReadAgreement = false {
+        didSet {
+            if hasReadAgreement {
+                UIView.animate(withDuration: 0.2) {
+                    self.setAcceptButtonColor()
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Controller Output
-extension AgreementView: AgreementControllerOutput {
-    
-    // Implement methods
-    
+extension AgreementView: ConditionsControllerOutput {
+    func getTermsConditionsURL(_ url: URL) {
+        webView.load(URLRequest(url: url))
+    }
 }
 
 // MARK: - UI Setup
 extension AgreementView {
+    private func setAcceptButtonColor() {
+        guard acceptButton != nil else { return }
+        acceptButton.backgroundColor = UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return self.hasReadAgreement ? UIColor.systemBlue : K_COLOR_GRAY
+            default:
+                return self.hasReadAgreement ? K_COLOR_RED : K_COLOR_GRAY
+            }
+        }
+    }
+    
     private func setupUI() {
-        // Add subviews and set constraints here
+        setAcceptButtonColor()
+    }
+}
+
+extension AgreementView: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        agreementIsLoading = false
+        guard acceptButton != nil, let indicator = acceptButton.subviews.filter({ $0.isKind(of: UIActivityIndicatorView.self)}).first as? UIActivityIndicatorView else { return }
+        UIView.animate(withDuration: 0.2) {
+            indicator.alpha = 0
+        } completion: { _ in
+            indicator.removeFromSuperview()
+            self.acceptButton.setTitle(NSLocalizedString("accept", comment: ""), for: .normal)
+        }
+    }
+}
+
+extension AgreementView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if !hasReadAgreement, (scrollView.contentOffset.y + scrollView.bounds.height) >= scrollView.contentSize.height {
+            hasReadAgreement = true
+        }
     }
 }
 

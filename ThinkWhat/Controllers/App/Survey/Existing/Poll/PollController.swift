@@ -250,7 +250,9 @@ class PollController: UIViewController {
                                 answer.totalVotes = _total
                                 totalVotes += _total
                                 let decoder = JSONDecoder()
-                                decoder.dateDecodingStrategy = .formatted(.dateTimeFormatter)
+                                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                                           DateFormatter.dateTimeFormatter,
+                                                                           DateFormatter.dateFormatter ]
                                 let instances = try decoder.decode([Userprofile].self, from: data)
                                 for instance in instances {
                                     if let existing = Userprofiles.shared.all.filter({ $0.hashValue == instance.hashValue }).first {
@@ -296,7 +298,9 @@ class PollController: UIViewController {
             switch result {
             case .success(let json):
                 let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .formatted(.dateTimeFormatter)
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
                 do {
                     let instance = try decoder.decode(Survey.self, from: json.rawData())
                     self.survey = Surveys.shared.all.filter({ $0.id == instance.id }).first

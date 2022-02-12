@@ -21,6 +21,7 @@ protocol SignupViewInput: class {
     func checkCredentials(username: String, email: String, completion: @escaping(Result<Bool,Error>)->())
     func onCaptchaValidation(completion: @escaping(Result<Bool,Error>)->())
     func onSignupSuccess()
+    func onLogin()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -46,7 +47,6 @@ protocol SignupModelOutput: class {
 protocol SignupControllerOutput: class {
     var viewInput: SignupViewInput? { get set }
     
-//    func onProviderControllerDisappear(provider: AuthProvider)
     func onDidDisappear()
 //    func onSignupFailure(error: Error)
 //    func onSignupSuccess()

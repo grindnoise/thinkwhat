@@ -16,8 +16,9 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AgreementView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
-                <outlet property="agreeButton" destination="fAY-s0-652" id="spt-AD-Z1F"/>
-                <outlet property="textView" destination="h8j-vp-fmQ" id="5nB-D1-5wj"/>
+                <outlet property="acceptButton" destination="fAY-s0-652" id="spt-AD-Z1F"/>
+                <outlet property="contentView" destination="iN0-l3-epB" id="dXL-cI-M7O"/>
+                <outlet property="webView" destination="6Cx-Za-DXN" id="jwl-B8-79a"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -26,7 +27,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fAY-s0-652">
-                    <rect key="frame" x="91" y="804" width="232" height="58"/>
+                    <rect key="frame" x="91" y="796" width="232" height="58"/>
                     <color key="backgroundColor" systemColor="systemBlueColor"/>
                     <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="20"/>
                     <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -36,34 +37,31 @@
                         <action selector="agreeButtonTapped:" destination="-1" eventType="touchUpInside" id="0wT-Y2-FVQ"/>
                     </connections>
                 </button>
-                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h8j-vp-fmQ">
-                    <rect key="frame" x="20" y="44" width="374" height="752"/>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
-                    <color key="textColor" systemColor="labelColor"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                </textView>
+                <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6Cx-Za-DXN">
+                    <rect key="frame" x="20" y="44" width="374" height="744"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <wkWebViewConfiguration key="configuration">
+                        <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                        <wkPreferences key="preferences"/>
+                    </wkWebViewConfiguration>
+                </wkWebView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="h8j-vp-fmQ" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="0AV-MS-o1V"/>
                 <constraint firstItem="fAY-s0-652" firstAttribute="width" secondItem="fAY-s0-652" secondAttribute="height" multiplier="4:1" id="2or-vB-x5x"/>
-                <constraint firstItem="h8j-vp-fmQ" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="IFU-Ed-m3r"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="h8j-vp-fmQ" secondAttribute="trailing" constant="20" id="Kgs-GM-A86"/>
-                <constraint firstItem="fAY-s0-652" firstAttribute="top" secondItem="h8j-vp-fmQ" secondAttribute="bottom" constant="8" symbolic="YES" id="Ubc-mv-sz4"/>
+                <constraint firstItem="fAY-s0-652" firstAttribute="top" secondItem="6Cx-Za-DXN" secondAttribute="bottom" constant="8" symbolic="YES" id="DVv-Dh-v94"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="6Cx-Za-DXN" secondAttribute="trailing" constant="20" id="Ov6-ba-f7f"/>
                 <constraint firstItem="fAY-s0-652" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.560386" id="eC5-oY-QIv"/>
-                <constraint firstItem="fAY-s0-652" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="h6C-ex-O7j"/>
+                <constraint firstItem="6Cx-Za-DXN" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="eaG-Eu-ReI"/>
+                <constraint firstItem="fAY-s0-652" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" constant="-8" id="h6C-ex-O7j"/>
                 <constraint firstItem="fAY-s0-652" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="jUO-We-NjA"/>
+                <constraint firstItem="6Cx-Za-DXN" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="nof-pk-obu"/>
             </constraints>
             <point key="canvasLocation" x="137.68115942028987" y="82.366071428571431"/>
         </view>
     </objects>
     <resources>
-        <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

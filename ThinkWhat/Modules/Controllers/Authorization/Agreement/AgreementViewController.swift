@@ -13,14 +13,10 @@ class AgreementViewController: UIViewController {
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-       
-        let view = AgreementView()
                
-        self.controllerOutput = view
+        self.controllerOutput = view as? AgreementView
         self.controllerOutput?
             .viewInput = self
-        
-        self.view = view as UIView
     }
 
     // MARK: - Properties

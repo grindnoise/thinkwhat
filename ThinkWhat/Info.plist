@@ -129,5 +129,7 @@
 	</array>
     <key>FacebookAutoLogAppEventsEnabled</key>
     <false/>
+    <key>FacebookAdvertiserIDCollectionEnabled</key>
+    <false/>
 </dict>
 </plist>

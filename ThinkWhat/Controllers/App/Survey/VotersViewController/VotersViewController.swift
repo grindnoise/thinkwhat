@@ -101,7 +101,9 @@ class VotersViewController: UIViewController {
                 do {
                     let data = try json.rawData()
                     let decoder = JSONDecoder()
-                    decoder.dateDecodingStrategy = .formatted(.dateTimeFormatter)
+                    decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                               DateFormatter.dateTimeFormatter,
+                                                               DateFormatter.dateFormatter ]
                     let instances = try decoder.decode([Userprofile].self, from: data)
                     instances.enumerated().forEach { (index, instance) in
                         ///Add voter for an answer

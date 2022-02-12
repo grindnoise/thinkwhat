@@ -15,9 +15,7 @@ class FBWorker {
     
     class func wakeUp() {
         ApplicationDelegate.shared.application(UIApplication.shared, didFinishLaunchingWithOptions: nil)
-        Settings.shared.isAdvertiserTrackingEnabled = false
     }
-//    private init() {}
     
     class func authorizeAsync(viewController: UIViewController) async throws -> AccessToken {
         try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<AccessToken, Error>) in
@@ -48,7 +46,9 @@ class FBWorker {
             GraphRequest(graphPath: "me", parameters: ["fields" : "name, first_name, last_name, email, picture.type(large)"]).start() { (connection, result, error) in
                 if let data = result {
                     continuation.resume(returning: JSON(data))
+#if DEBUG
                     print(JSON(data))
+#endif
                     return
                 } else if let error = error {
                     continuation.resume(throwing: error)
@@ -70,66 +70,7 @@ class FBWorker {
         return parameters
     }
     
-    //    static func _prepareDjangoData(_ data: [String : Any]) -> [String : Any] {
-    //        var userProfile = [String: Any]()
-    //        for (key, value) in data {
-    //            if key == "first_name" || key == "last_name" || key == "email" {
-    //                userProfile["owner."+key] = value
-    //            } else if key == "id" {
-    //                userProfile["facebook_ID"] = value
-    //            } else if key == "image" {
-    //                userProfile[key] = value
-    //            }
-    //        }
-    //        return userProfile
-    //    }
-    
-    //    public class func performLogin(viewController: UIViewController, completionHandler: @escaping(Bool) -> Void) {
-    //
-    //        shared.logIn(permissions: ["public_profile", "email"],
-    //                               from: viewController) { (result, error) in
-    //                                if error == nil {
-    //                                    completionHandler(true)
-//                                } else {
-//                                    print(error!.localizedDescription)
-//                                    completionHandler(false)
-//                                }
-//        }
-//    }
-    
-    public class func logout() {//(completionHandler: @escaping(Bool) -> Void) {
+    public class func logout() {
         shared.logOut()
     }
-    
-    public class func getUserData(completionHandler: @escaping(JSON?) -> Void) {
-        if AccessToken.current != nil {
-            GraphRequest(graphPath: "me", parameters: ["fields" : "name, first_name, last_name, email, picture.type(large)"]).start() {
-                (connection, result, error) in
-                if let conn = connection {
-                    print(conn)
-                }
-                if let error = error {
-                    print(error.localizedDescription)
-                    return
-                }
-                if result != nil {
-                    if let json = JSON(result!) as? JSON {
-                        completionHandler(json)
-                    }
-                }
-            }
-        }
-    }
-    
-//    private func initializeServerAPI() -> APIManagerProtocol {
-//        return appDelegate.container.resolve(APIManagerProtocol.self)!
-//    }
-}
-
-    
-
-
-func convertImageToBase64(image: UIImage) -> String {
-    let imageData = image.jpegData(compressionQuality: 1)!
-    return imageData.base64EncodedString(options:   Data.Base64EncodingOptions.lineLength64Characters)
 }

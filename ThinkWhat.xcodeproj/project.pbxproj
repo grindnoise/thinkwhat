@@ -17,11 +17,9 @@
 		AB0980DC24CF04A100A02405 /* UserActivityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0980DB24CF04A100A02405 /* UserActivityCell.swift */; };
 		AB0AB63227B3DF2B006FD33F /* GoogleWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63127B3DF2B006FD33F /* GoogleWorker.swift */; };
 		AB0AB63527B4E37C006FD33F /* TimeoutTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63427B4E37C006FD33F /* TimeoutTask.swift */; };
-		AB0AB63B27B5001F006FD33F /* AgreementContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63727B5001F006FD33F /* AgreementContract.swift */; };
-		AB0AB63C27B5001F006FD33F /* AgreementViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63827B5001F006FD33F /* AgreementViewController.swift */; };
+		AB0AB63B27B5001F006FD33F /* ConditionsContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63727B5001F006FD33F /* ConditionsContract.swift */; };
 		AB0AB63D27B5001F006FD33F /* AgreementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63927B5001F006FD33F /* AgreementView.swift */; };
 		AB0AB64027B506C6006FD33F /* AgreementView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB0AB63F27B506C6006FD33F /* AgreementView.xib */; };
-		AB0AB64227B507AB006FD33F /* AgreementViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB0AB64127B507AB006FD33F /* AgreementViewController.xib */; };
 		AB0BFDF1252DBCD500BD5EFF /* HeartIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF0252DBCD500BD5EFF /* HeartIcon.swift */; };
 		AB0BFDF3252DC9E400BD5EFF /* MegaphoneIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */; };
 		AB0BFDF5252EF20C00BD5EFF /* PieIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */; };
@@ -209,6 +207,17 @@
 		AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */; };
 		AB93FD78247EA245009546DD /* EmptySurvey.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD77247EA245009546DD /* EmptySurvey.swift */; };
 		AB93FD7A247EA255009546DD /* EmptySurvey.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB93FD79247EA255009546DD /* EmptySurvey.xib */; };
+		AB98306927B5359B002C5132 /* ConditionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98306727B5359B002C5132 /* ConditionsViewController.swift */; };
+		AB98306A27B5359B002C5132 /* ConditionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB98306827B5359B002C5132 /* ConditionsViewController.xib */; };
+		AB98306C27B5382E002C5132 /* ConditionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98306B27B5382E002C5132 /* ConditionsModel.swift */; };
+		AB98306E27B54CB2002C5132 /* terms_conditions.html in Resources */ = {isa = PBXBuildFile; fileRef = AB98306D27B54CB2002C5132 /* terms_conditions.html */; };
+		AB98307027B54D43002C5132 /* ContentLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98306F27B54D43002C5132 /* ContentLoader.swift */; };
+		AB98307427B687CB002C5132 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98307227B687CB002C5132 /* LoginViewController.swift */; };
+		AB98307527B687CB002C5132 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB98307327B687CB002C5132 /* LoginViewController.xib */; };
+		AB98307A27B68811002C5132 /* LoginContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98307627B68811002C5132 /* LoginContract.swift */; };
+		AB98307C27B68811002C5132 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98307827B68811002C5132 /* LoginView.swift */; };
+		AB98307D27B68811002C5132 /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98307927B68811002C5132 /* LoginModel.swift */; };
+		AB98307F27B68B63002C5132 /* LoginView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB98307E27B68B63002C5132 /* LoginView.xib */; };
 		AB988A9E254811AB00E3C39A /* NewPollController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9D254811AB00E3C39A /* NewPollController.swift */; };
 		AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */; };
 		AB99676123D9AA210037CD6C /* HideKeyboardIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */; };
@@ -318,11 +327,9 @@
 		AB0980DB24CF04A100A02405 /* UserActivityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserActivityCell.swift; sourceTree = "<group>"; };
 		AB0AB63127B3DF2B006FD33F /* GoogleWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleWorker.swift; sourceTree = "<group>"; };
 		AB0AB63427B4E37C006FD33F /* TimeoutTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeoutTask.swift; sourceTree = "<group>"; };
-		AB0AB63727B5001F006FD33F /* AgreementContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgreementContract.swift; sourceTree = "<group>"; };
-		AB0AB63827B5001F006FD33F /* AgreementViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgreementViewController.swift; sourceTree = "<group>"; };
+		AB0AB63727B5001F006FD33F /* ConditionsContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionsContract.swift; sourceTree = "<group>"; };
 		AB0AB63927B5001F006FD33F /* AgreementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgreementView.swift; sourceTree = "<group>"; };
 		AB0AB63F27B506C6006FD33F /* AgreementView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AgreementView.xib; sourceTree = "<group>"; };
-		AB0AB64127B507AB006FD33F /* AgreementViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AgreementViewController.xib; sourceTree = "<group>"; };
 		AB0BFDF0252DBCD500BD5EFF /* HeartIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MegaphoneIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieIcon.swift; sourceTree = "<group>"; };
@@ -521,6 +528,17 @@
 		AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayEncoding.swift; sourceTree = "<group>"; };
 		AB93FD77247EA245009546DD /* EmptySurvey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptySurvey.swift; sourceTree = "<group>"; };
 		AB93FD79247EA255009546DD /* EmptySurvey.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmptySurvey.xib; sourceTree = "<group>"; };
+		AB98306727B5359B002C5132 /* ConditionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionsViewController.swift; sourceTree = "<group>"; };
+		AB98306827B5359B002C5132 /* ConditionsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConditionsViewController.xib; sourceTree = "<group>"; };
+		AB98306B27B5382E002C5132 /* ConditionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionsModel.swift; sourceTree = "<group>"; };
+		AB98306D27B54CB2002C5132 /* terms_conditions.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = terms_conditions.html; sourceTree = "<group>"; };
+		AB98306F27B54D43002C5132 /* ContentLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLoader.swift; sourceTree = "<group>"; };
+		AB98307227B687CB002C5132 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		AB98307327B687CB002C5132 /* LoginViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginViewController.xib; sourceTree = "<group>"; };
+		AB98307627B68811002C5132 /* LoginContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginContract.swift; sourceTree = "<group>"; };
+		AB98307827B68811002C5132 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		AB98307927B68811002C5132 /* LoginModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
+		AB98307E27B68B63002C5132 /* LoginView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginView.xib; sourceTree = "<group>"; };
 		AB988A9D254811AB00E3C39A /* NewPollController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 2_BinarySelectionViewController.swift; sourceTree = "<group>"; };
 		AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideKeyboardIcon.swift; sourceTree = "<group>"; };
@@ -691,11 +709,12 @@
 		AB0AB63627B4FFF2006FD33F /* Agreement */ = {
 			isa = PBXGroup;
 			children = (
-				AB0AB63727B5001F006FD33F /* AgreementContract.swift */,
-				AB0AB63827B5001F006FD33F /* AgreementViewController.swift */,
+				AB0AB63727B5001F006FD33F /* ConditionsContract.swift */,
 				AB0AB63927B5001F006FD33F /* AgreementView.swift */,
 				AB0AB63F27B506C6006FD33F /* AgreementView.xib */,
-				AB0AB64127B507AB006FD33F /* AgreementViewController.xib */,
+				AB98306727B5359B002C5132 /* ConditionsViewController.swift */,
+				AB98306827B5359B002C5132 /* ConditionsViewController.xib */,
+				AB98306B27B5382E002C5132 /* ConditionsModel.swift */,
 			);
 			path = Agreement;
 			sourceTree = "<group>";
@@ -1378,6 +1397,19 @@
 			path = EmptySurvey;
 			sourceTree = "<group>";
 		};
+		AB98307127B687A6002C5132 /* Log in */ = {
+			isa = PBXGroup;
+			children = (
+				AB98307227B687CB002C5132 /* LoginViewController.swift */,
+				AB98307327B687CB002C5132 /* LoginViewController.xib */,
+				AB98307627B68811002C5132 /* LoginContract.swift */,
+				AB98307827B68811002C5132 /* LoginView.swift */,
+				AB98307927B68811002C5132 /* LoginModel.swift */,
+				AB98307E27B68B63002C5132 /* LoginView.xib */,
+			);
+			path = "Log in";
+			sourceTree = "<group>";
+		};
 		AB99A95724C8153400814F96 /* UserLogoHeader */ = {
 			isa = PBXGroup;
 			children = (
@@ -1448,6 +1480,7 @@
 				AB309C7F27B280BA005BBCB4 /* OAuth */,
 				AB8238F727A913F70061F7C6 /* REST */,
 				AB3C685A223FD74D00B57580 /* FileIOController.swift */,
+				AB98306F27B54D43002C5132 /* ContentLoader.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -1477,6 +1510,7 @@
 			isa = PBXGroup;
 			children = (
 				AB0AB63627B4FFF2006FD33F /* Agreement */,
+				AB98307127B687A6002C5132 /* Log in */,
 				AB8DA31E27A1487500F92C18 /* Sign Up */,
 				ABB9E880279EA6090018BB2E /* Welcome */,
 			);
@@ -1508,6 +1542,7 @@
 		ABB9E88C279FD59C0018BB2E /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AB98306D27B54CB2002C5132 /* terms_conditions.html */,
 				AB3C681F223FD1B100B57580 /* UI */,
 				AB3C67E2223FBB6400B57580 /* Main.storyboard */,
 				AB3C67E8223FBB6600B57580 /* Assets.xcassets */,
@@ -1726,10 +1761,11 @@
 			files = (
 				AB791D85243B70D00085E00E /* VoteCompletionView.xib in Resources */,
 				AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */,
+				AB98307F27B68B63002C5132 /* LoginView.xib in Resources */,
 				ABBA1989242B430100F11E0D /* AnswerHeaderCell.xib in Resources */,
 				AB0AB64027B506C6006FD33F /* AgreementView.xib in Resources */,
+				AB98306E27B54CB2002C5132 /* terms_conditions.html in Resources */,
 				AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */,
-				AB0AB64227B507AB006FD33F /* AgreementViewController.xib in Resources */,
 				ABB4AAA8266630D200D4738D /* NewSurveyTitle.xib in Resources */,
 				AB3C684B223FD3EE00B57580 /* OpenSans-Light.ttf in Resources */,
 				AB21970526BC2F0B005A7BA8 /* Banner.xib in Resources */,
@@ -1764,7 +1800,9 @@
 				AB8994F126C2BE5300F03375 /* InsufficientBalance.xib in Resources */,
 				ABB8B1932423D13900E8DFF3 /* Slide.xib in Resources */,
 				ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */,
+				AB98307527B687CB002C5132 /* LoginViewController.xib in Resources */,
 				AB334FBC270C5AF500DD7332 /* VoteView.xib in Resources */,
+				AB98306A27B5359B002C5132 /* ConditionsViewController.xib in Resources */,
 				ABB9E89227A003540018BB2E /* WelcomeView.xib in Resources */,
 				AB04144D244EF2F600336857 /* Controllers.storyboard in Resources */,
 				AB25E042265FAC0100EAA8AE /* Survey.storyboard in Resources */,
@@ -1913,6 +1951,7 @@
 				ABB46F3E2346373700AF212B /* TabBarController.swift in Sources */,
 				AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */,
 				AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */,
+				AB98307027B54D43002C5132 /* ContentLoader.swift in Sources */,
 				ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */,
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
 				AB19B6412432222300999917 /* SurveyResultCell.swift in Sources */,
@@ -1923,7 +1962,6 @@
 				AB2BC365264D0A31009B44BA /* ImageViewController.swift in Sources */,
 				AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */,
 				AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */,
-				AB0AB63C27B5001F006FD33F /* AgreementViewController.swift in Sources */,
 				AB869F2826C53313008353B3 /* PollController.swift in Sources */,
 				ABB9E885279EA6510018BB2E /* WelcomeContract.swift in Sources */,
 				AB8238F927A914100061F7C6 /* Urls.swift in Sources */,
@@ -1973,6 +2011,7 @@
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
 				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
 				AB8DA34527A1836900F92C18 /* SignupViewController.swift in Sources */,
+				AB98306C27B5382E002C5132 /* ConditionsModel.swift in Sources */,
 				ABB46F45234B4A3F00AF212B /* ProfileSettingsSelectionTableViewController.swift in Sources */,
 				AB61BA2F2782DDA200F89C4C /* Media.swift in Sources */,
 				ABA282ED274FD16800ED583F /* RangeSlider.swift in Sources */,
@@ -1984,7 +2023,7 @@
 				AB3C6848223FD3EE00B57580 /* Buttons.swift in Sources */,
 				AB334FBE270C67C900DD7332 /* VoteView.swift in Sources */,
 				AB21970E26C11ACA005A7BA8 /* BannerContent.swift in Sources */,
-				AB0AB63B27B5001F006FD33F /* AgreementContract.swift in Sources */,
+				AB0AB63B27B5001F006FD33F /* ConditionsContract.swift in Sources */,
 				AB219CA22420D0400074CF9F /* SurveyYoutubeCell.swift in Sources */,
 				AB30A4F9272AAD5300A7DCC0 /* Claim.swift in Sources */,
 				AB52B734240E5D4B006DBDA8 /* ReadySign.swift in Sources */,
@@ -2006,6 +2045,7 @@
 				AB735C092418EABD00776248 /* SurveyTitleCell.swift in Sources */,
 				ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */,
 				ABF20FBC24CAEB640092B223 /* UserClaimCell.swift in Sources */,
+				AB98306927B5359B002C5132 /* ConditionsViewController.swift in Sources */,
 				AB92237424F3EB4900F38936 /* SubcategoryViewController.swift in Sources */,
 				ABBA73F12382896900540ECF /* UserSurveysViewController.swift in Sources */,
 				AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */,
@@ -2013,6 +2053,7 @@
 				AB19B6432432282B00999917 /* PercentageLabel.swift in Sources */,
 				AB8FD485241F761F00BB74EF /* SurveyLinkCell.swift in Sources */,
 				AB8DA32E27A15BAD00F92C18 /* Basic.swift in Sources */,
+				AB98307427B687CB002C5132 /* LoginViewController.swift in Sources */,
 				AB1D845224EA91D200B75929 /* Topic.swift in Sources */,
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */,
@@ -2051,6 +2092,7 @@
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
 				ABBA74002387E66F00540ECF /* CategoryIcon.swift in Sources */,
 				AB30A5002731470000A7DCC0 /* ResultIndicator.swift in Sources */,
+				AB98307A27B68811002C5132 /* LoginContract.swift in Sources */,
 				AB238D1C27905859009E49C2 /* AppSettings.swift in Sources */,
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				AB4727A9268C6444002A9563 /* UI.swift in Sources */,
@@ -2059,6 +2101,7 @@
 				AB48B90624348CDC00A27B0D /* SurveyTotalCell.swift in Sources */,
 				AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */,
 				AB229D842464512500968D52 /* del_Segues.swift in Sources */,
+				AB98307D27B68811002C5132 /* LoginModel.swift in Sources */,
 				AB988A9E254811AB00E3C39A /* NewPollController.swift in Sources */,
 				AB0AB63527B4E37C006FD33F /* TimeoutTask.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
@@ -2070,6 +2113,7 @@
 				AB43A56025E63BB800BF8749 /* PaddingLabel.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
 				AB791D80243B31040085E00E /* VoteCompletionView.swift in Sources */,
+				AB98307C27B68811002C5132 /* LoginView.swift in Sources */,
 				ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */,
 				AB3C6812223FC71600B57580 /* Main.swift in Sources */,
 				AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */,

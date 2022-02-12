@@ -42,6 +42,7 @@ extension FileError: LocalizedError {
 struct FileIOController {
     static let manager = FileManager.default
     
+    ///Helper enums to store media in associated subdirectory
     enum DirectoryPath: String {
         case Profiles = "profiles/"
         case Surveys = "surveys/"
@@ -52,6 +53,13 @@ struct FileIOController {
         case Media = "media/"
     }
     
+    ///Converts UIImage->Data->String, the Base-64 encoded string
+    static func convertImageToBase64(image: UIImage) -> String {
+        let imageData = image.jpegData(compressionQuality: 1)!
+        return imageData.base64EncodedString(options:   Data.Base64EncodingOptions.lineLength64Characters)
+    }
+    
+    ///Delete resource for URL's abs string
     static func delete(dataPath path: String) throws {
         guard manager.fileExists(atPath: path) else { throw FileError.notFound(path: path) }
         do {
@@ -59,6 +67,7 @@ struct FileIOController {
         } catch { throw error }
     }
 
+    ///Write resource for URL's abs string with helper args
     static func write(data: Data, toPath path: DirectoryPath, ofType type: DirectoryType, id: String, toDocumentNamed documentName: String) throws -> URL {
         let rootFolderURL = try manager.url(
             for: .documentDirectory,
@@ -79,18 +88,6 @@ struct FileIOController {
             try data.write(to: fileURL)
             return fileURL
         } catch { throw error }
-//
-//
-//        let imageDirectory = getDocumentsDirectory().appendingPathComponent("/Data\(path)\(type)\(id)/")
-////        let imageDirectory =  NSHomeDirectory().appending("/Data\(path)\(type)\(id)/")
-//        if !manager.fileExists(atPath: imageDirectory.absoluteString) {
-//            do {
-//                try FileManager.default.createDirectory(at: NSURL.fileURL(withPath: imageDirectory.absoluteString), withIntermediateDirectories: true, attributes: nil)
-//            } catch {
-//                throw error
-//            }
-//        }
-//
     }
 }
 
