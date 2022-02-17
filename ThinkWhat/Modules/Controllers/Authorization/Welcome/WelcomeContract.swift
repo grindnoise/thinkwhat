@@ -13,8 +13,12 @@ import UIKit
 /// **Controller** conforms to this protocol
 protocol WelcomeViewInput: class {
     func onGetStartedTap()
+    func onLanguagesListPresented()
+    func onLanguageChangeAccepted(_: String)
+    func onLanguageChanged(_: String)
 }
 
 protocol WelcomeControllerOutput: class {
     var controller: WelcomeViewInput? { get set }
+    func onLanguageTapped()
 }

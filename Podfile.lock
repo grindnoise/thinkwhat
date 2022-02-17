@@ -23,6 +23,15 @@ PODS:
     - AppAuth/Core (~> 1.4)
     - GTMSessionFetcher/Core (~> 1.5)
   - GTMSessionFetcher/Core (1.7.0)
+  - L10n-swift (5.10.0):
+    - L10n-swift/Core (= 5.10.0)
+    - L10n-swift/Extension (= 5.10.0)
+    - L10n-swift/IBInspectable (= 5.10.0)
+  - L10n-swift/Core (5.10.0)
+  - L10n-swift/Extension (5.10.0):
+    - L10n-swift/Core
+  - L10n-swift/IBInspectable (5.10.0):
+    - L10n-swift/Core
   - Nimble (8.1.1)
   - Quick (3.0.0)
   - ReCaptcha (1.6.0):
@@ -41,6 +50,7 @@ DEPENDENCIES:
   - FBSDKLoginKit
   - FBSDKShareKit
   - GoogleSignIn
+  - L10n-swift (~> 5.10)
   - Nimble
   - Quick
   - ReCaptcha
@@ -63,6 +73,7 @@ SPEC REPOS:
     - GoogleSignIn
     - GTMAppAuth
     - GTMSessionFetcher
+    - L10n-swift
     - Nimble
     - Quick
     - ReCaptcha
@@ -84,6 +95,7 @@ SPEC CHECKSUMS:
   GoogleSignIn: c90b5bec45e780f54c6a8e1e3c182a86e3dda69d
   GTMAppAuth: ad5c2b70b9a8689e1a04033c9369c4915bfcbe89
   GTMSessionFetcher: 43748f93435c2aa068b1cbe39655aaf600652e91
+  L10n-swift: 4674994a2783577bd90ed80775e7526bcae3da1e
   Nimble: 5f8a2fb6fa343a7242dfdd9d42f7267419d464b2
   Quick: 6d9559f40647bc4d510103842ef2fdd882d753e2
   ReCaptcha: d493ed256054a7b6a7eabcaf0b47ec9a8f42a16e
@@ -94,6 +106,6 @@ SPEC CHECKSUMS:
   VK-ios-sdk: 62a10b6571fbcda0657f455fedce7fedf55b4cd0
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: 3a30539c6d5a6f3dd891d6e8f2d85b94e1b6882c
+PODFILE CHECKSUM: 960bbc38bf48f0d45dc82d95b25b0c5723ca0ac8
 
 COCOAPODS: 1.11.2

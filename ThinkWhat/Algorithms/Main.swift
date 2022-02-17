@@ -228,6 +228,7 @@ struct Notifications {
         static let ImageReceived                   = Notification.Name("NotificationProfileImageReceived")
         static let LineWidth                       = Notification.Name("LineWidth")
         static let SuveyViewsCountReceived         = Notification.Name("SuveyViewsCountReceived")
+        static let LanguageChanged                 = Notification.Name("LANGUAGE_CHANGED")
     }
 }
 

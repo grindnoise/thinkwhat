@@ -11,8 +11,12 @@
 "check_fields" = "Проверьте корректность заполненных полей";
 "warning" = "Внимание";
 "error" = "Ошибка";
+"send" = "Отправить";
+"select" = "Выбрать";
+"cancel" = "Отмена";
 
 //Welcome VC
+"welcome" = "Добро пожаловать в ThinkWhat!";
 "get_started" = "Начать!";
 //Signup VC
 "continue_with_provider" = "или продолжить с";
@@ -38,6 +42,10 @@
 "should_read_agreement_message" = "Пожалуйста, прочитайте пользовательское соглашение до конца";
 "wait_for_agreement" = "Пожалуйста, дождитесь загрузки лицензионного соглашения";
 //Conditions VC
-"log_in_title" = "Вход";
+"log_in_title" = "Вход в аккаунт";
 //Login VC
 "log_in_error" = "Пожалуйста, проверьте правильность данных для входа и попробуйте снова";
+"recover_label" = "Забыли логин или пароль?";
+"recover_button" = "Восстановить";
+//Recover VC
+"recover_title" = "Восстановление аккаунта";

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Bold.ttf">
+            <string>OpenSans-Bold</string>
+        </array>
+        <array key="OpenSans-Regular.ttf">
+            <string>OpenSans</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RecoverView" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="contentView" destination="iN0-l3-epB" id="1vI-Lv-dzV"/>
+                <outlet property="emailTF" destination="uDc-Sw-jA0" id="jR6-e3-dzD"/>
+                <outlet property="recoverButton" destination="ANJ-as-qst" id="tvk-ZX-4sM"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="22P-e1-YCp">
+                    <rect key="frame" x="62" y="424" width="290" height="58"/>
+                    <subviews>
+                        <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="uDc-Sw-jA0" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="0.0" width="290" height="58"/>
+                            <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
+                            <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="alphabet" returnKeyType="go"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                    <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                    <real key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                    <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                    <real key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                        </textField>
+                    </subviews>
+                </stackView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ANJ-as-qst">
+                    <rect key="frame" x="91" y="512" width="232" height="58"/>
+                    <color key="backgroundColor" systemColor="systemBlueColor"/>
+                    <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="20"/>
+                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="Войти"/>
+                    <connections>
+                        <action selector="recoverTapped:" destination="-1" eventType="touchUpInside" id="4L6-uM-ZCq"/>
+                    </connections>
+                </button>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="22P-e1-YCp" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="Dwl-HK-7hH"/>
+                <constraint firstItem="ANJ-as-qst" firstAttribute="width" secondItem="ANJ-as-qst" secondAttribute="height" multiplier="4:1" id="Inl-ip-3Z9"/>
+                <constraint firstItem="22P-e1-YCp" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.7" id="JVV-uM-QP3"/>
+                <constraint firstItem="ANJ-as-qst" firstAttribute="width" secondItem="uDc-Sw-jA0" secondAttribute="width" multiplier="0.8" id="Osd-Jr-6wq"/>
+                <constraint firstItem="22P-e1-YCp" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="SyR-yX-bhd"/>
+                <constraint firstItem="22P-e1-YCp" firstAttribute="height" secondItem="ANJ-as-qst" secondAttribute="height" id="WHT-vR-e3g"/>
+                <constraint firstItem="ANJ-as-qst" firstAttribute="top" secondItem="22P-e1-YCp" secondAttribute="bottom" constant="30" id="YdK-lp-1tZ"/>
+                <constraint firstItem="uDc-Sw-jA0" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="aOw-6p-4Rr"/>
+                <constraint firstItem="uDc-Sw-jA0" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="bIF-56-Dq7"/>
+                <constraint firstItem="ANJ-as-qst" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="xnx-zF-97m"/>
+            </constraints>
+            <point key="canvasLocation" x="139" y="82"/>
+        </view>
+    </objects>
+    <designables>
+        <designable name="uDc-Sw-jA0">
+            <size key="intrinsicContentSize" width="80.5" height="27.5"/>
+        </designable>
+    </designables>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

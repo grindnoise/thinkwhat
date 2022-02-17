@@ -593,8 +593,8 @@
             timestampString = "660233322.611492"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "677"
-            endingLineNumber = "677"
+            startingLineNumber = "692"
+            endingLineNumber = "692"
             landmarkName = "centerVertically()"
             landmarkType = "7">
          </BreakpointContent>

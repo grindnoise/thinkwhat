@@ -310,3 +310,35 @@
 // 
 //
 //
+import UIKit
+
+let locale = NSLocale(localeIdentifier: "ru")
+print(locale)
+
+locale.localizedString(forCountryCode: "AF")
+//NSLocale.localizedString(forCountryCode: NSLocale(localeIdentifier: "ru"))
+
+extension Bundle {
+    static var UIKit: Bundle {
+        Self(for: UIApplication.self)
+    }
+    func localize(_ key: String, table: String? = nil) -> String {
+        self.localizedString(forKey: key, value: nil, table: nil)
+    }
+    var localizableStrings: [String: String]? {
+        guard let fileURL = url(forResource: "Localizable", withExtension: "strings") else {
+            return nil
+        }
+        do {
+            let data = try Data(contentsOf: fileURL)
+            let plist = try PropertyListSerialization.propertyList(from: data, format: .none)
+            return plist as? [String: String]
+        } catch {
+            print(error)
+        }
+        return nil
+    }
+}
+
+Bundle.UIKit.localizableStrings
+Bundle.UIKit.localizableStrings?.keys.forEach { print($0)}

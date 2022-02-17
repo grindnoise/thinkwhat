@@ -36,6 +36,7 @@ class SignupView: UIView {
         }
     }
     @IBAction func signupTapped(_ sender: Any) {
+        textFieldsStackView.arrangedSubviews.filter { $0.isKind(of: UnderlinedSignTextField.self)}.forEach { ($0 as! UnderlinedSignTextField).resignFirstResponder() }
         guard isCorrect, !isPerformingChecks, let username = usernameTF.text, let email = mailTF.text, let password = passwordTF.text else {
             showAlert(type: .Warning, buttons: [[NSLocalizedString("ok", comment: ""): [CustomAlertView.ButtonType.Ok: nil]]], text: NSLocalizedString("check_fields", comment: ""))
             return

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import L10n_swift
 
 class WelcomeView: UIView {
     
@@ -29,6 +30,7 @@ class WelcomeView: UIView {
     }
     @IBOutlet weak var welcomeLabel: UILabel! {
         didSet {
+            welcomeLabel.text = "welcome".localized// NSLocalizedString("welcome", comment: "")
             welcomeLabel.textColor = .label
         }
     }
@@ -38,7 +40,7 @@ class WelcomeView: UIView {
     @IBOutlet weak var getStartedButton: UIButton! {
         didSet {
             getStartedButton.backgroundColor = K_COLOR_RED
-            getStartedButton.setTitle(NSLocalizedString("get_started", comment: ""), for: .normal)
+            getStartedButton.setTitle("get_started".localized, for: .normal)
         }
     }
     override var frame: CGRect {
@@ -74,6 +76,7 @@ class WelcomeView: UIView {
         contentView.frame = self.bounds
         contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(contentView)
+        NotificationCenter.default.addObserver(self, selector: #selector(onLanguageChange), name: Notifications.UI.LanguageChanged, object: nil)
         setupUI()
     }
     
@@ -84,6 +87,10 @@ class WelcomeView: UIView {
 
     // MARK: - Properties
     weak var controller: WelcomeViewInput?
+    private var initialLanguage = L10n.shared.language
+    private var selectedLanguage = L10n.shared.language
+    private var blurEffectView: UIVisualEffectView?
+    private var toolbarPicker: ToolbarPickerView?
 }
 
 // MARK: - UI Setup
@@ -121,8 +128,169 @@ extension WelcomeView {
         logo.icon.add(logoAnimation, forKey: nil)
         (logo.icon as! CAShapeLayer).fillColor = K_COLOR_RED.cgColor
     }
+    
+    private func dismissLanguages() {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+            self.blurEffectView?.effect = nil
+            self.toolbarPicker?.alpha = 0
+        }) { _ in
+            self.blurEffectView?.removeFromSuperview()
+            self.toolbarPicker?.removeFromSuperview()
+            self.controller?.onLanguagesListPresented()
+        }
+    }
+    
+    private func presentLanguages() {
+        blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
+        blurEffectView?.effect = nil
+        blurEffectView?.addEquallyTo(to: self)
+        
+        toolbarPicker = ToolbarPickerView()
+        toolbarPicker?.picker.delegate = self
+        toolbarPicker?.picker.dataSource = self
+        toolbarPicker?.toolbarDelegate = self
+        toolbarPicker?.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(toolbarPicker!)
+        toolbarPicker?.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor).isActive = true
+        toolbarPicker?.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor).isActive = true
+        toolbarPicker?.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
+        toolbarPicker?.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+            self.blurEffectView?.effect = UIBlurEffect(style: .prominent)
+            self.toolbarPicker?.alpha = 1
+        }) { [weak self] _ in
+            guard !self.isNil else { return }
+            self!.controller?.onLanguagesListPresented()
+            guard let currentLanguageIndex: Int = L10n.supportedLanguages.index(of: L10n.shared.language) else { return }
+            self!.toolbarPicker?.picker.selectRow(currentLanguageIndex, inComponent: 0, animated: true)
+        }
+    }
 }
 
-extension WelcomeView: WelcomeControllerOutput {}
+extension WelcomeView: WelcomeControllerOutput {
+    func onLanguageTapped() {
+        presentLanguages()
+    }
+}
 
+extension WelcomeView: UIPickerViewDataSource, UIPickerViewDelegate {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        L10n.supportedLanguages.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+        
+        return NSAttributedString(string: Locale(identifier: L10n.supportedLanguages[row]).localizedString(forLanguageCode: L10n.supportedLanguages[row])!.capitalized,
+                                  attributes: [NSAttributedString.Key.font: UIFont(name: StringAttributes.FontStyle.Regular.rawValue, size: 17.0)!])
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        selectedLanguage = L10n.supportedLanguages[row]
+        Bundle.setLanguage(selectedLanguage, in: Bundle(for: Self.self))
+        toolbarPicker?.toolbar.items?.forEach { button in
+            button.title = (button.style == .done ? "select" : "cancel").localized
+            controller?.onLanguageChanged(selectedLanguage)
+        }
+    }
+}
 
+extension WelcomeView: ToolbarPickerViewDelegate {
+    func didTapDone() {
+        controller?.onLanguageChangeAccepted(selectedLanguage)
+        dismissLanguages()
+    }
+    
+    func didTapCancel() {
+        Bundle.setLanguage(initialLanguage, in: Bundle(for: Self.self))
+//        controller?.onLanguageChangeAccepted(initialLanguage)
+        controller?.onLanguageChanged(initialLanguage)
+        dismissLanguages()
+    }
+}
+
+extension WelcomeView: Localizable {
+    @objc
+    func onLanguageChange() {
+        getStartedButton.setTitle("get_started".localized, for: .normal)
+        welcomeLabel.text = "welcome".localized
+    }
+}
+
+class ToolbarPickerView: UIView {
+
+    public private(set) var toolbar: UIToolbar!
+    public private(set) var picker: UIPickerView!
+    public weak var toolbarDelegate: ToolbarPickerViewDelegate?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.commonInit()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.commonInit()
+    }
+
+    private func commonInit() {
+        isUserInteractionEnabled = true
+        let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 44))
+        toolBar.barStyle = UIBarStyle.default
+        toolBar.isTranslucent = true
+        toolBar.tintColor = .label
+        toolBar.backgroundColor = .clear
+        toolBar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
+        toolBar.superview?.backgroundColor = .clear
+        toolBar.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(toolBar)
+        toolBar.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        toolBar.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        toolBar.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        toolBar.heightAnchor.constraint(equalToConstant: 44).isActive = true
+
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("select", comment: ""), style: .done, target: self, action: #selector(doneTapped))
+        let spaceButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let cancelButton = UIBarButtonItem(title: NSLocalizedString("cancel", comment: ""), style: .plain, target: self, action: #selector(cancelTapped))
+
+        toolBar.setItems([cancelButton, spaceButton, doneButton], animated: false)
+        toolBar.isUserInteractionEnabled = true
+        toolbar = toolBar
+        
+        picker = UIPickerView()
+        picker.translatesAutoresizingMaskIntoConstraints = false
+        picker.isUserInteractionEnabled = true
+        addSubview(picker)
+        picker.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        picker.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        picker.bottomAnchor.constraint(equalTo: toolBar.topAnchor).isActive = true
+//        picker.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        toolBar.items?.forEach { button in
+            button.tintColor = UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return .systemBlue
+                default:
+                    return .label
+                }
+            }
+        }
+    }
+
+    public func localize(languageCode: String) {
+//        toolbar.subviews.
+//        Locale.current.localizedString(forLanguageCode: languageCode)!.capitalized
+        
+    }
+    
+    @objc func doneTapped() {
+        self.toolbarDelegate?.didTapDone()
+    }
+
+    @objc func cancelTapped() {
+        self.toolbarDelegate?.didTapCancel()
+    }
+}

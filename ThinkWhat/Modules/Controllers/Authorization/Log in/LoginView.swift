@@ -9,7 +9,9 @@
 import UIKit
 
 class LoginView: UIView {
-    
+    deinit {
+        print("LoginView deinit")
+    }
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var loginTF: UnderlinedSignTextField! {
         didSet {
@@ -27,7 +29,7 @@ class LoginView: UIView {
         }
     }
     @IBAction func loginTapped(_ sender: Any) {
-        [loginTF, passwordTF].forEach { self.checkTextField(sender: $0) }
+        [loginTF, passwordTF].forEach { self.checkTextField(sender: $0!); $0?.resignFirstResponder() }
         guard isCorrect else { viewInput?.onIncorrectFields(); return }
         isUserInteractionEnabled = false
         viewInput?.onLogin(username: loginTF.text!, password: passwordTF.text!)
@@ -41,6 +43,20 @@ class LoginView: UIView {
         indicator.color = .white
         UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
     }
+    @IBOutlet weak var forgotLabel: UILabel! {
+        didSet {
+            forgotLabel.text = NSLocalizedString("recover_label", comment: "")
+        }
+    }
+    @IBOutlet weak var recoverButton: UIButton! {
+        didSet {
+            self.recoverButton.setTitle(NSLocalizedString("recover_button", comment: ""), for: .normal)
+        }
+    }
+    @IBAction func recoverTapped(_ sender: Any) {
+        viewInput?.onRecoverTapped()
+    }
+    
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -115,6 +131,12 @@ extension LoginView: LoginControllerOutput {
         } completion: { _ in
             indicator.removeFromSuperview()
             self.loginButton.setTitle(NSLocalizedString("provider_authorization_success", comment: ""), for: .normal)
+            Task {
+                try await Task.sleep(nanoseconds: UInt64(0.5 * 1_000_000_000))
+                await MainActor.run {
+                    self.viewInput?.onNextScene()
+                }
+            }
         }
     }
 }
@@ -123,6 +145,14 @@ extension LoginView: LoginControllerOutput {
 extension LoginView {
     private func setupUI() {
         loginButton.backgroundColor = UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return UIColor.systemBlue
+            default:
+                return K_COLOR_RED
+            }
+        }
+        recoverButton.tintColor = UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
                 return UIColor.systemBlue

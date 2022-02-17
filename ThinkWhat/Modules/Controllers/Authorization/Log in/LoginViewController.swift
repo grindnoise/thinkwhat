@@ -44,6 +44,20 @@ class LoginViewController: UIViewController {
 }
 
 extension LoginViewController: LoginViewInput {
+    func onRecoverTapped() {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        navigationItem.backBarButtonItem = backItem
+        navigationController?
+            .pushViewController(RecoverAccontViewController(),
+                                animated: true)
+    }
+    
+    func onNextScene() {
+        ///Check if profile view controller should be presented to fill necessary fields
+        
+    }
+    
     func onIncorrectFields() {
         let alert = UIAlertController(title: NSLocalizedString("warning",comment: ""),
                                       message: NSLocalizedString("check_fields", comment: ""),

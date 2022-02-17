@@ -18,6 +18,8 @@ protocol LoginViewInput: class {
     
     func onIncorrectFields()
     func onLogin(username: String, password: String)
+    func onNextScene()
+    func onRecoverTapped()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
