@@ -20,8 +20,8 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RecoverView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
                 <outlet property="contentView" destination="iN0-l3-epB" id="1vI-Lv-dzV"/>
-                <outlet property="emailTF" destination="uDc-Sw-jA0" id="jR6-e3-dzD"/>
-                <outlet property="recoverButton" destination="ANJ-as-qst" id="tvk-ZX-4sM"/>
+                <outlet property="mailTF" destination="uDc-Sw-jA0" id="jR6-e3-dzD"/>
+                <outlet property="sendButton" destination="ANJ-as-qst" id="tvk-ZX-4sM"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>

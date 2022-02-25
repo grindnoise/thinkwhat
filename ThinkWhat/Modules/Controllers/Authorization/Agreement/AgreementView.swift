@@ -11,6 +11,10 @@ import WebKit
 
 class AgreementView: UIView {
     
+    deinit {
+        print("AgreementView deinit")
+    }
+    
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var webView: WKWebView! {
@@ -30,21 +34,23 @@ class AgreementView: UIView {
             indicator.startAnimating()
             indicator.color = .white
             UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
-//            agreeButton.setTitle(NSLocalizedString("accept", comment: ""), for: .normal)
         }
     }
+    
+    // MARK: - IB actions
     @IBAction func agreeButtonTapped(_ sender: Any) {
         if agreementIsLoading {
-            viewInput?.onAcceptTappedWhileLoading()
+            viewInput?.onTapWhileLoading()
         } else {
             switch hasReadAgreement {
             case true:
-                viewInput?.onAcceptTappedWithSuccess()
+                viewInput?.onAccept()
             case false:
-                viewInput?.onAcceptTappedWithError()
+                viewInput?.onRefuse()
             }
         }
     }
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -112,6 +118,7 @@ extension AgreementView {
     }
 }
 
+// MARK: - Web delegate
 extension AgreementView: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         agreementIsLoading = false
@@ -120,11 +127,12 @@ extension AgreementView: WKNavigationDelegate {
             indicator.alpha = 0
         } completion: { _ in
             indicator.removeFromSuperview()
-            self.acceptButton.setTitle(NSLocalizedString("accept", comment: ""), for: .normal)
+            self.acceptButton.setTitle(#keyPath(AgreementView.acceptButton).localized, for: .normal)
         }
     }
 }
 
+// MARK: - Scroll delegate
 extension AgreementView: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if !hasReadAgreement, (scrollView.contentOffset.y + scrollView.bounds.height) >= scrollView.contentSize.height {

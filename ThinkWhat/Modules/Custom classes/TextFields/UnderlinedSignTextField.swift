@@ -18,12 +18,20 @@ class UnderlinedSignTextField: UnderlinedTextField {
         case EmailExists            =   "email_is_busy"
         case EmailIsIncorrect       =   "email_is_empty"
         case PasswordIsShort        =   "password_is_short"
+        case InvalidHyperlink       =   "invalid_url_error"
         
         func localizedString() -> String {
-            return NSLocalizedString(self.rawValue, comment: "")
+            return self.rawValue.localized.capitalized
         }
     }
     
+    public var customRightView: UIView? {
+        didSet {
+            guard !rightView.isNil else { oldValue?.removeFromSuperview(); return }
+            rightView!.subviews.filter({ $0 == oldValue }).first?.removeFromSuperview()
+            customRightView?.addEquallyTo(to: rightView!)//, multiplier: 1.25)
+        }
+    }
     public var isShowingSpinner = false {
         didSet {
             UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut]) {
@@ -50,6 +58,7 @@ class UnderlinedSignTextField: UnderlinedTextField {
     private var warningSign:    Icon!
     private var lowerTextView:  UITextView!
     private var spinner: UIActivityIndicatorView?
+    
 
     private var signSize = CGSize(width: 32, height: 32) {
         didSet {
@@ -97,51 +106,52 @@ class UnderlinedSignTextField: UnderlinedTextField {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        if rightView == nil {
-            rightViewMode = .always
-            rightView = UIView()
-            rightView?.frame = rightViewRect(forBounds: frame)
-//            self.rightView?.alpha = 0
-        }
-        if checkSign == nil || warningSign == nil || lowerTextView == nil {//|| spinner == nil {
-            checkSign = Icon()
-            checkSign.iconColor = color
-            checkSign.category = .Success
-            checkSign.alpha = 0
-            checkSign.backgroundColor = .clear
-//            checkSign = ValidSign(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
-//            checkSign.isOpaque = false
-            checkSign.addEquallyTo(to: rightView!)
-            warningSign = Icon()
-            warningSign.iconColor = color
-            warningSign.category = .Warning
-            warningSign.backgroundColor = .clear
-            warningSign.alpha = 0
-//            warningSign = WarningSign(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
-//            warningSign.isOpaque = false
-            warningSign.addEquallyTo(to: rightView!)
-//            spinner = UIActivityIndicatorView(frame: CGRect(origin: CGPoint.zero, size: rightViewSize))
-////            spinner.transform = CGAffineTransform(scaleX: 0, y: 0)
-//            spinner.color = color
-//            spinner.addEquallyTo(to: rightView!)
-////            spinner.startAnimating()
-            lowerTextView = UITextView(frame: CGRect(origin: CGPoint(x: 0, y: frame.maxY), size: CGSize(width: frame.width, height: 16)))
-            lowerTextView.alpha = 0
-            lowerTextView.isEditable = false
-            lowerTextView.isSelectable = false
-            lowerTextView.textColor = color
-            lowerTextView.isScrollEnabled = false
-            lowerTextView.textContainerInset = UIEdgeInsets(top: 0,left: -5,bottom: 0,right: 0)
-            superview?.addSubview(lowerTextView)
-            
-        }
+        guard rightView.isNil else { return }
+        rightViewMode = .always
+        rightView = UIView()
+        rightView?.frame = rightViewRect(forBounds: frame)
+        guard checkSign.isNil || warningSign.isNil || lowerTextView.isNil else  { return }
+        checkSign = Icon()
+        checkSign.iconColor = color
+        checkSign.category = .Success
+        checkSign.alpha = 0
+        checkSign.backgroundColor = .clear
+        checkSign.addEquallyTo(to: rightView!)
+        warningSign = Icon()
+        warningSign.iconColor = color
+        warningSign.category = .Warning
+        warningSign.backgroundColor = .clear
+        warningSign.alpha = 0
+        warningSign.addEquallyTo(to: rightView!)
+        lowerTextView = UITextView()
+        lowerTextView.alpha = 0
+        lowerTextView.isEditable = false
+        lowerTextView.isSelectable = false
+        lowerTextView.textColor = color
+        lowerTextView.isScrollEnabled = false
+        lowerTextView.textContainerInset = UIEdgeInsets(top: 0,
+                                                        left: -5,
+                                                        bottom: 0,
+                                                        right: 0)
+        superview?.addSubview(lowerTextView)
+        lowerTextView.translatesAutoresizingMaskIntoConstraints = false
+        lowerTextView.heightAnchor.constraint(equalToConstant: 16).isActive = true
+        lowerTextView.topAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        lowerTextView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        lowerTextView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        ///Add custom view
+        guard !customRightView.isNil else { return }
+        customRightView?.addEquallyTo(to: rightView!,
+                                      multiplier: 1.25)
     }
     
     open override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
         let width = min(bounds.size.width, rightViewSize.width)
         let height = min(bounds.size.height, rightViewSize.height)
-        let rect = CGRect(x: bounds.width - rightViewSize.width, y: bounds.size.height / 2 - height / 2, width: width, height: height)
-        
+        let rect = CGRect(x: bounds.width - rightViewSize.width,
+                          y: bounds.size.height / 2 - height / 2,
+                          width: width,
+                          height: height)
         return rect
     }
     
@@ -155,6 +165,11 @@ class UnderlinedSignTextField: UnderlinedTextField {
                 UIView.animate(withDuration: 0.15) {
                     self.checkSign.alpha = 1
                 }
+            }
+        case .InvalidHyperlink:
+            UIView.animate(withDuration: 0.15) {
+                self.lowerTextView.text = state.rawValue.localized
+                self.lowerTextView.alpha = 1
             }
         default:
             UIView.animate(withDuration: 0.15, animations: {

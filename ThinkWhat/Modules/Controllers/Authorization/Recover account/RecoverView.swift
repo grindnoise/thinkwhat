@@ -13,21 +13,25 @@ class RecoverView: UIView {
     deinit {
         print("RecoverView deinit")
     }
+    
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var emailTF: UnderlinedSignTextField! {
+    @IBOutlet weak var mailTF: UnderlinedSignTextField! {
         didSet {
-            setTextFieldColors(textField: emailTF)
+            mailTF.placeholder = #keyPath(RecoverView.mailTF).localized
+            setTextFieldColors(textField: mailTF)
         }
     }
-    @IBOutlet weak var recoverButton: UIButton! {
+    @IBOutlet weak var sendButton: UIButton! {
         didSet {
-            recoverButton.setTitle(NSLocalizedString("send", comment: ""), for: .normal)
+            sendButton.setTitle(#keyPath(RecoverView.sendButton).localized, for: .normal)
         }
     }
+    
+    // MARK: - IB actions
     @IBAction func recoverTapped(_ sender: Any) {
-        emailTF.resignFirstResponder()
-        checkTextField(sender: emailTF)
+        mailTF.resignFirstResponder()
+        checkTextField(sender: mailTF)
         if isEmailFilled {
             // TODO: - Send link
         }
@@ -56,8 +60,8 @@ class RecoverView: UIView {
     }
     
     override func layoutSubviews() {
-        guard recoverButton != nil else { return }
-        recoverButton.cornerRadius = recoverButton.frame.height/2.25
+        guard sendButton != nil else { return }
+        sendButton.cornerRadius = sendButton.frame.height/2.25
     }
     
     // MARK: - Properties
@@ -85,7 +89,7 @@ extension RecoverView: RecoverControllerOutput {
 // MARK: - UI Setup
 extension RecoverView {
     private func setupUI() {
-        recoverButton.backgroundColor = UIColor { traitCollection in
+        sendButton.backgroundColor = UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
                 return UIColor.systemBlue
@@ -131,10 +135,12 @@ extension RecoverView {
             destinationColor = K_COLOR_RED
 //            tfWarningColor = K_COLOR_RED
         }
-        emailTF.line.layer.strokeColor = destinationColor.cgColor
-        emailTF.tintColor = destinationColor
-        emailTF.color = tfWarningColor
-        emailTF.keyboardType = .asciiCapable
+        mailTF.line.layer.strokeColor = destinationColor.cgColor
+        mailTF.lineWidth = 1.5
+        mailTF.activeLineWidth = 1.5
+        mailTF.tintColor = destinationColor
+        mailTF.color = tfWarningColor
+        mailTF.keyboardType = .asciiCapable
     }
 }
 

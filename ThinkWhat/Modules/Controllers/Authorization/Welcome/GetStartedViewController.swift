@@ -75,7 +75,7 @@ extension GetStartedViewController: WelcomeViewInput {
     }
     
     func onLanguageChangeAccepted(_ languageCode: String) {
-        Bundle.setLanguage(languageCode, in: Bundle(for: Self.self))
+        Bundle.setLanguageAndPublish(languageCode, in: Bundle(for: Self.self))
     }
     
     func onLanguagesListPresented() {

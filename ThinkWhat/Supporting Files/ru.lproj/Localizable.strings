@@ -11,18 +11,29 @@
 "check_fields" = "Проверьте корректность заполненных полей";
 "warning" = "Внимание";
 "error" = "Ошибка";
-"send" = "Отправить";
+"sendButton" = "Отправить";
 "select" = "Выбрать";
 "cancel" = "Отмена";
+"Male" = "Мужчина";
+"Female" = "Женщина";
+"paste_link" = "Вставьте ссылку";
+"continueButton" = "Продолжить";
+"save" = "Сохранить";
+"camera" = "Камера";
+"photo_album" = "Фотоальбом";
 
 //Welcome VC
-"welcome" = "Добро пожаловать в ThinkWhat!";
-"get_started" = "Начать!";
+"welcomeLabel" = "Добро пожаловать в ThinkWhat!";
+"getStartedButton" = "Начать!";
+
 //Signup VC
-"continue_with_provider" = "или продолжить с";
-"already_registered" = "Уже зарегистрированы?";
-"log_in" = "Войти";
-"sign_up" = "Создать аккаунт";
+"providerLabel" = "или продолжить с";
+"haveAccountLabel" = "Уже зарегистрированы?";
+"loginButton" = "Войти";
+"signupButton" = "Создать аккаунт";
+"usernameTF" = "Логин пользователя";
+"mailTF" = "Электронная почта";
+"passwordTF" = "Пароль";
 "username_is_busy" = "Пользователь существует";
 "username_is_empty" = "Поле пустое";
 "username_is_short" = "Недостаточно символов";
@@ -34,8 +45,9 @@
 "provider_authorization_success" = "Успех!";
 "provider_authorization_failure" = "Ошибка";
 "timeout_error" = "Превышено время ожидания";
+
 //Conditions VC
-"accept" = "Принимаю";
+"acceptButton" = "Принимаю";
 "refuse" = "Отказываюсь";
 "terms_of_use" = "Соглашение";
 "should_read_agreement_title" = "Внимание";
@@ -45,7 +57,17 @@
 "log_in_title" = "Вход в аккаунт";
 //Login VC
 "log_in_error" = "Пожалуйста, проверьте правильность данных для входа и попробуйте снова";
-"recover_label" = "Забыли логин или пароль?";
-"recover_button" = "Восстановить";
+"forgotLabel" = "Забыли логин или пароль?";
+"recoverButton" = "Восстановить";
 //Recover VC
 "recover_title" = "Восстановление аккаунта";
+
+//Recover VC
+"profile_fill" = "Ваш профиль";
+
+//FillProfile VC
+"firstNameTF" = "Имя";
+"lastNameTF" = "Фамилия";
+"birthDateTF" = "Дата рождения";
+"cityTF" = "Город";
+"invalid_url_error" = "Некорректная ссылка";

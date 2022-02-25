@@ -15,9 +15,9 @@ protocol ConditionsViewInput: class {
     
     var controllerOutput: ConditionsControllerOutput? { get set }
     var controllerInput: ConditionsControllerInput? { get set }
-    func onAcceptTappedWithSuccess()
-    func onAcceptTappedWithError()
-    func onAcceptTappedWhileLoading()
+    func onAccept()
+    func onRefuse()
+    func onTapWhileLoading()
 //    func onViewInit()
 }
 

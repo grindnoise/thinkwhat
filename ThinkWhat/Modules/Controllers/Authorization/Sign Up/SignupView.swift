@@ -13,6 +13,8 @@ class SignupView: UIView {
     deinit {
         print("SignupView deinit")
     }
+    
+    // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var logo: Icon! {
         didSet {
@@ -32,9 +34,68 @@ class SignupView: UIView {
     @IBOutlet weak var textFieldsStackView: UIStackView!
     @IBOutlet weak var signupButton: UIButton! {
         didSet {
-            signupButton.setTitle(NSLocalizedString("sign_up", comment: ""), for: .normal)
+            signupButton.setTitle(#keyPath(SignupView.signupButton).localized, for: .normal)
         }
     }
+    @IBOutlet weak var signupButtonTopConstraint: NSLayoutConstraint!
+//    @IBOutlet weak var signupButtonBottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var usernameTF: UnderlinedSignTextField! {
+        didSet {
+            usernameTF.placeholder = #keyPath(SignupView.usernameTF).localized
+            setupTextField(textField: usernameTF)
+        }
+    }
+    @IBOutlet weak var mailTF: UnderlinedSignTextField! {
+        didSet {
+            mailTF.placeholder = #keyPath(SignupView.mailTF).localized
+            setupTextField(textField: mailTF)
+        }
+    }
+    @IBOutlet weak var passwordTF: UnderlinedSignTextField! {
+        didSet {
+            passwordTF.placeholder = #keyPath(SignupView.passwordTF).localized
+            setupTextField(textField: passwordTF)
+        }
+    }
+    @IBOutlet weak var providerLabel: UILabel! {
+        didSet {
+            providerLabel.text = #keyPath(SignupView.providerLabel).localized.uppercased()
+        }
+    }
+    @IBOutlet weak var providerStackView: UIStackView!
+    @IBOutlet weak var providerStackViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet weak var providerStackViewBottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var facebook: FacebookLogo! {
+        didSet {
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(SignupView.onFacebookTap))
+            facebook.addGestureRecognizer(recognizer)
+        }
+    }
+    @IBOutlet weak var vk: VKLogo! {
+        didSet {
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(SignupView.onVKTap))
+            vk.addGestureRecognizer(recognizer)
+        }
+    }
+    @IBOutlet weak var google: GoogleLogo! {
+        didSet {
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(SignupView.onGoogleTap))
+            google.addGestureRecognizer(recognizer)
+        }
+    }
+    @IBOutlet weak var haveAccountLabel: UILabel! {
+        didSet {
+            haveAccountLabel.text = #keyPath(SignupView.haveAccountLabel).localized
+        }
+    }
+    @IBOutlet weak var loginButton: UIButton! {
+        didSet {
+            loginButton.setTitle(#keyPath(SignupView.loginButton).localized, for: .normal)
+        }
+    }
+    @IBOutlet weak var loginButonTopConstraint: NSLayoutConstraint!
+    
+    // MARK: - IB actions
     @IBAction func signupTapped(_ sender: Any) {
         textFieldsStackView.arrangedSubviews.filter { $0.isKind(of: UnderlinedSignTextField.self)}.forEach { ($0 as! UnderlinedSignTextField).resignFirstResponder() }
         guard isCorrect, !isPerformingChecks, let username = usernameTF.text, let email = mailTF.text, let password = passwordTF.text else {
@@ -83,70 +144,50 @@ class SignupView: UIView {
                 } completion: { _ in
                     indicator.stopAnimating()
                     indicator.removeFromSuperview()
-                    self.signupButton.setTitle(NSLocalizedString("sign_up", comment: ""), for: .normal)
+                    self.signupButton.setTitle(#keyPath(SignupView.signupButton).localized, for: .normal)
                     showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                 }
             }
         }
     }
-    @IBOutlet weak var signupButtonTopConstraint: NSLayoutConstraint!
-//    @IBOutlet weak var signupButtonBottomConstraint: NSLayoutConstraint!
-    @IBOutlet weak var usernameTF: UnderlinedSignTextField! {
-        didSet {
-            setTextFieldColors(textField: usernameTF)
-        }
-    }
-    @IBOutlet weak var mailTF: UnderlinedSignTextField! {
-        didSet {
-            setTextFieldColors(textField: mailTF)
-        }
-    }
-    @IBOutlet weak var passwordTF: UnderlinedSignTextField! {
-        didSet {
-            setTextFieldColors(textField: passwordTF)
-        }
-    }
-    @IBOutlet weak var providerLabel: UILabel! {
-        didSet {
-            providerLabel.text = NSLocalizedString("continue_with_provider", comment: "").uppercased()
-        }
-    }
-    @IBOutlet weak var providerStackView: UIStackView!
-    @IBOutlet weak var providerStackViewTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var providerStackViewBottomConstraint: NSLayoutConstraint!
-    @IBOutlet weak var facebook: FacebookLogo! {
-        didSet {
-            let recognizer = UITapGestureRecognizer(target: self, action: #selector(SignupView.onFacebookTap))
-            facebook.addGestureRecognizer(recognizer)
-        }
-    }
-    @IBOutlet weak var vk: VKLogo! {
-        didSet {
-            let recognizer = UITapGestureRecognizer(target: self, action: #selector(SignupView.onVKTap))
-            vk.addGestureRecognizer(recognizer)
-        }
-    }
-    @IBOutlet weak var google: GoogleLogo! {
-        didSet {
-            let recognizer = UITapGestureRecognizer(target: self, action: #selector(SignupView.onGoogleTap))
-            google.addGestureRecognizer(recognizer)
-        }
-    }
-    @IBOutlet weak var haveAccountLabel: UILabel! {
-        didSet {
-            haveAccountLabel.text = NSLocalizedString("already_registered", comment: "")
-        }
-    }
-    @IBOutlet weak var loginButton: UIButton! {
-        didSet {
-            loginButton.setTitle(NSLocalizedString("log_in", comment: ""), for: .normal)
-        }
-    }
+    
     @IBAction func loginTapped(_ sender: Any) {
         viewInput?.onLogin()
     }
-    @IBOutlet weak var loginButonTopConstraint: NSLayoutConstraint!
+        
+    // MARK: - Initialization
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
+    }
     
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        commonInit()
+    }
+    
+    private func commonInit() {
+        guard let contentView = self.fromNib()
+                    else { fatalError("View could not load from nib") }
+                addSubview(contentView)
+
+        contentView.frame = self.bounds
+        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        self.addSubview(contentView)
+        setupUI()
+    }
+    
+    override func layoutSubviews() {
+        guard signupButton != nil else { return }
+        signupButton.cornerRadius = signupButton.frame.height/2.25
+        signupButtonTopConstraint.constant = signupButton.frame.height/2
+//        signupButtonBottomConstraint.constant = signupButton.frame.height/2
+//        providerStackViewBottomConstraint.constant = haveAccountLabel.frame.height
+//        providerStackViewTopConstraint.constant = providerLabel.frame.height
+    }
+    
+    // MARK: - Properties
+    weak var viewInput: SignupViewInput?
     private var isAnimationStopped = false
     private var isPerformingChecks = false {
         didSet {
@@ -211,40 +252,6 @@ class SignupView: UIView {
             layoutSubviews()
         }
     }
-        
-    // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        commonInit()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        commonInit()
-    }
-    
-    private func commonInit() {
-        guard let contentView = self.fromNib()
-                    else { fatalError("View could not load from nib") }
-                addSubview(contentView)
-
-        contentView.frame = self.bounds
-        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        self.addSubview(contentView)
-        setupUI()
-    }
-    
-    override func layoutSubviews() {
-        guard signupButton != nil else { return }
-        signupButton.cornerRadius = signupButton.frame.height/2.25
-        signupButtonTopConstraint.constant = signupButton.frame.height/2
-//        signupButtonBottomConstraint.constant = signupButton.frame.height/2
-//        providerStackViewBottomConstraint.constant = haveAccountLabel.frame.height
-//        providerStackViewTopConstraint.constant = providerLabel.frame.height
-    }
-    
-    // MARK: - Properties
-    weak var viewInput: SignupViewInput?
 }
 
 // MARK: - Controller Output
@@ -279,7 +286,7 @@ extension SignupView {
 //        usernameTF.isShowingSpinner = true
     }
     
-    private func setTextFieldColors(textField: UnderlinedSignTextField) {
+    private func setupTextField(textField: UnderlinedSignTextField) {
         let tfWarningColor = UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -298,6 +305,8 @@ extension SignupView {
         }
         textField.delegate = self
         textField.tintColor = color
+        textField.lineWidth = 1.5
+        textField.activeLineWidth = 1.5
         textField.line.layer.strokeColor = color.cgColor
         textField.color = tfWarningColor
     }
@@ -592,7 +601,7 @@ extension SignupView: UITextFieldDelegate {
                 guard let label = progressLabel?.subviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel,
                       let spinner = progressLabel?.subviews.filter({ $0.isKind(of: UIActivityIndicatorView.self) }).first as? UIActivityIndicatorView else { return }
                 UIView.transition(with: label, duration: 0.2, options: [.transitionCrossDissolve]) {
-                    label.text = NSLocalizedString("provider_authorization_success", comment: "")
+                    label.text = "provider_authorization_success".localized
                     spinner.alpha = 0
                 } completion: { [weak self] _ in
                     guard `self` == self else { return }
@@ -606,7 +615,7 @@ extension SignupView: UITextFieldDelegate {
                 guard let label = progressLabel?.subviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel,
                       let spinner = progressLabel?.subviews.filter({ $0.isKind(of: UIActivityIndicatorView.self) }).first as? UIActivityIndicatorView else { return }
                 UIView.transition(with: label, duration: 0.2, options: [.transitionCrossDissolve]) {
-                    label.text = NSLocalizedString("provider_authorization_failure", comment: "")
+                    label.text = "provider_authorization_failure".localized
                     spinner.alpha = 0
                 } completion: { _ in onExit() }
 #if DEBUG

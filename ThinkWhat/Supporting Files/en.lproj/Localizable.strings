@@ -11,18 +11,29 @@
 "check_fields" = "Check fields for errors";
 "warning" = "Warning";
 "error" = "Error";
-"send" = "Send";
+"sendButton" = "Send";
 "select" = "Select";
 "cancel" = "Cancel";
+"Male" = "Male";
+"Female" = "Female";
+"paste_link" = "Paste link";
+"continueButton" = "Continue";
+"save" = "Сохранить";
+"camera" = "Camera";
+"photo_album" = "Photos";
 
 //Welcome VC
-"welcome" = "Welcome to ThinkWhat!";
-"get_started" = "Get started!";
+"welcomeLabel" = "Welcome to ThinkWhat!";
+"getStartedButton" = "Get started!";
+
 //Signup VC
-"continue_with_provider" = "or continue with";
-"already_registered" = "Already have account?";
-"log_in" = "Log in";
-"sign_up" = "Sign up";
+"providerLabel" = "or continue with";
+"haveAccountLabel" = "Already have account?";
+"loginButton" = "Log in";
+"signupButton" = "Sign up";
+"usernameTF" = "Username";
+"mailTF" = "Email";
+"passwordTF" = "Password";
 "username_is_busy" = "Username is already used";
 "username_is_empty" = "Username is not filled";
 "username_is_short" = "Username is too short";
@@ -34,8 +45,9 @@
 "provider_authorization_success" = "Success";
 "provider_authorization_failure" = "Error";
 "timeout_error" = "Timeout exceeded";
+
 //Conditions VC
-"accept" = "Accept";
+"acceptButton" = "Accept";
 "refuse" = "Don't accept";
 "terms_of_use" = "Terms of use";
 "should_read_agreement_title" = "Warning";
@@ -45,7 +57,17 @@
 "log_in_title" = "Account log in";
 //Login VC
 "log_in_error" = "Please, check credentials and try again";
-"recover_label" = "Forgot username or password?";
-"recover_button" = "Recover";
+"forgotLabel" = "Forgot username or password?";
+"recoverButton" = "Recover";
 //Recover VC
 "recover_title" = "Account recovery";
+
+//Recover VC
+"profile_fill" = "Your profile";
+
+//FillProfile VC
+"firstNameTF" = "First Name";
+"lastNameTF" = "Last name";
+"birthDateTF" = "Birth date";
+"cityTF" = "City";
+"invalid_url_error" = "Invalid link";

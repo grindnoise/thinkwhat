@@ -9,30 +9,47 @@
 import UIKit
 
 class LoginView: UIView {
+    
     deinit {
         print("LoginView deinit")
     }
+    
+    // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var loginTF: UnderlinedSignTextField! {
+    @IBOutlet weak var usernameTF: UnderlinedSignTextField! {
         didSet {
-            setTextFieldColors(textField: loginTF)
+            usernameTF.placeholder = #keyPath(LoginView.usernameTF).localized
+            setTextFieldColors(textField: usernameTF)
         }
     }
     @IBOutlet weak var passwordTF: UnderlinedSignTextField! {
         didSet {
+            passwordTF.placeholder = #keyPath(LoginView.passwordTF).localized
             setTextFieldColors(textField: passwordTF)
         }
     }
     @IBOutlet weak var loginButton: UIButton! {
         didSet {
-            loginButton.setTitle(NSLocalizedString("log_in", comment: ""), for: .normal)
+            loginButton.setTitle(#keyPath(LoginView.loginButton).localized, for: .normal)
         }
     }
+    @IBOutlet weak var forgotLabel: UILabel! {
+        didSet {
+            forgotLabel.text = #keyPath(LoginView.forgotLabel).localized
+        }
+    }
+    @IBOutlet weak var recoverButton: UIButton! {
+        didSet {
+            self.recoverButton.setTitle(#keyPath(LoginView.recoverButton).localized, for: .normal)
+        }
+    }
+    
+    // MARK: - IB actions
     @IBAction func loginTapped(_ sender: Any) {
-        [loginTF, passwordTF].forEach { self.checkTextField(sender: $0!); $0?.resignFirstResponder() }
+        [usernameTF, passwordTF].forEach { self.checkTextField(sender: $0!); $0?.resignFirstResponder() }
         guard isCorrect else { viewInput?.onIncorrectFields(); return }
         isUserInteractionEnabled = false
-        viewInput?.onLogin(username: loginTF.text!, password: passwordTF.text!)
+        viewInput?.onLogin(username: usernameTF.text!, password: passwordTF.text!)
         loginButton.setTitle("", for: .normal)
         let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
                                                               size: CGSize(width: loginButton.frame.height,
@@ -43,16 +60,7 @@ class LoginView: UIView {
         indicator.color = .white
         UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
     }
-    @IBOutlet weak var forgotLabel: UILabel! {
-        didSet {
-            forgotLabel.text = NSLocalizedString("recover_label", comment: "")
-        }
-    }
-    @IBOutlet weak var recoverButton: UIButton! {
-        didSet {
-            self.recoverButton.setTitle(NSLocalizedString("recover_button", comment: ""), for: .normal)
-        }
-    }
+    
     @IBAction func recoverTapped(_ sender: Any) {
         viewInput?.onRecoverTapped()
     }
@@ -119,7 +127,7 @@ extension LoginView: LoginControllerOutput {
             indicator.alpha = 0
         } completion: { _ in
             indicator.removeFromSuperview()
-            self.loginButton.setTitle(NSLocalizedString("log_in", comment: ""), for: .normal)
+            self.loginButton.setTitle(#keyPath(LoginView.loginButton).localized, for: .normal)
         }
     }
     
@@ -130,7 +138,7 @@ extension LoginView: LoginControllerOutput {
             indicator.alpha = 0
         } completion: { _ in
             indicator.removeFromSuperview()
-            self.loginButton.setTitle(NSLocalizedString("provider_authorization_success", comment: ""), for: .normal)
+            self.loginButton.setTitle("provider_authorization_success".localized, for: .normal)
             Task {
                 try await Task.sleep(nanoseconds: UInt64(0.5 * 1_000_000_000))
                 await MainActor.run {
@@ -190,7 +198,7 @@ extension LoginView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         var tfWarningColor = K_COLOR_RED
         var destinationColor: UIColor!
-        let textFields: [UnderlinedSignTextField] = [passwordTF, loginTF]
+        let textFields: [UnderlinedSignTextField] = [passwordTF, usernameTF]
         switch traitCollection.userInterfaceStyle {
         case .dark:
             destinationColor = UIColor.systemBlue
@@ -201,6 +209,8 @@ extension LoginView {
         }
         textFields.forEach {
             $0.line.layer.strokeColor = destinationColor.cgColor
+            $0.lineWidth = 1.5
+            $0.activeLineWidth = 1.5
             $0.tintColor = destinationColor
             $0.color = tfWarningColor
             $0.keyboardType = .asciiCapable
@@ -215,7 +225,7 @@ extension LoginView: UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField === loginTF {
+        if textField === usernameTF {
             passwordTF.becomeFirstResponder()
         } else if textField === passwordTF {
 
@@ -240,7 +250,7 @@ extension LoginView: UITextFieldDelegate {
                 textField.hideSign()
                 isPwdFilled = true
             }
-        } else if textField === loginTF {
+        } else if textField === usernameTF {
             if textField.text!.isEmpty {
                 isLoginFilled = false
                 textField.hideSign()

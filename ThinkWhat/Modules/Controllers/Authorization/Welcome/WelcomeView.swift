@@ -30,33 +30,22 @@ class WelcomeView: UIView {
     }
     @IBOutlet weak var welcomeLabel: UILabel! {
         didSet {
-            welcomeLabel.text = "welcome".localized// NSLocalizedString("welcome", comment: "")
+            welcomeLabel.text = #keyPath(WelcomeView.welcomeLabel).localized
             welcomeLabel.textColor = .label
         }
-    }
-    @IBAction func getStartedTapped(_ sender: Any) {
-        controller?.onGetStartedTap()
     }
     @IBOutlet weak var getStartedButton: UIButton! {
         didSet {
             getStartedButton.backgroundColor = K_COLOR_RED
-            getStartedButton.setTitle("get_started".localized, for: .normal)
-        }
-    }
-    override var frame: CGRect {
-        didSet {
-            layoutSubviews()
+            getStartedButton.setTitle(#keyPath(WelcomeView.getStartedButton).localized, for: .normal)
         }
     }
     
-    override var bounds: CGRect {
-        didSet {
-            layoutSubviews()
-        }
+    // MARK: - IB actions
+    @IBAction func getStartedTapped(_ sender: Any) {
+        controller?.onGetStartedTap()
     }
-    
-    
-    
+   
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -76,8 +65,10 @@ class WelcomeView: UIView {
         contentView.frame = self.bounds
         contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(contentView)
-        NotificationCenter.default.addObserver(self, selector: #selector(onLanguageChange), name: Notifications.UI.LanguageChanged, object: nil)
         setupUI()
+        if Self.self is Localizable.Type {
+            perform(Selector("subscribe"))
+        }
     }
     
     override func layoutSubviews() {
@@ -91,6 +82,17 @@ class WelcomeView: UIView {
     private var selectedLanguage = L10n.shared.language
     private var blurEffectView: UIVisualEffectView?
     private var toolbarPicker: ToolbarPickerView?
+    override var frame: CGRect {
+        didSet {
+            layoutSubviews()
+        }
+    }
+    
+    override var bounds: CGRect {
+        didSet {
+            layoutSubviews()
+        }
+    }
 }
 
 // MARK: - UI Setup
@@ -190,7 +192,7 @@ extension WelcomeView: UIPickerViewDataSource, UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         selectedLanguage = L10n.supportedLanguages[row]
-        Bundle.setLanguage(selectedLanguage, in: Bundle(for: Self.self))
+        Bundle.setLanguageAndPublish(selectedLanguage, in: Bundle(for: Self.self))
         toolbarPicker?.toolbar.items?.forEach { button in
             button.title = (button.style == .done ? "select" : "cancel").localized
             controller?.onLanguageChanged(selectedLanguage)
@@ -205,7 +207,7 @@ extension WelcomeView: ToolbarPickerViewDelegate {
     }
     
     func didTapCancel() {
-        Bundle.setLanguage(initialLanguage, in: Bundle(for: Self.self))
+        Bundle.setLanguageAndPublish(initialLanguage, in: Bundle(for: Self.self))
 //        controller?.onLanguageChangeAccepted(initialLanguage)
         controller?.onLanguageChanged(initialLanguage)
         dismissLanguages()
@@ -214,9 +216,14 @@ extension WelcomeView: ToolbarPickerViewDelegate {
 
 extension WelcomeView: Localizable {
     @objc
+    func subscribe() {
+        NotificationCenter.default.addObserver(self, selector: #selector(onLanguageChange), name: Notifications.UI.LanguageChanged, object: nil)
+    }
+
+    @objc
     func onLanguageChange() {
-        getStartedButton.setTitle("get_started".localized, for: .normal)
-        welcomeLabel.text = "welcome".localized
+        getStartedButton.setTitle(#keyPath(WelcomeView.getStartedButton).localized, for: .normal)
+        welcomeLabel.text = #keyPath(WelcomeView.welcomeLabel).localized//"welcome".localized
     }
 }
 
@@ -278,12 +285,6 @@ class ToolbarPickerView: UIView {
                 }
             }
         }
-    }
-
-    public func localize(languageCode: String) {
-//        toolbar.subviews.
-//        Locale.current.localizedString(forLanguageCode: languageCode)!.capitalized
-        
     }
     
     @objc func doneTapped() {

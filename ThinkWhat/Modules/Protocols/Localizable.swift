@@ -8,6 +8,18 @@
 
 import Foundation
 
+/**
+ Conform if localizations is needed
+ */
 protocol Localizable {
-    func onLanguageChange() 
+    
+    /**
+     Subscription if Bundle language changes on the fly.
+     */
+    func subscribe()
+    
+    /**
+     Class-defined implementation.
+     */
+    func onLanguageChange()
 }

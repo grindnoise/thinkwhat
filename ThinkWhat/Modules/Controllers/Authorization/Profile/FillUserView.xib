@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Bold.ttf">
+            <string>OpenSans-Bold</string>
+        </array>
+        <array key="OpenSans-Regular.ttf">
+            <string>OpenSans</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="FillUserView" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="_scrollView" destination="Fmg-By-ayF" id="kCc-Gh-HZf"/>
+                <outlet property="avatar" destination="Fn9-kb-qKS" id="9eb-Ps-kNm"/>
+                <outlet property="birthDateTF" destination="yfn-rW-uv6" id="UVA-Is-EHS"/>
+                <outlet property="cityTF" destination="qjX-ej-Nes" id="NdK-qX-V7e"/>
+                <outlet property="contentView" destination="iN0-l3-epB" id="m63-sp-LEw"/>
+                <outlet property="continueButton" destination="Tk5-wl-oog" id="AA4-LW-vzn"/>
+                <outlet property="facebookLogo" destination="goZ-v0-3gX" id="m1C-kZ-uU5"/>
+                <outlet property="firstNameTF" destination="9o5-6U-WB9" id="avF-Hc-jlP"/>
+                <outlet property="genderControl" destination="4Gb-oJ-SZH" id="T8H-2t-fwu"/>
+                <outlet property="hyperlinkActionButton" destination="fF3-zL-G5H" id="LEf-rA-LRl"/>
+                <outlet property="hyperlinkTF" destination="tUm-df-qeP" id="OAJ-AG-Yan"/>
+                <outlet property="instagramLogo" destination="zBH-tN-VBq" id="eCN-Oy-XJW"/>
+                <outlet property="lastNameTF" destination="wIW-Cz-gTQ" id="zkh-DW-DTw"/>
+                <outlet property="logoStackView" destination="Ie8-tn-da6" id="Y4M-eS-YCy"/>
+                <outlet property="scrollContentView" destination="A4d-6p-QcZ" id="QP0-Ht-NtU"/>
+                <outlet property="stackView" destination="hpq-60-gLK" id="4RL-xR-cZX"/>
+                <outlet property="tikTokLogo" destination="5lu-EQ-x7x" id="q4F-67-kJq"/>
+                <outlet property="vkLogo" destination="Ve6-os-BtC" id="lts-5c-Q2i"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fmg-By-ayF">
+                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="A4d-6p-QcZ">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
+                            <subviews>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3ZQ-3L-Pao">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="179"/>
+                                    <subviews>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Fn9-kb-qKS" customClass="Avatar" customModule="ThinkWhat" customModuleProvider="target">
+                                            <rect key="frame" x="117.5" y="0.0" width="179" height="179"/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" secondItem="Fn9-kb-qKS" secondAttribute="height" multiplier="1:1" id="Zw3-tB-xpa"/>
+                                            </constraints>
+                                        </view>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstItem="Fn9-kb-qKS" firstAttribute="centerY" secondItem="3ZQ-3L-Pao" secondAttribute="centerY" id="XEY-bY-0fi"/>
+                                        <constraint firstItem="Fn9-kb-qKS" firstAttribute="centerX" secondItem="3ZQ-3L-Pao" secondAttribute="centerX" id="Zq5-in-6cj"/>
+                                        <constraint firstItem="Fn9-kb-qKS" firstAttribute="height" secondItem="3ZQ-3L-Pao" secondAttribute="height" id="c9O-ea-nWv"/>
+                                    </constraints>
+                                </view>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yyr-ze-BOu">
+                                    <rect key="frame" x="0.0" y="179" width="414" height="561"/>
+                                    <subviews>
+                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="hpq-60-gLK">
+                                            <rect key="frame" x="62" y="0.0" width="290" height="336.5"/>
+                                            <subviews>
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Имя" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="9o5-6U-WB9" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="290" height="61"/>
+                                                    <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="words" autocorrectionType="no" spellCheckingType="no" returnKeyType="next" textContentType="name"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                            <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                                            <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </textField>
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Фамилия" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wIW-Cz-gTQ" customClass="UnderlinedTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="69" width="290" height="61"/>
+                                                    <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="words" autocorrectionType="no" spellCheckingType="no" returnKeyType="next" textContentType="family-name"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                            <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                                            <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </textField>
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Дата рождения" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="yfn-rW-uv6" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="138" width="290" height="61"/>
+                                                    <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
+                                                    <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="alphabet" returnKeyType="next" textContentType="nickname"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                            <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                                            <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </textField>
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Город" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="qjX-ej-Nes" customClass="UnderlinedSearchTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="207" width="290" height="61"/>
+                                                    <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="words" autocorrectionType="no" spellCheckingType="no" returnKeyType="done" textContentType="address-level2"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                            <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                                            <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                    <connections>
+                                                        <action selector="textFieldEdited:" destination="-1" eventType="editingChanged" id="952-Zq-rn6"/>
+                                                    </connections>
+                                                </textField>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8oR-y3-RiZ">
+                                                    <rect key="frame" x="0.0" y="276" width="290" height="60.5"/>
+                                                    <subviews>
+                                                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="4Gb-oJ-SZH">
+                                                            <rect key="frame" x="79.5" y="18" width="131" height="43.5"/>
+                                                            <segments>
+                                                                <segment title="First"/>
+                                                                <segment title="Second"/>
+                                                            </segments>
+                                                            <connections>
+                                                                <action selector="genderChanged:" destination="-1" eventType="valueChanged" id="Cay-jq-4TN"/>
+                                                                <action selector="touchUpInside:" destination="-1" eventType="primaryActionTriggered" id="1KB-8A-fWr"/>
+                                                            </connections>
+                                                        </segmentedControl>
+                                                    </subviews>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <constraints>
+                                                        <constraint firstItem="4Gb-oJ-SZH" firstAttribute="height" secondItem="8oR-y3-RiZ" secondAttribute="height" multiplier="0.7" id="Exm-2s-Kdd"/>
+                                                        <constraint firstItem="4Gb-oJ-SZH" firstAttribute="centerX" secondItem="8oR-y3-RiZ" secondAttribute="centerX" id="SR2-bQ-W4q"/>
+                                                        <constraint firstAttribute="bottom" secondItem="4Gb-oJ-SZH" secondAttribute="bottom" id="bWe-zt-cpY"/>
+                                                    </constraints>
+                                                </view>
+                                            </subviews>
+                                        </stackView>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1q0-NL-vgc">
+                                            <rect key="frame" x="0.0" y="336.5" width="414" height="224.5"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="Ie8-tn-da6">
+                                                    <rect key="frame" x="61" y="76" width="292" height="73"/>
+                                                    <subviews>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="goZ-v0-3gX" customClass="FacebookLogo" customModule="ThinkWhat" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="73" height="73"/>
+                                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" secondItem="goZ-v0-3gX" secondAttribute="height" multiplier="1:1" id="qyh-TR-Bh0"/>
+                                                            </constraints>
+                                                        </view>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zBH-tN-VBq" customClass="InstagramLogo" customModule="ThinkWhat" customModuleProvider="target">
+                                                            <rect key="frame" x="73" y="0.0" width="73" height="73"/>
+                                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </view>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5lu-EQ-x7x" customClass="TikTokLogo" customModule="ThinkWhat" customModuleProvider="target">
+                                                            <rect key="frame" x="146" y="0.0" width="73" height="73"/>
+                                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </view>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ve6-os-BtC" customClass="VKLogo" customModule="ThinkWhat" customModuleProvider="target">
+                                                            <rect key="frame" x="219" y="0.0" width="73" height="73"/>
+                                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </view>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="Ve6-os-BtC" firstAttribute="width" secondItem="Ve6-os-BtC" secondAttribute="height" multiplier="1:1" id="fNm-bk-1pq"/>
+                                                        <constraint firstItem="5lu-EQ-x7x" firstAttribute="width" secondItem="5lu-EQ-x7x" secondAttribute="height" multiplier="1:1" id="i5I-Cr-IJe"/>
+                                                        <constraint firstItem="zBH-tN-VBq" firstAttribute="width" secondItem="zBH-tN-VBq" secondAttribute="height" multiplier="1:1" id="j0d-8k-sBq"/>
+                                                    </constraints>
+                                                </stackView>
+                                                <textField opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Вставьте ссылку" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="tUm-df-qeP" customClass="UnderlinedSignTextField" customModule="ThinkWhat" customModuleProvider="target">
+                                                    <rect key="frame" x="62" y="82" width="290" height="61"/>
+                                                    <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="19"/>
+                                                    <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="alphabet" returnKeyType="done" textContentType="url"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="lineColor">
+                                                            <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="lineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="color" keyPath="activeLineColor">
+                                                            <color key="value" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="activeLineWidth">
+                                                            <real key="value" value="2"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                    <connections>
+                                                        <action selector="textFieldEdited:" destination="-1" eventType="editingChanged" id="dpT-ph-lwv"/>
+                                                    </connections>
+                                                </textField>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstItem="Ie8-tn-da6" firstAttribute="centerX" secondItem="1q0-NL-vgc" secondAttribute="centerX" id="VhQ-Xj-aQ7"/>
+                                                <constraint firstItem="tUm-df-qeP" firstAttribute="centerY" secondItem="1q0-NL-vgc" secondAttribute="centerY" id="lfh-wF-neh"/>
+                                                <constraint firstItem="Ie8-tn-da6" firstAttribute="centerY" secondItem="1q0-NL-vgc" secondAttribute="centerY" id="qzN-Z9-vXA"/>
+                                                <constraint firstItem="tUm-df-qeP" firstAttribute="centerX" secondItem="1q0-NL-vgc" secondAttribute="centerX" id="wXP-Y6-Rwu"/>
+                                            </constraints>
+                                        </view>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <constraints>
+                                        <constraint firstItem="hpq-60-gLK" firstAttribute="centerX" secondItem="yyr-ze-BOu" secondAttribute="centerX" id="3Vv-g5-Q2F"/>
+                                        <constraint firstAttribute="bottom" secondItem="1q0-NL-vgc" secondAttribute="bottom" id="3X6-47-nVf"/>
+                                        <constraint firstItem="1q0-NL-vgc" firstAttribute="leading" secondItem="yyr-ze-BOu" secondAttribute="leading" id="3ht-Tw-vbJ"/>
+                                        <constraint firstItem="tUm-df-qeP" firstAttribute="height" secondItem="qjX-ej-Nes" secondAttribute="height" id="HVN-7e-kJ3"/>
+                                        <constraint firstItem="hpq-60-gLK" firstAttribute="top" secondItem="yyr-ze-BOu" secondAttribute="top" id="P7t-CM-h2O"/>
+                                        <constraint firstItem="tUm-df-qeP" firstAttribute="width" secondItem="qjX-ej-Nes" secondAttribute="width" id="UCS-4r-iPZ"/>
+                                        <constraint firstItem="Ie8-tn-da6" firstAttribute="height" secondItem="qjX-ej-Nes" secondAttribute="height" multiplier="1.2" id="XmT-Rt-8B5"/>
+                                        <constraint firstItem="hpq-60-gLK" firstAttribute="height" secondItem="yyr-ze-BOu" secondAttribute="height" multiplier="0.6" id="jmE-3C-YRs"/>
+                                        <constraint firstItem="hpq-60-gLK" firstAttribute="width" secondItem="yyr-ze-BOu" secondAttribute="width" multiplier="0.7" id="ulO-MA-AU0"/>
+                                        <constraint firstAttribute="trailing" secondItem="1q0-NL-vgc" secondAttribute="trailing" id="xdI-PQ-IUY"/>
+                                        <constraint firstItem="1q0-NL-vgc" firstAttribute="top" secondItem="hpq-60-gLK" secondAttribute="bottom" id="yAw-YZ-o3T"/>
+                                    </constraints>
+                                </view>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fF3-zL-G5H">
+                                    <rect key="frame" x="91" y="740" width="232" height="58"/>
+                                    <color key="backgroundColor" systemColor="systemBlueColor"/>
+                                    <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="20"/>
+                                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Ok"/>
+                                    <connections>
+                                        <action selector="hyperlinkActionButtonTapped:" destination="-1" eventType="touchUpInside" id="VSq-6o-HGY"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tk5-wl-oog">
+                                    <rect key="frame" x="91" y="740" width="232" height="58"/>
+                                    <color key="backgroundColor" systemColor="systemBlueColor"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="Tk5-wl-oog" secondAttribute="height" multiplier="4:1" id="F2b-2G-YH3"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="20"/>
+                                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                    <state key="normal" title="Принимаю"/>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstItem="Tk5-wl-oog" firstAttribute="width" secondItem="A4d-6p-QcZ" secondAttribute="width" multiplier="0.560386" id="3B0-kG-qI5"/>
+                                <constraint firstItem="fF3-zL-G5H" firstAttribute="centerY" secondItem="Tk5-wl-oog" secondAttribute="centerY" identifier="centerY" id="4Gj-o0-7jP"/>
+                                <constraint firstItem="3ZQ-3L-Pao" firstAttribute="top" secondItem="A4d-6p-QcZ" secondAttribute="top" id="9eC-YA-z9s"/>
+                                <constraint firstAttribute="trailing" secondItem="yyr-ze-BOu" secondAttribute="trailing" id="A8f-44-liw"/>
+                                <constraint firstItem="yyr-ze-BOu" firstAttribute="leading" secondItem="A4d-6p-QcZ" secondAttribute="leading" id="EBR-FS-JNl"/>
+                                <constraint firstItem="Tk5-wl-oog" firstAttribute="centerX" secondItem="A4d-6p-QcZ" secondAttribute="centerX" id="F1U-v9-33c"/>
+                                <constraint firstAttribute="trailing" secondItem="3ZQ-3L-Pao" secondAttribute="trailing" id="LE3-FX-uhi"/>
+                                <constraint firstAttribute="bottom" secondItem="Tk5-wl-oog" secondAttribute="bottom" constant="20" symbolic="YES" id="SLF-8U-1gh"/>
+                                <constraint firstItem="Tk5-wl-oog" firstAttribute="top" secondItem="yyr-ze-BOu" secondAttribute="bottom" id="YLA-2R-FKa"/>
+                                <constraint firstItem="3ZQ-3L-Pao" firstAttribute="leading" secondItem="A4d-6p-QcZ" secondAttribute="leading" id="Z3N-J3-2Aq"/>
+                                <constraint firstItem="fF3-zL-G5H" firstAttribute="height" secondItem="Tk5-wl-oog" secondAttribute="height" id="dSb-EK-fxk"/>
+                                <constraint firstItem="fF3-zL-G5H" firstAttribute="width" secondItem="Tk5-wl-oog" secondAttribute="width" id="jKv-3Z-onr"/>
+                                <constraint firstItem="fF3-zL-G5H" firstAttribute="centerX" secondItem="Tk5-wl-oog" secondAttribute="centerX" id="pg2-lI-d88"/>
+                                <constraint firstItem="yyr-ze-BOu" firstAttribute="top" secondItem="3ZQ-3L-Pao" secondAttribute="bottom" id="yPb-Bw-3Hn"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="A4d-6p-QcZ" firstAttribute="top" secondItem="udj-6s-tf4" secondAttribute="top" id="IOz-Uz-3I8"/>
+                        <constraint firstItem="A4d-6p-QcZ" firstAttribute="width" secondItem="trr-Ic-Elu" secondAttribute="width" id="LKe-MI-OxX"/>
+                        <constraint firstItem="A4d-6p-QcZ" firstAttribute="trailing" secondItem="udj-6s-tf4" secondAttribute="trailing" id="YEc-nt-Rz9"/>
+                        <constraint firstItem="A4d-6p-QcZ" firstAttribute="leading" secondItem="udj-6s-tf4" secondAttribute="leading" id="iOu-Dg-KNw"/>
+                        <constraint firstItem="A4d-6p-QcZ" firstAttribute="bottom" secondItem="udj-6s-tf4" secondAttribute="bottom" id="zxS-p3-bh3"/>
+                    </constraints>
+                    <viewLayoutGuide key="contentLayoutGuide" id="udj-6s-tf4"/>
+                    <viewLayoutGuide key="frameLayoutGuide" id="trr-Ic-Elu"/>
+                </scrollView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="Fmg-By-ayF" secondAttribute="trailing" id="PLs-FR-Fj2"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="Fmg-By-ayF" secondAttribute="bottom" id="V2d-Rr-pSQ"/>
+                <constraint firstItem="A4d-6p-QcZ" firstAttribute="height" secondItem="vUN-kp-3ea" secondAttribute="height" id="Xqw-9d-7AI"/>
+                <constraint firstItem="Fmg-By-ayF" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="htP-pa-wBl"/>
+                <constraint firstItem="3ZQ-3L-Pao" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.2" id="l7H-Mu-EsL"/>
+                <constraint firstItem="Fmg-By-ayF" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="qZj-Lh-Sgn"/>
+            </constraints>
+            <point key="canvasLocation" x="137.68115942028987" y="82.366071428571431"/>
+        </view>
+    </objects>
+    <designables>
+        <designable name="9o5-6U-WB9">
+            <size key="intrinsicContentSize" width="39" height="27.5"/>
+        </designable>
+        <designable name="qjX-ej-Nes">
+            <size key="intrinsicContentSize" width="54.5" height="27.5"/>
+        </designable>
+        <designable name="tUm-df-qeP">
+            <size key="intrinsicContentSize" width="149.5" height="27.5"/>
+        </designable>
+        <designable name="wIW-Cz-gTQ">
+            <size key="intrinsicContentSize" width="85.5" height="27.5"/>
+        </designable>
+        <designable name="yfn-rW-uv6">
+            <size key="intrinsicContentSize" width="141" height="27.5"/>
+        </designable>
+    </designables>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

@@ -318,27 +318,77 @@ print(locale)
 locale.localizedString(forCountryCode: "AF")
 //NSLocale.localizedString(forCountryCode: NSLocale(localeIdentifier: "ru"))
 
-extension Bundle {
-    static var UIKit: Bundle {
-        Self(for: UIApplication.self)
-    }
-    func localize(_ key: String, table: String? = nil) -> String {
-        self.localizedString(forKey: key, value: nil, table: nil)
-    }
-    var localizableStrings: [String: String]? {
-        guard let fileURL = url(forResource: "Localizable", withExtension: "strings") else {
-            return nil
+//extension Bundle {
+//    static var UIKit: Bundle {
+//        Self(for: UIApplication.self)
+//    }
+//    func localize(_ key: String, table: String? = nil) -> String {
+//        self.localizedString(forKey: key, value: nil, table: nil)
+//    }
+//    var localizableStrings: [String: String]? {
+//        guard let fileURL = url(forResource: "Localizable", withExtension: "strings") else {
+//            return nil
+//        }
+//        do {
+//            let data = try Data(contentsOf: fileURL)
+//            let plist = try PropertyListSerialization.propertyList(from: data, format: .none)
+//            return plist as? [String: String]
+//        } catch {
+//            print(error)
+//        }
+//        return nil
+//    }
+//}
+//
+//Bundle.UIKit.localizableStrings
+//Bundle.UIKit.localizableStrings?.keys.forEach { print($0)}
+import UIKit
+
+class TestView: UIView {
+    var mirror: Mirror!
+    var name: String = "Name" {
+        didSet {
+            let _mirror = Mirror(reflecting: name)
+            print(_mirror.children.count)
+//            print(_mirror.children.first.label)
+//            mirror.children.filter(<#T##(Element) -> Bool#>)
+            for child in _mirror.children {
+                print(child.self.label!)
+            }
         }
-        do {
-            let data = try Data(contentsOf: fileURL)
-            let plist = try PropertyListSerialization.propertyList(from: data, format: .none)
-            return plist as? [String: String]
-        } catch {
-            print(error)
-        }
-        return nil
+    }
+    let constant = "Constant"
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        mirror = Mirror(reflecting: self)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
-Bundle.UIKit.localizableStrings
-Bundle.UIKit.localizableStrings?.keys.forEach { print($0)}
+let test = TestView()
+test.name = "Stest"
+
+
+//class Test {
+//    let mirror = Mirror(reflecting: self)
+//    @objc var name: String {
+//        get {
+//            print(#keyPath(Test.name))
+//            print(\Test.name)
+//            return ""
+//        }
+//    }
+//    var lastName: String = "Cohen"
+//    let mirror = Mirror(reflecting: Test.self)
+//}
+//let t = Test()
+//t.name
+////let t = Test()
+////let mirror = Mirror(reflecting: t)
+////
+////for child in mirror.children {
+////    print(child.label ?? "")
+////}

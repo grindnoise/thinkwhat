@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        let controller = GetStartedViewController()
+        let controller = FillProfileViewController()//GetStartedViewController()
         window = UIWindow()
         window?.rootViewController = CustomNavigationController(rootViewController: controller)
         window?.makeKeyAndVisible()

@@ -109,6 +109,10 @@ enum AuthProvider: String {
     case Username   = "Username"
 }
 
+enum SocialMedia: String {
+    case VK, Facebook, TikTok, Instagram
+}
+
 enum ThirdPartyApp: String {
     case TikTok     = "TikTok"
     case Youtube    = "Youtube"

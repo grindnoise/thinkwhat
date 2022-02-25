@@ -45,12 +45,13 @@ class ConditionsViewController: UIViewController {
 
 // MARK: - View Input
 extension ConditionsViewController: ConditionsViewInput {
-    func onAcceptTappedWithSuccess() {
-        // TODO: - Next scene
-        print("onAcceptTappedWithSuccess")
+    func onAccept() {
+        navigationController?
+            .pushViewController(FillProfileViewController(),
+                                animated: true)
     }
     
-    func onAcceptTappedWithError() {
+    func onRefuse() {
         let alert = UIAlertController(title: NSLocalizedString("should_read_agreement_title",comment: ""),
                                       message: NSLocalizedString("should_read_agreement_message", comment: ""),
                                       preferredStyle: .alert)
@@ -59,7 +60,7 @@ extension ConditionsViewController: ConditionsViewInput {
         present(alert, animated: true)
     }
     
-    func onAcceptTappedWhileLoading() {
+    func onTapWhileLoading() {
         let alert = UIAlertController(title: NSLocalizedString("should_read_agreement_title",comment: ""),
                                       message: NSLocalizedString("wait_for_agreement", comment: ""),
                                       preferredStyle: .alert)

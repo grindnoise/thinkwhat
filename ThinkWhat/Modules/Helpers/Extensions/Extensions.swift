@@ -277,140 +277,7 @@ extension UIView {
     }
 }
 
-extension String {
-    func localized(_ bundle: Bundle = .main) -> String {
-        bundle.localize(self)
-    }
-    
-    var localized: String {
-        return localized()
-    }
-    
-    func localized(languageCode: String) -> String {
-        let path = Bundle.main.path(forResource: languageCode, ofType: "lproj")
-        let bundle = Bundle(path: path!)
-        
-        return NSLocalizedString(self, tableName: nil, bundle: bundle!, value: "", comment: "")
-    }
-    
-    func fullRange() -> NSRange {
-        let str = NSString(string: self)
-        return NSRange(location: 0, length: str.length)
-    }
-    
-    var hexColor: UIColor? {
-        guard !isEmpty else {
-            return nil
-        }
-        let hex = trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int = UInt32()
-        Scanner(string: hex).scanHexInt32(&int)
-        let a, r, g, b: UInt32
-        switch hex.count {//characters.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            return .clear
-        }
-        return UIColor(red: CGFloat(r) / 255, green: CGFloat(g) / 255, blue: CGFloat(b) / 255, alpha: CGFloat(a) / 255)
-    }
-    
-    var length: Int {
-        return self.count //characters.count
-    }
-    
-//    subscript (i: Int) -> String {
-//        return self[Range(i ..< i + 1)]
-//    }
-//
-//    func substring(from: Int) -> String {
-//        return self[Range(min(from, length) ..< length)]
-//    }
-//
-//    func substring(to: Int) -> String {
-//        return self[Range(0 ..< max(0, to))]
-//    }
-    
-    subscript (r: Range<Int>) -> String {
-        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
-                                            upper: min(length, max(0, r.upperBound))))
-        let start = index(startIndex, offsetBy: range.lowerBound)
-        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
-        return String(self[(start ..< end)])
-    }
-    
-    func toDateTime() -> Date {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy HH:mm:ss"
-        return formatter.date(from: self)!
-    }
-    
-    func toDate() -> Date {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy"
-        return formatter.date(from: self)!
-    }
-    
-    public func fileName() -> String {
-        return URL(fileURLWithPath: self).deletingPathExtension().lastPathComponent
-    }
-    
-    func fileExtension() -> String {
-        return URL(fileURLWithPath: self).pathExtension
-    }
-    
-    var trimmingTrailingSpaces: String {
-        if let range = rangeOfCharacter(from: .whitespacesAndNewlines, options: [.anchored, .backwards]) {
-            return String(self[..<range.lowerBound]).trimmingTrailingSpaces
-        }
-        return self
-    }
-    
-    var youtubeID: String? {
-        let pattern = "((?<=(v|V)/)|(?<=be/)|(?<=(\\?|\\&)v=)|(?<=embed/))([\\w-]++)"
-        
-        let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
-        let range = NSRange(location: 0, length: count)
-        
-        guard let result = regex?.firstMatch(in: self, range: range) else {
-            return nil
-        }
-        
-        return (self as NSString).substring(with: result.range)
-    }
-    
-    var isYoutubeLink: Bool {
-        
-        let youtubeRegex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?youtu(be\\.com|\\.be)(\\/watch\\?([&=a-z]{0,})(v=[\\d\\w]{1,}).+|\\/[\\d\\w]{1,})"
-        
-        let youtubeCheckResult = NSPredicate(format: "SELF MATCHES %@", youtubeRegex)
-        return youtubeCheckResult.evaluate(with: self)
-    }
-    var isTikTokLink: Bool {
-        return self.contains("https://www.tiktok.com/")
-//        let youtubeRegex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?youtu(be\\.com|\\.be)(\\/watch\\?([&=a-z]{0,})(v=[\\d\\w]{1,}).+|\\/[\\d\\w]{1,})"
-//
-//        let youtubeCheckResult = NSPredicate(format: "SELF MATCHES %@", youtubeRegex)
-//        return youtubeCheckResult.evaluate(with: self)
-    }
-    var isTikTokEmbedLink: Bool {
-        return self.contains("tiktok-embed")
-        //        let youtubeRegex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?youtu(be\\.com|\\.be)(\\/watch\\?([&=a-z]{0,})(v=[\\d\\w]{1,}).+|\\/[\\d\\w]{1,})"
-        //
-        //        let youtubeCheckResult = NSPredicate(format: "SELF MATCHES %@", youtubeRegex)
-        //        return youtubeCheckResult.evaluate(with: self)
-    }
-    
-    var isValidEmail: Bool {
-        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        return emailTest.evaluate(with: self)
-    }
-}
+
 
 extension CLLocationCoordinate2D: Hashable {
     public var hashValue: Int {
@@ -510,54 +377,7 @@ extension CGFloat {
     var radiansToDegrees: CGFloat { return self * 180 / .pi }
 }
 
-extension NSLayoutConstraint {
 
-    func setMultiplierWithFade(_ multiplier:CGFloat, duration: Double = 0) -> NSLayoutConstraint {
-        
-        let newConstraint = NSLayoutConstraint(
-            item: firstItem as Any,
-            attribute: firstAttribute,
-            relatedBy: relation,
-            toItem: secondItem,
-            attribute: secondAttribute,
-            multiplier: multiplier,
-            constant: constant)
-        newConstraint.priority = priority
-        newConstraint.shouldBeArchived = self.shouldBeArchived
-        newConstraint.identifier = self.identifier
-        
-        UIView.animate(withDuration: duration, animations: {
-            (self.firstItem as? UIView)?.alpha = 0
-        }, completion: {
-            _ in
-            NSLayoutConstraint.deactivate([self])
-            NSLayoutConstraint.activate([newConstraint])
-        })
-        
-//        UIView.animate(withDuration: 0.3, delay: 0.3, options: [], animations: {
-//            (self.firstItem as? UIView)?.alpha = 1
-//        }, completion: nil)
-        
-        return newConstraint
-    }
-    
-    func getMultipliedConstraint(_ multiplier:CGFloat, duration: Double = 0) -> NSLayoutConstraint {
-        
-        let newConstraint = NSLayoutConstraint(
-            item: firstItem as Any,
-            attribute: firstAttribute,
-            relatedBy: relation,
-            toItem: secondItem,
-            attribute: secondAttribute,
-            multiplier: multiplier,
-            constant: constant)
-        newConstraint.priority = priority
-        newConstraint.shouldBeArchived = self.shouldBeArchived
-        newConstraint.identifier = self.identifier
-        
-        return newConstraint
-    }
-}
 
 extension UIViewController {
     class func loadFromNib<T: UIViewController>() -> T {
@@ -1498,56 +1318,19 @@ extension JSONDecoder {
     }
 }
 
-extension Bundle {
-    static var UIKit: Bundle {
-        Self(for: UIApplication.self)
-    }
-    func localize(_ key: String, table: String? = nil) -> String {
-        self.localizedString(forKey: key, value: nil, table: nil)
-    }
-    var localizableStrings: [String: String]? {
-        guard let fileURL = url(forResource: "Localizable", withExtension: "strings") else {
-            return nil
-        }
-        do {
-            let data = try Data(contentsOf: fileURL)
-            let plist = try PropertyListSerialization.propertyList(from: data, format: .none)
-            return plist as? [String: String]
-        } catch {
-            print(error)
-        }
-        return nil
-    }
-}
 
-import ObjectiveC
 
-private var associatedLanguageBundle:Character = "0"
 
-class PrivateBundle: Bundle {
-    override func localizedString(forKey key: String, value: String?, table tableName: String?) -> String {
-        let bundle: Bundle? = objc_getAssociatedObject(self, &associatedLanguageBundle) as? Bundle
-        return (bundle != nil) ? (bundle!.localizedString(forKey: key, value: value, table: tableName)) : (super.localizedString(forKey: key, value: value, table: tableName))
 
-    }
-}
-
-import L10n_swift
-extension Bundle {
-    class func setLanguage(_ language: String, in bundle: Bundle = .main) {
-        var onceToken: Int = 0
-
-        if (onceToken == 0) {
-            /* TODO: move below code to a static variable initializer (dispatch_once is deprecated) */
-            object_setClass(Bundle.main, PrivateBundle.self)
-        }
-        onceToken = 1
-        objc_setAssociatedObject(Bundle.main, &associatedLanguageBundle, (language != nil) ? Bundle(path: bundle.path(forResource: language, ofType: "lproj") ?? "") : nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        L10n.shared.language = language
-        NotificationCenter.default.post(name: Notifications.UI.LanguageChanged, object: nil)
-    }
-}
-
+/**
+ Returns a localized plural version of the string designated by the specified `key` and residing in `resource`.
+ - parameter key: The key for a string in resource.
+ - parameter resource: The receiver’s string resource to search. If resource is nil or is an empty string, the method attempts to use the resource in **Localizable** files.
+ - parameter fittingWidth: The desired width of the string variation.
+ - parameter arg: The values for which the appropriate plural form is selected.
+ - parameter converting: A closure used to modify the number to display it to the user.
+ - returns: A localized plural version of the string designated by `key`. This method returns `key` when `key` not found or `arg` is not a number .
+ */
 extension String {
     func localized(forLanguageCode lanCode: String) -> String {
         guard
