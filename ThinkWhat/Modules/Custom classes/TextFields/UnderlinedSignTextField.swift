@@ -19,9 +19,10 @@ class UnderlinedSignTextField: UnderlinedTextField {
         case EmailIsIncorrect       =   "email_is_empty"
         case PasswordIsShort        =   "password_is_short"
         case InvalidHyperlink       =   "invalid_url_error"
+        case BirthDateIsEmpty       =   "birthdate_is_empty"
         
         func localizedString() -> String {
-            return self.rawValue.localized.capitalized
+            return self.rawValue.localized.firstUppercased
         }
     }
     

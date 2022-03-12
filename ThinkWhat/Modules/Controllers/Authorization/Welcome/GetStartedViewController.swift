@@ -16,6 +16,10 @@ protocol ToolbarPickerViewDelegate: class {
 
 class GetStartedViewController: UIViewController {
     
+    deinit {
+        print("GetStartedViewController deinit")
+    }
+    
     @IBOutlet var contentView: UIView!
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {

@@ -15,6 +15,16 @@ class GeoNamesWorker {
     class func searchByName(startsWith name: String) async throws -> Data {
         guard let url = URL(string: "http://api.geonames.org/searchJSON?name_startsWith=\(name)&cities=cities1000&featureClass=P&maxRows=10&lang=\(L10n.shared.language)&username=grindnoise".encodedURL) else { throw APIError.invalidURL }
         do {
+            return try await requestAsync(url:
+ url, httpMethod: .get)
+        } catch let error {
+            throw error
+        }
+    }
+    
+    class func getByGeonameId(_ id: Int) async throws -> Data {
+        guard let url = URL(string: "http://api.geonames.org/getJSON?formatted=true&geonameId=\(id)&username=grindnoise".encodedURL) else { throw APIError.invalidURL }
+        do {
             return try await requestAsync(url: url, httpMethod: .get)
         } catch let error {
             throw error

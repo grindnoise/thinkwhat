@@ -87,6 +87,47 @@ class API {
     static let shared = API()
     private init() {}
     
+    class func prepareUserData(firstName: String?, lastName: String?, email: String?, gender: Gender?, birthDate: String?, city: City?, image: UIImage?, vkID: String?, vkURL: String?, facebookID: String?, facebookURL: String?) -> [String: Any] {
+        
+        var parameters = [String: Any]()
+        if !firstName.isNil {
+            parameters["owner.\(DjangoVariables.User.firstName)"] = firstName!
+        }
+        if !lastName.isNil {
+            parameters["owner.\(DjangoVariables.User.lastName)"] = lastName!
+        }
+        if !email.isNil {
+            parameters["owner.\(DjangoVariables.User.email)"] = email!
+        }
+        if !gender.isNil {
+            parameters[DjangoVariables.UserProfile.gender] = gender!.rawValue
+        }
+        if !birthDate.isNil {
+            parameters[DjangoVariables.UserProfile.birthDate] = birthDate!
+        }
+        if !vkID.isNil {
+            parameters[DjangoVariables.UserProfile.vkID] = vkID!
+        }
+        if !vkURL.isNil {
+            parameters[DjangoVariables.UserProfile.vkURL] = vkURL!
+        }
+        if !facebookID.isNil {
+            parameters[DjangoVariables.UserProfile.facebookID] = facebookID!
+        }
+        if !facebookURL.isNil {
+            parameters[DjangoVariables.UserProfile.facebookURL] = facebookURL!
+        }
+        if !image.isNil {
+            parameters[DjangoVariables.UserProfile.image] = image!
+        }
+//        if !city.isNil {
+//            parameters[DjangoVariables.UserProfile.city] = city!.id
+////            parameters["\(DjangoVariables.UserProfile.city)"] = city!.id
+//        }
+        return parameters
+    }
+
+    
     private func headers() -> HTTPHeaders {
         let headers: HTTPHeaders = [
             "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
@@ -663,7 +704,7 @@ class API {
             }
         } else {
             do {
-            return try await requestAsync(url: url, httpMethod: .patch, parameters: dict, encoding: JSONEncoding.default)//JSON(data: responseData, options: .mutableContainers)
+            return try await requestAsync(url: url, httpMethod: .patch, parameters: dict, encoding: JSONEncoding.default, headers: headers())//JSON(data: responseData, options: .mutableContainers)
             } catch {
                 throw error
             }
@@ -1610,9 +1651,22 @@ class API {
         request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.USER_PROFILE_TOP_PUBS), httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
     }
     
+    public func sendPasswordResetLink(_ email: String) async throws {
+        do {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.RESET_PASSWORD) else {
+                throw APIError.notFound
+            }
+            let parameters: Parameters = ["email": email]
+            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil)
+            guard try JSON(data: data, options: .mutableContainers)["status"] == "OK" else { throw "Email error" }
+        } catch {
+            throw error
+        }
+    }
+    
     func cancelAllRequests() {
         AF.session.getAllTasks { (tasks) in
-            tasks.forEach {$0.cancel() }
+            tasks.forEach { $0.cancel() }
         }
         //        self.session.session.getTasksWithCompletionHandler {
         //            (sessionDataTask, uploadData, downloadData) in
@@ -1623,7 +1677,18 @@ class API {
     }
 }
 
-
-protocol UserDataPreparatory: class {
-    static func prepareUserData(_ data: [String: Any]) -> [String: Any]
+extension API {
+    ///Return city `id`
+    public func saveCity(_ parameters: Parameters) async throws -> Int {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CREATE_CITY) else {
+            throw APIError.notFound
+        }
+        do {
+            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers())
+            guard let id = try JSON(data: data, options: .mutableContainers)["id"].int else { throw "City id error" }
+            return id
+        } catch let error {
+            throw error
+        }
+    }
 }

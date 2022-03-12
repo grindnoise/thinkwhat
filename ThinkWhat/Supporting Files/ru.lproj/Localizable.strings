@@ -11,6 +11,7 @@
 "check_fields" = "Проверьте корректность заполненных полей";
 "warning" = "Внимание";
 "error" = "Ошибка";
+"backend_error" = "Произошла ошибка, попробуйте еще раз";
 "sendButton" = "Отправить";
 "select" = "Выбрать";
 "cancel" = "Отмена";
@@ -40,6 +41,7 @@
 "email_is_busy" = "Электронная почта уже используется";
 "email_is_empty" = "Некорректный формат почты";
 "password_is_short" = "Слишком короткий пароль";
+"birthdate_is_empty" = "Выберите дату рождения";
 "success" = "Ура!";
 "provider_authorization_progress" = "Авторизация";
 "provider_authorization_success" = "Успех!";
@@ -64,6 +66,8 @@
 
 //Recover VC
 "profile_fill" = "Ваш профиль";
+"email_sent" = "Электронное письмо со ссылкой для восстановления было отправлено";
+"email_not_found" = "Указанный адрес электронной почты не найден. Проверьте корректность или попробуйте другой";
 
 //FillProfile VC
 "firstNameTF" = "Имя";
@@ -71,3 +75,18 @@
 "birthDateTF" = "Дата рождения";
 "cityTF" = "Город";
 "invalid_url_error" = "Некорректная ссылка";
+
+//Hot VC
+"hot" = "Горячие";
+
+//Subscriptions VC
+"subscriptions" = "Подписки";
+
+//List VC
+"list" = "Лента";
+
+//Topics VC
+"topics" = "Темы";
+
+//Settings VC
+"settings" = "Настройки";

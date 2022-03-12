@@ -11,6 +11,7 @@
 "check_fields" = "Check fields for errors";
 "warning" = "Warning";
 "error" = "Error";
+"backend_error" = "Error occured, try again";
 "sendButton" = "Send";
 "select" = "Select";
 "cancel" = "Cancel";
@@ -40,6 +41,7 @@
 "email_is_busy" = "Email is already used";
 "email_is_empty" = "Email is incorrect";
 "password_is_short" = "Password is too short";
+"birthdate_is_empty" = "Select date of birth";
 "success" = "Success!";
 "provider_authorization_progress" = "Authorization";
 "provider_authorization_success" = "Success";
@@ -61,6 +63,8 @@
 "recoverButton" = "Recover";
 //Recover VC
 "recover_title" = "Account recovery";
+"email_sent" = "Email with recover link has been sent";
+"email_not_found" = "We couldn't find an account associated with that email. Please try a different e-mail address";
 
 //Recover VC
 "profile_fill" = "Your profile";
@@ -71,3 +75,18 @@
 "birthDateTF" = "Birth date";
 "cityTF" = "City";
 "invalid_url_error" = "Invalid link";
+
+//Hot VC
+"hot" = "Hot";
+
+//Subscriptions VC
+"subscriptions" = "Subscriptions";
+
+//List VC
+"list" = "Feed";
+
+//Topics VC
+"topics" = "Topics";
+
+//Settings VC
+"settings" = "Settings";

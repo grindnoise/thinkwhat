@@ -19,6 +19,7 @@ class AgreementView: UIView {
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var webView: WKWebView! {
         didSet {
+            webView.scrollView.isScrollEnabled = false
             webView.scrollView.delegate = self
             webView.navigationDelegate = self
         }
@@ -26,6 +27,7 @@ class AgreementView: UIView {
     @IBOutlet weak var acceptButton: UIButton! {
         didSet {
             acceptButton.setTitle("", for: .normal)
+            acceptButton.backgroundColor = K_COLOR_GRAY
             let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
                                                                   size: CGSize(width: acceptButton.frame.height,
                                                                                height: acceptButton.frame.height)))
@@ -80,7 +82,12 @@ class AgreementView: UIView {
     
     // MARK: - Properties
     weak var viewInput: ConditionsViewInput?
-    private var agreementIsLoading = true
+    private var agreementIsLoading = true {
+        didSet {
+            guard !agreementIsLoading, !webView.isNil else { return }
+            webView.scrollView.isScrollEnabled = true
+        }
+    }
     private var hasReadAgreement = false {
         didSet {
             if hasReadAgreement {
@@ -135,7 +142,7 @@ extension AgreementView: WKNavigationDelegate {
 // MARK: - Scroll delegate
 extension AgreementView: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if !hasReadAgreement, (scrollView.contentOffset.y + scrollView.bounds.height) >= scrollView.contentSize.height {
+        if scrollView.isScrollEnabled, !hasReadAgreement, (scrollView.contentOffset.y + scrollView.bounds.height) >= scrollView.contentSize.height {
             hasReadAgreement = true
         }
     }

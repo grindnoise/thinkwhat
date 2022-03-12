@@ -26,18 +26,28 @@ class FillUserView: UIView {
     @IBOutlet weak var avatar: Avatar! {
         didSet {
             avatar.delegate = self
-            avatar.imageView.image = UIImage(named: "anon")
+            guard let path = UserDefaults.Profile.imagePath,
+                  let url = URL(string: path),
+                  let data = try? Data(contentsOf: url) as? Data,
+                  data != nil,
+                  let image = UIImage(data: data!) else {
+                      avatar.imageView.image = UIImage(named: "anon")
+                      return
+            }
+            avatar.imageView.image = image
         }
     }
     @IBOutlet weak var firstNameTF: UnderlinedSignTextField! {
         didSet {
             firstNameTF.placeholder = #keyPath(FillUserView.firstNameTF).localized
+            firstNameTF.text = UserDefaults.Profile.firstName
             setupTextField(textField: firstNameTF)
         }
     }
     @IBOutlet weak var lastNameTF: UnderlinedTextField! {
         didSet {
             lastNameTF.placeholder = #keyPath(FillUserView.lastNameTF).localized
+            lastNameTF.text = UserDefaults.Profile.lastName
             setupTextField(textField: lastNameTF)
         }
     }
@@ -45,10 +55,15 @@ class FillUserView: UIView {
         didSet {
             birthDateTF.placeholder = #keyPath(FillUserView.birthDateTF).localized
             setupTextField(textField: birthDateTF)
+            guard let date = UserDefaults.Profile.birthDate else { return }
+            birthDateTF.text = dateFormatter.string(from: date)
         }
     }
     @IBOutlet weak var cityTF: UnderlinedSearchTextField! {
         didSet {
+            if let cityName = UserDefaults.Profile.city {
+                cityTF.text! = cityName
+            }
             cityTF.placeholder = #keyPath(FillUserView.cityTF).localized
             textFields.append(cityTF)
 //            let tfWarningColor = UIColor { traitCollection in
@@ -113,6 +128,7 @@ class FillUserView: UIView {
                     return K_COLOR_RED
                 }
             }
+            genderControl.selectedSegmentIndex = UserDefaults.Profile.gender == .Female ? 1 : 0
         }
     }
     @IBOutlet weak var hyperlinkTF: UnderlinedSignTextField! {
@@ -120,9 +136,6 @@ class FillUserView: UIView {
             hyperlinkTF.placeholder = #keyPath(FillUserView.hyperlinkTF).localized
             setupTextField(textField: hyperlinkTF)
             hyperlinkTF.placeholder = "paste_link".localized
-//            let logo = FacebookLogo()
-//            logo.isOpaque = false
-//            hyperlinkTF.customRightView = logo
         }
     }
     @IBOutlet weak var facebookLogo: FacebookLogo! {
@@ -181,6 +194,45 @@ class FillUserView: UIView {
             viewInput?.onCitySearch(name)
         }
     }
+    @IBAction func continueTapped(_ sender: Any) {
+        checkFields()
+        guard isCorrect else {
+            UIView.animate(withDuration: 0.12, delay: 0, options: []) {
+                self.continueButton.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            } completion: { _ in
+                UIView.animate(withDuration: 0.12) {
+                    self.continueButton.transform = .identity
+                }
+            }
+            return
+        }
+        guard let image = avatar.imageView.image,
+              let firstName = firstNameTF.text,
+              let lastName = lastNameTF.text,
+              !birthDateTF.text.isNil else {
+                  fatalError()
+              }
+        continueButton.setTitle("", for: .normal)
+        let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                              size: CGSize(width: continueButton.frame.height,
+                                                                           height: continueButton.frame.height)))
+        indicator.alpha = 0
+        indicator.layoutCentered(in: continueButton)
+        indicator.startAnimating()
+        indicator.color = .white
+        UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
+        isUserInteractionEnabled = false
+        viewInput?.updateUserprofile(image: isImageChanged ? image : nil,
+                                     firstName: firstName,
+                                     lastName: lastName,
+                                     gender: genderControl.selectedSegmentIndex == 0 ? .Male : .Female,
+                                     birthDate: birthDateTF.text!,
+                                     city: city,
+                                     vkID: nil,
+                                     vkURL: links[SocialMedia.VK],
+                                     facebookID: nil,
+                                     facebookURL: links[SocialMedia.Facebook])
+    }
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -203,6 +255,18 @@ class FillUserView: UIView {
         if Self.self is KeyboardScrollable.Type {
             perform(Selector("subscribeForKeyboardNotifications"))
         }
+        if let fb = UserDefaults.Profile.facebookURL?.absoluteString {
+            links[SocialMedia.Facebook] = fb
+        }
+        if let ig = UserDefaults.Profile.instagramURL?.absoluteString {
+            links[SocialMedia.Instagram] = ig
+        }
+        if let vk = UserDefaults.Profile.vkURL?.absoluteString {
+            links[SocialMedia.VK] = vk
+        }
+        if let tt = UserDefaults.Profile.tiktokURL?.absoluteString {
+            links[SocialMedia.TikTok] = tt
+        }
     }
     
     override func layoutSubviews() {
@@ -216,23 +280,11 @@ class FillUserView: UIView {
     // MARK: - Properties
     weak var viewInput: FillUserViewInput?
     private var isCorrect = false
-    private var isGenderFilled = false {
-        didSet {
-            if isGenderFilled {
-//                genderTF.hideSign()
-                if isNameFilled && isGenderFilled && isBirthDateFilled {
-                    isCorrect = true
-                }
-            } else {
-                isCorrect = false
-            }
-        }
-    }
     private var isNameFilled = false {
         didSet {
             if isNameFilled {
                 firstNameTF.hideSign()
-                if isNameFilled && isGenderFilled && isBirthDateFilled {
+                if isNameFilled && isBirthDateFilled {
                     isCorrect = true
                 }
             } else {
@@ -245,7 +297,7 @@ class FillUserView: UIView {
         didSet {
             if isBirthDateFilled {
                 birthDateTF.hideSign()
-                if isNameFilled && isGenderFilled && isBirthDateFilled {
+                if isNameFilled && isBirthDateFilled {
                     isCorrect = true
                 }
             } else {
@@ -253,12 +305,18 @@ class FillUserView: UIView {
             }
         }
     }
+    private var isImageChanged = false
     ///Distance in points between `hyperlinkTF` and `hyperlinkActionButton`
     private var distance: CGFloat = .zero
     ///Used to validate `hyperlinkTF.text` designated by provider
     private var social: SocialMedia?
     private var links = [SocialMedia: String]()
-    private var city: City?
+    private var city: City? {
+        didSet {
+            guard !city.isNil else { return }
+            viewInput?.onCitySelected(city!)
+        }
+    }
     
     ///`KeyboardScrollable` protocol properties
     internal var textFields: [UITextField] = [UITextField]()
@@ -280,7 +338,20 @@ class FillUserView: UIView {
 
 // MARK: - Controller Output
 extension FillUserView: FillUserControllerOutput {
+    func onUpdateProfileCompleteWithError() {
+        isUserInteractionEnabled = true
+        guard !continueButton.isNil, let indicator = continueButton.subviews.filter({ $0.isKind(of: UIActivityIndicatorView.self)}).first as? UIActivityIndicatorView else { return }
+        UIView.animate(withDuration: 0.2) {
+            indicator.alpha = 0
+        } completion: { _ in
+            self.isUserInteractionEnabled = true
+            indicator.removeFromSuperview()
+            self.continueButton.setTitle(#keyPath(FillUserView.continueButton).localized, for: .normal)
+        }
+    }
+    
     func onAvatarChange(_ image : UIImage) {
+        isImageChanged = true
         UIView.transition(with: avatar, duration: 0.3, options: [.transitionCrossDissolve]) {
             self.avatar.imageView.image = image } completion: { _ in}
     }
@@ -593,78 +664,46 @@ extension FillUserView: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        checkTextField(sender: textField)
+        guard let tf = textField as? UnderlinedSignTextField else { return }
+        tf.hideSign()
+//        checkTextField(textField)
     }
     
-    private func checkTextField(sender: UITextField) {
+    private func checkFields() {
+        if firstNameTF.text!.isEmpty {
+            isNameFilled = false
+            firstNameTF.showSign(state: .UsernameIsShort)
+        } else if firstNameTF.text!.count <= 2 {
+            isNameFilled = false
+            firstNameTF.showSign(state: .UsernameNotFilled)
+        } else {
+            isNameFilled = true
+        }
+        
+        if birthDateTF.text!.isEmpty {
+            isBirthDateFilled = false
+            birthDateTF.showSign(state: .BirthDateIsEmpty)
+        } else {
+            isBirthDateFilled = true
+        }
 //        guard let textField = sender as? UnderlinedSignTextField else { return }
 //        if textField === firstNameTF {
 //            if textField.text!.isEmpty {
 //                isNameFilled = false
-//                passwordTF.hideSign()
-//            } else if textField.text!.count < 6 {
-//                textField.showSign(state: .PasswordIsShort)
+//                firstNameTF.hideSign()
+//            } else if textField.text!.count < 2 {
+//                textField.showSign(state: .UsernameIsShort)
 //                isNameFilled = false
 //            } else {
 //                isNameFilled = true
 //            }
-//        } else if textField === usernameTF {
-//            if !textField.text!.isEmpty && textField.text!.count < 4 {
-//                usernameTF.showSign(state: .UsernameIsShort)
-//                isLoginFilled = false
-//            } else if textField.text!.count >= 4 {
-//                isPerformingChecks = true
-//                textField.isShowingSpinner = true
-//                viewInput?.checkCredentials(username: textField.text!, email: "") { [weak self] result in
-//                    guard let self = self else { return }
-//                    switch result {
-//                    case .success(let exists):
-//                        if !exists {
-//                            if self.usernameTF.text!.count >= 4 {
-//                                self.isLoginFilled = true
-//                            }
-//                        } else {
-//                            self.usernameTF.showSign(state: .UsernameExists)
-//                            self.isLoginFilled = false
-//                        }
-//                    case .failure(let error):
-//                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-//                    }
-//                    self.isPerformingChecks = false
-//                    textField.isShowingSpinner = false
-//                }
-//            } else if textField.text!.isEmpty {
-//                usernameTF.hideSign()
-//            } else {
-//                isLoginFilled = true
-//                usernameTF.hideSign()
-//            }
-//        } else if textField === mailTF {
+//        } else if textField === birthDateTF {
 //            if textField.text!.isEmpty {
-//                mailTF.hideSign()
-//                isMailFilled = false
-//            } else if textField.text!.isValidEmail {
-//                isPerformingChecks = true
-//                textField.isShowingSpinner = true
-//                viewInput?.checkCredentials(username: "", email: textField.text!) {  [weak self] result in
-//                    guard let self = self else { return }
-//                    switch result {
-//                    case .success(let exists):
-//                        if !exists {
-//                            self.isMailFilled = true
-//                        } else {
-//                            self.mailTF.showSign(state: .EmailExists)
-//                            self.isMailFilled = false
-//                        }
-//                    case .failure(let error):
-//                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-//                    }
-//                    self.isPerformingChecks = false
-//                    textField.isShowingSpinner = false
-//                }
+//                textField.showSign(state: .BirthDateIsEmpty)
+//                isBirthDateFilled = false
 //            } else {
-//                isMailFilled = false
-//                mailTF.showSign(state: .EmailIsIncorrect)
+//                firstNameTF.hideSign()
+//                isBirthDateFilled = true
 //            }
 //        }
     }
@@ -689,6 +728,8 @@ extension FillUserView: KeyboardScrollable {
     
     func onTextFieldActivated(_ textField: UITextField) {
         activeTextField = textField
+        guard let tf = textField as? UnderlinedSignTextField else { return }
+        tf.hideSign()
     }
     
     func setScreenInsets(zero: Bool = false) {

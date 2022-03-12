@@ -265,6 +265,8 @@ extension SignupViewController: SignupViewInput {
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategy = .formatted(.dateTimeFormatter)
                     Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: userData!)
+                    guard let url = UserDefaults.Profile.imageURL else { return }
+                    Userprofiles.shared.current?.image = try await API.shared.downloadImageAsync(from: url)
                 } catch {
                     ///5. Profile wasn't edited - we need to update it with provider data
                     do {

@@ -48,6 +48,7 @@ struct DjangoVariables {
         static let instagramURL             = "instagram_url"
         static let facebookURL              = "facebook_url"
         static let vkURL                    = "vk_url"
+        static let city                     = "city"
     }
     struct Survey {
         static let category                 = "category"

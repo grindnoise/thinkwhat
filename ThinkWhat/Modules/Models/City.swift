@@ -20,7 +20,7 @@ class Cities {
 
 class City: Decodable {
     private enum CodingKeys: String, CodingKey {
-        case id, name, countryName, geonames, geonameId,
+        case id, name, countryName, geonames, geonameId, localized,
              geoname_ID  = "geoname_id",
              regionID   = "region_id",
              countryID  = "country_id",
@@ -28,6 +28,7 @@ class City: Decodable {
     }
     var id: Int?
     var name: String
+    var localized: String?
     var geonameID: Int
     var countryID: Int?
     var regionID: Int?
@@ -46,6 +47,7 @@ class City: Decodable {
             } else {
                 throw "geonameID not found"
             }
+            localized       = try container.decodeIfPresent(String.self, forKey: .localized)
             countryID       = try container.decodeIfPresent(Int.self, forKey: .countryID)
             regionID        = try container.decodeIfPresent(Int.self, forKey: .regionID)
             countryName     = try container.decode(String.self, forKey: .countryName)

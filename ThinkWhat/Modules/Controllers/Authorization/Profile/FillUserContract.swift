@@ -18,8 +18,10 @@ protocol FillUserViewInput: class {
     
     func validateHyperlink(socialMedia: SocialMedia, hyperlink: String) throws
     func onCitySearch(_ : String)
+    func onCitySelected(_ : City)
     func onImageTap()
     func onHyperlinkError()
+    func updateUserprofile(image: UIImage?, firstName: String, lastName: String, gender: Gender, birthDate: String?, city: City?, vkID: String?, vkURL: String?, facebookID: String?, facebookURL: String?)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -30,7 +32,8 @@ protocol FillUserControllerInput: class {
     var modelOutput: FillUserModelOutput? { get set }
     func validateHyperlink(socialMedia: SocialMedia, hyperlink: String) throws
     func fetchCity(_: String) async
-    func saveData()
+    func updateUserprofile(image: UIImage?, firstName: String, lastName: String, gender: Gender, birthDate: String?, city: City?, vkID: String?, vkURL: String?, facebookID: String?, facebookURL: String?)
+    func saveCity(_: City)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -39,6 +42,7 @@ protocol FillUserControllerInput: class {
 protocol FillUserModelOutput: class {
     func onFetchCityComplete(_: [City])
     func onFetchCityError(_: Error)
+    func onUpdateProfileComplete(_: Result<Bool,Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -49,4 +53,5 @@ protocol FillUserControllerOutput: class {
     func onDidLayout()
     func onCityFetchResults(_:[City])
     func onAvatarChange(_: UIImage)
+    func onUpdateProfileCompleteWithError()
 }

@@ -30,11 +30,20 @@ class RecoverView: UIView {
     
     // MARK: - IB actions
     @IBAction func recoverTapped(_ sender: Any) {
-        mailTF.resignFirstResponder()
         checkTextField(sender: mailTF)
-        if isEmailFilled {
-            // TODO: - Send link
-        }
+        mailTF.resignFirstResponder()
+        guard isEmailFilled else { return }
+        viewInput?.sendEmail(mailTF.text!)
+        sendButton.setTitle("", for: .normal)
+        let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                              size: CGSize(width: sendButton.frame.height,
+                                                                           height: sendButton.frame.height)))
+        indicator.alpha = 0
+        indicator.layoutCentered(in: sendButton)
+        indicator.startAnimating()
+        indicator.color = .white
+        UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
+        isUserInteractionEnabled = false
     }
     
     // MARK: - Initialization
@@ -81,9 +90,17 @@ class RecoverView: UIView {
 
 // MARK: - Controller Output
 extension RecoverView: RecoverControllerOutput {
-    
-    // Implement methods
-    
+    func onEmailSent() {
+        isUserInteractionEnabled = true
+        guard !sendButton.isNil, let indicator = sendButton.subviews.filter({ $0.isKind(of: UIActivityIndicatorView.self)}).first as? UIActivityIndicatorView else { return }
+        UIView.animate(withDuration: 0.2) {
+            indicator.alpha = 0
+        } completion: { _ in
+            self.isUserInteractionEnabled = true
+            indicator.removeFromSuperview()
+            self.sendButton.setTitle(#keyPath(RecoverView.sendButton).localized, for: .normal)
+        }
+    }
 }
 
 // MARK: - UI Setup
@@ -151,7 +168,8 @@ extension RecoverView: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        checkTextField(sender: textField)
+        guard let tf = textField as? UnderlinedSignTextField else { return }
+        tf.hideSign()
     }
     
     private func checkTextField(sender: UITextField) {

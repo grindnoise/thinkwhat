@@ -10,6 +10,11 @@ import UIKit
 
 class CustomNavigationController: UINavigationController {
     
+    deinit {
+        print("CustomNavigationController deinit")
+        viewControllers.removeAll()
+    }
+    
     enum TransitionStyle {
         case Default, Auth
         

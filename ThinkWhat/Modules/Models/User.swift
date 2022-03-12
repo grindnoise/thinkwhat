@@ -19,8 +19,8 @@ class Userprofiles {
     var all: [Userprofile] = []
     var current: Userprofile? {
         didSet {
-            guard shouldImportUserDefaults else { return }
-//            UserDefaults.Profile.load(from: current)
+            guard shouldImportUserDefaults, !current.isNil else { return }
+            UserDefaults.Profile.load(from: current!)
         }
     }
 //    lazy var current: Userprofile {
@@ -44,7 +44,7 @@ class Userprofiles {
 
 class Userprofile: Decodable {
     private enum CodingKeys: String, CodingKey {
-        case id, age, gender, email, username,
+        case id, age, gender, email, username, city,
              isBanned = "is_banned",
              birthDate = "birth_date",
              firstName = "first_name",
@@ -84,6 +84,7 @@ class Userprofile: Decodable {
     var tiktokURL:          URL?
     var vkURL:              URL?
     var facebookURL:        URL?
+    var city:               City?
     var image:              UIImage? {
         didSet {
             guard let imageData = image?.jpeg else { return }
@@ -158,7 +159,9 @@ class Userprofile: Decodable {
             lastName            = try container.decode(String.self, forKey: .lastName)
             email               = try container.decode(String.self, forKey: .email)
             lastVisit           = try container.decode(Date.self, forKey: .lastVisit)
-            birthDate           = try container.decodeIfPresent(Date.self, forKey: .birthDate)
+            if let _birthDate   = try container.decodeIfPresent(String.self, forKey: .birthDate) {
+                birthDate = _birthDate.toDate()
+            }
             imageURL            = URL(string: try container.decodeIfPresent(String.self, forKey: .imageURL) ?? "")
             favoritesTotal      = try container.decode(Int.self, forKey: .favoritesTotal)
             completeTotal       = try container.decode(Int.self, forKey: .completeTotal)
@@ -170,6 +173,10 @@ class Userprofile: Decodable {
             wasEdited           = try container.decodeIfPresent(Bool.self, forKey: .wasEdited)
             isBanned            = try container.decode(Bool.self, forKey: .isBanned)
             gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
+            ///City decoding
+            if let cityInstance = try container.decodeIfPresent(City.self, forKey: .city) {
+                city = Cities.shared.all.filter({ $0 == cityInstance }).first ?? cityInstance
+            }
             topPublicationCategories.removeAll()
             let topics          = try container.decode([String: Int].self, forKey: .topPublicationCategories)
             topics.forEach { dict in

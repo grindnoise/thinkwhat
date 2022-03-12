@@ -17,7 +17,7 @@ import UserNotifications
 
 typealias Closure = (()->())
 
-var localhost = false
+var localhost = true
 
 let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()

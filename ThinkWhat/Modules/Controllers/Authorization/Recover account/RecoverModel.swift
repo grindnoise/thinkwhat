@@ -15,5 +15,17 @@ class RecoverModel {
 
 // MARK: - Controller Input
 extension RecoverModel: RecoverControllerInput {
-    // Implement methods
+    func sendEmail(_ email: String) {
+        Task {
+            do {
+                try await API.shared.sendPasswordResetLink(email)
+                await modelOutput?.onEmailSent(.success(true))
+            } catch {
+#if DEBUG
+                print(error.localizedDescription)
+#endif
+                await modelOutput?.onEmailSent(.failure(error))
+            }
+        }
+    }
 }

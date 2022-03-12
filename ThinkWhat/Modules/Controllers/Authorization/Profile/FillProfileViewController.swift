@@ -25,6 +25,7 @@ class FillProfileViewController: UIViewController, UINavigationControllerDelegat
             .modelOutput = self
         
         title = "profile_fill".localized
+        navigationItem.setHidesBackButton(true, animated: false)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -48,6 +49,14 @@ class FillProfileViewController: UIViewController, UINavigationControllerDelegat
 
 // MARK: - View Input
 extension FillProfileViewController: FillUserViewInput {
+    func onCitySelected(_ city: City) {
+        controllerInput?.saveCity(city)
+    }
+    
+    func updateUserprofile(image: UIImage?, firstName: String, lastName: String, gender: Gender, birthDate: String?, city: City?, vkID: String?, vkURL: String?, facebookID: String?, facebookURL: String?) {
+        controllerInput?.updateUserprofile(image: image, firstName: firstName, lastName: lastName, gender: gender, birthDate: birthDate, city: city, vkID: vkID, vkURL: vkURL, facebookID: facebookID, facebookURL: facebookURL)
+    }
+    
     func onImageTap() {
             imagePicker.allowsEditing = true
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertController.Style.actionSheet)//UIAlertController(title: "Выберите источник", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
@@ -113,6 +122,31 @@ extension FillProfileViewController: FillUserViewInput {
 
 // MARK: - Model Output
 extension FillProfileViewController: FillUserModelOutput {
+    func onUpdateProfileComplete(_ result: Result<Bool, Error>) {
+        Task {
+            await MainActor.run {
+                switch result {
+                case .success:
+//                    let backItem = UIBarButtonItem()
+//                    backItem.title = ""
+//                    navigationItem.backBarButtonItem = backItem
+//                    navigationItem.setHidesBackButton(true, animated: true)
+                    navigationController?
+                        .pushViewController(MainController(),
+                                            animated: true)
+                case .failure(let error):
+                    let alert = UIAlertController(title: NSLocalizedString("error",comment: ""),
+                                                  message: NSLocalizedString("backend_error", comment: ""),
+                                                  preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""),
+                                                  style: .default))
+                    present(alert, animated: true)
+                    controllerOutput?.onUpdateProfileCompleteWithError()
+                }
+            }
+        }
+    }
+    
     func onFetchCityComplete(_ cities: [City]) {
         Task {
             await MainActor.run {
@@ -134,24 +168,24 @@ extension FillProfileViewController: UIImagePickerControllerDelegate {
             
             controllerOutput?.onAvatarChange(UIImage(data: imageData!)!)
             
-            guard let  url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + String(describing: UserDefaults.Profile.id) + "/") else { return }
-            let multipartFormData = MultipartFormData()
-            multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id)).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
-            
-            API.shared.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData) { progress in
-                print(progress)
-            } completion: { result in
-                switch result {
-                case .success:
-                    do {
-                        UserDefaults.Profile.imagePath = try FileIOController.write(data: imageData!, toPath: .Profiles, ofType: .Images, id: String(UserDefaults.Profile.id!), toDocumentNamed: "profile\(NSData(data: imageData!).fileFormat)").absoluteString
-                    } catch {
-                        showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка при загрузке изображения: \(error.localizedDescription)")
-                    }
-                case .failure(let error):
-                    showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка при загрузке изображения: \(error.localizedDescription)")
-                }
-            }
+//            guard let  url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + String(describing: UserDefaults.Profile.id) + "/") else { return }
+//            let multipartFormData = MultipartFormData()
+//            multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id)).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
+//
+//            API.shared.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData) { progress in
+//                print(progress)
+//            } completion: { result in
+//                switch result {
+//                case .success:
+//                    do {
+//                        UserDefaults.Profile.imagePath = try FileIOController.write(data: imageData!, toPath: .Profiles, ofType: .Images, id: String(UserDefaults.Profile.id!), toDocumentNamed: "profile\(NSData(data: imageData!).fileFormat)").absoluteString
+//                    } catch {
+//                        showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка при загрузке изображения: \(error.localizedDescription)")
+//                    }
+//                case .failure(let error):
+//                    showAlert(type: .Ok, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: "Ошибка при загрузке изображения: \(error.localizedDescription)")
+//                }
+//            }
             dismiss(animated: true)
         }
     }

@@ -15,8 +15,7 @@ protocol RecoverViewInput: class {
     
     var controllerOutput: RecoverControllerOutput? { get set }
     var controllerInput: RecoverControllerInput? { get set }
-    
-    // View input methods here
+    func sendEmail(_: String)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -25,15 +24,14 @@ protocol RecoverViewInput: class {
 protocol RecoverControllerInput: class {
     
     var modelOutput: RecoverModelOutput? { get set }
-    
-    // Controller input methods here
+    func sendEmail(_: String)
 }
 
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
 protocol RecoverModelOutput: class {
-    // Model output methods here
+    @MainActor func onEmailSent(_: Result<Bool, Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -41,6 +39,5 @@ protocol RecoverModelOutput: class {
 /// **View** conforms to this protocol
 protocol RecoverControllerOutput: class {
     var viewInput: RecoverViewInput? { get set }
-    
-    // Controller output methods here
+    func onEmailSent()
 }

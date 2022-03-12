@@ -17,6 +17,61 @@ class FillUserModel {
 
 // MARK: - Controller Input
 extension FillUserModel: FillUserControllerInput {
+    func saveCity(_ city: City) {
+        Task {
+            do {
+                let data = try await GeoNamesWorker.getByGeonameId(city.geonameID)
+                guard let dict = JSON(data).dictionaryObject else { return }
+#if DEBUG
+                print(dict)
+#endif
+                city.id = try await API.shared.saveCity(dict)
+            } catch {
+#if DEBUG
+                print(error)
+#endif
+            }
+        }
+    }
+    
+    func updateUserprofile(image: UIImage?, firstName: String, lastName: String, gender: Gender, birthDate: String?, city: City?, vkID: String?, vkURL: String?, facebookID: String?, facebookURL: String?) {
+        Task {
+            do {
+                let parameters = API.prepareUserData(firstName: firstName,
+                                                     lastName: lastName,
+                                                     email: nil,
+                                                     gender: gender,
+                                                     birthDate: birthDate,
+                                                     city: city,
+                                                     image: image,
+                                                     vkID: vkID,
+                                                     vkURL: vkURL,
+                                                     facebookID: facebookID,
+                                                     facebookURL: facebookURL)
+#if DEBUG
+                    print(parameters)
+#endif
+                let data = try await API.shared.updateUserprofileAsync(data: parameters, uploadProgress: { progress in
+#if DEBUG
+                    print(progress)
+#endif
+                })
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: data)
+                Userprofiles.shared.current?.image = image
+                modelOutput?.onUpdateProfileComplete(.success(true))
+            } catch {
+#if DEBUG
+                print(error)
+#endif
+                modelOutput?.onUpdateProfileComplete(.failure(error))
+            }
+        }
+    }
+    
     func fetchCity(_ name: String) async {
         var cities = [City]()
         do {
@@ -37,10 +92,6 @@ extension FillUserModel: FillUserControllerInput {
         } catch {
             modelOutput?.onFetchCityError(error)
         }
-    }
-    
-    func saveData() {
-        
     }
     
     func validateHyperlink(socialMedia: SocialMedia, hyperlink: String) throws {

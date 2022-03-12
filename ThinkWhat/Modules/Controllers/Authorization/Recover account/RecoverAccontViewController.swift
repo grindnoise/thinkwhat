@@ -37,11 +37,39 @@ class RecoverAccontViewController: UIViewController {
 
 // MARK: - View Input
 extension RecoverAccontViewController: RecoverViewInput {
-    // Implement methods
+    func sendEmail(_ email: String) {
+        controllerInput?.sendEmail(email)
+    }
 }
 
 // MARK: - Model Output
 extension RecoverAccontViewController: RecoverModelOutput {
-    // Implement methods
+    func onEmailSent(_ result: Result<Bool, Error>) {
+        Task {
+            await MainActor.run {
+                controllerOutput?.onEmailSent()
+            }
+        }
+        switch result {
+        case .success:
+            let alert = UIAlertController(title: NSLocalizedString("success",comment: ""),
+                                          message: NSLocalizedString("email_sent", comment: ""),
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""),
+                                          style: .default))
+            present(alert, animated: true)
+        case .failure(let error):
+            var errorDescription = ""
+            if error.localizedDescription.contains("find an account associated with that email") {
+                errorDescription = "email_not_found"
+            }
+            let alert = UIAlertController(title: NSLocalizedString("warning",comment: ""),
+                                          message: NSLocalizedString(errorDescription, comment: ""),
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""),
+                                          style: .default))
+            present(alert, animated: true)
+        }
+    }
 }
 
