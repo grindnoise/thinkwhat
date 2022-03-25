@@ -40,3 +40,9 @@ extension SubsciptionsController: SubsciptionsViewInput {
 extension SubsciptionsController: SubsciptionsModelOutput {
     // Implement methods
 }
+
+extension SubsciptionsController: DataObservable {
+    func onDataLoaded() {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+}

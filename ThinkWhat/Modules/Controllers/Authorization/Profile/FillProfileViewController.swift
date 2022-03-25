@@ -24,6 +24,7 @@ class FillProfileViewController: UIViewController, UINavigationControllerDelegat
         self.controllerInput?
             .modelOutput = self
         
+        navigationController?.setNavigationBarHidden(false, animated: false)
         title = "profile_fill".localized
         navigationItem.setHidesBackButton(true, animated: false)
     }
@@ -131,6 +132,7 @@ extension FillProfileViewController: FillUserModelOutput {
 //                    backItem.title = ""
 //                    navigationItem.backBarButtonItem = backItem
 //                    navigationItem.setHidesBackButton(true, animated: true)
+                    navigationController?.setNavigationBarHidden(true, animated: true)
                     navigationController?
                         .pushViewController(MainController(),
                                             animated: true)

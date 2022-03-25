@@ -22,6 +22,8 @@
 "save" = "Сохранить";
 "camera" = "Camera";
 "photo_album" = "Photos";
+"api_unavailable" = "Server is currently unavailable, try again later";
+"retry" = "Retry";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";
@@ -67,7 +69,7 @@
 "email_not_found" = "We couldn't find an account associated with that email. Please try a different e-mail address";
 
 //Recover VC
-"profile_fill" = "Your profile";
+"profile_fill" = "Fill in profile";
 
 //FillProfile VC
 "firstNameTF" = "First Name";

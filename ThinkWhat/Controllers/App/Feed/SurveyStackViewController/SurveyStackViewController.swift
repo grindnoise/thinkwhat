@@ -10,17 +10,17 @@ import UIKit
 
 class SurveyStackViewController: UIViewController {
     
-    var isPause = false
+    var isMakingStackPaused = false
     var delegate: SurveysViewController!
     var surveyPreview: SurveyPreview!
 //    fileprivate var isRequesting = false //Don't overlap requests
     fileprivate var isFirstAppearance = true
-    fileprivate var removePreview:  SurveyPreview!
-    fileprivate var nextPreview:    SurveyPreview?
+    fileprivate var removePreview: SurveyPreview!
+    fileprivate var nextSurveyPreview: SurveyPreview?
     fileprivate var timer:          Timer?
 //    fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
     fileprivate lazy var loadingView: EmptySurvey = self.createLoadingView()
-    fileprivate var previewSurveys: [Survey] = []
+    fileprivate var surveyStack: [Survey] = []
     fileprivate var isRequestingStack = false
     fileprivate var surveyPreviewInitialRect = CGRect.zero
     fileprivate var surveyPreviewCurrentCenter = CGPoint.zero
@@ -52,7 +52,7 @@ class SurveyStackViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        isPause = false
+        isMakingStackPaused = false
         delay(seconds: 0.2) {
             self.generatePreviews()
         }
@@ -72,12 +72,12 @@ class SurveyStackViewController: UIViewController {
     }
     
     @objc fileprivate func generatePreviews() {
-        if !isPause {
+        if !isMakingStackPaused {
             if surveyPreview == nil {
                 if let _nextPreview = createSurveyPreview() {
                     stopTimer()
-                    nextPreview = _nextPreview
-                    nextSurvey(nextPreview!)
+                    nextSurveyPreview = _nextPreview
+                    nextSurvey(nextSurveyPreview!)
                 } else {
                     loadingView.setEnabled(true) { _ in }
                 }
@@ -89,10 +89,10 @@ class SurveyStackViewController: UIViewController {
         if !Surveys.shared.hot.isEmpty {
 //            if let survey = Surveys.shared.stackObjects.remove(at: 0) as? FullSurvey {
             
-            if let survey = Surveys.shared.hot.filter({$0 != self.previewSurveys.map({$0}).last}).first {//Set(Surveys.shared.stackObjects).symmetricDifference(Set(previewSurveys)).first {//zip(Surveys.shared.stackObjects, previewSurveys).filter({ $0.0.hashValue != $0.1.hashValue}).fir {//Surveys.shared.stackObjects.//.filter({$0.hashValue != self.previewSurveys.map({$0.hashValue}).f}).first {
+            if let survey = Surveys.shared.hot.filter({$0 != self.surveyStack.map({$0}).last}).first {//Set(Surveys.shared.stackObjects).symmetricDifference(Set(previewSurveys)).first {//zip(Surveys.shared.stackObjects, previewSurveys).filter({ $0.0.hashValue != $0.1.hashValue}).fir {//Surveys.shared.stackObjects.//.filter({$0.hashValue != self.previewSurveys.map({$0.hashValue}).f}).first {
 //                previewSurveys.addUnique(object: survey)
-                if previewSurveys.filter({ $0.hashValue == survey.hashValue }).isEmpty {
-                    previewSurveys.append(survey)
+                if surveyStack.filter({ $0.hashValue == survey.hashValue }).isEmpty {
+                    surveyStack.append(survey)
                 }
                 if surveyPreviewInitialRect == .zero {
                     let multiplier: CGFloat = 0.93
@@ -146,7 +146,7 @@ class SurveyStackViewController: UIViewController {
                     if userprofile.image != nil {
                         _surveyPreview.userImage.image = userprofile.image!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED)
                     } else {
-                        let postImageNotification = self.nextPreview === _surveyPreview//Notify only if current preview is on screen
+                        let postImageNotification = self.nextSurveyPreview === _surveyPreview//Notify only if current preview is on screen
                         _surveyPreview.userImage.image = UIImage(named: "user")!.circularImage(size: _surveyPreview.userImage.frame.size, frameColor: K_COLOR_RED)
                         guard let url = userprofile.imageURL else { return _surveyPreview }
                         API.shared.downloadImage(url: url) { progress in
@@ -215,9 +215,9 @@ class SurveyStackViewController: UIViewController {
                 }
                 
                 if let _nextPreview = self.createSurveyPreview() {
-                    self.nextPreview = _nextPreview
+                    self.nextSurveyPreview = _nextPreview
                 } else {
-                    self.nextPreview = nil
+                    self.nextSurveyPreview = nil
                 }
             }
         }
@@ -308,7 +308,7 @@ extension SurveyStackViewController: CallbackDelegate {
                     }
                 }
                 removePreview = surveyPreview
-                nextSurvey(nextPreview)
+                nextSurvey(nextSurveyPreview)
             }
 //            } else if accessibilityIdentifier == "Next" {
 //                removePreview = surveyPreview
@@ -317,19 +317,19 @@ extension SurveyStackViewController: CallbackDelegate {
         } else if sender is Userprofile {
             delegate.performSegue(withIdentifier: Segues.App.FeedToUser, sender: sender)
         } else if let _view = sender as? EmptySurvey  {
-            isPause = true
+            isMakingStackPaused = true
             _view.startingPoint = view.convert(_view.createButton.center, to: tabBarController?.view)
 
             delegate.performSegue(withIdentifier: Segues.App.FeedToNewSurvey, sender: _view)
         } else if sender is Claim { //Claim
             removePreview = surveyPreview
             delay(seconds: 0.5) {
-                self.nextSurvey(self.nextPreview)
+                self.nextSurvey(self.nextSurveyPreview)
             }
         } else if sender is Survey { //Voted
             delay(seconds: 0.4) {
                 self.removePreview = self.surveyPreview
-                self.nextSurvey(self.nextPreview)
+                self.nextSurvey(self.nextSurveyPreview)
             }
         }
     }

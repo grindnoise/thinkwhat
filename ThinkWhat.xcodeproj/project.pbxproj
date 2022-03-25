@@ -91,7 +91,7 @@
 		AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67EA223FBB6600B57580 /* LaunchScreen.storyboard */; };
 		AB3C67F7223FBB6600B57580 /* ThinkWhatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67F6223FBB6600B57580 /* ThinkWhatTests.swift */; };
 		AB3C6802223FBB6600B57580 /* ThinkWhatUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6801223FBB6600B57580 /* ThinkWhatUITests.swift */; };
-		AB3C6812223FC71600B57580 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6811223FC71600B57580 /* Main.swift */; };
+		AB3C6812223FC71600B57580 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6811223FC71600B57580 /* Constants.swift */; };
 		AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */; };
 		AB3C681B223FD04500B57580 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6817223FD04500B57580 /* Animations.swift */; };
 		AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6818223FD04500B57580 /* SMSResponse.swift */; };
@@ -182,7 +182,6 @@
 		AB72961627DA3F2300D45B54 /* SubsciptionsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961427DA3F2300D45B54 /* SubsciptionsController.swift */; };
 		AB72961727DA3F2300D45B54 /* SubsciptionsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB72961527DA3F2300D45B54 /* SubsciptionsController.xib */; };
 		AB72961C27DA3F2C00D45B54 /* SubsciptionsContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961827DA3F2C00D45B54 /* SubsciptionsContract.swift */; };
-		AB72961D27DA3F2C00D45B54 /* SubsciptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961927DA3F2C00D45B54 /* SubsciptionsViewController.swift */; };
 		AB72961E27DA3F2C00D45B54 /* SubsciptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961A27DA3F2C00D45B54 /* SubsciptionsView.swift */; };
 		AB72961F27DA3F2C00D45B54 /* SubsciptionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961B27DA3F2C00D45B54 /* SubsciptionsModel.swift */; };
 		AB72962127DA418700D45B54 /* SubsciptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB72962027DA418700D45B54 /* SubsciptionsView.xib */; };
@@ -287,6 +286,14 @@
 		ABA282EA274FC8A100ED583F /* VotersFilterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA282E8274FC8A100ED583F /* VotersFilterController.swift */; };
 		ABA282ED274FD16800ED583F /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA282EC274FD16700ED583F /* RangeSlider.swift */; };
 		ABA282F0274FD93E00ED583F /* RangeSliderTrackLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA282EF274FD93E00ED583F /* RangeSliderTrackLayer.swift */; };
+		ABA448D427E331B000F8E00D /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA448D327E331B000F8E00D /* UIView.swift */; };
+		ABA448D727E46F2A00F8E00D /* CardView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABA448D627E46F2A00F8E00D /* CardView.xib */; };
+		ABA448D927E46F3B00F8E00D /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA448D827E46F3B00F8E00D /* CardView.swift */; };
+		ABA448DC27E8747700F8E00D /* Star.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA448DB27E8747700F8E00D /* Star.swift */; };
+		ABA448DF27E874BD00F8E00D /* StarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABA448DD27E874BD00F8E00D /* StarView.xib */; };
+		ABA448E027E874BD00F8E00D /* StarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA448DE27E874BD00F8E00D /* StarView.swift */; };
+		ABA448E327EC627D00F8E00D /* APIUnavailableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA448E227EC627D00F8E00D /* APIUnavailableView.swift */; };
+		ABA448E527EC62DC00F8E00D /* APIUnavailableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABA448E427EC62DC00F8E00D /* APIUnavailableView.xib */; };
 		ABA6B3B223FD1A8D00335074 /* LoadingTextIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B3B123FD1A8D00335074 /* LoadingTextIndicator.swift */; };
 		ABA6E18822FACAA200F8F39A /* ValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */; };
 		ABAEEE5A27A5D4A100E4EF29 /* VKDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABAEEE5927A5D4A100E4EF29 /* VKDelegate.swift */; };
@@ -334,6 +341,7 @@
 		ABDAE152258211D5007DD188 /* 3_VotesCountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDAE151258211D5007DD188 /* 3_VotesCountViewController.swift */; };
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
+		ABE000B227E0855300B6B4CB /* DataObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE000B127E0855300B6B4CB /* DataObservable.swift */; };
 		ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE43694251C7FD300C1428D /* CustomSwitch.swift */; };
 		ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */; };
 		ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */; };
@@ -464,7 +472,7 @@
 		AB3C67FD223FBB6600B57580 /* ThinkWhatUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ThinkWhatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C6801223FBB6600B57580 /* ThinkWhatUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkWhatUITests.swift; sourceTree = "<group>"; };
 		AB3C6803223FBB6600B57580 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AB3C6811223FC71600B57580 /* Main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
+		AB3C6811223FC71600B57580 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		AB3C6815223FCE3D00B57580 /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
 		AB3C6817223FD04500B57580 /* Animations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3C6818223FD04500B57580 /* SMSResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMSResponse.swift; sourceTree = "<group>"; };
@@ -556,7 +564,6 @@
 		AB72961427DA3F2300D45B54 /* SubsciptionsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsciptionsController.swift; sourceTree = "<group>"; };
 		AB72961527DA3F2300D45B54 /* SubsciptionsController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SubsciptionsController.xib; sourceTree = "<group>"; };
 		AB72961827DA3F2C00D45B54 /* SubsciptionsContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsciptionsContract.swift; sourceTree = "<group>"; };
-		AB72961927DA3F2C00D45B54 /* SubsciptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsciptionsViewController.swift; sourceTree = "<group>"; };
 		AB72961A27DA3F2C00D45B54 /* SubsciptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsciptionsView.swift; sourceTree = "<group>"; };
 		AB72961B27DA3F2C00D45B54 /* SubsciptionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsciptionsModel.swift; sourceTree = "<group>"; };
 		AB72962027DA418700D45B54 /* SubsciptionsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SubsciptionsView.xib; sourceTree = "<group>"; };
@@ -664,6 +671,14 @@
 		ABA282E8274FC8A100ED583F /* VotersFilterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotersFilterController.swift; sourceTree = "<group>"; };
 		ABA282EC274FD16700ED583F /* RangeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
 		ABA282EF274FD93E00ED583F /* RangeSliderTrackLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSliderTrackLayer.swift; sourceTree = "<group>"; };
+		ABA448D327E331B000F8E00D /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
+		ABA448D627E46F2A00F8E00D /* CardView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CardView.xib; sourceTree = "<group>"; };
+		ABA448D827E46F3B00F8E00D /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		ABA448DB27E8747700F8E00D /* Star.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Star.swift; sourceTree = "<group>"; };
+		ABA448DD27E874BD00F8E00D /* StarView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StarView.xib; sourceTree = "<group>"; };
+		ABA448DE27E874BD00F8E00D /* StarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarView.swift; sourceTree = "<group>"; };
+		ABA448E227EC627D00F8E00D /* APIUnavailableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIUnavailableView.swift; sourceTree = "<group>"; };
+		ABA448E427EC62DC00F8E00D /* APIUnavailableView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = APIUnavailableView.xib; sourceTree = "<group>"; };
 		ABA6B3B123FD1A8D00335074 /* LoadingTextIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingTextIndicator.swift; sourceTree = "<group>"; };
 		ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidationViewController.swift; sourceTree = "<group>"; };
 		ABAEEE5927A5D4A100E4EF29 /* VKDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKDelegate.swift; sourceTree = "<group>"; };
@@ -711,6 +726,7 @@
 		ABDAE151258211D5007DD188 /* 3_VotesCountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 3_VotesCountViewController.swift; sourceTree = "<group>"; };
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
+		ABE000B127E0855300B6B4CB /* DataObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataObservable.swift; sourceTree = "<group>"; };
 		ABE43694251C7FD300C1428D /* CustomSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSwitch.swift; sourceTree = "<group>"; };
 		ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcLabel.swift; sourceTree = "<group>"; };
 		ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditingListTableViewController.swift; sourceTree = "<group>"; };
@@ -811,6 +827,7 @@
 		AB0AB63327B4E346006FD33F /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				AB3C6811223FC71600B57580 /* Constants.swift */,
 				AB10030B27BF760400338EE4 /* Extensions */,
 				AB309C7827ADB4E1005BBCB4 /* UserDefaults.swift */,
 				AB3C6819223FD04500B57580 /* KeychainService.swift */,
@@ -838,6 +855,7 @@
 			children = (
 				AB10030927BEB83E00338EE4 /* Localizable.swift */,
 				AB463FAF27C1378D007D7240 /* KeyboardObservable.swift */,
+				ABE000B127E0855300B6B4CB /* DataObservable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -849,6 +867,7 @@
 				AB8F28AF27C0DEEB008E4ED0 /* Constraints.swift */,
 				AB3C681A223FD04500B57580 /* Extensions.swift */,
 				AB10030C27BF762400338EE4 /* String.swift */,
+				ABA448D327E331B000F8E00D /* UIView.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1109,7 +1128,6 @@
 				AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */,
 				AB3C6817223FD04500B57580 /* Animations.swift */,
 				AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */,
-				AB3C6811223FC71600B57580 /* Main.swift */,
 				AB3C682C223FD3C300B57580 /* QC.swift */,
 				AB3C6858223FD74C00B57580 /* Reachability.swift */,
 				AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */,
@@ -1363,12 +1381,12 @@
 		AB7295FF27DA06BD00D45B54 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				ABA448E127EC623B00F8E00D /* MainController */,
 				AB72964027DB60B400D45B54 /* Settings */,
 				AB72963127DB5ED800D45B54 /* Topics */,
 				AB72962227DB54D000D45B54 /* List */,
 				AB72961327DA3EE500D45B54 /* Subscriptions */,
 				AB72960427DA2EA300D45B54 /* Hot */,
-				AB72960027DA096200D45B54 /* MainController.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -1376,6 +1394,7 @@
 		AB72960427DA2EA300D45B54 /* Hot */ = {
 			isa = PBXGroup;
 			children = (
+				ABA448D527E46F0C00F8E00D /* Card */,
 				AB72960527DA2EE600D45B54 /* HotController.swift */,
 				AB72960627DA2EE600D45B54 /* HotController.xib */,
 				AB72960927DA2F0F00D45B54 /* HotContract.swift */,
@@ -1392,7 +1411,6 @@
 				AB72961427DA3F2300D45B54 /* SubsciptionsController.swift */,
 				AB72961527DA3F2300D45B54 /* SubsciptionsController.xib */,
 				AB72961827DA3F2C00D45B54 /* SubsciptionsContract.swift */,
-				AB72961927DA3F2C00D45B54 /* SubsciptionsViewController.swift */,
 				AB72961A27DA3F2C00D45B54 /* SubsciptionsView.swift */,
 				AB72961B27DA3F2C00D45B54 /* SubsciptionsModel.swift */,
 				AB72962027DA418700D45B54 /* SubsciptionsView.xib */,
@@ -1704,6 +1722,36 @@
 				ABA282EF274FD93E00ED583F /* RangeSliderTrackLayer.swift */,
 			);
 			path = RangeSlider;
+			sourceTree = "<group>";
+		};
+		ABA448D527E46F0C00F8E00D /* Card */ = {
+			isa = PBXGroup;
+			children = (
+				ABA448DA27E8742E00F8E00D /* UI */,
+				ABA448D627E46F2A00F8E00D /* CardView.xib */,
+				ABA448D827E46F3B00F8E00D /* CardView.swift */,
+			);
+			path = Card;
+			sourceTree = "<group>";
+		};
+		ABA448DA27E8742E00F8E00D /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				ABA448DE27E874BD00F8E00D /* StarView.swift */,
+				ABA448DD27E874BD00F8E00D /* StarView.xib */,
+				ABA448DB27E8747700F8E00D /* Star.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		ABA448E127EC623B00F8E00D /* MainController */ = {
+			isa = PBXGroup;
+			children = (
+				AB72960027DA096200D45B54 /* MainController.swift */,
+				ABA448E227EC627D00F8E00D /* APIUnavailableView.swift */,
+				ABA448E427EC62DC00F8E00D /* APIUnavailableView.xib */,
+			);
+			path = MainController;
 			sourceTree = "<group>";
 		};
 		ABA6B3B023FD1A6000335074 /* LoadingTextIndicator */ = {
@@ -2037,6 +2085,7 @@
 				AB98307F27B68B63002C5132 /* LoginView.xib in Resources */,
 				ABBA1989242B430100F11E0D /* AnswerHeaderCell.xib in Resources */,
 				AB0AB64027B506C6006FD33F /* AgreementView.xib in Resources */,
+				ABA448D727E46F2A00F8E00D /* CardView.xib in Resources */,
 				AB98306E27B54CB2002C5132 /* terms_conditions.html in Resources */,
 				AB3C6865223FDC5200B57580 /* Root.storyboard in Resources */,
 				ABB4AAA8266630D200D4738D /* NewSurveyTitle.xib in Resources */,
@@ -2060,6 +2109,7 @@
 				AB10031427BFAF2F00338EE4 /* FillProfileViewController.xib in Resources */,
 				AB3C6826223FD1E900B57580 /* CustomAlertView.xib in Resources */,
 				AB72961727DA3F2300D45B54 /* SubsciptionsController.xib in Resources */,
+				ABA448E527EC62DC00F8E00D /* APIUnavailableView.xib in Resources */,
 				AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */,
 				AB98308427B935DA002C5132 /* RecoverAccontViewController.xib in Resources */,
 				AB2C03D32440A61C001BFD75 /* LostConnectionView.xib in Resources */,
@@ -2068,6 +2118,7 @@
 				AB334FC3270C6F0400DD7332 /* Alert.xib in Resources */,
 				AB217964275797F700D19567 /* InterestCollectionCell.xib in Resources */,
 				AB3C6851223FD3EF00B57580 /* OpenSans-ExtraBoldItalic.ttf in Resources */,
+				ABA448DF27E874BD00F8E00D /* StarView.xib in Resources */,
 				AB7AEFB8273BDB1400431E85 /* UserCell.xib in Resources */,
 				AB8C99572486789000BC517B /* SurveyClaimView.xib in Resources */,
 				AB9CADBF25F755B3002AFD19 /* CircleButton.xib in Resources */,
@@ -2257,6 +2308,7 @@
 				AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */,
 				AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */,
 				AB869F2826C53313008353B3 /* PollController.swift in Sources */,
+				ABA448E327EC627D00F8E00D /* APIUnavailableView.swift in Sources */,
 				ABB9E885279EA6510018BB2E /* WelcomeContract.swift in Sources */,
 				AB8238F927A914100061F7C6 /* URLs.swift in Sources */,
 				AB72963D27DB5F0B00D45B54 /* TopicsModel.swift in Sources */,
@@ -2268,6 +2320,7 @@
 				ABBA198B242B915200F11E0D /* SurveyVoteCell.swift in Sources */,
 				ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */,
 				AB1D7BA4248F606200845F1C /* FadeTransition.swift in Sources */,
+				ABA448DC27E8747700F8E00D /* Star.swift in Sources */,
 				AB30A4FB272AAE5500A7DCC0 /* SurveyReference.swift in Sources */,
 				AB6083B72240E77B002C0D7E /* SocialAuthViewController.swift in Sources */,
 				AB2FBD02242A433000344DCC /* CheckBox.swift in Sources */,
@@ -2360,6 +2413,7 @@
 				AB19B6432432282B00999917 /* PercentageLabel.swift in Sources */,
 				AB8FD485241F761F00BB74EF /* SurveyLinkCell.swift in Sources */,
 				AB8DA32E27A15BAD00F92C18 /* Basic.swift in Sources */,
+				ABE000B227E0855300B6B4CB /* DataObservable.swift in Sources */,
 				AB98307427B687CB002C5132 /* LoginViewController.swift in Sources */,
 				AB1D845224EA91D200B75929 /* Topic.swift in Sources */,
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
@@ -2370,6 +2424,7 @@
 				AB463FB927C4D409007D7240 /* City.swift in Sources */,
 				AB72960727DA2EE600D45B54 /* HotController.swift in Sources */,
 				AB7478C52428D0A300317EB6 /* FilmIcon.swift in Sources */,
+				ABA448D427E331B000F8E00D /* UIView.swift in Sources */,
 				AB72964927DB612000D45B54 /* SettingsContract.swift in Sources */,
 				AB463FB027C1378D007D7240 /* KeyboardObservable.swift in Sources */,
 				AB72963C27DB5F0B00D45B54 /* TopicsView.swift in Sources */,
@@ -2419,6 +2474,7 @@
 				AB48B90624348CDC00A27B0D /* SurveyTotalCell.swift in Sources */,
 				AB98308C27B9385B002C5132 /* RecoverModel.swift in Sources */,
 				AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */,
+				ABA448E027E874BD00F8E00D /* StarView.swift in Sources */,
 				AB229D842464512500968D52 /* del_Segues.swift in Sources */,
 				AB98307D27B68811002C5132 /* LoginModel.swift in Sources */,
 				AB988A9E254811AB00E3C39A /* NewPollController.swift in Sources */,
@@ -2437,11 +2493,12 @@
 				AB791D80243B31040085E00E /* VoteCompletionView.swift in Sources */,
 				AB98307C27B68811002C5132 /* LoginView.swift in Sources */,
 				ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */,
-				AB3C6812223FC71600B57580 /* Main.swift in Sources */,
+				AB3C6812223FC71600B57580 /* Constants.swift in Sources */,
 				AB10031927BFBBDE00338EE4 /* FillUserContract.swift in Sources */,
 				AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */,
 				ABB8B1912423D11600E8DFF3 /* Slide.swift in Sources */,
 				AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */,
+				ABA448D927E46F3B00F8E00D /* CardView.swift in Sources */,
 				AB72962527DB5A6100D45B54 /* ListController.swift in Sources */,
 				AB21795B27577ED300D19567 /* InterestCell.swift in Sources */,
 				ABF20FB624C993D60092B223 /* UserVotesCell.swift in Sources */,
@@ -2458,7 +2515,6 @@
 				AB7478BF2428951F00317EB6 /* CircularIndicatorImageView.swift in Sources */,
 				AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */,
 				ABF20FB824C994250092B223 /* UserSurveysCell.swift in Sources */,
-				AB72961D27DA3F2C00D45B54 /* SubsciptionsViewController.swift in Sources */,
 				ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */,
 				AB32DA3D25D56138007AFF05 /* TextInputViewController.swift in Sources */,
 				AB238D1E279058A0009E49C2 /* AppData.swift in Sources */,

@@ -10,10 +10,10 @@ import UIKit
 import SwiftyJSON
 
 class Userprofiles {
+
     private var shouldImportUserDefaults = false
     static let shared = Userprofiles()
     private init() {
-        
         shouldImportUserDefaults = true
     }
     var all: [Userprofile] = []
@@ -84,7 +84,14 @@ class Userprofile: Decodable {
     var tiktokURL:          URL?
     var vkURL:              URL?
     var facebookURL:        URL?
-    var city:               City?
+    var city:               City? {
+        didSet {
+            if !city.isNil {
+                cityTitle = city!.localized
+            }
+        }
+    }
+    var cityTitle:          String?
     var image:              UIImage? {
         didSet {
             guard let imageData = image?.jpeg else { return }
@@ -107,7 +114,7 @@ class Userprofile: Decodable {
     var lastVisit:          Date
     var wasEdited:          Bool?
     var isBanned:           Bool
-    var balance:            Int
+    var balance:            Int = 0
     var hashValue: Int {
         return ObjectIdentifier(self).hashValue
     }
@@ -147,8 +154,51 @@ class Userprofile: Decodable {
 //        tiktokURL = _tiktokURL
 //        facebookURL = _facebookURL
 //        vkURL = _vkURL
-//        lastVisit = Date()
-//    }
+    //        lastVisit = Date()
+    //    }
+    init?() {
+        guard let _id = UserDefaults.Profile.id,
+        let _firstName = UserDefaults.Profile.firstName,
+            let _lastName = UserDefaults.Profile.lastName,
+            let _email = UserDefaults.Profile.email,
+            let _gender = UserDefaults.Profile.gender,
+            let _isBanned = UserDefaults.Profile.isBanned else {
+                return nil
+            }
+        lastVisit   = Date()
+        id          = _id
+        firstName   = _firstName
+        lastName    = _lastName
+        email       = _email
+        gender      = _gender
+        isBanned    = _isBanned
+        imageURL    = UserDefaults.Profile.imageURL
+        if let path = UserDefaults.Profile.imagePath, let _image = UIImage(contentsOfFile: path) {
+            image = _image
+        } else {
+            if let url = imageURL {
+                Task {
+                    image = try await API.shared.downloadImageAsync(from: url)
+                }
+//                API.shared.downloadImage(url: url) { _ in } completion: { result in
+//                    switch result {
+//                    case .success(let _image):
+//                        self.image = _image
+//                    case .failure(let error):
+//#if DEBUG
+//                        print(error.localizedDescription)
+//#endif
+//                    }
+//                }
+            }
+        }
+        cityTitle       = UserDefaults.Profile.city
+        birthDate       = UserDefaults.Profile.birthDate
+        instagramURL    = UserDefaults.Profile.instagramURL
+        tiktokURL       = UserDefaults.Profile.tiktokURL
+        vkURL           = UserDefaults.Profile.vkURL
+        facebookURL     = UserDefaults.Profile.facebookURL
+    }
     
     required init(from decoder: Decoder) throws {
         do {
@@ -174,7 +224,7 @@ class Userprofile: Decodable {
             isBanned            = try container.decode(Bool.self, forKey: .isBanned)
             gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
             ///City decoding
-            if let cityInstance = try container.decodeIfPresent(City.self, forKey: .city) {
+            if let cityInstance = try? container.decodeIfPresent(City.self, forKey: .city) {
                 city = Cities.shared.all.filter({ $0 == cityInstance }).first ?? cityInstance
             }
             topPublicationCategories.removeAll()

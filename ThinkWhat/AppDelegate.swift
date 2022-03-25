@@ -28,9 +28,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        let controller = MainController()// GetStartedViewController()
+        var rootViewController: UIViewController!
+        do {
+            try UserDefaults.Profile.authorize()
+            rootViewController = MainController()
+        } catch {
+            rootViewController = CustomNavigationController(rootViewController: MainController())
+        }
         window = UIWindow()
-        window?.rootViewController = MainController()//CustomNavigationController(rootViewController: controller)
+        window?.rootViewController = rootViewController
         window?.makeKeyAndVisible()
 //        vkDelegateReference = VKDelegate()
 //        GIDSignIn.sharedInstance.restorePreviousSignIn()

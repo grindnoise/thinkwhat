@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 class HotModel {
     
@@ -15,5 +16,20 @@ class HotModel {
 
 // MARK: - Controller Input
 extension HotModel: HotControllerInput {
-    // Implement methods
+    func loadSurveys() {
+        Task {
+            do {
+                let data = try await API.shared.downloadSurveysAsync(type: .Hot)
+                let json = try JSON(data: data, options: .mutableContainers)
+                print(json)
+                await MainActor.run {
+                    Surveys.shared.load(json)
+                }
+            } catch {
+                #if DEBUG
+                print(error.localizedDescription)
+                #endif
+            }
+        }
+    }
 }

@@ -21,7 +21,8 @@ class HotController: UIViewController {
         self.controllerInput = model
         self.controllerInput?
             .modelOutput = self
-        
+//        navigationController?.setNavigationBarHidden(true, animated: true)
+        addObservers()
 //        title = "hot".localized
 //        navigationController?.isNavigationBarHidden = true
     }
@@ -34,18 +35,93 @@ class HotController: UIViewController {
         controllerOutput?.onDidLayout()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+//        isMakingStackPaused = false
+//        delay(seconds: 0.2) {
+//            self.makePreviewStack()
+//        }
+    }
+    
+    private func addObservers() {
+//        NotificationCenter.default.addObserver(self,
+//                                               selector: #selector(HotController.makePreviewStack),
+//                                               name: Notifications.Surveys.UpdateHotSurveys,
+//                                               object: nil)
+//        NotificationCenter.default.addObserver(self,
+//                                               selector: #selector(SurveyStackViewController.didBecomeActive),
+//                                               name: UIApplication.didBecomeActiveNotification,
+//                                               object: nil)
+    }
+    
     // MARK: - Properties
     var controllerOutput: HotControllerOutput?
     var controllerInput: HotControllerInput?
+//    var surveyStack: [Survey] = []
     private var isViewLayedOut = false
+//    private var isMakingStackPaused = false
+//    private var surveyPreview: SurveyPreview!
+//    private var nextSurveyPreview: SurveyPreview?
+    private var timer: Timer?
+    
 }
 
 // MARK: - View Input
 extension HotController: HotViewInput {
-    // Implement methods
+    func onEmptyStack() {
+        startTimer()
+    }
 }
 
 // MARK: - Model Output
 extension HotController: HotModelOutput {
-    // Implement methods
+    func onSurveysReceived(_: [Survey]) {
+        
+    }
 }
+
+extension HotController: DataObservable {
+    func onDataLoaded() {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        controllerOutput?.onLoad()
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(HotController.makePreviewStack),
+                                               name: Notifications.Surveys.UpdateHotSurveys,
+                                               object: nil)
+//        makePreviewStack()
+    }
+}
+
+// MARK: - Observers
+extension HotController {
+    @objc
+    private func makePreviewStack() {
+        controllerOutput?.onLoad()
+        stopTimer()
+    }
+    
+    private func startTimer() {
+        guard timer == nil else { return }
+        timer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(HotController.requestSurveys), userInfo: nil, repeats: true)
+        timer?.fire()
+    }
+    
+    @objc
+    private func requestSurveys() {
+//        Task {
+//            let data = try await controllerInput?.loadSurveys()
+//            await MainActor.run {
+//                let json = try JSON(data: data, options: .mutableContainers)
+//                //                print(json)
+//                ////                let json = JSON(["hot": nested])
+//                                Surveys.shared.load(json)
+//            }
+//        }
+        controllerInput?.loadSurveys()
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+}
+

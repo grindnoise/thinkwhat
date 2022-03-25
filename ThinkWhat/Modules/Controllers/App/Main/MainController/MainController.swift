@@ -24,6 +24,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
         
         setViewControllers()
         setupUI()
+        loadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -47,6 +48,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
             navigationController.tabBarItem.image = image
             navigationController.tabBarItem.selectedImage = selectedImage
             navigationController.navigationBar.prefersLargeTitles = true
+            navigationController.setNavigationBarHidden(true, animated: false)
             rootViewController.navigationItem.title = title.localized
             return navigationController
         }
@@ -60,11 +62,12 @@ class MainController: UITabBarController {//}, StorageProtocol {
     }
     
     private func setupUI() {
+        view.isUserInteractionEnabled = false
         tabBar.backgroundColor = .systemBackground
         tabBar.tintColor = UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
-                return .systemBlue
+                return .white
             default:
                 return K_COLOR_TABBAR
             }
@@ -77,18 +80,106 @@ class MainController: UITabBarController {//}, StorageProtocol {
         navigationController?.navigationBar.prefersLargeTitles = true
         UITabBar.appearance().barTintColor = .systemBackground
         
+        loadingIndicator = LoadingIndicator()//CGSize(width: view.frame.width, height: container.frame.height)))
+        loadingIndicator!.alpha = 0
+//        loadingIndicator!.layoutCentered(in: view, multiplier: 0.6)
+//        loadingIndicator!.addEnableAnimation()
+        setTabBarVisible(visible: false, animated: false)
 //        rootViewController.navigationItem.title = title
     }
     
+    public func loadData() {
+        if loadingIndicator.isNil || loadingIndicator?.alpha != 1 {
+//            loadingIndicator = LoadingIndicator()//CGSize(width: view.frame.width, height: container.frame.height)))
+            loadingIndicator!.alpha = 1
+            loadingIndicator!.layoutCentered(in: view, multiplier: 0.6)
+            loadingIndicator!.addEnableAnimation()
+        }
+        requestAttempt += 1
+        guard requestAttempt <= MAX_REQUEST_ATTEMPTS else {
+            onServerUnavailable()
+            return
+        }
+        Task {
+            do {
+                try await appLaunch()
+            } catch {
+                loadData()
+            }
+        }
+    }
+    
+    private func onServerUnavailable() {
+        apiUnavailableView = APIUnavailableView(frame: view.frame, delegate: self)
+        apiUnavailableView?.alpha = 0
+        apiUnavailableView?.addEquallyTo(to: view)
+        view.isUserInteractionEnabled = true
+        UIView.animate(withDuration: 0.3, delay: 0.5, options: .curveEaseInOut) {
+            self.loadingIndicator?.alpha = 0
+        } completion: { _ in
+            self.loadingIndicator?.removeAllAnimations()
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                self.apiUnavailableView?.alpha = 1
+            } completion: { _ in
+                self.loadingIndicator?.removeFromSuperview()
+            }
+        }
+        requestAttempt = 0
+    }
+    
+    func appLaunch() async throws {
+        do {
+            let json = try await API.shared.appLaunch()
+            UserDefaults.App.minAPIVersion = json["api_version"].double
+            ModelProperties.shared.importJson(json["field_properties"])
+            PriceList.shared.importJson(json["pricelist"])
+            if let balance = json[DjangoVariables.UserProfile.balance].int {
+                Userprofiles.shared.current!.balance = balance
+            }
+            await MainActor.run {
+                do {
+                    let topics      = try json["categories"].rawData()
+                    let claims      = try json["claim_categories"].rawData()
+                    let surveys     = json["surveys"]
+                    Topics.shared.load(topics)
+                    Claims.shared.load(claims)
+                    Surveys.shared.load(surveys)
+
+                    UIView.animate(withDuration: 0.2, delay: 0.5, options: .curveEaseInOut) {
+                        self.loadingIndicator?.alpha = 0
+                    } completion: { _ in
+                        self.view.isUserInteractionEnabled = true
+                        self.loadingIndicator?.removeAllAnimations()
+                        self.loadingIndicator?.removeFromSuperview()
+                        self.setTabBarVisible(visible: true, animated: true)
+                        self.viewControllers?.forEach {
+                            guard let nav = $0 as? CustomNavigationController, let target = nav.viewControllers.first as? DataObservable else { return }
+                            target.onDataLoaded()
+                        }
+                    }
+                } catch {
+                    print(error.localizedDescription)
+                }
+                requestAttempt = 0
+            }
+        } catch {
+            throw error
+        }
+    }
+
+    
     // MARK: - Properties
-//    private let _delegate = ScrollingTabBarControllerDelegate()
+    private var requestAttempt = 0
+    private var loadingIndicator: LoadingIndicator?
+    private var apiUnavailableView: APIUnavailableView?
+    
+    //    private let _delegate = ScrollingTabBarControllerDelegate()
     
 //    override func present(_ viewControllerToPresent: UIViewController,
 //                          animated flag: Bool,
 //                          completion: (() -> Void)? = nil) {
 //        viewControllerToPresent.modalPresentationStyle = .fullScreen
 //        super.present(viewControllerToPresent, animated: flag, completion: completion)
-//    }
 }
 
 //MARK: -  UITabBarControllerDelegate
@@ -105,6 +196,18 @@ extension MainController: UITabBarControllerDelegate {
         } else if vc.isKind(of: SubsciptionsController.self) {
             navigationController.title = "subscriptions".localized
             vc.navigationItem.title = "subscriptions".localized
+        }
+    }
+}
+
+extension MainController: CallbackDelegate {
+    func callbackReceived(_ sender: Any) {
+        if sender is APIUnavailableView {
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                self.apiUnavailableView?.alpha = 0
+            } completion: { _ in
+                self.loadData()
+            }
         }
     }
 }

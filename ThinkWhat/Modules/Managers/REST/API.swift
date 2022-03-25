@@ -797,10 +797,14 @@ class API {
     
     func downloadSurveys(type: SurveyType, completion: @escaping(Result<JSON, Error>)->()) {
         //TODO: - Add survey type
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else { completion(.failure(APIError.invalidURL)); return }
-        self.request(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { result in
+//        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else { completion(.failure(APIError.invalidURL)); return }
+        self.request(url: type.getURL(), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { result in
             completion(result)
         }
+    }
+    
+    func downloadSurveysAsync(type: SurveyType) async throws -> Data{
+        return try await requestAsync(url: type.getURL(), httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: headers())
     }
     
     func appLaunch() async throws -> JSON {

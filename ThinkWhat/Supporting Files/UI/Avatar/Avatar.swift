@@ -54,18 +54,39 @@ class Avatar: UIView {
             layoutSubviews()
         }
     }
-    
-    private var lightColor = K_COLOR_RED
-    private var darkColor = UIColor.systemBlue
+    public var lightColor = K_COLOR_RED {
+        didSet {
+            border.backgroundColor = UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return self.darkColor
+                default:
+                    return self.lightColor
+                }
+            }
+        }
+    }
+    public var darkColor = UIColor.systemBlue {
+        didSet {
+            border.backgroundColor = UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return self.darkColor
+                default:
+                    return self.lightColor
+                }
+            }
+        }
+    }
     weak var delegate: CallbackDelegate?
     
     private func setupUI() {
         border.backgroundColor = UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
-                return UIColor.systemBlue
+                return self.darkColor
             default:
-                return K_COLOR_RED
+                return self.lightColor
             }
         }
         let touch = UITapGestureRecognizer(target:self, action:#selector(Avatar.handleTap))

@@ -107,6 +107,13 @@ extension UserDefaults {
             }
         }
         
+        static func authorize() throws {
+            guard !KeychainService.loadAccessToken().isNil, let user = Userprofile.init() else {
+                throw ""
+            }
+            Userprofiles.shared.current = user
+        }
+        
 //        func load(from json: JSON) {
 //            UserDefaults.Profile.id             = json["id"].int ?? UserDefaults.Profile.id
 //            UserDefaults.Profile.firstName      = json["first_name"].string ?? UserDefaults.Profile.firstName

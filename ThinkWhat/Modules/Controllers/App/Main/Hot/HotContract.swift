@@ -17,6 +17,8 @@ protocol HotViewInput: class {
     var controllerInput: HotControllerInput? { get set }
     
     // View input methods here
+//    var surveyStack: [Survey] { get set }
+    func onEmptyStack()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -25,15 +27,14 @@ protocol HotViewInput: class {
 protocol HotControllerInput: class {
     
     var modelOutput: HotModelOutput? { get set }
-    
-    // Controller input methods here
+    func loadSurveys() 
 }
 
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
 protocol HotModelOutput: class {
-    // Model output methods here
+    func onSurveysReceived(_: [Survey])
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -42,5 +43,7 @@ protocol HotModelOutput: class {
 protocol HotControllerOutput: class {
     var viewInput: HotViewInput? { get set }
     
+    func onLoad()
     func onDidLayout()
+//    func onSurveysReceived()
 }
