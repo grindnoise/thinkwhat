@@ -59,7 +59,10 @@ class CardView: UIView {
     
     private func setupUI() {
         voteButton.layer.cornerRadius = voteButton.frame.height/2.25
-        stars.rating = Double(survey.totalVotes)*5/Double(survey.views)
+        let rating = Double(survey.totalVotes)*5/Double(survey.views)
+        stars.rating = rating
+        ratingLabel.text = "\(rating)"
+        viewsLabel.text = "\(survey.views)"
         let categoryString = NSMutableAttributedString()
         categoryString.append(NSAttributedString(string: "\(survey!.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey!.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey!.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
@@ -67,6 +70,7 @@ class CardView: UIView {
         topic.attributedText = categoryString
         icon.iconColor = traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white
         icon.category = Icon.Category(rawValue: survey.topic.id) ?? .Null
+        viewsIcon.iconColor = traitCollection.userInterfaceStyle == .light ? .black : .white
         
         avatar.lightColor = survey!.topic.tagColor
         guard let image = survey!.owner.image else {
@@ -108,6 +112,7 @@ class CardView: UIView {
             categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
             self.icon.setIconColor(.white)
+            self.viewsIcon.setIconColor(.white)
             self.layer.shadowOpacity = 0
 //            self.voteButton.layer.shadowOpacity = 0
         default:
@@ -119,6 +124,7 @@ class CardView: UIView {
             categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
             self.icon.setIconColor(survey!.topic.tagColor)
+            self.viewsIcon.setIconColor(.black)
             self.layer.shadowOpacity = 1
 //            self.voteButton.layer.shadowOpacity = 1
         }
@@ -170,16 +176,35 @@ class CardView: UIView {
             stars.backgroundColor = .clear
         }
     }
+    @IBOutlet weak var ratingLabel: UILabel! {
+        didSet {
+            ratingLabel.backgroundColor = .clear
+        }
+    }
+    @IBOutlet weak var viewsIcon: Icon! {
+        didSet {
+            viewsIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
+            viewsIcon.scaleMultiplicator = 1.4
+            viewsIcon.backgroundColor = .clear
+            viewsIcon.category = .Eye
+        }
+    }
+    @IBOutlet weak var viewsLabel: UILabel! {
+        didSet {
+            viewsLabel.backgroundColor = .clear
+        }
+    }
     @IBOutlet weak var user: UILabel! {
         didSet {
             user.backgroundColor = .clear
         }
     }
     
-    
+    // MARK: - IB actions
     @IBAction func buttonTapped(_ sender: UIButton) {
         if sender == voteButton {
-            sender.accessibilityIdentifier = "Vote"
+            delegate?.callbackReceived(survey)
+//            sender.accessibilityIdentifier = "Vote"
         } else {
             sender.accessibilityIdentifier = "Reject"
         }
@@ -189,15 +214,4 @@ class CardView: UIView {
     // MARK: - Properties
     weak private var delegate: CallbackDelegate?
     var survey: Survey!
-//    override var frame: CGRect {
-//        didSet {
-//
-//        }
-//    }
-//    override var bounds: CGRect {
-//        didSet {
-//
-//        }
-//    }
-    
 }

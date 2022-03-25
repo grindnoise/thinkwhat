@@ -80,6 +80,7 @@
 
 //Hot VC
 "hot" = "Hot";
+"searching" = "Searching";
 
 //Subscriptions VC
 "subscriptions" = "Subscriptions";

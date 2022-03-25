@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-class PollController: UIViewController {
+class delPollController: UIViewController {
 
     enum Mode {
         case ReadOnly, Write
@@ -177,7 +177,7 @@ class PollController: UIViewController {
 //        navigationItem.backBarButtonItem?.title = ""
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(PollController.handleTap))
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(delPollController.handleTap))
         likeButton.addGestureRecognizer(gesture)
         
         if let nc = navigationController as? NavigationControllerPreloaded {
@@ -189,7 +189,7 @@ class PollController: UIViewController {
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: likeButton)]
         }
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(PollController.updateViewsCount(notification:)),
+                                               selector: #selector(delPollController.updateViewsCount(notification:)),
                                                name: Notifications.UI.SuveyViewsCountReceived,
                                                object: nil)
         tableView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.06)
@@ -440,7 +440,7 @@ class PollController: UIViewController {
     }
 }
 
-extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
+extension delPollController: UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
             if let cell = tableView.cellForRow(at: indexPath) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() {
@@ -780,7 +780,7 @@ extension PollController: UITableViewDelegate, UITableViewDataSource, UIScrollVi
 //    }
 }
 
-extension PollController: CAAnimationDelegate {
+extension delPollController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
             completionBlocks.map{ $0() }
@@ -789,7 +789,7 @@ extension PollController: CAAnimationDelegate {
 }
 
 import SafariServices
-extension PollController: CallbackDelegate {
+extension delPollController: CallbackDelegate {
     func callbackReceived(_ sender: Any) {
         if sender is WebResourceCell, let url = survey!.url {
             var vc: SFSafariViewController!

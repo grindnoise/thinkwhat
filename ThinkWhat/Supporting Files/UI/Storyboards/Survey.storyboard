@@ -25,7 +25,7 @@
         <!--Title-->
         <scene sceneID="4vd-jv-YMb">
             <objects>
-                <viewController storyboardIdentifier="PollController" id="Xd1-gG-fRC" customClass="PollController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PollController" id="Xd1-gG-fRC" customClass="delPollController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="An1-M0-nUU"/>
                         <viewControllerLayoutGuide type="bottom" id="Ve0-9t-Sgm"/>

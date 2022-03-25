@@ -80,6 +80,7 @@
 
 //Hot VC
 "hot" = "Горячие";
+"searching" = "Поиск";
 
 //Subscriptions VC
 "subscriptions" = "Подписки";

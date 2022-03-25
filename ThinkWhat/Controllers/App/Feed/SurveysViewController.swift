@@ -383,7 +383,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             nc.duration = 0.3
             nc.transitionStyle = .Icon
             destinationVC.delegate = self
-        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? PollController, let surveyRef = sender as? SurveyReference {
+        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? delPollController, let surveyRef = sender as? SurveyReference {
 //            let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
             navigationController?.setNavigationBarHidden(false, animated: true)
             nc.duration = 0.2

@@ -46,15 +46,13 @@ class HotView: UIView {
     weak var navigationController: UINavigationController? {
         return parentController?.navigationController
     }
-    var surveyStack: [Survey] = []
-//    var surveyStack: [Survey] {
-//        get {
-//            return viewInput?.surveyStack ?? []
-//        }
-//        set {
-//            viewInput?.surveyStack = newValue
-//        }
-//    }
+    var surveyStack: [Survey] = [] {
+        didSet {
+            if surveyStack.isEmpty {
+                self.viewInput?.onEmptyStack()
+            }
+        }
+    }
     private var surveyPreviewInitialRect: CGRect {
         let indent: CGFloat = 10
         let origin = navigationController.isNil ? frame.origin : CGPoint(x: indent + frame.origin.x + frame.size.width,
@@ -71,7 +69,7 @@ class HotView: UIView {
     private var previousCard: CardView?
     private var currentCard: CardView!
     private var nextCard: CardView?
-    private lazy var loadingView: EmptySurvey = self.createLoadingView()
+    private lazy var emptyCard: EmptyCard = self.createLoadingView()
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -79,23 +77,36 @@ class HotView: UIView {
 
 // MARK: - Controller Output
 extension HotView: HotControllerOutput {
-    func onLoad() {
-//        Surveys.shared.hot.filter({ $0 })
+    func pushStack() {
+        let stackSet: Set<Survey>    = Set(surveyStack)
+        var hotSet: Set<Survey>      = Set(Surveys.shared.hot)
+        let rejectedSet: Set<Survey> = Set(Surveys.shared.rejected)
         
+        hotSet.subtract(rejectedSet)
+        let diff = stackSet.symmetricDifference(hotSet)
+        surveyStack.append(contentsOf: diff)
+        onLoad()
+    }
+    
+    func onLoad() {
         guard currentCard.isNil || nextCard.isNil else {
             return
         }
-        guard let card = getCard() else {
-            return
+        if let card = getCard() {
+            if emptyCard.isEnabled {
+                self.emptyCard.setEnabled(false) { _ in
+                    self.onNext(card)
+                }
+            } else {
+                onNext(card)
+            }
+        } else {
+            emptyCard.setEnabled(true) { _ in }
         }
-        onNext(card)
     }
     
     func getCard() -> CardView? {
-        guard !Surveys.shared.hot.isEmpty, let survey = Surveys.shared.hot.filter({$0 != self.surveyStack.map({$0}).last}).first else { return nil }
-        if surveyStack.filter({ $0.hashValue == survey.hashValue }).isEmpty {
-            surveyStack.append(survey)
-        }
+        guard !surveyStack.isEmpty, let survey = surveyStack.removeFirst() as? Survey else { return nil }
         let card = CardView(frame: surveyPreviewInitialRect, survey: survey, delegate: self)
         card.background.layer.masksToBounds = true
         card.background.layer.cornerRadius = card.frame.width * 0.05
@@ -139,7 +150,7 @@ extension HotView: HotControllerOutput {
         guard card.isNil else {
             card!.transform = card!.transform.scaledBy(x: 0.85, y: 0.85)
             addSubview(card!)
-            loadingView.setEnabled(false) { _ in
+            emptyCard.setEnabled(false) { _ in
                 nextFrame()
             }
             return
@@ -154,24 +165,19 @@ extension HotView: HotControllerOutput {
             }
         }) {
             _ in
-            self.currentCard.removeFromSuperview()
-            self.surveyStack.remove(object: self.currentCard.survey)
-            self.currentCard = nil
-            Surveys.shared.hot.removeAll()
-            self.viewInput?.onEmptyStack()
-            self.loadingView.setEnabled(true) {
-                completed in
-                self.loadingView.createButton.layer.cornerRadius = self.loadingView.createButton.frame.height / 2
+            if !self.currentCard.isNil {
+                self.currentCard.removeFromSuperview()
+                self.surveyStack.remove(object: self.currentCard.survey)
+                self.currentCard = nil
             }
+            self.emptyCard.setEnabled(true) { _ in }
             guard !self.previousCard.isNil else { return }
             self.previousCard!.removeFromSuperview()
         }
         return
     }
     
-    func onDidLayout() {
-        
-    }
+    func onDidLayout() { }
 }
 
 // MARK: - UI Setup
@@ -180,13 +186,26 @@ extension HotView {
         // Add subviews and set constraints here
     }
     
-    private func createLoadingView() -> EmptySurvey {
-        let loadingView = EmptySurvey(frame: surveyPreviewInitialRect, delegate: self)
+    private func createLoadingView() -> EmptyCard {
+        func getFrame() -> CGRect {
+            let indent: CGFloat = 10
+            let origin = navigationController.isNil ? frame.origin : CGPoint(x: indent + frame.origin.x,
+                                                                             y: indent + navigationController!.navigationBar.frame.height + statusBarFrame.height)
+            let size = tabBarController.isNil ? frame.size : CGSize(width: frame.size.width - indent*2,
+                                                                    height: frame.size.height - (tabBarController!.tabBar.isHidden ? 0 : tabBarController!.tabBar.frame.height) - origin.y - indent)
+            return CGRect(origin: origin, size: size)
+        }
+        
+        let loadingView = EmptyCard(frame: getFrame(), delegate: self)
         loadingView.alpha = 0
-        loadingView.center = center
-        loadingView.setNeedsLayout()
-        loadingView.layoutIfNeeded()
-        loadingView.createButton.layer.cornerRadius = loadingView.createButton.frame.height / 2
+        loadingView.background.layer.masksToBounds = true
+        loadingView.background.layer.cornerRadius = loadingView.frame.width * 0.05
+        ///Add shadow
+        loadingView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+        loadingView.layer.shadowPath = UIBezierPath(roundedRect: loadingView.bounds, cornerRadius: loadingView.frame.width * 0.05).cgPath
+        loadingView.layer.shadowRadius = 7
+        loadingView.layer.shadowOffset = .zero
+        loadingView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         addSubview(loadingView)
         return loadingView
     }
@@ -196,7 +215,7 @@ extension HotView: CallbackDelegate {
     func callbackReceived(_ sender: Any) {
         if let button = sender as? UIButton, let accessibilityIdentifier = button.accessibilityIdentifier {
             if accessibilityIdentifier == "Vote" {//Vote
-//                delegate.performSegue(withIdentifier: Segues.App.FeedToSurveyFromTop, sender: self)
+//                viewInput?.onVote()
             } else if accessibilityIdentifier == "Reject" {//Reject
                 Surveys.shared.rejected.append(currentCard.survey)
                 API.shared.rejectSurvey(survey: currentCard.survey) { result in
@@ -212,7 +231,7 @@ extension HotView: CallbackDelegate {
             }
         } else if sender is Userprofile {
 //            delegate.performSegue(withIdentifier: Segues.App.FeedToUser, sender: sender)
-        } else if let _view = sender as? EmptySurvey  {
+        } else if let _view = sender as? EmptyCard  {
 //            isMakingStackPaused = true
             _view.startingPoint = convert(_view.createButton.center, to: tabBarController?.view)
 
@@ -222,11 +241,8 @@ extension HotView: CallbackDelegate {
             delay(seconds: 0.5) {
 //                self.nextSurvey(self.nextCardView)
             }
-        } else if sender is Survey { //Voted
-            delay(seconds: 0.4) {
-                self.previousCard = self.currentCard
-//                self.nextSurvey(self.nextCardView)
-            }
+        } else if let survey = sender as? Survey {
+            viewInput?.onVote(survey: survey)
         }
     }
 }

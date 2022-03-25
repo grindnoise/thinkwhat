@@ -803,8 +803,8 @@ class API {
         }
     }
     
-    func downloadSurveysAsync(type: SurveyType) async throws -> Data{
-        return try await requestAsync(url: type.getURL(), httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: headers())
+    func downloadSurveysAsync(type: SurveyType, parameters: Parameters? = nil) async throws -> Data{
+        return try await requestAsync(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers())
     }
     
     func appLaunch() async throws -> JSON {

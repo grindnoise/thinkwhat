@@ -67,35 +67,38 @@ class HotController: UIViewController {
 
 // MARK: - View Input
 extension HotController: HotViewInput {
+    func onVote(survey: Survey) {
+        if let nav = navigationController as? CustomNavigationController {
+            nav.transitionStyle = .Default
+            nav.duration = 0.5
+        }
+        navigationController?.pushViewController(PollController(), animated: true)
+    }
+    
     func onEmptyStack() {
         startTimer()
     }
 }
 
 // MARK: - Model Output
-extension HotController: HotModelOutput {
-    func onSurveysReceived(_: [Survey]) {
-        
-    }
-}
+extension HotController: HotModelOutput {}
 
 extension HotController: DataObservable {
     func onDataLoaded() {
         navigationController?.setNavigationBarHidden(false, animated: true)
-        controllerOutput?.onLoad()
+        controllerOutput?.pushStack()
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(HotController.makePreviewStack),
+                                               selector: #selector(HotController.pushStack),
                                                name: Notifications.Surveys.UpdateHotSurveys,
                                                object: nil)
-//        makePreviewStack()
     }
 }
 
 // MARK: - Observers
 extension HotController {
     @objc
-    private func makePreviewStack() {
-        controllerOutput?.onLoad()
+    private func pushStack() {
+        controllerOutput?.pushStack()
         stopTimer()
     }
     
@@ -107,15 +110,6 @@ extension HotController {
     
     @objc
     private func requestSurveys() {
-//        Task {
-//            let data = try await controllerInput?.loadSurveys()
-//            await MainActor.run {
-//                let json = try JSON(data: data, options: .mutableContainers)
-//                //                print(json)
-//                ////                let json = JSON(["hot": nested])
-//                                Surveys.shared.load(json)
-//            }
-//        }
         controllerInput?.loadSurveys()
     }
     

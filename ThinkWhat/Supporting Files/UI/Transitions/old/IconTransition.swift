@@ -554,7 +554,7 @@ class IconTransition: delBasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? PollController, let vc_2 = toVC as? ImageViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let initialView = cell.scrollView {
+            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? ImageViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let initialView = cell.scrollView {
                 toVC.view.setNeedsLayout()
                 toVC.view.layoutIfNeeded()
                 
@@ -885,7 +885,7 @@ class IconTransition: delBasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-            } else if let vc_1 = fromVC as? SurveysViewController, let vc_2 = toVC as? PollController {
+            } else if let vc_1 = fromVC as? SurveysViewController, let vc_2 = toVC as? delPollController {
                 var animationBlocks: [Closure] = []
                 vc_2.tableView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5 )
                 animationBlocks.append {
@@ -899,7 +899,7 @@ class IconTransition: delBasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: false) { _ in }
-            } else if let vc_1 = fromVC as? PollController, let vc_2 = toVC as? VotersViewController, let initialCell = vc_1.tableView.cellForRow(at: vc_2.initialIndex) as? ChoiceResultCell, let resultIndicator = initialCell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_2.collectionView as? UICollectionView {
+            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? VotersViewController, let initialCell = vc_1.tableView.cellForRow(at: vc_2.initialIndex) as? ChoiceResultCell, let resultIndicator = initialCell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_2.collectionView as? UICollectionView {
 
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
@@ -964,7 +964,7 @@ class IconTransition: delBasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-            } else if let vc_1 = fromVC as? PollController, let vc_2 = toVC as? UserViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = cell.avatar, let destinationImageView = vc_2.imageView {
+            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? UserViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = cell.avatar, let destinationImageView = vc_2.imageView {
                 let imageView = UIImageView(frame: CGRect(origin: initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView), size: initialImageView.frame.size))
                 if let image = vc_1.survey?.owner.image {
                     imageView.image = image.circularImage(size: initialImageView.frame.size, frameColor: vc_1.survey?.topic.tagColor ?? K_COLOR_RED)
@@ -1509,7 +1509,7 @@ class IconTransition: delBasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? ImageViewController, let vc_2 = toVC as? PollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let destinationView = cell.scrollView {
+            } else if let vc_1 = fromVC as? ImageViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let destinationView = cell.scrollView {
                 toVC.view.alpha = 1
                 
                 let blackScreen = UIView(frame: vc_1.view.frame)
@@ -1828,7 +1828,7 @@ class IconTransition: delBasicTransition {
                         self.context?.completeTransition(true)
                 })
                 
-            }  else if fromVC is PollController, toVC is SurveysViewController {
+            }  else if fromVC is delPollController, toVC is SurveysViewController {
                 var animationBlocks: [Closure] = []
                 toVC.view.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
                 animationBlocks.append {
@@ -1851,7 +1851,7 @@ class IconTransition: delBasicTransition {
                     _ in
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? VotersViewController, let vc_2 = toVC as? PollController, let cell = vc_2.tableView.cellForRow(at: vc_1.initialIndex) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_1.collectionView as? UICollectionView {
+            } else if let vc_1 = fromVC as? VotersViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: vc_1.initialIndex) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_1.collectionView as? UICollectionView {
                 
                 var tempImageViews: [UIImageView] = []
                 for (i, initialImageView) in imageViews.enumerated() {
@@ -1890,7 +1890,7 @@ class IconTransition: delBasicTransition {
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
 //                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: []) { _ in self.context?.completeTransition(true) }
-            } else if let vc_1 = fromVC as? UserViewController, let vc_2 = toVC as? PollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = vc_1.imageView, let destinationImageView = cell.avatar {
+            } else if let vc_1 = fromVC as? UserViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = vc_1.imageView, let destinationImageView = cell.avatar {
                 let imageView = UIImageView(frame: CGRect(origin: initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView), size: initialImageView.frame.size))
                 if let image = vc_1.userprofile.image {
                     imageView.image = image.circularImage(size: initialImageView.frame.size, frameColor: vc_1.color)

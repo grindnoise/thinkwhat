@@ -8,7 +8,7 @@
 
 import UIKit
 
-class EmptySurvey: UIView {
+class EmptyCard: UIView {
 
     deinit {
         print("EmptySurvey deinit")
@@ -19,9 +19,36 @@ class EmptySurvey: UIView {
     weak fileprivate var delegate: CallbackDelegate?
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var loadingIndicator: LoadingIndicator!
+    @IBOutlet weak var createButton: UIButton! {
+        didSet {
+            createButton.backgroundColor = UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return .systemBlue
+                default:
+                    return K_COLOR_RED
+                }
+            }
+        }
+    }
+    @IBOutlet weak var background: UIView! {
+        didSet {
+            background.backgroundColor = UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return .secondarySystemBackground
+                default:
+                    return .systemBackground
+                }
+            }
+        }
+    }
+    @IBOutlet weak var label: UILabel! {
+        didSet {
+            label.text = "searching".localized.capitalized
+        }
+    }
     
-    @IBOutlet weak var createButton: UIButton!
-
     @IBAction func buttonTapped(_ sender: Any) {
         delegate?.callbackReceived(self)
     }
@@ -37,16 +64,25 @@ class EmptySurvey: UIView {
     }
     
     private func commonInit() {
-        
-        Bundle.main.loadNibNamed("EmptySurvey", owner: self, options: nil)
-        guard let content = contentView else {
-            return
+        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        addSubview(contentView)
+        contentView.frame = self.bounds
+        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        self.addSubview(contentView)
+        setupUI()
+    }
+    
+    private func setupUI() {
+        createButton.layer.cornerRadius = createButton.frame.height/2.25
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        switch traitCollection.userInterfaceStyle {
+        case .dark:
+            self.layer.shadowOpacity = 0
+        default:
+            self.layer.shadowOpacity = 1
         }
-        
-        content.frame = self.bounds
-        content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        content.backgroundColor = .white//UIColor.lightGray.withAlphaComponent(0.09)
-        self.addSubview(content)
     }
     
     @objc fileprivate func callback(recognizer: UITapGestureRecognizer) {
@@ -62,7 +98,6 @@ class EmptySurvey: UIView {
                 loadingIndicator.addEnableAnimation()
                 createButton.transform = createButton.transform.scaledBy(x: 0.75, y: 0.75)
                 createButton.alpha = 0
-                createButton.backgroundColor = K_COLOR_GRAY
                 UIView.animate(withDuration: 0.5) {
                     self.alpha = 1
                 }
@@ -74,14 +109,8 @@ class EmptySurvey: UIView {
                     options: [.curveEaseInOut],
                     animations: {
                         self.createButton.alpha = 1
-                        self.createButton.backgroundColor = K_COLOR_RED
                         self.createButton.transform = .identity
-                }) {
-                    _ in
-//                    self.createButton.cornerRadius = self.createButton.frame.height / 2
-                    self.createButton.layer.cornerRadius = self.createButton.frame.height / 2
-                    completion(true)
-                }
+                }) { _ in completion(true) }
             } else {
                 UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
                     self.createButton.transform = self.createButton.transform.scaledBy(x: 0.75, y: 0.75)
@@ -94,7 +123,6 @@ class EmptySurvey: UIView {
                         _ in completion(true)
                     }
                 }
-
             }
         } else {
             completion(true)

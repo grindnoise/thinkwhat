@@ -19,7 +19,7 @@ class SurveyStackViewController: UIViewController {
     fileprivate var nextSurveyPreview: SurveyPreview?
     fileprivate var timer:          Timer?
 //    fileprivate lazy var apiManager: APIManagerProtocol = self.initializeServerAPI()
-    fileprivate lazy var loadingView: EmptySurvey = self.createLoadingView()
+    fileprivate lazy var loadingView: EmptyCard = self.createLoadingView()
     fileprivate var surveyStack: [Survey] = []
     fileprivate var isRequestingStack = false
     fileprivate var surveyPreviewInitialRect = CGRect.zero
@@ -176,9 +176,9 @@ class SurveyStackViewController: UIViewController {
         return nil
     }
     
-    private func createLoadingView() -> EmptySurvey {
+    private func createLoadingView() -> EmptyCard {
         let multiplier: CGFloat = 0.95
-        let loadingView = EmptySurvey(frame: CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier)), delegate: self)
+        let loadingView = EmptyCard(frame: CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.size.width * multiplier, height: view.frame.size.height * multiplier)), delegate: self)
         loadingView.alpha = 0
         loadingView.center = view.center
         loadingView.setNeedsLayout()
@@ -316,7 +316,7 @@ extension SurveyStackViewController: CallbackDelegate {
 //            }
         } else if sender is Userprofile {
             delegate.performSegue(withIdentifier: Segues.App.FeedToUser, sender: sender)
-        } else if let _view = sender as? EmptySurvey  {
+        } else if let _view = sender as? EmptyCard  {
             isMakingStackPaused = true
             _view.startingPoint = view.convert(_view.createButton.center, to: tabBarController?.view)
 

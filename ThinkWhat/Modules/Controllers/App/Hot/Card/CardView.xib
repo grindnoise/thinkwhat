@@ -25,10 +25,13 @@
                 <outlet property="descriptionTextView" destination="cnF-2y-AeP" id="NDI-bo-XnJ"/>
                 <outlet property="icon" destination="7bl-86-llw" id="Rqw-OW-FKR"/>
                 <outlet property="nextButton" destination="O0A-Jb-aD2" id="6xf-7U-jLr"/>
+                <outlet property="ratingLabel" destination="4HK-W3-Iqe" id="a5A-cQ-9wY"/>
                 <outlet property="stars" destination="vpm-ql-Gc5" id="7cK-D9-9v8"/>
                 <outlet property="titleLabel" destination="h71-6S-4Vo" id="hxO-BQ-zdE"/>
                 <outlet property="topic" destination="c28-0U-s5e" id="Qez-K5-K8K"/>
                 <outlet property="user" destination="dx1-f1-T6b" id="tU8-yn-HWi"/>
+                <outlet property="viewsIcon" destination="78w-y0-TNK" id="Xr4-n2-wsg"/>
+                <outlet property="viewsLabel" destination="n9R-QD-1LI" id="45z-kp-fpS"/>
                 <outlet property="voteButton" destination="25v-Tu-FZ3" id="E3x-MK-pAq"/>
             </connections>
         </placeholder>
@@ -52,7 +55,7 @@
                             <nil key="highlightedColor"/>
                         </label>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vpm-ql-Gc5" customClass="StarView" customModule="ThinkWhat" customModuleProvider="target">
-                            <rect key="frame" x="8" y="51" width="67" height="13"/>
+                            <rect key="frame" x="8" y="51" width="80.5" height="16"/>
                             <color key="backgroundColor" systemColor="systemGray3Color"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="vpm-ql-Gc5" secondAttribute="height" multiplier="5:1" id="OD1-zL-O4g"/>
@@ -79,15 +82,41 @@
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="78w-y0-TNK" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
+                            <rect key="frame" x="8" y="71" width="22.5" height="22.5"/>
+                            <color key="backgroundColor" systemColor="systemGray2Color"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="78w-y0-TNK" secondAttribute="height" multiplier="1:1" id="HRN-DK-D6G"/>
+                            </constraints>
+                        </view>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="4.4" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4HK-W3-Iqe">
+                            <rect key="frame" x="92.5" y="51" width="16" height="16"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="4.4" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n9R-QD-1LI">
+                            <rect key="frame" x="34.5" y="74" width="16" height="16.5"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
+                        <constraint firstItem="n9R-QD-1LI" firstAttribute="height" secondItem="4HK-W3-Iqe" secondAttribute="height" id="0yE-Wr-PMx"/>
+                        <constraint firstItem="n9R-QD-1LI" firstAttribute="centerY" secondItem="78w-y0-TNK" secondAttribute="centerY" id="2sg-cg-8em"/>
+                        <constraint firstItem="n9R-QD-1LI" firstAttribute="leading" secondItem="78w-y0-TNK" secondAttribute="trailing" constant="4" id="4AZ-i0-fgO"/>
                         <constraint firstItem="c28-0U-s5e" firstAttribute="centerY" secondItem="7bl-86-llw" secondAttribute="centerY" id="4QU-C1-ski"/>
+                        <constraint firstItem="78w-y0-TNK" firstAttribute="leading" secondItem="vpm-ql-Gc5" secondAttribute="leading" id="CNK-pl-89y"/>
+                        <constraint firstItem="4HK-W3-Iqe" firstAttribute="centerY" secondItem="vpm-ql-Gc5" secondAttribute="centerY" id="EAK-S2-AgL"/>
                         <constraint firstItem="c28-0U-s5e" firstAttribute="leading" secondItem="7bl-86-llw" secondAttribute="trailing" constant="4" id="FwS-cp-K42"/>
                         <constraint firstAttribute="trailing" secondItem="9j7-K4-Jhg" secondAttribute="trailing" constant="8" id="KWQ-lw-4V3"/>
                         <constraint firstItem="9j7-K4-Jhg" firstAttribute="leading" secondItem="dx1-f1-T6b" secondAttribute="trailing" constant="8" symbolic="YES" id="NIs-iO-LBU"/>
                         <constraint firstItem="dx1-f1-T6b" firstAttribute="centerY" secondItem="Wu5-hZ-fKR" secondAttribute="centerY" id="RwO-Xa-I48"/>
-                        <constraint firstItem="vpm-ql-Gc5" firstAttribute="height" secondItem="7bl-86-llw" secondAttribute="height" multiplier="0.5" id="S15-AI-1MK"/>
+                        <constraint firstItem="vpm-ql-Gc5" firstAttribute="height" secondItem="7bl-86-llw" secondAttribute="height" multiplier="0.6" id="S15-AI-1MK"/>
                         <constraint firstItem="9j7-K4-Jhg" firstAttribute="centerY" secondItem="Wu5-hZ-fKR" secondAttribute="centerY" id="YXb-Iw-s51"/>
                         <constraint firstItem="7bl-86-llw" firstAttribute="height" secondItem="Wu5-hZ-fKR" secondAttribute="height" multiplier="0.3" id="brp-lX-cK6"/>
                         <constraint firstItem="7bl-86-llw" firstAttribute="leading" secondItem="Wu5-hZ-fKR" secondAttribute="leading" constant="8" id="dev-aw-doe"/>
@@ -95,7 +124,11 @@
                         <constraint firstItem="c28-0U-s5e" firstAttribute="height" secondItem="7bl-86-llw" secondAttribute="height" id="f4B-IJ-kUj"/>
                         <constraint firstItem="dx1-f1-T6b" firstAttribute="height" secondItem="9j7-K4-Jhg" secondAttribute="height" id="gga-gw-2Aq"/>
                         <constraint firstItem="7bl-86-llw" firstAttribute="bottom" secondItem="9j7-K4-Jhg" secondAttribute="centerY" constant="2" id="lDF-9q-yEz"/>
+                        <constraint firstItem="78w-y0-TNK" firstAttribute="height" secondItem="vpm-ql-Gc5" secondAttribute="height" multiplier="1.4" id="lpo-T9-j4z"/>
                         <constraint firstItem="9j7-K4-Jhg" firstAttribute="height" secondItem="Wu5-hZ-fKR" secondAttribute="height" multiplier="0.75" id="mYG-48-4BR"/>
+                        <constraint firstItem="4HK-W3-Iqe" firstAttribute="height" secondItem="vpm-ql-Gc5" secondAttribute="height" id="p91-VO-8no"/>
+                        <constraint firstItem="4HK-W3-Iqe" firstAttribute="leading" secondItem="vpm-ql-Gc5" secondAttribute="trailing" constant="4" id="pkn-4T-pux"/>
+                        <constraint firstItem="78w-y0-TNK" firstAttribute="top" secondItem="vpm-ql-Gc5" secondAttribute="bottom" constant="4" id="sho-G8-DZg"/>
                         <constraint firstItem="vpm-ql-Gc5" firstAttribute="top" secondItem="7bl-86-llw" secondAttribute="bottom" constant="4" id="yoE-Vm-hng"/>
                     </constraints>
                 </view>

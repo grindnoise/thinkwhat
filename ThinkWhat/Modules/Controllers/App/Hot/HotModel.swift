@@ -19,7 +19,14 @@ extension HotModel: HotControllerInput {
     func loadSurveys() {
         Task {
             do {
-                let data = try await API.shared.downloadSurveysAsync(type: .Hot)
+                var parameters: [String: Any] = [:]
+                let stackList = Surveys.shared.hot.map { $0.id }
+                let rejectedList = Surveys.shared.rejected.map { $0.id }
+                let list = Array(Set(stackList + rejectedList))
+                if !list.isEmpty {
+                    parameters["ids"] = list
+                }
+                let data = try await API.shared.downloadSurveysAsync(type: .Hot, parameters: parameters)
                 let json = try JSON(data: data, options: .mutableContainers)
                 print(json)
                 await MainActor.run {
