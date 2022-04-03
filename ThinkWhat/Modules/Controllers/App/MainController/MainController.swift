@@ -26,6 +26,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
         setupUI()
         loadData()
     }
+
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -77,7 +78,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
 
         delegate = self//_delegate
         navigationItem.setHidesBackButton(true, animated: false)
-        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationController?.navigationBar.prefersLargeTitles = true
         UITabBar.appearance().barTintColor = .systemBackground
         
         loadingIndicator = LoadingIndicator()//CGSize(width: view.frame.width, height: container.frame.height)))
@@ -200,7 +201,7 @@ extension MainController: UITabBarControllerDelegate {
     }
 }
 
-extension MainController: CallbackDelegate {
+extension MainController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if sender is APIUnavailableView {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {

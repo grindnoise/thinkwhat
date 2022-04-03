@@ -27,4 +27,13 @@ extension UIView {
               }
         return statusBarManager.statusBarFrame
     }
+    
+//    var statusBarWindow: UIWindow {
+//        guard let window = window,
+//              let windowScene = window.windowScene,
+//              let statusBarManager = windowScene.statusBarManager else {
+//                  return .zero
+//              }
+//        return statusBarManager.
+//    }
 }

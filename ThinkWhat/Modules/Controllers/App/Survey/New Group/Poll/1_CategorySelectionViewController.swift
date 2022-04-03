@@ -198,7 +198,7 @@ class CategorySelectionViewController: UIViewController {
     }
 }
 
-extension CategorySelectionViewController: CallbackDelegate {
+extension CategorySelectionViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let _category = sender as? Topic {
             if _category.hasNoChildren {

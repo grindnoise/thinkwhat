@@ -97,7 +97,7 @@ class VotersFilterController: UITableViewController {
     }
     
 //    var rangeSlider: RangeSlider!
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate      = self

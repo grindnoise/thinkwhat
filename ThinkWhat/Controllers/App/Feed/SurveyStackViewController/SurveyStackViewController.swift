@@ -292,7 +292,7 @@ class SurveyStackViewController: UIViewController {
 
 
 
-extension SurveyStackViewController: CallbackDelegate {
+extension SurveyStackViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let button = sender as? UIButton, let accessibilityIdentifier = button.accessibilityIdentifier {
             if accessibilityIdentifier == "Vote" {//Vote

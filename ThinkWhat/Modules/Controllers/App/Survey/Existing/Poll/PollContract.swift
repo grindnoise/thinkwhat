@@ -15,8 +15,10 @@ protocol PollViewInput: class {
     
     var controllerOutput: PollControllerOutput? { get set }
     var controllerInput: PollControllerInput? { get set }
+    var survey: Survey? { get }
     
-    // View input methods here
+    func onClaim()
+    func onAddFavorite(_: Bool)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -25,15 +27,22 @@ protocol PollViewInput: class {
 protocol PollControllerInput: class {
     
     var modelOutput: PollModelOutput? { get set }
+    var survey: Survey? { get }
     
-    // Controller input methods here
+    func loadSurvey()
+    func addFavorite(_: Bool)
+    func claim()
 }
 
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
 protocol PollModelOutput: class {
-    // Model output methods here
+    var survey: Survey? { get }
+    
+    func onLoad(_: Result<Bool, Error>)
+    func onCountUpdated()
+    func onAddFavorite(_: Result<Bool,Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -41,6 +50,8 @@ protocol PollModelOutput: class {
 /// **View** conforms to this protocol
 protocol PollControllerOutput: class {
     var viewInput: PollViewInput? { get set }
+    var survey: Survey? { get }
     
-    // Controller output methods here
+    func onLoad(_: Result<Bool, Error>)
+    func onCountUpdated()
 }

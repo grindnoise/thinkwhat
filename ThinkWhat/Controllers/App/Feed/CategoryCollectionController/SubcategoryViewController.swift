@@ -10,7 +10,7 @@ import UIKit
 
 class SubcategoryViewController: UIViewController {
 
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     var parentCategory: Topic!
     @IBOutlet weak var icon: Icon!
     @IBOutlet weak var upperContainer: UIView!
@@ -86,7 +86,7 @@ class SubcategoryViewController: UIViewController {
     }
 }
 
-extension SubcategoryViewController: CallbackDelegate {
+extension SubcategoryViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if sender is Topic {
             if let nc = navigationController as? NavigationControllerPreloaded {

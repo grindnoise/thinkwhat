@@ -47,7 +47,7 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBOutlet weak var feedbackView: UIView!
     @IBOutlet weak var tableView: UITableView!
     private var claimCells: [ClaimCell]    = []
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -154,7 +154,7 @@ class ClaimCell: UITableViewCell {
             }
         }
     }
-    weak var cellDelegate: CallbackDelegate?
+    weak var cellDelegate: CallbackObservable?
     var isChecked = false {
         didSet {
             if oldValue != isChecked, checkBox != nil {
@@ -172,7 +172,7 @@ class ClaimCell: UITableViewCell {
 //    }
 }
 
-extension ClaimViewController: CallbackDelegate {
+extension ClaimViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if sender is ClaimCancelCell {
             delegate?.callbackReceived("cancel_claim" as AnyObject)
@@ -182,7 +182,7 @@ extension ClaimViewController: CallbackDelegate {
 }
 
 class ClaimCancelCell: UITableViewCell {
-    weak var cellDelegate: CallbackDelegate?
+    weak var cellDelegate: CallbackObservable?
     deinit {
         print("***ClaimCancelCell deinit***")
     }

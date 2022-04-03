@@ -75,12 +75,12 @@ class TextInputViewController: UIViewController {
         if textView.text.count - (needsParagraphSpace ? 1 : 0) < minCharacters {
             UIView.animate(withDuration: 0, animations: {self.view.endEditing(true)}, completion: {
                 _ in
-                Banner.shared.contentType = .Warning
-                if let content = Banner.shared.content as? Warning {
+                delBanner.shared.contentType = .Warning
+                if let content = delBanner.shared.content as? Warning {
                     content.level = .Warning
                     content.text = "Поле \(self.type.rawValue) должен содержать не менее \(self.minCharacters) знаков"
                 }
-                Banner.shared.present(shouldDismissAfter: 2, delegate: self)
+                delBanner.shared.present(shouldDismissAfter: 2, delegate: self)
             })
         } else {
             //            delegate?.callbackReceived(text)
@@ -99,7 +99,7 @@ class TextInputViewController: UIViewController {
             }
         }
     }
-    var delegate: CallbackDelegate?
+    var delegate: CallbackObservable?
     var maxCharacters = 0
     var minCharacters = 0
     var font: UIFont?
@@ -252,12 +252,12 @@ class TextInputViewController: UIViewController {
     }
 }
 
-extension TextInputViewController: CallbackDelegate {
+extension TextInputViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let identifier = sender as? String {
-            if identifier == Banner.bannerWillAppearSignal {
+            if identifier == delBanner.bannerWillAppearSignal {
                 view.endEditing(true)
-            } else if identifier == Banner.bannerDidDisappearSignal {
+            } else if identifier == delBanner.bannerDidDisappearSignal {
                 textView.becomeFirstResponder()
             }
         }

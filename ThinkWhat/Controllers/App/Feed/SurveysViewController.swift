@@ -933,7 +933,7 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
     
 }
 
-extension SurveysViewController: CallbackDelegate {
+extension SurveysViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if sender is LostConnectionView {
             delay(seconds: TimeIntervals.NetworkInactivity) {

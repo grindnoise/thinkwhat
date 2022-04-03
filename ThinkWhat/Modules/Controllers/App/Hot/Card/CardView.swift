@@ -25,7 +25,7 @@ class CardView: UIView {
         commonInit()
     }
     
-    init(frame: CGRect, survey: Survey, delegate: CallbackDelegate?) {
+    init(frame: CGRect, survey: Survey, delegate: CallbackObservable?) {
         super.init(frame: frame)
         commonInit()
         self.survey = survey
@@ -77,7 +77,7 @@ class CardView: UIView {
             //TODO: - Download
             Task {
                  let image = try await survey.owner.downloadImageAsync()
-                onImageLoaded(imageView: avatar.imageView, image: image)
+                Animations.onImageLoaded(imageView: avatar.imageView, image: image)
             }
             return
         }
@@ -88,19 +88,7 @@ class CardView: UIView {
 //        descriptionTextView.layoutManager.usesDefaultHyphenation = true
     }
     
-    private func onImageLoaded(imageView: UIImageView, image: UIImage) {
-        Task {
-            await MainActor.run {
-                UIView.transition(with: imageView,
-                                  duration: 0.5,
-                                  options: .transitionCrossDissolve,
-                                  animations: {
-                    imageView.image = image
-                })
-            }
-        }
-    }
-    
+        
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         switch traitCollection.userInterfaceStyle {
         case .dark:
@@ -212,6 +200,6 @@ class CardView: UIView {
     }
     
     // MARK: - Properties
-    weak private var delegate: CallbackDelegate?
+    weak private var delegate: CallbackObservable?
     var survey: Survey!
 }

@@ -28,12 +28,12 @@ class VotesCountViewController: UIViewController {
 //                actionButton.text = "\(votesCapacity)"
                 if votesCapacity > MAX_VOTES_COUNT {//, UserDefaults.App.hasSeenPollCreationIntroduction {
                     if !isMaxVotesBannerShown {
-                        Banner.shared.contentType = .Warning
-                        if let content = Banner.shared.content as? Warning {
+                        delBanner.shared.contentType = .Warning
+                        if let content = delBanner.shared.content as? Warning {
                             content.level = .Warning
                             content.text = "Максимальное число участников должно быть не более \(MAX_VOTES_COUNT)"
                         }
-                        Banner.shared.present(shouldDismissAfter: 2, delegate: self)
+                        delBanner.shared.present(shouldDismissAfter: 2, delegate: self)
                         isMaxVotesBannerShown = true
                         actionButton.animateIconChange(toCategory: Icon.Category.Error)
                     }
@@ -42,12 +42,12 @@ class VotesCountViewController: UIViewController {
                     }
                 } else if votesCapacity < MIN_VOTES_COUNT {//}, UserDefaults.App.hasSeenPollCreationIntroduction {
                     if !isMinVotesBannerShown {
-                        Banner.shared.contentType = .Warning
-                        if let content = Banner.shared.content as? Warning {
+                        delBanner.shared.contentType = .Warning
+                        if let content = delBanner.shared.content as? Warning {
                             content.level = .Warning
                             content.text = "Минимальное число участников должно быть не менее \(MIN_VOTES_COUNT)"
                         }
-                        Banner.shared.present(shouldDismissAfter: 2, delegate: self)
+                        delBanner.shared.present(shouldDismissAfter: 2, delegate: self)
                         isMinVotesBannerShown = true
                         actionButton.animateIconChange(toCategory: Icon.Category.Error)
                     }
@@ -178,20 +178,20 @@ class VotesCountViewController: UIViewController {
     
     @objc private func actionButtonTapped() {
         if votesCapacity < MIN_VOTES_COUNT {
-            Banner.shared.contentType = .Warning
-            if let content = Banner.shared.content as? Warning {
+            delBanner.shared.contentType = .Warning
+            if let content = delBanner.shared.content as? Warning {
                 content.level = .Warning
                 content.text = "Минимальное число участников не менее \(MIN_VOTES_COUNT)"
             }
-            Banner.shared.present(shouldDismissAfter: 2, delegate: self)
+            delBanner.shared.present(shouldDismissAfter: 2, delegate: self)
 //            showAlert(type: .Warning, buttons: [["Хорошо": [.Ok: {self.votesCountTF.becomeFirstResponder()}]]], text: "Минимальное число участников - \(MIN_VOTES_COUNT)")
         } else if votesCapacity > MAX_VOTES_COUNT {
-            Banner.shared.contentType = .Warning
-            if let content = Banner.shared.content as? Warning {
+            delBanner.shared.contentType = .Warning
+            if let content = delBanner.shared.content as? Warning {
                 content.level = .Warning
                 content.text = "Максимальное число участников не более \(MAX_VOTES_COUNT)"
             }
-            Banner.shared.present(shouldDismissAfter: 2, delegate: self)
+            delBanner.shared.present(shouldDismissAfter: 2, delegate: self)
 //            showAlert(type: .Warning, buttons: [["Хорошо": [.Ok: {self.votesCountTF.becomeFirstResponder()}]]], text: "Максимально возможное количество голосов - \(MAX_VOTES_COUNT)")
         } else {
             UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
@@ -205,8 +205,8 @@ class VotesCountViewController: UIViewController {
     
     @objc private func viewTapped(recognizer: UITapGestureRecognizer) {
         if let v = recognizer.view, v.accessibilityIdentifier == "sum" {
-            Banner.shared.contentType = .Sum
-            if let content = Banner.shared.content as? VotesFormula {
+            delBanner.shared.contentType = .Sum
+            if let content = delBanner.shared.content as? VotesFormula {
 //                content.backgroundColor = Colors.UpperButtons.Avocado
                 content.icon.backgroundColor = Colors.Banner.Info
                 content.icon.category = .Info
@@ -214,17 +214,17 @@ class VotesCountViewController: UIViewController {
                 content.votes = votesCapacity
 //                content.price = PriceList.shared.vote
             }
-            Banner.shared.present(shouldDismissAfter: 5, delegate: self)
+            delBanner.shared.present(shouldDismissAfter: 5, delegate: self)
         }
     }
 }
 
-extension VotesCountViewController: CallbackDelegate {
+extension VotesCountViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let identifier = sender as? String {
-            if identifier == Banner.bannerWillAppearSignal {
+            if identifier == delBanner.bannerWillAppearSignal {
                 self.view.endEditing(true)
-            } else if identifier == Banner.bannerDidDisappearSignal {
+            } else if identifier == delBanner.bannerDidDisappearSignal {
                 self.votesCountTF.becomeFirstResponder()
             }
         }

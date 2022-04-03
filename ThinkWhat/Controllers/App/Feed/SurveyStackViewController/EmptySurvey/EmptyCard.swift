@@ -16,7 +16,7 @@ class EmptyCard: UIView {
     
     var startingPoint: CGPoint!
     var isEnabled = false
-    weak fileprivate var delegate: CallbackDelegate?
+    weak fileprivate var delegate: CallbackObservable?
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var loadingIndicator: LoadingIndicator!
     @IBOutlet weak var createButton: UIButton! {
@@ -52,7 +52,7 @@ class EmptyCard: UIView {
     @IBAction func buttonTapped(_ sender: Any) {
         delegate?.callbackReceived(self)
     }
-    init(frame: CGRect, delegate _delegate: CallbackDelegate) {
+    init(frame: CGRect, delegate _delegate: CallbackObservable) {
         delegate = _delegate
         super.init(frame: frame)
         self.commonInit()

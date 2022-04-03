@@ -34,9 +34,9 @@ class SurveyClaimView: UIView, UITabBarDelegate, UITableViewDataSource {
 //    @IBAction func retryTapped(_ sender: Any) {
 //        delegate?.signalReceived(self)
 //    }
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     
-    init(frame: CGRect, delegate: CallbackDelegate?) {
+    init(frame: CGRect, delegate: CallbackObservable?) {
         super.init(frame: frame)
         self.commonInit()
         self.delegate = delegate

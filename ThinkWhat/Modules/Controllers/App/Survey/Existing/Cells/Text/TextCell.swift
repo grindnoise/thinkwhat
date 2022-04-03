@@ -1,0 +1,43 @@
+//
+//  TextCell.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 28.03.2022.
+//  Copyright © 2022 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+
+class TextCell: UITableViewCell {
+
+    private var isSetupComplete = false
+    private weak var delegate: CallbackObservable?
+    private var survey: Survey!
+    
+    @IBOutlet weak var textView: UITextView!
+    
+    public func setupUI(delegate callbackDelegate: CallbackObservable, survey _survey: Survey, isQuestion: Bool = false) {
+        guard !isSetupComplete else { return }
+        setNeedsLayout()
+        layoutIfNeeded()
+        delegate = callbackDelegate
+        survey = _survey
+        
+        let paragraph = NSMutableParagraphStyle()
+        
+        if #available(iOS 15.0, *) {
+            paragraph.usesDefaultHyphenation = true
+        } else {
+            paragraph.hyphenationFactor = 1
+        }
+        
+        let attributedText = NSMutableAttributedString(string: isQuestion ? survey.question : survey.description, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
+        attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: isQuestion ? .systemGray : .label, backgroundColor: .clear), range: isQuestion ? survey.question.fullRange() : survey.description.fullRange())
+        textView.attributedText = attributedText
+        textView.textContainerInset = UIEdgeInsets(top: isQuestion ? 25 : textView.textContainerInset.left,
+                                                   left: textView.textContainerInset.left,
+                                                   bottom: isQuestion ? 30 : textView.textContainerInset.left,
+                                                   right: textView.textContainerInset.right)
+        isSetupComplete = true
+    }
+}

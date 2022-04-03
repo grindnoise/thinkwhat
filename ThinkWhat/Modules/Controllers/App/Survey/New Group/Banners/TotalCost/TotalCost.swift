@@ -37,7 +37,7 @@ class TotalCost: UIView, BannerContent {
             costLabel.alpha = cost == 0 ? 0 : 1
         }
     }
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     var color: UIColor = Colors.UpperButtons.VioletBlueCrayola
     var balance = 0 {
         didSet {

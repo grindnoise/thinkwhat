@@ -14,7 +14,7 @@ class UserLogoHeader: UIView {
         print("EmptySurvey deinit")
     }
     
-    weak fileprivate var delegate: CallbackDelegate?
+    weak fileprivate var delegate: CallbackObservable?
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var nameTF: UITextField! {
@@ -34,7 +34,7 @@ class UserLogoHeader: UIView {
     @IBAction func buttonTapped(_ sender: Any) {
         delegate?.callbackReceived(self)
     }
-    init(frame: CGRect, delegate _delegate: CallbackDelegate) {
+    init(frame: CGRect, delegate _delegate: CallbackObservable) {
         delegate = _delegate
         super.init(frame: frame)
         self.commonInit()

@@ -135,7 +135,7 @@ class AlertController: UIViewController {
     } ()
     private var popController = false
     private var currentController: UIViewController?
-    private weak var delegate: CallbackDelegate?
+    private weak var delegate: CallbackObservable?
     private var contentType: ContentType = .Info {
         didSet {
             if button != nil {
@@ -177,7 +177,7 @@ class AlertController: UIViewController {
     private var timer:  Timer?
     private var timeElapsed: TimeInterval = 0
     
-    func show(delegate _delegate: CallbackDelegate?, height: CGFloat = 0, contentType _contentType: ContentType = .Info, survey _survey: Survey? = nil, voters _voters: [Userprofile]? = nil, filtered _filtered: [Userprofile]? = nil, filters _filters: [String: AnyObject] = [:]) {
+    func show(delegate _delegate: CallbackObservable?, height: CGFloat = 0, contentType _contentType: ContentType = .Info, survey _survey: Survey? = nil, voters _voters: [Userprofile]? = nil, filtered _filtered: [Userprofile]? = nil, filters _filters: [String: AnyObject] = [:]) {
         popController = false
         survey = _survey
         filters = _filters
@@ -259,7 +259,7 @@ class AlertController: UIViewController {
     }
 }
 
-extension AlertController: CallbackDelegate {
+extension AlertController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if contentType == .Claim {
             if let _claimCategory =  sender as? Claim, survey != nil {

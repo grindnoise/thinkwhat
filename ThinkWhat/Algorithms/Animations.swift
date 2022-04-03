@@ -87,6 +87,19 @@ struct Animations {
         return rotationAnimation
     }
     
+    static func onImageLoaded(imageView: UIImageView, image: UIImage) {
+        Task {
+            await MainActor.run {
+                UIView.transition(with: imageView,
+                                  duration: 0.5,
+                                  options: .transitionCrossDissolve,
+                                  animations: {
+                    imageView.image = image
+                })
+            }
+        }
+    }
+    
 }
 
 func animateImageChange(imageView: UIImageView, fromImage: UIImage, toImage: UIImage, duration: CFTimeInterval) {
@@ -154,4 +167,5 @@ class AnimatedVisualEffectView: UIVisualEffectView {
 //        return hitView == self ? nil : hitView
 //    }
     
+
 }

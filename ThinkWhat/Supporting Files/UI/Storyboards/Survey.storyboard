@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -525,7 +525,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BOf-kt-dVO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-517" y="-4211"/>
+            <point key="canvasLocation" x="-518.1159420289855" y="-4211.3839285714284"/>
         </scene>
         <!--Выберите тип-->
         <scene sceneID="Sg7-5S-PXB">
@@ -952,7 +952,7 @@
                                                 <rect key="frame" x="16" y="1710.5" width="288" height="211.5"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Voa-ee-52D" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                                                        <rect key="frame" x="250" y="8" width="30" height="30"/>
+                                                        <rect key="frame" x="247" y="8" width="33" height="33"/>
                                                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="Voa-ee-52D" secondAttribute="height" multiplier="1:1" id="Fp7-Fj-1MI"/>
@@ -1082,7 +1082,7 @@
                                                         <rect key="frame" x="29" y="158.5" width="230" height="53"/>
                                                         <subviews>
                                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="y8L-8f-pgV">
-                                                                <rect key="frame" x="64.5" y="11.5" width="101" height="30"/>
+                                                                <rect key="frame" x="65.5" y="10" width="99" height="33"/>
                                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                                 <state key="normal" title="ПРОПУСТИТЬ">
                                                                     <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1149,7 +1149,7 @@
                                                 <rect key="frame" x="16" y="2024.5" width="288" height="211.5"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RpD-x8-ft5" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                                                        <rect key="frame" x="250" y="8" width="30" height="30"/>
+                                                        <rect key="frame" x="247" y="8" width="33" height="33"/>
                                                         <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" secondItem="RpD-x8-ft5" secondAttribute="height" multiplier="1:1" id="CAs-YM-FAe"/>
@@ -1185,7 +1185,7 @@
                                                         <rect key="frame" x="5" y="140" width="288" height="71.5"/>
                                                         <subviews>
                                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0P7-ld-G9i">
-                                                                <rect key="frame" x="93.5" y="21" width="101" height="30"/>
+                                                                <rect key="frame" x="94.5" y="19.5" width="99" height="33"/>
                                                                 <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                                 <state key="normal" title="ПРОПУСТИТЬ">
                                                                     <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1289,10 +1289,10 @@
                                                         </constraints>
                                                         <prototypes>
                                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="answer" id="Poj-ke-4or" customClass="AnswerSelectionCell" customModule="ThinkWhat" customModuleProvider="target">
-                                                                <rect key="frame" x="0.0" y="44.5" width="256" height="360.5"/>
+                                                                <rect key="frame" x="0.0" y="44.5" width="256" height="452.5"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Poj-ke-4or" id="mo2-Wz-39i">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="256" height="360.5"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="256" height="452.5"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <subviews>
                                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0QN-Ej-dKr" customClass="UILabel">
@@ -1304,7 +1304,7 @@
                                                                             </constraints>
                                                                         </view>
                                                                         <textView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xGa-Ix-HAy">
-                                                                            <rect key="frame" x="8" y="0.0" width="240" height="360.5"/>
+                                                                            <rect key="frame" x="8" y="0.0" width="240" height="452.5"/>
                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                             <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="16"/>
@@ -1328,14 +1328,14 @@
                                                                 </connections>
                                                             </tableViewCell>
                                                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="addAnswer" id="g1X-tL-z9o" customClass="AddAnswerCell" customModule="ThinkWhat" customModuleProvider="target">
-                                                                <rect key="frame" x="0.0" y="405" width="256" height="30.5"/>
+                                                                <rect key="frame" x="0.0" y="497" width="256" height="33.5"/>
                                                                 <autoresizingMask key="autoresizingMask"/>
                                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="g1X-tL-z9o" id="K02-J9-OOa">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="256" height="30.5"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="256" height="33.5"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <subviews>
                                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MWm-kZ-fdc">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="256" height="30.5"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="256" height="33.5"/>
                                                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="15"/>
                                                                             <state key="normal" title="ДОБАВИТЬ">
                                                                                 <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -2390,14 +2390,14 @@
                                                     <rect key="frame" x="38" y="0.0" width="250" height="30"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xCf-IR-cPk">
-                                                            <rect key="frame" x="0.0" y="6" width="27" height="18"/>
+                                                            <rect key="frame" x="0.0" y="6" width="30" height="18"/>
                                                             <color key="backgroundColor" red="1" green="0.14901960780000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="11"/>
                                                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ываыва" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EWn-Cn-OxU">
-                                                            <rect key="frame" x="210.5" y="6" width="39.5" height="18"/>
+                                                            <rect key="frame" x="208" y="6" width="42" height="18"/>
                                                             <color key="backgroundColor" red="1" green="0.14901960780000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="11"/>
                                                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -2415,7 +2415,7 @@
                                                     </constraints>
                                                 </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hvs-JZ-oQ6">
-                                                    <rect key="frame" x="65" y="14.5" width="183.5" height="1"/>
+                                                    <rect key="frame" x="68" y="14.5" width="178" height="1"/>
                                                     <color key="backgroundColor" red="1" green="0.14901960780000001" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rvh-d6-xRt">
@@ -2492,14 +2492,14 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="link" id="6ix-gQ-LZw" customClass="SurveyLinkCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="389.5" width="320" height="54.5"/>
+                                <rect key="frame" x="0.0" y="389.5" width="320" height="58.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6ix-gQ-LZw" id="yyB-TY-vIy">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="54.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="58.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DLx-BB-Ehz">
-                                            <rect key="frame" x="87" y="11" width="146" height="32.5"/>
+                                            <rect key="frame" x="88" y="11" width="144" height="36.5"/>
                                             <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="17"/>
                                             <state key="normal" title="УЗНАТЬ БОЛЬШЕ">
                                                 <color key="titleColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2521,7 +2521,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="youtube" rowHeight="270" id="KCz-6h-HIJ" customClass="SurveyYoutubeCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="444" width="320" height="270"/>
+                                <rect key="frame" x="0.0" y="448" width="320" height="270"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="KCz-6h-HIJ" id="BOB-IZ-2iH">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="270"/>
@@ -2588,7 +2588,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="image" rowHeight="270" id="BGN-dl-6rr" customClass="SurveyImageCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="714" width="320" height="270"/>
+                                <rect key="frame" x="0.0" y="718" width="320" height="270"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="BGN-dl-6rr" id="zjg-CP-O17">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="270"/>
@@ -2659,7 +2659,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="answer" rowHeight="100" id="7JJ-q8-ZLp" customClass="SurveyAnswerCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="984" width="320" height="100"/>
+                                <rect key="frame" x="0.0" y="988" width="320" height="100"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="7JJ-q8-ZLp" id="4bz-DT-mPS">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
@@ -2697,7 +2697,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="vote" rowHeight="100" id="Vt7-nE-LiG" userLabel="vote" customClass="SurveyVoteCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="1084" width="320" height="100"/>
+                                <rect key="frame" x="0.0" y="1088" width="320" height="100"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Vt7-nE-LiG" id="1vq-WA-3CQ">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
@@ -2731,7 +2731,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="result" rowHeight="100" id="oaY-Fl-1Xu" customClass="SurveyResultCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="1184" width="320" height="100"/>
+                                <rect key="frame" x="0.0" y="1188" width="320" height="100"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="oaY-Fl-1Xu" id="Uad-OH-VAw">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
@@ -2783,14 +2783,14 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="total" rowHeight="50" id="enT-Fa-9qV" customClass="SurveyTotalCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="1284" width="320" height="50"/>
+                                <rect key="frame" x="0.0" y="1288" width="320" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="enT-Fa-9qV" id="5mM-g1-R0q">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2136 голосов" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FRP-Fc-hLC">
-                                            <rect key="frame" x="119" y="17.5" width="82" height="15.5"/>
+                                            <rect key="frame" x="118.5" y="16" width="83.5" height="18"/>
                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="13"/>
                                             <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
@@ -2808,14 +2808,14 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="info" rowHeight="50" id="MYk-s0-MbD" customClass="SurveyInfoCell" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="1334" width="320" height="50"/>
+                                <rect key="frame" x="0.0" y="1338" width="320" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="MYk-s0-MbD" id="fkA-Ex-4uZ">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="baa-qT-2Cr">
-                                            <rect key="frame" x="190" y="11" width="114" height="28"/>
+                                            <rect key="frame" x="188" y="11" width="116" height="28"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1JA-rP-ZV5">
                                                     <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -2824,16 +2824,16 @@
                                                     </constraints>
                                                 </imageView>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="1fv-hF-ldE">
-                                                    <rect key="frame" x="30" y="0.0" width="84" height="28"/>
+                                                    <rect key="frame" x="30" y="0.0" width="86" height="28"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pavel Bukharov" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Aaz-Dq-iBM">
-                                                            <rect key="frame" x="0.0" y="0.0" width="84" height="14"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="86" height="14"/>
                                                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                                                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="18.04.2020 16:15" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fcU-2h-8CW">
-                                                            <rect key="frame" x="0.0" y="14" width="84" height="14"/>
+                                                            <rect key="frame" x="0.0" y="14" width="86" height="14"/>
                                                             <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="10"/>
                                                             <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
@@ -3131,65 +3131,65 @@
     </scenes>
     <designables>
         <designable name="15S-jg-zXa">
-            <size key="intrinsicContentSize" width="116" height="14"/>
+            <size key="intrinsicContentSize" width="110" height="16.5"/>
         </designable>
         <designable name="2zC-z6-iNa">
-            <size key="intrinsicContentSize" width="108" height="14"/>
+            <size key="intrinsicContentSize" width="108" height="16.5"/>
         </designable>
         <designable name="7we-hL-jaD">
-            <size key="intrinsicContentSize" width="77.5" height="14"/>
+            <size key="intrinsicContentSize" width="77" height="16.5"/>
         </designable>
         <designable name="BbB-uI-rLr">
-            <size key="intrinsicContentSize" width="76.5" height="14"/>
+            <size key="intrinsicContentSize" width="79" height="16.5"/>
         </designable>
         <designable name="KkK-YW-qNW">
-            <size key="intrinsicContentSize" width="88" height="14"/>
+            <size key="intrinsicContentSize" width="85" height="16.5"/>
         </designable>
         <designable name="O2g-EL-7cP">
-            <size key="intrinsicContentSize" width="141" height="14"/>
+            <size key="intrinsicContentSize" width="139" height="16.5"/>
         </designable>
         <designable name="Qi8-NE-l5h">
-            <size key="intrinsicContentSize" width="77" height="14"/>
+            <size key="intrinsicContentSize" width="82" height="16.5"/>
         </designable>
         <designable name="R6C-13-hPI"/>
         <designable name="W7s-Sn-dVk">
-            <size key="intrinsicContentSize" width="107.5" height="14"/>
+            <size key="intrinsicContentSize" width="106" height="16.5"/>
         </designable>
         <designable name="Wl5-ZJ-jBB">
-            <size key="intrinsicContentSize" width="107" height="14"/>
+            <size key="intrinsicContentSize" width="105" height="16.5"/>
         </designable>
         <designable name="Z4I-Cz-lAV">
-            <size key="intrinsicContentSize" width="65.5" height="14"/>
+            <size key="intrinsicContentSize" width="62" height="16.5"/>
         </designable>
         <designable name="bwK-bw-dqn">
-            <size key="intrinsicContentSize" width="114.5" height="14"/>
+            <size key="intrinsicContentSize" width="110" height="16.5"/>
         </designable>
         <designable name="cTr-eY-NbI">
-            <size key="intrinsicContentSize" width="61.5" height="14"/>
+            <size key="intrinsicContentSize" width="58" height="16.5"/>
         </designable>
         <designable name="ctR-vM-uuH">
-            <size key="intrinsicContentSize" width="49" height="23.5"/>
+            <size key="intrinsicContentSize" width="52.5" height="27.5"/>
         </designable>
         <designable name="jSZ-cg-1MB">
-            <size key="intrinsicContentSize" width="69" height="14"/>
+            <size key="intrinsicContentSize" width="67" height="16.5"/>
         </designable>
         <designable name="jW6-5J-YXK">
-            <size key="intrinsicContentSize" width="71.5" height="14"/>
+            <size key="intrinsicContentSize" width="70.5" height="16.5"/>
         </designable>
         <designable name="mRe-Dw-odV">
-            <size key="intrinsicContentSize" width="34.5" height="16.5"/>
+            <size key="intrinsicContentSize" width="35.5" height="19.5"/>
         </designable>
         <designable name="nyA-x1-HKE">
-            <size key="intrinsicContentSize" width="52" height="14"/>
+            <size key="intrinsicContentSize" width="51" height="16.5"/>
         </designable>
         <designable name="ueC-xm-fKu">
-            <size key="intrinsicContentSize" width="102.5" height="14"/>
+            <size key="intrinsicContentSize" width="100" height="16.5"/>
         </designable>
         <designable name="vm6-DN-a2F">
-            <size key="intrinsicContentSize" width="277.5" height="17.5"/>
+            <size key="intrinsicContentSize" width="280" height="20.5"/>
         </designable>
         <designable name="wzm-bY-7Ha">
-            <size key="intrinsicContentSize" width="23.5" height="16.5"/>
+            <size key="intrinsicContentSize" width="24" height="19.5"/>
         </designable>
     </designables>
     <inferredMetricsTieBreakers>

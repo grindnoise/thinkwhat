@@ -78,7 +78,7 @@ class Avatar: UIView {
             }
         }
     }
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     
     private func setupUI() {
         border.backgroundColor = UIColor { traitCollection in

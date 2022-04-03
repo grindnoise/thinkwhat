@@ -1,0 +1,132 @@
+//
+//  YoutubeCell.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 28.03.2022.
+//  Copyright © 2022 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+import YoutubePlayer_in_WKWebView
+
+class YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackObservable {
+
+    private var tempAppPreference: SideAppPreference?
+    private var sideAppPreference: SideAppPreference? {
+        if UserDefaults.App.youtubePlay == nil {
+            return nil
+        } else {
+            return UserDefaults.App.youtubePlay
+        }
+    }
+    private var isYoutubeInstalled: Bool {
+        let appName = "youtube"
+        let appScheme = "\(appName)://app"
+        let appUrl = URL(string: appScheme)
+        return UIApplication.shared.canOpenURL(appUrl! as URL)
+    }
+    private var videoID = ""
+    private weak var delegate: CallbackObservable?
+    private var isSetupComplete = false
+    private var loadingIndicator: LoadingIndicator!
+    private var isVideoLoaded = false
+
+    @IBOutlet weak var playerView: WKYTPlayerView! {
+        didSet {
+            playerView.alpha = 0
+            playerView.delegate = self
+            loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: contentView.frame.height, height: contentView.frame.height)))
+            loadingIndicator.layer.masksToBounds = false
+            loadingIndicator.layoutCentered(in: contentView, multiplier: 0.2)//addEquallyTo(to: tableView)
+            loadingIndicator.addEnableAnimation()
+        }
+    }
+    
+    public func setupUI(delegate callbackDelegate: CallbackObservable, videoID id: String) {
+        if !isSetupComplete {
+            setNeedsLayout()
+            layoutIfNeeded()
+            videoID = id
+            delegate = callbackDelegate
+            isSetupComplete = true
+            playerView.cornerRadius = playerView.frame.width * 0.05
+            loadVideo()
+        }
+    }
+    
+    @objc fileprivate func callback() {
+        delegate?.callbackReceived(self)
+    }
+    
+    private func loadVideo() {
+        if !isVideoLoaded {
+            isVideoLoaded = true
+            playerView.load(withVideoId: videoID)
+        }
+    }
+    
+    func playerViewDidBecomeReady(_ playerView: WKYTPlayerView) {
+        print("ready")
+        UIView.animate(withDuration: 0.3, animations: {
+            self.loadingIndicator.alpha = 0
+        }) {
+            _ in
+            UIView.animate(withDuration: 1, delay: 0, options: .curveEaseInOut, animations: {
+                self.playerView.alpha = 1
+            })
+        }
+    }
+    
+    func playerView(_ playerView: WKYTPlayerView, didChangeTo state: WKYTPlayerState) {
+        if state == .buffering {
+            if sideAppPreference != nil {
+                if sideAppPreference! == .Embedded {
+                    playerView.playVideo()
+                } else {
+                    if isYoutubeInstalled {
+                        playInYotubeApp()
+                        playerView.stopVideo()
+                    }
+                }
+            } else if isYoutubeInstalled, tempAppPreference == nil {
+                    playerView.pauseVideo()
+                    delBanner.shared.contentType = .SideApp
+                    if let content = delBanner.shared.content as? SideApp {
+                        content.app = .Youtube
+                        content.delegate = self
+                    }
+                    delBanner.shared.present(isModal: true, delegate: nil)
+            } else {
+                if tempAppPreference == .Embedded {
+                    playerView.playVideo()
+                } else {
+                    if isYoutubeInstalled {
+                        playInYotubeApp()
+                        playerView.stopVideo()
+                    }
+                }
+            }
+        }
+    }
+    
+    private func playInYotubeApp() {
+        let appScheme = "youtube://watch?v=\(videoID)"
+        if let appUrl = URL(string: appScheme) {
+            UIApplication.shared.open(appUrl)
+        }
+    }
+
+    func callbackReceived(_ sender: Any) {
+        if let option = sender as? SideAppPreference {
+            switch option {
+            case .App:
+                tempAppPreference = .App
+                playInYotubeApp()
+                playerView.stopVideo()
+            case .Embedded:
+                playerView.playVideo()
+                tempAppPreference = .Embedded
+            }
+        }
+    }
+}

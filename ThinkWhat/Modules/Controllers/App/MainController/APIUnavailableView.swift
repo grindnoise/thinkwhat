@@ -14,7 +14,7 @@ class APIUnavailableView: UIView {
     }
     
     // MARK: - Initialization
-    init(frame: CGRect, delegate _delegate: CallbackDelegate) {
+    init(frame: CGRect, delegate _delegate: CallbackObservable) {
         super.init(frame: frame)
         delegate = _delegate
         commonInit()
@@ -69,5 +69,5 @@ class APIUnavailableView: UIView {
         delegate?.callbackReceived(self)
     }
     
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
 }

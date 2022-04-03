@@ -767,7 +767,7 @@ extension FillUserView: KeyboardScrollable {
     }
 }
 
-extension FillUserView: CallbackDelegate {
+extension FillUserView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if (sender as AnyObject).isKind(of: Avatar.self) {
             viewInput?.onImageTap()

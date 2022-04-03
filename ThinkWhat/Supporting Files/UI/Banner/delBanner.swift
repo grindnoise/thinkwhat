@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Banner: UIView {
+class delBanner: UIView {
     static let bannerWillAppearSignal       = "bannerWillAppearSignal"
     static let bannerDidAppearSignal        = "bannerDidAppearSignal"
     static let bannerWillDisappearSignal    = "bannerWillDisappearSignal"
@@ -28,7 +28,7 @@ class Banner: UIView {
             }
         }
     }
-    static let shared = Banner()
+    static let shared = delBanner()
     var contentType: ContentType = .None {
         didSet {
             if oldValue != contentType {
@@ -80,8 +80,8 @@ class Banner: UIView {
             }
         }
     }
-    private var keyWindow:  UIWindow!
-    private weak var delegate : CallbackDelegate?
+    private var keyWindow:  UIView!
+    private weak var delegate : CallbackObservable?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("Not for XIB/NIB")
@@ -93,8 +93,9 @@ class Banner: UIView {
     }
     
     private func commonInit() {
-        Bundle.main.loadNibNamed("Banner", owner: self, options: nil)
-        guard let content = contentView, let _keyWindow = UIApplication.shared.value(forKey: "statusBarWindow") as? UIWindow else {
+        Bundle.main.loadNibNamed("delBanner", owner: self, options: nil)
+//        guard let content = contentView, let _keyWindow = UIApplication.shared.value(forKey: "statusBarWindow") as? UIWindow else {
+        guard let content = contentView, let _keyWindow = UIApplication.shared.statusBarView else {
             return
         }
         backgroundColor             = .clear
@@ -115,7 +116,7 @@ class Banner: UIView {
         body.addGestureRecognizer(gestureRecognizer)
     }
     
-    func present(isModal _isModal: Bool = false, shouldDismissAfter seconds: TimeInterval = 0, delegate _delegate: CallbackDelegate?) {
+    func present(isModal _isModal: Bool = false, shouldDismissAfter seconds: TimeInterval = 0, delegate _delegate: CallbackObservable?) {
         isInteracting = false
         isModal       = _isModal
         if seconds != 0 {
@@ -123,7 +124,7 @@ class Banner: UIView {
             startTimer()
         }
         delegate = _delegate
-        delegate?.callbackReceived(Banner.bannerWillAppearSignal as AnyObject)
+        delegate?.callbackReceived(delBanner.bannerWillAppearSignal as AnyObject)
         alpha = 1
         UIView.animate(
             withDuration: 0.4,
@@ -137,17 +138,18 @@ class Banner: UIView {
                 self.layoutIfNeeded()
         }) {
             _ in
-            self.delegate?.callbackReceived(Banner.bannerDidAppearSignal as AnyObject)
+            self.delegate?.callbackReceived(delBanner.bannerDidAppearSignal as AnyObject)
             self.isVisible = true
         }
         
         UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
             self.background.alpha = 1
         })
+        layer.zPosition = 100
     }
     
     func dismiss(completion: @escaping (Bool) -> ()) {
-        self.delegate?.callbackReceived(Banner.bannerWillDisappearSignal as AnyObject)
+        self.delegate?.callbackReceived(delBanner.bannerWillDisappearSignal as AnyObject)
         UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
             self.setNeedsLayout()
             self.topConstraint.constant = self.yOrigin
@@ -155,7 +157,7 @@ class Banner: UIView {
             self.background.alpha = 0
         }) {
             _ in
-            self.delegate?.callbackReceived(Banner.bannerDidDisappearSignal as AnyObject)
+            self.delegate?.callbackReceived(delBanner.bannerDidDisappearSignal as AnyObject)
             self.delegate = nil
             self.isVisible = false
             self.alpha = 0
@@ -218,7 +220,7 @@ class Banner: UIView {
         let yVelocity = recognizer.velocity(in: contentView).y
         let distance = abs(yOrigin) - abs(yPoint)
         if yVelocity < -500 {
-            delegate?.callbackReceived(Banner.bannerWillDisappearSignal as AnyObject)
+            delegate?.callbackReceived(delBanner.bannerWillDisappearSignal as AnyObject)
             let time = TimeInterval(distance/abs(yVelocity)*2.5)
             let duration: TimeInterval = time < 0.08 ? 0.08 : time
             UIView.animate(withDuration: duration, delay: 0, options: [.curveLinear], animations: {
@@ -229,7 +231,7 @@ class Banner: UIView {
             }) {
                 _ in
                 self.alpha = 0
-                self.delegate?.callbackReceived(Banner.bannerDidDisappearSignal as AnyObject)
+                self.delegate?.callbackReceived(delBanner.bannerDidDisappearSignal as AnyObject)
             }
         } else if background.alpha > 0.33 {
             UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
@@ -239,7 +241,7 @@ class Banner: UIView {
                 self.background.alpha = 1
             })
         } else {
-            delegate?.callbackReceived(Banner.bannerWillDisappearSignal as AnyObject)
+            delegate?.callbackReceived(delBanner.bannerWillDisappearSignal as AnyObject)
             UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
                 self.setNeedsLayout()
                 self.topConstraint.constant = self.yOrigin
@@ -248,7 +250,7 @@ class Banner: UIView {
             }) {
                 _ in
                 self.alpha = 0
-                self.delegate?.callbackReceived(Banner.bannerDidDisappearSignal as AnyObject)
+                self.delegate?.callbackReceived(delBanner.bannerDidDisappearSignal as AnyObject)
             }
         }
     }

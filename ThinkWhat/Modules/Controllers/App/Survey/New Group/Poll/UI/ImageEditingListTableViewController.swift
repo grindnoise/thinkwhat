@@ -10,7 +10,7 @@ import UIKit
 
 class ImageEditingListTableViewController: UITableViewController {
     
-    var delegate: CallbackDelegate?
+    var delegate: CallbackObservable?
     
     @IBOutlet weak var openIcon: Icon! {
         didSet {

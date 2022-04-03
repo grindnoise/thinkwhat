@@ -61,7 +61,7 @@ class CheckBox: UIView, CAAnimationDelegate {
     }
     
     func setupLayers(){
-        self.backgroundColor = UIColor(red:1.00, green: 1.00, blue:1.00, alpha:1.0)
+        self.backgroundColor = .clear
         
         let path = CAShapeLayer()
         self.layer.addSublayer(path)
@@ -86,7 +86,7 @@ class CheckBox: UIView, CAAnimationDelegate {
         if layerIds == nil || layerIds.contains("path"){
             let path = layers["path"] as! CAShapeLayer
             path.fillRule    = .evenOdd
-            path.fillColor   = UIColor.black.cgColor
+            path.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.white.cgColor : UIColor.black.cgColor
             path.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             path.lineWidth   = 0
         }
@@ -96,7 +96,7 @@ class CheckBox: UIView, CAAnimationDelegate {
             rectangle.frame       = CGRect(x: 0.0541 * rectangle.superlayer!.bounds.width, y: 0.45702 * rectangle.superlayer!.bounds.height, width: 0.17959 * rectangle.superlayer!.bounds.width, height: 0.01 * rectangle.superlayer!.bounds.height)
             rectangle.setValue(-44.64 * CGFloat.pi/180, forKeyPath:"transform.rotation")
             rectangle.opacity     = 0
-            rectangle.fillColor   = self.main.cgColor
+            rectangle.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
             rectangle.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             rectangle.lineWidth   = 0
         }
@@ -106,7 +106,7 @@ class CheckBox: UIView, CAAnimationDelegate {
             rectangle2.frame       = CGRect(x: 0.25858 * rectangle2.superlayer!.bounds.width, y: 0.77369 * rectangle2.superlayer!.bounds.height, width: 0.16959 * rectangle2.superlayer!.bounds.width, height: 0.01 * rectangle2.superlayer!.bounds.height)
             rectangle2.setValue(-135.09 * CGFloat.pi/180, forKeyPath:"transform.rotation")
             rectangle2.opacity     = 0
-            rectangle2.fillColor   = self.main.cgColor
+            rectangle2.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
             rectangle2.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             rectangle2.lineWidth   = 0
         }
@@ -331,6 +331,22 @@ class CheckBox: UIView, CAAnimationDelegate {
         return rectangle2Path
     }
     
-    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        guard let path = layers["path"] as? CAShapeLayer,
+              let rectangle = layers["rectangle"] as? CAShapeLayer,
+              let rectangle2 = layers["rectangle2"] as? CAShapeLayer else {
+            return
+        }
+        switch traitCollection.userInterfaceStyle {
+        case .dark:
+            path.fillColor = UIColor.white.cgColor
+            rectangle.fillColor = UIColor.systemBlue.cgColor
+            rectangle2.fillColor = UIColor.systemBlue.cgColor
+        default:
+            path.fillColor = UIColor.black.cgColor
+            rectangle.fillColor = K_COLOR_RED.cgColor
+            rectangle2.fillColor = K_COLOR_RED.cgColor
+        }
+    }
 }
 

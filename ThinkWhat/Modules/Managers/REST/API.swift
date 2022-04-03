@@ -739,6 +739,38 @@ class API {
         }
     }
     
+    private func accessControlAsync() async throws {
+        func refreshAccessTokenAsync() async throws {
+            guard let refreshToken = (KeychainService.loadRefreshToken() as String?) else {
+                throw "Error occured while retrieving refresh token from KeychainService"
+            }
+            print(refreshToken)
+            let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refreshToken)"]
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else {
+                throw APIError.invalidURL
+            }
+            
+            do {
+                let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil, accessControl: false)
+                let json = try JSON(data: data, options: .mutableContainers)
+                saveTokenInKeychain(json: json)
+            } catch {
+                throw error
+            }
+        }
+        
+        guard let expiryDate = (KeychainService.loadTokenExpireDateTime() as String?)?.toDateTime() else {
+            throw "Can't retrieve token expiration date from KeychainService"
+        }
+        guard Date() >= expiryDate else { return }
+        do {
+            try await refreshAccessTokenAsync()
+        } catch {
+            throw error
+        }
+    }
+
+    
     private func refreshAccessToken(completion: @escaping (Result<Bool, Error>) -> ()) {
         guard let refreshToken = (KeychainService.loadRefreshToken() as String?) else {
             completion(.failure("Error occured while retrieving refresh token from KeychainService"))
@@ -765,25 +797,6 @@ class API {
             case let .failure(_error):
                 completion(.failure(_error))
             }
-        }
-    }
-    
-    private func refreshAccessTokenAsync() async throws -> Bool {
-        guard let refreshToken = (KeychainService.loadRefreshToken() as String?) else {
-            throw "Error occured while retrieving refresh token from KeychainService"
-        }
-        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refreshToken)"]
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else {
-            throw APIError.invalidURL
-        }
-        
-        do {
-            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding.default)
-            let json = try JSON(data: data, options: .mutableContainers)
-            saveTokenInKeychain(json: json)
-            return true
-        } catch {
-            throw error
         }
     }
     
@@ -824,35 +837,40 @@ class API {
         }
     }
     
-    func requestAsync(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, headers: HTTPHeaders? = nil) async throws -> Data {
-        try await withUnsafeThrowingContinuation { continuation in
-            AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseData { response in
-                switch response.result {
-                case .success(let data):
-                    guard let statusCode = response.response?.statusCode else { continuation.resume(throwing: APIError.httpStatusCodeMissing); return }
-                    do {
-                        let json = try JSON(data: data, options: .mutableContainers)
-                        guard 200...299 ~= statusCode else { continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString())); return }
-                        continuation.resume(returning: data)
-                        return
-                    } catch {
+    func requestAsync(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, headers: HTTPHeaders? = nil, accessControl: Bool = true) async throws -> Data {
+        
+        func request() async throws -> Data {
+            try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data,Error>) in
+                AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseData { response in
+                    switch response.result {
+                    case .success(let data):
+                        guard let statusCode = response.response?.statusCode else { continuation.resume(throwing: APIError.httpStatusCodeMissing); return }
+                        do {
+                            let json = try JSON(data: data, options: .mutableContainers)
+                            guard 200...299 ~= statusCode else { continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString())); return }
+                            continuation.resume(returning: data)
+                            return
+                        } catch {
+                            continuation.resume(throwing: error)
+                            return
+                        }
+                    case let .failure(error):
                         continuation.resume(throwing: error)
                         return
                     }
-                case let .failure(error):
-                    continuation.resume(throwing: error)
-                    return
                 }
-                //                if let data = response.data {
-                //                    continuation.resume(returning: data)
-                //                    return
-                //                }
-                //                if let err = response.error {
-                //                    continuation.resume(throwing: err)
-                //                    return
-                //                }
-                fatalError("should not get here")
             }
+        }
+        
+        do {
+            if accessControl {
+                try await accessControlAsync()
+                return try await request()
+            } else {
+                return try await request()
+            }
+        } catch {
+            throw error
         }
     }
     
@@ -891,6 +909,13 @@ class API {
             completion(result)
         }
     }
+    
+    func markFavoriteAsync(mark: Bool, surveyReference: SurveyReference) async throws -> Data {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(mark ? API_URLS.SURVEYS_ADD_FAVORITE : API_URLS.SURVEYS_REMOVE_FAVORITE) else { throw APIError.invalidURL }
+        
+        return try await requestAsync(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default, headers: headers())
+    }
+
     
     func incrementViewCounter(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_ADD_VIEW_COUNT) else { completion(.failure(APIError.invalidURL)); return }

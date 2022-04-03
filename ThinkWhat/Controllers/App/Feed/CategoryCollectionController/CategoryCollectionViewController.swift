@@ -20,7 +20,7 @@ class CategoryCollectionViewController: UICollectionViewController {
     var needsAnimation = true
 //    fileprivate var effectView: AnimatedVisualEffectView!
     let effectView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     var currentIndex: IndexPath = IndexPath(row: 0, section: 0)
     var childColor: UIColor?
     var returnPos: CGPoint = .zero

@@ -694,12 +694,12 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
         if postButton.backgroundColor == K_COLOR_RED {
             postSurvey()
         } else {
-            Banner.shared.contentType = .Warning
-            if let content = Banner.shared.content as? Warning {
+            delBanner.shared.contentType = .Warning
+            if let content = delBanner.shared.content as? Warning {
                 content.level = .Warning
                 content.text = "Минимальное количество вариантов ответов - 2"
             }
-            Banner.shared.present(shouldDismissAfter: 3, delegate: nil)
+            delBanner.shared.present(shouldDismissAfter: 3, delegate: nil)
         }
     }
     @IBOutlet weak var postButton: UIButton! {
@@ -1473,12 +1473,12 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             }
             if UserDefaults.App.hasSeenPollCreationIntroduction {
                 delay(seconds: 1) {
-                    Banner.shared.contentType = .Warning
-                    if let content = Banner.shared.content as? Warning {
+                    delBanner.shared.contentType = .Warning
+                    if let content = delBanner.shared.content as? Warning {
                         content.level = .Info
                         content.text = "Прикрепите веб-ссылку (опционально)"
                     }
-                    Banner.shared.present(shouldDismissAfter: 3, delegate: nil)
+                    delBanner.shared.present(shouldDismissAfter: 3, delegate: nil)
                 }
             }
             
@@ -1515,12 +1515,12 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             }
             if UserDefaults.App.hasSeenPollCreationIntroduction {
                 delay(seconds: 1) {
-                    Banner.shared.contentType = .Warning
-                    if let content = Banner.shared.content as? Warning {
+                    delBanner.shared.contentType = .Warning
+                    if let content = delBanner.shared.content as? Warning {
                         content.level = .Info
                         content.text = "Дополните опрос изображениями (опционально)"
                     }
-                    Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                    delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
                 }
             }
 //            delay(seconds: lineAnimationDuration * 0.2) {
@@ -1720,25 +1720,25 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             } else if effectView != nil, let frameView = highlitedImage.keys.first as? UIView, let imageView = highlitedImage.values.first as? UIImageView, let keyWindow = navigationController?.view.window {
                 dismissImageEffectView(_effectView: effectView!, frameView: frameView, imageView: imageView, keyWindow: keyWindow)
             } else if v.accessibilityIdentifier == "balance" {
-                Banner.shared.contentType = .TotaLCost
-                if let content = Banner.shared.content as? TotalCost {
+                delBanner.shared.contentType = .TotaLCost
+                if let content = delBanner.shared.content as? TotalCost {
                     content.balance = Userprofiles.shared.current!.balance
                 }
-                Banner.shared.present(shouldDismissAfter: 5, delegate: nil)
+                delBanner.shared.present(shouldDismissAfter: 5, delegate: nil)
             } else if v == hyperlinkInfoButton {
-                Banner.shared.contentType = .Warning
-                if let content = Banner.shared.content as? Warning {
+                delBanner.shared.contentType = .Warning
+                if let content = delBanner.shared.content as? Warning {
                     content.level = .Info
                     content.text = "Прикрепите веб-ссылку (опционально)"
                 }
-                Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
             } else if v == imagesInfoButton {
-                Banner.shared.contentType = .Warning
-                if let content = Banner.shared.content as? Warning {
+                delBanner.shared.contentType = .Warning
+                if let content = delBanner.shared.content as? Warning {
                     content.level = .Info
                     content.text = "Прикрепите изображение (опционально)"
                 }
-                Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
             } else if v === pollTitleTextView {
                 performSegue(withIdentifier: Segues.App.NewSurveyToTypingViewController, sender: titleIcon)
             } else if v === pollDescriptionTextView {
@@ -2049,12 +2049,12 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             self.answers.append("")
             self.tableView.insertRows(at: [IndexPath(row: self.answers.count-1, section: 0)], with: .top)
             if self.answers.count == ModelProperties.shared.surveyAnswerMaxFreeCount + 1 {
-                Banner.shared.contentType = .Warning
-                if let content = Banner.shared.content as? Warning {
+                delBanner.shared.contentType = .Warning
+                if let content = delBanner.shared.content as? Warning {
                     content.level = .Warning
                     content.text = "5 вариантов ответов бесплатно. За снятие ограничений будет дополнительно списано \(PriceList.shared.extraAnswers) баллов"
                 }
-                Banner.shared.present(shouldDismissAfter: 5, delegate: nil)
+                delBanner.shared.present(shouldDismissAfter: 5, delegate: nil)
             }
             //.selectRow(at: IndexPath(row: answers.count-1, section: 0), animated: true, scrollPosition: .bottom)
             self.setAnswerContainerHeight()
@@ -2084,7 +2084,7 @@ extension NewPollController: CAAnimationDelegate {
     }
 }
 
-extension NewPollController: CallbackDelegate {
+extension NewPollController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let _category = sender as? Topic {
             topic = _category
@@ -2462,7 +2462,7 @@ class AddAnswerCell: UITableViewCell {
     deinit {
         print("***AddAnswerCell deinit***")
     }
-    weak var delegate:   CallbackDelegate?
+    weak var delegate:   CallbackObservable?
     @IBOutlet weak var addButton: UIButton!
     @IBAction func addButtonTapped(_ sender: Any) {
         delegate?.callbackReceived("addAnswer" as AnyObject)
@@ -2473,7 +2473,7 @@ class AnswerSelectionCell: UITableViewCell {
     deinit {
         print("***AnswerSelectionCell deinit***")
     }
-    weak var delegate:   CallbackDelegate?
+    weak var delegate:   CallbackObservable?
     var index:      IndexPath!
 //    @IBOutlet weak var frameView: UIView!
     @IBOutlet weak var textView: UITextView! {

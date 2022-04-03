@@ -217,7 +217,7 @@ extension VotersViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
 }
 
-extension VotersViewController: CallbackDelegate {
+extension VotersViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let dict = sender as? [String: AnyObject] {
             if let _filtered = dict["filtered"] as? [Userprofile] {

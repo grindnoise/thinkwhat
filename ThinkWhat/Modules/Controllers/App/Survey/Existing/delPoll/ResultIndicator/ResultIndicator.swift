@@ -45,7 +45,7 @@ class ResultIndicator: UIView {
     private var panGesture: UIPanGestureRecognizer!
 //    private var apiManager: APIManagerProtocol!
     private var color: UIColor = K_COLOR_RED
-    private weak var delegate: CallbackDelegate!
+    private weak var delegate: CallbackObservable!
     private var highlightedImageView: UIImageView? {
         didSet {
             if highlightedImageView != nil, highlightedImageView != oldValue {
@@ -217,7 +217,7 @@ class ResultIndicator: UIView {
         self.commonInit()
     }
     
-    init(delegate: CallbackDelegate, answer: Answer, color: UIColor, isSelected: Bool) {
+    init(delegate: CallbackObservable, answer: Answer, color: UIColor, isSelected: Bool) {
         super.init(frame: .zero)
         self.delegate = delegate
         self.isSelected = isSelected

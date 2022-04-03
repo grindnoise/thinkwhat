@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Semibold.ttf">
+            <string>OpenSans-Semibold</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="images" id="KGk-i7-Jjw" customClass="ImagesCell" customModule="ThinkWhat" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="200"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="200"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="j2G-bq-ta6">
+                        <rect key="frame" x="32" y="28" width="256" height="144"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LfJ-9Z-1tZ">
+                                <rect key="frame" x="0.0" y="0.0" width="256" height="144"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </scrollView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PlX-Jh-P1p">
+                                <rect key="frame" x="8" y="116" width="30" height="20"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1/2" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="2" translatesAutoresizingMaskIntoConstraints="NO" id="3Nw-PM-eq0">
+                                        <rect key="frame" x="3" y="2" width="24" height="16"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="10"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="3Nw-PM-eq0" firstAttribute="centerX" secondItem="PlX-Jh-P1p" secondAttribute="centerX" id="63t-nV-NpV"/>
+                                    <constraint firstItem="3Nw-PM-eq0" firstAttribute="width" secondItem="PlX-Jh-P1p" secondAttribute="width" multiplier="0.8" id="SkM-fw-bfi"/>
+                                    <constraint firstAttribute="width" secondItem="PlX-Jh-P1p" secondAttribute="height" multiplier="6:4" id="cd1-eB-CnN"/>
+                                    <constraint firstItem="3Nw-PM-eq0" firstAttribute="height" secondItem="PlX-Jh-P1p" secondAttribute="height" multiplier="0.8" id="fgr-1b-WfS"/>
+                                    <constraint firstItem="3Nw-PM-eq0" firstAttribute="centerY" secondItem="PlX-Jh-P1p" secondAttribute="centerY" id="tif-b3-Gxb"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="PlX-Jh-P1p" firstAttribute="leading" secondItem="j2G-bq-ta6" secondAttribute="leadingMargin" id="1fO-aN-KKV"/>
+                            <constraint firstItem="LfJ-9Z-1tZ" firstAttribute="leading" secondItem="j2G-bq-ta6" secondAttribute="leading" id="5a7-TQ-ovP"/>
+                            <constraint firstAttribute="trailing" secondItem="LfJ-9Z-1tZ" secondAttribute="trailing" id="6dZ-NN-UAq"/>
+                            <constraint firstAttribute="bottom" secondItem="LfJ-9Z-1tZ" secondAttribute="bottom" id="EPr-of-ik0"/>
+                            <constraint firstAttribute="bottomMargin" secondItem="PlX-Jh-P1p" secondAttribute="bottom" id="S3r-Ly-BAN"/>
+                            <constraint firstItem="LfJ-9Z-1tZ" firstAttribute="top" secondItem="j2G-bq-ta6" secondAttribute="top" id="f5p-cr-g9g"/>
+                            <constraint firstItem="PlX-Jh-P1p" firstAttribute="height" secondItem="LfJ-9Z-1tZ" secondAttribute="height" multiplier="0.14" id="n8q-Vl-MGs"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="j2G-bq-ta6" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="5C4-eM-seE"/>
+                    <constraint firstItem="j2G-bq-ta6" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="fsi-lS-prS"/>
+                    <constraint firstItem="j2G-bq-ta6" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.8" id="h8h-Fx-e8C"/>
+                    <constraint firstItem="j2G-bq-ta6" firstAttribute="width" secondItem="j2G-bq-ta6" secondAttribute="height" multiplier="16:9" id="oWg-Il-M0z"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="page" destination="3Nw-PM-eq0" id="IMr-E0-caL"/>
+                <outlet property="pageControl" destination="PlX-Jh-P1p" id="b1M-WM-ebs"/>
+                <outlet property="scrollView" destination="LfJ-9Z-1tZ" id="9wM-Qw-9hS"/>
+            </connections>
+            <point key="canvasLocation" x="139" y="74"/>
+        </tableViewCell>
+    </objects>
+</document>

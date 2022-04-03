@@ -20,7 +20,7 @@ class LostConnectionView: UIView {
     @IBAction func retryTapped(_ sender: Any) {
         delegate?.callbackReceived(self)
     }
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     
     override init(frame: CGRect) {
         super.init(frame: frame)

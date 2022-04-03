@@ -22,7 +22,7 @@ class ClaimView: UIView {
             }
         }
     }
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     
     deinit {
         print("deinit")

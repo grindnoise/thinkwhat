@@ -21,25 +21,18 @@ class HotController: UIViewController {
         self.controllerInput = model
         self.controllerInput?
             .modelOutput = self
-//        navigationController?.setNavigationBarHidden(true, animated: true)
         addObservers()
-//        title = "hot".localized
-//        navigationController?.isNavigationBarHidden = true
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+//        navigationItem.title = "New Order"
+//            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.largeTitleDisplayMode =  .always
         guard !isViewLayedOut else { return }
         view.setNeedsLayout()
         view.layoutIfNeeded()
         controllerOutput?.onDidLayout()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-//        isMakingStackPaused = false
-//        delay(seconds: 0.2) {
-//            self.makePreviewStack()
-//        }
     }
     
     private func addObservers() {
@@ -56,11 +49,7 @@ class HotController: UIViewController {
     // MARK: - Properties
     var controllerOutput: HotControllerOutput?
     var controllerInput: HotControllerInput?
-//    var surveyStack: [Survey] = []
     private var isViewLayedOut = false
-//    private var isMakingStackPaused = false
-//    private var surveyPreview: SurveyPreview!
-//    private var nextSurveyPreview: SurveyPreview?
     private var timer: Timer?
     
 }
@@ -71,8 +60,13 @@ extension HotController: HotViewInput {
         if let nav = navigationController as? CustomNavigationController {
             nav.transitionStyle = .Default
             nav.duration = 0.5
+//            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
         }
-        navigationController?.pushViewController(PollController(), animated: true)
+//        let backItem = UIBarButtonItem()
+//            backItem.title = ""
+//            navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(PollController(survey: survey), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
     func onEmptyStack() {

@@ -36,7 +36,7 @@ class BinarySelectionViewController: UIViewController {
         }
     }
     var cost: [String: Int]?
-    var delegate: CallbackDelegate?
+    var delegate: CallbackObservable?
     private var enabledString = ""
     private var disabledString = ""
     private var isSelected = false
@@ -46,12 +46,12 @@ class BinarySelectionViewController: UIViewController {
     var isEnabled: Bool? {
         didSet {
             if UserDefaults.App.hasSeenPollCreationIntroduction, selectionType == .Hot, isEnabled == true, !isBannerShown {
-                Banner.shared.contentType = .Warning
-                if let content = Banner.shared.content as? Warning {
+                delBanner.shared.contentType = .Warning
+                if let content = delBanner.shared.content as? Warning {
                     content.level = .Warning
                     content.text = "Платная опция, будет списано дополнительно \(PriceList.shared.hotPost) баллов"
                 }
-                Banner.shared.present(shouldDismissAfter: 3, delegate: nil)
+                delBanner.shared.present(shouldDismissAfter: 3, delegate: nil)
                 isBannerShown = true
             }
         }
@@ -228,12 +228,12 @@ class BinarySelectionViewController: UIViewController {
     @objc fileprivate func okButtonTapped() {
         isAnimationStopped = true
         if !isSelected {
-            Banner.shared.contentType = .Warning
-            if let content = Banner.shared.content as? Warning {
+            delBanner.shared.contentType = .Warning
+            if let content = delBanner.shared.content as? Warning {
                 content.level = .Error
                 content.text = "Необходимо выбрать опцию"
             }
-            Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+            delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
         } else {
             navigationController?.popViewController(animated: true)
         }
@@ -242,12 +242,12 @@ class BinarySelectionViewController: UIViewController {
     @objc fileprivate func viewTapped(gesture: UITapGestureRecognizer) {
         if gesture.state == .ended, let v = gesture.view {
             if v.accessibilityIdentifier == "info" {
-                Banner.shared.contentType = .Warning
-                if let content = Banner.shared.content as? Warning {
+                delBanner.shared.contentType = .Warning
+                if let content = delBanner.shared.content as? Warning {
                     content.level = .Info
                     content.text = "Стоимость публикации в ленте горячих составляет \(PriceList.shared.hotPost) баллов"
                 }
-                Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
                 return
             }
          

@@ -32,7 +32,7 @@ class SideApp: UIView, BannerContent {
         return topView.frame.height
     }
 
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     deinit {
         print("Warning banner deinit")
     }
@@ -43,7 +43,7 @@ class SideApp: UIView, BannerContent {
 
     @IBOutlet weak var playButton: UIButton!
     @IBAction func playEmbedded(_ sender: Any) {
-        Banner.shared.dismiss() {
+        delBanner.shared.dismiss() {
             _ in
             self.delegate?.callbackReceived(SideAppPreference.Embedded as AnyObject)
             if self.app == .Youtube {
@@ -55,7 +55,7 @@ class SideApp: UIView, BannerContent {
     }
     @IBOutlet weak var openButton: UIButton!
     @IBAction func openYoutubeApp(_ sender: Any) {
-        Banner.shared.dismiss() {
+        delBanner.shared.dismiss() {
             _ in
             self.delegate?.callbackReceived(SideAppPreference.App as AnyObject)
             if self.app == .Youtube {

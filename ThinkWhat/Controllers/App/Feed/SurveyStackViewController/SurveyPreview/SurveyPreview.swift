@@ -15,7 +15,7 @@ class SurveyPreview: UIView {
     }
 
     var survey: Survey! 
-    weak fileprivate var delegate: CallbackDelegate?
+    weak fileprivate var delegate: CallbackObservable?
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var userImage: UIImageView! {
         didSet {
@@ -42,7 +42,7 @@ class SurveyPreview: UIView {
         }
         delegate?.callbackReceived(sender as AnyObject)
     }
-    init(frame: CGRect, survey _survey: Survey, delegate _delegate: CallbackDelegate) {
+    init(frame: CGRect, survey _survey: Survey, delegate _delegate: CallbackObservable) {
         survey = _survey
         delegate = _delegate
         super.init(frame: frame)

@@ -61,7 +61,7 @@ class delPollController: UIViewController {
             }
         }
     }
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     private var isDownloadingImages  = true
     private var answersCells: [ChoiceSelectionCell] = []
     private var needsAnimation                      = true
@@ -130,7 +130,7 @@ class delPollController: UIViewController {
                                 UIView.transition(with: cell.avatar,
                                                   duration: 0.5,
                                                   options: .transitionCrossDissolve,
-                                                  animations: { cell.avatar.image = image.circularImage(size: cell.avatar.frame.size, frameColor: self.survey!.topic.tagColor) }
+                                                  animations: { cell.avatar.imageView.image = image.circularImage(size: cell.avatar.frame.size, frameColor: self.survey!.topic.tagColor) }
                                 )
                             }
                         case .failure(let error):
@@ -398,12 +398,12 @@ class delPollController: UIViewController {
     @objc private func handleTap() {
         if !isRequesting {
             if survey == nil {
-                Banner.shared.contentType = .Warning
-                if let content = Banner.shared.content as? Warning {
+                delBanner.shared.contentType = .Warning
+                if let content = delBanner.shared.content as? Warning {
                     content.level = .Error
                     content.text = "Пожалуйста, дождитесь загрузки опроса"
                 }
-                Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
             } else if survey!.isComplete {
                 isRequesting = true
                 var mark = true
@@ -429,12 +429,12 @@ class delPollController: UIViewController {
                     self.isRequesting = false
                 }
             } else {
-                Banner.shared.contentType = .Warning
-                if let content = Banner.shared.content as? Warning {
+                delBanner.shared.contentType = .Warning
+                if let content = delBanner.shared.content as? Warning {
                     content.level = .Info
                     content.text = "Пройдите опрос для отслеживания результатов"
                 }
-                Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
             }
         }
     }
@@ -457,17 +457,17 @@ extension delPollController: UITableViewDelegate, UITableViewDataSource, UIScrol
             if indexPath.row == 0, let cell = tableView.dequeueReusableCell(withIdentifier: "author", for: indexPath) as? AuthorCell {
                 cell.setNeedsLayout()
                 cell.layoutIfNeeded()
-                cell.delegate = self
+//                cell.delegate = self
                 if let image = survey!.owner.image {
-                    cell.avatar.image = image.circularImage(size: cell.avatar.frame.size, frameColor: survey!.topic.tagColor)
+                    cell.avatar.imageView.image = image.circularImage(size: cell.avatar.frame.size, frameColor: survey!.topic.tagColor)
                 }
                 let categoryString = NSMutableAttributedString()
                 categoryString.append(NSAttributedString(string: "\(survey!.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear)))
                 categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear)))
                 categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear)))
-                cell.categoryLabel.attributedText = categoryString
+                cell.topic.attributedText = categoryString
                 cell.viewsLabel.text = "\(survey!.views), \(survey!.startDate.toDateStringLiteral_dMMM())"
-                cell.userCredentials.text = survey!.owner.name.replacingOccurrences(of: " ", with: "\n")//.components(separatedBy: CharacterSet.whitespaces)
+                cell.user.text = survey!.owner.name.replacingOccurrences(of: " ", with: "\n")//.components(separatedBy: CharacterSet.whitespaces)
                 return cell
             } else if indexPath.row == 1, let cell = tableView.dequeueReusableCell(withIdentifier: "title", for: indexPath) as? LabelCell {
                 cell.label.text = survey!.title
@@ -482,55 +482,55 @@ extension delPollController: UITableViewDelegate, UITableViewDataSource, UIScrol
                 return cell
             } else if indexPath.row == 3 {
                 if survey!.imagesCount > 0, let cell = tableView.dequeueReusableCell(withIdentifier: "images", for: indexPath) as? ImagesCell  {
-                    if !cell.isSetupCompleted {
-                        cell.setNeedsLayout()
-                        cell.layoutIfNeeded()
-                        cell.pageControl.cornerRadius = cell.pageControl.frame.height/4
-                        cell.createSlides(count: survey!.imagesCount)
-                        for (index, slide) in cell.slides.enumerated() {
-                            if let media = survey!.mediaWithImageURLs.filter({ $0.order == index}).first {
-                                if let image = media.image {
-                                    slide.imageView.image = image//survey!.images![index]?.keys.first
-                                    slide.imageView.progressIndicatorView.alpha = 0
-                                } else if let url = media.imageURL {
-                                    API.shared.downloadImage(url: url) { progress in
-                                        cell.slides[index].imageView.progressIndicatorView.progress = progress
-                                    } completion: { result in
-                                        switch result {
-                                        case .success(let image):
-                                            media.image = image
-                                            cell.slides[index].imageView.image = image
-                                            cell.slides[index].imageView.progressIndicatorView.reveal()
-                                            if index == 0 {
-                                                cell.showPageControl()
-                                            }
-                                        case .failure(let error):
-                                            Banner.shared.contentType = .Warning
-                                            if let content = Banner.shared.content as? Warning {
-                                                content.level = .Error
-                                                content.text = "Произошла ошибка, изображение не было загружено"
-                                            }
-                                            Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
-                                            print(error.localizedDescription)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        cell.delegate = self
-                        cell.pageControl.alpha = cell.slides.count > 1 ? 1 : 0
-                        cell.showPageControl(animated: false)
-                        cell.isSetupCompleted = true
-                    }
+//                    if !cell.isSetupCompleted {
+//                        cell.setNeedsLayout()
+//                        cell.layoutIfNeeded()
+//                        cell.pageControl.cornerRadius = cell.pageControl.frame.height/4
+//                        cell.createSlides(count: survey!.imagesCount)
+//                        for (index, slide) in cell.slides.enumerated() {
+//                            if let media = survey!.mediaWithImageURLs.filter({ $0.order == index}).first {
+//                                if let image = media.image {
+//                                    slide.imageView.image = image//survey!.images![index]?.keys.first
+//                                    slide.imageView.progressIndicatorView.alpha = 0
+//                                } else if let url = media.imageURL {
+//                                    API.shared.downloadImage(url: url) { progress in
+//                                        cell.slides[index].imageView.progressIndicatorView.progress = progress
+//                                    } completion: { result in
+//                                        switch result {
+//                                        case .success(let image):
+//                                            media.image = image
+//                                            cell.slides[index].imageView.image = image
+//                                            cell.slides[index].imageView.progressIndicatorView.reveal()
+//                                            if index == 0 {
+//                                                cell.showPageControl()
+//                                            }
+//                                        case .failure(let error):
+//                                            Banner.shared.contentType = .Warning
+//                                            if let content = Banner.shared.content as? Warning {
+//                                                content.level = .Error
+//                                                content.text = "Произошла ошибка, изображение не было загружено"
+//                                            }
+//                                            Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+//                                            print(error.localizedDescription)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        cell.delegate = self
+//                        cell.pageControl.alpha = cell.slides.count > 1 ? 1 : 0
+//                        cell.showPageControl(animated: false)
+//                        cell.isSetupCompleted = true
+//                    }
                     return cell
                 }
             } else if indexPath.row == 4 {
                 if let link = survey!.url{
                     //1) YT link
                     if link.absoluteString.isYoutubeLink, let cell = tableView.dequeueReusableCell(withIdentifier: "youtube") as? YoutubeCell, let videoID = link.absoluteString.youtubeID {
-                        cell.delegate = self
-                        cell.videoID = videoID
-                        cell.loadVideo(url: link)
+//                        cell.delegate = self
+//                        cell.videoID = videoID
+//                        cell.loadVideo(url: link)
                         return cell
                     } else if link.absoluteString.isTikTokLink, let cell = tableView.dequeueReusableCell(withIdentifier: "embedded") as? EmbeddedURLCell {
                         cell.app = .TikTok
@@ -545,36 +545,36 @@ extension delPollController: UITableViewDelegate, UITableViewDataSource, UIScrol
                         } else {
                             cell.url = link
                             guard let url = URL(string: "https://www.tiktok.com/oembed?url=\(link)") else {
-                                Banner.shared.contentType = .Warning
-                                if let content = Banner.shared.content as? Warning {
+                                delBanner.shared.contentType = .Warning
+                                if let content = delBanner.shared.content as? Warning {
                                     content.level = .Error
                                     content.text = "Произошла ошибка, TikTok не загрузился"
                                 }
-                                Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                                delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
                                 return cell
                             }
                             API.shared.getTikTokEmbedHTML(url: url) { result in
                                 switch result {
                                 case .success(let json):
                                     guard let html = json["html"].string else {
-                                        Banner.shared.contentType = .Warning
-                                        if let content = Banner.shared.content as? Warning {
+                                        delBanner.shared.contentType = .Warning
+                                        if let content = delBanner.shared.content as? Warning {
                                             content.level = .Error
                                             content.text = "Произошла ошибка, TikTok не загрузился"
                                         }
-                                        Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                                        delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
                                         return
                                     }
                                     var webContent = "<meta name='viewport' content='initial-scale=0.8, maximum-scale=0.8, user-scalable=no'/>"
                                     webContent += html
                                     cell.webView.loadHTMLString(webContent, baseURL: URL(string: "http://www.tiktok.com")!)
                                 case .failure(let error):
-                                    Banner.shared.contentType = .Warning
-                                    if let content = Banner.shared.content as? Warning {
+                                    delBanner.shared.contentType = .Warning
+                                    if let content = delBanner.shared.content as? Warning {
                                         content.level = .Error
                                         content.text = "Произошла ошибка, TikTok не загрузился"
                                     }
-                                    Banner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                                    delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
                                     print(error.localizedDescription)
                                 }
                             }
@@ -750,6 +750,7 @@ extension delPollController: UITableViewDelegate, UITableViewDataSource, UIScrol
         //            sublayer.add(pathAnim, forKey: nil)
         //            sublayer.path = destinationPath.cgPath
         //        }
+        
     }
     
 //    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
@@ -789,7 +790,7 @@ extension delPollController: CAAnimationDelegate {
 }
 
 import SafariServices
-extension delPollController: CallbackDelegate {
+extension delPollController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if sender is WebResourceCell, let url = survey!.url {
             var vc: SFSafariViewController!
@@ -860,12 +861,12 @@ extension delPollController: CallbackDelegate {
                         }
                     case .failure(let error):
                         print(error.localizedDescription)
-                        Banner.shared.contentType = .Warning
-                        if let content = Banner.shared.content as? Warning {
+                        delBanner.shared.contentType = .Warning
+                        if let content = delBanner.shared.content as? Warning {
                             content.level = .Error
                             content.text = "Произошла ошибка по техническим причинам, повторите позже"
                         }
-                        Banner.shared.present(isModal: true, shouldDismissAfter: 3, delegate: self)
+                        delBanner.shared.present(isModal: true, shouldDismissAfter: 3, delegate: self)
                     }
                 }
                 AlertController.shared.show(delegate: self, survey: nil)
@@ -903,54 +904,54 @@ extension delPollController: CallbackDelegate {
 
 
 
-class AuthorCell: UITableViewCell {
-    weak var delegate: CallbackDelegate?
-    @IBOutlet weak var avatar: UIImageView! {
-        didSet {
-            let touch = UITapGestureRecognizer(target:self, action:#selector(self.handleTap(recognizer:)))
-            touch.cancelsTouchesInView = false
-            avatar.addGestureRecognizer(touch)
-        }
-    }
-    @IBOutlet weak var userCredentials: UILabel! {
-        didSet {
-            userCredentials.backgroundColor = .clear
-            userCredentials.textColor = .black
-        }
-    }
-    @IBOutlet weak var categoryLabel: UILabel!
-    @IBOutlet weak var viewsIcon: Icon! {
-        didSet {
-            viewsIcon.scaleMultiplicator = 1.3
-            viewsIcon.backgroundColor = .clear
-            viewsIcon.iconColor = .darkGray
-            viewsIcon.category = .Eye
-        }
-    }
-    @IBOutlet weak var viewsLabel: UILabel! {
-        didSet {
-            viewsLabel.textColor = .darkGray
-        }
-    }
-//    @IBOutlet weak var commentsIcon: SurveyCategoryIcon! {
+//class AuthorCell: UITableViewCell {
+//    weak var delegate: CallbackDelegate?
+//    @IBOutlet weak var avatar: UIImageView! {
 //        didSet {
-//            commentsIcon.scaleMultiplicator = 1
-//            commentsIcon.backgroundColor = .clear
-//            commentsIcon.iconColor = .lightGray
-//            commentsIcon.category = .Opinion
+//            let touch = UITapGestureRecognizer(target:self, action:#selector(self.handleTap(recognizer:)))
+//            touch.cancelsTouchesInView = false
+//            avatar.addGestureRecognizer(touch)
 //        }
 //    }
-//    @IBOutlet weak var commentsLabel: UILabel! {
+//    @IBOutlet weak var userCredentials: UILabel! {
 //        didSet {
-//            commentsLabel.textColor = .lightGray
+//            userCredentials.backgroundColor = .clear
+//            userCredentials.textColor = .black
 //        }
 //    }
-    
-    
-    @objc private func handleTap(recognizer: UITapGestureRecognizer) {
-        delegate?.callbackReceived("user" as AnyObject)
-    }
-}
+//    @IBOutlet weak var categoryLabel: UILabel!
+//    @IBOutlet weak var viewsIcon: Icon! {
+//        didSet {
+//            viewsIcon.scaleMultiplicator = 1.3
+//            viewsIcon.backgroundColor = .clear
+//            viewsIcon.iconColor = .darkGray
+//            viewsIcon.category = .Eye
+//        }
+//    }
+//    @IBOutlet weak var viewsLabel: UILabel! {
+//        didSet {
+//            viewsLabel.textColor = .darkGray
+//        }
+//    }
+////    @IBOutlet weak var commentsIcon: SurveyCategoryIcon! {
+////        didSet {
+////            commentsIcon.scaleMultiplicator = 1
+////            commentsIcon.backgroundColor = .clear
+////            commentsIcon.iconColor = .lightGray
+////            commentsIcon.category = .Opinion
+////        }
+////    }
+////    @IBOutlet weak var commentsLabel: UILabel! {
+////        didSet {
+////            commentsLabel.textColor = .lightGray
+////        }
+////    }
+//
+//
+//    @objc private func handleTap(recognizer: UITapGestureRecognizer) {
+//        delegate?.callbackReceived("user" as AnyObject)
+//    }
+//}
 
 class LabelCell: UITableViewCell {
     @IBOutlet weak var label: UILabel!
@@ -961,234 +962,234 @@ class TextViewCell: UITableViewCell {
 }
 
 class WebResourceCell: UITableViewCell {
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     @IBOutlet weak var button: ButtonWithImage!
     @IBAction func buttonTapped(_ sender: Any) {
         delegate?.callbackReceived(self)
     }
 }
 
-class ImagesCell: UITableViewCell, UIScrollViewDelegate {
-    deinit {
-        print("***ImagesCell deinit()***")
-    }
-    var slides: [Slide] = []
-    var isSetupCompleted = false {
-        didSet {
-            if isSetupCompleted {
-                scrollView.isUserInteractionEnabled = true
-            }
-        }
-    }
-    @IBOutlet weak var scrollView: UIScrollView! {
-        didSet {
-            scrollView.isUserInteractionEnabled = isSetupCompleted ? true : false
-            scrollView.delegate = self
-        }
-    }
-    @IBOutlet weak var pageControl: UIView! {
-        didSet {
-            pageControl.alpha = 0
-            pageControl.backgroundColor = UIColor.black.withAlphaComponent(0.8)
-        }
-    }
-    @IBOutlet weak var page: UILabel! {
-        didSet {
-            if page != nil, !slides.isEmpty {
-                page.text = "\(pageIndex+1)/\(slides.count)"
-            }
-        }
-    }
-    //    @IBOutlet weak var pageControl: UIPageControl! {
+//class ImagesCell: UITableViewCell, UIScrollViewDelegate {
+//    deinit {
+//        print("***ImagesCell deinit()***")
+//    }
+//    var slides: [Slide] = []
+//    var isSetupCompleted = false {
+//        didSet {
+//            if isSetupCompleted {
+//                scrollView.isUserInteractionEnabled = true
+//            }
+//        }
+//    }
+//    @IBOutlet weak var scrollView: UIScrollView! {
+//        didSet {
+//            scrollView.isUserInteractionEnabled = isSetupCompleted ? true : false
+//            scrollView.delegate = self
+//        }
+//    }
+//    @IBOutlet weak var pageControl: UIView! {
 //        didSet {
 //            pageControl.alpha = 0
+//            pageControl.backgroundColor = UIColor.black.withAlphaComponent(0.8)
 //        }
 //    }
-    
-    @objc fileprivate func callback() {
-        delegate?.callbackReceived(self)
-    }
-    private var pageIndex: Int = 0
-    weak var delegate: CallbackDelegate?
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
-    
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        
-        // Configure the view for the selected state
-    }
-    
-    func createSlides(count: Int) {
-//        if !isSetupCompleted {
-            scrollView.contentSize = CGSize(width: scrollView.frame.width * CGFloat(count), height: scrollView.frame.height)
-            scrollView.isScrollEnabled = true
-            scrollView.isPagingEnabled = true
-            
-            for i in 0..<count {
-                let slide  = Bundle.main.loadNibNamed("Slide", owner: self, options: nil)?.first as! Slide
-                slide.frame = CGRect(x: scrollView.frame.width * CGFloat(i), y: 0, width: scrollView.frame.width, height: scrollView.frame.height)
-                slide.imageView.backgroundColor = .lightGray
-                let recognizer = UITapGestureRecognizer(target: self, action: #selector(ImagesCell.imageTapped(recognizer:)))
-                slide.imageView.addGestureRecognizer(recognizer)
-//                scrollView.addSubview(slide)
-                scrollView.insertSubview(slide, at: 0)
-                slides.append(slide)
-            }
-//            isSetupCompleted = true
+//    @IBOutlet weak var page: UILabel! {
+//        didSet {
+//            if page != nil, !slides.isEmpty {
+//                page.text = "\(pageIndex+1)/\(slides.count)"
+//            }
 //        }
-    }
-    
-    func showPageControl(animated: Bool = true) {
-        if slides.count > 1, pageControl != nil, page != nil {
-            page.text = "\(pageIndex+1)/\(slides.count)"
-            if animated {
-                pageControl.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-                UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseInOut, animations: {
-                    self.pageControl.alpha = 1
-                    self.pageControl.transform = .identity
-                })
-            } else {
-                pageControl.alpha = 1
-            }
-        }
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        pageIndex = Int(round(scrollView.contentOffset.x/contentView.frame.width))
-        page.text = "\(pageIndex+1)/\(slides.count)"
-    }
-    
-    @objc private func imageTapped(recognizer: UITapGestureRecognizer) {
-        if let imageView = recognizer.view as? UIImageView, let image = imageView.image {
-            delegate?.callbackReceived(image as AnyObject)
-        }
-    }
-}
+//    }
+//    //    @IBOutlet weak var pageControl: UIPageControl! {
+////        didSet {
+////            pageControl.alpha = 0
+////        }
+////    }
+//
+//    @objc fileprivate func callback() {
+//        delegate?.callbackReceived(self)
+//    }
+//    private var pageIndex: Int = 0
+//    weak var delegate: CallbackDelegate?
+//    override func awakeFromNib() {
+//        super.awakeFromNib()
+//        // Initialization code
+//    }
+//
+//    override func setSelected(_ selected: Bool, animated: Bool) {
+//        super.setSelected(selected, animated: animated)
+//
+//        // Configure the view for the selected state
+//    }
+//
+//    func createSlides(count: Int) {
+////        if !isSetupCompleted {
+//            scrollView.contentSize = CGSize(width: scrollView.frame.width * CGFloat(count), height: scrollView.frame.height)
+//            scrollView.isScrollEnabled = true
+//            scrollView.isPagingEnabled = true
+//
+//            for i in 0..<count {
+//                let slide  = Bundle.main.loadNibNamed("Slide", owner: self, options: nil)?.first as! Slide
+//                slide.frame = CGRect(x: scrollView.frame.width * CGFloat(i), y: 0, width: scrollView.frame.width, height: scrollView.frame.height)
+//                slide.imageView.backgroundColor = .lightGray
+//                let recognizer = UITapGestureRecognizer(target: self, action: #selector(ImagesCell.imageTapped(recognizer:)))
+//                slide.imageView.addGestureRecognizer(recognizer)
+////                scrollView.addSubview(slide)
+//                scrollView.insertSubview(slide, at: 0)
+//                slides.append(slide)
+//            }
+////            isSetupCompleted = true
+////        }
+//    }
+//
+//    func showPageControl(animated: Bool = true) {
+//        if slides.count > 1, pageControl != nil, page != nil {
+//            page.text = "\(pageIndex+1)/\(slides.count)"
+//            if animated {
+//                pageControl.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+//                UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseInOut, animations: {
+//                    self.pageControl.alpha = 1
+//                    self.pageControl.transform = .identity
+//                })
+//            } else {
+//                pageControl.alpha = 1
+//            }
+//        }
+//    }
+//
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        pageIndex = Int(round(scrollView.contentOffset.x/contentView.frame.width))
+//        page.text = "\(pageIndex+1)/\(slides.count)"
+//    }
+//
+//    @objc private func imageTapped(recognizer: UITapGestureRecognizer) {
+//        if let imageView = recognizer.view as? UIImageView, let image = imageView.image {
+//            delegate?.callbackReceived(image as AnyObject)
+//        }
+//    }
+//}
 
 import YoutubePlayer_in_WKWebView
-class YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackDelegate {
-//    private var bannerHasBeenShown = false
-    private var tempAppPreference: SideAppPreference?
-    private var sideAppPreference: SideAppPreference? {
-        if UserDefaults.App.youtubePlay == nil {
-            return nil
-        } else {
-            return UserDefaults.App.youtubePlay
-        }
-    }
-    private var isYoutubeInstalled: Bool {
-        let appName = "youtube"
-        let appScheme = "\(appName)://app"
-        let appUrl = URL(string: appScheme)
-        return UIApplication.shared.canOpenURL(appUrl! as URL)
-    }
-    var videoID = ""
-    private var loadingIndicator: ClockIndicator!
-    private var isVideoLoaded = false
-//    @IBOutlet weak var subv: UIView! {
-//        didSet {
-//            loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: subv.frame.height, height: subv.frame.height)))
-//            loadingIndicator.layoutCentered(in: subv, multiplier: 0.6)//addEquallyTo(to: tableView)
-//            loadingIndicator.addEnableAnimation()
+//class YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackDelegate {
+////    private var bannerHasBeenShown = false
+//    private var tempAppPreference: SideAppPreference?
+//    private var sideAppPreference: SideAppPreference? {
+//        if UserDefaults.App.youtubePlay == nil {
+//            return nil
+//        } else {
+//            return UserDefaults.App.youtubePlay
 //        }
 //    }
-    @IBOutlet weak var playerView: WKYTPlayerView! {
-        didSet {
-            playerView.alpha = 0
-            playerView.delegate = self
-            loadingIndicator = ClockIndicator(frame: CGRect(origin: .zero, size: CGSize(width: contentView.frame.height, height: contentView.frame.height)))
-            loadingIndicator.layer.masksToBounds = false
-            loadingIndicator.layoutCentered(in: contentView, multiplier: 0.2)//addEquallyTo(to: tableView)
-            loadingIndicator.addEnableAnimation()
-//            let recognizer = UITapGestureRecognizer(target: self, action: #selector(YoutubeCell.viewTapped(recognizer:)))
-//            playerView.addGestureRecognizer(recognizer)
-        }
-    }
-    
-    @objc fileprivate func callback() {
-        delegate?.callbackReceived(self)
-    }
-    weak var delegate: CallbackDelegate?
-    
-    func loadVideo(url: URL) {
-        if !isVideoLoaded {
-            isVideoLoaded = true
-            if let id = url.absoluteString.youtubeID {
-                playerView.load(withVideoId: id)
-            }
-        }
-    }
-    
-    func playerViewDidBecomeReady(_ playerView: WKYTPlayerView) {
-        print("ready")
-        UIView.animate(withDuration: 0.3, animations: {
-            self.loadingIndicator.alpha = 0
-        }) {
-            _ in
-            UIView.animate(withDuration: 1, delay: 0, options: .curveEaseInOut, animations: {
-                self.playerView.alpha = 1
-            })
-        }
-    }
-    
-    func playerView(_ playerView: WKYTPlayerView, didChangeTo state: WKYTPlayerState) {
-        if state == .buffering {
-            if sideAppPreference != nil {
-                if sideAppPreference! == .Embedded {
-                    playerView.playVideo()
-                } else {
-                    if isYoutubeInstalled {
-                        playInYotubeApp()
-                        playerView.stopVideo()
-                    }
-                }
-            } else if isYoutubeInstalled, tempAppPreference == nil {
-                    playerView.pauseVideo()
-                    Banner.shared.contentType = .SideApp
-                    if let content = Banner.shared.content as? SideApp {
-                        content.app = .Youtube
-                        content.delegate = self
-                    }
-                    Banner.shared.present(isModal: true, delegate: nil)
-            } else {
-                if tempAppPreference == .Embedded {
-                    playerView.playVideo()
-                } else {
-                    if isYoutubeInstalled {
-                        playInYotubeApp()
-                        playerView.stopVideo()
-                    }
-                }
-            }
-        }
-    }
-    
-    private func playInYotubeApp() {
-        let appScheme = "youtube://watch?v=\(videoID)"
-        if let appUrl = URL(string: appScheme) {
-            UIApplication.shared.open(appUrl)
-        }
-    }
+//    private var isYoutubeInstalled: Bool {
+//        let appName = "youtube"
+//        let appScheme = "\(appName)://app"
+//        let appUrl = URL(string: appScheme)
+//        return UIApplication.shared.canOpenURL(appUrl! as URL)
+//    }
+//    var videoID = ""
+//    private var loadingIndicator: ClockIndicator!
+//    private var isVideoLoaded = false
+////    @IBOutlet weak var subv: UIView! {
+////        didSet {
+////            loadingIndicator = LoadingIndicator(frame: CGRect(origin: .zero, size: CGSize(width: subv.frame.height, height: subv.frame.height)))
+////            loadingIndicator.layoutCentered(in: subv, multiplier: 0.6)//addEquallyTo(to: tableView)
+////            loadingIndicator.addEnableAnimation()
+////        }
+////    }
+//    @IBOutlet weak var playerView: WKYTPlayerView! {
+//        didSet {
+//            playerView.alpha = 0
+//            playerView.delegate = self
+//            loadingIndicator = ClockIndicator(frame: CGRect(origin: .zero, size: CGSize(width: contentView.frame.height, height: contentView.frame.height)))
+//            loadingIndicator.layer.masksToBounds = false
+//            loadingIndicator.layoutCentered(in: contentView, multiplier: 0.2)//addEquallyTo(to: tableView)
+//            loadingIndicator.addEnableAnimation()
+////            let recognizer = UITapGestureRecognizer(target: self, action: #selector(YoutubeCell.viewTapped(recognizer:)))
+////            playerView.addGestureRecognizer(recognizer)
+//        }
+//    }
+//    
+//    @objc fileprivate func callback() {
+//        delegate?.callbackReceived(self)
+//    }
+//    weak var delegate: CallbackDelegate?
+//    
+//    func loadVideo(url: URL) {
+//        if !isVideoLoaded {
+//            isVideoLoaded = true
+//            if let id = url.absoluteString.youtubeID {
+//                playerView.load(withVideoId: id)
+//            }
+//        }
+//    }
+//    
+//    func playerViewDidBecomeReady(_ playerView: WKYTPlayerView) {
+//        print("ready")
+//        UIView.animate(withDuration: 0.3, animations: {
+//            self.loadingIndicator.alpha = 0
+//        }) {
+//            _ in
+//            UIView.animate(withDuration: 1, delay: 0, options: .curveEaseInOut, animations: {
+//                self.playerView.alpha = 1
+//            })
+//        }
+//    }
+//    
+//    func playerView(_ playerView: WKYTPlayerView, didChangeTo state: WKYTPlayerState) {
+//        if state == .buffering {
+//            if sideAppPreference != nil {
+//                if sideAppPreference! == .Embedded {
+//                    playerView.playVideo()
+//                } else {
+//                    if isYoutubeInstalled {
+//                        playInYotubeApp()
+//                        playerView.stopVideo()
+//                    }
+//                }
+//            } else if isYoutubeInstalled, tempAppPreference == nil {
+//                    playerView.pauseVideo()
+//                    Banner.shared.contentType = .SideApp
+//                    if let content = Banner.shared.content as? SideApp {
+//                        content.app = .Youtube
+//                        content.delegate = self
+//                    }
+//                    Banner.shared.present(isModal: true, delegate: nil)
+//            } else {
+//                if tempAppPreference == .Embedded {
+//                    playerView.playVideo()
+//                } else {
+//                    if isYoutubeInstalled {
+//                        playInYotubeApp()
+//                        playerView.stopVideo()
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    
+//    private func playInYotubeApp() {
+//        let appScheme = "youtube://watch?v=\(videoID)"
+//        if let appUrl = URL(string: appScheme) {
+//            UIApplication.shared.open(appUrl)
+//        }
+//    }
+//
+//    func callbackReceived(_ sender: Any) {
+//        if let option = sender as? SideAppPreference {
+//            switch option {
+//            case .App:
+//                tempAppPreference = .App
+//                playInYotubeApp()
+//                playerView.stopVideo()
+//            case .Embedded:
+//                playerView.playVideo()
+//                tempAppPreference = .Embedded
+//            }
+//        }
+//    }
+//}
 
-    func callbackReceived(_ sender: Any) {
-        if let option = sender as? SideAppPreference {
-            switch option {
-            case .App:
-                tempAppPreference = .App
-                playInYotubeApp()
-                playerView.stopVideo()
-            case .Embedded:
-                playerView.playVideo()
-                tempAppPreference = .Embedded
-            }
-        }
-    }
-}
-
-class EmbeddedURLCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackDelegate {
+class EmbeddedURLCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackObservable {
     private var tempAppPreference: SideAppPreference?
     private var sideAppPreference: SideAppPreference? {
         if app == .TikTok {
@@ -1210,7 +1211,7 @@ class EmbeddedURLCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, Call
     var url: URL!
     var isContentLoading = false
     var app: ThirdPartyApp  = .Null
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     @IBOutlet weak var webView: WKWebView! {
         didSet {
             opaqueView = UIView(frame: .zero)
@@ -1243,12 +1244,12 @@ class EmbeddedURLCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, Call
                         UIApplication.shared.open(url, options: [:], completionHandler: {_ in})
                     }
                 } else if sideAppPreference == nil, tempAppPreference == nil, isTiTokInstalled {
-                    Banner.shared.contentType = .SideApp
-                    if let content = Banner.shared.content as? SideApp {
+                    delBanner.shared.contentType = .SideApp
+                    if let content = delBanner.shared.content as? SideApp {
                         content.app = .TikTok
                         content.delegate = self
                     }
-                    Banner.shared.present(isModal: true, delegate: nil)
+                    delBanner.shared.present(isModal: true, delegate: nil)
                 }
             default:
                 print("")
@@ -1317,7 +1318,7 @@ class ChoiceSelectionCell: UITableViewCell {
             }
         }
     }
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
 //    var index: IndexPath!
     var isChecked = false {
         didSet {
@@ -1421,5 +1422,5 @@ class SurveyVoteCell: UITableViewCell {
     @IBAction func btnTapped(_ sender: Any) {
         delegate?.callbackReceived("vote" as AnyObject)
     }
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
 }

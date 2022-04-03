@@ -16,7 +16,7 @@ class UserSubscriptionCell: UITableViewCell {
         delegate?.callbackReceived(sender)
     }
     
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     
     override func awakeFromNib() {
         super.awakeFromNib()

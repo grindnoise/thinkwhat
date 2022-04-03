@@ -24,6 +24,7 @@
 "photo_album" = "Фотоальбом";
 "api_unavailable" = "Сервер временно недоступен, попробуйте позже";
 "retry" = "Повторить";
+"more_info" = "Подробнee";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";

@@ -24,6 +24,7 @@
 "photo_album" = "Photos";
 "api_unavailable" = "Server is currently unavailable, try again later";
 "retry" = "Retry";
+"more_info" = "More info";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";

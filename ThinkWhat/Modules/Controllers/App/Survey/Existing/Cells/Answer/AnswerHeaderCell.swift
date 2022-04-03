@@ -10,7 +10,7 @@ import UIKit
 
 class AnswerHeaderCell: UITableViewHeaderFooterView {
 
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     @IBOutlet weak var icon: ManTalikngIcon! {
         didSet {
             let touch = UITapGestureRecognizer(target:self, action:#selector(self.callback))

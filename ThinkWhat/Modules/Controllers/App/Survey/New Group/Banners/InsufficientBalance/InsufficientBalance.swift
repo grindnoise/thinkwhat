@@ -40,7 +40,7 @@ class InsufficientBalance: UIView, BannerContent {
             balanceLabel.textColor = color
         }
     }
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     var color: UIColor = Colors.UpperButtons.VioletBlueCrayola
     var balance = 0 {
         didSet {

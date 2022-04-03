@@ -14,7 +14,7 @@ class SurveyLinkCell: UITableViewCell {
         delegate?.callbackReceived(sender as AnyObject)
     }
     @IBOutlet weak var linkButton: UIButton!
-    weak var delegate: CallbackDelegate?
+    weak var delegate: CallbackObservable?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

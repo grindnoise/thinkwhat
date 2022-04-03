@@ -55,7 +55,7 @@ class TextViewController: UIViewController {
     }
     var titleString = ""
     var textContent = ""
-    var delegate: CallbackDelegate?
+    var delegate: CallbackObservable?
     var charactersLimit = 0
     var font: UIFont?
     var textColor: UIColor?
