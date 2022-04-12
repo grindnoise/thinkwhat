@@ -8,6 +8,8 @@
 
 //Common
 "ok" = "Хорошо";
+"results" = "Результат";
+"vote" = "Голосовать";
 "check_fields" = "Проверьте корректность заполненных полей";
 "warning" = "Внимание";
 "error" = "Ошибка";
@@ -25,6 +27,12 @@
 "api_unavailable" = "Сервер временно недоступен, попробуйте позже";
 "retry" = "Повторить";
 "more_info" = "Подробнee";
+"play_youtube" = "Воспроизвести здесь";
+"open_youtube" = "Открыть в приложении Youtube";
+"remember" = "Запомнить";
+"bad_url" = "Нерабочая ссылка";
+"claim_sent" = "Жалоба отправлена";
+"thanks_for_feedback" = "Спасибо за обратную поддержку!";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";
@@ -50,6 +58,7 @@
 "provider_authorization_success" = "Успех!";
 "provider_authorization_failure" = "Ошибка";
 "timeout_error" = "Превышено время ожидания";
+"tiktok_web_error" = "Ошибка при загрузке TikTok";
 
 //Conditions VC
 "acceptButton" = "Принимаю";
@@ -94,3 +103,7 @@
 
 //Settings VC
 "settings" = "Настройки";
+
+//Poll VC
+"make_choice" = "Выберите вариант ответа";
+"finish_poll" = "Пожалуйста, сначала пройдите опрос";

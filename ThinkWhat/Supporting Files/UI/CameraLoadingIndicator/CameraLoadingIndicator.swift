@@ -54,6 +54,11 @@ class CameraLoadingIndicator: UIView {
     let circlePathLayer = CAShapeLayer()
     let cameraPathLayer = CAShapeLayer()
     let circleRadius: CGFloat = 25.0
+    public var color = K_COLOR_RED {
+        didSet {
+            configure()
+        }
+    }
     var progress: CGFloat {
         get {
             return circlePathLayer.strokeEnd
@@ -73,6 +78,11 @@ class CameraLoadingIndicator: UIView {
         configure()
     }
     
+    init(color _color: UIColor) {
+        super.init(frame: .zero)
+        self.color = _color
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         configure()
@@ -84,7 +94,7 @@ class CameraLoadingIndicator: UIView {
         circlePathLayer.frame = bounds
         circlePathLayer.lineWidth = 4
         circlePathLayer.fillColor = UIColor.clear.cgColor
-        circlePathLayer.strokeColor = K_COLOR_RED.cgColor//UIColor.white.cgColor
+        circlePathLayer.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor//UIColor.white.cgColor
         circlePathLayer.lineCap = .round
         cameraPathLayer.frame = bounds
         //cameraPathLayer.lineWidth = 5
@@ -262,14 +272,9 @@ class CameraLoadingIndicator: UIView {
         
     }
     
-    /*
-     // Only override draw() if you perform custom drawing.
-     // An empty implementation adversely affects performance during animation.
-     override func draw(_ rect: CGRect) {
-     // Drawing code
-     }
-     */
-    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        circlePathLayer.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor
+    }
 }
 
 extension CameraLoadingIndicator: CAAnimationDelegate {

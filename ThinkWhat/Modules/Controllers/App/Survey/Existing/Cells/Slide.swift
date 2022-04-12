@@ -9,9 +9,18 @@
 import UIKit
 
 class Slide: UIView {
-    @IBOutlet weak var imageView: CircularIndicatorImageView!
-    var title = ""
+    
     deinit {
-        print("deinit")
+        print("Slide deinit")
+    }
+    
+    @IBOutlet weak var imageView: CircularIndicatorImageView!
+    
+    var title = ""
+    var color = K_COLOR_RED {
+        didSet {
+            guard !imageView.isNil else { return }
+            imageView.color = color
+        }
     }
 }

@@ -903,6 +903,22 @@ class API {
         }
     }
     
+    func downloadSurveyAsync(reference: SurveyReference, incrementCounter: Bool = false) async throws {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS + "\(reference.id)/") else { throw APIError.invalidURL }
+        
+        do {
+            let data = try await requestAsync(url: url, httpMethod: .get, parameters: incrementCounter ? ["add_view_count": true] : nil, encoding: URLEncoding.default, headers: headers())
+            let json = try JSON(data: data, options: .mutableContainers)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                       DateFormatter.dateTimeFormatter,
+                                                       DateFormatter.dateFormatter ]
+            try decoder.decode(Survey.self, from: json.rawData())
+        } catch let error {
+            throw error
+        }
+    }
+    
     func markFavorite(mark: Bool, surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(mark ? API_URLS.SURVEYS_ADD_FAVORITE : API_URLS.SURVEYS_REMOVE_FAVORITE) else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { result in
@@ -924,6 +940,20 @@ class API {
         }
     }
     
+    func incrementViewCounterAsync(surveyReference: SurveyReference) async throws {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_ADD_VIEW_COUNT) else { throw APIError.invalidURL }
+        
+        let data = try await requestAsync(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default, headers: headers())
+        let json = try JSON(data: data, options: .mutableContainers)
+        if let value = json["views"].int {
+            surveyReference.survey?.views = value
+        } else if let error = json["views"].string {
+            throw error
+        } else {
+            throw "Unknown error"
+        }
+    }
+    
     func getSurveyStats(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_UPDATE_STATS) else { completion(.failure(APIError.invalidURL)); return }
         self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { completion($0) }
@@ -932,291 +962,34 @@ class API {
     func postPoll(survey: Survey, uploadProgress: @escaping(Double)->()?, completion: @escaping(Result<JSON, Error>)->()) {
         //TODO: - postSurvey replace dict()
         var dict: [String: AnyObject] = [:]//survey.dict
-            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS) else { completion(.failure(APIError.invalidURL)); return }
-            request(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default) { result in
-                switch result {
-                case .success(let json):
-                    completion(.success(json))
-                    if !survey.images.isEmpty {
-                        for mediafile in survey.mediaWithImagesSortedByOrder {
-                            let multipartFormData = MultipartFormData()
-                            var imgExt: FileFormat = .Unknown
-                            var imageData: Data?
-                            if let data = mediafile.image!.jpegData(compressionQuality: 1) {
-                                imageData = data
-                                imgExt = .JPEG
-                            } else if let data = mediafile.image!.pngData() {
-                                imageData = data
-                                imgExt = .PNG
-                            }
-                            multipartFormData.append(imageData!, withName: "image", fileName: "\(UserDefaults.Profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
-                            multipartFormData.append("\(survey.id)".data(using: .utf8)!, withName: "survey")
-                            multipartFormData.append("\(mediafile.order)".data(using: .utf8)!, withName: "order")
-                            multipartFormData.append("\(mediafile.title)".data(using: .utf8)!, withName: "title")
-                            self.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) }) { completion($0) }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS) else { completion(.failure(APIError.invalidURL)); return }
+        request(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default) { result in
+            switch result {
+            case .success(let json):
+                completion(.success(json))
+                if !survey.images.isEmpty {
+                    for mediafile in survey.mediaWithImagesSortedByOrder {
+                        let multipartFormData = MultipartFormData()
+                        var imgExt: FileFormat = .Unknown
+                        var imageData: Data?
+                        if let data = mediafile.image!.jpegData(compressionQuality: 1) {
+                            imageData = data
+                            imgExt = .JPEG
+                        } else if let data = mediafile.image!.pngData() {
+                            imageData = data
+                            imgExt = .PNG
                         }
+                        multipartFormData.append(imageData!, withName: "image", fileName: "\(UserDefaults.Profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
+                        multipartFormData.append("\(survey.id)".data(using: .utf8)!, withName: "survey")
+                        multipartFormData.append("\(mediafile.order)".data(using: .utf8)!, withName: "order")
+                        multipartFormData.append("\(mediafile.title)".data(using: .utf8)!, withName: "title")
+                        self.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) }) { completion($0) }
                     }
-                case .failure(let error):
-                    completion(.failure(error))
                 }
+            case .failure(let error):
+                completion(.failure(error))
             }
-            
-//            uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) }) { completion($0) }
-//
-//            for (index, image) in images!.enumerated() {
-//                AF.upload(multipartFormData: { multipartFormData in
-//                    var imgExt: FileFormat = .Unknown
-//                    var imageData: Data?
-//                    if let data = image.keys.first!.jpegData(compressionQuality: 1) {
-//                        imageData = data
-//                        imgExt = .JPEG
-//                    } else if let data = image.keys.first!.pngData() {
-//                        imageData = data
-//                        imgExt = .PNG
-//                    }
-//                    multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
-//                    multipartFormData.append("\(surveyID)".data(using: .utf8)!, withName: "survey")
-//                    multipartFormData.append("\(index)".data(using: .utf8)!, withName: "order")
-//                    if !(image.values.first?.isEmpty)! {
-//                        multipartFormData.append(image.values.first!.data(using: .utf8)!, withName: "title")
-//                    }
-//                }, to: url, method: HTTPMethod.patch, headers: headers).uploadProgress(queue: .main, closure: { progress in
-//                    print("Upload Progress: \(progress.fractionCompleted)")
-//                }).response { response in
-//                    switch response.result {
-//                    case .success(let value):
-//
-//                        do {
-//                            //TODO: Определиться с инициализацией JSON
-//                            json = try JSON(data: value!, options: .mutableContainers)
-//                            if let statusCode = response.response?.statusCode {
-//                                if 200...299 ~= statusCode {
-//                                    print("Upload complete: \(String(describing: json))")
-//                                } else if 400...499 ~= statusCode, let errorDescription = json?.rawString() {
-//                                    uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
-//                                    print(uploadError!)
-//                                }
-//                            }
-//                            completion(json, error)
-//                        }  catch let _error {
-//                            uploadError = _error
-//                            print(_error.localizedDescription)
-//                        }
-//                    case let .failure(_error):
-//                        uploadError = _error
-//                        completion(nil, error)
-//                    }
-//                }
-//            }
-//
-//
-//
-//
-//            var url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS)
-//            let images = dict.removeValue(forKey: DjangoVariables.Survey.images) as? [[UIImage: String]]
-//
-//            _performRequest(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default) {
-//                _json, _error in
-//                if _error != nil {
-//                    error = _error
-//                    completion(json, error)
-//                } else if _json != nil {
-//                    json = _json
-//
-//                    if images != nil, images?.count != 0 {
-//                        //Upload images
-//                        let surveyID = json!["id"].intValue
-//                        let headers: HTTPHeaders = [
-//                            "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-//                            "Content-Type": "application/json"
-//                        ]
-//                        url = URL(string: SERVER_URLS.BASE)!.appendingPathComponent(SERVER_URLS.SURVEYS_MEDIA)
-//                        var uploadError: Error?
-//                        for (index, image) in images!.enumerated() {
-//                            AF.upload(multipartFormData: { multipartFormData in
-//                                var imgExt: FileFormat = .Unknown
-//                                var imageData: Data?
-//                                if let data = image.keys.first!.jpegData(compressionQuality: 1) {
-//                                    imageData = data
-//                                    imgExt = .JPEG
-//                                } else if let data = image.keys.first!.pngData() {
-//                                    imageData = data
-//                                    imgExt = .PNG
-//                                }
-//                                multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
-//                                multipartFormData.append("\(surveyID)".data(using: .utf8)!, withName: "survey")
-//                                multipartFormData.append("\(index)".data(using: .utf8)!, withName: "order")
-//                                if !(image.values.first?.isEmpty)! {
-//                                    multipartFormData.append(image.values.first!.data(using: .utf8)!, withName: "title")
-//                                }
-//                            }, to: url, method: HTTPMethod.patch, headers: headers).uploadProgress(queue: .main, closure: { progress in
-//                                print("Upload Progress: \(progress.fractionCompleted)")
-//                            }).response { response in
-//                                switch response.result {
-//                                case .success(let value):
-//
-//                                    do {
-//                                        //TODO: Определиться с инициализацией JSON
-//                                        json = try JSON(data: value!, options: .mutableContainers)
-//                                        if let statusCode = response.response?.statusCode {
-//                                            if 200...299 ~= statusCode {
-//                                                print("Upload complete: \(String(describing: json))")
-//                                            } else if 400...499 ~= statusCode, let errorDescription = json?.rawString() {
-//                                                uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
-//                                                print(uploadError!)
-//                                            }
-//                                        }
-//                                        completion(json, error)
-//                                    }  catch let _error {
-//                                        uploadError = _error
-//                                        print(_error.localizedDescription)
-//                                    }
-//                                case let .failure(_error):
-//                                    uploadError = _error
-//                                    completion(nil, error)
-//                                }
-//                            }
-//                        }
-//                        completion(json, uploadError)
-//                    } else {
-//                        completion(json, error)
-//                    }
-//                    //
-//                    //
-//                    //
-//                    //
-//                    //                            Alamofire.upload(multipartFormData: { multipartFormData in
-//                    //                                //                            for image in images! {
-//                    //                                var imgExt: FileFormat = .Unknown
-//                    //                                var imageData: Data?
-//                    //                                if let data = image.keys.first!.jpegData(compressionQuality: 1) {
-//                    //                                    imageData = data
-//                    //                                    imgExt = .JPEG
-//                    //                                } else if let data = image.keys.first!.pngData() {
-//                    //                                    imageData = data
-//                    //                                    imgExt = .PNG
-//                    //                                }
-//                    //                                multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userprofile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
-//                    //                                multipartFormData.append("\(surveyID)".data(using: .utf8)!, withName: "survey")
-//                    //                                if !(image.values.first?.isEmpty)! {
-//                    //                                    multipartFormData.append(image.values.first!.data(using: .utf8)!, withName: "title")
-//                    //                                }
-//                    //                            }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .post, headers: headers) {
-//                    //                                result in
-//                    //                                switch result {
-//                    //                                case .failure(let _error):
-//                    //                                    uploadError = _error
-//                    //                                    //                                completion(json, error)
-//                    //                                case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
-//                    //                                    upload.uploadProgress(closure: { (progress) in
-//                    //                                        print("Upload Progress: \(progress.fractionCompleted)")
-//                    //                                    })
-//                    //                                    upload.responseJSON(completionHandler: { (response) in
-//                    //                                        if response.result.isFailure {
-//                    //                                            uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
-//                    //                                        }
-//                    //                                        if let _error = response.result.error as? AFError {
-//                    //                                            uploadError = self.parseAFError(_error)
-//                    //                                        } else {
-//                    //                                            if let statusCode  = response.response?.statusCode{
-//                    //                                                if 200...299 ~= statusCode {
-//                    //                                                    do {
-//                    //                                                        json = try JSON(data: response.data!)
-//                    //                                                    } catch let _error {
-//                    //                                                        uploadError = _error
-//                    //                                                    }
-//                    //
-//                    //                                                    //TODO save local
-//                    //                                                } else if 400...499 ~= statusCode {
-//                    //                                                    do {
-//                    //                                                        let errorJSON = try JSON(data: response.data!)
-//                    //                                                        uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()!]) as Error
-//                    //                                                        print(uploadError!)
-//                    //                                                    } catch let _error {
-//                    //                                                        uploadError = _error
-//                    //                                                    }
-//                    //                                                }
-//                    //                                            }
-//                    //                                        }
-//                    //                                    })
-//                    //                                }
-//                    //                            }
-//                    //                        }
-//                    //                        error = uploadError
-//                    //                        completion(json, error)
-//                    //                    } else {
-//                    //                        completion(json, error)
-//                    //                    }
-                
-            
-            
-            
-            
-            //
-            //
-            //            if let images = dict["media"] as? [[UIImage: String]], images.count != 0 {
-            //                dict.removeValue(forKey: "images")
-            //                Alamofire.upload(multipartFormData: { multipartFormData in
-            //                    for image in images {
-            //                        var imgExt: FileFormat = .Unknown
-            //                        var imageData: Data?
-            //                        if let data = image.keys.first!.jpegData(compressionQuality: 1) {
-            //                            imageData = data
-            //                            imgExt = .JPEG
-            //                        } else if let data = image.keys.first!.pngData() {
-            //                            imageData = data
-            //                            imgExt = .PNG
-            //                        }
-            //                        multipartFormData.append(imageData!, withName: "media.image", fileName: "\(AppData.shared.userprofile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
-            //                        multipartFormData.append("\(image.values.first!)".data(using: .utf8)!, withName: "media.title")
-            //                    }
-            //
-            //                    for (key, value) in dict {
-            //                        if value is String || value is Int {
-            //                            multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
-            //                        }
-            //                    }
-            //                }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .patch, headers: headers) {
-            //                    result in
-            //                    switch result {
-            //                    case .failure(let _error):
-            //                        error = _error
-            //                        completion(json, error)
-            //                    case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
-            //                        upload.uploadProgress(closure: { (progress) in
-            //                            print("Upload Progress: \(progress.fractionCompleted)")
-            //                        })
-            //                        upload.responseJSON(completionHandler: { (response) in
-            //                            if response.result.isFailure {
-            //                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
-            //                            }
-            //                            if let _error = response.result.error as? AFError {
-            //                                error = self.parseAFError(_error)
-            //                            } else {
-            //                                if let statusCode  = response.response?.statusCode{
-            //                                    if 200...299 ~= statusCode {
-            //                                        do {
-            //                                            json = try JSON(data: response.data!)
-            //                                        } catch let _error {
-            //                                            error = _error
-            //                                        }
-            //                                    } else if 400...499 ~= statusCode {
-            //                                        do {
-            //                                            let errorJSON = try JSON(data: response.data!)
-            //                                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()]) as Error
-            //                                        } catch let _error {
-            //                                            error = _error
-            //                                        }
-            //                                    }
-            //                                }
-            //                                completion(json, error)
-            //                            }
-            //                        })
-            //                    }
-            //                }
-            //            } else {
-            //                _performRequest(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default, completion: completion)
-            //            }
+        }
     }
     
     public func postVote(answer: Answer, completion: @escaping(Result<JSON, Error>)->()) {
@@ -1232,6 +1005,29 @@ class API {
             }
         }
         self.request(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default) { completion($0) }
+    }
+    
+    public func vote(answer: Answer) async throws -> JSON {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTE) else { throw APIError.notFound }
+        guard let surveyID = answer.survey?.id else { throw APIError.badData }
+        var parameters: [String: Any] = ["survey": surveyID, "answer": answer.id]
+        if Surveys.shared.hot.count <= MIN_STACK_SIZE {
+            let stackList = Surveys.shared.hot.map { $0.id }
+            let rejectedList = Surveys.shared.rejected.map { $0.id }
+            let completedList = [answer.id]
+            let list = Array(Set(stackList + rejectedList + completedList))
+            if !list.isEmpty {
+                parameters["ids"] = list
+            }
+        }
+        
+        do {
+            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers())
+            let json = try JSON(data: data, options: .mutableContainers)
+            return json
+        } catch let error {
+            throw error
+        }
     }
     
 //    @propertyWrapper
@@ -1287,10 +1083,24 @@ class API {
     }
     
     public func postClaim(survey: Survey, reason: Claim, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_REJECT) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_CLAIM) else { completion(.failure(APIError.invalidURL)); return }
         let parameters: Parameters = ["survey": survey.id, "claim": reason.id]
         Surveys.shared.banSurvey(object: survey)
         request(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default) { completion($0) }
+    }
+    
+    
+    public func claim(survey: Survey, reason: Claim) async throws -> JSON {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_CLAIM) else { throw APIError.notFound }
+        let parameters: Parameters = ["survey": survey.id, "claim": reason.id]
+        
+        do {
+            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers())
+            let json = try JSON(data: data, options: .mutableContainers)
+            return json
+        } catch let error {
+            throw error
+        }
     }
     
     public func getUserStats(user: Userprofile, completion: @escaping(Result<JSON, Error>)->()) {
@@ -1332,7 +1142,7 @@ class API {
     public func getVoters(answer: Answer, users: [Userprofile], completion: @escaping(Result<JSON, Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTERS) else { completion(.failure(APIError.invalidURL)); return }
         guard let survey = answer.survey else { fatalError("answer.survey is nil") }
-        let parameters: Parameters = ["survey": survey.id, "answer": answer.id, "userprofiles": users.map { $0.id }]
+        let parameters: Parameters = ["survey": survey.id, "answer": answer.id, "voters": users.map { $0.id }]
         request(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding()) { completion($0) }
     }
     
@@ -1340,7 +1150,7 @@ class API {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTERS) else {
             throw APIError.notFound
         }
-        let parameters: Parameters = ["survey": answer.surveyID, "answer": answer.id, "userprofiles": answer.voters.map({ return $0.id })]
+        let parameters: Parameters = ["survey": answer.surveyID, "answer": answer.id, "voters": answer.voters.map({ return $0.id })]
         do {
             return try await requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: headers())
         } catch let error {

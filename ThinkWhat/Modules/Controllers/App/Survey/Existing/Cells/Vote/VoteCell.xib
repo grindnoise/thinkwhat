@@ -27,11 +27,11 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3mZ-e1-BD6">
-                        <rect key="frame" x="98" y="88" width="124" height="15"/>
+                        <rect key="frame" x="93" y="88" width="134" height="15"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="15" id="t4p-yv-2ah"/>
                         </constraints>
-                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
+                        <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="13"/>
                         <state key="normal" title="ОТПРАВИТЬ ЖАЛОБУ">
                             <color key="titleColor" systemColor="systemBackgroundColor"/>
                         </state>
@@ -50,23 +50,13 @@
                             <action selector="btnTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="AvU-4f-Tpf"/>
                         </connections>
                     </button>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2AE-ql-wag" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                        <rect key="frame" x="83" y="88" width="15" height="15"/>
-                        <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="15" id="c15-mc-gmF"/>
-                        </constraints>
-                    </view>
                 </subviews>
                 <constraints>
                     <constraint firstItem="Cvc-uj-wbH" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" multiplier="0.75" id="7aL-kZ-0rc"/>
-                    <constraint firstItem="2AE-ql-wag" firstAttribute="width" secondItem="2AE-ql-wag" secondAttribute="height" multiplier="1:1" id="Arh-vt-0L3"/>
                     <constraint firstItem="Cvc-uj-wbH" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.6" id="AtT-9g-2nu"/>
                     <constraint firstItem="Cvc-uj-wbH" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="CCy-t7-I7z"/>
                     <constraint firstItem="3mZ-e1-BD6" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="CeL-dw-qFX"/>
-                    <constraint firstItem="2AE-ql-wag" firstAttribute="centerY" secondItem="3mZ-e1-BD6" secondAttribute="centerY" id="Toi-6d-1IY"/>
                     <constraint firstItem="Cvc-uj-wbH" firstAttribute="width" secondItem="Cvc-uj-wbH" secondAttribute="height" multiplier="29:7" id="e9c-g4-3Bd"/>
-                    <constraint firstItem="3mZ-e1-BD6" firstAttribute="leading" secondItem="2AE-ql-wag" secondAttribute="trailing" id="ma0-79-6eD"/>
                     <constraint firstAttribute="bottomMargin" secondItem="3mZ-e1-BD6" secondAttribute="bottom" constant="16" id="vpN-MA-Cre"/>
                 </constraints>
             </tableViewCellContentView>
@@ -75,7 +65,6 @@
             <connections>
                 <outlet property="btn" destination="Cvc-uj-wbH" id="qEs-kS-ZLi"/>
                 <outlet property="claimButton" destination="3mZ-e1-BD6" id="oaP-tI-plW"/>
-                <outlet property="claimIcon" destination="2AE-ql-wag" id="Nym-Oc-gmY"/>
             </connections>
             <point key="canvasLocation" x="139" y="74"/>
         </tableViewCell>

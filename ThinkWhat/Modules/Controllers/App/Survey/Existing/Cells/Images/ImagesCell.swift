@@ -23,6 +23,7 @@ class ImagesCell: UITableViewCell, UIScrollViewDelegate {
     private weak var delegate: CallbackObservable?
     private var survey: Survey!
     private var pageIndex: Int = 0
+    private var color: UIColor = K_COLOR_RED
     
     @IBOutlet weak var scrollView: UIScrollView! {
         didSet {
@@ -55,24 +56,21 @@ class ImagesCell: UITableViewCell, UIScrollViewDelegate {
     
     
     func createSlides(count: Int) {
-//        if !isSetupCompleted {
             scrollView.contentSize = CGSize(width: scrollView.frame.width * CGFloat(count), height: scrollView.frame.height)
             scrollView.isScrollEnabled = true
             scrollView.isPagingEnabled = true
             
             for i in 0..<count {
                 let slide  = Bundle.main.loadNibNamed("Slide", owner: self, options: nil)?.first as! Slide
+                slide.color = survey.topic.tagColor
                 slide.frame = CGRect(x: scrollView.frame.width * CGFloat(i), y: 0, width: scrollView.frame.width, height: scrollView.frame.height)
                 slide.imageView.backgroundColor = .secondarySystemBackground
                 let recognizer = UITapGestureRecognizer(target: self, action: #selector(ImagesCell.imageTapped(recognizer:)))
                 slide.imageView.addGestureRecognizer(recognizer)
-//                scrollView.addSubview(slide)
                 scrollView.insertSubview(slide, at: 0)
                 slide.cornerRadius = slide.frame.width * 0.05
                 slides.append(slide)
             }
-//            isSetupCompleted = true
-//        }
     }
     
     func showPageControl(animated: Bool = true) {
@@ -91,7 +89,7 @@ class ImagesCell: UITableViewCell, UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        pageIndex = Int(round(scrollView.contentOffset.x/contentView.frame.width))
+        pageIndex = Int(round(scrollView.contentOffset.x/scrollView.frame.width))
         page.text = "\(pageIndex+1)/\(slides.count)"
     }
     

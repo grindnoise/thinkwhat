@@ -53,7 +53,11 @@ class PollView: UIView {
             }
         }
     }
-    private var loadingIndicator: LoadingIndicator?
+    private var loadingIndicator: LoadingIndicator? {
+        didSet {
+            loadingIndicator?.color = surveyReference.topic.tagColor
+        }
+    }
     private var answersCells: [ChoiceCell] = []
     private var resultIndicators: [ResultIndicator] = []
     private var choice: Answer! {
@@ -75,6 +79,21 @@ class PollView: UIView {
         }
     }
     private var isAutoScrolling = false   //is on when scrollArrow is tapped
+    private var isAwaitingVoteResponse = false
+    ///Enable/disable checkboxes
+    private var isChoiceEnabled = true {
+        didSet {
+            guard !tableView.isNil else { return }
+            tableView.visibleCells.forEach { cell in
+                guard cell.isKind(of: ChoiceCell.self)
+                        || cell.isKind(of: AuthorCell.self)
+                        || cell.isKind(of: HyperlinkCell.self)
+                        || cell.isKind(of: VoteCell.self)
+                        || cell.isKind(of: ImagesCell.self) else { return }
+                cell.isUserInteractionEnabled = self.isChoiceEnabled
+            }
+        }
+    }
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -88,6 +107,28 @@ class PollView: UIView {
 
 // MARK: - Controller Output
 extension PollView: PollControllerOutput {
+    func onClaim(_: Result<Bool, Error>) {
+//        fatalError()
+    }
+    
+    func onVote(_ result: Result<Bool, Error>) {
+        isAwaitingVoteResponse = false
+        tableView.visibleCells.forEach {
+            guard let cell = $0 as? VoteCell else { return }
+            cell.isLoading = false
+        }
+        switch result {
+        case .success:
+            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightMultiplictator: 1.25)
+            banner.present(subview: VoteMessage(imageContent: UIView(), color: survey?.topic.tagColor ?? K_COLOR_RED, callbackDelegate: banner))
+//            mode = .ReadOnly
+        case .failure:
+            self.isChoiceEnabled = true
+            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+            banner.present(subview: PlainBannerContent(text: "backend_error".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 3)
+        }
+    }
+    
     func onLoad(_: Result<Bool, Error>) {
         tableView.reloadData()
         
@@ -121,20 +162,21 @@ extension PollView: PollControllerOutput {
     }
     
     func onCountUpdated() {
-        guard !survey.isNil,
-              let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell,
-              let label = cell.viewsLabel else {
-            return
+        tableView.visibleCells.forEach {
+            guard let cell = $0 as? AuthorCell else { return }
+            UIView.transition(with: cell.viewsLabel, duration: 0.2, options: .transitionCrossDissolve) {
+                cell.viewsLabel.text = "\(self.survey!.views)"
+            } completion: { _ in}
         }
-        UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) {
-            label.text = "\(self.survey!.views)"
-        } completion: { _ in}
     }
     
     var survey: Survey? {
         return viewInput?.survey
     }
     
+    var surveyReference: SurveyReference {
+        return viewInput!.surveyReference
+    }
 }
 
 // MARK: - UI Setup
@@ -161,12 +203,12 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.section == 1 {
-            if let cell = tableView.cellForRow(at: indexPath) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() {
-                resultIndicator.needsUIUpdate = false
-                resultIndicator.setPercentage(value: nil)
-            }
-        }
+//        if indexPath.section == 1 {
+//            if let cell = tableView.cellForRow(at: indexPath) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() {
+//                resultIndicator.needsUIUpdate = false
+//                resultIndicator.setPercentage(value: nil)
+//            }
+//        }
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -199,12 +241,13 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard survey != nil else {
-            fatalError()
             return UITableViewCell()
         }
         if indexPath.section == 0 {
             if indexPath.row == 0, let cell = tableView.dequeueReusableCell(withIdentifier: "author", for: indexPath) as? AuthorCell {
                 cell.setupUI(delegate: self, survey: survey!)
+                cell.viewsLabel.text = "\(self.survey!.views)"
+                cell.isUserInteractionEnabled = isChoiceEnabled
                 return cell
             } else if indexPath.row == 1, let cell = tableView.dequeueReusableCell(withIdentifier: "title", for: indexPath) as? TitleCell {
                 cell.setupUI(delegate: self, survey: survey!)
@@ -214,16 +257,18 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
                 return cell
             } else if indexPath.row == 3, let cell = tableView.dequeueReusableCell(withIdentifier: "images", for: indexPath) as? ImagesCell {
                 cell.setupUI(delegate: self, survey: survey!)
+                cell.isUserInteractionEnabled = isChoiceEnabled
                 return cell
             } else if indexPath.row == 4, let url = survey!.url {
                 if url.absoluteString.isYoutubeLink, let videoID = url.absoluteString.youtubeID, let cell = tableView.dequeueReusableCell(withIdentifier: "youtube") as? YoutubeCell {
-                    cell.setupUI(delegate: self, videoID: videoID)
+                    cell.setupUI(delegate: self, videoID: videoID, color: surveyReference.topic.tagColor)
                     return cell
                 } else if url.absoluteString.isTikTokLink, let cell = tableView.dequeueReusableCell(withIdentifier: "web") as? WebCell {
                     cell.setupUI(delegate: self, url: url)
                     return cell
                 } else if let cell = tableView.dequeueReusableCell(withIdentifier: "hyperlink", for: indexPath) as? HyperlinkCell {
                     cell.setupUI(delegate: self)
+                    cell.isUserInteractionEnabled = isChoiceEnabled
                     return cell
                 }
             } else if indexPath.row == 5, let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath) as? TextCell {
@@ -236,6 +281,8 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
                 if let cell = tableView.dequeueReusableCell(withIdentifier: "choice", for: indexPath) as? ChoiceCell, let answer = survey?.answers[indexPath.row] {
                     cell.setupUI(delegate: self, answer: answer)
                     if answersCells.filter({ $0 == cell }).isEmpty { answersCells.append(cell) }
+                    cell.isChecked = answer == choice
+                    cell.isUserInteractionEnabled = isChoiceEnabled
                     return cell
                 }
             case .ReadOnly:
@@ -259,7 +306,8 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
             switch mode {
             case .Write:
                 if let cell = tableView.dequeueReusableCell(withIdentifier: "vote", for: indexPath) as? VoteCell {
-                    cell.setupUI(delegate: self)
+                    cell.setupUI(delegate: self, color: survey!.topic.tagColor)
+                    cell.isLoading = isAwaitingVoteResponse
                     return cell
                 }
             case .ReadOnly:
@@ -336,98 +384,59 @@ extension PollView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if sender is Avatar {
             fatalError()
-        } else if let string = sender as? String {
-            if string == "claim" {
-                fatalError()
-            } else if string == "vote" {
-                let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self)
-                banner.present(subview: PlainBannerContent(text: "check_fields".localized, imageContent: UIImageView(image: UIImage(systemName: "exclamationmark.circle.fill"))))
-//                delBanner.shared.contentType = .Warning
-//                if let content = delBanner.shared.content as? Warning {
-//                    content.level = .Error
-//                    content.text = "Произошла ошибка по техническим причинам, повторите позже"
-//                }
-//                delBanner.shared.present(isModal: true, shouldDismissAfter: 3, delegate: self)
-                
-//                API.shared.postVote(answer: vote) { result in
-//                    switch result {
-//                    case .success(let json):
-//                        for i in json {
-//                            if i.0 == "survey_result" {
-//                                for entity in i.1 {
-//                                    guard let answerId = entity.1["answer"].int,
-//                                          let timeString = entity.1["timestamp"].string,
-//                                          let timestamp = Date(dateTimeString: timeString) as? Date else { break }
-//                                    self.survey!.result = [answerId: timestamp]
-//                                    Surveys.shared.hot.remove(object: self.survey!)
-//                                    Userprofiles.shared.current!.balance += 1
-//                                }
-//                                self.surveyReference.isComplete = true
-//                                self.mode = .ReadOnly
-//                            } else if i.0 == "hot" && !i.1.isEmpty {
-//                                Surveys.shared.load(i.1)
-//                            } else if i.0 == "result_total" {
-//                                do {
-//                                    var totalVotes = 0
-//                                    for entity in i.1 {
-//                                        guard let dict = entity.1.dictionary,
-//                                              let data = try dict["userprofiles"]?.rawData(),
-//                                              let _answerID = dict["answer"]?.int,
-//                                              let answer = self.survey?.answers.filter({ $0.id == _answerID }).first,
-//                                              let _total = dict["total"]?.int else { break }
-//                                        answer.totalVotes = _total
-//                                        totalVotes += _total
-//                                        let instances = try JSONDecoder().decode([Userprofile].self, from: data)
-//                                        instances.forEach { instance in
-//                                            answer.addVoter(Userprofiles.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-//                                        }
-//                                    }
-//                                    self.survey?.totalVotes = totalVotes
-//                                } catch let error {
-//                                    print(error)
-//                                }
-//                            }
-//                        }
-//                    case .failure(let error):
-//                        print(error.localizedDescription)
-//                        Banner.shared.contentType = .Warning
-//                        if let content = Banner.shared.content as? Warning {
-//                            content.level = .Error
-//                            content.text = "Произошла ошибка по техническим причинам, повторите позже"
-//                        }
-//                        Banner.shared.present(isModal: true, shouldDismissAfter: 3, delegate: self)
-//                    }
-//                }
-            } else if string == AlertController.popController {
-//                navigationController?.popViewController(animated: true)
+        } else if let claim = sender as? Claim {
+            viewInput?.onClaim(claim)
+        } else if let button = sender as? UIButton {
+            if button.accessibilityIdentifier == "vote" {
+                guard !choice.isNil else {
+                    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+                    banner.present(subview: PlainBannerContent(text: "make_choice".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 1)
+                    return
+                }
+                if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 2)) as? VoteCell {
+                    cell.isLoading = true
+                }
+                isChoiceEnabled = false
+                isAwaitingVoteResponse = true
+                viewInput?.onVote(choice)
+                return
+            } else if button.accessibilityIdentifier == "claim" {
+                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightMultiplictator: 1.5)
+                banner.accessibilityIdentifier = "claim"
+                banner.present(subview: ClaimSelection(callbackDelegate: banner))
             }
         } else if let image = sender as? UIImage {
-//            performSegue(withIdentifier: Segues.App.Image, sender: image)
+            viewInput?.onImageTapped(image: image, title: "")
         } else if let array = sender as? [AnyObject], let _ = array.filter({ $0 is Answer}).first as? Answer,
 //            let _ = array.filter({ $0 is [UIImageView]}).first as? [UIImageView],
             let _ = array.filter({ $0 is IndexPath}).first as? IndexPath {
 //            performSegue(withIdentifier: Segues.App.UsersList, sender: array)
+        } else if sender is HyperlinkCell {
+            guard let url = survey?.url else {
+                let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+                banner.present(subview: PlainBannerContent(text: "bad_url".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 1)
+                return
+            }
+            viewInput?.onURLTapped(url)
         }
     }
 }
 
 extension PollView: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {
-            
-    }
+    func onBannerWillAppear(_ sender: Any) {}
     
-    func onBannerWillDisappear(_ sender: Any) {
-            
-    }
+    func onBannerWillDisappear(_ sender: Any) {}
     
-    func onBannerDidAppear(_ sender: Any) {
-            
-    }
+    func onBannerDidAppear(_ sender: Any) {}
     
     func onBannerDidDisappear(_ sender: Any) {
-        guard let banner = sender as? Banner else { return }
-        banner.removeFromSuperview()
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+            if popup.accessibilityIdentifier == "claim" {
+                viewInput?.onExitWithClaim()
+            }
+        }
     }
-    
-    
 }

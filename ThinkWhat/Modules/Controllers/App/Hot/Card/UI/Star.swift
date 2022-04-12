@@ -16,16 +16,20 @@ class Star: UIView {
     }
     
     let state: StarState
+    private var color = UIColor.systemBlue
     
-    init(frame: CGRect, state: StarState) {
+    init(frame: CGRect, state: StarState, color _color: UIColor) {
         self.state = state
+        self.color = _color
         super.init(frame: frame)
     }
     
     required init?(coder aDecoder: NSCoder) {
         if let stateString = aDecoder.decodeObject(forKey: "state") as? String,
+            let colorString = aDecoder.decodeObject(forKey: "color") as? String,
             let frame = aDecoder.decodeCGRect(forKey: "frame") as? CGRect {
             self.state = StarState(rawValue: stateString)!
+            self.color = colorString.hexColor ?? .systemYellow
             super.init(frame: frame)
             self.layer.isOpaque = false
         } else {
@@ -36,16 +40,22 @@ class Star: UIView {
     override func encode(with aCoder: NSCoder) {
         aCoder.encode(self.state.rawValue, forKey: "state")
         aCoder.encode(self.frame, forKey: "frame")
+        guard let colorString = self.color.hex as? String else { return }
+        aCoder.encode(colorString, forKey: "color")
     }
     
     override func draw(_ rect: CGRect) {
         if state == .Full {
-            StarStyleKit.drawFullStar(frame: rect, resizing: .aspectFit)
+            StarStyleKit.drawFullStar(frame: rect, resizing: .aspectFit, color: traitCollection.userInterfaceStyle == .dark ? .systemBlue : color)
         } else if state == .Half {
-            StarStyleKit.drawHalfStar(frame: rect, resizing: .aspectFit)
+            StarStyleKit.drawHalfStar(frame: rect, resizing: .aspectFit, color: traitCollection.userInterfaceStyle == .dark ? .systemBlue : color)
         } else if state == .Empty {
-            StarStyleKit.drawEmptyStar(frame: rect, resizing: .aspectFit)
+            StarStyleKit.drawEmptyStar(frame: rect, resizing: .aspectFit, color: traitCollection.userInterfaceStyle == .dark ? .systemBlue : color)
         }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        setNeedsDisplay()
     }
 }
 
@@ -53,7 +63,7 @@ public class StarStyleKit : NSObject {
     
     //// Drawing Methods
     
-    @objc public dynamic class func drawFullStar(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 100, height: 100), resizing: ResizingBehavior = .aspectFit) {
+    @objc public dynamic class func drawFullStar(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 100, height: 100), resizing: ResizingBehavior = .aspectFit, color: UIColor) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -65,7 +75,7 @@ public class StarStyleKit : NSObject {
         
         
         //// Color Declarations
-        let main = UIColor.systemYellow
+        let main = color
 //        let main = UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)
         
         //// Star Drawing
@@ -91,7 +101,7 @@ public class StarStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawEmptyStar(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 100, height: 100), resizing: ResizingBehavior = .aspectFit) {
+    @objc public dynamic class func drawEmptyStar(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 100, height: 100), resizing: ResizingBehavior = .aspectFit, color: UIColor) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -103,7 +113,7 @@ public class StarStyleKit : NSObject {
         
         
         //// Color Declarations
-        let main = UIColor.systemYellow
+        let main = color
 //        let main = UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)
         
         //// Star Drawing
@@ -127,7 +137,7 @@ public class StarStyleKit : NSObject {
         
     }
     
-    @objc public dynamic class func drawHalfStar(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 100, height: 100), resizing: ResizingBehavior = .aspectFit) {
+    @objc public dynamic class func drawHalfStar(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 100, height: 100), resizing: ResizingBehavior = .aspectFit, color: UIColor) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
         
@@ -139,7 +149,7 @@ public class StarStyleKit : NSObject {
         
         
         //// Color Declarations
-        let main = UIColor.systemYellow
+        let main = color
 //        let main = UIColor(red: 0.753, green: 0.243, blue: 0.271, alpha: 1.000)
         
         //// Bezier Drawing

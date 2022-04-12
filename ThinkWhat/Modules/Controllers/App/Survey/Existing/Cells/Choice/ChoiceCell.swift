@@ -16,15 +16,9 @@ class ChoiceCell: UITableViewCell {
     
     @IBOutlet weak var checkBox: CheckBox!
     @IBOutlet weak var frameView: UIView!
-    @IBOutlet weak var textView: UITextView! {
-        didSet {
-            let recognizer = UITapGestureRecognizer(target: self, action: #selector(ChoiceCell.handleTap(recognizer:)))
-            textView.addGestureRecognizer(recognizer)
-        }
-    }
+    @IBOutlet weak var textView: UITextView!
     
     private var _answer: Answer!
-    private weak var delegate: CallbackObservable?
     var answer: Answer {
         return _answer
     }
@@ -38,17 +32,11 @@ class ChoiceCell: UITableViewCell {
             }
         }
     }
-    @objc private func handleTap(recognizer: UITapGestureRecognizer) {
-        if recognizer.state == .ended {
-            delegate?.callbackReceived(index as AnyObject)
-        }
-    }
     
     public func setupUI(delegate callbackDelegate: CallbackObservable, answer __answer: Answer) {
         setNeedsLayout()
         layoutIfNeeded()
         _answer = __answer
-        delegate = callbackDelegate
         let textContent = answer.description.contains("\t") ? answer.description : "\t" + answer.description
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.hyphenationFactor = 1.0
@@ -58,6 +46,7 @@ class ChoiceCell: UITableViewCell {
         attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 16), foregroundColor: setTextColor(), backgroundColor: .clear) as [NSAttributedString.Key : Any], range: textContent.fullRange())
         textView.attributedText = attributedString
         textView.textContainerInset = UIEdgeInsets(top: 3, left: textView.textContainerInset.left, bottom: 3, right: textView.textContainerInset.right)
+        checkBox.main = answer.survey?.topic.tagColor ?? K_COLOR_RED
     }
     
     private func setTextColor() -> UIColor {
@@ -84,5 +73,11 @@ class ChoiceCell: UITableViewCell {
                                                    left: textView.textContainerInset.left,
                                                    bottom: 3,
                                                    right: textView.textContainerInset.right)
+    }
+    
+    override func prepareForReuse() {
+        guard !checkBox.isNil else { return }
+        isChecked = false
+        checkBox.removeAllAnimations()
     }
 }

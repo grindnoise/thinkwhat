@@ -52,21 +52,13 @@ extension ConditionsViewController: ConditionsViewInput {
     }
     
     func onRefuse() {
-        let alert = UIAlertController(title: NSLocalizedString("should_read_agreement_title",comment: ""),
-                                      message: NSLocalizedString("should_read_agreement_message", comment: ""),
-                                      preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""),
-                                      style: .default))
-        present(alert, animated: true)
+        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+        banner.present(subview: PlainBannerContent(text: "should_read_agreement_message".localized, imageContent: ImageSigns.envelope, color: .systemOrange), isModal: false, shouldDismissAfter: 1.5)
     }
     
     func onTapWhileLoading() {
-        let alert = UIAlertController(title: NSLocalizedString("should_read_agreement_title",comment: ""),
-                                      message: NSLocalizedString("wait_for_agreement", comment: ""),
-                                      preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""),
-                                      style: .default))
-        present(alert, animated: true)
+        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+        banner.present(subview: PlainBannerContent(text: "wait_for_agreement".localized, imageContent: ImageSigns.envelope, color: .systemOrange), isModal: false, shouldDismissAfter: 1.5)
     }
 }
 
@@ -74,5 +66,18 @@ extension ConditionsViewController: ConditionsViewInput {
 extension ConditionsViewController: ConditionsModelOutput {
     func onTermsConditionsURLReceived(_ url: URL) {
         controllerOutput?.getTermsConditionsURL(url)
+    }
+}
+
+extension ConditionsViewController: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        guard let banner = sender as? Banner else { return }
+        banner.removeFromSuperview()
     }
 }

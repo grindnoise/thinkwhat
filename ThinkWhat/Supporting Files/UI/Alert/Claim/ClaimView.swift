@@ -9,7 +9,7 @@
 import UIKit
 
 class ClaimView: UIView {
-    private var claimCells: [ClaimCell]    = []
+    private var claimCells: [delClaimCell]    = []
     private var claimCategory: Claim? {
         didSet {
             for cell in claimCells {
@@ -63,7 +63,7 @@ extension ClaimView: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = ClaimCell(frame: CGRect(origin: .zero, size: CGSize(width: tableView.frame.width, height: 50)))
+        let cell = delClaimCell(frame: CGRect(origin: .zero, size: CGSize(width: tableView.frame.width, height: 50)))
             cell.claimCategory = Claims.shared.all[indexPath.row]
             if !claimCells.contains(cell) {
                 claimCells.append(cell)
@@ -73,7 +73,7 @@ extension ClaimView: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let cell = tableView.cellForRow(at: indexPath) as? ClaimCell {
+        if let cell = tableView.cellForRow(at: indexPath) as? delClaimCell {
             cell.isChecked = true
             claimCategory = cell.claimCategory
         }

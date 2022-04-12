@@ -508,7 +508,7 @@ class IconTransition: delBasicTransition {
                 
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: false) { _ in }
                 
-            } else if let vc_1 = fromVC as? NewPollController, let vc_2 = toVC as? ImageViewController {
+            } else if let vc_1 = fromVC as? NewPollController, let vc_2 = toVC as? delImageViewController {
                 var initialImageView: UIImageView!
                 toVC.view.setNeedsLayout()
                 toVC.view.layoutIfNeeded()
@@ -554,7 +554,7 @@ class IconTransition: delBasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? ImageViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let initialView = cell.scrollView {
+            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? delImageViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let initialView = cell.scrollView {
                 toVC.view.setNeedsLayout()
                 toVC.view.layoutIfNeeded()
                 
@@ -1465,7 +1465,7 @@ class IconTransition: delBasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: vc_1.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-            } else if let vc_1 = fromVC as? ImageViewController, let vc_2 = toVC as? NewPollController {
+            } else if let vc_1 = fromVC as? delImageViewController, let vc_2 = toVC as? NewPollController {
                 toVC.view.alpha = 1
                 var destinationImageView: UIImageView!
                 let blackScreen = UIView(frame: vc_1.view.frame)
@@ -1509,7 +1509,7 @@ class IconTransition: delBasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? ImageViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let destinationView = cell.scrollView {
+            } else if let vc_1 = fromVC as? delImageViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let destinationView = cell.scrollView {
                 toVC.view.alpha = 1
                 
                 let blackScreen = UIView(frame: vc_1.view.frame)

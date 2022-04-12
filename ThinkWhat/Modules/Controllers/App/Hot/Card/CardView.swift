@@ -26,9 +26,9 @@ class CardView: UIView {
     }
     
     init(frame: CGRect, survey: Survey, delegate: CallbackObservable?) {
+        self.survey = survey
         super.init(frame: frame)
         commonInit()
-        self.survey = survey
         self.delegate = delegate
         self.titleLabel.text = survey.title
         self.user.text = survey.owner.firstName
@@ -59,21 +59,26 @@ class CardView: UIView {
     
     private func setupUI() {
         voteButton.layer.cornerRadius = voteButton.frame.height/2.25
-        let rating = Double(survey.totalVotes)*5/Double(survey.views)
+        var rating = Double(survey.totalVotes)*5/Double(survey.views).rounded(toPlaces: 1)
+        if rating < 0.5 {
+            rating = 0
+        }
         stars.rating = rating
+        stars.color = survey.topic.tagColor
         ratingLabel.text = "\(rating)"
+        favoriteLabel.text = "\(survey.likes)"
         viewsLabel.text = "\(survey.views)"
         let categoryString = NSMutableAttributedString()
-        categoryString.append(NSAttributedString(string: "\(survey!.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey!.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey!.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey!.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topic.attributedText = categoryString
-        icon.iconColor = traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white
+        icon.iconColor = traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .systemBlue
         icon.category = Icon.Category(rawValue: survey.topic.id) ?? .Null
-        viewsIcon.iconColor = traitCollection.userInterfaceStyle == .light ? .black : .white
-        
-        avatar.lightColor = survey!.topic.tagColor
-        guard let image = survey!.owner.image else {
+        viewsIcon.iconColor = traitCollection.userInterfaceStyle == .light ? .black : .systemBlue
+        voteButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.survey.topic.tagColor
+        avatar.lightColor = survey.topic.tagColor
+        guard let image = survey.owner.image else {
             //TODO: - Download
             Task {
                  let image = try await survey.owner.downloadImageAsync()
@@ -95,24 +100,26 @@ class CardView: UIView {
             self.background.backgroundColor = .secondarySystemBackground
             self.voteButton.backgroundColor = .systemBlue
             let categoryString = NSMutableAttributedString()
-            categoryString.append(NSAttributedString(string: "\(survey!.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
-            self.icon.setIconColor(.white)
-            self.viewsIcon.setIconColor(.white)
+            self.icon.setIconColor(.systemBlue)
+            self.viewsIcon.setIconColor(.systemBlue)
+            self.favoriteIcon.setIconColor(.systemBlue)
             self.layer.shadowOpacity = 0
 //            self.voteButton.layer.shadowOpacity = 0
         default:
             self.background.backgroundColor = .systemBackground
-            self.voteButton.backgroundColor = K_COLOR_RED
+            self.voteButton.backgroundColor = self.survey.topic.tagColor
             let categoryString = NSMutableAttributedString()
-            categoryString.append(NSAttributedString(string: "\(survey!.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
-            self.icon.setIconColor(survey!.topic.tagColor)
+            self.icon.setIconColor(survey.topic.tagColor)
             self.viewsIcon.setIconColor(.black)
+            self.favoriteIcon.setIconColor(.black)
             self.layer.shadowOpacity = 1
 //            self.voteButton.layer.shadowOpacity = 1
         }
@@ -146,21 +153,11 @@ class CardView: UIView {
     @IBOutlet weak var topic: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var descriptionTextView: UITextView!
-    @IBOutlet weak var voteButton: UIButton! {
-        didSet {
-            voteButton.backgroundColor = UIColor { traitCollection in
-                switch traitCollection.userInterfaceStyle {
-                case .dark:
-                    return .systemBlue
-                default:
-                    return K_COLOR_RED
-                }
-            }
-        }
-    }
+    @IBOutlet weak var voteButton: UIButton!
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var stars: StarView! {
         didSet {
+            stars.color = survey.topic.tagColor
             stars.backgroundColor = .clear
         }
     }
@@ -171,10 +168,23 @@ class CardView: UIView {
     }
     @IBOutlet weak var viewsIcon: Icon! {
         didSet {
-            viewsIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
+            viewsIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
             viewsIcon.scaleMultiplicator = 1.4
             viewsIcon.backgroundColor = .clear
             viewsIcon.category = .Eye
+        }
+    }
+    @IBOutlet weak var favoriteLabel: UILabel! {
+        didSet {
+            favoriteLabel.backgroundColor = .clear
+        }
+    }
+    @IBOutlet weak var favoriteIcon: Icon! {
+        didSet {
+            favoriteIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+            favoriteIcon.scaleMultiplicator = 1.4
+            favoriteIcon.backgroundColor = .clear
+            favoriteIcon.category = .Heart
         }
     }
     @IBOutlet weak var viewsLabel: UILabel! {
@@ -201,5 +211,5 @@ class CardView: UIView {
     
     // MARK: - Properties
     weak private var delegate: CallbackObservable?
-    var survey: Survey!
+    public var survey: Survey!
 }

@@ -7,24 +7,18 @@
 //
 
 import UIKit
+import SafariServices
 
 class PollController: UIViewController {
     
     deinit {
         print("PollController deinit")
     }
-    init(survey: Survey) {
-        super.init(nibName: nil, bundle: nil)
-        self._survey = survey
-        self.surveyReference = _survey.reference
-    }
     
     init(surveyReference: SurveyReference) {
         super.init(nibName: nil, bundle: nil)
-        self.surveyReference = surveyReference
-        if let instance = surveyReference.survey {
-            self._survey = instance
-        }
+        self._surveyReference = surveyReference
+        self._survey = surveyReference.survey
     }
     
     required init?(coder: NSCoder) {
@@ -51,10 +45,10 @@ class PollController: UIViewController {
         //Set icon category in title
         let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
         icon.backgroundColor = .clear
-        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor
         icon.isRounded = false
         icon.scaleMultiplicator = 1.4
-        icon.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
+        icon.category = Icon.Category(rawValue: _surveyReference.topic.id) ?? .Null
         navigationItem.titleView = icon
         navigationItem.titleView?.clipsToBounds = false
 //        navigationItem.backBarButtonItem?.title = ""
@@ -74,13 +68,17 @@ class PollController: UIViewController {
 //                                               name: Notifications.UI.SuveyViewsCountReceived,
 //                                               object: nil)
         navigationItem.largeTitleDisplayMode = .never
-        guard surveyReference.isOwn else {
+        guard _surveyReference.isOwn else {
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: likeButton)]
             return
         }
     }
     
     private func performChecks() {
+        guard surveyReference.survey.isNil else {
+            controllerInput?.addView()
+            return
+        }
 //        switch survey {
 //        case .none:
 //            tableView.alpha = 0
@@ -97,7 +95,7 @@ class PollController: UIViewController {
 //        default:
 //            switch survey?.isComplete {
 //            case true:
-//                API.shared.getSurveyStats(surveyReference: surveyRef) { result in
+//                API.shared.getSurveyStats(_surveyReference: surveyRef) { result in
 //                    switch result {
 //                    case .success(let json):
 //                        guard let views = json["views"].int, let results = json["result_total"].array else { return }
@@ -139,7 +137,7 @@ class PollController: UIViewController {
 //                    }
 //                }
 //            case false:
-//                API.shared.incrementViewCounter(surveyReference: surveyRef) { result in
+//                API.shared.incrementViewCounter(_surveyReference: surveyRef) { result in
 //                    switch result {
 //                    case .success(let json):
 //                        guard let views = json["views"].int else { return }
@@ -163,12 +161,8 @@ class PollController: UIViewController {
     @objc private func addFavorite() {
         guard !isLoading, !survey.isNil else { return }
         guard survey!.isComplete else {
-            delBanner.shared.contentType = .Warning
-            if let content = delBanner.shared.content as? Warning {
-                content.level = .Info
-                content.text = "Пройдите опрос для отслеживания результатов"
-            }
-            delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
+            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+            banner.present(subview: PlainBannerContent(text: "finish_poll".localized, imageContent: ImageSigns.exclamationMark, color: .systemOrange), isModal: false, shouldDismissAfter: 3)
             return
         }
         isLoading = true
@@ -176,11 +170,11 @@ class PollController: UIViewController {
         if likeButton.state == .disabled {
             likeButton.state = .enabled
             mark = true
-            if Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences[self.surveyReference] = Date() }
+            if Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == _surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences[self._surveyReference] = Date() }
         } else {
             likeButton.state = .disabled
             mark = false
-            if let key = Surveys.shared.favoriteReferences.keys.filter({ $0.id == surveyReference.id }).first {
+            if let key = Surveys.shared.favoriteReferences.keys.filter({ $0.id == _surveyReference.id }).first {
                 Surveys.shared.favoriteReferences.removeValue(forKey: key)
             }
         }
@@ -214,15 +208,31 @@ class PollController: UIViewController {
     var controllerOutput: PollControllerOutput?
     var controllerInput: PollControllerInput?
     private var _survey: Survey!
-    private var surveyReference: SurveyReference!
+    private var _surveyReference: SurveyReference!
     private var isLoading = false
     private let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 30, height: 30)))
 }
 
 // MARK: - View Input
 extension PollController: PollViewInput {
-    func onClaim() {
-        controllerInput?.claim()
+    func onURLTapped(_ url: URL) {
+        var vc: SFSafariViewController!
+        let config = SFSafariViewController.Configuration()
+        config.entersReaderIfAvailable = true
+        vc = SFSafariViewController(url: url, configuration: config)
+        present(vc, animated: true)
+    }
+    
+    func onImageTapped(image: UIImage, title: String) {
+        navigationController?.pushViewController(ImageController(image: image, title: title), animated: true)
+    }
+    
+    func onVote(_ choice: Answer) {
+        controllerInput?.vote(choice)
+    }
+    
+    func onClaim(_ claim: Claim) {
+        controllerInput?.claim(claim)
     }
     
     func onAddFavorite(_ mark: Bool) {
@@ -234,19 +244,62 @@ extension PollController: PollViewInput {
             return _survey
         }
     }
+    
+    var surveyReference: SurveyReference {
+        get {
+            return _surveyReference
+        }
+    }
 }
 
 // MARK: - Model Output
 extension PollController: PollModelOutput {
-    func onAddFavorite(_ result: Result<Bool, Error>) {
+    func onExitWithClaim() {
+        Task {
+            try await Task.sleep(nanoseconds: UInt64(0.25 * 1_000_000_000))
+            await MainActor.run {
+                navigationController?.popViewController(animated: true)
+            }
+        }
+    }
+    
+    func onClaimCallback(_ result: Result<Bool, Error>) {
+        controllerOutput?.onClaim(result)
+    }
+    
+    func onVoteCallback(_ result: Result<Bool, Error>) {
+        controllerOutput?.onVote(result)
+    }
+    
+    func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
         isLoading = false
     }
     
-    func onLoad(_ result: Result<Bool, Error>) {
-        
+    func onLoadCallback(_ result: Result<Bool, Error>) {
+        controllerOutput?.onLoad(result)
     }
     
-    func onCountUpdated() {
-        controllerOutput?.onCountUpdated()
+    func onCountUpdateCallback(_ result: Result<Bool, Error>) {
+        switch result {
+        case .success:
+            controllerOutput?.onCountUpdated()
+        case .failure(let error):
+#if DEBUG
+            print(error.localizedDescription)
+#endif
+        }
+    }
+}
+
+extension PollController: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        guard let banner = sender as? Banner else { return }
+        banner.removeFromSuperview()
     }
 }

@@ -38,20 +38,36 @@ class StarView: UIView {
         self.addSubview(content)
     }
     
-    public var color = UIColor.systemYellow
+    public var color = UIColor.systemYellow {
+        didSet {
+            
+        }
+    }
     open var rating: Double = 0.0 {
         didSet {
-            let emptyStar = Star(frame: star_1.frame, state: .Empty)
+            let emptyStar = Star(frame: star_1.frame, state: .Empty, color: color)
             emptyStar.isOpaque = false
             emptyStar.backgroundColor = .clear
-            let halfStar  = Star(frame: star_1.frame, state: .Half)
+            let halfStar  = Star(frame: star_1.frame, state: .Half, color: color)
             halfStar.isOpaque = false
             halfStar.backgroundColor = .clear
-            let fullStar  = Star(frame: star_1.frame, state: .Full)
+            let fullStar  = Star(frame: star_1.frame, state: .Full, color: color)
             fullStar.isOpaque = false
             fullStar.backgroundColor = .clear
-            if rating < 1.0 {
-                if let star1 = fullStar.copyView(),
+            if rating < 0.5 {
+                if let star1 = emptyStar.copyView(),
+                    let star2 = emptyStar.copyView(),
+                    let star3 = emptyStar.copyView(),
+                    let star4 = emptyStar.copyView(),
+                    let star5 = emptyStar.copyView() {
+                    star1.addEquallyTo(to: star_1)
+                    star2.addEquallyTo(to: star_2)
+                    star3.addEquallyTo(to: star_3)
+                    star4.addEquallyTo(to: star_4)
+                    star5.addEquallyTo(to: star_5)
+                }
+            } else if rating < 1.0 {
+                if let star1 = halfStar.copyView(),
                     let star2 = emptyStar.copyView(),
                     let star3 = emptyStar.copyView(),
                     let star4 = emptyStar.copyView(),

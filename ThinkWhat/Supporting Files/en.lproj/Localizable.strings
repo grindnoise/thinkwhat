@@ -8,6 +8,8 @@
 
 //Common
 "ok" = "Ok";
+"results" = "Results";
+"vote" = "Vote";
 "check_fields" = "Check fields for errors";
 "warning" = "Warning";
 "error" = "Error";
@@ -25,6 +27,13 @@
 "api_unavailable" = "Server is currently unavailable, try again later";
 "retry" = "Retry";
 "more_info" = "More info";
+"play_youtube" = "Play here";
+"open_youtube" = "Open in Youtube app";
+"remember" = "Remember";
+"tiktok_web_error" = "TikTok loading error";
+"bad_url" = "Incorrect url";
+"claim_sent" = "Сlaim has been sent";
+"thanks_for_feedback" = "Thanks for feedback!";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";
@@ -94,3 +103,7 @@
 
 //Settings VC
 "settings" = "Settings";
+
+//Poll VC
+"make_choice" = "Make your choice";
+"finish_poll" = "Please, vote at first";

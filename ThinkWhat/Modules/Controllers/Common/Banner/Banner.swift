@@ -37,12 +37,13 @@ class Banner: UIView {
         
         //Set default height
         setNeedsLayout()
-        height                      = contentView.bounds.width/3.5
+        height                      = contentView.bounds.width/4
         heightConstraint.constant   = height
         topConstraint.constant      = yOrigin//-(topConstraint.constant + height)
         layoutIfNeeded()
         let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:)))
         body.addGestureRecognizer(gestureRecognizer)
+        body.cornerRadius = body.frame.width * 0.05
     }
     
     // MARK: - IB Outlets
@@ -115,7 +116,7 @@ class Banner: UIView {
         bannerDelegate?.onBannerWillAppear(self)
         alpha = 1
         UIView.animate(
-            withDuration: 0.4,
+            withDuration: 0.5,
             delay: 0,
             usingSpringWithDamping: 0.7,
             initialSpringVelocity: 0.4,

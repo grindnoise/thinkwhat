@@ -59,12 +59,8 @@ extension LoginViewController: LoginViewInput {
     }
     
     func onIncorrectFields() {
-        let alert = UIAlertController(title: NSLocalizedString("warning",comment: ""),
-                                      message: NSLocalizedString("check_fields", comment: ""),
-                                      preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""),
-                                      style: .default))
-        present(alert, animated: true)
+        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+        banner.present(subview: PlainBannerContent(text: "check_fields".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, shouldDismissAfter: 1.5)
     }
     
     func onLogin(username: String, password: String) {
@@ -78,14 +74,10 @@ extension LoginViewController: LoginModelOutput {
             await MainActor.run {
                 controllerOutput?.onError(error)
             }
-            let alert = UIAlertController(title: NSLocalizedString("error",comment: ""),
-                                          message: NSLocalizedString("log_in_error", comment: ""),
-                                          preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""),
-                                          style: .default))
             try await Task.sleep(nanoseconds: UInt64(0.5 * 1_000_000_000))
             await MainActor.run {
-                present(alert, animated: true)
+                let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+                banner.present(subview: PlainBannerContent(text: "log_in_error".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, shouldDismissAfter: 1.5)
             }
         }
     }
@@ -96,5 +88,18 @@ extension LoginViewController: LoginModelOutput {
                 controllerOutput?.onSuccess()
             }
         }
+    }
+}
+
+extension LoginViewController: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        guard let banner = sender as? Banner else { return }
+        banner.removeFromSuperview()
     }
 }

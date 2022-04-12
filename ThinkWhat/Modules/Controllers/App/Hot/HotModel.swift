@@ -33,9 +33,9 @@ extension HotModel: HotControllerInput {
                     Surveys.shared.load(json)
                 }
             } catch {
-                #if DEBUG
+#if DEBUG
                 print(error.localizedDescription)
-                #endif
+#endif
             }
         }
     }

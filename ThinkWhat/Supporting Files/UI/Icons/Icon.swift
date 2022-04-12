@@ -136,6 +136,7 @@ class Icon: UIView {
         case Choice = 10053
         case Follow = 10054
         case Valid = 10055
+        case Heart = 10056
     }
     
     override func encode(with aCoder: NSCoder) {
@@ -8701,6 +8702,18 @@ class Icon: UIView {
             iconPath.close()
 //        case .Valid:
             
+        case .Heart:
+            iconPath.move(to: CGPoint(x: 132.3, y: 39.35))
+            iconPath.addLine(to: CGPoint(x: 132.21, y: 39.35))
+            iconPath.addCurve(to: CGPoint(x: 99.92, y: 59.79), controlPoint1: CGPoint(x: 118.37, y: 39.35), controlPoint2: CGPoint(x: 105.77, y: 47.32))
+            iconPath.addLine(to: CGPoint(x: 99.92, y: 59.46))
+            iconPath.addCurve(to: CGPoint(x: 52.57, y: 42.33), controlPoint1: CGPoint(x: 91.61, y: 41.73), controlPoint2: CGPoint(x: 70.41, y: 34.06))
+            iconPath.addCurve(to: CGPoint(x: 32.01, y: 75.04), controlPoint1: CGPoint(x: 39.82, y: 48.24), controlPoint2: CGPoint(x: 31.76, y: 61.06))
+            iconPath.addCurve(to: CGPoint(x: 100, y: 161), controlPoint1: CGPoint(x: 32, y: 112), controlPoint2: CGPoint(x: 100, y: 161))
+            iconPath.addCurve(to: CGPoint(x: 168, y: 74.83), controlPoint1: CGPoint(x: 100, y: 161), controlPoint2: CGPoint(x: 168, y: 112))
+            iconPath.addLine(to: CGPoint(x: 168, y: 74.83))
+            iconPath.addCurve(to: CGPoint(x: 132.3, y: 39.35), controlPoint1: CGPoint(x: 168, y: 55.23), controlPoint2: CGPoint(x: 152.02, y: 39.35))
+            iconPath.close()
             
         default:
             iconPath.move(to: CGPoint(x: 115, y: 100))

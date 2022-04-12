@@ -2017,7 +2017,7 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                 //                destinationVC.actionButton.lineWidth = lineWidth
                 destinationVC.actionButtonWidthConstant = votesIcon.frame.width
                 destinationVC.color = selectedColor
-            } else if segue.identifier == Segues.App.Image, let destinationVC = segue.destination as? ImageViewController, let image = sender as? UIImage {
+            } else if segue.identifier == Segues.App.Image, let destinationVC = segue.destination as? delImageViewController, let image = sender as? UIImage {
                 nc.duration = 0.25
                 nc.transitionStyle = .Icon
                 destinationVC.image = image

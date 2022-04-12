@@ -32,11 +32,16 @@ class TextCell: UITableViewCell {
         }
         
         let attributedText = NSMutableAttributedString(string: isQuestion ? survey.question : survey.description, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-        attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: isQuestion ? .systemGray : .label, backgroundColor: .clear), range: isQuestion ? survey.question.fullRange() : survey.description.fullRange())
+        if isQuestion {
+            attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.SemiboldItalic, size: 17), foregroundColor: .systemGray, backgroundColor: .clear), range: survey.question.fullRange())
+        } else {
+            attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: .label, backgroundColor: .clear), range: survey.description.fullRange())
+        }
+        
         textView.attributedText = attributedText
-        textView.textContainerInset = UIEdgeInsets(top: isQuestion ? 25 : textView.textContainerInset.left,
+        textView.textContainerInset = UIEdgeInsets(top: isQuestion ? 40 : textView.textContainerInset.left,
                                                    left: textView.textContainerInset.left,
-                                                   bottom: isQuestion ? 30 : textView.textContainerInset.left,
+                                                   bottom: isQuestion ? 40 : textView.textContainerInset.left,
                                                    right: textView.textContainerInset.right)
         isSetupComplete = true
     }

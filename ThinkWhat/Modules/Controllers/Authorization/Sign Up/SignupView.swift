@@ -498,7 +498,8 @@ extension SignupView: UITextFieldDelegate {
                             self.isLoginFilled = false
                         }
                     case .failure(let error):
-                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+                        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+                        banner.present(subview: PlainBannerContent(text: error.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 10.5)
                     }
                     self.isPerformingChecks = false
                     textField.isShowingSpinner = false
@@ -631,5 +632,18 @@ extension SignupView: CAAnimationDelegate {
         guard !isAnimationStopped else { return }
         providerProgressIndicator?.layer.removeAllAnimations()
         bounce()
+    }
+}
+
+extension SignupView: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        guard let banner = sender as? Banner else { return }
+        banner.removeFromSuperview()
     }
 }

@@ -65,7 +65,7 @@ extension HotController: HotViewInput {
 //        let backItem = UIBarButtonItem()
 //            backItem.title = ""
 //            navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(PollController(survey: survey), animated: true)
+        navigationController?.pushViewController(PollController(surveyReference: survey.reference), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     

@@ -41,44 +41,65 @@ class SideApp: UIView, BannerContent {
     @IBOutlet weak var topView: UIView!
     @IBOutlet weak var icon: UIView!
 
-    @IBOutlet weak var playButton: UIButton!
+    @IBOutlet weak var playButton: UIButton! {
+        didSet {
+            playButton.setTitle("play_youtube".localized, for: .normal)
+        }
+    }
     @IBAction func playEmbedded(_ sender: Any) {
-        delBanner.shared.dismiss() {
-            _ in
-            self.delegate?.callbackReceived(SideAppPreference.Embedded as AnyObject)
+            self.delegate?.callbackReceived(self)
             if self.app == .Youtube {
                 UserDefaults.App.youtubePlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.youtubePlay
             } else if self.app == .TikTok {
                 UserDefaults.App.tiktokPlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.tiktokPlay
             }
+        if localhost {
+        UserDefaults.App.youtubePlay = nil
         }
     }
-    @IBOutlet weak var openButton: UIButton!
+    @IBOutlet weak var openButton: UIButton! {
+        didSet {
+            openButton.setTitle("open_youtube".localized, for: .normal)
+        }
+    }
     @IBAction func openYoutubeApp(_ sender: Any) {
-        delBanner.shared.dismiss() {
-            _ in
-            self.delegate?.callbackReceived(SideAppPreference.App as AnyObject)
+            self.delegate?.callbackReceived(self)
             if self.app == .Youtube {
                 UserDefaults.App.youtubePlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.youtubePlay
             } else if self.app == .TikTok {
                 UserDefaults.App.tiktokPlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.tiktokPlay
             }
+        if localhost {
+        UserDefaults.App.youtubePlay = nil
         }
     }
-    @IBAction func setDefault(_ sender: Any) {
-        //TODO
+    
+    @IBAction func onChange(_ sender: UISwitch) {
+        print(sender.isOn)
     }
     @IBOutlet weak var defaultSwitch: UISwitch! {
         didSet {
-            defaultSwitch.onTintColor = K_COLOR_RED
+            defaultSwitch.onTintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
         }
     }
-    @IBOutlet weak var valueChanged: UIView!
+    @IBOutlet weak var label: UILabel! {
+        didSet {
+            label.text = "remember".localized
+        }
+    }
+    
     
     
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.commonInit()
+    }
+    
+    init(app _app: ThirdPartyApp, callbackDelegate _callbackDelegate: CallbackObservable? = nil) {
+        super.init(frame: .zero)
+        self.app = _app
+        self.delegate = _callbackDelegate
         self.commonInit()
     }
     
@@ -102,5 +123,27 @@ class SideApp: UIView, BannerContent {
         content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(content)
         self.backgroundColor = .clear
+        guard !icon.isNil else { return }
+        switch app {
+        case .TikTok:
+            let v = TikTokLogo(frame: icon.frame)
+            v.isOpaque = false
+            v.addEquallyTo(to: icon)
+        case .Youtube:
+            let v = YoutubeLogo(frame: icon.frame)
+            v.isOpaque = false
+            v.addEquallyTo(to: icon)
+        case .Null:
+            print("")
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        switch traitCollection.userInterfaceStyle {
+        case .dark:
+            self.defaultSwitch.onTintColor = .systemBlue
+        default:
+            self.defaultSwitch.onTintColor = .systemGreen
+        }
     }
 }

@@ -46,7 +46,7 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     @IBOutlet weak var feedbackView: UIView!
     @IBOutlet weak var tableView: UITableView!
-    private var claimCells: [ClaimCell]    = []
+    private var claimCells: [delClaimCell]    = []
     weak var delegate: CallbackObservable?
     
     override func viewDidLoad() {
@@ -60,7 +60,7 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.row < Claims.shared.all.count, let cell = tableView.dequeueReusableCell(withIdentifier: "claim", for: indexPath) as? ClaimCell {
+        if indexPath.row < Claims.shared.all.count, let cell = tableView.dequeueReusableCell(withIdentifier: "claim", for: indexPath) as? delClaimCell {
             cell.setNeedsLayout()
             cell.layoutIfNeeded()
             cell.claimCategory = Claims.shared.all[indexPath.row]
@@ -76,7 +76,7 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let cell = tableView.cellForRow(at: indexPath) as? ClaimCell {
+        if let cell = tableView.cellForRow(at: indexPath) as? delClaimCell {
             cell.isChecked = true
             claimCategory = cell.claimCategory
         }
@@ -117,7 +117,7 @@ class ClaimViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
 }
 
-class ClaimCell: UITableViewCell {
+class delClaimCell: UITableViewCell {
     deinit {
         print("***ClaimCell deinit***")
     }

@@ -33,7 +33,7 @@ class AuthorCell: UITableViewCell {
     }
     @IBOutlet weak var viewsIcon: Icon! {
         didSet {
-            viewsIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
+            viewsIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
             viewsIcon.scaleMultiplicator = 1.4
             viewsIcon.backgroundColor = .clear
             viewsIcon.category = .Eye
@@ -42,6 +42,19 @@ class AuthorCell: UITableViewCell {
     @IBOutlet weak var viewsLabel: UILabel! {
         didSet {
             viewsLabel.backgroundColor = .clear
+        }
+    }
+    @IBOutlet weak var favoriteLabel: UILabel! {
+        didSet {
+            favoriteLabel.backgroundColor = .clear
+        }
+    }
+    @IBOutlet weak var favoriteIcon: Icon! {
+        didSet {
+            favoriteIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+            favoriteIcon.scaleMultiplicator = 1.4
+            favoriteIcon.backgroundColor = .clear
+            favoriteIcon.category = .Heart
         }
     }
     @IBOutlet weak var user: UILabel! {
@@ -60,7 +73,9 @@ class AuthorCell: UITableViewCell {
         layoutIfNeeded()
         delegate = callbackDelegate
         survey = _survey
+        stars.color = survey.topic.tagColor
         avatar.lightColor = survey.topic.tagColor
+        favoriteLabel.text = "\(survey.likes)"
         if let image = survey.owner.image {
             avatar.imageView.image = image
         } else {
@@ -70,12 +85,15 @@ class AuthorCell: UITableViewCell {
             }
         }
         let categoryString = NSMutableAttributedString()
-        categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear)))
-        categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear)))
-        categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear)))
+        categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topic.attributedText = categoryString
         user.text = survey!.owner.firstName
-        let rating = Double(survey.totalVotes)*5/Double(survey.views)
+        var rating = Double(survey.totalVotes)*5/Double(survey.views).rounded(toPlaces: 1)
+        if rating < 0.5 {
+            rating = 0
+        }
         stars.rating = rating
         ratingLabel.text = "\(rating)"
         viewsLabel.text = "\(survey.views)"
@@ -93,7 +111,8 @@ class AuthorCell: UITableViewCell {
             categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
-            self.viewsIcon.setIconColor(.white)
+            self.viewsIcon.setIconColor(.systemBlue)
+            self.favoriteIcon.setIconColor(.systemBlue)
         default:
             let categoryString = NSMutableAttributedString()
             categoryString.append(NSAttributedString(string: "\(survey!.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
@@ -101,6 +120,7 @@ class AuthorCell: UITableViewCell {
             categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
             self.viewsIcon.setIconColor(.black)
+            self.favoriteIcon.setIconColor(.black)
         }
     }
 }

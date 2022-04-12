@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="Popup" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="background" destination="ZIu-0u-mvn" id="RXH-Bl-GFf"/>
+                <outlet property="body" destination="J0d-KJ-2ol" id="fkL-dr-yt9"/>
+                <outlet property="centerYConstraint" destination="yOg-sg-kHN" id="Phj-zs-iEr"/>
+                <outlet property="container" destination="R6y-UU-KN5" id="gVf-XT-cvJ"/>
+                <outlet property="contentView" destination="iN0-l3-epB" id="VV3-Kw-CIE"/>
+                <outlet property="heightConstraint" destination="uQC-SG-ur4" id="n9v-RF-otY"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZIu-0u-mvn">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                    <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="J0d-KJ-2ol">
+                    <rect key="frame" x="15.5" y="268.5" width="383" height="359"/>
+                    <subviews>
+                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="R6y-UU-KN5">
+                            <rect key="frame" x="19" y="18" width="345" height="323"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="R6y-UU-KN5" firstAttribute="height" secondItem="J0d-KJ-2ol" secondAttribute="height" multiplier="0.9" id="57I-ub-pID"/>
+                        <constraint firstItem="R6y-UU-KN5" firstAttribute="centerY" secondItem="J0d-KJ-2ol" secondAttribute="centerY" id="U5o-k7-c2i"/>
+                        <constraint firstItem="R6y-UU-KN5" firstAttribute="width" secondItem="J0d-KJ-2ol" secondAttribute="width" multiplier="0.9" id="UdX-yP-KiX"/>
+                        <constraint firstItem="R6y-UU-KN5" firstAttribute="centerX" secondItem="J0d-KJ-2ol" secondAttribute="centerX" id="sG0-s8-Z9E"/>
+                        <constraint firstAttribute="height" constant="359" id="uQC-SG-ur4"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="17"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="J0d-KJ-2ol" firstAttribute="centerX" secondItem="ZIu-0u-mvn" secondAttribute="centerX" id="ABC-MK-VLk"/>
+                <constraint firstAttribute="bottom" secondItem="ZIu-0u-mvn" secondAttribute="bottom" id="BOl-LR-HjU"/>
+                <constraint firstItem="ZIu-0u-mvn" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="K4K-zc-IQ5"/>
+                <constraint firstItem="J0d-KJ-2ol" firstAttribute="width" secondItem="ZIu-0u-mvn" secondAttribute="width" multiplier="0.925" id="Sqs-Gs-vMT"/>
+                <constraint firstItem="ZIu-0u-mvn" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="gIS-pw-35k"/>
+                <constraint firstItem="ZIu-0u-mvn" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="xSx-Fy-WFP"/>
+                <constraint firstItem="J0d-KJ-2ol" firstAttribute="centerY" secondItem="ZIu-0u-mvn" secondAttribute="centerY" id="yOg-sg-kHN"/>
+            </constraints>
+            <point key="canvasLocation" x="139" y="72"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

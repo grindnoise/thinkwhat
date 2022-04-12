@@ -29,10 +29,10 @@
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AB7-J0-o3H">
-                    <rect key="frame" x="27.5" y="52" width="359" height="120"/>
+                    <rect key="frame" x="15.5" y="52" width="383" height="120"/>
                     <subviews>
                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rar-ub-moY">
-                            <rect key="frame" x="8" y="8" width="343" height="104"/>
+                            <rect key="frame" x="8.5" y="8" width="366" height="104"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </view>
                     </subviews>
@@ -57,7 +57,7 @@
                 <constraint firstItem="AB7-J0-o3H" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="8" id="585-1d-HCy"/>
                 <constraint firstAttribute="bottom" secondItem="ThP-Hz-SG0" secondAttribute="bottom" id="JCF-Vn-ExU"/>
                 <constraint firstItem="AB7-J0-o3H" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="MqJ-QO-2om"/>
-                <constraint firstItem="AB7-J0-o3H" firstAttribute="width" secondItem="vUN-kp-3ea" secondAttribute="width" multiplier="0.86715" id="P7q-61-3OP"/>
+                <constraint firstItem="AB7-J0-o3H" firstAttribute="width" secondItem="vUN-kp-3ea" secondAttribute="width" multiplier="0.925" id="P7q-61-3OP"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="ThP-Hz-SG0" secondAttribute="trailing" id="bsP-y6-KZX"/>
                 <constraint firstItem="ThP-Hz-SG0" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="kf7-yJ-nnC"/>
                 <constraint firstItem="ThP-Hz-SG0" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="o4V-p9-pJa"/>

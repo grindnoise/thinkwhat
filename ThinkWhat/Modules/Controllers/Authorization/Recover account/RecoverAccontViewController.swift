@@ -52,24 +52,30 @@ extension RecoverAccontViewController: RecoverModelOutput {
         }
         switch result {
         case .success:
-            let alert = UIAlertController(title: NSLocalizedString("success",comment: ""),
-                                          message: NSLocalizedString("email_sent", comment: ""),
-                                          preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""),
-                                          style: .default))
-            present(alert, animated: true)
+            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+            ImageSigns.envelope.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
+            banner.present(subview: PlainBannerContent(text: "success".localized, imageContent: ImageSigns.envelope, color: .systemGreen), isModal: false, shouldDismissAfter: 1.5)
         case .failure(let error):
             var errorDescription = ""
             if error.localizedDescription.contains("find an account associated with that email") {
                 errorDescription = "email_not_found"
             }
-            let alert = UIAlertController(title: NSLocalizedString("warning",comment: ""),
-                                          message: NSLocalizedString(errorDescription, comment: ""),
-                                          preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: ""),
-                                          style: .default))
-            present(alert, animated: true)
+            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+            banner.present(subview: PlainBannerContent(text: "errorDescription".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, shouldDismissAfter: 1.5)
         }
+    }
+}
+
+extension RecoverAccontViewController: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        guard let banner = sender as? Banner else { return }
+        banner.removeFromSuperview()
     }
 }
 

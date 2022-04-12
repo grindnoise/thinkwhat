@@ -339,7 +339,7 @@ class delPollController: UIViewController {
                 nc.transitionStyle = .Icon
                 destinationVC.color = survey!.topic.tagColor
                 destinationVC.userprofile = userprofile
-            } else if segue.identifier == Segues.App.Image, let image = sender as? UIImage, let destinationVC = segue.destination as? ImageViewController, survey != nil {
+            } else if segue.identifier == Segues.App.Image, let image = sender as? UIImage, let destinationVC = segue.destination as? delImageViewController, survey != nil {
                 nc.duration = 0.25
                 nc.transitionStyle = .Icon
                 destinationVC.image = image

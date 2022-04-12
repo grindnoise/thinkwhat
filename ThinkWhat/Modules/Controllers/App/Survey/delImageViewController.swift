@@ -8,16 +8,28 @@
 
 import UIKit
 
-class ImageViewController: UIViewController {
+class delImageViewController: UIViewController {
+    
     deinit {
-        debugPrint("---\(self) deinit")
+        debugPrint("ImageViewController deinit")
     }
+    
+    init(image _image: UIImage, title _title: String) {
+        super.init(nibName: nil, bundle: nil)
+        self.image = _image
+        self.titleString = _title
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     enum Mode {
         case ReadOnly, Write
     }
     var image:              UIImage!
     var titleString:        String = ""
-    var mode: Mode = .Write
+    var mode: Mode = .ReadOnly
     
     private var tapRecognizer: UITapGestureRecognizer! {
         didSet {
@@ -100,10 +112,10 @@ class ImageViewController: UIViewController {
         tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         tapRecognizer.numberOfTapsRequired = 1
         scrollView.addGestureRecognizer(tapRecognizer)
-        NotificationCenter.default.addObserver(self, selector: #selector(ImageViewController.applicationWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: UIApplication.shared)
-        NotificationCenter.default.addObserver(self, selector: #selector(ImageViewController.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(ImageViewController.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ImageViewController.handleDoubleTap(_:)))
+        NotificationCenter.default.addObserver(self, selector: #selector(delImageViewController.applicationWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: UIApplication.shared)
+        NotificationCenter.default.addObserver(self, selector: #selector(delImageViewController.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(delImageViewController.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(delImageViewController.handleDoubleTap(_:)))
         doubleTapRecognizer.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTapRecognizer)
     }
@@ -115,33 +127,6 @@ class ImageViewController: UIViewController {
 //        tabBarController?.setNeedsStatusBarAppearanceUpdate()
         setNeedsStatusBarAppearanceUpdate()
     }
-    
-//    override func viewDidAppear(_ animated: Bool) {
-//        delay(seconds: 2) {
-//            self.navigationController?.navigationBar.barStyle = .black
-//            self.navigationController?.setNeedsStatusBarAppearanceUpdate()
-//            self.tabBarController?.setNeedsStatusBarAppearanceUpdate()
-//            self.setNeedsStatusBarAppearanceUpdate()
-//        }
-//    }
-//        super.viewWillAppear(animated)
-////        if #available(iOS 13, *) {
-////        tabBarController?.navigationController?.navigationBar.barStyle = .default
-////            navigationController?.navigationBar.barStyle = .black
-////            setNeedsStatusBarAppearanceUpdate()
-////            self.navigationController?.navigationBar.backgroundColor = .black
-////            self.navigationController?.navigationBar.tintColor = .black
-////        }
-////        UINavigationBar.appearance().backgroundColor = .black
-////        appDelegate.window?.backgroundColor = .black
-////        super.viewWillAppear(animated)
-////            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
-////                self.navigationController?.navigationBar.setNeedsLayout()
-////                self.navigationController?.navigationBar.barTintColor = .black
-////                self.navigationController?.navigationBar.tintColor = .white
-////                self.navigationController?.navigationBar.layoutIfNeeded()
-////            })
-//    }
     
     override func willMove(toParent parent: UIViewController?) {
         self.navigationController?.navigationBar.barTintColor = .white
@@ -177,7 +162,7 @@ class ImageViewController: UIViewController {
     }
 }
 
-extension ImageViewController: UITextFieldDelegate {
+extension delImageViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -262,73 +247,7 @@ extension ImageViewController: UITextFieldDelegate {
     }
 }
 
-class PanZoomImageView: UIScrollView {
-//    var doubleTapRecognizer: UITapGestureRecognizer!
-    var image: UIImage! {
-        didSet {
-            imageView.image = image
-        }
-    }
-    let imageView = UIImageView()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        commonInit()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        commonInit()
-    }
-    
-    convenience init(named: String) {
-        self.init(frame: .zero)
-//        self.imageName = named
-    }
-    
-    private func commonInit() {
-        // Setup image view
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
-        addSubview(imageView)
-        NSLayoutConstraint.activate([
-            imageView.widthAnchor.constraint(equalTo: widthAnchor),
-            imageView.heightAnchor.constraint(equalTo: heightAnchor),
-            imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: centerYAnchor)
-            ])
-        
-        // Setup scroll view
-        minimumZoomScale = 1
-        maximumZoomScale = 3
-        showsHorizontalScrollIndicator = false
-        showsVerticalScrollIndicator = false
-        delegate = self
-////        doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
-//        doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(ImageViewController.handleDoubleTap(_:)))
-//        doubleTapRecognizer.numberOfTapsRequired = 2
-//        addGestureRecognizer(doubleTapRecognizer)
-    }
-    
-//    @objc private func handleDoubleTap(_ sender: UITapGestureRecognizer) {
-//        if zoomScale == 1 {
-//            setZoomScale(2, animated: true)
-//        } else {
-//            setZoomScale(1, animated: true)
-//        }
-//    }
-    
-}
-
-extension PanZoomImageView: UIScrollViewDelegate {
-    
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return imageView
-    }
-    
-}
-
-extension ImageViewController: UIGestureRecognizerDelegate {
+extension delImageViewController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }

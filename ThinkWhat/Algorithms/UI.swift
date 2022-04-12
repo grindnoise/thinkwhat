@@ -45,12 +45,13 @@ struct StringAttributes {
     
     struct Fonts {
         struct Style {
-            static let Semibold     = "OpenSans-Semibold"
-            static let Bold         = "OpenSans-Bold"
-            static let Regular      = "OpenSans"
-            static let Light        = "OpenSans-Light"
-            static let Italic       = "OpenSans-Italic"
-            static let Extrabold    = "OpenSans-ExtraBold"
+            static let Semibold         = "OpenSans-Semibold"
+            static let SemiboldItalic   = "OpenSans-SemiboldItalic"
+            static let Bold             = "OpenSans-Bold"
+            static let Regular          = "OpenSans"
+            static let Light            = "OpenSans-Light"
+            static let Italic           = "OpenSans-Italic"
+            static let Extrabold        = "OpenSans-ExtraBold"
         }
     }
     

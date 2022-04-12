@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="OpenSans-Regular.ttf">
+            <string>OpenSans</string>
+        </array>
+        <array key="OpenSans-Semibold.ttf">
+            <string>OpenSans-Semibold</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ClaimSelection" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="btn" destination="m7b-dS-KaK" id="Z0j-7a-gfx"/>
+                <outlet property="cancel" destination="DdD-fd-r93" id="7Ce-rB-LZW"/>
+                <outlet property="contentView" destination="iN0-l3-epB" id="ON1-3M-cbL"/>
+                <outlet property="icon" destination="PIS-8X-rlt" id="aXu-KY-2pS"/>
+                <outlet property="label" destination="XmX-QE-bUR" id="bUH-gB-CvZ"/>
+                <outlet property="tableView" destination="g2f-n8-7xD" id="id7-Po-Gqf"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="300" height="500"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m7b-dS-KaK">
+                    <rect key="frame" x="45" y="418.5" width="210" height="50.5"/>
+                    <color key="backgroundColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="17"/>
+                    <state key="normal" title="ГОЛОСОВАТЬ">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </state>
+                    <connections>
+                        <action selector="btnTapped:" destination="-1" eventType="touchUpInside" id="d9g-Ml-BiV"/>
+                    </connections>
+                </button>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="g2f-n8-7xD">
+                    <rect key="frame" x="8" y="91" width="284" height="319.5"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <color key="separatorColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </tableView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DdD-fd-r93">
+                    <rect key="frame" x="123" y="477" width="54" height="15"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="15" id="2ma-vH-SWJ"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="13"/>
+                    <state key="normal" title="ОТМЕНА">
+                        <color key="titleColor" systemColor="labelColor"/>
+                    </state>
+                    <connections>
+                        <action selector="cancelTapped:" destination="-1" eventType="touchUpInside" id="xYs-1f-Ki3"/>
+                    </connections>
+                </button>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PIS-8X-rlt" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
+                    <rect key="frame" x="112.5" y="0.0" width="75" height="75"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="PIS-8X-rlt" secondAttribute="height" multiplier="1:1" id="PO3-2t-mS7"/>
+                    </constraints>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" alpha="0.0" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XmX-QE-bUR">
+                    <rect key="frame" x="30" y="83" width="240" height="417"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="m7b-dS-KaK" firstAttribute="top" secondItem="g2f-n8-7xD" secondAttribute="bottom" constant="8" symbolic="YES" id="50g-S4-NoK"/>
+                <constraint firstItem="m7b-dS-KaK" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.7" id="Cbo-0E-zcH"/>
+                <constraint firstItem="PIS-8X-rlt" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="ERc-CQ-VmJ"/>
+                <constraint firstAttribute="bottom" secondItem="XmX-QE-bUR" secondAttribute="bottom" id="FBY-Sb-cB1"/>
+                <constraint firstAttribute="bottom" secondItem="DdD-fd-r93" secondAttribute="bottom" constant="8" id="GnW-ET-shI"/>
+                <constraint firstItem="XmX-QE-bUR" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="JfR-6T-sIm"/>
+                <constraint firstItem="g2f-n8-7xD" firstAttribute="top" secondItem="PIS-8X-rlt" secondAttribute="bottom" constant="16" id="MLM-0V-kmc"/>
+                <constraint firstItem="DdD-fd-r93" firstAttribute="top" secondItem="m7b-dS-KaK" secondAttribute="bottom" constant="8" symbolic="YES" id="Y8s-1A-RxK"/>
+                <constraint firstItem="PIS-8X-rlt" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.25" id="afy-92-AqZ"/>
+                <constraint firstItem="DdD-fd-r93" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="eFM-KY-m8a"/>
+                <constraint firstAttribute="trailing" secondItem="g2f-n8-7xD" secondAttribute="trailing" constant="8" id="fUC-Hv-HYZ"/>
+                <constraint firstItem="XmX-QE-bUR" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.8" id="fgF-2i-nUm"/>
+                <constraint firstItem="XmX-QE-bUR" firstAttribute="top" secondItem="PIS-8X-rlt" secondAttribute="bottom" constant="8" symbolic="YES" id="fzp-zB-e1s"/>
+                <constraint firstItem="m7b-dS-KaK" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="g9D-7a-mkf"/>
+                <constraint firstItem="g2f-n8-7xD" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="oL0-pb-HP0"/>
+                <constraint firstItem="PIS-8X-rlt" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="teW-jk-sMM"/>
+                <constraint firstItem="m7b-dS-KaK" firstAttribute="width" secondItem="m7b-dS-KaK" secondAttribute="height" multiplier="29:7" id="twN-0u-Ewa"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="137.68115942028987" y="89.732142857142847"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

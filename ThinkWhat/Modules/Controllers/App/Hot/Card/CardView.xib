@@ -23,6 +23,8 @@
                 <outlet property="background" destination="CGJ-eW-kag" id="J0a-Jo-cdO"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Ay7-ha-YcJ"/>
                 <outlet property="descriptionTextView" destination="cnF-2y-AeP" id="NDI-bo-XnJ"/>
+                <outlet property="favoriteIcon" destination="oHE-Dj-qdF" id="cGi-pg-sKq"/>
+                <outlet property="favoriteLabel" destination="mCF-5J-X9k" id="bH4-RV-GYd"/>
                 <outlet property="icon" destination="7bl-86-llw" id="Rqw-OW-FKR"/>
                 <outlet property="nextButton" destination="O0A-Jb-aD2" id="6xf-7U-jLr"/>
                 <outlet property="ratingLabel" destination="4HK-W3-Iqe" id="a5A-cQ-9wY"/>
@@ -48,56 +50,67 @@
                     <rect key="frame" x="0.0" y="44" width="414" height="89.5"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pavel Bukharov" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumFontSize="5" translatesAutoresizingMaskIntoConstraints="NO" id="dx1-f1-T6b">
-                            <rect key="frame" x="245" y="11" width="86" height="67.5"/>
+                            <rect key="frame" x="245" y="13.5" width="86" height="67"/>
                             <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                             <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                             <color key="textColor" systemColor="secondaryLabelColor"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vpm-ql-Gc5" customClass="StarView" customModule="ThinkWhat" customModuleProvider="target">
-                            <rect key="frame" x="8" y="51" width="80.5" height="16"/>
+                            <rect key="frame" x="8" y="39" width="80.5" height="16"/>
                             <color key="backgroundColor" systemColor="systemGray3Color"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="vpm-ql-Gc5" secondAttribute="height" multiplier="5:1" id="OD1-zL-O4g"/>
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7bl-86-llw" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                            <rect key="frame" x="8" y="20" width="27" height="27"/>
+                            <rect key="frame" x="8" y="8" width="27" height="27"/>
                             <color key="backgroundColor" systemColor="systemGray2Color"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="7bl-86-llw" secondAttribute="height" multiplier="1:1" id="d80-m7-7hl"/>
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9j7-K4-Jhg" customClass="Avatar" customModule="ThinkWhat" customModuleProvider="target">
-                            <rect key="frame" x="339" y="11" width="67" height="67.5"/>
+                            <rect key="frame" x="339" y="13.5" width="67" height="67"/>
                             <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="9j7-K4-Jhg" secondAttribute="height" multiplier="1:1" id="boh-H5-OSi"/>
                             </constraints>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c28-0U-s5e">
-                            <rect key="frame" x="39" y="20" width="41.5" height="27"/>
+                            <rect key="frame" x="39" y="8" width="41.5" height="27"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="78w-y0-TNK" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                            <rect key="frame" x="8" y="71" width="22.5" height="22.5"/>
+                            <rect key="frame" x="8" y="59" width="22.5" height="22.5"/>
                             <color key="backgroundColor" systemColor="systemGray2Color"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="78w-y0-TNK" secondAttribute="height" multiplier="1:1" id="HRN-DK-D6G"/>
                             </constraints>
                         </view>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="4.4" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4HK-W3-Iqe">
-                            <rect key="frame" x="92.5" y="51" width="16" height="16"/>
+                            <rect key="frame" x="92.5" y="39" width="16" height="16"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="4.4" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n9R-QD-1LI">
-                            <rect key="frame" x="34.5" y="74" width="16" height="16.5"/>
+                            <rect key="frame" x="34.5" y="62" width="16" height="16.5"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oHE-Dj-qdF" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
+                            <rect key="frame" x="54.5" y="59" width="22.5" height="22.5"/>
+                            <color key="backgroundColor" systemColor="systemGray2Color"/>
+                        </view>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="4.4" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mCF-5J-X9k">
+                            <rect key="frame" x="81" y="64.5" width="16" height="12"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
                             <nil key="textColor"/>
@@ -110,25 +123,31 @@
                         <constraint firstItem="n9R-QD-1LI" firstAttribute="centerY" secondItem="78w-y0-TNK" secondAttribute="centerY" id="2sg-cg-8em"/>
                         <constraint firstItem="n9R-QD-1LI" firstAttribute="leading" secondItem="78w-y0-TNK" secondAttribute="trailing" constant="4" id="4AZ-i0-fgO"/>
                         <constraint firstItem="c28-0U-s5e" firstAttribute="centerY" secondItem="7bl-86-llw" secondAttribute="centerY" id="4QU-C1-ski"/>
+                        <constraint firstItem="7bl-86-llw" firstAttribute="top" secondItem="Wu5-hZ-fKR" secondAttribute="top" constant="8" id="4y9-ov-QI8"/>
+                        <constraint firstItem="oHE-Dj-qdF" firstAttribute="width" secondItem="oHE-Dj-qdF" secondAttribute="height" multiplier="1:1" id="8Bf-xy-6yR"/>
                         <constraint firstItem="78w-y0-TNK" firstAttribute="leading" secondItem="vpm-ql-Gc5" secondAttribute="leading" id="CNK-pl-89y"/>
                         <constraint firstItem="4HK-W3-Iqe" firstAttribute="centerY" secondItem="vpm-ql-Gc5" secondAttribute="centerY" id="EAK-S2-AgL"/>
                         <constraint firstItem="c28-0U-s5e" firstAttribute="leading" secondItem="7bl-86-llw" secondAttribute="trailing" constant="4" id="FwS-cp-K42"/>
                         <constraint firstAttribute="trailing" secondItem="9j7-K4-Jhg" secondAttribute="trailing" constant="8" id="KWQ-lw-4V3"/>
+                        <constraint firstItem="mCF-5J-X9k" firstAttribute="leading" secondItem="oHE-Dj-qdF" secondAttribute="trailing" constant="4" id="Me2-hS-uv5"/>
                         <constraint firstItem="9j7-K4-Jhg" firstAttribute="leading" secondItem="dx1-f1-T6b" secondAttribute="trailing" constant="8" symbolic="YES" id="NIs-iO-LBU"/>
-                        <constraint firstItem="dx1-f1-T6b" firstAttribute="centerY" secondItem="Wu5-hZ-fKR" secondAttribute="centerY" id="RwO-Xa-I48"/>
                         <constraint firstItem="vpm-ql-Gc5" firstAttribute="height" secondItem="7bl-86-llw" secondAttribute="height" multiplier="0.6" id="S15-AI-1MK"/>
-                        <constraint firstItem="9j7-K4-Jhg" firstAttribute="centerY" secondItem="Wu5-hZ-fKR" secondAttribute="centerY" id="YXb-Iw-s51"/>
+                        <constraint firstItem="dx1-f1-T6b" firstAttribute="centerY" secondItem="vpm-ql-Gc5" secondAttribute="centerY" id="SDv-0c-Tj1"/>
+                        <constraint firstItem="oHE-Dj-qdF" firstAttribute="width" secondItem="78w-y0-TNK" secondAttribute="width" id="SxE-ct-cfr"/>
+                        <constraint firstItem="oHE-Dj-qdF" firstAttribute="leading" secondItem="n9R-QD-1LI" secondAttribute="trailing" constant="4" id="XdS-fF-C5B"/>
                         <constraint firstItem="7bl-86-llw" firstAttribute="height" secondItem="Wu5-hZ-fKR" secondAttribute="height" multiplier="0.3" id="brp-lX-cK6"/>
                         <constraint firstItem="7bl-86-llw" firstAttribute="leading" secondItem="Wu5-hZ-fKR" secondAttribute="leading" constant="8" id="dev-aw-doe"/>
                         <constraint firstItem="vpm-ql-Gc5" firstAttribute="leading" secondItem="7bl-86-llw" secondAttribute="leading" id="eYW-9S-5wt"/>
                         <constraint firstItem="c28-0U-s5e" firstAttribute="height" secondItem="7bl-86-llw" secondAttribute="height" id="f4B-IJ-kUj"/>
                         <constraint firstItem="dx1-f1-T6b" firstAttribute="height" secondItem="9j7-K4-Jhg" secondAttribute="height" id="gga-gw-2Aq"/>
-                        <constraint firstItem="7bl-86-llw" firstAttribute="bottom" secondItem="9j7-K4-Jhg" secondAttribute="centerY" constant="2" id="lDF-9q-yEz"/>
                         <constraint firstItem="78w-y0-TNK" firstAttribute="height" secondItem="vpm-ql-Gc5" secondAttribute="height" multiplier="1.4" id="lpo-T9-j4z"/>
                         <constraint firstItem="9j7-K4-Jhg" firstAttribute="height" secondItem="Wu5-hZ-fKR" secondAttribute="height" multiplier="0.75" id="mYG-48-4BR"/>
                         <constraint firstItem="4HK-W3-Iqe" firstAttribute="height" secondItem="vpm-ql-Gc5" secondAttribute="height" id="p91-VO-8no"/>
                         <constraint firstItem="4HK-W3-Iqe" firstAttribute="leading" secondItem="vpm-ql-Gc5" secondAttribute="trailing" constant="4" id="pkn-4T-pux"/>
+                        <constraint firstItem="9j7-K4-Jhg" firstAttribute="centerY" secondItem="dx1-f1-T6b" secondAttribute="centerY" id="sXe-ac-hti"/>
                         <constraint firstItem="78w-y0-TNK" firstAttribute="top" secondItem="vpm-ql-Gc5" secondAttribute="bottom" constant="4" id="sho-G8-DZg"/>
+                        <constraint firstItem="oHE-Dj-qdF" firstAttribute="centerY" secondItem="78w-y0-TNK" secondAttribute="centerY" id="wDk-hk-rDQ"/>
+                        <constraint firstItem="mCF-5J-X9k" firstAttribute="centerY" secondItem="oHE-Dj-qdF" secondAttribute="centerY" id="wRp-fj-Gps"/>
                         <constraint firstItem="vpm-ql-Gc5" firstAttribute="top" secondItem="7bl-86-llw" secondAttribute="bottom" constant="4" id="yoE-Vm-hng"/>
                     </constraints>
                 </view>

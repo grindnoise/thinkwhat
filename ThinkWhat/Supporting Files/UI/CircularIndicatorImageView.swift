@@ -10,6 +10,12 @@ import UIKit
 
 class CircularIndicatorImageView: UIImageView {
     
+    public var color: UIColor = K_COLOR_RED {
+        didSet {
+            progressIndicatorView.color = color
+        }
+    }
+    
     let progressIndicatorView = CameraLoadingIndicator(frame: .zero)
     
     required init?(coder aDecoder: NSCoder) {

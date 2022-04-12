@@ -796,28 +796,6 @@ extension UITableView {
     }
 }
 
-extension UILabel {
-    //Typewriter effect text animation
-    func setTextWithTypeAnimation(typedText: String, characterDelay: TimeInterval = 5.0) {
-        text = ""
-        var writingTask: DispatchWorkItem?
-        writingTask = DispatchWorkItem { [weak weakSelf = self] in
-            for character in typedText {
-                DispatchQueue.main.async {
-                    weakSelf?.text!.append(character)
-                }
-                Thread.sleep(forTimeInterval: characterDelay/100)
-            }
-        }
-        
-        if let task = writingTask {
-            let queue = DispatchQueue(label: "typespeed", qos: DispatchQoS.userInteractive)
-            queue.asyncAfter(deadline: .now() + 0.05, execute: task)
-        }
-    }
-    
-}
-
 extension UIColor {
     convenience init(hexString: String, alpha: CGFloat = 1.0) {
         let hexString: String = hexString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
@@ -838,6 +816,16 @@ extension UIColor {
     }
     
     func toHexString() -> String {
+        var r:CGFloat = 0
+        var g:CGFloat = 0
+        var b:CGFloat = 0
+        var a:CGFloat = 0
+        getRed(&r, green: &g, blue: &b, alpha: &a)
+        let rgb:Int = (Int)(r*255)<<16 | (Int)(g*255)<<8 | (Int)(b*255)<<0
+        return String(format:"#%06x", rgb)
+    }
+    
+    var hex: String {
         var r:CGFloat = 0
         var g:CGFloat = 0
         var b:CGFloat = 0

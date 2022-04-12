@@ -117,42 +117,32 @@ class WebCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackObse
                 }
                 isContentLoading = true
                 if url.absoluteString.isTikTokEmbedLink {
-                    var webContent = "<meta name='viewport' content='initial-scale=0.8, maximum-scale=0.8, user-scalable=no'/>"
+                    var webContent = "<meta name='viewport' content='initial-scale=0.6, maximum-scale=0.6, user-scalable=no'/>"
                     webContent += url.absoluteString
                     webView.loadHTMLString(webContent, baseURL: URL(string: "http://www.tiktok.com")!)
                 } else {
                     guard let embeddedURL = URL(string: "https://www.tiktok.com/oembed?url=\(url.absoluteString)") else {
-                        delBanner.shared.contentType = .Warning
-                        if let content = delBanner.shared.content as? Warning {
-                            content.level = .Error
-                            content.text = "Произошла ошибка, TikTok не загрузился"
-                        }
-                        delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+                        banner.present(subview: PlainBannerContent(text: "tiktok_web_error".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 2)
                         return
                     }
                     API.shared.getTikTokEmbedHTML(url: embeddedURL) { result in
                         switch result {
                         case .success(let json):
                             guard let html = json["html"].string else {
-                                delBanner.shared.contentType = .Warning
-                                if let content = delBanner.shared.content as? Warning {
-                                    content.level = .Error
-                                    content.text = "Произошла ошибка, TikTok не загрузился"
-                                }
-                                delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                                let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+                                banner.present(subview: PlainBannerContent(text: "tiktok_web_error".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 2)
                                 return
                             }
                             var webContent = "<meta name='viewport' content='initial-scale=0.8, maximum-scale=0.8, user-scalable=no'/>"
                             webContent += html
                             self.webView.loadHTMLString(webContent, baseURL: URL(string: "http://www.tiktok.com")!)
                         case .failure(let error):
-                            delBanner.shared.contentType = .Warning
-                            if let content = delBanner.shared.content as? Warning {
-                                content.level = .Error
-                                content.text = "Произошла ошибка, TikTok не загрузился"
-                            }
-                            delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
+                            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+                            banner.present(subview: PlainBannerContent(text: "tiktok_web_error".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 2)
+                            #if DEBUG
                             print(error.localizedDescription)
+                            #endif
                         }
                     }
                 }
@@ -163,3 +153,18 @@ class WebCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackObse
     }
 }
 
+extension WebCell: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
+    }
+}

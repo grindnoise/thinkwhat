@@ -13,12 +13,21 @@ class LoadingIndicator: UIView, CAAnimationDelegate {
     var layers = [String: CALayer]()
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
     var updateLayerValueForCompletedAnimation : Bool = false
-    
-    
+    var color = K_COLOR_RED {
+        didSet {
+            resetLayerProperties(forLayerIdentifiers: nil)
+        }
+    }
     
     //MARK: - Life Cycle
-    
     override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupProperties()
+        setupLayers()
+    }
+    
+    init(frame: CGRect, color _color: UIColor = K_COLOR_RED) {
+        self.color = _color
         super.init(frame: frame)
         setupProperties()
         setupLayers()
@@ -70,16 +79,16 @@ class LoadingIndicator: UIView, CAAnimationDelegate {
             let path = layers["path"] as! CAShapeLayer
             path.opacity     = 0
             path.fillRule    = CAShapeLayerFillRule.evenOdd
-            path.fillColor   = UIColor(red:0.806, green: 0.33, blue:0.339, alpha:1).cgColor
-            path.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
+            path.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor//UIColor(red:0.806, green: 0.33, blue:0.339, alpha:1).cgColor
+            path.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor//UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             path.lineWidth   = 0
         }
         if layerIds == nil || layerIds.contains("path2"){
             let path2 = layers["path2"] as! CAShapeLayer
             path2.opacity     = 0
             path2.fillRule    = CAShapeLayerFillRule.evenOdd
-            path2.fillColor   = UIColor(red:0.806, green: 0.33, blue:0.339, alpha:0.751).cgColor
-            path2.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
+            path2.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.withAlphaComponent(0.7).cgColor : color.withAlphaComponent(0.7).cgColor//UIColor(red:0.806, green: 0.33, blue:0.339, alpha:0.751).cgColor
+            path2.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor//UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             path2.lineWidth   = 0
         }
         
@@ -232,6 +241,14 @@ class LoadingIndicator: UIView, CAAnimationDelegate {
         return path2Path
     }
     
-    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        resetLayerProperties(forLayerIdentifiers: nil)
+//        switch traitCollection.userInterfaceStyle {
+//        case .dark:
+//            self.color = .systemBlue
+//        default:
+//            self.color = self.initialColor
+//        }
+    }
 }
 
