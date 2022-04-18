@@ -390,7 +390,7 @@ class API {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { throw APIError.invalidURL }
         let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
         do {
-            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding())
+            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding(), accessControl: false)
             let json = try JSON(data: data, options: .mutableContainers)
             saveTokenInKeychain(json: json)
         } catch let error {
@@ -759,7 +759,9 @@ class API {
             }
         }
         
-        guard let expiryDate = (KeychainService.loadTokenExpireDateTime() as String?)?.toDateTime() else {
+        guard let string = KeychainService.loadTokenExpireDateTime() as String?,
+              !string.isEmpty,
+              let expiryDate = string.dateTime else {
             throw "Can't retrieve token expiration date from KeychainService"
         }
         guard Date() >= expiryDate else { return }
@@ -1011,6 +1013,9 @@ class API {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTE) else { throw APIError.notFound }
         guard let surveyID = answer.survey?.id else { throw APIError.badData }
         var parameters: [String: Any] = ["survey": surveyID, "answer": answer.id]
+        #if DEBUG
+        print(parameters)
+        #endif
         if Surveys.shared.hot.count <= MIN_STACK_SIZE {
             let stackList = Surveys.shared.hot.map { $0.id }
             let rejectedList = Surveys.shared.rejected.map { $0.id }
@@ -1096,6 +1101,7 @@ class API {
         
         do {
             let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers())
+            Surveys.shared.banned.append(survey)
             let json = try JSON(data: data, options: .mutableContainers)
             return json
         } catch let error {
@@ -1158,11 +1164,11 @@ class API {
         }
     }
     
-    public func request(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(Result<JSON, Error>)->()) {
+    public func request(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, useHeaders: Bool = true, completion: @escaping(Result<JSON, Error>)->()) {
         accessControl { result in
             switch result {
             case .success:
-                AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: self.headers()).response { response in
+                AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: useHeaders ? self.headers() : nil).response { response in
                     switch response.result {
                     case .success(let value):
                         guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
@@ -1502,6 +1508,35 @@ class API {
             throw error
         }
     }
+    
+    public func getCountryByIP()  {
+        guard let url = URL(string: API_URLS.Geocoding.countryByIP) else {
+            return
+        }
+        request(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, useHeaders: false) { result in
+            switch result {
+            case .success(let json):
+                guard let code = json["countryCode"].string else { return }
+                UserDefaults.App.countryByIP = code
+            case .failure(let error):
+#if DEBUG
+                print(error)
+#endif
+            }
+        }
+    }
+//    public func getCountryByIP() async throws {
+//        guard let url = URL(string: API_URLS.Geocoding.countryByIP) else {
+//            throw APIError.notFound
+//        }
+//        do {
+//            let data = try await requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: nil, accessControl: false)
+//            let json = try JSON(data: data, options: .mutableContainers)
+//            print(json)
+//        } catch let error {
+//            throw error
+//        }
+//    }
     
     func cancelAllRequests() {
         AF.session.getAllTasks { (tasks) in

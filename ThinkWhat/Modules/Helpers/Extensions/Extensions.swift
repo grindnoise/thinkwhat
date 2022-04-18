@@ -400,17 +400,22 @@ extension UIImage {
         
         let offset = size.height * 0.04
         
+        let outerPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint.zero, size: size))
+        outerPath.lineWidth = offset * 2.5
+        UIColor.white.setStroke()
+        outerPath.stroke()
+        
         if frameColor != .clear {
             let outerPath = UIBezierPath(ovalIn: CGRect(origin: CGPoint.zero, size: size))
             outerPath.lineWidth = offset * 2.5
             frameColor.setStroke()
             outerPath.stroke()
             
-            let innerFrame = CGRect(origin: CGPoint(x: CGPoint.zero.x + offset , y: CGPoint.zero.y + offset), size: CGSize(width: size.width - offset * 2, height: size.height - offset * 2))
-            let innerPath = UIBezierPath(ovalIn: innerFrame)
-            innerPath.lineWidth = offset * 0.7
-            UIColor.white.setStroke()
-            innerPath.stroke()
+//            let innerFrame = CGRect(origin: CGPoint(x: CGPoint.zero.x + offset , y: CGPoint.zero.y + offset), size: CGSize(width: size.width - offset * 2, height: size.height - offset * 2))
+//            let innerPath = UIBezierPath(ovalIn: innerFrame)
+//            innerPath.lineWidth = offset * 0.7
+//            UIColor.white.setStroke()
+//            innerPath.stroke()
         }
         
         context!.setBlendMode(.copy)
@@ -748,53 +753,7 @@ extension RangeReplaceableCollection where Indices: Equatable {
     }
 }
 
-extension UITableView {
-    
-    func scrollToBottom() {
-        DispatchQueue.main.async {
-            guard self.numberOfSections > 0 else { return }
-            
-            // Make an attempt to use the bottom-most section with at least one row
-            var section = max(self.numberOfSections - 1, 0)
-            var row = max(self.numberOfRows(inSection: section) - 1, 0)
-            var indexPath = IndexPath(row: row, section: section)
-            
-            // Ensure the index path is valid, otherwise use the section above (sections can
-            // contain 0 rows which leads to an invalid index path)
-            while !self.indexPathIsValid(indexPath) {
-                section = max(section - 1, 0)
-                row = max(self.numberOfRows(inSection: section) - 1, 0)
-                indexPath = IndexPath(row: row, section: section)
-                
-                // If we're down to the last section, attempt to use the first row
-                if indexPath.section == 0 {
-                    indexPath = IndexPath(row: 0, section: 0)
-                    break
-                }
-            }
-            
-            // In the case that [0, 0] is valid (perhaps no data source?), ensure we don't encounter an
-            // exception here
-            guard self.indexPathIsValid(indexPath) else { return }
-            
-            self.scrollToRow(at: indexPath/*IndexPath(row: 0, section: self.numberOfSections - 1)*/, at: .bottom, animated: true)
-        }
-    }
-    
-    func indexPathIsValid(_ indexPath: IndexPath) -> Bool {
-        let section = indexPath.section
-        let row = indexPath.row
-        return section < self.numberOfSections && row < self.numberOfRows(inSection: section)
-    }
-    
-    func scrollToTop() {
-        
-        DispatchQueue.main.async {
-            let indexPath = IndexPath(row: 0, section: 0)
-            self.scrollToRow(at: indexPath, at: .top, animated: false)
-        }
-    }
-}
+
 
 extension UIColor {
     convenience init(hexString: String, alpha: CGFloat = 1.0) {

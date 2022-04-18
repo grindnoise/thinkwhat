@@ -37,12 +37,29 @@ class VoteMessage: UIView {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        switch traitCollection.userInterfaceStyle {
-        case .dark:
-            self.btn.backgroundColor = .systemBlue
-        default:
-            self.btn.backgroundColor = self.color
-        }
+        btn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        guard let imageView = imageContainer.subviews.filter({$0 is UIImageView}).first as? UIImageView else { return }
+        imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+    }
+    
+    private func setupUI() {
+        guard !label.isNil else { return }
+//        let paragraph = NSMutableParagraphStyle()
+//        if #available(iOS 15.0, *) {
+//            paragraph.usesDefaultHyphenation = true
+//        } else {
+//            paragraph.hyphenationFactor = 1
+//        }
+//        paragraph.alignment = .center
+        let attributedText = NSMutableAttributedString()
+        attributedText.append(NSAttributedString(string: "congratulations".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.08), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\n\n", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "most_popular_choice".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.06), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\n\n", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "extra_points".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.06), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "2", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.07), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .systemBlue : color, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "points".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.06), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        label.attributedText = attributedText
     }
     
     // MARK: - IB Outlets
@@ -50,10 +67,12 @@ class VoteMessage: UIView {
     @IBOutlet weak var imageContainer: UIView! {
         didSet {
             imageContent.addEquallyTo(to: imageContainer)
+            imageContent.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
     @IBOutlet weak var btn: UIButton! {
         didSet {
+            btn.accessibilityIdentifier = "vote"
             btn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             btn.setTitle("results".localized.uppercased(), for: .normal)
         }
@@ -61,15 +80,18 @@ class VoteMessage: UIView {
     @IBAction func btnTapped(_ sender: UIButton) {
         callbackDelegate?.callbackReceived(self)
     }
+    @IBOutlet weak var label: UILabel!
     
     override var frame: CGRect {
         didSet {
+            setupUI()
             guard !btn.isNil else { return }
             btn.cornerRadius = btn.frame.height / 2.25
         }
     }
     override var bounds: CGRect {
         didSet {
+            setupUI()
             guard !btn.isNil else { return }
             btn.cornerRadius = btn.frame.height / 2.25
         }

@@ -431,6 +431,12 @@ extension FillUserView {
         }
         let touch = UITapGestureRecognizer(target:self, action:#selector(FillUserView.hideKeyboard))
         self.addGestureRecognizer(touch)
+        guard let countryCode = UserDefaults.App.countryByIP else { return }
+        if countryCode == "RU" {
+            facebookLogo.removeFromSuperview()
+            instagramLogo.removeFromSuperview()
+        }
+
     }
     
     private func setupTextField(textField: UnderlinedTextField) {

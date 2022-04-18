@@ -69,6 +69,12 @@ extension String {
         return String(self[(start ..< end)])
     }
     
+    var dateTime: Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy HH:mm:ss"
+        return formatter.date(from: self)
+    }
+    
     func toDateTime() -> Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy HH:mm:ss"

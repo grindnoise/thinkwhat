@@ -35,6 +35,19 @@ class HotController: UIViewController {
         controllerOutput?.onDidLayout()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+//        controllerOutput?.onDidAppear()
+        if shouldSkipCurrentCard {
+            Task {
+                try await Task.sleep(nanoseconds: UInt64(0.3 * 1_000_000_000))
+                await MainActor.run {
+                    controllerOutput?.skipCard()
+                    shouldSkipCurrentCard = false
+                }
+            }
+        }
+    }
     private func addObservers() {
 //        NotificationCenter.default.addObserver(self,
 //                                               selector: #selector(HotController.makePreviewStack),
@@ -49,13 +62,14 @@ class HotController: UIViewController {
     // MARK: - Properties
     var controllerOutput: HotControllerOutput?
     var controllerInput: HotControllerInput?
+    var shouldSkipCurrentCard = false
     private var isViewLayedOut = false
     private var timer: Timer?
-    
 }
 
 // MARK: - View Input
 extension HotController: HotViewInput {
+    
     func onVote(survey: Survey) {
         if let nav = navigationController as? CustomNavigationController {
             nav.transitionStyle = .Default
@@ -65,7 +79,7 @@ extension HotController: HotViewInput {
 //        let backItem = UIBarButtonItem()
 //            backItem.title = ""
 //            navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(PollController(surveyReference: survey.reference), animated: true)
+        navigationController?.pushViewController(PollController(surveyReference: survey.reference, showNext: true), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
@@ -80,9 +94,9 @@ extension HotController: HotModelOutput {}
 extension HotController: DataObservable {
     func onDataLoaded() {
         navigationController?.setNavigationBarHidden(false, animated: true)
-        controllerOutput?.pushStack()
+        controllerOutput?.populateStack()
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(HotController.pushStack),
+                                               selector: #selector(HotController.populateStack),
                                                name: Notifications.Surveys.UpdateHotSurveys,
                                                object: nil)
     }
@@ -91,8 +105,8 @@ extension HotController: DataObservable {
 // MARK: - Observers
 extension HotController {
     @objc
-    private func pushStack() {
-        controllerOutput?.pushStack()
+    private func populateStack() {
+        controllerOutput?.populateStack()
         stopTimer()
     }
     

@@ -46,7 +46,7 @@ class ChoiceCell: UITableViewCell {
         attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 16), foregroundColor: setTextColor(), backgroundColor: .clear) as [NSAttributedString.Key : Any], range: textContent.fullRange())
         textView.attributedText = attributedString
         textView.textContainerInset = UIEdgeInsets(top: 3, left: textView.textContainerInset.left, bottom: 3, right: textView.textContainerInset.right)
-        checkBox.main = answer.survey?.topic.tagColor ?? K_COLOR_RED
+        checkBox.innerColor = answer.survey?.topic.tagColor ?? K_COLOR_RED
     }
     
     private func setTextColor() -> UIColor {
@@ -55,7 +55,7 @@ class ChoiceCell: UITableViewCell {
             case .dark:
                 return self.isChecked ? .white : .systemGray
             default:
-                return self.isChecked ? .black : .systemGray
+                return self.isChecked ? .black : .darkGray
             }
         }
     }

@@ -45,6 +45,10 @@ class Survey: Decodable {
     var answersSortedByVotes:   [Answer] {
         return answers.sorted { $0.totalVotes > $1.totalVotes }
     }
+    var answersSortedByOrder:   [Answer] {
+        return answers.sorted { $0.order < $1.order }
+    }
+
     var url:                    URL? = nil///hlink
     var voteCapacity:           Int
     var isPrivate:              Bool
@@ -78,6 +82,11 @@ class Survey: Decodable {
     }
     var reference: SurveyReference {
         return SurveyReferences.shared.all.filter({ $0.hashValue == hashValue}).first ?? createReference()
+    }
+    var completion: Int {
+        get {
+            return totalVotes * 100 / voteCapacity
+        }
     }
     private let tempId = 999999
     
@@ -141,8 +150,8 @@ class Survey: Decodable {
         media               = _media.map({ number, dict in
             return Mediafile(title: dict.first?.value ?? "", order: number, survey: self, image: dict.first?.key)
         })
-        answers             = _answers.map({ title in
-            return Answer(description: "", title: title, survey: self)
+        answers             = _answers.enumerated().map({ (index,title) in
+            return Answer(description: "", title: title, survey: self, order: index)
         })
     }
     

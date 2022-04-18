@@ -111,12 +111,7 @@ struct Colors {
         static let MaximumRed        = UIColor(hexString: "#DD1C1A")
     }
     struct Tags {
-//        static let DarkSlateBlue    = UIColor(hexString: "#4E4187")
-//        static let BleuDeFrance     = UIColor(hexString: "#3083DC")
-//        static let SandyBrown       = UIColor(hexString: "#FC9F5B")
-//        static let CafeNoir         = UIColor(hexString: "#4E3822")
-//        static let Cardinal         = UIColor(hexString: "#AD343E")
-//        static let GreenPantone     = UIColor(hexString: "#4DAA57")
+
         static let RoyalPurple      = UIColor(hexString: "#6C4FB2")
         static let PacificBlue      = UIColor(hexString: "#47A8BD")
         static let LaserLemon       = UIColor(hexString: "#F0F757")
@@ -126,15 +121,31 @@ struct Colors {
         static let Corn             = UIColor(hexString: "#F2E86D")
         static let Saffron          = UIColor(hexString: "#F8C630")
         static let OrangeSoda       = UIColor(hexString: "#F2542D")
+                static let DarkSlateBlue    = UIColor(hexString: "#4E4187")
+                static let BleuDeFrance     = UIColor(hexString: "#3083DC")
+                static let SandyBrown       = UIColor(hexString: "#FC9F5B")
+                static let CafeNoir         = UIColor(hexString: "#4E3822")
+                static let Cardinal         = UIColor(hexString: "#AD343E")
+                static let GreenPantone     = UIColor(hexString: "#4DAA57")
     }
     static func tags() -> [UIColor] {
         return [
+        Tags.EnglishVermillion,
         Tags.RoyalPurple,
         Tags.Saffron,
         Tags.CoyoteBrown,
         Tags.BudGreen,
-        Tags.EnglishVermillion,
-        Tags.PacificBlue
+        Tags.PacificBlue,
+        Tags.LaserLemon,
+        Tags.Corn,
+        Tags.Saffron,
+        Tags.OrangeSoda,
+        Tags.DarkSlateBlue,
+        Tags.BleuDeFrance,
+        Tags.SandyBrown,
+        Tags.CafeNoir,
+        Tags.Cardinal,
+        Tags.GreenPantone
         ]
     }
     static let CadetBlue        = UIColor(hexString: "#699999")

@@ -46,7 +46,7 @@ class ClaimCell: UITableViewCell {
         attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 16), foregroundColor: setTextColor(), backgroundColor: .clear) as [NSAttributedString.Key : Any], range: textContent.fullRange())
         textView.attributedText = attributedString
         textView.textContainerInset = UIEdgeInsets(top: 3, left: textView.textContainerInset.left, bottom: 3, right: textView.textContainerInset.right)
-        checkBox.main = color
+        checkBox.innerColor = color
     }
     
     private func setTextColor() -> UIColor {

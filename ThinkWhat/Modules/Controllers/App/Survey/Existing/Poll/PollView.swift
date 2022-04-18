@@ -48,9 +48,14 @@ class PollView: UIView {
     var mode: Mode = .Write {
         didSet {
             if tableView != nil {
-                tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .fade)
-                tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .fade)
+                updateResults()
+//                tableView.insertSections(IndexSet(, with: <#T##UITableView.RowAnimation#>)
+                tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
+                tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .automatic)
+                tableView.reloadSections(IndexSet(arrayLiteral: 3), with: .automatic)
             }
+            guard oldValue == .Write, mode == .ReadOnly else { return }
+            _hasVoted = true
         }
     }
     private var loadingIndicator: LoadingIndicator? {
@@ -94,6 +99,7 @@ class PollView: UIView {
             }
         }
     }
+    private var _hasVoted = false
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -107,11 +113,52 @@ class PollView: UIView {
 
 // MARK: - Controller Output
 extension PollView: PollControllerOutput {
+    var showNext: Bool {
+        return viewInput?.showNext ?? false
+    }
+    
+    var hasVoted: Bool {
+        return _hasVoted
+    }
+    
     func onClaim(_: Result<Bool, Error>) {
 //        fatalError()
     }
     
     func onVote(_ result: Result<Bool, Error>) {
+        func animate() {
+            let label = UILabel(frame: CGRect(origin: .zero, size: CGSize(width: 200, height: 200)))
+            label.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+            label.alpha = 0
+            label.textAlignment = .center
+            insertSubview(label, at: 10)
+            label.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                label.centerXAnchor.constraint(equalTo: centerXAnchor),
+                label.centerYAnchor.constraint(equalTo: centerYAnchor),
+//                    label.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5),
+//                    label.heightAnchor.constraint(equalTo: heightAnchor)
+            ])
+            let attrSring = NSMutableAttributedString()
+            attrSring.append(NSAttributedString(string: "+1", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: frame.width * 0.3), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .systemBlue : survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            label.attributedText = attrSring
+            UIView.animate(withDuration: 1.4, delay: 0, options: UIView.AnimationOptions.curveEaseInOut) {
+                label.transform = .identity
+            } completion: { _ in
+                label.removeFromSuperview()
+                
+            }
+            
+            UIView.animate(withDuration: 0.7, delay: 0, options: UIView.AnimationOptions.curveLinear) {
+                label.alpha = 1
+                self.tableView.scrollToBottom()
+            } completion: { _ in
+                UIView.animate(withDuration: 0.7, delay: 0, options: UIView.AnimationOptions.curveLinear) {
+                    label.alpha = 0
+                } completion: { _ in }
+            }
+        }
+        
         isAwaitingVoteResponse = false
         tableView.visibleCells.forEach {
             guard let cell = $0 as? VoteCell else { return }
@@ -119,9 +166,14 @@ extension PollView: PollControllerOutput {
         }
         switch result {
         case .success:
+            mode = .ReadOnly
+            guard choice == survey?.answers.sorted{ $0.totalVotes > $1.totalVotes }.first else {
+                animate()
+                return
+            }
             let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightMultiplictator: 1.25)
-            banner.present(subview: VoteMessage(imageContent: UIView(), color: survey?.topic.tagColor ?? K_COLOR_RED, callbackDelegate: banner))
-//            mode = .ReadOnly
+            banner.accessibilityIdentifier = "vote"
+            banner.present(subview: VoteMessage(imageContent: ImageSigns.flameFilled, color: survey?.topic.tagColor ?? K_COLOR_RED, callbackDelegate: banner))
         case .failure:
             self.isChoiceEnabled = true
             let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
@@ -184,6 +236,27 @@ extension PollView {
     private func setupUI() {
         
     }
+    
+    private func updateResults() {
+        guard !survey.isNil else { return }
+        for (i,answer) in survey!.answers.enumerated() {
+            var resultIndicator: ResultIndicator!
+            if let found = resultIndicators.filter({ $0.answer === answer }).first {
+                resultIndicator = found
+            } else {
+                resultIndicator = ResultIndicator(delegate: self, answer: answer, color: Colors.tags()[i], isSelected: answer.id == survey!.result!.keys.first)
+                resultIndicators.append(resultIndicator)
+            }
+            resultIndicator.needsUIUpdate = true
+//            resultIndicator.isSelected = answer.ID == survey!.result!.keys.first
+            if survey!.isAnonymous {
+                resultIndicator.mode = .Anon
+            } else if answer.voters.isEmpty {
+                resultIndicator.mode = .None
+            }
+            resultIndicator.value = survey!.getPercentForAnswer(answer)
+        }
+    }
 }
 
 // MARK: - TableView delegate
@@ -200,15 +273,10 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
         tableView.register(UINib(nibName: "WebCell", bundle: nil), forCellReuseIdentifier: "web")
         tableView.register(UINib(nibName: "ChoiceCell", bundle: nil), forCellReuseIdentifier: "choice")
         tableView.register(UINib(nibName: "VoteCell", bundle: nil), forCellReuseIdentifier: "vote")
-    }
-    
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-//        if indexPath.section == 1 {
-//            if let cell = tableView.cellForRow(at: indexPath) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() {
-//                resultIndicator.needsUIUpdate = false
-//                resultIndicator.setPercentage(value: nil)
-//            }
-//        }
+        tableView.register(UINib(nibName: "PollResultCell", bundle: nil), forCellReuseIdentifier: "result")
+        tableView.register(UINib(nibName: "StatisticsCell", bundle: nil), forCellReuseIdentifier: "statistics")
+        tableView.register(UINib(nibName: "NextCell", bundle: nil), forCellReuseIdentifier: "next")
+//        tableView.register(UINib(nibName: "Comment", bundle: nil), forCellReuseIdentifier: "result")
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -217,9 +285,9 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
         } else {
             switch mode {
             case .ReadOnly:
-                return 3//2//Body & answers
+                return 4//2//Body & answers
             case .Write:
-                return 3//Body & answers & vote button
+                return 4//Body & answers & vote button
             }
         }
     }
@@ -235,6 +303,8 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
             } else {
                 return 1
             }
+        } else if section == 3 {
+            return 1
         }
         return 0
     }
@@ -286,18 +356,15 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
                     return cell
                 }
             case .ReadOnly:
-                if let cell = tableView.dequeueReusableCell(withIdentifier: "result", for: indexPath) as? ChoiceResultCell, let answer = survey?.answersSortedByVotes[indexPath.row], let resultIndicator = resultIndicators.filter({ $0.answer === answer }).first {
-                    if !cell.isViewSetupComplete {
-                        cell.layer.masksToBounds = false
-                        cell.frame.size = CGSize(width: frame.width, height: cell.frame.height)
-                        cell.setNeedsLayout()
-                        cell.layoutIfNeeded()
-                        cell.isViewSetupComplete = true
-                        cell.container.backgroundColor = .clear
-                    }
+                if let cell = tableView.dequeueReusableCell(withIdentifier: "result", for: indexPath) as? PollResultCell, let answer = survey?.answersSortedByOrder[indexPath.row], let resultIndicator = resultIndicators.filter({ $0.answer === answer }).first {
+                    cell.setupUI(width: frame.width, height: cell.frame.height)
+//                    cell.setNeedsLayout()
+//                    cell.layoutIfNeeded()
                     resultIndicator.indexPath = indexPath
                     cell.setResultIndicator(resultIndicator)
                     cell.answer = answer
+                    cell.userChoice = answer == choice
+                    cell.setText()
                     return cell
                 }
                 return UITableViewCell()
@@ -308,11 +375,24 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
                 if let cell = tableView.dequeueReusableCell(withIdentifier: "vote", for: indexPath) as? VoteCell {
                     cell.setupUI(delegate: self, color: survey!.topic.tagColor)
                     cell.isLoading = isAwaitingVoteResponse
+                    if !choice.isNil {
+                        cell.enable()
+                    }
                     return cell
                 }
             case .ReadOnly:
-                print("ReadOnly")
-                return UITableViewCell()
+                if let cell = tableView.dequeueReusableCell(withIdentifier: "statistics", for: indexPath) as? StatisticsCell {
+                    cell.setupUI(delegate: self, color: survey!.topic.tagColor, progress: CGFloat(survey!.completion)/CGFloat(100), voters: survey!.totalVotes, total: survey!.voteCapacity)
+                    return cell
+                } else if let cell = tableView.dequeueReusableCell(withIdentifier: "next", for: indexPath) as? NextCell {
+                    cell.callbackDelegate = self
+                    return cell
+                }
+            }
+        } else if indexPath.section == 3 {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "next", for: indexPath) as? NextCell {
+                cell.callbackDelegate = self
+                return cell
             }
         }
         return UITableViewCell()
@@ -350,21 +430,24 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
             
                 switch mode {
                 case .Write:
-//                    if indexPath.row == 0 {
-                        return 140
-//                    } else {
-//                        return 0
-//                    }
-                case .ReadOnly:
-                    //TODO: - Set row height
                     return 140
+                case .ReadOnly:
+                    return 275
                 }
             
+        } else if indexPath.section == 3 {
+            if mode == .ReadOnly {
+                return showNext ? 60 : 0
+            }
+            return 0
         }
         return UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 2 {
+            return 30
+        }
         return CGFloat.leastNonzeroMagnitude
     }
     
@@ -404,6 +487,8 @@ extension PollView: CallbackObservable {
                 let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightMultiplictator: 1.5)
                 banner.accessibilityIdentifier = "claim"
                 banner.present(subview: ClaimSelection(callbackDelegate: banner))
+            } else if button.accessibilityIdentifier == "next" {
+                viewInput?.onExitWithSkip()
             }
         } else if let image = sender as? UIImage {
             viewInput?.onImageTapped(image: image, title: "")
@@ -425,7 +510,11 @@ extension PollView: CallbackObservable {
 extension PollView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     
-    func onBannerWillDisappear(_ sender: Any) {}
+    func onBannerWillDisappear(_ sender: Any) {
+        if let popup = sender as? Popup, popup.accessibilityIdentifier == "vote" {
+            tableView.scrollToBottom()
+        }
+    }
     
     func onBannerDidAppear(_ sender: Any) {}
     
@@ -434,8 +523,10 @@ extension PollView: BannerObservable {
             banner.removeFromSuperview()
         } else if let popup = sender as? Popup {
             popup.removeFromSuperview()
-            if popup.accessibilityIdentifier == "claim" {
-                viewInput?.onExitWithClaim()
+            if popup.accessibilityIdentifier == "exit" {
+                viewInput?.onExitWithSkip()
+//            } else if popup.accessibilityIdentifier == "vote" {
+//                tableView.scrollToBottom()
             }
         }
     }

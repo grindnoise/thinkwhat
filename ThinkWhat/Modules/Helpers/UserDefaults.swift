@@ -108,7 +108,8 @@ extension UserDefaults {
         }
         
         static func authorize() throws {
-            guard !KeychainService.loadAccessToken().isNil, let user = Userprofile.init() else {
+            guard let accessToken = KeychainService.loadAccessToken() as? String, !accessToken.isEmpty,
+                  let user = Userprofile.init() else {
                 throw ""
             }
             Userprofiles.shared.current = user
@@ -159,6 +160,9 @@ extension UserDefaults {
         @UserDefault(key: "min_api_version", defaultValue: 0.3)
         static var minAPIVersion: Double?
         
+        @UserDefault(key: "country_by_ip", defaultValue: nil)
+        static var countryByIP: String?
+        
         static var youtubePlay: SideAppPreference? {
             set { _youtubePlay = newValue?.rawValue }
             get { return SideAppPreference(rawValue: _youtubePlay ?? "") }
@@ -179,6 +183,7 @@ extension UserDefaults {
         static func clear() {
             UserDefaults.App.hasSeenAppIntroduction             = nil
             UserDefaults.App.minAPIVersion                      = nil
+            UserDefaults.App.countryByIP                        = nil
             UserDefaults.App.youtubePlay                        = nil
             UserDefaults.App.tiktokPlay                         = nil
             UserDefaults.App.hasSeenPollCreationIntroduction    = false
@@ -190,6 +195,10 @@ extension UserDefaults {
         Profile.clear()
         KeychainService.saveAccessToken(token: "")
         KeychainService.saveRefreshToken(token: "")
+        KeychainService.saveTokenExpireDateTime(token: "")
+#if DEBUG
+        print("cleaned")
+#endif
     }
 }
 

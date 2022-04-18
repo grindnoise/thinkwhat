@@ -264,6 +264,7 @@ extension SignupView: SignupControllerOutput {
 // MARK: - UI Setup
 extension SignupView {
     private func setupUI() {
+        
         signupButton.backgroundColor = UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -284,6 +285,11 @@ extension SignupView {
         let touch = UITapGestureRecognizer(target:self, action:#selector(SignupView.hideKeyboard))
         self.addGestureRecognizer(touch)
 //        usernameTF.isShowingSpinner = true
+        
+        guard let countryCode = UserDefaults.App.countryByIP else { return }
+        if countryCode == "RU" {
+            facebook.removeFromSuperview()
+        }
     }
     
     private func setupTextField(textField: UnderlinedSignTextField) {

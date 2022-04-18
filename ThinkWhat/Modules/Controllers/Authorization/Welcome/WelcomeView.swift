@@ -66,9 +66,7 @@ class WelcomeView: UIView {
         contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(contentView)
         setupUI()
-        if Self.self is Localizable.Type {
-            perform(Selector("subscribe"))
-        }
+        ProtocolSubscriptions.subscribe(self)
     }
     
     override func layoutSubviews() {
@@ -216,7 +214,7 @@ extension WelcomeView: ToolbarPickerViewDelegate {
 
 extension WelcomeView: Localizable {
     @objc
-    func subscribe() {
+    func subscribeLocalizable() {
         NotificationCenter.default.addObserver(self, selector: #selector(onLanguageChange), name: Notifications.UI.LanguageChanged, object: nil)
     }
 

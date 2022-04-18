@@ -11,12 +11,13 @@ import SwiftyJSON
 
 class Answer: Decodable {
     private enum CodingKeys: String, CodingKey {
-        case description, title, totalVotes = "total_votes", id, voters, survey = "survey_id", image, file, url = "hlink"
+        case description, title, totalVotes = "total_votes", id, voters, survey = "survey_id", image, order, file, url = "hlink"
     }
     var id: Int
     var description: String
     var totalVotes: Int = 0
     var title: String
+    var order: Int
     var voters: [Userprofile] = []
     var surveyID : Int
     var survey: Survey? {
@@ -37,6 +38,7 @@ class Answer: Decodable {
             title       = try container.decode(String.self, forKey: .title)
             totalVotes  = try container.decodeIfPresent(Int.self, forKey: .totalVotes) ?? 0
             description = try container.decode(String.self, forKey: .description)
+            order       = try container.decode(Int.self, forKey: .order)
             let instances = try container.decode([Userprofile].self, forKey: .voters)
             instances.forEach { instance in
                 if voters.filter({ $0.hashValue == instance.hashValue }).isEmpty {
@@ -51,11 +53,12 @@ class Answer: Decodable {
         }
     }
     
-    init(description _description: String, title _title: String, survey _survey: Survey) {
+    init(description _description: String, title _title: String, survey _survey: Survey, order _order: Int) {
         id = tempId
         description = _description
         title = _title
         surveyID = _survey.id
+        order = _order
     }
     
     
@@ -63,6 +66,7 @@ class Answer: Decodable {
         do {
             title       = json[CodingKeys.title.rawValue].stringValue
             totalVotes  = json[CodingKeys.totalVotes.rawValue].intValue
+            order        = json[CodingKeys.order.rawValue].intValue
             description = json[CodingKeys.title.rawValue].stringValue
             if json.first?.0 == CodingKeys.voters.rawValue, let data = try json.first?.1.rawData() {
                 let instances = try JSONDecoder().decode([Userprofile].self, from: data)

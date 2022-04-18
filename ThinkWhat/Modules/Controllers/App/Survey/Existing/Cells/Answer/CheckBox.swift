@@ -15,7 +15,7 @@ class CheckBox: UIView, CAAnimationDelegate {
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
     var updateLayerValueForCompletedAnimation : Bool = false
     
-    var main : UIColor! {
+    var innerColor : UIColor! {
         didSet {
             setupLayers()
             setupProperties()
@@ -62,8 +62,8 @@ class CheckBox: UIView, CAAnimationDelegate {
     }
     
     func setupProperties(){
-        guard main.isNil else { return }
-        self.main = K_COLOR_RED
+        guard innerColor.isNil else { return }
+        self.innerColor = K_COLOR_RED
     }
     
     func setupLayers(){
@@ -92,7 +92,7 @@ class CheckBox: UIView, CAAnimationDelegate {
         if layerIds == nil || layerIds.contains("path"){
             let path = layers["path"] as! CAShapeLayer
             path.fillRule    = .evenOdd
-            path.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.white.cgColor : UIColor.black.cgColor
+            path.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.white.cgColor : UIColor.darkGray.cgColor//UIColor.black.cgColor
             path.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             path.lineWidth   = 0
         }
@@ -102,7 +102,7 @@ class CheckBox: UIView, CAAnimationDelegate {
             rectangle.frame       = CGRect(x: 0.0541 * rectangle.superlayer!.bounds.width, y: 0.45702 * rectangle.superlayer!.bounds.height, width: 0.17959 * rectangle.superlayer!.bounds.width, height: 0.01 * rectangle.superlayer!.bounds.height)
             rectangle.setValue(-44.64 * CGFloat.pi/180, forKeyPath:"transform.rotation")
             rectangle.opacity     = 0
-            rectangle.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : main.cgColor
+            rectangle.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : innerColor.cgColor
             rectangle.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             rectangle.lineWidth   = 0
         }
@@ -112,7 +112,7 @@ class CheckBox: UIView, CAAnimationDelegate {
             rectangle2.frame       = CGRect(x: 0.25858 * rectangle2.superlayer!.bounds.width, y: 0.77369 * rectangle2.superlayer!.bounds.height, width: 0.16959 * rectangle2.superlayer!.bounds.width, height: 0.01 * rectangle2.superlayer!.bounds.height)
             rectangle2.setValue(-135.09 * CGFloat.pi/180, forKeyPath:"transform.rotation")
             rectangle2.opacity     = 0
-            rectangle2.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : main.cgColor
+            rectangle2.fillColor   = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : innerColor.cgColor
             rectangle2.strokeColor = UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             rectangle2.lineWidth   = 0
         }
@@ -349,9 +349,9 @@ class CheckBox: UIView, CAAnimationDelegate {
             rectangle.fillColor = UIColor.systemBlue.cgColor
             rectangle2.fillColor = UIColor.systemBlue.cgColor
         default:
-            path.fillColor = UIColor.black.cgColor
-            rectangle.fillColor = main.cgColor
-            rectangle2.fillColor = main.cgColor
+            path.fillColor = UIColor.darkGray.cgColor
+            rectangle.fillColor = innerColor.cgColor
+            rectangle2.fillColor = innerColor.cgColor
         }
     }
 }

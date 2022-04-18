@@ -94,6 +94,7 @@ class VoteCell: UITableViewCell {
     }
     
     public func enable() {
+        guard !isEnabled else { return }
         UIView.animate(withDuration: 0.3, animations: {
             self.btn.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color
         }) {

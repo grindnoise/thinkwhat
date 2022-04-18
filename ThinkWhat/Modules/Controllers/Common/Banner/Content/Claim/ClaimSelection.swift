@@ -65,18 +65,19 @@ class ClaimSelection: UIView {
     @IBOutlet weak var btn: UIButton! {
         didSet {
             btn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .darkGray : K_COLOR_GRAY
+            btn.accessibilityIdentifier = "exit"
             btn.setTitle("sendButton".localized.uppercased(), for: .normal)
         }
     }
     @IBAction func btnTapped(_ sender: UIButton) {
         guard !choice.isNil else { return }
         callbackDelegate?.callbackReceived(choice)
-        animate()
+        animate(sender)
     }
     @IBOutlet weak var cancel: UIButton! {
         didSet {
             cancel.setTitleColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label, for: .normal)
-            cancel.accessibilityIdentifier = "dismiss"
+//            cancel.accessibilityIdentifier = "dismiss"
             cancel.setTitle("cancel".localized.uppercased(), for: .normal)
         }
     }
@@ -111,22 +112,7 @@ class ClaimSelection: UIView {
                                     
             attributedString.append(NSAttributedString(string: textContent_2,
                                                        attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 20), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-                                    
-            
-//            attributedString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            
-            
-//            let attributedString = NSMutableAttributedString(string: textContent_1,
-//                                                             attributes: [NSAttributedString.Key.paragraphStyle:paragraph])
-//            attributedString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 30), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: textContent_1.fullRange())
-//
-//            let attributedString_1 = NSMutableAttributedString(string: textContent_2,
-//                                                             attributes: [NSAttributedString.Key.paragraphStyle:paragraph])
-//            attributedString_1.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: textContent_2.fullRange())
-//
-//            attributedString.append(attributedString_1)
             label.attributedText = attributedString
-            print(attributedString.string)
         }
     }
     
@@ -165,7 +151,7 @@ class ClaimSelection: UIView {
         }) { _ in }
     }
     
-    private func animate() {
+    private func animate(_ sender: Optional<Any> = nil) {
         let pathAnim = Animations.get(property: .Path, fromValue: (self.icon.icon as! CAShapeLayer).path!, toValue: (self.icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
         self.icon.icon.add(pathAnim, forKey: nil)
         UIView.animate(withDuration: 0.15, animations: {
@@ -173,22 +159,22 @@ class ClaimSelection: UIView {
             self.btn.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
         }) { _ in }
         
-        UIView.animate(withDuration: 0.15, delay: 0.1, options: .curveLinear) {
+        UIView.animate(withDuration: 0.15, delay: 0, options: .curveLinear) {
             self.cancel.alpha = 0
             self.cancel.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
         } completion: { _ in }
         
-        UIView.animate(withDuration: 0.2, delay: 0.1, options: .curveLinear) {
+        UIView.animate(withDuration: 0.15, delay: 0.1, options: .curveLinear) {
             self.tableView.alpha = 0
             self.tableView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
         } completion: { _ in
             self.label.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
-            UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) {
+            UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
                 self.label.transform = .identity
                 self.label.alpha = 1
             } completion: { _ in
                 delay(seconds: 1.25) {
-                    self.callbackDelegate?.callbackReceived(self.cancel)
+                    self.callbackDelegate?.callbackReceived(sender as Any)
                 }
             }
         }

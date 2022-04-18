@@ -16,7 +16,7 @@ protocol Localizable {
     /**
      Subscription if Bundle language changes on the fly.
      */
-    func subscribe()
+    func subscribeLocalizable()
     
     /**
      Class-defined implementation.

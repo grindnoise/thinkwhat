@@ -15,7 +15,6 @@ protocol HotViewInput: class {
     
     var controllerOutput: HotControllerOutput? { get set }
     var controllerInput: HotControllerInput? { get set }
-    
     // View input methods here
 //    var surveyStack: [Survey] { get set }
     func onEmptyStack()
@@ -45,6 +44,8 @@ protocol HotControllerOutput: class {
     var viewInput: HotViewInput? { get set }
     
     func onLoad()
+    func skipCard()
+//    func onDidAppear()
     func onDidLayout()
-    func pushStack()
+    func populateStack()
 }

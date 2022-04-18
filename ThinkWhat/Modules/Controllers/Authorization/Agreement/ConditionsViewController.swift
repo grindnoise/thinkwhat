@@ -11,6 +11,7 @@ import UIKit
 class ConditionsViewController: UIViewController {
     
     deinit {
+        NotificationCenter.default.removeObserver(self)
         print("ConditionsViewController deinit")
     }
     
@@ -27,6 +28,11 @@ class ConditionsViewController: UIViewController {
             .modelOutput = self
         title = NSLocalizedString("terms_of_use", comment: "")
         controllerInput?.getTermsConditionsURL()
+        
+        ProtocolSubscriptions.subscribe(self)
+//        if Self.self is AppTerminateObservable.Type {
+//            perform(Selector("subscribeAppTerminateObservable"))
+//        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -37,6 +43,8 @@ class ConditionsViewController: UIViewController {
             UserDefaults.clear()
         }
     }
+    
+    
     
     // MARK: - Properties
     var controllerOutput: ConditionsControllerOutput?
@@ -53,12 +61,12 @@ extension ConditionsViewController: ConditionsViewInput {
     
     func onRefuse() {
         let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-        banner.present(subview: PlainBannerContent(text: "should_read_agreement_message".localized, imageContent: ImageSigns.envelope, color: .systemOrange), isModal: false, shouldDismissAfter: 1.5)
+        banner.present(subview: PlainBannerContent(text: "should_read_agreement_message".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 1.5)
     }
     
     func onTapWhileLoading() {
         let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-        banner.present(subview: PlainBannerContent(text: "wait_for_agreement".localized, imageContent: ImageSigns.envelope, color: .systemOrange), isModal: false, shouldDismissAfter: 1.5)
+        banner.present(subview: PlainBannerContent(text: "wait_for_agreement".localized, imageContent: ImageSigns.exclamationMark, color: .systemOrange), isModal: false, shouldDismissAfter: 1.5)
     }
 }
 
@@ -79,5 +87,17 @@ extension ConditionsViewController: BannerObservable {
     func onBannerDidDisappear(_ sender: Any) {
         guard let banner = sender as? Banner else { return }
         banner.removeFromSuperview()
+    }
+}
+
+extension ConditionsViewController: AppTerminateObservable {
+    @objc
+    func subscribeAppTerminateObservable() {
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onAppTerminated), name: UIApplication.willTerminateNotification, object: UIApplication.shared)
+    }
+    
+    @objc
+    func onAppTerminated() {
+        UserDefaults.clear()
     }
 }

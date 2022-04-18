@@ -42,7 +42,7 @@ class Popup: UIView {
         heightConstraint.constant   = height
         centerYConstraint.constant  = yOrigin
         layoutIfNeeded()
-        body.cornerRadius = body.frame.width * 0.05
+        body.cornerRadius = body.frame.width * 0.07
     }
     
     // MARK: - IB Outlets
@@ -138,12 +138,13 @@ class Popup: UIView {
         })
     }
     
-    func dismiss() {
+    func dismiss(_ sender: Optional<Any> = nil) {
         bannerDelegate?.onBannerWillDisappear(self)
         UIView.animate(withDuration: 0.4, delay: 0, options: [.curveLinear], animations: {
             self.background.alpha = 0
         }) {
             _ in
+            self.accessibilityIdentifier = sender as? String
             self.bannerDelegate?.onBannerDidDisappear(self)
         }
         UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
@@ -186,11 +187,9 @@ class Popup: UIView {
 extension Popup: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if sender is VoteMessage {
-            dismiss()
+            dismiss("vote")
         } else if let btn = sender as? UIButton {
-            if btn.accessibilityIdentifier == "dismiss" {
-                dismiss()
-            }
+            dismiss(btn.accessibilityIdentifier)// == "exit" ? "exit" : nil)
         } else if sender is Claim {
             callbackDelegate?.callbackReceived(sender)
         }

@@ -49,12 +49,13 @@ class AuthorCell: UITableViewCell {
             favoriteLabel.backgroundColor = .clear
         }
     }
-    @IBOutlet weak var favoriteIcon: Icon! {
+    
+    @IBOutlet weak var watchIcon: UIImageView! {
         didSet {
-            favoriteIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
-            favoriteIcon.scaleMultiplicator = 1.4
-            favoriteIcon.backgroundColor = .clear
-            favoriteIcon.category = .Heart
+            watchIcon.backgroundColor = .clear
+            watchIcon.image = ImageSigns.binocularsFilled.image
+            watchIcon.contentMode = .scaleAspectFit
+            watchIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
         }
     }
     @IBOutlet weak var user: UILabel! {
@@ -90,12 +91,12 @@ class AuthorCell: UITableViewCell {
         categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topic.attributedText = categoryString
         user.text = survey!.owner.firstName
-        var rating = Double(survey.totalVotes)*5/Double(survey.views).rounded(toPlaces: 1)
+        var rating = min(Double(survey.totalVotes)*5/Double(survey.views), 5)//.rounded(toPlaces: 1)
         if rating < 0.5 {
             rating = 0
         }
         stars.rating = rating
-        ratingLabel.text = "\(rating)"
+        ratingLabel.text = String(format: "%.1f", rating)
         viewsLabel.text = "\(survey.views)"
         if survey.owner.lastName.count > 0 {
             user.text! += "\n\(survey.owner.lastName)"
@@ -104,6 +105,7 @@ class AuthorCell: UITableViewCell {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        watchIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
         switch traitCollection.userInterfaceStyle {
         case .dark:
             let categoryString = NSMutableAttributedString()
@@ -112,7 +114,6 @@ class AuthorCell: UITableViewCell {
             categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
             self.viewsIcon.setIconColor(.systemBlue)
-            self.favoriteIcon.setIconColor(.systemBlue)
         default:
             let categoryString = NSMutableAttributedString()
             categoryString.append(NSAttributedString(string: "\(survey!.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
@@ -120,7 +121,6 @@ class AuthorCell: UITableViewCell {
             categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
             self.viewsIcon.setIconColor(.black)
-            self.favoriteIcon.setIconColor(.black)
         }
     }
 }

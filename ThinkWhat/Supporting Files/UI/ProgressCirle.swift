@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ProgressCirle: UIView {
+class _ProgressCirle: UIView {
     
     var circlePathLayer: CAShapeLayer?
     var innerCirclePathLayer: CAShapeLayer?

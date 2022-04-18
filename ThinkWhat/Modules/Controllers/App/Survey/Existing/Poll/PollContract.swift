@@ -17,13 +17,14 @@ protocol PollViewInput: class {
     var controllerInput: PollControllerInput? { get set }
     var survey: Survey? { get }
     var surveyReference: SurveyReference { get }
+    var showNext: Bool { get }
     
     func onClaim(_: Claim)
     func onAddFavorite(_: Bool)
     func onVote(_: Answer)
     func onImageTapped(image: UIImage, title: String)
     func onURLTapped(_: URL)
-    func onExitWithClaim()
+    func onExitWithSkip()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -61,6 +62,8 @@ protocol PollControllerOutput: class {
     var viewInput: PollViewInput? { get set }
     var survey: Survey? { get }
     var surveyReference: SurveyReference { get }
+    var hasVoted: Bool { get }
+    var showNext: Bool { get }
     
     func onLoad(_: Result<Bool, Error>)
     func onCountUpdated()

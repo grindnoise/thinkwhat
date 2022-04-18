@@ -59,13 +59,13 @@ class CardView: UIView {
     
     private func setupUI() {
         voteButton.layer.cornerRadius = voteButton.frame.height/2.25
-        var rating = Double(survey.totalVotes)*5/Double(survey.views).rounded(toPlaces: 1)
+        var rating = min(Double(survey.totalVotes)*5/Double(survey.views), 5)//.rounded(toPlaces: 1)
         if rating < 0.5 {
             rating = 0
         }
         stars.rating = rating
         stars.color = survey.topic.tagColor
-        ratingLabel.text = "\(rating)"
+        ratingLabel.text = String(format: "%.1f", rating)
         favoriteLabel.text = "\(survey.likes)"
         viewsLabel.text = "\(survey.views)"
         let categoryString = NSMutableAttributedString()
@@ -95,6 +95,7 @@ class CardView: UIView {
     
         
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        watchIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
         switch traitCollection.userInterfaceStyle {
         case .dark:
             self.background.backgroundColor = .secondarySystemBackground
@@ -106,9 +107,8 @@ class CardView: UIView {
             self.topic.attributedText = categoryString
             self.icon.setIconColor(.systemBlue)
             self.viewsIcon.setIconColor(.systemBlue)
-            self.favoriteIcon.setIconColor(.systemBlue)
             self.layer.shadowOpacity = 0
-//            self.voteButton.layer.shadowOpacity = 0
+
         default:
             self.background.backgroundColor = .systemBackground
             self.voteButton.backgroundColor = self.survey.topic.tagColor
@@ -119,9 +119,7 @@ class CardView: UIView {
             self.topic.attributedText = categoryString
             self.icon.setIconColor(survey.topic.tagColor)
             self.viewsIcon.setIconColor(.black)
-            self.favoriteIcon.setIconColor(.black)
             self.layer.shadowOpacity = 1
-//            self.voteButton.layer.shadowOpacity = 1
         }
     }
     
@@ -179,12 +177,12 @@ class CardView: UIView {
             favoriteLabel.backgroundColor = .clear
         }
     }
-    @IBOutlet weak var favoriteIcon: Icon! {
+    @IBOutlet weak var watchIcon: UIImageView! {
         didSet {
-            favoriteIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
-            favoriteIcon.scaleMultiplicator = 1.4
-            favoriteIcon.backgroundColor = .clear
-            favoriteIcon.category = .Heart
+            watchIcon.backgroundColor = .clear
+            watchIcon.image = ImageSigns.binocularsFilled.image
+            watchIcon.contentMode = .scaleAspectFit
+            watchIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
         }
     }
     @IBOutlet weak var viewsLabel: UILabel! {

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -12,6 +12,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="Avatar" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
                 <outlet property="border" destination="gQv-EW-IX4" id="2BB-Eo-u4S"/>
+                <outlet property="borderBg" destination="js7-17-TTd" id="ISf-HI-Jr9"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="zSk-59-MPF"/>
                 <outlet property="imageView" destination="4eG-q8-nmk" id="yjb-iy-Y9W"/>
             </connections>
@@ -21,6 +22,10 @@
             <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="js7-17-TTd">
+                    <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gQv-EW-IX4">
                     <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
                     <subviews>
@@ -44,8 +49,12 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="gQv-EW-IX4" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="D8B-rm-gbL"/>
+                <constraint firstItem="js7-17-TTd" firstAttribute="centerX" secondItem="gQv-EW-IX4" secondAttribute="centerX" id="UlT-0v-BiM"/>
                 <constraint firstAttribute="trailing" secondItem="gQv-EW-IX4" secondAttribute="trailing" id="X5s-XK-7jz"/>
+                <constraint firstItem="js7-17-TTd" firstAttribute="width" secondItem="gQv-EW-IX4" secondAttribute="width" id="af4-Mj-b4N"/>
                 <constraint firstAttribute="bottom" secondItem="gQv-EW-IX4" secondAttribute="bottom" id="qch-ix-pgq"/>
+                <constraint firstItem="js7-17-TTd" firstAttribute="height" secondItem="gQv-EW-IX4" secondAttribute="height" id="tm6-HR-v8u"/>
+                <constraint firstItem="js7-17-TTd" firstAttribute="centerY" secondItem="gQv-EW-IX4" secondAttribute="centerY" id="u1r-XP-KAr"/>
                 <constraint firstItem="gQv-EW-IX4" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="wzv-Jd-iRa"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>

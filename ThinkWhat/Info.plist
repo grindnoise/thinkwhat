@@ -64,6 +64,13 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>ip-api.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
 			<key>api.geonames.org</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>

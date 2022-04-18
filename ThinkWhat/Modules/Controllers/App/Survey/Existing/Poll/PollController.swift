@@ -15,10 +15,11 @@ class PollController: UIViewController {
         print("PollController deinit")
     }
     
-    init(surveyReference: SurveyReference) {
+    init(surveyReference: SurveyReference, showNext __showNext: Bool = false) {
         super.init(nibName: nil, bundle: nil)
         self._surveyReference = surveyReference
         self._survey = surveyReference.survey
+        self._showNext = __showNext
     }
     
     required init?(coder: NSCoder) {
@@ -39,10 +40,11 @@ class PollController: UIViewController {
         
         setupUI()
         performChecks()
+        navigationController?.delegate = self
     }
     
     private func setupUI() {
-        //Set icon category in title
+//        //Set icon category in title
         let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
         icon.backgroundColor = .clear
         icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor
@@ -50,12 +52,19 @@ class PollController: UIViewController {
         icon.scaleMultiplicator = 1.4
         icon.category = Icon.Category(rawValue: _surveyReference.topic.id) ?? .Null
         navigationItem.titleView = icon
+
         navigationItem.titleView?.clipsToBounds = false
 //        navigationItem.backBarButtonItem?.title = ""
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         
         let gesture = UITapGestureRecognizer(target: self, action: #selector(PollController.addFavorite))
-        likeButton.addGestureRecognizer(gesture)
+        watchButton.addGestureRecognizer(gesture)
+        
+        if isAddedToFavorite {
+            watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+        } else {
+            watchButton.tintColor = .systemGray
+        }
         
         if let nc = navigationController as? NavigationControllerPreloaded {
             nc.setNavigationBarHidden(false, animated: false)
@@ -69,7 +78,21 @@ class PollController: UIViewController {
 //                                               object: nil)
         navigationItem.largeTitleDisplayMode = .never
         guard _surveyReference.isOwn else {
-            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: likeButton)]
+            
+            if Surveys.shared.favoriteReferences.filter({ (ref, date) in
+                ref == _surveyReference
+            }).isEmpty {
+                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
+                    self.watchButton.image = ImageSigns.binoculars.image
+                } completion: { _ in}
+                isAddedToFavorite = false
+            } else {
+                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
+                    self.watchButton.image = ImageSigns.binocularsFilled.image
+                } completion: { _ in}
+                isAddedToFavorite = true
+            }
+            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
             return
         }
     }
@@ -165,19 +188,24 @@ class PollController: UIViewController {
             banner.present(subview: PlainBannerContent(text: "finish_poll".localized, imageContent: ImageSigns.exclamationMark, color: .systemOrange), isModal: false, shouldDismissAfter: 3)
             return
         }
-        isLoading = true
+//        isLoading = true
         var mark = true
-        if likeButton.state == .disabled {
-            likeButton.state = .enabled
+        if !isAddedToFavorite {
+            UIView.transition(with: watchButton, duration: 0.3, options: [.transitionCrossDissolve]) {
+                self.watchButton.image = ImageSigns.binocularsFilled.image
+            } completion: { _ in}
             mark = true
             if Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == _surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences[self._surveyReference] = Date() }
         } else {
-            likeButton.state = .disabled
+            UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
+                self.watchButton.image = ImageSigns.binoculars.image
+            } completion: { _ in}
             mark = false
             if let key = Surveys.shared.favoriteReferences.keys.filter({ $0.id == _surveyReference.id }).first {
                 Surveys.shared.favoriteReferences.removeValue(forKey: key)
             }
         }
+        isAddedToFavorite = !isAddedToFavorite
         NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
         controllerInput?.addFavorite(mark)
     }
@@ -190,17 +218,18 @@ class PollController: UIViewController {
 //    }
     
     override func willMove(toParent parent: UIViewController?) {
+        super.willMove(toParent: parent)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         if let icon = navigationItem.titleView as? Icon {
-            switch traitCollection.userInterfaceStyle {
-            case .light:
-                icon.setIconColor(survey!.topic.tagColor)
-            default:
-                icon.setIconColor(.systemBlue)
-            }
+            icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor)
+        }
+        if isAddedToFavorite {
+            watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+        } else {
+            watchButton.tintColor = .systemGray
         }
     }
     
@@ -209,12 +238,26 @@ class PollController: UIViewController {
     var controllerInput: PollControllerInput?
     private var _survey: Survey!
     private var _surveyReference: SurveyReference!
+    private var _showNext: Bool = false
     private var isLoading = false
-    private let likeButton = HeartView(frame: CGRect(origin: .zero, size: CGSize(width: 30, height: 30)))
+    private let watchButton = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 27)))
+    private var isAddedToFavorite = false {
+        didSet {
+            if isAddedToFavorite {
+                watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+            } else {
+                watchButton.tintColor = .systemGray
+            }
+        }
+    }
 }
 
 // MARK: - View Input
 extension PollController: PollViewInput {
+    var showNext: Bool {
+        return _showNext
+    }
+    
     func onURLTapped(_ url: URL) {
         var vc: SFSafariViewController!
         let config = SFSafariViewController.Configuration()
@@ -254,10 +297,13 @@ extension PollController: PollViewInput {
 
 // MARK: - Model Output
 extension PollController: PollModelOutput {
-    func onExitWithClaim() {
+    func onExitWithSkip() {
         Task {
             try await Task.sleep(nanoseconds: UInt64(0.25 * 1_000_000_000))
             await MainActor.run {
+                if let vc = previousController as? HotController {
+                    vc.shouldSkipCurrentCard = true
+                }
                 navigationController?.popViewController(animated: true)
             }
         }
@@ -301,5 +347,13 @@ extension PollController: BannerObservable {
     func onBannerDidDisappear(_ sender: Any) {
         guard let banner = sender as? Banner else { return }
         banner.removeFromSuperview()
+    }
+}
+
+extension PollController: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        if let vc = viewController as? HotController, controllerOutput?.hasVoted == true {
+            vc.shouldSkipCurrentCard = true
+        }
     }
 }

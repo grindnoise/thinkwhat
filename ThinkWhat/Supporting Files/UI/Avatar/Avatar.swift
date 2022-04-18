@@ -10,6 +10,7 @@ import UIKit
 
 class Avatar: UIView {
     @IBOutlet var contentView: UIView!
+    @IBOutlet weak var borderBg: UIView!
     @IBOutlet weak var border: UIView!
     @IBOutlet weak var imageView: UIImageView! {
         didSet {
@@ -40,7 +41,10 @@ class Avatar: UIView {
     
     override func layoutSubviews() {
         if !border.isNil { border.cornerRadius = border.frame.height/2 }
-        if !imageView.isNil { imageView.cornerRadius = imageView.frame.width/2 }
+        if !imageView.isNil {
+            imageView.cornerRadius = imageView.frame.width/2
+            borderBg.cornerRadius = borderBg.frame.width/2
+        }
     }
     
     override var frame: CGRect {

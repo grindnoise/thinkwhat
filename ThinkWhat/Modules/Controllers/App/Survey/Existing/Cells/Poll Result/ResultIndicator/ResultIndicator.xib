@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -25,6 +23,7 @@
                 <outlet property="foregroundFrame" destination="eFn-cw-bv0" id="Ia8-Ic-a0j"/>
                 <outlet property="label" destination="Juc-c7-MYx" id="AEW-PH-9HI"/>
                 <outlet property="percentLabel" destination="szB-pT-O8i" id="egH-cU-wD6"/>
+                <outlet property="whiteFrame" destination="w97-18-FV5" id="Lyz-2r-bIx"/>
                 <outlet property="widthConstraint" destination="6lG-fx-cOQ" id="jTt-w0-jO0"/>
             </connections>
         </placeholder>
@@ -34,7 +33,11 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ldV-YT-jtI">
-                    <rect key="frame" x="0.0" y="0.0" width="201" height="50"/>
+                    <rect key="frame" x="0.0" y="0.0" width="210" height="50"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w97-18-FV5">
+                    <rect key="frame" x="0.0" y="0.0" width="0.0" height="50"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eFn-cw-bv0">
@@ -50,15 +53,15 @@
                         <constraint firstAttribute="width" secondItem="szB-pT-O8i" secondAttribute="height" multiplier="1:1" id="Gwh-vp-zvp"/>
                     </constraints>
                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
+                    <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WJU-wH-9E1">
-                    <rect key="frame" x="201" y="0.0" width="99" height="50"/>
+                    <rect key="frame" x="210" y="0.0" width="90" height="50"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Голосов нет" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Juc-c7-MYx">
-                            <rect key="frame" x="0.0" y="0.0" width="99" height="50"/>
-                            <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="10"/>
-                            <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <rect key="frame" x="0.0" y="0.0" width="90" height="50"/>
+                            <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="12"/>
                             <nil key="highlightedColor"/>
                         </label>
                     </subviews>
@@ -71,7 +74,7 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vnN-0f-XXS" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                    <rect key="frame" x="188.5" y="12.5" width="25" height="25"/>
+                    <rect key="frame" x="197.5" y="12.5" width="25" height="25"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="vnN-0f-XXS" secondAttribute="height" multiplier="1:1" id="C1e-Aa-K2e"/>
@@ -92,11 +95,15 @@
                 <constraint firstAttribute="bottom" secondItem="szB-pT-O8i" secondAttribute="bottom" id="Rkd-HM-eh5"/>
                 <constraint firstItem="ldV-YT-jtI" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Wkb-c3-fSK"/>
                 <constraint firstItem="vnN-0f-XXS" firstAttribute="height" secondItem="ldV-YT-jtI" secondAttribute="height" multiplier="0.5" id="Y84-gX-fhP"/>
+                <constraint firstItem="w97-18-FV5" firstAttribute="centerX" secondItem="eFn-cw-bv0" secondAttribute="centerX" id="YHQ-HR-cXP"/>
                 <constraint firstItem="WJU-wH-9E1" firstAttribute="leading" secondItem="ldV-YT-jtI" secondAttribute="trailing" id="YVZ-Uc-mre"/>
+                <constraint firstItem="w97-18-FV5" firstAttribute="width" secondItem="eFn-cw-bv0" secondAttribute="width" id="exM-b2-GQn"/>
                 <constraint firstItem="eFn-cw-bv0" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="gVB-vu-hJm"/>
+                <constraint firstItem="w97-18-FV5" firstAttribute="centerY" secondItem="eFn-cw-bv0" secondAttribute="centerY" id="i8y-fg-jOR"/>
                 <constraint firstItem="szB-pT-O8i" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="j98-Sx-hNM"/>
-                <constraint firstItem="WJU-wH-9E1" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.33" id="qjX-cb-PeB"/>
+                <constraint firstItem="WJU-wH-9E1" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.3" id="qjX-cb-PeB"/>
                 <constraint firstItem="vnN-0f-XXS" firstAttribute="centerY" secondItem="ldV-YT-jtI" secondAttribute="centerY" id="rvs-DJ-rSa"/>
+                <constraint firstItem="w97-18-FV5" firstAttribute="height" secondItem="eFn-cw-bv0" secondAttribute="height" id="vcy-tt-mtQ"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="52.799999999999997" y="74.662668665667169"/>

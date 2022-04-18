@@ -53,7 +53,9 @@ extension PollModel: PollControllerInput {
                             Userprofiles.shared.current!.balance += 1
                         }
                     } else if i.0 == "hot" && !i.1.isEmpty {
-                        Surveys.shared.load(i.1)
+                        await MainActor.run {
+                            Surveys.shared.load(i.1)
+                        }
                     } else if i.0 == "result_total" {
                         do {
                             var totalVotes = 0
@@ -73,7 +75,7 @@ extension PollModel: PollControllerInput {
                                 instances.forEach { instance in
                                     answer.addVoter(Userprofiles.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
                                 }
-                                print(answer.voters)
+//                                print(answer.voters)
                             }
                             self.survey?.totalVotes = totalVotes
                         } catch let error {

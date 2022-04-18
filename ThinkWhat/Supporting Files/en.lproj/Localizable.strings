@@ -8,6 +8,7 @@
 
 //Common
 "ok" = "Ok";
+"more" = "more";
 "results" = "Results";
 "vote" = "Vote";
 "check_fields" = "Check fields for errors";
@@ -34,6 +35,8 @@
 "bad_url" = "Incorrect url";
 "claim_sent" = "Сlaim has been sent";
 "thanks_for_feedback" = "Thanks for feedback!";
+"congratulations" = "Congratulations!";
+
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";
@@ -107,3 +110,11 @@
 //Poll VC
 "make_choice" = "Make your choice";
 "finish_poll" = "Please, vote at first";
+"no_votes" = "No votes";
+"poll_complete_at" = "Poll completion";
+"voted" = "Voted";
+"most_popular_choice" = "Your choice is the most popular now!";
+"extra_points" = "We've topped up your balance with ";
+"points" = " votes";
+"support_poll" = "Support poll";
+"next" = "Next";

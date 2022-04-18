@@ -77,7 +77,13 @@ class HotView: UIView {
 
 // MARK: - Controller Output
 extension HotView: HotControllerOutput {
-    func pushStack() {
+    
+    func skipCard() {
+        previousCard = currentCard
+        onNext(nextCard)
+    }
+    
+    func populateStack() {
         let stackSet: Set<Survey>    = Set(surveyStack)
         var hotSet: Set<Survey>      = Set(Surveys.shared.hot)
         let rejectedSet: Set<Survey> = Set(Surveys.shared.rejected)
