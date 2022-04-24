@@ -25,6 +25,13 @@ class Avatar: UIView {
         commonInit()
     }
     
+    init(color: UIColor, image: UIImage) {
+        super.init(frame: .zero)
+        self.lightColor = color
+        self.imageView.image = image
+        commonInit()
+    }
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         commonInit()

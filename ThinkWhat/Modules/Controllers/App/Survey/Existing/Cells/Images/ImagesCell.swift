@@ -124,13 +124,14 @@ class ImagesCell: UITableViewCell, UIScrollViewDelegate {
                                     self.showPageControl()
                                 }
                             case .failure(let error):
-                                delBanner.shared.contentType = .Warning
-                                if let content = delBanner.shared.content as? Warning {
-                                    content.level = .Error
-                                    content.text = "Произошла ошибка, изображение не было загружено"
-                                }
-                                delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
-                                print(error.localizedDescription)
+                                callbackDelegate.callbackReceived(AppError.imageDownload)
+//                                delBanner.shared.contentType = .Warning
+//                                if let content = delBanner.shared.content as? Warning {
+//                                    content.level = .Error
+//                                    content.text = "Произошла ошибка, изображение не было загружено"
+//                                }
+//                                delBanner.shared.present(shouldDismissAfter: 2, delegate: nil)
+//                                print(error.localizedDescription)
                             }
                         }
                     }

@@ -14,7 +14,7 @@ class Banner: UIView {
         print("Banner deinit")
     }
     
-    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?) {
+    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightDivisor: CGFloat = 3.05) {
         super.init(frame: frame)
         self.callbackDelegate = callbackDelegate
         self.bannerDelegate = bannerDelegate
@@ -28,8 +28,8 @@ class Banner: UIView {
     // MARK: - Initialization
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-        backgroundColor             = .clear
-        bounds                      = UIScreen.main.bounds
+        backgroundColor                 = .clear
+        bounds                          = UIScreen.main.bounds
         contentView.frame               = bounds
         contentView.autoresizingMask    = [.flexibleHeight, .flexibleWidth]
         appDelegate.window?.addSubview(self)
@@ -37,7 +37,7 @@ class Banner: UIView {
         
         //Set default height
         setNeedsLayout()
-        height                      = contentView.bounds.width/4
+        height                      = contentView.bounds.width/heightDivisor
         heightConstraint.constant   = height
         topConstraint.constant      = yOrigin//-(topConstraint.constant + height)
         layoutIfNeeded()
@@ -75,17 +75,18 @@ class Banner: UIView {
     }
     
     // MARK: - Properties
-//    private var isFolded = false
-    private let topMargin:  CGFloat = 8
-    private var yOrigin:    CGFloat = 0
-    private var height:     CGFloat = 0 {
+    ///Geometry
+    private var heightDivisor:  CGFloat = .zero
+    private let topMargin:      CGFloat = 8
+    private var yOrigin:        CGFloat = 0
+    private var height:         CGFloat = 0 {
         didSet {
             if oldValue != height {
                 yOrigin = -(height*1.5+topMargin)
             }
         }
     }
-    //Use for auto dismiss
+    ///Auto dismiss
     private var timer:  Timer?
     private var timeElapsed: TimeInterval = 0
     private var isModal = false
@@ -97,6 +98,7 @@ class Banner: UIView {
         }
     }
     
+    ///Delegates
     private weak var callbackDelegate : CallbackObservable?
     private weak var bannerDelegate: BannerObservable?
     
@@ -236,4 +238,16 @@ class Banner: UIView {
             self.body.backgroundColor = .systemBackground
         }
     }
+}
+
+func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, imageContent: UIView, color: UIColor = .systemRed, isModal: Bool = false, shouldDismissAfter: TimeInterval = 1, accessibilityIdentifier: String = "") {
+    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
+    banner.accessibilityIdentifier = accessibilityIdentifier
+    banner.present(subview: PlainBannerContent(text: text, imageContent: imageContent, color: color), isModal: isModal, shouldDismissAfter: shouldDismissAfter)
+}
+
+func showPopup(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: UIView, color: UIColor = .systemRed, isModal: Bool = false, shouldDismissAfter: TimeInterval = 1, accessibilityIdentifier: String = "") {
+    let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
+    banner.accessibilityIdentifier = accessibilityIdentifier
+    banner.present(subview: subview)
 }

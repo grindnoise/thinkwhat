@@ -34,7 +34,7 @@ protocol HotControllerInput: class {
 ///
 /// **Controller** conforms to this protocol
 protocol HotModelOutput: class {
-//    func onSurveysReceived(_: [Survey])
+    func onRequestCompleted()
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -45,7 +45,7 @@ protocol HotControllerOutput: class {
     
     func onLoad()
     func skipCard()
-//    func onDidAppear()
+    func onDidAppear()
     func onDidLayout()
     func populateStack()
 }

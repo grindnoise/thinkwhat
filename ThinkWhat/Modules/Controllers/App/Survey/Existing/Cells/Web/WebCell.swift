@@ -106,6 +106,7 @@ class WebCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackObse
     
     public func setupUI(delegate callbackDelegate: CallbackObservable, url _url: URL) {
         if !isSetupComplete {
+            isSetupComplete = true
             setNeedsLayout()
             layoutIfNeeded()
             url = _url
@@ -122,33 +123,30 @@ class WebCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackObse
                     webView.loadHTMLString(webContent, baseURL: URL(string: "http://www.tiktok.com")!)
                 } else {
                     guard let embeddedURL = URL(string: "https://www.tiktok.com/oembed?url=\(url.absoluteString)") else {
-                        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-                        banner.present(subview: PlainBannerContent(text: "tiktok_web_error".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 2)
+                        callbackDelegate.callbackReceived(AppError.tikTokContent)
                         return
                     }
                     API.shared.getTikTokEmbedHTML(url: embeddedURL) { result in
                         switch result {
                         case .success(let json):
                             guard let html = json["html"].string else {
-                                let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-                                banner.present(subview: PlainBannerContent(text: "tiktok_web_error".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 2)
+                                callbackDelegate.callbackReceived(AppError.tikTokContent)
                                 return
                             }
                             var webContent = "<meta name='viewport' content='initial-scale=0.8, maximum-scale=0.8, user-scalable=no'/>"
                             webContent += html
                             self.webView.loadHTMLString(webContent, baseURL: URL(string: "http://www.tiktok.com")!)
                         case .failure(let error):
-                            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-                            banner.present(subview: PlainBannerContent(text: "tiktok_web_error".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 2)
-                            #if DEBUG
+#if DEBUG
                             print(error.localizedDescription)
-                            #endif
+#endif
+                            callbackDelegate.callbackReceived(AppError.tikTokContent)
+                            return
                         }
                     }
                 }
             }
             delegate = callbackDelegate
-            isSetupComplete = true
         }
     }
 }

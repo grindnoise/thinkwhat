@@ -138,6 +138,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "SubsciptionsController.toggleBarButton():SubsciptionsController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.isBarButtonOn">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.keyboardWillShow(_:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -346,10 +354,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "PollView.onVote(_:):PollView.swift">
+         contextName = "VotersView.collectionView(_:numberOfItemsInSection:):VotersView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "banner.accessibilityIdentifier">
+               value = "answer">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -494,6 +502,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "VotersView.filtered.didset:VotersView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "filtered">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "VotersFilterController.callback():VotersFilterController.swift">
          <PersistentStrings>
             <PersistentString
@@ -581,6 +597,26 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "VotersFilter.fetchData():VotersFilter.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "gender">
+            </PersistentString>
+            <PersistentString
+               value = "Int(rangeSlider.selectedMaximum)">
+            </PersistentString>
+            <PersistentString
+               value = "voters!.filter({ $0.age &gt;= Int(rangeSlider.selectedMinimum)}).filter({$0.age &lt;= Int(rangeSlider.selectedMaximum)})">
+            </PersistentString>
+            <PersistentString
+               value = "Int(rangeSlider.selectedMinimum)">
+            </PersistentString>
+            <PersistentString
+               value = "lowerBounds.filter({$0.age &lt; Int(rangeSlider.selectedMaximum)})">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.viewWillAppear(_:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -588,6 +624,14 @@
             </PersistentString>
             <PersistentString
                value = "self.tabBarController?.tabBar.layer.zPosition">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "VoteMessage.setupUI():VoteMessage.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "label">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1544,14 +1588,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "Survey.completion.getter:Survey.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "totalVotes * 100 / voteCapacity">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "ChoiceResultCell.answer.didset:PollController.swift">
          <PersistentStrings>
             <PersistentString
@@ -2301,14 +2337,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "ProgressCircle.draw(_:):ProgressCircle.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "frame">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "AuthViewController.viewWillAppear(_:):AuthViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -2348,6 +2376,14 @@
          <PersistentStrings>
             <PersistentString
                value = "selectedLanguage">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "PollView.updateResults():PollView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Colors.tags()">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -2799,10 +2835,24 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "VotersView.callbackReceived(_:):VotersView.swift">
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyResultViewController.viewWillDisappear(_:):NewSurveyResultViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "timer">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SubsciptionsView.setupUI():SubsciptionsView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tabBarController">
+            </PersistentString>
+            <PersistentString
+               value = "card.frame">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -3155,17 +3205,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "PollResultCell.frame.didset:PollResultCell.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "frame">
-            </PersistentString>
-            <PersistentString
-               value = "bounds">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "VotersViewController.collectionView(_:numberOfItemsInSection:):VotersViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -3282,14 +3321,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "PollView.onBannerDidDisappear(_:):PollView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "popup.accessibilityIdentifier">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "UITextView.centerVertically():Extensions.swift">
          <PersistentStrings>
             <PersistentString
@@ -3338,14 +3369,6 @@
          <PersistentStrings>
             <PersistentString
                value = "isRequesting">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ResultIndicator.setText():ResultIndicator.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "frame.height * 0.5">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -3781,6 +3804,9 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "VotersFilter.callback():VotersFilter.swift">
+      </ContextState>
+      <ContextState
          contextName = "AddBarButton.commonInit():AddBarButton.swift">
          <PersistentStrings>
             <PersistentString
@@ -4161,14 +4187,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "PollResultCell.setText():PollResultCell.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "answer">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "CustomViewFlowLayout.layoutAttributesForElements(in:):InterestCollectionCell.swift">
       </ContextState>
       <ContextState
@@ -4227,14 +4245,6 @@
          <PersistentStrings>
             <PersistentString
                value = "btn.accessibilityIdentifier">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "PollView.tableView(_:numberOfRowsInSection:):PollView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "showNext">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -5705,6 +5715,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "VoteMessage.traitCollectionDidChange(_:):VoteMessage.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "imageContent.subviews">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "InterestCell.collectionView(_:numberOfItemsInSection:):InterestCell.swift">
          <PersistentStrings>
             <PersistentString
@@ -5793,7 +5811,18 @@
          contextName = "PollView.tableView(_:cellForRowAt:):PollView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "CGFloat(survey!.completion)/CGFloat(100)">
+               value = "cell.isChecked">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SubsciptionsView.onDidLayout():SubsciptionsView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "tabBarController!.tabBar.frame.height">
+            </PersistentString>
+            <PersistentString
+               value = "cardShadow.bounds">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

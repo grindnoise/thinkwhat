@@ -147,10 +147,10 @@ class Survey: Decodable {
         isPrivate           = _isPrivate
         isAnonymous         = _isAnonymous
         isCommentingAllowed = _isCommentingAllowed
-        media               = _media.map({ number, dict in
+        media = _media.map({ number, dict in
             return Mediafile(title: dict.first?.value ?? "", order: number, survey: self, image: dict.first?.key)
         })
-        answers             = _answers.enumerated().map({ (index,title) in
+        answers = _answers.enumerated().map({ (index,title) in
             return Answer(description: "", title: title, survey: self, order: index)
         })
     }
@@ -207,6 +207,7 @@ class Surveys {
     var ownReferences:           [SurveyReference] = []
     var favoriteReferences:      [SurveyReference: Date] = [:]
 //    var categorizedLinks:   [Topic: [SurveyReference]] = [:]
+    var completed:               [Survey] = []
     var all:                     [Survey] = []
     var hot:                     [Survey] = []
     var banned:                  [Survey] = []///Banned by user

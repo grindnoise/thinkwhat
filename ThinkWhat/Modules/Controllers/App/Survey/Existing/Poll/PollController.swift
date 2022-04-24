@@ -240,7 +240,11 @@ class PollController: UIViewController {
     private var _surveyReference: SurveyReference!
     private var _showNext: Bool = false
     private var isLoading = false
-    private let watchButton = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 27)))
+    private let watchButton: UIImageView = {
+        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
+        v.contentMode = .scaleAspectFit
+        return v
+    }()
     private var isAddedToFavorite = false {
         didSet {
             if isAddedToFavorite {
@@ -256,6 +260,10 @@ class PollController: UIViewController {
 extension PollController: PollViewInput {
     var showNext: Bool {
         return _showNext
+    }
+    
+    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor) {
+        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
     }
     
     func onURLTapped(_ url: URL) {

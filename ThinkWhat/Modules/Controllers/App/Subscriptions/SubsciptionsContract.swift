@@ -43,4 +43,5 @@ protocol SubsciptionsControllerOutput: class {
     var viewInput: SubsciptionsViewInput? { get set }
     
     func onDidLayout()
+    func onUpperContainerShown(_: Bool)
 }

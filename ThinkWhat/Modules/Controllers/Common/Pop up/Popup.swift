@@ -192,6 +192,9 @@ extension Popup: CallbackObservable {
             dismiss(btn.accessibilityIdentifier)// == "exit" ? "exit" : nil)
         } else if sender is Claim {
             callbackDelegate?.callbackReceived(sender)
+        } else if let votersFilter = sender as? VotersFilter {
+            callbackDelegate?.callbackReceived(votersFilter.getData())
+            dismiss()
         }
     }
 }

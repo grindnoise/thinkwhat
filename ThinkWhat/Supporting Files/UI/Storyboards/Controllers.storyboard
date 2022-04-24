@@ -130,20 +130,20 @@
                             <tableViewSection id="7gE-1t-LAl">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="open" id="TaL-bt-QMj">
-                                        <rect key="frame" x="0.0" y="44.5" width="200" height="46"/>
+                                        <rect key="frame" x="0.0" y="44.5" width="200" height="46.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="TaL-bt-QMj" id="BrG-RD-oy4">
-                                            <rect key="frame" x="0.0" y="0.0" width="200" height="46"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="200" height="46.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Открыть" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="ukA-6z-4dy">
-                                                    <rect key="frame" x="53" y="11" width="131" height="24"/>
+                                                    <rect key="frame" x="53" y="11" width="131" height="24.5"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bH8-BM-Gem" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                                                    <rect key="frame" x="8" y="4.5" width="37" height="37"/>
+                                                    <rect key="frame" x="8" y="4.5" width="37" height="37.5"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="bH8-BM-Gem" secondAttribute="height" multiplier="1:1" id="mWB-X8-HTv"/>
@@ -167,20 +167,20 @@
                                         </accessibility>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="change" id="fKh-Ai-rEy">
-                                        <rect key="frame" x="0.0" y="90.5" width="200" height="46"/>
+                                        <rect key="frame" x="0.0" y="91" width="200" height="46.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="fKh-Ai-rEy" id="OjN-4Q-vbt">
-                                            <rect key="frame" x="0.0" y="0.0" width="200" height="46"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="200" height="46.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Заменить" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="sEK-Ao-hOE">
-                                                    <rect key="frame" x="53" y="11" width="131" height="24"/>
+                                                    <rect key="frame" x="53" y="11" width="131" height="24.5"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aQy-YM-mb5" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                                                    <rect key="frame" x="8" y="4.5" width="37" height="37"/>
+                                                    <rect key="frame" x="8" y="4.5" width="37" height="37.5"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </view>
                                             </subviews>
@@ -202,21 +202,21 @@
                                         </accessibility>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="delete" id="fRW-KT-x3d">
-                                        <rect key="frame" x="0.0" y="136.5" width="200" height="46"/>
+                                        <rect key="frame" x="0.0" y="137.5" width="200" height="46.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="fRW-KT-x3d" id="Fb8-gg-L1Z">
-                                            <rect key="frame" x="0.0" y="0.0" width="200" height="46"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="200" height="46.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Удалить" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="P4m-bT-xbu">
-                                                    <rect key="frame" x="53" y="11" width="131" height="24"/>
+                                                    <rect key="frame" x="53" y="11" width="131" height="24.5"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="17"/>
                                                     <color key="textColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yca-p9-0X9" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                                                    <rect key="frame" x="8" y="4.5" width="37" height="37"/>
+                                                    <rect key="frame" x="8" y="4.5" width="37" height="37.5"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </view>
                                             </subviews>

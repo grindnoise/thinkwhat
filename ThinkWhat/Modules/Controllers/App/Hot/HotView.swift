@@ -48,9 +48,8 @@ class HotView: UIView {
     }
     var surveyStack: [Survey] = [] {
         didSet {
-            if surveyStack.isEmpty {
-                self.viewInput?.onEmptyStack()
-            }
+            guard surveyStack.isEmpty else { return }
+            viewInput?.onEmptyStack()
         }
     }
     private var surveyPreviewInitialRect: CGRect {
@@ -77,6 +76,11 @@ class HotView: UIView {
 
 // MARK: - Controller Output
 extension HotView: HotControllerOutput {
+    func onDidAppear() {
+        guard !Topics.shared.all.isEmpty, surveyStack.isEmpty else { return }
+        viewInput?.onEmptyStack()
+    }
+    
     
     func skipCard() {
         previousCard = currentCard
@@ -87,9 +91,12 @@ extension HotView: HotControllerOutput {
         let stackSet: Set<Survey>    = Set(surveyStack)
         var hotSet: Set<Survey>      = Set(Surveys.shared.hot)
         let rejectedSet: Set<Survey> = Set(Surveys.shared.rejected)
+        let completedSet: Set<Survey> = Set(Surveys.shared.completed)
         
         hotSet.subtract(rejectedSet)
+        hotSet.subtract(completedSet)
         let diff = stackSet.symmetricDifference(hotSet)
+        
         surveyStack.append(contentsOf: diff)
         onLoad()
     }

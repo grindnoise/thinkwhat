@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-class VotersViewController: UIViewController {
+class delVotersViewController: UIViewController {
 
     deinit {
         print("---\(self) deinit()")
@@ -53,7 +53,7 @@ class VotersViewController: UIViewController {
         filterButton.iconColor = .lightGray
         filterButton.isRounded = false
         filterButton.category = .Filter
-        let tap = UITapGestureRecognizer(target: self, action: #selector(VotersViewController.handleTap(recognizer:)))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(delVotersViewController.handleTap(recognizer:)))
         filterButton.addGestureRecognizer(tap)
         navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: filterButton)]
         setTitle()
@@ -127,13 +127,13 @@ class VotersViewController: UIViewController {
     }
 }
 
-extension VotersViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension delVotersViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return filtered.isEmpty ? answer.voters.count : filtered.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? UserCell {
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? delUserCell {
             var userprofile: Userprofile!
             if filtered.isEmpty, let user = answer.voters[indexPath.row] as? Userprofile {
                 userprofile = user
@@ -217,7 +217,7 @@ extension VotersViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
 }
 
-extension VotersViewController: CallbackObservable {
+extension delVotersViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let dict = sender as? [String: AnyObject] {
             if let _filtered = dict["filtered"] as? [Userprofile] {

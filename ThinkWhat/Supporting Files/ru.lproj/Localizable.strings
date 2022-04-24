@@ -6,6 +6,15 @@
   Copyright © 2022 Pavel Bukharov. All rights reserved.
 */
 
+//Errors
+"web" = "Ошибка при загрузке web контента";
+"invalid_url_error" = "Некорректная ссылка";
+"backend_error" = "Произошла ошибка, попробуйте еще раз";
+"provider_authorization_failure" = "Ошибка";
+"timeout_error" = "Превышено время ожидания";
+"tiktok_web_error" = "Ошибка при загрузке TikTok";
+"image_loading_error" = "Произошла ошибка, изображение не было загружено";
+
 //Common
 "ok" = "Хорошо";
 "more" = "еще";
@@ -14,7 +23,6 @@
 "check_fields" = "Проверьте корректность заполненных полей";
 "warning" = "Внимание";
 "error" = "Ошибка";
-"backend_error" = "Произошла ошибка, попробуйте еще раз";
 "sendButton" = "Отправить";
 "select" = "Выбрать";
 "cancel" = "Отмена";
@@ -35,6 +43,8 @@
 "claim_sent" = "Жалоба отправлена";
 "thanks_for_feedback" = "Спасибо за обратную поддержку!";
 "congratulations" = "Поздравляем!";
+"show" = "показать";
+"reset" = "сбросить";
 
 
 //Welcome VC
@@ -59,9 +69,7 @@
 "success" = "Ура!";
 "provider_authorization_progress" = "Авторизация";
 "provider_authorization_success" = "Успех!";
-"provider_authorization_failure" = "Ошибка";
-"timeout_error" = "Превышено время ожидания";
-"tiktok_web_error" = "Ошибка при загрузке TikTok";
+
 
 //Conditions VC
 "acceptButton" = "Принимаю";
@@ -89,7 +97,6 @@
 "lastNameTF" = "Фамилия";
 "birthDateTF" = "Дата рождения";
 "cityTF" = "Город";
-"invalid_url_error" = "Некорректная ссылка";
 
 //Hot VC
 "hot" = "Горячие";
@@ -118,3 +125,6 @@
 "points" = " голоса";
 "support_poll" = "Поддержать опрос";
 "next" = "Следующий";
+
+//Voters VC
+"voters_load_error" = "Возникла ошибка при загрузке пользователей";

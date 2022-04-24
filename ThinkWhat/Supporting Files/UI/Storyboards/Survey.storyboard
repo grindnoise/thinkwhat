@@ -3045,10 +3045,10 @@
             </objects>
             <point key="canvasLocation" x="1035" y="-4210"/>
         </scene>
-        <!--Voters View Controller-->
+        <!--Del Voters View Controller-->
         <scene sceneID="5V2-Oo-Ovg">
             <objects>
-                <viewController id="YCi-om-VNu" customClass="VotersViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="YCi-om-VNu" customClass="delVotersViewController" customModule="ThinkWhat" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="gXi-bm-IIt"/>
                         <viewControllerLayoutGuide type="bottom" id="p9p-Dx-B0I"/>
@@ -3109,7 +3109,7 @@
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
                         <cells>
-                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="userCell" id="3gf-a4-mcw" customClass="UserCell" customModule="ThinkWhat" customModuleProvider="target">
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="userCell" id="3gf-a4-mcw" customClass="delUserCell" customModule="ThinkWhat" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">

@@ -19,13 +19,13 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jPN-4S-JUT" customClass="WKYTPlayerView">
-                        <rect key="frame" x="32" y="28" width="256" height="144"/>
+                        <rect key="frame" x="16" y="19" width="288" height="162"/>
                         <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
                     </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
-                    <constraint firstItem="jPN-4S-JUT" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.8" id="Dsq-O2-mSA"/>
+                    <constraint firstItem="jPN-4S-JUT" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.9" id="Dsq-O2-mSA"/>
                     <constraint firstItem="jPN-4S-JUT" firstAttribute="width" secondItem="jPN-4S-JUT" secondAttribute="height" multiplier="16:9" id="LvY-O2-XRc"/>
                     <constraint firstItem="jPN-4S-JUT" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="Qf6-Gv-WdJ"/>
                     <constraint firstItem="jPN-4S-JUT" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="u04-MV-Tnw"/>

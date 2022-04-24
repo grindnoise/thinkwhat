@@ -22,6 +22,7 @@ class HotController: UIViewController {
         self.controllerInput?
             .modelOutput = self
         addObservers()
+        setupUI()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -37,7 +38,7 @@ class HotController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        controllerOutput?.onDidAppear()
+        controllerOutput?.onDidAppear()
         if shouldSkipCurrentCard {
             Task {
                 try await Task.sleep(nanoseconds: UInt64(0.3 * 1_000_000_000))
@@ -48,6 +49,29 @@ class HotController: UIViewController {
             }
         }
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        stopTimer()
+    }
+    
+    private func setupUI() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+        guard let navigationBar = self.navigationController?.navigationBar else { return }
+        navigationBar.addSubview(barButton)
+        barButton.layer.cornerRadius = UINavigationController.Constants.ImageSizeForLargeState / 2
+        barButton.clipsToBounds = true
+        barButton.translatesAutoresizingMaskIntoConstraints = false
+        barButton.image = ImageSigns.plusFilled.image
+        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        NSLayoutConstraint.activate([
+            barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
+            barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
+            barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
+            ])
+    }
+    
     private func addObservers() {
 //        NotificationCenter.default.addObserver(self,
 //                                               selector: #selector(HotController.makePreviewStack),
@@ -59,11 +83,23 @@ class HotController: UIViewController {
 //                                               object: nil)
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    }
+    
     // MARK: - Properties
     var controllerOutput: HotControllerOutput?
     var controllerInput: HotControllerInput?
     var shouldSkipCurrentCard = false
     private var isViewLayedOut = false
+    private let barButton: UIImageView = {
+        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
+        v.contentMode = .scaleAspectFit
+        v.isUserInteractionEnabled = true
+        return v
+    }()
+    ///Indicates that request is in progress, so another one shouldn't be fired
+    private var isNetworking = false
     private var timer: Timer?
 }
 
@@ -89,7 +125,11 @@ extension HotController: HotViewInput {
 }
 
 // MARK: - Model Output
-extension HotController: HotModelOutput {}
+extension HotController: HotModelOutput {
+    func onRequestCompleted() {
+        isNetworking = false
+    }
+}
 
 extension HotController: DataObservable {
     func onDataLoaded() {
@@ -118,6 +158,8 @@ extension HotController {
     
     @objc
     private func requestSurveys() {
+        guard !isNetworking else { return }
+        isNetworking = true
         controllerInput?.loadSurveys()
     }
     

@@ -899,7 +899,7 @@ class IconTransition: delBasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: false) { _ in }
-            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? VotersViewController, let initialCell = vc_1.tableView.cellForRow(at: vc_2.initialIndex) as? ChoiceResultCell, let resultIndicator = initialCell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_2.collectionView as? UICollectionView {
+            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? delVotersViewController, let initialCell = vc_1.tableView.cellForRow(at: vc_2.initialIndex) as? ChoiceResultCell, let resultIndicator = initialCell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_2.collectionView as? UICollectionView {
 
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
@@ -930,7 +930,7 @@ class IconTransition: delBasicTransition {
                 var destinationSize: CGSize = .zero
                 var destinationImageViews: [UIImageView] = []
                 for i in 0..<tempImageViews.count {
-                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? UserCell, let imageView = cell.imageView as? UIImageView{
+                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? delUserCell, let imageView = cell.imageView as? UIImageView{
                         if destinationSize == .zero { destinationSize = imageView.frame.size }
                         imageView.alpha = 0
                         destinationOrigins.append(cell.convert(imageView.frame.origin, to: containerView))
@@ -1851,11 +1851,11 @@ class IconTransition: delBasicTransition {
                     _ in
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? VotersViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: vc_1.initialIndex) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_1.collectionView as? UICollectionView {
+            } else if let vc_1 = fromVC as? delVotersViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: vc_1.initialIndex) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_1.collectionView as? UICollectionView {
                 
                 var tempImageViews: [UIImageView] = []
                 for (i, initialImageView) in imageViews.enumerated() {
-                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? UserCell {
+                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? delUserCell {
                         let tempImageView = UIImageView(frame: CGRect(origin: cell.convert(cell.imageView.frame.origin, to: containerView), size: cell.imageView.frame.size))
                         tempImageView.image = cell.imageView.image
 //                        tempImageView.frame.origin = cell.convert(cell.imageView.frame.origin, to: containerView)

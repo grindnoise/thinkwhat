@@ -6,6 +6,15 @@
   Copyright © 2022 Pavel Bukharov. All rights reserved.
 */
 
+//Errors
+"web" = "Error loading web content";
+"invalid_url_error" = "Invalid link";
+"backend_error" = "Error occured, try again";
+"provider_authorization_failure" = "Error";
+"timeout_error" = "Timeout exceeded";
+"tiktok_web_error" = "TikTok loading error";
+"image_loading_error" = "Image loading failed";
+
 //Common
 "ok" = "Ok";
 "more" = "more";
@@ -14,7 +23,6 @@
 "check_fields" = "Check fields for errors";
 "warning" = "Warning";
 "error" = "Error";
-"backend_error" = "Error occured, try again";
 "sendButton" = "Send";
 "select" = "Select";
 "cancel" = "Cancel";
@@ -31,11 +39,12 @@
 "play_youtube" = "Play here";
 "open_youtube" = "Open in Youtube app";
 "remember" = "Remember";
-"tiktok_web_error" = "TikTok loading error";
 "bad_url" = "Incorrect url";
 "claim_sent" = "Сlaim has been sent";
 "thanks_for_feedback" = "Thanks for feedback!";
 "congratulations" = "Congratulations!";
+"show" = "show";
+"reset" = "reset";
 
 
 //Welcome VC
@@ -60,8 +69,7 @@
 "success" = "Success!";
 "provider_authorization_progress" = "Authorization";
 "provider_authorization_success" = "Success";
-"provider_authorization_failure" = "Error";
-"timeout_error" = "Timeout exceeded";
+
 
 //Conditions VC
 "acceptButton" = "Accept";
@@ -89,7 +97,6 @@
 "lastNameTF" = "Last name";
 "birthDateTF" = "Birth date";
 "cityTF" = "City";
-"invalid_url_error" = "Invalid link";
 
 //Hot VC
 "hot" = "Hot";
@@ -118,3 +125,6 @@
 "points" = " votes";
 "support_poll" = "Support poll";
 "next" = "Next";
+
+//Voters VC
+"voters_load_error" = "Error occured during loading voters list";

@@ -23,10 +23,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="j2G-bq-ta6">
-                        <rect key="frame" x="32" y="28" width="256" height="144"/>
+                        <rect key="frame" x="16" y="19" width="288" height="162"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LfJ-9Z-1tZ">
-                                <rect key="frame" x="0.0" y="0.0" width="256" height="144"/>
+                                <rect key="frame" x="0.0" y="0.0" width="288" height="162"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -35,10 +35,10 @@
                                 </userDefinedRuntimeAttributes>
                             </scrollView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PlX-Jh-P1p">
-                                <rect key="frame" x="8" y="116" width="30" height="20"/>
+                                <rect key="frame" x="8" y="131.5" width="34" height="22.5"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1/2" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="2" translatesAutoresizingMaskIntoConstraints="NO" id="3Nw-PM-eq0">
-                                        <rect key="frame" x="3" y="2" width="24" height="16"/>
+                                        <rect key="frame" x="3.5" y="2" width="27" height="18"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="10"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -70,7 +70,7 @@
                 <constraints>
                     <constraint firstItem="j2G-bq-ta6" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="5C4-eM-seE"/>
                     <constraint firstItem="j2G-bq-ta6" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="fsi-lS-prS"/>
-                    <constraint firstItem="j2G-bq-ta6" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.8" id="h8h-Fx-e8C"/>
+                    <constraint firstItem="j2G-bq-ta6" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.9" id="h8h-Fx-e8C"/>
                     <constraint firstItem="j2G-bq-ta6" firstAttribute="width" secondItem="j2G-bq-ta6" secondAttribute="height" multiplier="16:9" id="oWg-Il-M0z"/>
                 </constraints>
             </tableViewCellContentView>

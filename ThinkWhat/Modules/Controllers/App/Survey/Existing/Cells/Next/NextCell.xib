@@ -18,10 +18,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gch-7J-9Lm">
-                        <rect key="frame" x="125.5" y="0.0" width="69" height="34"/>
+                        <rect key="frame" x="127.5" y="0.0" width="65.5" height="32"/>
                         <state key="normal" title="Button"/>
                         <buttonConfiguration key="configuration" style="plain" title="Button">
-                            <fontDescription key="titleFontDescription" name="OpenSans" family="Open Sans" pointSize="14"/>
+                            <fontDescription key="titleFontDescription" name="OpenSans" family="Open Sans" pointSize="13"/>
                             <color key="baseForegroundColor" systemColor="secondaryLabelColor"/>
                         </buttonConfiguration>
                         <connections>
@@ -35,6 +35,7 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
                 <outlet property="btn" destination="Gch-7J-9Lm" id="bep-Gc-NDc"/>
             </connections>

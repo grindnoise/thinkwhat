@@ -197,11 +197,12 @@ class ResultIndicator: UIView {
                         switch result {
                         case .success(let image):
                             self.answer.voters[i].image = image
-                            UIView.transition(with: avatar,
-                                              duration: 0.5,
-                                              options: .transitionCrossDissolve,
-                                              animations: { avatar.imageView.image = image },
-                                              completion: nil)
+                            Animations.onImageLoaded(imageView: avatar.imageView, image: image)
+//                            UIView.transition(with: avatar,
+//                                              duration: 0.5,
+//                                              options: .transitionCrossDissolve,
+//                                              animations: { avatar.imageView.image = image },
+//                                              completion: nil)
                         case .failure(let error):
 #if DEBUG
                             print(error.localizedDescription)
@@ -332,7 +333,7 @@ class ResultIndicator: UIView {
         if recognizer.state == .ended {
             if !answer.voters.isEmpty {
 //                let dict = ["users": userprofiles, "total": totalCount, "answerID": answerID] as [String : Any]
-                let array = [answer as AnyObject, avatars as AnyObject, indexPath as AnyObject]
+                let array = [answer as AnyObject, avatars as AnyObject, indexPath as AnyObject, color as AnyObject]
                 delegate?.callbackReceived(array as AnyObject)
             }
         }

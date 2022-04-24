@@ -184,8 +184,8 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hRM-42-gb1">
                     <rect key="frame" x="20" y="683" width="374" height="179"/>
                     <subviews>
-                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="ivZ-zC-CRu">
-                            <rect key="frame" x="59" y="38.5" width="256" height="102"/>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ivZ-zC-CRu">
+                            <rect key="frame" x="59" y="77" width="256" height="94"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="25v-Tu-FZ3">
                                     <rect key="frame" x="0.0" y="0.0" width="256" height="62"/>
@@ -199,7 +199,7 @@
                                     </connections>
                                 </button>
                                 <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="O0A-Jb-aD2">
-                                    <rect key="frame" x="0.0" y="70" width="256" height="32"/>
+                                    <rect key="frame" x="0.0" y="62" width="256" height="32"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="14"/>
                                     <state key="normal" title="СЛЕДУЮЩИЙ">
@@ -218,8 +218,8 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstItem="ivZ-zC-CRu" firstAttribute="centerY" secondItem="hRM-42-gb1" secondAttribute="centerY" id="1Ix-YH-NBW"/>
                         <constraint firstItem="ivZ-zC-CRu" firstAttribute="centerX" secondItem="hRM-42-gb1" secondAttribute="centerX" id="CgR-Cd-mFm"/>
+                        <constraint firstAttribute="bottom" secondItem="ivZ-zC-CRu" secondAttribute="bottom" constant="8" id="KiV-gm-zca"/>
                     </constraints>
                 </view>
             </subviews>

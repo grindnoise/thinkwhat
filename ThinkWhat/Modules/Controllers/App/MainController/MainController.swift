@@ -192,7 +192,7 @@ extension MainController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         guard let navigationController = viewController as? CustomNavigationController, let vc = navigationController.viewControllers.first else { return }
         if vc.isKind(of: HotController.self) {
-            navigationController.title = "subscriptions".localized
+            navigationController.title = "hot".localized
             vc.navigationItem.title = "hot".localized
         } else if vc.isKind(of: SubsciptionsController.self) {
             navigationController.title = "subscriptions".localized

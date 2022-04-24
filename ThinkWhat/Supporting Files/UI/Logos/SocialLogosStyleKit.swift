@@ -65,6 +65,8 @@ class WikiLogo: UIView {
 @IBDesignable
 class TikTokLogo: UIView {
     override func draw(_ rect: CGRect) {
+//        isOpaque = false
+//        backgroundColor = .clear
         SocialLogosStyleKit.drawTikTok(frame: rect, resizing: .aspectFit)
     }
 }

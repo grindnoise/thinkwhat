@@ -351,7 +351,7 @@ class delPollController: UIViewController {
 //                        break
 //                    }
 //                }
-            } else if segue.identifier == Segues.App.UsersList, let destinationVC = segue.destination as? VotersViewController, let array = sender as? [AnyObject],
+            } else if segue.identifier == Segues.App.UsersList, let destinationVC = segue.destination as? delVotersViewController, let array = sender as? [AnyObject],
                 let answer = array.filter({ $0 is Answer}).first as? Answer,
 //                let imageViews = array.filter({ $0 is [UIImageView]}).first as? [UIImageView],
                 let indexPath = array.filter({ $0 is IndexPath}).first as? IndexPath {

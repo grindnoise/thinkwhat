@@ -25,6 +25,7 @@ protocol PollViewInput: class {
     func onImageTapped(image: UIImage, title: String)
     func onURLTapped(_: URL)
     func onExitWithSkip()
+    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor)
 }
 
 /// *Controller* tells the *Model* what to do based on the input

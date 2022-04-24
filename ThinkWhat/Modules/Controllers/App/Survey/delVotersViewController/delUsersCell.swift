@@ -8,7 +8,7 @@
 
 import UIKit
 
-class UserCell: UICollectionViewCell {
+class delUserCell: UICollectionViewCell {
 
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var name: UILabel!

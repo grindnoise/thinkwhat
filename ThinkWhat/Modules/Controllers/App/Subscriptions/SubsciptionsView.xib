@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -11,21 +11,74 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SubsciptionsView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
+                <outlet property="bottomContainer" destination="Vpm-D9-cyN" id="t9q-wg-oYh"/>
+                <outlet property="card" destination="X4d-cI-Foa" id="JGT-AC-cza"/>
+                <outlet property="cardShadow" destination="WXd-xw-6Wt" id="m0J-2h-vpY"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Pgm-6r-hSr"/>
+                <outlet property="upperContainer" destination="OwL-Ha-6XN" id="cZn-lg-cDY"/>
+                <outlet property="upperContainerHeightConstraint" destination="NDq-Y8-pXZ" id="PM2-PK-6Vz"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OwL-Ha-6XN">
+                    <rect key="frame" x="0.0" y="44" width="414" height="0.0"/>
+                    <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" id="NDq-Y8-pXZ"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vpm-D9-cyN">
+                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WXd-xw-6Wt">
+                            <rect key="frame" x="10" y="10" width="394" height="798"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="shadow" value="YES"/>
+                            </userDefinedRuntimeAttributes>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="X4d-cI-Foa">
+                            <rect key="frame" x="10" y="10" width="394" height="798"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="WXd-xw-6Wt" firstAttribute="height" secondItem="X4d-cI-Foa" secondAttribute="height" id="75O-R7-aZo"/>
+                        <constraint firstAttribute="bottom" secondItem="X4d-cI-Foa" secondAttribute="bottom" constant="10" id="83n-mA-1vE"/>
+                        <constraint firstItem="WXd-xw-6Wt" firstAttribute="width" secondItem="X4d-cI-Foa" secondAttribute="width" id="BnG-tt-Qw9"/>
+                        <constraint firstAttribute="trailing" secondItem="X4d-cI-Foa" secondAttribute="trailing" constant="10" id="PrD-xJ-cx8"/>
+                        <constraint firstItem="X4d-cI-Foa" firstAttribute="leading" secondItem="Vpm-D9-cyN" secondAttribute="leading" constant="10" id="anM-3R-KIo"/>
+                        <constraint firstItem="WXd-xw-6Wt" firstAttribute="centerX" secondItem="X4d-cI-Foa" secondAttribute="centerX" id="ndB-YX-XDb"/>
+                        <constraint firstItem="WXd-xw-6Wt" firstAttribute="centerY" secondItem="X4d-cI-Foa" secondAttribute="centerY" id="vex-xQ-0eE"/>
+                    </constraints>
+                </view>
+            </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
-            <color key="backgroundColor" systemColor="systemYellowColor"/>
-            <point key="canvasLocation" x="139" y="82"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="X4d-cI-Foa" firstAttribute="top" secondItem="OwL-Ha-6XN" secondAttribute="bottom" constant="10" id="1qZ-mw-RET"/>
+                <constraint firstItem="OwL-Ha-6XN" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="9Db-rX-6wy"/>
+                <constraint firstItem="Vpm-D9-cyN" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="FZQ-k1-Rw8"/>
+                <constraint firstItem="Vpm-D9-cyN" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="Uh5-ds-Aan"/>
+                <constraint firstItem="Vpm-D9-cyN" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="cls-aG-JXF"/>
+                <constraint firstItem="OwL-Ha-6XN" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="ngT-dr-8px"/>
+                <constraint firstItem="OwL-Ha-6XN" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="nzZ-Zk-AIp"/>
+                <constraint firstItem="Vpm-D9-cyN" firstAttribute="top" secondItem="OwL-Ha-6XN" secondAttribute="bottom" id="pAp-oX-ZTw"/>
+            </constraints>
+            <point key="canvasLocation" x="137.68115942028987" y="81.696428571428569"/>
         </view>
     </objects>
     <resources>
-        <systemColor name="systemYellowColor">
-            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="opaqueSeparatorColor">
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>
