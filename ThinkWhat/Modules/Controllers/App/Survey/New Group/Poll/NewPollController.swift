@@ -2331,7 +2331,8 @@ extension NewPollController: UITableViewDelegate, UITableViewDataSource {
                         isPrivate: isPrivate,
                         isAnonymous: isAnonymous,
                         isCommentingAllowed: isCommentingAllowed,
-                        isHot: isHot)
+                        isHot: isHot,
+                        isFavorite: false)
         
         performSegue(withIdentifier: Segues.NewSurvey.Results, sender: nil)
         
@@ -2372,7 +2373,7 @@ extension NewPollController: UITableViewDelegate, UITableViewDataSource {
             return dict
         }
         
-        survey = Survey(type: .Poll, title: pollTitle, topic: topic!, description: pollDescription, question: question, answers: answers, media: images, url: hyperlink, voteCapacity: votesCapacity, isPrivate: isPrivate, isAnonymous: isAnonymous, isCommentingAllowed: isCommentingAllowed, isHot: isHot)
+        survey = Survey(type: .Poll, title: pollTitle, topic: topic!, description: pollDescription, question: question, answers: answers, media: images, url: hyperlink, voteCapacity: votesCapacity, isPrivate: isPrivate, isAnonymous: isAnonymous, isCommentingAllowed: isCommentingAllowed, isHot: isHot, isFavorite: false)
         performSegue(withIdentifier: Segues.NewSurvey.Results, sender: nil)
         
         

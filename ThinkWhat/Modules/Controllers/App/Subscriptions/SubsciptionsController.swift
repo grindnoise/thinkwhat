@@ -21,21 +21,33 @@ class SubsciptionsController: UIViewController {
         self.controllerInput = model
         self.controllerInput?
             .modelOutput = self
-        
+        ProtocolSubscriptions.subscribe(self)
         title = "subscriptions".localized
         setupUI()
+        setObservers()
+        controllerOutput?.onDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
+        barButton.alpha = 1
+        tabBarController?.setTabBarVisible(visible: true, animated: true)
+        controllerOutput?.onWillAppear()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         controllerOutput?.onDidLayout()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-//        controllerOutput?.onDidLayout()
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        barButton.alpha = 0
+    }
+    
+    private func setObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscribedForUpdated), name: Notifications.Userprofiles.SubscribedForUpdated, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscriptionsUpdated), name: Notifications.Surveys.UpdateSubscriptions, object: nil)
     }
 
     private func setupUI() {
@@ -62,7 +74,17 @@ class SubsciptionsController: UIViewController {
     }
     
     @objc
-    private func toggleBarButton() {
+    private func onSubscribedForUpdated() {
+        controllerOutput?.onSubscribedForUpdated()
+    }
+    
+//    @objc
+//    private func onSubscriptionsUpdated() {
+//        controllerOutput?.onSubscriptionsUpdated()
+//    }
+    
+    @objc
+    func toggleBarButton() {
         controllerOutput?.onUpperContainerShown(isBarButtonOn)
         UIView.animate(withDuration: 0.2,
                        delay: 0,
@@ -88,12 +110,51 @@ class SubsciptionsController: UIViewController {
 
 // MARK: - View Input
 extension SubsciptionsController: SubsciptionsViewInput {
-    // Implement methods
+    func onSurveyTapped(_ surveyReference: SurveyReference) {
+        if let nav = navigationController as? CustomNavigationController {
+            nav.transitionStyle = .Default
+            nav.duration = 0.5
+//            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
+        }
+        let backItem = UIBarButtonItem()
+            backItem.title = ""
+            navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(PollController(surveyReference: surveyReference, showNext: false), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    func onDataSourceUpdate() {
+        controllerInput?.loadSubscriptions()
+    }
+    
+    var userprofiles: [Userprofile] {
+        guard !controllerInput.isNil else { return [] }
+        return controllerInput!.userprofiles
+    }
+    
+    func onSubscribersTapped() {
+        let backItem = UIBarButtonItem()
+            backItem.title = ""
+            navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(SubscribersController(mode: .Subscribers), animated: true)
+    }
+    
+    func onSubscpitionsTapped() {
+        let backItem = UIBarButtonItem()
+            backItem.title = ""
+            navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(SubscribersController(mode: .Subscriptions), animated: true)
+    }
 }
 
 // MARK: - Model Output
 extension SubsciptionsController: SubsciptionsModelOutput {
-    // Implement methods
+    func onError(_ error: Error) {
+#if DEBUG
+        print(error.localizedDescription)
+#endif
+        controllerOutput?.onError()
+    }
 }
 
 extension SubsciptionsController: DataObservable {

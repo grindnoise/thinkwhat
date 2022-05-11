@@ -130,110 +130,116 @@ class ResultIndicator: UIView {
     private var interactionViews: [[UIView: Avatar]] = []
     var answer: Answer!
     private func setupImages() {
-        if !answer.voters.isEmpty {
-            if isSelected {
-                if !answer.voters.filter({ $0 == Userprofiles.shared.current! }).isEmpty {
-                    if let index = answer.voters.firstIndex(where: { $0 == Userprofiles.shared.current!/*Userprofiles.shared.own?.id*/ }) {
-                        if  index != 0  {
-                            answer.voters.rearrange(from: index, to: 0)
+        switch mode {
+        case .Anon:
+            label.alpha = 1
+            label.text = answer.totalVotes == 0 ? "no_votes".localized : "\(answer.totalVotes)\n" + "votes".localized
+        default:
+            if !answer.voters.isEmpty {
+                if isSelected {
+                    if !answer.voters.filter({ $0 == Userprofiles.shared.current! }).isEmpty {
+                        if let index = answer.voters.firstIndex(where: { $0 == Userprofiles.shared.current!/*Userprofiles.shared.own?.id*/ }) {
+                            if  index != 0  {
+                                answer.voters.rearrange(from: index, to: 0)
+                            }
                         }
-                    }
-                } else {
-                    answer.voters.insert(Userprofiles.shared.current!, at: 0)//(Userprofiles.shared.own!, at: 0)
-                }
-            }
-            
-            for i in 0..<answer.voters.count {
-                if i == 5 {
-                    break
-                }
-                let avatar = Avatar(frame: .zero)
-                avatar.layer.zPosition = 10 - CGFloat(i)
-                avatars.append(avatar)
-                actionView.addSubview(avatar)
-                avatar.layer.masksToBounds = false
-                avatar.translatesAutoresizingMaskIntoConstraints = false
-                let centerY = avatar.centerYAnchor.constraint(equalTo: actionView.centerYAnchor)
-                centerY.identifier = "centerY"
-                centerY.isActive = true
-                //                    .isActive = true
-                if i == 0 {
-                    if answer.totalVotes > 5 {
-                        avatar.leadingAnchor.constraint(equalTo: actionView.leadingAnchor, constant: 4).isActive = true
                     } else {
-                        avatar.centerXAnchor.constraint(equalTo: actionView.centerXAnchor).isActive = true
+                        answer.voters.insert(Userprofiles.shared.current!, at: 0)//(Userprofiles.shared.own!, at: 0)
                     }
-                } else {
-                    avatar.leadingAnchor.constraint(equalTo: avatars[i-1].leadingAnchor, constant: 8).isActive = true
                 }
-//                imageView.heightAnchor.constraint(equalTo: actionView.heightAnchor, multiplier: (0.8 - 0)/1.0).isActive = true
-                avatar.heightAnchor.constraint(equalTo: actionView.heightAnchor).isActive = true
-                avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor).isActive = true
-                avatar.darkColor = color.withAlphaComponent(0.5)
-                avatar.lightColor = color.withAlphaComponent(0.5)
                 
-                ///Add arc label with first name
-                let label = ArcLabel()
-                label.angle = 1.65
-                label.text = answer.voters[i].firstName
-                label.font = StringAttributes.font(name: StringAttributes.FontStyle.Regular.rawValue, size: 8)
-                label.textColor = .label
-                avatar.addSubview(label)
-                label.translatesAutoresizingMaskIntoConstraints = false
-                label.alpha = 0
-                NSLayoutConstraint.activate([
-                    label.widthAnchor.constraint(equalTo: avatar.widthAnchor, multiplier: 1.6),
-                    label.heightAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1.6),
-                    label.centerXAnchor.constraint(equalTo: avatar.centerXAnchor),
-                    label.centerYAnchor.constraint(equalTo: avatar.centerYAnchor)
-                ])
-                if answer.voters[i].image != nil {
-                    avatar.imageView.image = answer.voters[i].image!
-                } else if let url = answer.voters[i].imageURL {
-                    avatar.imageView.image = UIImage(named: "user")!
-                    API.shared.downloadImage(url: url) { progress in
-//                        print(progress)
-                    } completion: { result in
-                        switch result {
-                        case .success(let image):
-                            self.answer.voters[i].image = image
-                            Animations.onImageLoaded(imageView: avatar.imageView, image: image)
-//                            UIView.transition(with: avatar,
-//                                              duration: 0.5,
-//                                              options: .transitionCrossDissolve,
-//                                              animations: { avatar.imageView.image = image },
-//                                              completion: nil)
-                        case .failure(let error):
-#if DEBUG
-                            print(error.localizedDescription)
-#endif
-                        }
+                for i in 0..<answer.voters.count {
+                    if i == 5 {
+                        break
                     }
-                } else {
-                    avatar.imageView.image = UIImage(named: "user")!
+                    let avatar = Avatar(frame: .zero)
+                    avatar.layer.zPosition = 10 - CGFloat(i)
+                    avatars.append(avatar)
+                    actionView.addSubview(avatar)
+                    avatar.layer.masksToBounds = false
+                    avatar.translatesAutoresizingMaskIntoConstraints = false
+                    let centerY = avatar.centerYAnchor.constraint(equalTo: actionView.centerYAnchor)
+                    centerY.identifier = "centerY"
+                    centerY.isActive = true
+                    //                    .isActive = true
+                    if i == 0 {
+                        if answer.totalVotes > 5 {
+                            avatar.leadingAnchor.constraint(equalTo: actionView.leadingAnchor, constant: 4).isActive = true
+                        } else {
+                            avatar.centerXAnchor.constraint(equalTo: actionView.centerXAnchor).isActive = true
+                        }
+                    } else {
+                        avatar.leadingAnchor.constraint(equalTo: avatars[i-1].leadingAnchor, constant: 8).isActive = true
+                    }
+                    //                imageView.heightAnchor.constraint(equalTo: actionView.heightAnchor, multiplier: (0.8 - 0)/1.0).isActive = true
+                    avatar.heightAnchor.constraint(equalTo: actionView.heightAnchor).isActive = true
+                    avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor).isActive = true
+                    avatar.darkColor = color.withAlphaComponent(0.5)
+                    avatar.lightColor = color.withAlphaComponent(0.5)
+                    
+                    ///Add arc label with first name
+                    let label = ArcLabel()
+                    label.angle = 1.65
+                    label.text = answer.voters[i].firstName
+                    label.font = StringAttributes.font(name: StringAttributes.FontStyle.Regular.rawValue, size: 8)
+                    label.textColor = .label
+                    avatar.addSubview(label)
+                    label.translatesAutoresizingMaskIntoConstraints = false
+                    label.alpha = 0
+                    NSLayoutConstraint.activate([
+                        label.widthAnchor.constraint(equalTo: avatar.widthAnchor, multiplier: 1.6),
+                        label.heightAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1.6),
+                        label.centerXAnchor.constraint(equalTo: avatar.centerXAnchor),
+                        label.centerYAnchor.constraint(equalTo: avatar.centerYAnchor)
+                    ])
+                    if answer.voters[i].image != nil {
+                        avatar.imageView.image = answer.voters[i].image!
+                    } else if let url = answer.voters[i].imageURL {
+                        avatar.imageView.image = UIImage(named: "user")!
+                        API.shared.downloadImage(url: url) { progress in
+                            //                        print(progress)
+                        } completion: { result in
+                            switch result {
+                            case .success(let image):
+                                self.answer.voters[i].image = image
+                                Animations.onImageLoaded(imageView: avatar.imageView, image: image)
+                                //                            UIView.transition(with: avatar,
+                                //                                              duration: 0.5,
+                                //                                              options: .transitionCrossDissolve,
+                                //                                              animations: { avatar.imageView.image = image },
+                                //                                              completion: nil)
+                            case .failure(let error):
+#if DEBUG
+                                print(error.localizedDescription)
+#endif
+                            }
+                        }
+                    } else {
+                        avatar.imageView.image = UIImage(named: "user")!
+                    }
                 }
+                if answer.totalVotes > 5 {
+                    let label = UILabel(frame: .zero)
+                    actionView.addSubview(label)
+                    label.translatesAutoresizingMaskIntoConstraints = false
+                    label.numberOfLines = 0
+                    label.text = "\("more".localized)\n\(answer.totalVotes-5)"
+                    label.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 9)
+                    label.textColor = .label
+                    label.backgroundColor = .clear
+                    label.textAlignment = .center
+                    label.heightAnchor.constraint(equalTo: actionView.heightAnchor).isActive = true
+                    label.leadingAnchor.constraint(equalTo: avatars.last!.trailingAnchor).isActive = true
+                    label.trailingAnchor.constraint(equalTo: actionView.trailingAnchor).isActive = true
+                    label.layer.zPosition = 100
+                }
+                panGesture = UIPanGestureRecognizer(target: self, action: #selector(ResultIndicator.handlePan(recognizer:)))
+                panGesture.delegate = self
+                actionView.addGestureRecognizer(panGesture)
+                tapGesture = UITapGestureRecognizer(target: self, action: #selector(ResultIndicator.handleTap(recognizer:)))
+                tapGesture.delegate = self
+                actionView.addGestureRecognizer(tapGesture)
             }
-            if answer.totalVotes > 5 {
-                let label = UILabel(frame: .zero)
-                actionView.addSubview(label)
-                label.translatesAutoresizingMaskIntoConstraints = false
-                label.numberOfLines = 0
-                label.text = "\("more".localized)\n\(answer.totalVotes-5)"
-                label.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 9)
-                label.textColor = .label
-                label.backgroundColor = .clear
-                label.textAlignment = .center
-                label.heightAnchor.constraint(equalTo: actionView.heightAnchor).isActive = true
-                label.leadingAnchor.constraint(equalTo: avatars.last!.trailingAnchor).isActive = true
-                label.trailingAnchor.constraint(equalTo: actionView.trailingAnchor).isActive = true
-                label.layer.zPosition = 100
-            }
-            panGesture = UIPanGestureRecognizer(target: self, action: #selector(ResultIndicator.handlePan(recognizer:)))
-            panGesture.delegate = self
-            actionView.addGestureRecognizer(panGesture)
-            tapGesture = UITapGestureRecognizer(target: self, action: #selector(ResultIndicator.handleTap(recognizer:)))
-            tapGesture.delegate = self
-            actionView.addGestureRecognizer(tapGesture)
         }
     }
     var isSelected = false {
@@ -245,7 +251,7 @@ class ResultIndicator: UIView {
     var mode: ChoiceResultCell.Mode = .Stock {
         didSet {
             if mode == .Anon {
-                actionViewConstraint.setMultiplierWithFade(0, duration: 0)
+                //actionViewConstraint.setMultiplierWithFade(0, duration: 0)
             } else if mode == .None {
                 label.alpha = 1
                 label.leadingAnchor.constraint(equalTo: actionView.leadingAnchor).isActive = true
@@ -282,8 +288,9 @@ class ResultIndicator: UIView {
         self.commonInit()
     }
     
-    init(delegate: CallbackObservable, answer: Answer, color: UIColor, isSelected: Bool) {
+    init(delegate: CallbackObservable, answer: Answer, color: UIColor, isSelected: Bool, mode _mode: ChoiceResultCell.Mode) {
         super.init(frame: .zero)
+        self.mode = _mode
         self.delegate = delegate
         self.isSelected = isSelected
         self.answer = answer

@@ -75,15 +75,18 @@ class AuthorCell: UITableViewCell {
         delegate = callbackDelegate
         survey = _survey
         stars.color = survey.topic.tagColor
-        avatar.lightColor = survey.topic.tagColor
+        avatar.lightColor = survey.isAnonymous ? .black : survey.topic.tagColor
         favoriteLabel.text = "\(survey.likes)"
-        if let image = survey.owner.image {
+        if survey.owner == Userprofiles.shared.anonymous {
+            avatar.setImage(UIImage(named: "anon")!)
+        } else if let image = survey.owner.image {
             avatar.imageView.image = image
         } else {
             Task {
                 let image = try await survey.owner.downloadImageAsync()
                 Animations.onImageLoaded(imageView: avatar.imageView, image: image)
             }
+            
         }
         let categoryString = NSMutableAttributedString()
         categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
@@ -91,7 +94,7 @@ class AuthorCell: UITableViewCell {
         categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topic.attributedText = categoryString
         user.text = survey!.owner.firstName
-        var rating = min(Double(survey.totalVotes)*5/Double(survey.views), 5)//.rounded(toPlaces: 1)
+        var rating = min(Double(survey.votesTotal)*5/Double(survey.views), 5)//.rounded(toPlaces: 1)
         if rating < 0.5 {
             rating = 0
         }

@@ -15,8 +15,13 @@ protocol SubsciptionsViewInput: class {
     
     var controllerOutput: SubsciptionsControllerOutput? { get set }
     var controllerInput: SubsciptionsControllerInput? { get set }
+    var userprofiles: [Userprofile] { get }
     
-    // View input methods here
+    func onSubscribersTapped()
+    func onSubscpitionsTapped()
+    func onDataSourceUpdate()
+    func toggleBarButton()
+    func onSurveyTapped(_: SurveyReference)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -25,15 +30,16 @@ protocol SubsciptionsViewInput: class {
 protocol SubsciptionsControllerInput: class {
     
     var modelOutput: SubsciptionsModelOutput? { get set }
+    var userprofiles: [Userprofile] { get }
     
-    // Controller input methods here
+    func loadSubscriptions()
 }
 
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
 protocol SubsciptionsModelOutput: class {
-    // Model output methods here
+    func onError(_: Error)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -42,6 +48,10 @@ protocol SubsciptionsModelOutput: class {
 protocol SubsciptionsControllerOutput: class {
     var viewInput: SubsciptionsViewInput? { get set }
     
+    func onWillAppear()
     func onDidLayout()
+    func onDidLoad()
     func onUpperContainerShown(_: Bool)
+    func onSubscribedForUpdated()
+    func onError()
 }

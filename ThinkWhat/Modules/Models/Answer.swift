@@ -11,7 +11,7 @@ import SwiftyJSON
 
 class Answer: Decodable {
     private enum CodingKeys: String, CodingKey {
-        case description, title, totalVotes = "total_votes", id, voters, survey = "survey_id", image, order, file, url = "hlink"
+        case description, title, totalVotes = "votes_total", id, voters, survey = "survey_id", image, order, file, url = "hlink"
     }
     var id: Int
     var description: String

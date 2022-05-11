@@ -1,23 +1,21 @@
 {
   "images" : [
     {
+      "filename" : "anon.png",
       "idiom" : "universal",
-      "filename" : "Incognito.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "Incognito2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "Incognito3x.png",
       "scale" : "3x"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }

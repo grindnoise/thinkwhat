@@ -17,7 +17,11 @@ class SurveyReference: Decodable {
              isComplete = "is_complete",
              isOwn = "is_own",
              isFavorite = "is_favorite",
-             owner = "userprofile"
+             owner = "userprofile",
+             votesLimit = "vote_capacity",
+             votesTotal = "votes_total",
+             isHot = "is_hot",
+             isAnonymous = "is_anonymous"
     }
     var id: Int
     var title: String
@@ -32,12 +36,35 @@ class SurveyReference: Decodable {
         }
     }
     var type: Survey.SurveyType
-    var isComplete: Bool
+    var isComplete: Bool {
+        didSet {
+            guard oldValue != isComplete else { return }
+            Notification.send(names: [Notifications.Surveys.Completed])
+        }
+    }
     var isOwn: Bool
-    var isFavorite: Bool
+    var isAnonymous: Bool
+    var isHot: Bool
+    var isFavorite: Bool {
+        didSet {
+            guard oldValue != isFavorite else { return }
+            if isFavorite, Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).isEmpty {
+                Surveys.shared.favoriteReferences[self] = Date()
+            } else if !isFavorite, let instance = Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).first {
+                Surveys.shared.favoriteReferences[instance] = nil
+            }
+        }
+    }
     var owner: Userprofile
+    var votesTotal: Int
+    var votesLimit: Int
     var survey: Survey? {
         return Surveys.shared.all.filter{ $0.hashValue == hashValue }.first
+    }
+    var progress: Int {
+        get {
+            return votesTotal * 100 / votesLimit
+        }
     }
     
     required init(from decoder: Decoder) throws {
@@ -49,18 +76,27 @@ class SurveyReference: Decodable {
             guard let _type = Survey.SurveyType(rawValue: try container.decode(String.self, forKey: .type)) else {
                 throw "Type not defined"
             }
+            isAnonymous             = try container.decode(Bool.self, forKey: .isAnonymous)
+            owner                   = Userprofiles.shared.anonymous
+            let _owner              = try container.decodeIfPresent(Userprofile.self, forKey: .owner)
+            if !_owner.isNil {
+                owner = Userprofiles.shared.all.filter({ $0.id == _owner!.id }).first ?? _owner!
+            }
             id      = try container.decode(Int.self, forKey: .id)
             title   = try container.decode(String.self, forKey: .title)
             topic   = _topic
             type    = _type
-            let _owner  = try container.decode(Userprofile.self, forKey: .owner)
-            owner       = Userprofiles.shared.all.filter({ $0.id == _owner.id }).first ?? _owner
+//            let _owner  = try container.decode(Userprofile.self, forKey: .owner)
+//            owner       = Userprofiles.shared.all.filter({ $0.id == _owner.id }).first ?? _owner
             likes       = try container.decode(Int.self, forKey: .likes)
             views       = try container.decode(Int.self, forKey: .views)
+            votesLimit  = try container.decode(Int.self, forKey: .votesLimit)
+            votesTotal  = try container.decode(Int.self, forKey: .votesTotal)
             startDate   = try container.decode(Date.self, forKey: .startDate)
             isComplete  = try container.decode(Bool.self, forKey: .isComplete)
             isOwn       = try container.decode(Bool.self, forKey: .isOwn)
             isFavorite  = try container.decode(Bool.self, forKey: .isFavorite)
+            isHot       = try container.decode(Bool.self, forKey: .isHot)
             ///Check for existing instance by hashValue
             if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 SurveyReferences.shared.all.append(self)
@@ -70,7 +106,7 @@ class SurveyReference: Decodable {
         }
     }
     
-    init(id _id: Int, title _title: String, startDate _startDate: Date, topic _topic: Topic, type _type: Survey.SurveyType, likes _likes: Int = 0, views _views: Int = 0, isOwn _isOwn: Bool, isComplete _isComplete: Bool, isFavorite _isFavorite: Bool, survey _survey: Survey, owner _owner: Userprofile) {
+    init(id _id: Int, title _title: String, startDate _startDate: Date, topic _topic: Topic, type _type: Survey.SurveyType, likes _likes: Int = 0, views _views: Int = 0, isOwn _isOwn: Bool, isComplete _isComplete: Bool, isFavorite _isFavorite: Bool, isHot _isHot: Bool, survey _survey: Survey, owner _owner: Userprofile, votesTotal _votesTotal: Int = 0, votesLimit _votesLimit: Int = 0, isAnonymous _isAnonymous: Bool) {
         id                      = _id
         title                   = _title
         topic                   = _topic
@@ -79,10 +115,14 @@ class SurveyReference: Decodable {
         views                   = _views
         type                    = _type
         isOwn                   = _isOwn
+        isHot                   = _isHot
         isComplete              = _isComplete
         isFavorite              = _isFavorite
+        votesTotal              = _votesTotal
+        votesLimit              = _votesLimit
 //        survey                  = _survey
         owner                   = _owner
+        isAnonymous             = _isAnonymous
         if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
             SurveyReferences.shared.all.append(self)
         }

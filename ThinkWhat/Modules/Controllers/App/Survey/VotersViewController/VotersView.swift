@@ -120,42 +120,15 @@ extension VotersView: UICollectionViewDelegate, UICollectionViewDataSource, UICo
             }
             
             guard !userprofile.isNil else { return UICollectionViewCell() }
-            cell.setupUI(callbackDelegate: self, userprofile: userprofile, color: viewInput?.color ?? K_COLOR_RED)
+            let color = viewInput?.color.withAlphaComponent(0.5) ?? K_COLOR_RED.withAlphaComponent(0.5)
+            cell.setupUI(callbackDelegate: self, userprofile: userprofile, mode: .FirstnameAge, lightColor: color, darkColor: color)
             return cell
-//            if userprofile != nil {
-//                cell.userprofile = userprofile
-//                cell.name.text = "\(userprofile.firstName) \(userprofile.lastName)"//userprofile.name
-//                cell.age = userprofile.age
-//                cell.gender = userprofile.gender
-//                if let image = userprofile.image {
-//                    let circle = image.circularImage(size: cell.imageView.frame.size, frameColor: answer.survey!.topic.tagColor)
-//                    cell.imageView.image = circle
-//                } else {
-//                    let circle = UIImage(named: "user")!.circularImage(size: cell.imageView.frame.size, frameColor: answer.survey!.topic.tagColor)
-//                    cell.imageView.image = circle
-//                    Task {
-//                        do {
-//                            let image = try await cell.userprofile!.downloadImageAsync()
-//                            animateImageChange(image: image, imageView: cell.imageView)
-//                        } catch {
-//                            print(error)
-//                        }
-//                    }
-//                }
-//                return cell
-//            }
         }
         return UICollectionViewCell()
     }
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         return true
-    }
-    
-    @MainActor func animateImageChange(image: UIImage, imageView: UIImageView) {
-        UIView.transition(with: imageView, duration: 0.3, options: [.transitionCrossDissolve]) {
-            imageView.image = image.circularImage(size: imageView.frame.size, frameColor: self.answer.survey!.topic.tagColor)
-        } completion: { _ in}
     }
     
     //1 collectionView(_:layout:sizeForItemAt:) is responsible for telling the layout the size of a given cell

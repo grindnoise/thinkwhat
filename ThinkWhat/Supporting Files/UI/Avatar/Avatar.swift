@@ -15,7 +15,7 @@ class Avatar: UIView {
     @IBOutlet weak var imageView: UIImageView! {
         didSet {
             imageView.isUserInteractionEnabled = true
-            imageView.contentMode = .scaleAspectFit
+            imageView.contentMode = .scaleAspectFill
         }
     }
     

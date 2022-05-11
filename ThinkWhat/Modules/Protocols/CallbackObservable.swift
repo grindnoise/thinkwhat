@@ -11,3 +11,7 @@ import UIKit
 protocol CallbackObservable: class {
     func callbackReceived(_ sender: Any)
 }
+
+protocol CallbackCallable: class {
+    var callbackDelegate: CallbackObservable? { get set }
+}

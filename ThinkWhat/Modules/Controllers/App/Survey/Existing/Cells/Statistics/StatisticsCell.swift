@@ -26,6 +26,8 @@ class StatisticsCell: UITableViewCell {
     @IBOutlet weak var votersLabel: UILabel!
     @IBOutlet weak var btn: UIButton! {
         didSet {
+            btn.setTitle("support_poll".localized.uppercased(), for: .normal)
+            btn.accessibilityIdentifier = "support"
             btn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }

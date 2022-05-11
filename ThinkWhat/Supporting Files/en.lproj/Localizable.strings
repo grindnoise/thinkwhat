@@ -45,6 +45,9 @@
 "congratulations" = "Congratulations!";
 "show" = "show";
 "reset" = "reset";
+"anonymous" = "Anonymous";
+"user" = "User";
+"votes" = "votes";
 
 
 //Welcome VC
@@ -104,6 +107,7 @@
 
 //Subscriptions VC
 "subscriptions" = "Subscriptions";
+"subscribers" = "subscribers";
 
 //List VC
 "list" = "Feed";
@@ -118,7 +122,7 @@
 "make_choice" = "Make your choice";
 "finish_poll" = "Please, vote at first";
 "no_votes" = "No votes";
-"poll_complete_at" = "Poll completion";
+"poll_complete_at" = "Poll is completed at";
 "voted" = "Voted";
 "most_popular_choice" = "Your choice is the most popular now!";
 "extra_points" = "We've topped up your balance with ";
@@ -128,3 +132,9 @@
 
 //Voters VC
 "voters_load_error" = "Error occured during loading voters list";
+
+//Subscribers VC
+"subscribers" = "Subscribers";
+"subscribed_for" = "Subscribed for";
+"unsubscribe" = "Unsubscribe";
+"unsubscribe_question" = "Are you sure to unsubscribe?";

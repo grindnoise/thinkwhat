@@ -17,12 +17,32 @@ class Userprofiles {
         shouldImportUserDefaults = true
     }
     var all: [Userprofile] = []
+    var subscribedFor: [Userprofile] = [] {
+        didSet {
+            Notification.send(names: [Notifications.Userprofiles.SubscribedForUpdated])
+        }
+    }
+    var subscribers: [Userprofile] = [] {
+        didSet {
+            Notification.send(names: [Notifications.Userprofiles.SubscribersUpdated])
+        }
+    }
     var current: Userprofile? {
         didSet {
             guard shouldImportUserDefaults, !current.isNil else { return }
             UserDefaults.Profile.load(from: current!)
         }
     }
+    let anonymous: Userprofile = {
+        let user = Userprofile()
+        user!.image = UIImage(named: "anon")
+        user!.firstName = "anonymous".localized
+        user!.lastName = "user".localized
+        user!.id = 1010000110010011
+        user!.gender = .Unassigned
+        user!.email = ""
+        return user!
+    }()
 //    lazy var current: Userprofile {
 ////        return shared.all.filter({ $0.id == UserDefaults.Profile.id && $0.name == "\(User)) \(String(describing: profile.lastName))" }).first ?? Userprofile(id: profile.id!,
 ////                                                                                                                                                                                             name: "\(String(describing: profile.firstName)) \(String(describing: profile.lastName))",
@@ -36,9 +56,37 @@ class Userprofiles {
 ////                                                                                                                                                                                             facebookURL: profile.facebookURL)
 //    }()
     
+    func loadSubscribedFor(_ data: Data) {
+        let decoder                                 = JSONDecoder()
+//        var notifications: [NSNotification.Name]    = []
+        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                   DateFormatter.dateTimeFormatter,
+                                                   DateFormatter.dateFormatter ]
+        do {
+            let instances = try decoder.decode([Userprofile].self, from: data)
+            for instance in instances {
+                if subscribedFor.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+                    subscribedFor.append(Userprofiles.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+//                    notifications.append(Notifications.Userprofiles.SubscribedForUpdated)
+                }
+            }
+//            Notification.send(names: notifications.uniqued())
+        } catch {
+            fatalError(error.localizedDescription)
+        }
+    }
+    
+    public func addSubscriber(_ userprofile: Userprofile) {
+        if subscribers.filter({ $0.hashValue == userprofile.hashValue }).isEmpty {
+            subscribers.append(userprofile)
+        }
+    }
+    
     public func eraseData() {
         current = nil
         all.removeAll()
+        subscribers.removeAll()
+        subscribedFor.removeAll()
     }
 }
 
@@ -126,7 +174,18 @@ class Userprofile: Decodable {
             first.first!.value > second.first!.value
         }
     }
-    
+    var firstNameSingleWord: String {
+        guard let components = firstName.components(separatedBy: .whitespaces) as? [String], components.count > 1 else {
+            return firstName
+        }
+        return components.first!
+    }
+    var lastNameSingleWord: String {
+        guard let components = lastName.components(separatedBy: .whitespaces) as? [String], components.count > 1 else {
+            return lastName
+        }
+        return components.first!
+    }
 //    init(id _id: Int,
 //         firstName _firstName: String,
 //         lastName _lastName: String,
@@ -290,6 +349,8 @@ class Userprofile: Decodable {
                 throw "Image URL is nil"
             }
             self.image = try await API.shared.downloadImageAsync(from: url)
+            let publisher = NotificationCenter.default
+                .publisher(for: Notifications.UI.ImageReceived, object: nil)
             return self.image!
         } catch {
             throw error

@@ -77,7 +77,7 @@ extension PollModel: PollControllerInput {
                                 }
 //                                print(answer.voters)
                             }
-                            self.survey?.totalVotes = totalVotes
+                            self.survey?.votesTotal = totalVotes
                         } catch let error {
     #if DEBUG
                             print(error.localizedDescription)
@@ -142,7 +142,7 @@ extension PollModel: PollControllerInput {
         
         Task {
             do {
-                let data = try await API.shared.markFavoriteAsync(mark: mark, surveyReference: survey!.reference)
+                let data = try await API.shared.surveys.markFavoriteAsync(mark: mark, surveyReference: survey!.reference)
                 let json = try JSON(data: data, options: .mutableContainers)
                 guard let value = json["status"].string else { throw "Unknown error" }
                 guard value == "ok" else {
@@ -153,7 +153,7 @@ extension PollModel: PollControllerInput {
                     return
                 }
                 await MainActor.run {
-                    modelOutput?.onAddFavoriteCallback(.success(true))
+                    modelOutput?.onAddFavoriteCallback(.success(mark ? true : false))
                 }
             } catch {
                 await MainActor.run {

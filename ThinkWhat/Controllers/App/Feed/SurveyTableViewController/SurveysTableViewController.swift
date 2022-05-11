@@ -75,7 +75,7 @@ class SurveysTableViewController: UITableViewController {
                     //            refreshControl?.tintColor = K_COLOR_RED
                     NotificationCenter.default.addObserver(self,
                                                            selector: #selector(SurveysTableViewController.updateTableView),
-                                                           name: Notifications.Surveys.FavoriteSurveysUpdated,
+                                                           name: Notifications.Surveys.UpdateFavorite,
                                                            object: nil)
                     //            refreshControl?.attributedTitle = NSAttributedString(string: "")
                     //            refreshControl?.addTarget(self, action: #selector(SurveysTableViewController.refreshTableView), for: .valueChanged)

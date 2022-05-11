@@ -18,6 +18,7 @@ protocol PollViewInput: class {
     var survey: Survey? { get }
     var surveyReference: SurveyReference { get }
     var showNext: Bool { get }
+    var mode: PollController.Mode { get }
     
     func onClaim(_: Claim)
     func onAddFavorite(_: Bool)
@@ -65,9 +66,12 @@ protocol PollControllerOutput: class {
     var surveyReference: SurveyReference { get }
     var hasVoted: Bool { get }
     var showNext: Bool { get }
+    var mode: PollController.Mode { get }
     
     func onLoad(_: Result<Bool, Error>)
     func onCountUpdated()
     func onVote(_: Result<Bool,Error>)
     func onClaim(_: Result<Bool,Error>)
+    func startLoading()
+    func onAddFavorite()
 }

@@ -12,10 +12,7 @@ class PollView: UIView {
     
     deinit {
         print("PollView deinit")
-    }
-    
-    enum Mode {
-        case ReadOnly, Write
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Initialization
@@ -37,6 +34,7 @@ class PollView: UIView {
         self.addSubview(contentView)
         setupTableView()
         setupUI()
+//        mode = surveyReference.isComplete ? .ReadOnly : .Write
     }
     
     override func layoutSubviews() {
@@ -45,19 +43,22 @@ class PollView: UIView {
     
     // MARK: - Properties
     weak var viewInput: PollViewInput?
-    var mode: Mode = .Write {
-        didSet {
-            if tableView != nil {
-                updateResults()
-//                tableView.insertSections(IndexSet(, with: <#T##UITableView.RowAnimation#>)
-                tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
-                tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .automatic)
-                tableView.reloadSections(IndexSet(arrayLiteral: 3), with: .automatic)
-            }
-            guard oldValue == .Write, mode == .ReadOnly else { return }
-            _hasVoted = true
-        }
-    }
+//    var mode: PollController.Mode = .Write
+//    var mode: PollController.Mode = .Write {
+//        didSet {
+//            guard !isLoadingData else { return }
+//            if tableView != nil {
+//                updateResults()
+////                tableView.insertSections(IndexSet(, with: <#T##UITableView.RowAnimation#>)
+//                tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
+//                tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .automatic)
+//                tableView.reloadSections(IndexSet(arrayLiteral: 3), with: .automatic)
+//            }
+//            guard oldValue == .Write, mode == .ReadOnly else { return }
+//            _hasVoted = true
+//        }
+//    }
+    private var isLoadingData = false
     private var loadingIndicator: LoadingIndicator? {
         didSet {
             loadingIndicator?.color = surveyReference.topic.tagColor
@@ -118,6 +119,49 @@ class PollView: UIView {
 
 // MARK: - Controller Output
 extension PollView: PollControllerOutput {
+    func onAddFavorite() {
+        let imageView = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 200, height: 200)))
+        imageView.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+        imageView.alpha = 0
+        imageView.contentMode = .scaleAspectFill
+        imageView.image = ImageSigns.binocularsFilled.image
+        imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : survey!.topic.tagColor
+        insertSubview(imageView, at: 10)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: frame.width/2.5),
+            imageView.heightAnchor.constraint(equalToConstant: frame.width/2.5)
+        ])
+        UIView.animate(withDuration: 0.6, delay: 0, options: UIView.AnimationOptions.curveLinear) {
+            imageView.transform = .identity
+        } completion: { _ in
+            imageView.removeFromSuperview()
+            
+        }
+        
+        UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn) {
+            imageView.alpha = 0.5
+        } completion: { _ in
+            UIView.animate(withDuration: 0.3, delay: 0, options: UIView.AnimationOptions.curveLinear) {
+                imageView.alpha = 0
+            } completion: { _ in }
+        }
+    }
+    
+    var mode: PollController.Mode {
+        return viewInput!.mode
+    }
+    
+    func startLoading() {
+        tableView.alpha = 0
+        loadingIndicator = LoadingIndicator()//CGSize(width: view.frame.width, height: container.frame.height)))
+        loadingIndicator!.alpha = 1
+        loadingIndicator!.layoutCentered(in: self, multiplier: 0.6)
+        loadingIndicator!.addEnableAnimation()
+    }
+    
     var showNext: Bool {
         return viewInput?.showNext ?? false
     }
@@ -172,7 +216,13 @@ extension PollView: PollControllerOutput {
         }
         switch result {
         case .success:
-            mode = .ReadOnly
+            //            mode = .ReadOnly
+            updateResults()
+            tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .automatic)
+            tableView.reloadSections(IndexSet(arrayLiteral: 2), with: .automatic)
+            tableView.reloadSections(IndexSet(arrayLiteral: 3), with: .automatic)
+            
+            _hasVoted = true
             guard choice == survey?.answers.sorted{ $0.totalVotes > $1.totalVotes }.first else {
                 animate()
                 return
@@ -183,12 +233,29 @@ extension PollView: PollControllerOutput {
             banner.present(subview: VoteMessage(imageContent: ImageSigns.flameFilled, color: survey?.topic.tagColor ?? K_COLOR_RED, callbackDelegate: banner))
         case .failure:
             self.isChoiceEnabled = true
-            showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 2)
+            showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 1)
         }
     }
     
-    func onLoad(_: Result<Bool, Error>) {
-        tableView.reloadData()
+    func onLoad(_ result: Result<Bool, Error>) {
+        switch result {
+        case .success:
+            tableView.reloadData()
+            guard !loadingIndicator.isNil else { return }
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, options: [.curveEaseIn], animations: {
+                        self.loadingIndicator?.alpha = 0
+                        self.loadingIndicator?.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
+                    }) {
+                        _ in
+                        self.loadingIndicator?.removeFromSuperview()
+                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
+                            self.tableView.alpha = 1
+                        }) {_ in }
+                    }
+        case .failure:
+            showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, imageContent: ImageSigns.exclamationMark)
+        }
+        
         
 //        let effectViewOutgoing = UIVisualEffectView(effect: UIBlurEffect(style: .light))
 //        effectViewOutgoing.frame = view.frame
@@ -197,26 +264,7 @@ extension PollView: PollControllerOutput {
 //            effectViewOutgoing.effect = nil
 //        })
 //
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: [.curveEaseIn], animations: {
-//            self.loadingIndicator?.alpha = 0
-//            self.loadingIndicator?.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-//            effectViewOutgoing.effect = UIBlurEffect(style: .light)
-//        }) {
-//            _ in
-//            self.loadingIndicator?.transform = .identity
-//            self.loadingIndicator?.removeAllAnimations()
-//            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0/*delay*/, options: [.curveEaseIn], animations: {
-//                effectViewOutgoing.effect = nil
-//            })
-//            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0/*delay*/, options: [.curveEaseOut], animations: {
-//                self.tableView.transform = .identity
-//                self.tableView.alpha = 1
-//            }) {
-//                _ in
-//                effectViewOutgoing.removeFromSuperview()
-//                self.isInitialLoading = false
-//            }
-//        }
+
     }
     
     func onCountUpdated() {
@@ -240,7 +288,7 @@ extension PollView: PollControllerOutput {
 // MARK: - UI Setup
 extension PollView {
     private func setupUI() {
-        
+
     }
     
     private func updateResults() {
@@ -250,15 +298,16 @@ extension PollView {
             if let found = resultIndicators.filter({ $0.answer === answer }).first {
                 resultIndicator = found
             } else {
-                resultIndicator = ResultIndicator(delegate: self, answer: answer, color: Colors.tags()[i], isSelected: answer.id == survey!.result!.keys.first)
+                resultIndicator = ResultIndicator(delegate: self, answer: answer, color: Colors.tags()[i], isSelected: answer.id == survey!.result!.keys.first, mode: survey!.isAnonymous ? .Anon : .Stock)
                 resultIndicators.append(resultIndicator)
             }
             resultIndicator.needsUIUpdate = true
 //            resultIndicator.isSelected = answer.ID == survey!.result!.keys.first
-            if survey!.isAnonymous {
-                resultIndicator.mode = .Anon
-            } else if answer.voters.isEmpty {
-                resultIndicator.mode = .None
+//            if survey!.isAnonymous {
+//                resultIndicator.mode = .Anon
+//            } else if answer.voters.isEmpty {
+                if answer.voters.isEmpty {
+                resultIndicator.mode = .Stock
             }
             resultIndicator.value = survey!.getPercentForAnswer(answer)
         }
@@ -292,19 +341,19 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        if survey == nil {
-            return 0
-        } else {
-            switch mode {
-            case .ReadOnly:
-                return 4//2//Body & answers
-            case .Write:
-                return 4//Body & answers & vote button
-            }
-        }
+        guard !survey.isNil else { return 0 }
+        if mode == .ReadOnly, resultIndicators.isEmpty { updateResults() }
+        return 4
+//        switch mode {
+//        case .ReadOnly:
+//            return 4//2//Body & answers
+//        case .Write:
+//            return 4//Body & answers & vote button
+//        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        guard !survey.isNil else { return 0 }
         if section == 0 {//ОСНОВНОЕ
             return 6
         } else if section == 1, survey != nil {//Варианты ответов
@@ -322,9 +371,7 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard survey != nil else {
-            return UITableViewCell()
-        }
+        guard !survey.isNil else { return UITableViewCell() }
         if indexPath.section == 0 {
             if indexPath.row == 0, let cell = tableView.dequeueReusableCell(withIdentifier: "author", for: indexPath) as? AuthorCell {
                 cell.setupUI(delegate: self, survey: survey!)
@@ -397,7 +444,7 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
                 }
             case .ReadOnly:
                 if let cell = tableView.dequeueReusableCell(withIdentifier: "statistics", for: indexPath) as? StatisticsCell {
-                    cell.setupUI(delegate: self, color: survey!.topic.tagColor, progress: CGFloat(survey!.completion)/CGFloat(100), voters: survey!.totalVotes, total: survey!.voteCapacity)
+                    cell.setupUI(delegate: self, color: survey!.topic.tagColor, progress: CGFloat(survey!.progress)/CGFloat(100), voters: survey!.votesTotal, total: survey!.votesLimit)
                     return cell
                 } else if let cell = tableView.dequeueReusableCell(withIdentifier: "next", for: indexPath) as? NextCell {
                     cell.callbackDelegate = self
@@ -414,9 +461,7 @@ extension PollView: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard survey != nil else {
-            return 0
-        }
+        guard !survey.isNil else { return 0 }
         if indexPath.section == 0 {
             if indexPath.row == 0 {//Author & category
                 return 80
@@ -512,7 +557,7 @@ extension PollView: CallbackObservable {
             viewInput?.onVotersTapped(answer: answer, indexPath: indexPath, color: color)
         } else if sender is HyperlinkCell {
             guard let url = survey?.url else {
-                showBanner(bannerDelegate: self, text: AppError.webContent.localizedDescription, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 1)
+                showBanner(bannerDelegate: self, text: AppError.webContent.localizedDescription, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 0.5)
                 return
             }
             viewInput?.onURLTapped(url)
@@ -520,10 +565,10 @@ extension PollView: CallbackObservable {
             foldWebCell = true
             let logo = TikTokLogo()
             logo.isOpaque = false
-            showBanner(bannerDelegate: self, text: error.localizedDescription, imageContent: logo, shouldDismissAfter: 1)
+            showBanner(bannerDelegate: self, text: error.localizedDescription, imageContent: logo, shouldDismissAfter: 0.5)
         } else if let error = AppError.tikTokContent as? AppError {
             foldWebCell = true
-            showBanner(bannerDelegate: self, text: error.localizedDescription, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 1)
+            showBanner(bannerDelegate: self, text: error.localizedDescription, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 0.5)
         }
     }
 }

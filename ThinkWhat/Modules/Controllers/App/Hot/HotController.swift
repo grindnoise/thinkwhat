@@ -34,6 +34,7 @@ class HotController: UIViewController {
         view.setNeedsLayout()
         view.layoutIfNeeded()
         controllerOutput?.onDidLayout()
+        barButton.alpha = 1
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -48,6 +49,14 @@ class HotController: UIViewController {
                 }
             }
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        barButton.alpha = 0
+        guard let navigationBar = self.navigationController?.navigationBar,
+              let button = navigationBar.subviews.filter({ $0.isKind(of: UIImageView.self)}).first as? UIImageView else { return }
+        button.alpha = 0
     }
     
     override func viewDidDisappear(_ animated: Bool) {

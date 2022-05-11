@@ -14,10 +14,11 @@ class Banner: UIView {
         print("Banner deinit")
     }
     
-    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightDivisor: CGFloat = 3.05) {
+    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightDivisor _heightDivisor: CGFloat = 3.05) {
         super.init(frame: frame)
         self.callbackDelegate = callbackDelegate
         self.bannerDelegate = bannerDelegate
+        self.heightDivisor = _heightDivisor
         commonInit()
     }
     
@@ -245,9 +246,17 @@ func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: Ban
     banner.accessibilityIdentifier = accessibilityIdentifier
     banner.present(subview: PlainBannerContent(text: text, imageContent: imageContent, color: color), isModal: isModal, shouldDismissAfter: shouldDismissAfter)
 }
+//
+//func showPopup(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: UIView, color: UIColor = .systemRed, isModal: Bool = true, shouldDismissAfter: TimeInterval = 1, accessibilityIdentifier: String = "", callbackPassthrough: Bool = false) {
+//    let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
+//    banner.accessibilityIdentifier = accessibilityIdentifier
+//    banner.present(subview: subview)
+//}
 
-func showPopup(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: UIView, color: UIColor = .systemRed, isModal: Bool = false, shouldDismissAfter: TimeInterval = 1, accessibilityIdentifier: String = "") {
+
+func showPopup<C: UIView>(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: C, isModal: Bool = true, shouldDismissAfter: TimeInterval = .infinity, accessibilityIdentifier: String = "") where C:CallbackCallable {
     let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
     banner.accessibilityIdentifier = accessibilityIdentifier
+    subview.callbackDelegate = banner
     banner.present(subview: subview)
 }

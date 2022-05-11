@@ -14,7 +14,12 @@ import CoreAudio
 
 class API {
     static let shared = API()
-    private init() {}
+    public let profiles = Profiles()
+    public let surveys = Polls()
+    private init() {
+        profiles.parent = self
+        surveys.parent = self
+    }
     
     class func prepareUserData(firstName: String?, lastName: String?, email: String?, gender: Gender?, birthDate: String?, city: City?, image: UIImage?, vkID: String?, vkURL: String?, facebookID: String?, facebookURL: String?) -> [String: Any] {
         
@@ -857,12 +862,7 @@ class API {
         }
     }
     
-    func markFavoriteAsync(mark: Bool, surveyReference: SurveyReference) async throws -> Data {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(mark ? API_URLS.SURVEYS_ADD_FAVORITE : API_URLS.SURVEYS_REMOVE_FAVORITE) else { throw APIError.invalidURL }
-        
-        return try await requestAsync(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default, headers: headers())
-    }
-
+    
     
     func incrementViewCounter(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_ADD_VIEW_COUNT) else { completion(.failure(APIError.invalidURL)); return }
@@ -877,7 +877,9 @@ class API {
         let data = try await requestAsync(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default, headers: headers())
         let json = try JSON(data: data, options: .mutableContainers)
         if let value = json["views"].int {
-            surveyReference.survey?.views = value
+            await MainActor.run {
+                surveyReference.survey?.views = value
+            }
         } else if let error = json["views"].string {
             throw error
         } else {
@@ -958,7 +960,10 @@ class API {
         do {
             let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers())
             let json = try JSON(data: data, options: .mutableContainers)
-            Surveys.shared.completed.append(answer.survey!)
+            await MainActor.run {
+                Surveys.shared.completed.append(answer.survey!)
+            }
+//            answer.survey?.reference.isComplete = true
             return json
         } catch let error {
             throw error
@@ -1051,9 +1056,159 @@ class API {
     }
     
     public func subsribeToUser(subscribe: Bool, user: Userprofile, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(subscribe ? API_URLS.USERPOFILE_SUBSCRIBE : API_URLS.USERPOFILE_UNSUBSCRIBE) else { completion(.failure(APIError.invalidURL)); return }
+        guard let url = API_URLS.Profiles.subscribe else { completion(.failure(APIError.invalidURL)); return }
         let parameters: Parameters = ["userprofile_id": user.id]
         request(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
+    }
+    
+    class Profiles {
+        weak var parent: API! = nil
+        
+        public func subscribedFor() async throws {
+            guard let url = API_URLS.Profiles.subscribedFor else { throw APIError.invalidURL }
+            let parameters: Parameters = ["ids": Userprofiles.shared.subscribedFor.map{ return $0.id}]
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                let instances = try decoder.decode([Userprofile].self, from: data)
+                await MainActor.run {
+                    instances.forEach { instance in
+                        if Userprofiles.shared.subscribedFor.filter({ $0 == instance }).isEmpty {
+                            if let existing = Userprofiles.shared.all.filter({ $0 == instance }).first {
+                                Userprofiles.shared.subscribedFor.append(existing)
+                            } else {
+                                Userprofiles.shared.subscribedFor.append(instance)
+                            }
+                        }
+                    }
+                }
+            } catch let error {
+    #if DEBUG
+                print(error)
+    #endif
+                throw error
+            }
+        }
+        
+        public func subscribers() async throws {
+            guard let url = API_URLS.Profiles.subscribers else { throw APIError.invalidURL }
+            let parameters: Parameters = ["ids": Userprofiles.shared.subscribers.map{ return $0.id}]
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                let instances = try decoder.decode([Userprofile].self, from: data)
+                await MainActor.run {
+                    instances.forEach { instance in
+                        if Userprofiles.shared.subscribers.filter({ $0 == instance }).isEmpty {
+                            if let existing = Userprofiles.shared.all.filter({ $0 == instance }).first {
+                                Userprofiles.shared.subscribers.append(existing)
+                            } else {
+                                Userprofiles.shared.subscribers.append(instance)
+                            }
+                        }
+                    }
+                }
+            } catch let error {
+    #if DEBUG
+                print(error)
+    #endif
+                throw error
+            }
+        }
+        
+        public func subscribe(_ userprofile: Userprofile) async throws {
+            guard let url = API_URLS.Profiles.subscribe else { throw APIError.invalidURL }
+            let parameters: Parameters = ["userprofile_id": userprofile.id]
+            do {
+                try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default, headers: parent.headers())
+                await MainActor.run {
+                    Userprofiles.shared.subscribedFor.append(userprofile)
+                }
+            } catch let error {
+    #if DEBUG
+                print(error)
+    #endif
+                throw error
+            }
+        }
+        
+        public func unsubscribe(_ userprofiles: [Userprofile]) async throws {
+            guard let url = API_URLS.Profiles.unsubscribe else { throw APIError.invalidURL }
+            let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
+            do {
+                try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                await MainActor.run {
+                    userprofiles.forEach {
+                        Userprofiles.shared.subscribedFor.remove(object: $0)
+                    }
+                }
+            } catch let error {
+    #if DEBUG
+                print(error)
+    #endif
+                throw error
+            }
+        }
+    }
+    
+    class Polls {
+        weak var parent: API! = nil
+        
+        public func loadSubscriptions() async throws {
+            guard let url = API_URLS.Surveys.subscriptions else { throw APIError.invalidURL }
+            let parameters: Parameters = ["ids": Surveys.shared.subscriptions.map{ return $0.id}]
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                let instances = try decoder.decode([SurveyReference].self, from: data)
+                guard !instances.isEmpty else {
+                    await MainActor.run {
+                        Notification.send(names: [Notifications.Surveys.ZeroSubscriptions])
+                    }
+                    return
+                }
+                await MainActor.run {
+                    instances.forEach { instance in
+                        if Surveys.shared.subscriptions.filter({ $0 == instance }).isEmpty {
+                            if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+                                Surveys.shared.subscriptions.append(existing)
+                            } else {
+                                Surveys.shared.subscriptions.append(instance)
+                            }
+                        }
+                    }
+//                    Notification.send(names: [Notifications.Surveys.UpdateSubscriptions])
+                }
+            } catch let error {
+    #if DEBUG
+                print(error)
+    #endif
+                throw error
+            }
+        }
+        
+        func markFavoriteAsync(mark: Bool, surveyReference: SurveyReference) async throws -> Data {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(mark ? API_URLS.SURVEYS_ADD_FAVORITE : API_URLS.SURVEYS_REMOVE_FAVORITE) else { throw APIError.invalidURL }
+            
+            
+            let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default, headers: parent.headers())
+            await MainActor.run {
+                if let survey = surveyReference.survey {
+                    survey.isFavorite = mark
+                }
+            }
+            return data
+        }
+
     }
     
     public func getBalanceAndPrice() {

@@ -11,6 +11,10 @@ import SafariServices
 
 class PollController: UIViewController {
     
+    enum Mode {
+        case ReadOnly, Write
+    }
+    
     deinit {
         print("PollController deinit")
     }
@@ -20,6 +24,7 @@ class PollController: UIViewController {
         self._surveyReference = surveyReference
         self._survey = surveyReference.survey
         self._showNext = __showNext
+        self._mode = surveyReference.isComplete ? .ReadOnly : .Write
     }
     
     required init?(coder: NSCoder) {
@@ -102,79 +107,8 @@ class PollController: UIViewController {
             controllerInput?.addView()
             return
         }
-//        switch survey {
-//        case .none:
-//            tableView.alpha = 0
-//            tableView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-//            DispatchQueue.main.async {
-//                self.loadingIndicator = ClockIndicator(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: self.view.frame.width)))
-//                self.loadingIndicator!.layer.masksToBounds = false
-//                self.loadingIndicator!.layoutCentered(in: self.view, multiplier: 0.2)
-//                self.loadingIndicator!.layer.zPosition = 1
-//                self.loadingIndicator?.alpha = 1
-//                self.loadingIndicator?.addEnableAnimation()
-//            }
-//            downloadPoll()
-//        default:
-//            switch survey?.isComplete {
-//            case true:
-//                API.shared.getSurveyStats(_surveyReference: surveyRef) { result in
-//                    switch result {
-//                    case .success(let json):
-//                        guard let views = json["views"].int, let results = json["result_total"].array else { return }
-//                            NotificationCenter.default.post(name: Notifications.UI.SuveyViewsCountReceived, object: views)
-//                        self.surveyRef.views = views
-//
-//                        var totalVotes = 0
-//                        do {
-//                            for entity in results {
-//                                guard let dict = entity.dictionary else { continue }
-//                                guard let data = try dict["userprofiles"]?.rawData() else { continue }
-//                                guard let _answerID = dict["answer"]?.int else { continue }
-//                                guard let answer = self.survey?.answers.filter({ $0.id == _answerID }).first, let _total = dict["total"]?.int else { continue }
-//                                answer.totalVotes = _total
-//                                totalVotes += _total
-//                                let decoder = JSONDecoder()
-//                                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-//                                                                           DateFormatter.dateTimeFormatter,
-//                                                                           DateFormatter.dateFormatter ]
-//                                let instances = try decoder.decode([Userprofile].self, from: data)
-//                                for instance in instances {
-//                                    if let existing = Userprofiles.shared.all.filter({ $0.hashValue == instance.hashValue }).first {
-//                                        answer.addVoter(existing)
-//                                        continue
-//                                    }
-//                                    answer.addVoter(instance)
-//                                }
-//
-//                                self.survey?.totalVotes = totalVotes
-//                            }
-//                        } catch {
-//                            print(error.localizedDescription)
-//                        }
-//                        //TODO: - Update UI
-//                        self.updateResults()
-//                            self.tableView.reloadSections(IndexSet(arrayLiteral: 1), with: .fade)
-//                    case .failure(let error):
-//                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-//                    }
-//                }
-//            case false:
-//                API.shared.incrementViewCounter(_surveyReference: surveyRef) { result in
-//                    switch result {
-//                    case .success(let json):
-//                        guard let views = json["views"].int else { return }
-//                        NotificationCenter.default.post(name: Notifications.UI.SuveyViewsCountReceived, object: views)
-//                        self.surveyRef.views = views
-//                    case .failure(let error):
-//                        print(error.localizedDescription)
-//                    }
-//                }
-//            default:
-//                fatalError("Shouldn't get here")
-//            }
-//
-//        }
+        controllerOutput?.startLoading()
+        controllerInput?.loadPoll(surveyReference, incrementViewCounter: true)
     }
 //
 //    @objc private func updateViewsCount(notification: Notification) {
@@ -184,8 +118,7 @@ class PollController: UIViewController {
     @objc private func addFavorite() {
         guard !isLoading, !survey.isNil else { return }
         guard survey!.isComplete else {
-            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-            banner.present(subview: PlainBannerContent(text: "finish_poll".localized, imageContent: ImageSigns.exclamationMark, color: .systemOrange), isModal: false, shouldDismissAfter: 3)
+            showBanner(bannerDelegate: self, text: "finish_poll".localized, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 1)
             return
         }
 //        isLoading = true
@@ -206,7 +139,7 @@ class PollController: UIViewController {
             }
         }
         isAddedToFavorite = !isAddedToFavorite
-        NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
+        NotificationCenter.default.post(name: Notifications.Surveys.UpdateFavorite, object: nil)
         controllerInput?.addFavorite(mark)
     }
 
@@ -236,13 +169,17 @@ class PollController: UIViewController {
     // MARK: - Properties
     var controllerOutput: PollControllerOutput?
     var controllerInput: PollControllerInput?
+    private var _mode: Mode = .Write
+    var mode: Mode {
+        return _mode
+    }
     private var _survey: Survey!
     private var _surveyReference: SurveyReference!
     private var _showNext: Bool = false
     private var isLoading = false
     private let watchButton: UIImageView = {
-        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
-        v.contentMode = .scaleAspectFit
+        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
+        v.contentMode = .scaleAspectFill
         return v
     }()
     private var isAddedToFavorite = false {
@@ -292,7 +229,7 @@ extension PollController: PollViewInput {
     
     var survey: Survey? {
         get {
-            return _survey
+            return _surveyReference.survey
         }
     }
     
@@ -322,11 +259,28 @@ extension PollController: PollModelOutput {
     }
     
     func onVoteCallback(_ result: Result<Bool, Error>) {
+        switch result {
+        case .success:
+            _mode = .ReadOnly
+        default:
+#if DEBUG
+            print("")
+#endif
+        }
         controllerOutput?.onVote(result)
     }
     
     func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
         isLoading = false
+        switch result {
+        case .success(let mark):
+            guard mark else { return }
+            controllerOutput?.onAddFavorite()
+        case .failure:
+#if DEBUG
+            print("")
+#endif
+        }
     }
     
     func onLoadCallback(_ result: Result<Bool, Error>) {

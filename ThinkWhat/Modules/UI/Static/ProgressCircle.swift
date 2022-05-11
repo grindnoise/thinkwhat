@@ -15,16 +15,22 @@ class ProgressCircle: UIView {
     private var fgColor: UIColor = UIColor(red: 1.000, green: 0.000, blue: 0.000, alpha: 1.000)
     private var textColor: UIColor = .label
     private var lineWidth: CGFloat = 13
+    private var lineWidthFactor: CGFloat = 0.15
     private var progress: CGFloat = 0
+    private var showPercentSign = true
     
     public func setupUI(foregroundColor: UIColor,
                         backgroundColor: UIColor = UIColor(red: 0.516, green: 0.516, blue: 0.516, alpha: 0.207),
                         textColor _textColor: UIColor = .label,
-                        progress _progress: CGFloat) {
+                        progress _progress: CGFloat,
+                        lineWidthFactor _lineWidthFactor: CGFloat = 0.15,
+                        showPercentSign _showPercentSign: Bool = true) {
         fgColor = foregroundColor
         bgColor = backgroundColor
         textColor = _textColor
         progress = _progress
+        lineWidthFactor = _lineWidthFactor
+        showPercentSign = _showPercentSign
         setNeedsDisplay()
     }
     
@@ -37,7 +43,8 @@ class ProgressCircle: UIView {
                                            foregroundColor: traitCollection.userInterfaceStyle == .dark ? .systemBlue : fgColor,
                                            backgroundColor: bgColor,
                                            textColor: textColor,
-                                           lineWidth: lineWidth)
+                                           lineWidth: lineWidth,
+                                           showPercentSign: showPercentSign)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -46,13 +53,13 @@ class ProgressCircle: UIView {
     
     override var frame: CGRect {
         didSet {
-            lineWidth = frame.width * 0.15
+            lineWidth = frame.width * lineWidthFactor
         }
     }
     
     override var bounds: CGRect {
         didSet {
-            lineWidth = frame.width * 0.15
+            lineWidth = frame.width * lineWidthFactor
         }
     }
 }
@@ -61,7 +68,7 @@ public class ProgressCircleStyleKit : NSObject {
 
     //// Drawing Methods
 
-    @objc dynamic public class func drawCanvas1(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 115, height: 115), resizing: ResizingBehavior = .aspectFit, width: CGFloat = 13, progress: CGFloat = 0.655, foregroundColor: UIColor = .systemRed, backgroundColor: UIColor = .systemGray, textColor _textColor: UIColor = .label, lineWidth: CGFloat) {
+    @objc dynamic public class func drawCanvas1(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 115, height: 115), resizing: ResizingBehavior = .aspectFit, width: CGFloat = 13, progress: CGFloat = 0.655, foregroundColor: UIColor = .systemRed, backgroundColor: UIColor = .systemGray, textColor _textColor: UIColor = .label, lineWidth: CGFloat, showPercentSign: Bool) {
         //// General Declarations
         let context = UIGraphicsGetCurrentContext()!
 
@@ -99,24 +106,26 @@ public class ProgressCircleStyleKit : NSObject {
         oval2Path.lineWidth = width
         oval2Path.lineCapStyle = .round
         oval2Path.stroke()
-
-
-        //// Text Drawing
-        let textRect = CGRect(x: 0, y: 0, width: 115, height: 115)
-        let textStyle = NSMutableParagraphStyle()
-        textStyle.alignment = .center
-        let textFontAttributes = [
-            .font: UIFont(name: "OpenSans-Bold", size: fontSize)!,
-            .foregroundColor: textColor,
-            .paragraphStyle: textStyle,
-        ] as [NSAttributedString.Key: Any]
-
-        let textTextHeight: CGFloat = formattedText.boundingRect(with: CGSize(width: textRect.width, height: CGFloat.infinity), options: .usesLineFragmentOrigin, attributes: textFontAttributes, context: nil).height
-        context.saveGState()
-        context.clip(to: textRect)
-        formattedText.draw(in: CGRect(x: textRect.minX, y: textRect.minY + (textRect.height - textTextHeight) / 2, width: textRect.width, height: textTextHeight), withAttributes: textFontAttributes)
-        context.restoreGState()
-
+        
+        
+        if showPercentSign {
+            //// Text Drawing
+            let textRect = CGRect(x: 0, y: 0, width: 115, height: 115)
+            let textStyle = NSMutableParagraphStyle()
+            textStyle.alignment = .center
+            let textFontAttributes = [
+                .font: UIFont(name: "OpenSans-Bold", size: fontSize)!,
+                .foregroundColor: textColor,
+                .paragraphStyle: textStyle,
+            ] as [NSAttributedString.Key: Any]
+            
+            let textTextHeight: CGFloat = formattedText.boundingRect(with: CGSize(width: textRect.width, height: CGFloat.infinity), options: .usesLineFragmentOrigin, attributes: textFontAttributes, context: nil).height
+            context.saveGState()
+            context.clip(to: textRect)
+            formattedText.draw(in: CGRect(x: textRect.minX, y: textRect.minY + (textRect.height - textTextHeight) / 2, width: textRect.width, height: textTextHeight), withAttributes: textFontAttributes)
+            context.restoreGState()
+        }
+        
         context.restoreGState()
 
     }

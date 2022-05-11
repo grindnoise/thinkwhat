@@ -45,6 +45,9 @@
 "congratulations" = "Поздравляем!";
 "show" = "показать";
 "reset" = "сбросить";
+"anonymous" = "Анонимный";
+"user" = "Пользователь";
+"votes" = "голосов";
 
 
 //Welcome VC
@@ -104,6 +107,7 @@
 
 //Subscriptions VC
 "subscriptions" = "Подписки";
+"subscribers" = "подписчики";
 
 //List VC
 "list" = "Лента";
@@ -128,3 +132,9 @@
 
 //Voters VC
 "voters_load_error" = "Возникла ошибка при загрузке пользователей";
+
+//Subscribers VC
+"subscribers" = "Подписчики";
+"subscribed_for" = "Подписки";
+"unsubscribe" = "Отписаться";
+"unsubscribe_question" = "Вы уверены, что хотите отписаться?";

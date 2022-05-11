@@ -189,6 +189,9 @@ extension Popup: CallbackObservable {
         if sender is VoteMessage {
             dismiss("vote")
         } else if let btn = sender as? UIButton {
+            if btn.accessibilityIdentifier == "unsubscribe" {
+                callbackDelegate?.callbackReceived(btn)
+            }
             dismiss(btn.accessibilityIdentifier)// == "exit" ? "exit" : nil)
         } else if sender is Claim {
             callbackDelegate?.callbackReceived(sender)

@@ -190,51 +190,7 @@ var apiReachability: ApiReachabilityState = .Reachable {
 }
 var temporaryTokenToRevoke = ""
 
-struct Notifications {
-    struct Network {
-        static let InternetConnectionChange        = Notification.Name("InternetConnectionChange")
-        static let RemoteReachable                 = Notification.Name("smsNotificationApiReachable")
-        static let RemoteNotReachable              = Notification.Name("smsNotificationApiNotReachable")
-    }
-    
-    struct OAuth {
-        static let TokenReceived                   = Notification.Name("NotificationTokenReceived")
-        static let TokenError                      = Notification.Name("NotificationTokenError")
-        static let TokenRevoked                    = Notification.Name("NotificationTokenRevoked")
-        static let TokenWrongCredentials           = Notification.Name("NotificationTokenWrongCredentials")
-        static let TokenConnectionError            = Notification.Name("NotificationTokenConnectionError")
-        static let TokenAccessDenied               = Notification.Name("NotificationTokenAccessDenied")
-    }
-    
-    struct EmailResponse {
-        static let Received                        = Notification.Name("NotificationEmailResponseReceived")
-        static let Expired                         = Notification.Name("NotificationEmailResponseExpired")
-    }
 
-    struct Surveys {
-        static let UpdateTopSurveys                 = Notification.Name("NotificationTopSurveysUpdated")
-        static let UpdateNewSurveys                 = Notification.Name("NotificationNewSurveysUpdated")
-        static let UpdateHotSurveys                 = Notification.Name("NotificationSurveysStackReceived")
-        static let SurveysStackUpdated              = Notification.Name("NotificationSurveysStackUpdated")
-        static let OwnSurveysUpdated                = Notification.Name("NotificationOwnSurveysUpdated")
-        static let OwnSurveysReceived               = Notification.Name("NotificationOwnSurveysReceived")
-        static let SurveysByCategoryUpdated         = Notification.Name("NotificationSurveysByCategoryUpdated")
-        static let FavoriteSurveysUpdated           = Notification.Name("NotificationFavoriteSurveysUpdated")
-        static let UserSurveysUpdated               = Notification.Name("NotificationUserSurveysUpdated")
-        static let UserFavoriteSurveysUpdated       = Notification.Name("NotificationUserFavoriteSurveysUpdated")
-        static let NewSurveyPostError               = Notification.Name("NotificationNewSurveyPostError")
-    }
-    
-    struct UI {
-        static let ClaimSignAppeared               = Notification.Name("ClaimSignAppeared")
-        static let CategorySelected                = Notification.Name("CategorySelected")
-        static let UserImageChanged                = Notification.Name("NotificationUserImageChanged")
-        static let ImageReceived                   = Notification.Name("NotificationProfileImageReceived")
-        static let LineWidth                       = Notification.Name("LineWidth")
-        static let SuveyViewsCountReceived         = Notification.Name("SuveyViewsCountReceived")
-        static let LanguageChanged                 = Notification.Name("LANGUAGE_CHANGED")
-    }
-}
 
 
 let appDelegate         = UIApplication.shared.delegate as! AppDelegate

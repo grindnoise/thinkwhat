@@ -47,6 +47,7 @@ class CardView: UIView {
         attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: .label, backgroundColor: .clear), range: survey.description.fullRange())
         self.descriptionTextView.attributedText = attributedText
         setupUI()
+        setObservers()
     }
     
     private func commonInit() {
@@ -57,9 +58,14 @@ class CardView: UIView {
         self.addSubview(contentView)
     }
     
+    private func setObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(self.updateUI), name: Notifications.Surveys.Completed, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.updateUI), name: Notifications.Surveys.Views, object: nil)
+    }
+    
     private func setupUI() {
         voteButton.layer.cornerRadius = voteButton.frame.height/2.25
-        var rating = min(Double(survey.totalVotes)*5/Double(survey.views), 5)//.rounded(toPlaces: 1)
+        var rating = min(Double(survey.votesTotal)*5/Double(survey.views), 5)//.rounded(toPlaces: 1)
         if rating < 0.5 {
             rating = 0
         }
@@ -93,6 +99,11 @@ class CardView: UIView {
 //        descriptionTextView.layoutManager.usesDefaultHyphenation = true
     }
     
+    @objc
+    private func updateUI() {
+        favoriteLabel.text = "\(survey.likes)"
+        viewsLabel.text = "\(survey.views)"
+    }
         
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         watchIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black

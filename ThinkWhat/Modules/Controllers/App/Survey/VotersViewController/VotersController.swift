@@ -90,7 +90,7 @@ class VotersController: UIViewController {
     private let _answer: Answer
     private let _indexPath: IndexPath
     private let _color: UIColor
-    private let filterButton = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 35, height: 35)))
+    private let filterButton = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
     private var isFilterEnabled = false
     private var filters: [String: AnyObject] = [:]
     private var requestAttempt = 0

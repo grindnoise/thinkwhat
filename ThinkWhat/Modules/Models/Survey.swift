@@ -15,7 +15,29 @@ class Survey: Decodable {
         case Ranking = "Ranking"
     }
     private enum CodingKeys: String, CodingKey {
-        case active, id, title, description, category, question, type, startDate = "start_date", url = "hlink", media, answers, voteCapacity = "vote_capacity", isPrivate = "is_private", isAnonymous = "is_anonymous", isCommentingAllowed = "is_commenting_allowed", totalVotes = "total_votes", watchers, likes, views, owner = "userprofile", result
+        case active,
+             id,
+             title,
+             description,
+             category,
+             question,
+             type,
+             watchers,
+             likes,
+             views,
+             media,
+             answers,
+             result,
+             startDate = "start_date",
+             url = "hlink",
+             voteCapacity = "vote_capacity",
+             isPrivate = "is_private",
+             isAnonymous = "is_anonymous",
+             isFavorite = "is_favorite",
+             isCommentingAllowed = "is_commenting_allowed",
+             totalVotes = "votes_total",
+             owner = "userprofile",
+             isHot = "is_hot"
     }
     
     var active:                 Bool
@@ -50,11 +72,19 @@ class Survey: Decodable {
     }
 
     var url:                    URL? = nil///hlink
-    var voteCapacity:           Int
+    var votesLimit:             Int {
+        didSet {
+            reference.votesLimit = votesLimit
+        }
+    }
     var isPrivate:              Bool
     var isAnonymous:            Bool
     var isCommentingAllowed:    Bool
-    var totalVotes:             Int = 0
+    var votesTotal:             Int = 0 {
+        didSet {
+            reference.votesTotal = votesTotal
+        }
+    }
     var watchers:               Int = 0
     var result:                 [Int: Date]? {
         didSet {
@@ -64,10 +94,31 @@ class Survey: Decodable {
         }
     }
     var owner:                  Userprofile
-    var likes:                  Int = 0
-    var views:                  Int = 0
+    var likes:                  Int = 0 {
+        didSet {
+            guard oldValue != likes else { return }
+            reference.likes = likes
+            Notification.send(names: [Notifications.Surveys.Watchers])
+        }
+    }
+
+    var views:                  Int = 0 {
+        didSet {
+            guard oldValue != views else { return }
+            reference.views = views
+            Notification.send(names: [Notifications.Surveys.Views])
+        }
+    }
     var type:                   SurveyType
-    var isHot = false
+    var isHot: Bool {
+        didSet {
+            guard oldValue != isHot else { return }
+            reference.isHot = isHot
+            Notification.send(names: [Notifications.Surveys.UpdateHotSurveys])
+        }
+//        return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
+    }
+
     var isComplete: Bool {
         if let _result = result, !_result.isEmpty {
             return true
@@ -78,14 +129,19 @@ class Survey: Decodable {
         return owner.id == UserDefaults.Profile.id
     }
     var isFavorite: Bool {
-        return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
+        didSet {
+            guard oldValue != isFavorite else { return }
+            reference.isFavorite = isFavorite
+            Notification.send(names: [Notifications.Surveys.UpdateFavorite])
+        }
+//        return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
     }
     var reference: SurveyReference {
         return SurveyReferences.shared.all.filter({ $0.hashValue == hashValue}).first ?? createReference()
     }
-    var completion: Int {
+    var progress: Int {
         get {
-            return totalVotes * 100 / voteCapacity
+            return votesTotal * 100 / votesLimit
         }
     }
     private let tempId = 999999
@@ -99,27 +155,35 @@ class Survey: Decodable {
             guard let _type = SurveyType(rawValue: try container.decode(String.self, forKey: .type)) else {
                 throw "SurveyType not defined"
             }
-            let _owner          = try container.decode(Userprofile.self, forKey: .owner)
-            owner               = Userprofiles.shared.all.filter({ $0.id == _owner.id }).first ?? _owner
-            topic               = _topic
-            active              = try container.decode(Bool.self, forKey: .active)
-            id                  = try container.decode(Int.self, forKey: .id)
-            title               = try container.decode(String.self, forKey: .title)
-            description         = try container.decode(String.self, forKey: .description)
-            startDate           = try container.decode(Date.self, forKey: .startDate)
-            url                 = URL(string: try container.decode(String.self, forKey: .url))
-            question            = try container.decode(String.self, forKey: .question)
-            type                = _type
-            media               = try container.decode([Mediafile].self, forKey: .media)
-            answers             = try container.decode([Answer].self, forKey: .answers)
-            voteCapacity        = try container.decode(Int.self, forKey: .voteCapacity)
-            totalVotes          = try container.decode(Int.self, forKey: .totalVotes)
-            watchers            = try container.decode(Int.self, forKey: .watchers)
-            likes                = try container.decode(Int.self, forKey: .likes)
-            views                = try container.decode(Int.self, forKey: .views)
-            isPrivate            = try container.decode(Bool.self, forKey: .isPrivate)
-            isAnonymous                 = try container.decode(Bool.self, forKey: .isAnonymous)
-            isCommentingAllowed = try container.decode(Bool.self, forKey: .isCommentingAllowed)
+            isAnonymous             = try container.decode(Bool.self, forKey: .isAnonymous)
+            owner                   = Userprofiles.shared.anonymous
+            let _owner              = try container.decodeIfPresent(Userprofile.self, forKey: .owner)
+            if !_owner.isNil {
+                owner = Userprofiles.shared.all.filter({ $0.id == _owner!.id }).first ?? _owner!
+            }
+            topic                   = _topic
+            active                  = try container.decode(Bool.self, forKey: .active)
+            id                      = try container.decode(Int.self, forKey: .id)
+            title                   = try container.decode(String.self, forKey: .title)
+            description             = try container.decode(String.self, forKey: .description)
+            startDate               = try container.decode(Date.self, forKey: .startDate)
+            url                     = URL(string: try container.decode(String.self, forKey: .url))
+            question                = try container.decode(String.self, forKey: .question)
+            type                    = _type
+            media                   = try container.decode([Mediafile].self, forKey: .media)
+            answers                 = try container.decode([Answer].self, forKey: .answers)
+            votesLimit              = try container.decode(Int.self, forKey: .voteCapacity)
+            votesTotal              = try container.decode(Int.self, forKey: .totalVotes)
+            watchers                = try container.decode(Int.self, forKey: .watchers)
+            likes                   = try container.decode(Int.self, forKey: .likes)
+            views                   = try container.decode(Int.self, forKey: .views)
+            isPrivate               = try container.decode(Bool.self, forKey: .isPrivate)
+            isCommentingAllowed     = try container.decode(Bool.self, forKey: .isCommentingAllowed)
+            isFavorite              = try container.decode(Bool.self, forKey: .isFavorite)
+            isHot                   = try container.decode(Bool.self, forKey: .isHot)
+            
+            
+            
             if let dict = try container.decodeIfPresent([String: Date].self, forKey: .result), !dict.isEmpty {
                 result = [Int(dict.keys.first!)!: dict.values.first!]
             }
@@ -132,7 +196,7 @@ class Survey: Decodable {
         }
     }
     
-    init(type _type: SurveyType, title _title: String, topic _topic: Topic, description _description: String, question _question: String, answers _answers: [String], media _media: [Int: [UIImage: String]], url _url: URL?, voteCapacity _voteCapacity: Int, isPrivate _isPrivate: Bool, isAnonymous _isAnonymous: Bool, isCommentingAllowed _isCommentingAllowed: Bool, isHot _isHot: Bool) {
+    init(type _type: SurveyType, title _title: String, topic _topic: Topic, description _description: String, question _question: String, answers _answers: [String], media _media: [Int: [UIImage: String]], url _url: URL?, voteCapacity _voteCapacity: Int, isPrivate _isPrivate: Bool, isAnonymous _isAnonymous: Bool, isCommentingAllowed _isCommentingAllowed: Bool, isHot _isHot: Bool, isFavorite _isFavorite: Bool) {
         owner               = Userprofiles.shared.current!
         topic               = _topic
         active              = true
@@ -143,10 +207,12 @@ class Survey: Decodable {
         url                 = _url
         question            = _question
         type                = _type
-        voteCapacity        = _voteCapacity
+        votesLimit          = _voteCapacity
         isPrivate           = _isPrivate
         isAnonymous         = _isAnonymous
         isCommentingAllowed = _isCommentingAllowed
+        isFavorite          = _isFavorite
+        isHot               = _isHot
         media = _media.map({ number, dict in
             return Mediafile(title: dict.first?.value ?? "", order: number, survey: self, image: dict.first?.key)
         })
@@ -156,16 +222,16 @@ class Survey: Decodable {
     }
     
     private func createReference() -> SurveyReference {
-        return SurveyReference(id: id, title: title, startDate: startDate, topic: topic, type: type, likes: likes, views: views, isOwn: isOwn, isComplete: isComplete, isFavorite: isFavorite, survey: self, owner: owner)
+        return SurveyReference(id: id, title: title, startDate: startDate, topic: topic, type: type, likes: likes, views: views, isOwn: isOwn, isComplete: isComplete, isFavorite: isFavorite, isHot: isHot, survey: self, owner: owner, isAnonymous: isAnonymous)
     }
     
     func getAnswerVotePercentage(_ answerVotesCount: Int) -> Int {
-        return Int((Double(answerVotesCount) * Double(100) / Double(totalVotes)).rounded())
+        return Int((Double(answerVotesCount) * Double(100) / Double(votesTotal)).rounded())
     }
     
     func getPercentForAnswer(_ answer: Answer) -> Int {
         if let _answer = answers.filter({ $0.id == answer.id }).first {
-            return 100 * _answer.totalVotes / totalVotes
+            return 100 * _answer.totalVotes / votesTotal
         }
         return 0
     }
@@ -188,7 +254,7 @@ class Surveys {
         case TopLinks, NewLinks, Categorized, OwnLinks, Favorite, Downloaded, Completed, Stack, Claim, AllLinks
     }
     private enum Category: String {
-        case Top = "top", Own = "own", New = "new", Favorite = "favorite", Hot = "hot", byTopic = "by_category"
+        case Top = "top", Own = "own", New = "new", Favorite = "favorite", Hot = "hot", Subscriptions = "subscriptions", byTopic = "by_category"
     }
     static let shared = Surveys()
     private init() {}
@@ -205,9 +271,19 @@ class Surveys {
         }
     }
     var ownReferences:           [SurveyReference] = []
+    var subscriptions:           [SurveyReference] = [] {
+        didSet {
+            guard oldValue.count != subscriptions.count else { return }
+            Notification.send(names: [Notifications.Surveys.UpdateSubscriptions])
+        }
+    }
     var favoriteReferences:      [SurveyReference: Date] = [:]
 //    var categorizedLinks:   [Topic: [SurveyReference]] = [:]
-    var completed:               [Survey] = []
+    var completed:               [Survey] = [] {
+        didSet {
+            completed.forEach { $0.reference.isComplete = true }
+        }
+    }
     var all:                     [Survey] = []
     var hot:                     [Survey] = []
     var banned:                  [Survey] = []///Banned by user
@@ -247,7 +323,7 @@ class Surveys {
                             }
                             if favoriteReferences.keys.filter({ $0.hashValue == instance.hashValue }).isEmpty {
                                 favoriteReferences[SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance] = date
-                                notifications.append(Notifications.Surveys.FavoriteSurveysUpdated)
+                                notifications.append(Notifications.Surveys.UpdateFavorite)
                             }
                         }
                     default:
@@ -269,20 +345,20 @@ class Surveys {
                                     ownReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
                                     notifications.append(Notifications.Surveys.UpdateNewSurveys)
                                 }
+                            } else if key == Category.Subscriptions.rawValue {
+                                if subscriptions.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+                                    subscriptions.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+                                    notifications.append(Notifications.Surveys.UpdateSubscriptions)
+                                }
                             }
                         }
                     }
                 }
             }
-            sendNotifications(names: notifications.uniqued())
-            print(all.count)
+            Notification.send(names: notifications.uniqued())
         } catch {
             fatalError("Survey init() threw error: \(error)")
         }
-    }
-    
-    private func sendNotifications(names: [NSNotification.Name]) {
-        names.forEach { NotificationCenter.default.post(name: $0, object: nil) }
     }
     
     ///Remove from lists & notify
@@ -294,7 +370,7 @@ class Surveys {
         newReferences.remove(object: reference)
         newReferences.remove(object: reference)
         hot.remove(object: instance)
-        sendNotifications(names: [Notifications.Surveys.UpdateNewSurveys, Notifications.Surveys.UpdateTopSurveys])
+        Notification.send(names: [Notifications.Surveys.UpdateNewSurveys, Notifications.Surveys.UpdateTopSurveys])
     }
     
     func eraseData() {
@@ -326,11 +402,3 @@ class Surveys {
         timer?.fire()
     }
 }
-
-
-
-
-
-
-
-

@@ -71,7 +71,7 @@ struct DjangoVariables {
         static let userprofile              = "userprofile"
         static let type                     = "type"
         static let watchers                 = "watchers"
-        static let totalVotes               = "total_votes"
+        static let totalVotes               = "votes_total"
         static let result                   = "result"
         static let postHot                  = "post_hot"
     }
@@ -81,7 +81,7 @@ struct DjangoVariables {
         static let url                      = "hlink"
         static let file                     = "file"
         static let image                    = "image"
-        static let totalVotes               = "total_votes"
+        static let totalVotes               = "votes_total"
     }
     struct PriceList {
         static let like                     = "like"

@@ -15,5 +15,19 @@ class SubsciptionsModel {
 
 // MARK: - Controller Input
 extension SubsciptionsModel: SubsciptionsControllerInput {
-    // Implement methods
+    func loadSubscriptions() {
+        Task {
+            do {
+                try await API.shared.surveys.loadSubscriptions()
+            } catch {
+                await MainActor.run {
+                    modelOutput?.onError(error)
+                }
+            }
+        }
+    }
+    
+    var userprofiles: [Userprofile] {
+        return Array(Userprofiles.shared.subscribedFor.prefix(upTo: min(Userprofiles.shared.subscribedFor.count, 10)))
+    }
 }

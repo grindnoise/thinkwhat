@@ -109,6 +109,7 @@ class WebCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackObse
             isSetupComplete = true
             setNeedsLayout()
             layoutIfNeeded()
+            contentView.cornerRadius = contentView.frame.width * 0.05
             url = _url
             delegate = callbackDelegate
             if url.absoluteString.isTikTokLink {
@@ -117,6 +118,8 @@ class WebCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackObse
                     return
                 }
                 isContentLoading = true
+//                webView.url = url
+                webView.load(URLRequest(url: url))
                 if url.absoluteString.isTikTokEmbedLink {
                     var webContent = "<meta name='viewport' content='initial-scale=0.6, maximum-scale=0.6, user-scalable=no'/>"
                     webContent += url.absoluteString

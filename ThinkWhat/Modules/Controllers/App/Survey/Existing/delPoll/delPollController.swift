@@ -202,7 +202,7 @@ class delPollController: UIViewController {
             if let found = resultIndicators.filter({ $0.answer === answer }).first {
                 resultIndicator = found
             } else {
-                resultIndicator = ResultIndicator(delegate: self, answer: answer, color: survey!.topic.tagColor, isSelected: answer.id == survey!.result!.keys.first)
+                resultIndicator = ResultIndicator(delegate: self, answer: answer, color: survey!.topic.tagColor, isSelected: answer.id == survey!.result!.keys.first, mode: .Anon)
                 resultIndicators.append(resultIndicator)
             }
             resultIndicator.needsUIUpdate = true
@@ -262,7 +262,7 @@ class delPollController: UIViewController {
                                     answer.addVoter(instance)
                                 }
                                 
-                                self.survey?.totalVotes = totalVotes
+                                self.survey?.votesTotal = totalVotes
                             }
                         } catch {
                             print(error.localizedDescription)
@@ -418,7 +418,7 @@ class delPollController: UIViewController {
                         Surveys.shared.favoriteReferences.removeValue(forKey: key)
                     }
                 }
-                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteSurveysUpdated, object: nil)
+                NotificationCenter.default.post(name: Notifications.Surveys.UpdateFavorite, object: nil)
                 API.shared.markFavorite(mark: mark, surveyReference: surveyRef) { result in
                     switch result {
                     case .success:
@@ -853,7 +853,7 @@ extension delPollController: CallbackObservable {
                                             answer.addVoter(Userprofiles.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
                                         }
                                     }
-                                    self.survey?.totalVotes = totalVotes
+                                    self.survey?.votesTotal = totalVotes
                                 } catch let error {
                                     print(error)
                                 }
