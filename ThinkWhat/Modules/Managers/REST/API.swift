@@ -1160,9 +1160,9 @@ class API {
     class Polls {
         weak var parent: API! = nil
         
-        public func loadSubscriptions() async throws {
-            guard let url = API_URLS.Surveys.subscriptions else { throw APIError.invalidURL }
-            let parameters: Parameters = ["ids": Surveys.shared.subscriptions.map{ return $0.id}]
+        public func loadSurveyReferences(_ category: Survey.SurveyCategory) async throws {
+            guard let url = category.url else { throw APIError.invalidURL }
+            let parameters: Parameters = ["ids": category.dataItems.map { $0.id }]
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
                 let decoder = JSONDecoder()
@@ -1178,15 +1178,51 @@ class API {
                 }
                 await MainActor.run {
                     instances.forEach { instance in
-                        if Surveys.shared.subscriptions.filter({ $0 == instance }).isEmpty {
-                            if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-                                Surveys.shared.subscriptions.append(existing)
-                            } else {
-                                Surveys.shared.subscriptions.append(instance)
+                        switch category {
+                        case .Subscriptions:
+                            if Surveys.shared.subscriptions.filter({ $0 == instance }).isEmpty {
+                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+                                    Surveys.shared.subscriptions.append(existing)
+                                } else {
+                                    Surveys.shared.subscriptions.append(instance)
+                                }
                             }
+                        case .Favorite:
+                            if Surveys.shared.favoriteReferences.filter({ $0 == instance }).isEmpty {
+                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+                                    Surveys.shared.favoriteReferences.append(existing)
+                                } else {
+                                    Surveys.shared.favoriteReferences.append(instance)
+                                }
+                            }
+                        case .Top:
+                            if Surveys.shared.topReferences.filter({ $0 == instance }).isEmpty {
+                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+                                    Surveys.shared.topReferences.append(existing)
+                                } else {
+                                    Surveys.shared.topReferences.append(instance)
+                                }
+                            }
+                        case .Own:
+                            if Surveys.shared.ownReferences.filter({ $0 == instance }).isEmpty {
+                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+                                    Surveys.shared.ownReferences.append(existing)
+                                } else {
+                                    Surveys.shared.ownReferences.append(instance)
+                                }
+                            }
+                        case .New:
+                            if Surveys.shared.newReferences.filter({ $0 == instance }).isEmpty {
+                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+                                    Surveys.shared.newReferences.append(existing)
+                                } else {
+                                    Surveys.shared.newReferences.append(instance)
+                                }
+                            }
+                        default:
+                            fatalError()
                         }
                     }
-//                    Notification.send(names: [Notifications.Surveys.UpdateSubscriptions])
                 }
             } catch let error {
     #if DEBUG

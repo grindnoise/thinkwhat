@@ -33,7 +33,7 @@ class Userprofiles {
             UserDefaults.Profile.load(from: current!)
         }
     }
-    let anonymous: Userprofile = {
+    lazy var anonymous: Userprofile = {
         let user = Userprofile()
         user!.image = UIImage(named: "anon")
         user!.firstName = "anonymous".localized

@@ -24,11 +24,16 @@ class TopicsView: UIView {
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
-        contentView.frame = self.bounds
-        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        self.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
         setupUI()
     }
+
     
     override func layoutSubviews() {
         

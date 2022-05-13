@@ -50,27 +50,10 @@ class SurveyCell: UITableViewCell {
                 }
             }
         }
+        hotSpacer.constant = surveyReference.isHot ? 4 : 0
         hotIcon.alpha = surveyReference.isHot ? 1 : 0
-
-        let watchIcon: UIImageView = stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "watch" }).first as? UIImageView ?? {
-            let v = UIImageView(frame: .zero)
-            v.contentMode = .scaleAspectFill
-            v.image = ImageSigns.binocularsFilled.image
-            v.tintColor = mark.tintColor
-            v.accessibilityIdentifier = "watch"
-            return v
-        }()
-        switch surveyReference.isFavorite {
-        case true:
-            watchIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-            stackView.addArrangedSubview(watchIcon)
-            stackViewSigns.append(watchIcon)
-        case false:
-            watchIcon.removeFromSuperview()
-            stackViewSigns.remove(object: watchIcon)
-        default:
-            print("")
-        }
+        watch.alpha = surveyReference.isFavorite ? 1 : 0
+        watch.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
         
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         setText()
@@ -82,24 +65,29 @@ class SurveyCell: UITableViewCell {
         guard !surveyReference.isNil else { return }
         setText()
         topicIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-        topicIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : surveyReference.topic.tagColor)
+        topicIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         votesLimitIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         viewsIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         mark.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        watch.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
         hotIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-        stackViewSigns.forEach {
-            if $0.accessibilityIdentifier == "watch" {
-                $0.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-            }
-        }
     }
     
     private func setText() {
         guard !surveyReference.isNil else { return }
-        let titleAttrString = NSMutableAttributedString()
-        titleAttrString.append(NSAttributedString(string: surveyReference.title, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        let paragraph = NSMutableParagraphStyle()
+        if #available(iOS 15.0, *) {
+            paragraph.usesDefaultHyphenation = true
+        } else {
+            paragraph.hyphenationFactor = 1
+        }
+        paragraph.alignment = .center
+        let string = surveyReference.title
+        let titleAttrString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
+        titleAttrString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: surveyReference.isComplete ? .secondaryLabel : .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
         titleLabel.attributedText = titleAttrString
+        titleLabel.textAlignment = .left
         
         let topicAttrString = NSMutableAttributedString()
         topicAttrString.append(NSAttributedString(string: "\(surveyReference.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : surveyReference.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
@@ -132,19 +120,6 @@ class SurveyCell: UITableViewCell {
     private var topicFontSize: CGFloat = 0
     private var lowerLabelsFontSize: CGFloat = 0
     private var titleFontSize: CGFloat = 0
-    private var stackViewSigns: [UIView] = [] {
-        didSet {
-            stackViewWidthConstraint.constant = stackView.frame.height * CGFloat(stackView.arrangedSubviews.count)
-        }
-    }
-    
-//    override var frame: CGRect {
-//        didSet {
-//            guard !progress.isNil, !surveyReference.isNil else { return }
-//            progress.setupUI(foregroundColor: traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor, progress: CGFloat(surveyReference.progress)/CGFloat(100), lineWidthFactor: 0.3, showPercentSign: false)
-//            hotIconWidth.constant = surveyReference.isHot ? hotIcon.frame.height : 0
-//        }
-//    }
     
     // MARK: - IB outlets
     @IBOutlet weak var titleLabel: UILabel!
@@ -190,20 +165,18 @@ class SurveyCell: UITableViewCell {
         }
     }
     @IBOutlet weak var userCredentials: UILabel!
-//    @IBOutlet weak var heightConstraint: NSLayoutConstraint!
     @IBOutlet weak var mark: UIImageView! {
         didSet {
             mark.contentMode = .scaleAspectFit
             mark.image = ImageSigns.checkmarkSealFilled.image
         }
     }
-    @IBOutlet weak var stackView: UIStackView! {
+    @IBOutlet weak var watch: UIImageView! {
         didSet {
-            stackView.distribution = .fillEqually
-            stackView.spacing = 4
+            watch.contentMode = .scaleAspectFill
+            watch.image = ImageSigns.binocularsFilled.image
         }
     }
-    @IBOutlet weak var stackViewWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var hotIconWidth: NSLayoutConstraint!
-    
+    @IBOutlet weak var hotSpacer: NSLayoutConstraint!
 }

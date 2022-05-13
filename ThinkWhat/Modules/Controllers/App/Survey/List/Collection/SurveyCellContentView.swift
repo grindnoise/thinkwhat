@@ -37,46 +37,18 @@ class SurveyCellContentView: UIView, UIContentView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         setText()
         topicIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!
-        topicIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : currentConfiguration.color!)
+        topicIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!)
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         votesLimitIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         viewsIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         mark.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!
+        watch.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!
         hotIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-        stackViewSigns.forEach {
-            if $0.accessibilityIdentifier == "watch" {
-                $0.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!
-            }
-        }
-//        switch traitCollection.userInterfaceStyle {
-//        case .dark:
-//            self.topic.attributedText = categoryString
-//            self.icon.setIconColor(.systemBlue)
-//            self.viewsIcon.setIconColor(.systemBlue)
-//            self.layer.shadowOpacity = 0
-//
-//        default:
-//            self.background.backgroundColor = .systemBackground
-//            self.voteButton.backgroundColor = self.survey.topic.tagColor
-//            let categoryString = NSMutableAttributedString()
-//            categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            self.topic.attributedText = categoryString
-//            self.icon.setIconColor(survey.topic.tagColor)
-//            self.viewsIcon.setIconColor(.black)
-//            self.layer.shadowOpacity = 1
-//        }
     }
     
     private var topicFontSize: CGFloat = 0
     private var lowerLabelsFontSize: CGFloat = 0
     private var titleFontSize: CGFloat = 0
-    private var stackViewSigns: [UIView] = [] {
-        didSet {
-            stackViewWidthConstraint.constant = stackView.frame.height * CGFloat(stackView.arrangedSubviews.count)
-        }
-    }
     
     private var currentConfiguration: SurveyCollectionCellConfiguration!
     var configuration: UIContentConfiguration {
@@ -94,7 +66,8 @@ class SurveyCellContentView: UIView, UIContentView {
         didSet {
             guard !progress.isNil, !currentConfiguration.isNil else { return }
             progress.setupUI(foregroundColor: traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!, progress: CGFloat(currentConfiguration.progress)/CGFloat(100), lineWidthFactor: 0.3, showPercentSign: false)
-            hotIconWidth.constant = currentConfiguration!.isHot ? hotIcon.frame.height : 0
+            hotIconWidth.constant = currentConfiguration!.isHot! ? hotIcon.frame.height : 0
+            hotSpacer.constant = currentConfiguration!.isHot! ? 4 : 0
         }
     }
     
@@ -150,15 +123,15 @@ class SurveyCellContentView: UIView, UIContentView {
             mark.image = ImageSigns.checkmarkSealFilled.image
         }
     }
-    @IBOutlet weak var stackView: UIStackView! {
+    @IBOutlet weak var watch: UIImageView! {
         didSet {
-            stackView.distribution = .fillEqually
-            stackView.spacing = 4
+            watch.contentMode = .scaleAspectFill
+            watch.image = ImageSigns.binocularsFilled.image
         }
     }
-    @IBOutlet weak var stackViewWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var hotIconWidth: NSLayoutConstraint!
     //    @IBOutlet weak var labelWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var hotSpacer: NSLayoutConstraint!
 }
 
 @available(iOS 14.0, *)
@@ -172,8 +145,8 @@ private extension SurveyCellContentView {
         // Replace current configuration with new configuration
         currentConfiguration = configuration
         
-        setNeedsLayout()
-        layoutIfNeeded()
+//        setNeedsLayout()
+//        layoutIfNeeded()
         setText()
         
         topicIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!
@@ -181,74 +154,53 @@ private extension SurveyCellContentView {
         mark.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color
         mark.alpha = currentConfiguration.isComplete! ? 1 : 0
         progress.alpha = currentConfiguration.isComplete! ? 1 : 0
-//        progress.setupUI(foregroundColor: traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!, progress: CGFloat(currentConfiguration.progress)/CGFloat(100), lineWidthFactor: 0.6, showPercentSign: false)
         
-        avatar.lightColor = currentConfiguration!.isAnonymous ? .black : currentConfiguration.color!
+        
+        avatar.lightColor = currentConfiguration.isAnonymous! ? .black : currentConfiguration.color!
         if avatar.imageView.isNil, !currentConfiguration.avatar.isNil {
             Animations.onImageLoaded(imageView: avatar.imageView, image: currentConfiguration.avatar!)
         } else {
             avatar.imageView.image = currentConfiguration.avatar
         }
-        hotIcon.alpha = currentConfiguration!.isHot ? 1 : 0
-//        hotIconWidth.constant = currentConfiguration!.isHot ? hotIcon.frame.height : 0
-        let watchIcon: UIImageView = stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "watch" }).first as? UIImageView ?? {
-            let v = UIImageView(frame: .zero)
-            v.contentMode = .scaleAspectFill
-            v.image = ImageSigns.binocularsFilled.image
-            v.tintColor = mark.tintColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!
-            v.accessibilityIdentifier = "watch"
-            return v
-        }()
-        switch currentConfiguration!.isFavorite {
-        case true:
-            watchIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color//mark.tintColor
-            stackView.addArrangedSubview(watchIcon)
-            stackViewSigns.append(watchIcon)
-        case false:
-            watchIcon.removeFromSuperview()
-            stackViewSigns.remove(object: watchIcon)
-        default:
-            print("")
-        }
-        
-//        let hotIcon: UIImageView = stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "hot" }).first as? UIImageView ?? {
-//            let v = UIImageView(frame: .zero)
-//            v.contentMode = .scaleAspectFill
-//            v.image = ImageSigns.flameFilled.image
-//            v.accessibilityIdentifier = "hot"
-//            return v
-//        }()
-//        switch currentConfiguration!.isFavorite {
-//        case true:
-//            hotIcon.tintColor = .systemRed
-//            stackView.addArrangedSubview(hotIcon)
-//            stackViewSigns.append(hotIcon)
-//        case false:
-//            hotIcon.removeFromSuperview()
-//            stackViewSigns.remove(object: hotIcon)
-//        default:
-//            print("")
-//        }
+        hotIcon.alpha = currentConfiguration.isHot! ? 1 : 0
+        watch.alpha = currentConfiguration.isFavorite! ? 1 : 0
+        watch.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.color!
     }
     
     
     private func setupUI() {
-        titleFontSize = heightConstraint.constant * 0.17
-        lowerLabelsFontSize = votesLimitLabel.frame.height * 0.85
-        topicFontSize = heightConstraint.constant * 0.08
+        titleFontSize = heightConstraint.constant * 0.16
+        lowerLabelsFontSize = votesLimitLabel.frame.height * 0.83
+        topicFontSize = heightConstraint.constant * 0.07
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     }
     
     private func setText() {
         guard !currentConfiguration.isNil else { return }
-        let titleAttrString = NSMutableAttributedString()
-        titleAttrString.append(NSAttributedString(string: currentConfiguration.title!, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        
+        let paragraph = NSMutableParagraphStyle()
+        if #available(iOS 15.0, *) {
+            paragraph.usesDefaultHyphenation = true
+        } else {
+            paragraph.hyphenationFactor = 1
+        }
+        paragraph.alignment = .center
+        let string = currentConfiguration.title!
+        let titleAttrString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
+        titleAttrString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: currentConfiguration.isComplete! ? .secondaryLabel : .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
+//        titleAttrString.append(NSAttributedString(string: string, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: currentConfiguration.isComplete! ? .secondaryLabel : .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         titleLabel.attributedText = titleAttrString
+//        guard titleLabel.numberOfTotatLines > 1 else { return }
+        titleLabel.textAlignment = .left
+        
+//        let titleAttrString = NSMutableAttributedString()
+//        titleAttrString.append(NSAttributedString(string: currentConfiguration.title!, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: currentConfiguration.isComplete! ? .secondaryLabel : .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//        titleLabel.attributedText = titleAttrString
         
         let topicAttrString = NSMutableAttributedString()
-        topicAttrString.append(NSAttributedString(string: "\(currentConfiguration.titleTopic!.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : currentConfiguration!.color, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        topicAttrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : currentConfiguration!.color, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        topicAttrString.append(NSAttributedString(string: "\(currentConfiguration.titleTopicParent!.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : currentConfiguration!.color, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicAttrString.append(NSAttributedString(string: "\(currentConfiguration.titleTopic!.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : currentConfiguration.color!, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicAttrString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : currentConfiguration.color!, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicAttrString.append(NSAttributedString(string: "\(currentConfiguration.titleTopicParent!.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : currentConfiguration.color!, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topicLabel.attributedText = topicAttrString
         
         let limitsAttrString = NSMutableAttributedString()
@@ -265,12 +217,5 @@ private extension SurveyCellContentView {
         let userAttrString = NSMutableAttributedString()
         userAttrString.append(NSAttributedString(string: userText, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: lowerLabelsFontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         userCredentials.attributedText = userAttrString
-        
-//        titleLabel.sizeToFit()
-//        let width = titleLabel.frame.width > hotIcon.frame.origin.x ? hotIcon.frame.origin.x - 8 : titleLabel.frame.width
-//        labelWidthConstraint.constant = width//currentConfiguration!.isHot ? min(titleLabel.frame.width, titleLabel.frame.width - 8 - hotIcon.frame.width) : titleLabel.frame.width
-//        labelWidthConstraint.constant = min(titleLabel.frame.width, (contentView.frame.width - avatar.frame.origin.x) - (currentConfiguration!.isHot ? hotIcon.frame.width + 8 : 0))
     }
-    
-    
 }

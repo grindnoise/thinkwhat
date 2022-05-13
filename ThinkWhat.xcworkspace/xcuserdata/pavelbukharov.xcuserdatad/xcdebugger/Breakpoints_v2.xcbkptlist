@@ -1415,8 +1415,8 @@
             filePath = "ThinkWhat/Modules/Models/Survey.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "308"
-            endingLineNumber = "308"
+            startingLineNumber = "372"
+            endingLineNumber = "372"
             landmarkName = "load(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1559,8 +1559,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/PollController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "142"
-            endingLineNumber = "142"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
             landmarkName = "addFavorite()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1575,8 +1575,8 @@
             filePath = "ThinkWhat/Modules/Models/Survey.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "135"
-            endingLineNumber = "135"
+            startingLineNumber = "178"
+            endingLineNumber = "178"
             landmarkName = "isFavorite"
             landmarkType = "24">
          </BreakpointContent>
@@ -1591,8 +1591,8 @@
             filePath = "ThinkWhat/Modules/Managers/REST/API.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1206"
-            endingLineNumber = "1206"
+            startingLineNumber = "1242"
+            endingLineNumber = "1242"
             landmarkName = "markFavoriteAsync(mark:surveyReference:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1639,8 +1639,8 @@
             filePath = "ThinkWhat/Modules/Models/Survey.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "360"
-            endingLineNumber = "360"
+            startingLineNumber = "429"
+            endingLineNumber = "429"
             landmarkName = "load(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1656,8 +1656,8 @@
             filePath = "ThinkWhat/Modules/Models/SurveyReference.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "82"
-            endingLineNumber = "82"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
             landmarkName = "init(from:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1715,16 +1715,48 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "E87ADB12-6DAB-4F1F-99A2-2207F5E863DD"
+            uuid = "49DBC9C7-3632-4BB8-95E8-7DDD3F53339C"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Survey/List/Table/SurveyCell.swift"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/List/Collection/SurveysCollection.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "78"
-            endingLineNumber = "78"
-            landmarkName = "forceUpdate()"
+            startingLineNumber = "173"
+            endingLineNumber = "173"
+            landmarkName = "onPagination()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "424561BA-BA8C-4EA3-8067-72D2BE9DCC4B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Managers/REST/API.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1215"
+            endingLineNumber = "1215"
+            landmarkName = "loadSurveyReferences(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E776F81A-A145-4A9D-A76F-D9B1D6B4A307"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/List/Collection/SurveyCollectionCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "74"
+            endingLineNumber = "74"
+            landmarkName = "updateConfiguration(using:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

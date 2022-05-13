@@ -17,8 +17,8 @@ class ProtocolSubscriptions {
         if object is Localizable {
             object.perform(Selector("subscribeLocalizable"))
         }
-        if object is Localizable {
-            object.perform(Selector("subscribeDataObservable"))
-        }
+//        if object is DataObservable {
+//            object.perform(Selector("subscribeDataObservable"))
+//        }
     }
 }

@@ -134,17 +134,17 @@ extension PollView: PollControllerOutput {
             imageView.widthAnchor.constraint(equalToConstant: frame.width/2.5),
             imageView.heightAnchor.constraint(equalToConstant: frame.width/2.5)
         ])
-        UIView.animate(withDuration: 0.6, delay: 0, options: UIView.AnimationOptions.curveLinear) {
+        UIView.animate(withDuration: 0.8, delay: 0, options: UIView.AnimationOptions.curveLinear) {
             imageView.transform = .identity
         } completion: { _ in
             imageView.removeFromSuperview()
             
         }
         
-        UIView.animate(withDuration: 0.25, delay: 0, options: UIView.AnimationOptions.curveEaseIn) {
-            imageView.alpha = 0.5
+        UIView.animate(withDuration: 0.4, delay: 0, options: UIView.AnimationOptions.curveLinear) {
+            imageView.alpha = 0.7
         } completion: { _ in
-            UIView.animate(withDuration: 0.3, delay: 0, options: UIView.AnimationOptions.curveLinear) {
+            UIView.animate(withDuration: 0.4, delay: 0, options: UIView.AnimationOptions.curveLinear) {
                 imageView.alpha = 0
             } completion: { _ in }
         }

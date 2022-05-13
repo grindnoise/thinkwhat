@@ -83,10 +83,7 @@ class PollController: UIViewController {
 //                                               object: nil)
         navigationItem.largeTitleDisplayMode = .never
         guard _surveyReference.isOwn else {
-            
-            if Surveys.shared.favoriteReferences.filter({ (ref, date) in
-                ref == _surveyReference
-            }).isEmpty {
+            if Surveys.shared.favoriteReferences.filter({ $0 == _surveyReference }).isEmpty {
                 UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
                     self.watchButton.image = ImageSigns.binoculars.image
                 } completion: { _ in}
@@ -97,6 +94,19 @@ class PollController: UIViewController {
                 } completion: { _ in}
                 isAddedToFavorite = true
             }
+//            if Surveys.shared.favoriteReferences.filter({ (ref, date) in
+//                ref == _surveyReference
+//            }).isEmpty {
+//                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
+//                    self.watchButton.image = ImageSigns.binoculars.image
+//                } completion: { _ in}
+//                isAddedToFavorite = false
+//            } else {
+//                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
+//                    self.watchButton.image = ImageSigns.binocularsFilled.image
+//                } completion: { _ in}
+//                isAddedToFavorite = true
+//            }
             navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
             return
         }
@@ -128,15 +138,19 @@ class PollController: UIViewController {
                 self.watchButton.image = ImageSigns.binocularsFilled.image
             } completion: { _ in}
             mark = true
-            if Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == _surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences[self._surveyReference] = Date() }
+            if Surveys.shared.favoriteReferences.filter({ $0.id == _surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences.append(_surveyReference)
+            }
+//            if Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == _surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences[self._surveyReference] = Date() }
         } else {
             UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
                 self.watchButton.image = ImageSigns.binoculars.image
             } completion: { _ in}
             mark = false
-            if let key = Surveys.shared.favoriteReferences.keys.filter({ $0.id == _surveyReference.id }).first {
-                Surveys.shared.favoriteReferences.removeValue(forKey: key)
+            if Surveys.shared.favoriteReferences.filter({ $0.id == _surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences.remove(object: _surveyReference)
             }
+//            if let key = Surveys.shared.favoriteReferences.keys.filter({ $0.id == _surveyReference.id }).first {
+//                Surveys.shared.favoriteReferences.removeValue(forKey: key)
+//            }
         }
         isAddedToFavorite = !isAddedToFavorite
         NotificationCenter.default.post(name: Notifications.Surveys.UpdateFavorite, object: nil)

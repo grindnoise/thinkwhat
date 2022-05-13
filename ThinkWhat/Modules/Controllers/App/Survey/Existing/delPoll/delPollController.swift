@@ -100,7 +100,7 @@ class delPollController: UIViewController {
                 survey = surveyRef.survey
             }
             likeButton.removeAllAnimations()
-            likeButton.state = Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == surveyRef.id }).isEmpty ? .disabled : .enabled
+//            likeButton.state = Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == surveyRef.id }).isEmpty ? .disabled : .enabled
         }
     }
     //Nil if object isn't downloaded, checked in performChecks()
@@ -407,17 +407,17 @@ class delPollController: UIViewController {
             } else if survey!.isComplete {
                 isRequesting = true
                 var mark = true
-                if likeButton.state == .disabled {
-                    likeButton.state = .enabled
-                    mark = true
-                    if Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == surveyRef.id }).isEmpty { Surveys.shared.favoriteReferences[self.surveyRef] = Date() }
-                } else {
-                    likeButton.state = .disabled
-                    mark = false
-                    if let key = Surveys.shared.favoriteReferences.keys.filter({ $0.id == surveyRef.id }).first {
-                        Surveys.shared.favoriteReferences.removeValue(forKey: key)
-                    }
-                }
+//                if likeButton.state == .disabled {
+//                    likeButton.state = .enabled
+//                    mark = true
+//                    if Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == surveyRef.id }).isEmpty { Surveys.shared.favoriteReferences[self.surveyRef] = Date() }
+//                } else {
+//                    likeButton.state = .disabled
+//                    mark = false
+//                    if let key = Surveys.shared.favoriteReferences.keys.filter({ $0.id == surveyRef.id }).first {
+//                        Surveys.shared.favoriteReferences.removeValue(forKey: key)
+//                    }
+//                }
                 NotificationCenter.default.post(name: Notifications.Surveys.UpdateFavorite, object: nil)
                 API.shared.markFavorite(mark: mark, surveyReference: surveyRef) { result in
                     switch result {

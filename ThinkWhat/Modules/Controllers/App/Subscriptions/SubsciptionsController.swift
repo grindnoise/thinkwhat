@@ -123,7 +123,7 @@ extension SubsciptionsController: SubsciptionsViewInput {
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
-    func onDataSourceUpdate() {
+    func onDataSourceRequest() {
         controllerInput?.loadSubscriptions()
     }
     

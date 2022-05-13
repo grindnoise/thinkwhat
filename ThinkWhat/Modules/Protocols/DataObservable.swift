@@ -13,6 +13,8 @@ protocol DataObservable {
     /**
      Subscription if Bundle language changes on the fly.
      */
+//    func subscribeDataObservable()
+    
     func onDataLoaded()
 
 

@@ -358,7 +358,8 @@ class SurveysTableViewController: UITableViewController {
                 case .Own:
                     dataSource = Surveys.shared.ownReferences
                 case .Favorite:
-                    dataSource = Surveys.shared.favoriteReferences.keys.compactMap({ $0 })
+                    fatalError()
+//                    dataSource = Surveys.shared.favoriteReferences.keys.compactMap({ $0 })
                 default:
                     dataSource = Surveys.shared.topReferences
                 }

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SurveyTable: UIView {
+class SurveyTable: UIView, SurveyDataSource {
 
     deinit {
         print("HotView deinit")
@@ -16,18 +16,21 @@ class SurveyTable: UIView {
     }
     
     // MARK: - Initialization
-    init(delegate: CallbackObservable) {
+    init(delegate: CallbackObservable, category: Survey.SurveyCategory) {
+        self.category = category
         super.init(frame: .zero)
         callbackDelegate = delegate
         commonInit()
     }
     
     override init(frame: CGRect) {
+        self.category = .All
         super.init(frame: frame)
         commonInit()
     }
     
     required init?(coder: NSCoder) {
+        self.category = .All
         super.init(coder: coder)
         commonInit()
     }
@@ -56,28 +59,38 @@ class SurveyTable: UIView {
     }
     
     private func setObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscriptionsUpdated), name: Notifications.Surveys.UpdateSubscriptions, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.endRefreshing), name: Notifications.Surveys.ZeroSubscriptions, object: nil)
+        let pagination = [Notifications.Surveys.UpdateSubscriptions,
+                          Notifications.Surveys.UpdateTopSurveys,
+                          Notifications.Surveys.UpdateOwn,
+                          Notifications.Surveys.UpdateFavorite,
+                          Notifications.Surveys.UpdateNewSurveys,]
+        let zeroEmitted = [Notifications.Surveys.ZeroSubscriptions]
+        
+        pagination.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onPagination), name: $0, object: nil) }
+        zeroEmitted.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.endRefreshing), name: $0, object: nil) }
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         tableView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-//        tableView.sectionIndexBackgroundColor
     }
     
     @objc
-    private func onSubscriptionsUpdated() {
+    private func onPagination() {
         endRefreshing()
-        tableView.reloadData()//reloadRows(at: [IndexPath(row: dataItems.endIndex, section: 0)], with: .bottom)
-        
-        // Sections(IndexSet(arrayLiteral: 0), with: .automatic)
-//        layoutIfNeeded()
+        tableView.reloadData()
     }
     
     weak var callbackDelegate: CallbackObservable?
     private let refreshControl = UIRefreshControl()
-    var dataItems: [SurveyReference] {
-        return Surveys.shared.subscriptions
+    var category: Survey.SurveyCategory {
+        didSet {
+            guard oldValue != category else { return }
+            tableView.reloadSections(IndexSet(arrayLiteral: 0), with: .automatic)
+            tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+        }
+    }
+    private var dataItems: [SurveyReference] {
+        return category.dataItems
     }
     
     // MARK: - IB outlets

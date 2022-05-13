@@ -15,5 +15,19 @@ class ListModel {
 
 // MARK: - Controller Input
 extension ListModel: ListControllerInput {
+    func onDataSourceRequest() {
+        guard let source = modelOutput?.surveyCategory else { return }
+        
+        Task {
+            do {
+                try await API.shared.surveys.loadSurveyReferences(source)
+            } catch {
+                await MainActor.run {
+                    modelOutput?.onError(error)
+                }
+            }
+        }
+    }
+    
     // Implement methods
 }

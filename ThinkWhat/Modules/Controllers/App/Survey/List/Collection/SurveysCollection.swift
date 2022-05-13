@@ -8,8 +8,12 @@
 
 import UIKit
 
+protocol SurveyDataSource: class {
+    var category: Survey.SurveyCategory { get set }
+}
+
 @available(iOS 14, *)
-class SurveysCollection: UIView {
+class SurveysCollection: UIView, SurveyDataSource {
     
     deinit {
         print("SurveysCollection deinit")
@@ -21,17 +25,20 @@ class SurveysCollection: UIView {
 
     // MARK: - Initialization
     override init(frame: CGRect) {
+        self.category = .All
         super.init(frame: frame)
         commonInit()
     }
     
-    init(delegate: CallbackObservable) {
+    init(delegate: CallbackObservable, category: Survey.SurveyCategory) {
+        self.category = category
         super.init(frame: .zero)
         callbackDelegate = delegate
         commonInit()
     }
     
     required init?(coder: NSCoder) {
+        self.category = .All
         super.init(coder: coder)
         commonInit()
     }
@@ -48,8 +55,15 @@ class SurveysCollection: UIView {
     }
     
     private func setObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscriptionsUpdated), name: Notifications.Surveys.UpdateSubscriptions, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.endRefreshing), name: Notifications.Surveys.ZeroSubscriptions, object: nil)
+        let pagination = [Notifications.Surveys.UpdateSubscriptions,
+                          Notifications.Surveys.UpdateTopSurveys,
+                          Notifications.Surveys.UpdateOwn,
+                          Notifications.Surveys.UpdateFavorite,
+                          Notifications.Surveys.UpdateNewSurveys,]
+        let zeroEmitted = [Notifications.Surveys.ZeroSubscriptions]
+        
+        pagination.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onPagination), name: $0, object: nil) }
+        zeroEmitted.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.endRefreshing), name: $0, object: nil) }
     }
     
     private func setupUI() {
@@ -106,13 +120,16 @@ class SurveysCollection: UIView {
         }
     }
     
-    var dataItems = Surveys.shared.subscriptions //{
-//        didSet {
-//            if oldValue.count != dataItems.count {
-//                needsRefresh = true
-//            }
-//        }
-//    }
+    var category: Survey.SurveyCategory {
+        didSet {
+            guard oldValue != category else { return }
+            setDataSource()
+            collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+        }
+    }
+    private var dataItems: [SurveyReference] {
+        return category.dataItems
+    }
     var dataSource: UICollectionViewDiffableDataSource<Section, SurveyReference>!
     var snapshot: NSDiffableDataSourceSnapshot<Section, SurveyReference>!
     weak var callbackDelegate: CallbackObservable?
@@ -134,6 +151,8 @@ extension SurveysCollection: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        cell.setNeedsLayout()
+        cell.layoutIfNeeded()
         if let biggestRow = collectionView.indexPathsForVisibleItems.sorted{ $1.row < $0.row }.first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
             callbackDelegate?.callbackReceived(self)
         }
@@ -150,19 +169,27 @@ extension SurveysCollection: UICollectionViewDelegate {
     }
     
     @objc
-    private func onSubscriptionsUpdated() {
+    private func onPagination() {
         endRefreshing()
-        dataItems = Surveys.shared.subscriptions
-        updateDataSource()
+        appendToDataSource()
     }
     
-    func updateDataSource() {
+    func appendToDataSource() {
         guard let newInstance = dataItems.last else { return }
         var snapshot = dataSource.snapshot()
 //        dataSource
 //        let existingSet = Set(dataSource.for)
 //        var newSet = Set(dataItems)
         snapshot.appendItems([newInstance], toSection: .main)
+
+        // Display data in the collection view by applying the snapshot to data source
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func setDataSource() {
+        snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(dataItems, toSection: .main)
 
         // Display data in the collection view by applying the snapshot to data source
         dataSource.apply(snapshot, animatingDifferences: true)

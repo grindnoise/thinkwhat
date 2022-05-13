@@ -18,7 +18,7 @@ extension SubsciptionsModel: SubsciptionsControllerInput {
     func loadSubscriptions() {
         Task {
             do {
-                try await API.shared.surveys.loadSubscriptions()
+                try await API.shared.surveys.loadSurveyReferences(Survey.SurveyCategory.Subscriptions)
             } catch {
                 await MainActor.run {
                     modelOutput?.onError(error)

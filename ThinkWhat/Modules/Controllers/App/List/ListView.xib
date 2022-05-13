@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -11,21 +11,58 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ListView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
+                <outlet property="card" destination="cha-N3-aee" id="n7b-bG-S4E"/>
+                <outlet property="cardShadow" destination="IME-4v-gI4" id="4PE-8T-Hi8"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="fzN-9a-KHM"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" id="iN0-l3-epB">
+        <view clipsSubviews="YES" contentMode="scaleToFill" id="iN0-l3-epB">
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s5C-Mj-HBA">
+                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IME-4v-gI4">
+                            <rect key="frame" x="10" y="10" width="394" height="798"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="shadow" value="YES"/>
+                            </userDefinedRuntimeAttributes>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cha-N3-aee">
+                            <rect key="frame" x="10" y="10" width="394" height="798"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="cha-N3-aee" secondAttribute="trailing" constant="10" id="Avf-bB-5pM"/>
+                        <constraint firstItem="IME-4v-gI4" firstAttribute="centerY" secondItem="cha-N3-aee" secondAttribute="centerY" id="Xqe-KL-c1Y"/>
+                        <constraint firstItem="IME-4v-gI4" firstAttribute="height" secondItem="cha-N3-aee" secondAttribute="height" id="c5X-F0-IOy"/>
+                        <constraint firstAttribute="bottom" secondItem="cha-N3-aee" secondAttribute="bottom" constant="10" id="krk-Gf-BTA"/>
+                        <constraint firstItem="IME-4v-gI4" firstAttribute="width" secondItem="cha-N3-aee" secondAttribute="width" id="uBr-IJ-gZn"/>
+                        <constraint firstItem="cha-N3-aee" firstAttribute="top" secondItem="s5C-Mj-HBA" secondAttribute="top" constant="10" id="vhA-yC-HMO"/>
+                        <constraint firstItem="IME-4v-gI4" firstAttribute="centerX" secondItem="cha-N3-aee" secondAttribute="centerX" id="yfP-EV-hBt"/>
+                        <constraint firstItem="cha-N3-aee" firstAttribute="leading" secondItem="s5C-Mj-HBA" secondAttribute="leading" constant="10" id="znF-sq-742"/>
+                    </constraints>
+                </view>
+            </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
-            <color key="backgroundColor" systemColor="systemRedColor"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="s5C-Mj-HBA" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="ASv-xm-8st"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="s5C-Mj-HBA" secondAttribute="bottom" id="IHp-Nd-OJo"/>
+                <constraint firstItem="s5C-Mj-HBA" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="O9N-7j-2ry"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="s5C-Mj-HBA" secondAttribute="trailing" id="t3r-p3-Yqr"/>
+            </constraints>
             <point key="canvasLocation" x="139" y="67"/>
         </view>
     </objects>
     <resources>
-        <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

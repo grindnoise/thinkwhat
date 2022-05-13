@@ -24,25 +24,16 @@ class SubsciptionsView: UIView {
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
-        contentView.frame = self.bounds
-        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        self.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
         setupUI()
     }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-//        ///Add shadow
-//        cardShadow.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-//        cardShadow.layer.shadowPath = UIBezierPath(roundedRect: cardShadow.bounds, cornerRadius: cardShadow.frame.width * 0.05).cgPath
-//        cardShadow.layer.shouldRasterize = true
-//        cardShadow.layer.rasterizationScale = UIScreen.main.scale
-//        cardShadow.layer.shadowRadius = 7
-//        cardShadow.layer.shadowOffset = .zero
-//        cardShadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-
-    }
-    
+        
     // MARK: - Properties
     weak var viewInput: SubsciptionsViewInput?
     private var isSetupCompleted = false
@@ -213,10 +204,10 @@ extension SubsciptionsView {
         alpha = 0
         setText()
         if #available(iOS 14, *)  {
-            let list = SurveysCollection(delegate: self)//(frame: card.bounds)
+            let list = SurveysCollection(delegate: self, category: .Subscriptions)//(frame: card.bounds)
             list.addEquallyTo(to: card)
         } else {
-            let list = SurveyTable(delegate: self)
+            let list = SurveyTable(delegate: self, category: .Subscriptions)
             list.addEquallyTo(to: card)
         }
     }
@@ -296,7 +287,11 @@ extension SubsciptionsView: CallbackObservable {
             viewInput?.onSurveyTapped(instance)
         } else if #available(iOS 14, *) {
             if sender is SurveysCollection || sender is SurveyTable {
-                viewInput?.onDataSourceUpdate()
+                viewInput?.onDataSourceRequest()
+            }
+        } else {
+            if sender is SurveyTable {
+                viewInput?.onDataSourceRequest()
             }
         }
     }

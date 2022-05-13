@@ -10,6 +10,49 @@ import Foundation
 import SwiftyJSON
 
 class Survey: Decodable {
+    enum SurveyCategory: String, CaseIterable {
+        case Hot, New, Top, Own, Favorite, Subscriptions, All
+        
+        var dataItems: [SurveyReference] {
+            switch self {
+            case .Hot:
+                return Surveys.shared.hot.map { return $0.reference }
+            case .New:
+                return Surveys.shared.newReferences
+            case .Top:
+                return Surveys.shared.topReferences
+            case .Own:
+                return Surveys.shared.ownReferences
+            case .Favorite:
+                return Surveys.shared.favoriteReferences
+//                return Surveys.shared.favoriteReferences.keys.compactMap { $0 }
+            case .Subscriptions:
+                return Surveys.shared.subscriptions
+            case .All:
+                return SurveyReferences.shared.all
+            }
+        }
+        
+        var url: URL? {
+            switch self {
+            case .Hot:
+                return API_URLS.Surveys.hot
+            case .New:
+                return API_URLS.Surveys.subscriptions
+            case .Top:
+                return API_URLS.Surveys.top
+            case .Own:
+                return API_URLS.Surveys.own
+            case .Favorite:
+                return API_URLS.Surveys.own
+            case .Subscriptions:
+                return API_URLS.Surveys.subscriptions
+            case .All:
+                return API_URLS.Surveys.all
+            }
+        }
+    }
+    
     enum SurveyType: String, CaseIterable {
         case Poll = "Poll"
         case Ranking = "Ranking"
@@ -261,23 +304,44 @@ class Surveys {
     private var timer:  Timer?
     
 //    var allReferences:           [SurveyReference] = []
-    var topReferences:           [SurveyReference] = []
+    var topReferences:           [SurveyReference] = [] {
+        didSet {
+            guard oldValue.count != subscriptions.count else { return }
+            Notification.send(names: [Notifications.Surveys.UpdateTopSurveys])
+        }
+    }
+
     var newReferences:           [SurveyReference] = [] {
         didSet {
             if oldValue.count != newReferences.count {
                 let sorted = newReferences.sorted { $0.startDate > $1.startDate }
                 newReferences = sorted
+                Notification.send(names: [Notifications.Surveys.UpdateNewSurveys])
             }
         }
     }
-    var ownReferences:           [SurveyReference] = []
+    var ownReferences:           [SurveyReference] = [] {
+        didSet {
+            guard oldValue.count != subscriptions.count else { return }
+            Notification.send(names: [Notifications.Surveys.UpdateOwn])
+        }
+    }
     var subscriptions:           [SurveyReference] = [] {
         didSet {
             guard oldValue.count != subscriptions.count else { return }
             Notification.send(names: [Notifications.Surveys.UpdateSubscriptions])
         }
     }
-    var favoriteReferences:      [SurveyReference: Date] = [:]
+//    var favoriteReferences:      [SurveyReference: Date] = [:]
+    
+    var favoriteReferences:      [SurveyReference] = [] {
+       didSet {
+           guard oldValue.count != subscriptions.count else { return }
+           Notification.send(names: [Notifications.Surveys.UpdateFavorite])
+       }
+   }
+
+    
 //    var categorizedLinks:   [Topic: [SurveyReference]] = [:]
     var completed:               [Survey] = [] {
         didSet {
@@ -315,44 +379,49 @@ class Surveys {
                         }
                     }
                 } else {
-                    switch key {
-                    case Category.Favorite.rawValue:
-                        for entry in value.arrayValue {
-                            guard let dateStr = entry["timestamp"].rawString(), let date = Date(dateTimeString: dateStr) as? Date, let instance = try decoder.decode(SurveyReference.self, from: entry["survey"].rawData()) as? SurveyReference else {
-                                continue
-                            }
-                            if favoriteReferences.keys.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                favoriteReferences[SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance] = date
-                                notifications.append(Notifications.Surveys.UpdateFavorite)
-                            }
-                        }
-                    default:
+//                    switch key {
+//                    case Category.Favorite.rawValue:
+//                        for entry in value.arrayValue {
+//                            guard let dateStr = entry["timestamp"].rawString(), let date = Date(dateTimeString: dateStr) as? Date, let instance = try decoder.decode(SurveyReference.self, from: entry["survey"].rawData()) as? SurveyReference else {
+//                                continue
+//                            }
+//                            if favoriteReferences.keys.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+//                                favoriteReferences[SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance] = date
+//                                notifications.append(Notifications.Surveys.UpdateFavorite)
+//                            }
+//                        }
+//                    default:
                         let instances = try decoder.decode([SurveyReference].self, from: value.rawData())
                         for instance in instances {
     //                        let surveyReference = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first!
                             if key == Category.Top.rawValue {//} && !value.isEmpty {
                                 if topReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
                                     topReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                                    notifications.append(Notifications.Surveys.UpdateTopSurveys)
+//                                    notifications.append(Notifications.Surveys.UpdateTopSurveys)
                                 }
                             } else if key == Category.New.rawValue {
                                 if newReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
                                     newReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
+//                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
                                 }
                             } else if key == Category.Own.rawValue {
                                 if ownReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
                                     ownReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
+//                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
                                 }
                             } else if key == Category.Subscriptions.rawValue {
                                 if subscriptions.filter({ $0.hashValue == instance.hashValue }).isEmpty {
                                     subscriptions.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                                    notifications.append(Notifications.Surveys.UpdateSubscriptions)
+//                                    notifications.append(Notifications.Surveys.UpdateSubscriptions)
+                                }
+                            } else if key == Category.Favorite.rawValue {
+                                if favoriteReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+                                    favoriteReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+//                                    notifications.append(Notifications.Surveys.UpdateFavorite)
                                 }
                             }
                         }
-                    }
+//                    }
                 }
             }
             Notification.send(names: notifications.uniqued())

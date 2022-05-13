@@ -47,10 +47,10 @@ class Avatar: UIView {
     }
     
     override func layoutSubviews() {
-        if !border.isNil { border.cornerRadius = border.frame.height/2 }
+        if !border.isNil { border.cornerRadius = border.bounds.height/2 }
         if !imageView.isNil {
-            imageView.cornerRadius = imageView.frame.width/2
-            borderBg.cornerRadius = borderBg.frame.width/2
+            imageView.cornerRadius = imageView.bounds.width/2
+            borderBg.cornerRadius = borderBg.bounds.width/2
         }
     }
     

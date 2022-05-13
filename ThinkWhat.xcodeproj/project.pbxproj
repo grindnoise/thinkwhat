@@ -184,6 +184,8 @@
 		AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */; };
 		AB6083C122410131002C0D7E /* ValidSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083C022410130002C0D7E /* ValidSign.swift */; };
 		AB61BA2F2782DDA200F89C4C /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB61BA2E2782DDA200F89C4C /* Media.swift */; };
+		AB66B4DD282D06AC00244A38 /* ListSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66B4DC282D06AC00244A38 /* ListSwitch.swift */; };
+		AB66B4DF282D06B600244A38 /* ListSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB66B4DE282D06B600244A38 /* ListSwitch.xib */; };
 		AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */; };
 		AB6B071F247688600095721B /* delUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6B071E247688600095721B /* delUserViewController.swift */; };
 		AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */; };
@@ -650,6 +652,8 @@
 		AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderlinedSignTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB6083C022410130002C0D7E /* ValidSign.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidSign.swift; sourceTree = "<group>"; };
 		AB61BA2E2782DDA200F89C4C /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
+		AB66B4DC282D06AC00244A38 /* ListSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListSwitch.swift; sourceTree = "<group>"; };
+		AB66B4DE282D06B600244A38 /* ListSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListSwitch.xib; sourceTree = "<group>"; };
 		AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconsStyleKit.swift; sourceTree = "<group>"; };
 		AB6B071E247688600095721B /* delUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delUserViewController.swift; sourceTree = "<group>"; };
 		AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyIcons.swift; sourceTree = "<group>"; };
@@ -1580,6 +1584,15 @@
 			path = Banners;
 			sourceTree = "<group>";
 		};
+		AB66B4DB282D064F00244A38 /* Switch */ = {
+			isa = PBXGroup;
+			children = (
+				AB66B4DC282D06AC00244A38 /* ListSwitch.swift */,
+				AB66B4DE282D06B600244A38 /* ListSwitch.xib */,
+			);
+			path = Switch;
+			sourceTree = "<group>";
+		};
 		AB6B071D247687D90095721B /* User */ = {
 			isa = PBXGroup;
 			children = (
@@ -1653,6 +1666,7 @@
 		AB72962227DB54D000D45B54 /* List */ = {
 			isa = PBXGroup;
 			children = (
+				AB66B4DB282D064F00244A38 /* Switch */,
 				AB72962327DB5A6100D45B54 /* ListController.swift */,
 				AB72962427DB5A6100D45B54 /* ListController.xib */,
 				AB72962727DB5A6D00D45B54 /* ListContract.swift */,
@@ -2604,6 +2618,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AB791D85243B70D00085E00E /* VoteCompletionView.xib in Resources */,
+				AB66B4DF282D06B600244A38 /* ListSwitch.xib in Resources */,
 				AB883B2D2800708500DBE4EF /* Popup.xib in Resources */,
 				AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */,
 				ABADF57527F1D36100A26474 /* TextCell.xib in Resources */,
@@ -3010,6 +3025,7 @@
 				AB3C6846223FD3EE00B57580 /* VK.swift in Sources */,
 				AB463FB927C4D409007D7240 /* City.swift in Sources */,
 				AB72960727DA2EE600D45B54 /* HotController.swift in Sources */,
+				AB66B4DD282D06AC00244A38 /* ListSwitch.swift in Sources */,
 				AB7478C52428D0A300317EB6 /* FilmIcon.swift in Sources */,
 				ABA448D427E331B000F8E00D /* UIView.swift in Sources */,
 				ABA448F027EE031D00F8E00D /* PollContract.swift in Sources */,

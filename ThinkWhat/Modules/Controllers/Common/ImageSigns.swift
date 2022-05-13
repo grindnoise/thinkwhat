@@ -30,4 +30,6 @@ struct ImageSigns {
     static let speedometer                  = UIImageView(image: UIImage(systemName: "speedometer"))
     static let personWaveFilled             = UIImageView(image: UIImage(systemName: "person.wave.2.fill"))
     static let eyeFilled                    = UIImageView(image: UIImage(systemName: "eye.fill"))
+    static let capslockFilled               = UIImageView(image: UIImage(systemName: "capslock.fill"))
+    static let tagFilled                    = UIImageView(image: UIImage(systemName: "tag.fill"))
 }

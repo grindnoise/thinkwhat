@@ -15,8 +15,10 @@ protocol ListViewInput: class {
     
     var controllerOutput: ListControllerOutput? { get set }
     var controllerInput: ListControllerInput? { get set }
+    var surveyCategory: Survey.SurveyCategory { get }
     
-    // View input methods here
+    func onSurveyTapped(_: SurveyReference)
+    func onDataSourceRequest()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -26,7 +28,7 @@ protocol ListControllerInput: class {
     
     var modelOutput: ListModelOutput? { get set }
     
-    // Controller input methods here
+    func onDataSourceRequest()
 }
 
 /// *Model* returns the result to the *Controller*
@@ -34,6 +36,9 @@ protocol ListControllerInput: class {
 /// **Controller** conforms to this protocol
 protocol ListModelOutput: class {
     // Model output methods here
+    var surveyCategory: Survey.SurveyCategory { get }
+    
+    func onError(_: Error)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -43,4 +48,8 @@ protocol ListControllerOutput: class {
     var viewInput: ListViewInput? { get set }
     
     func onDidLayout()
+    func onWillAppear()
+    func onDidLoad()
+    func onDataSourceChanged()
+    func onError()
 }

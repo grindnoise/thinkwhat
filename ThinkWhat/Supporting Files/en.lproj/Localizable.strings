@@ -111,6 +111,9 @@
 
 //List VC
 "list" = "Feed";
+"top" = "Popular";
+"new" = "New";
+"watching" = "Watching";
 
 //Topics VC
 "topics" = "Topics";

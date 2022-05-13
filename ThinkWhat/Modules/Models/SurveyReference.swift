@@ -45,16 +45,17 @@ class SurveyReference: Decodable {
     var isOwn: Bool
     var isAnonymous: Bool
     var isHot: Bool
-    var isFavorite: Bool {
-        didSet {
-            guard oldValue != isFavorite else { return }
-            if isFavorite, Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).isEmpty {
-                Surveys.shared.favoriteReferences[self] = Date()
-            } else if !isFavorite, let instance = Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).first {
-                Surveys.shared.favoriteReferences[instance] = nil
-            }
-        }
-    }
+    var isFavorite: Bool
+//    var isFavorite: Bool {
+//        didSet {
+//            guard oldValue != isFavorite else { return }
+//            if isFavorite, Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).isEmpty {
+//                Surveys.shared.favoriteReferences[self] = Date()
+//            } else if !isFavorite, let instance = Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).first {
+//                Surveys.shared.favoriteReferences[instance] = nil
+//            }
+//        }
+//    }
     var owner: Userprofile
     var votesTotal: Int
     var votesLimit: Int

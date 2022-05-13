@@ -19,7 +19,7 @@ protocol SubsciptionsViewInput: class {
     
     func onSubscribersTapped()
     func onSubscpitionsTapped()
-    func onDataSourceUpdate()
+    func onDataSourceRequest()
     func toggleBarButton()
     func onSurveyTapped(_: SurveyReference)
 }
