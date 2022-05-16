@@ -10,6 +10,9 @@ import UIKit
 
 protocol SurveyDataSource: class {
     var category: Survey.SurveyCategory { get set }
+    var topic: Topic? { get set }
+    
+    func reload()
 }
 
 @available(iOS 14, *)
@@ -37,6 +40,15 @@ class SurveysCollection: UIView, SurveyDataSource {
         commonInit()
     }
     
+    init(delegate: CallbackObservable, topic: Topic?) {
+        self.topic = topic
+        self.category = .Topic
+        super.init(frame: .zero)
+        callbackDelegate = delegate
+        commonInit()
+    }
+
+    
     required init?(coder: NSCoder) {
         self.category = .All
         super.init(coder: coder)
@@ -59,6 +71,7 @@ class SurveysCollection: UIView, SurveyDataSource {
                           Notifications.Surveys.UpdateTopSurveys,
                           Notifications.Surveys.UpdateOwn,
                           Notifications.Surveys.UpdateFavorite,
+                          Notifications.Surveys.UpdateAll,
                           Notifications.Surveys.UpdateNewSurveys,]
         let zeroEmitted = [Notifications.Surveys.ZeroSubscriptions]
         
@@ -97,44 +110,52 @@ class SurveysCollection: UIView, SurveyDataSource {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         refreshControl.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
         collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        collectionView.alpha = dataItems.isEmpty ? 0 : 1
+    }
+    
+    func reload() {
+        collectionView.reloadSections(IndexSet(arrayLiteral: 0))
     }
     
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var collectionView: UICollectionView! {
         didSet {
             // Create list layout
-            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
+            layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
             layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
             
             let listLayout = UICollectionViewCompositionalLayout.list(using: layoutConfig)
-//            listLayout.collectionView?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-            
             // Create collection view with list layout
             collectionView.collectionViewLayout = listLayout
             collectionView.delegate = self
-//            collectionView.backgroundColor = .clear
-//            collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
             
             refreshControl.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
             collectionView.refreshControl = refreshControl
         }
     }
     
+    var topic: Topic?
     var category: Survey.SurveyCategory {
         didSet {
             guard oldValue != category else { return }
+            collectionView.alpha = dataItems.isEmpty ? 0 : 1
             setDataSource()
+            guard !dataItems.isEmpty else { return }
             collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         }
     }
     private var dataItems: [SurveyReference] {
-        return category.dataItems
+        if category == .Topic {
+            return category.dataItems(topic)
+        }
+        return category.dataItems()
     }
     var dataSource: UICollectionViewDiffableDataSource<Section, SurveyReference>!
     var snapshot: NSDiffableDataSourceSnapshot<Section, SurveyReference>!
     weak var callbackDelegate: CallbackObservable?
+    private var layoutConfig: UICollectionLayoutListConfiguration!
     private let refreshControl = UIRefreshControl()
-//    private var needsRefresh = false
 }
 
 @available(iOS 14, *)
@@ -153,8 +174,11 @@ extension SurveysCollection: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         cell.setNeedsLayout()
         cell.layoutIfNeeded()
-        if let biggestRow = collectionView.indexPathsForVisibleItems.sorted{ $1.row < $0.row }.first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
+        
+        if dataItems.count < 10 {
             callbackDelegate?.callbackReceived(self)
+        } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted{ $1.row < $0.row }.first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
+                callbackDelegate?.callbackReceived(self)
         }
     }
     
@@ -177,9 +201,6 @@ extension SurveysCollection: UICollectionViewDelegate {
     func appendToDataSource() {
         guard let newInstance = dataItems.last else { return }
         var snapshot = dataSource.snapshot()
-//        dataSource
-//        let existingSet = Set(dataSource.for)
-//        var newSet = Set(dataItems)
         snapshot.appendItems([newInstance], toSection: .main)
 
         // Display data in the collection view by applying the snapshot to data source

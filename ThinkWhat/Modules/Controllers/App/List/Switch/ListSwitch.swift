@@ -11,7 +11,7 @@ import UIKit
 class ListSwitch: UIView {
 
     enum State {
-        case Top, New, Watching
+        case Top, New, Watching, Own
     }
     
     // MARK: - Initialization
@@ -54,9 +54,10 @@ class ListSwitch: UIView {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        top.tintColor = state == .Top ? .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        new.tintColor = state == .New ? .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        watching.tintColor = state == .Watching ? .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        top.tintColor = state == .Top ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        new.tintColor = state == .New ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        watching.tintColor = state == .Watching ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        own.tintColor = state == .Own ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         mark.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
@@ -67,8 +68,10 @@ class ListSwitch: UIView {
             state = .Top
         } else if v === new {
             state = .New
-        } else {
+        } else if v === watching {
             state = .Watching
+        } else {
+            state = .Own
         }
     }
     
@@ -101,6 +104,15 @@ class ListSwitch: UIView {
             watching.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
         }
     }
+    @IBOutlet weak var own: UIImageView! {
+        didSet {
+            own.isUserInteractionEnabled = true
+            own.contentMode = .center
+            own.image = ImageSigns.figureWave.image
+            own.tintColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            own.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
+        }
+    }
     
     var state: ListSwitch.State = .New {
         didSet {
@@ -114,6 +126,8 @@ class ListSwitch: UIView {
                 oldView = new
             case .Watching:
                 oldView = watching
+            case .Own:
+                oldView = own
             }
             var newView: UIView!
             switch state {
@@ -123,13 +137,15 @@ class ListSwitch: UIView {
                 newView = new
             case .Watching:
                 newView = watching
+            case .Own:
+                newView = own
             }
             UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: [.curveEaseInOut]) {
                 self.mark.center.x  = newView.center.x
                 oldView.tintColor = .secondaryLabel//self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
                 oldView.transform = .identity
                 newView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-                newView.tintColor = .white
+                newView.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .white
             } completion: { _ in }
         }
     }

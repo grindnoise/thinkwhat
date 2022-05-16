@@ -100,7 +100,7 @@ class SubsciptionsController: UIViewController {
     var controllerInput: SubsciptionsControllerInput?
     private let barButton: UIImageView = {
         let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
-        v.contentMode = .scaleAspectFit
+        v.contentMode = .scaleAspectFill
         v.image = ImageSigns.chevronDownFilled.image
         v.isUserInteractionEnabled = true
         return v

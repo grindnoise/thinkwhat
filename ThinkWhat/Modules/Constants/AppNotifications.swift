@@ -41,6 +41,7 @@ struct Notifications {
         static let UpdateHotSurveys                 = Notification.Name("NotificationSurveysStackReceived")
         static let UpdateSubscriptions              = Notification.Name("NotificationSubscriptionsReceived")
         static let UpdateOwn                        = Notification.Name("NotificationOwnSurveysUpdated")
+        static let UpdateAll                        = Notification.Name("NotificationAllSurveysUpdated")
         
         static let ZeroSubscriptions                = Notification.Name("NotificationZeroSubscriptionsReceived")
         static let Completed                        = Notification.Name("NotificationSurveyCompleted")

@@ -23,6 +23,14 @@ class SurveyTable: UIView, SurveyDataSource {
         commonInit()
     }
     
+    init(delegate: CallbackObservable, topic: Topic) {
+        self.topic = topic
+        self.category = .Topic
+        super.init(frame: .zero)
+        callbackDelegate = delegate
+        commonInit()
+    }
+    
     override init(frame: CGRect) {
         self.category = .All
         super.init(frame: frame)
@@ -80,8 +88,13 @@ class SurveyTable: UIView, SurveyDataSource {
         tableView.reloadData()
     }
     
+    func reload() {
+        tableView.reloadData()
+    }
+    
     weak var callbackDelegate: CallbackObservable?
     private let refreshControl = UIRefreshControl()
+    var topic: Topic?
     var category: Survey.SurveyCategory {
         didSet {
             guard oldValue != category else { return }
@@ -89,8 +102,12 @@ class SurveyTable: UIView, SurveyDataSource {
             tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         }
     }
+    
     private var dataItems: [SurveyReference] {
-        return category.dataItems
+        if category == .Topic {
+            return category.dataItems(topic)
+        }
+        return category.dataItems()
     }
     
     // MARK: - IB outlets

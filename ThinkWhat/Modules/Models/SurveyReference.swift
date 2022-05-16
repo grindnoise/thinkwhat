@@ -181,7 +181,12 @@ extension SurveyReference: Hashable {
 class SurveyReferences {
     static let shared = SurveyReferences()
     private init() {}
-    var all: [SurveyReference] = []
+    var all: [SurveyReference] = [] {
+        didSet {
+            guard oldValue.count != all.count else { return }
+            Notification.send(names: [Notifications.Surveys.UpdateAll])
+        }
+    }
     
     public func eraseData() {
         all.removeAll()

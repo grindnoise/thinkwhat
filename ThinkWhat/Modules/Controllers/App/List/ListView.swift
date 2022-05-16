@@ -42,11 +42,12 @@ class ListView: UIView {
     weak var viewInput: ListViewInput?
     private var isSetupCompleted = false
     private var shadowPath: CGPath!
-    private var list: SurveyDataSource! {
+    private var list: (UIView & SurveyDataSource)! {
         didSet {
-            (list as! UIView).addEquallyTo(to: card)
+            list.addEquallyTo(to: card)
         }
     }
+    
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!

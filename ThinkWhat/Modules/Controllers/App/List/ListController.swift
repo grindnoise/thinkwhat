@@ -59,8 +59,8 @@ class ListController: UIViewController {
         NSLayoutConstraint.activate([
             listSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             listSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
-            listSwitch.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
-            listSwitch.widthAnchor.constraint(equalTo: listSwitch.heightAnchor, multiplier: 3.25)
+            listSwitch.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState * 0.97),
+            listSwitch.widthAnchor.constraint(equalTo: listSwitch.heightAnchor, multiplier: 4.2)
             ])
     }
     // MARK: - Properties
@@ -130,6 +130,9 @@ extension ListController: CallbackObservable {
             case .Watching:
                 category = .Favorite
                 navigationItem.title = "watching".localized
+            case .Own:
+                category = .Own
+                navigationItem.title = "own".localized
             }
         }
     }

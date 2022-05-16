@@ -32,4 +32,8 @@ struct ImageSigns {
     static let eyeFilled                    = UIImageView(image: UIImage(systemName: "eye.fill"))
     static let capslockFilled               = UIImageView(image: UIImage(systemName: "capslock.fill"))
     static let tagFilled                    = UIImageView(image: UIImage(systemName: "tag.fill"))
+    static let figureWave                   = UIImageView(image: UIImage(systemName: "figure.wave"))
+    static let magnifyingGlassFilled        = UIImageView(image: UIImage(systemName: "magnifyingglass.circle.fill"))
+    static let arrowLeft                    = UIImageView(image: UIImage(systemName: "arrowshape.turn.up.backward.circle.fill"))
+    
 }

@@ -103,7 +103,7 @@ class HotController: UIViewController {
     private var isViewLayedOut = false
     private let barButton: UIImageView = {
         let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
-        v.contentMode = .scaleAspectFit
+        v.contentMode = .scaleAspectFill
         v.isUserInteractionEnabled = true
         return v
     }()

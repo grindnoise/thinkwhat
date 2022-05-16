@@ -31,7 +31,7 @@ class CategoryCollectionViewController: UICollectionViewController {
         self.collectionView?.register(UINib(nibName: "CategoryCollectionViewCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
         if categories == nil {
             parentMode = true
-            categories = Topics.shared.all.filter { $0.parent == nil }.sorted { $0.totalCount > $1.totalCount }
+            categories = Topics.shared.all.filter { $0.parent == nil }.sorted { $0.total > $1.total }
         }
         effectView.frame = collectionView.bounds
         effectView.addEquallyTo(to: collectionView)
@@ -76,8 +76,8 @@ class CategoryCollectionViewController: UICollectionViewController {
             if let category = categories[indexPath.row] as? Topic {
                 cell.childColor = childColor
                 cell.category = category
-                cell.total.alpha = selectionMode ? 0 : 1
-                if selectionMode, (category.parent != nil || category.hasNoChildren) {
+//                cell.total.alpha = selectionMode ? 0 : 1
+                if selectionMode, (category.parent != nil || category.isParentNode) {
                     cell.selectionMode = true
                     cell.icon.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5)
                 }
@@ -133,7 +133,7 @@ class CategoryCollectionViewController: UICollectionViewController {
         if let cell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell, let category = cell.category {
             currentIndex = indexPath
             if let cell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell, let category = cell.category, category.parent == nil, selectionMode  {
-                if category.hasNoChildren {
+                if category.isParentNode {
                     //Subcategory
                     delegate?.callbackReceived(category)
                 } else {

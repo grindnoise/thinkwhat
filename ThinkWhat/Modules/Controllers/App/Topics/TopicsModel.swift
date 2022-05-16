@@ -15,5 +15,15 @@ class TopicsModel {
 
 // MARK: - Controller Input
 extension TopicsModel: TopicsControllerInput {
-    // Implement methods
+    func onDataSourceRequest(_ topic: Topic) {
+        Task {
+            do {
+                try await API.shared.surveys.loadSurveyReferences(.Topic, topic)
+            } catch {
+                await MainActor.run {
+                    modelOutput?.onError(error)
+                }
+            }
+        }
+    }
 }

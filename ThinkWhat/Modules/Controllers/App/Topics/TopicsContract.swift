@@ -15,8 +15,11 @@ protocol TopicsViewInput: class {
     
     var controllerOutput: TopicsControllerOutput? { get set }
     var controllerInput: TopicsControllerInput? { get set }
+    var mode: TopicsController.Mode { get set }
     
-    // View input methods here
+    func onSurveyTapped(_: SurveyReference)
+    func onDataSourceRequest(_: Topic)
+    
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -26,14 +29,14 @@ protocol TopicsControllerInput: class {
     
     var modelOutput: TopicsModelOutput? { get set }
     
-    // Controller input methods here
+    func onDataSourceRequest(_: Topic)
 }
 
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
 protocol TopicsModelOutput: class {
-    // Model output methods here
+    func onError(_: Error)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -43,4 +46,10 @@ protocol TopicsControllerOutput: class {
     var viewInput: TopicsViewInput? { get set }
     
     func onDidLayout()
+    func onWillAppear()
+    func onParentMode()
+    func onChildMode()
+    func onListMode()
+    func onListToChildMode()
+    func onError()
 }

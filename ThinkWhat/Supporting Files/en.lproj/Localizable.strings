@@ -48,6 +48,7 @@
 "anonymous" = "Anonymous";
 "user" = "User";
 "votes" = "votes";
+"publications" = "Publications";
 
 
 //Welcome VC
@@ -111,6 +112,7 @@
 
 //List VC
 "list" = "Feed";
+"own" = "Own";
 "top" = "Popular";
 "new" = "New";
 "watching" = "Watching";

@@ -24,7 +24,7 @@ class SubcategoryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 //        container.alpha = 0
-        categories = Topics.shared.all.filter { $0.parent == parentCategory }.sorted { $0.totalCount > $1.totalCount }
+        categories = Topics.shared.all.filter { $0.parent == parentCategory }.sorted { $0.total > $1.total }
         categoryVC.delegate = self
         categoryVC.categories = categories
         categoryVC.childColor = parentCategory.tagColor
@@ -46,7 +46,7 @@ class SubcategoryViewController: UIViewController {
         navTitle.textAlignment = .center
         let attrString = NSMutableAttributedString()
         attrString.append(NSAttributedString(string: parentCategory.title, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .black, backgroundColor: .clear)))
-        attrString.append(NSAttributedString(string: "\n(\(parentCategory.totalCount))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .gray, backgroundColor: .clear)))
+        attrString.append(NSAttributedString(string: "\n(\(parentCategory.total))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 9), foregroundColor: .gray, backgroundColor: .clear)))
         navTitle.attributedText = attrString
         navigationItem.titleView = navTitle
         

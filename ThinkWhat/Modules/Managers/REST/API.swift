@@ -1160,9 +1160,15 @@ class API {
     class Polls {
         weak var parent: API! = nil
         
-        public func loadSurveyReferences(_ category: Survey.SurveyCategory) async throws {
+        public func loadSurveyReferences(_ category: Survey.SurveyCategory, _ topic: Topic? = nil) async throws {
             guard let url = category.url else { throw APIError.invalidURL }
-            let parameters: Parameters = ["ids": category.dataItems.map { $0.id }]
+            var parameters: Parameters!
+            if category == .Topic, !topic.isNil {
+                parameters = ["ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
+                parameters["category_id"] = topic?.id
+            } else {
+                parameters  = ["ids": category.dataItems().map { $0.id }]
+            }
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
                 let decoder = JSONDecoder()
@@ -1218,6 +1224,10 @@ class API {
                                 } else {
                                     Surveys.shared.newReferences.append(instance)
                                 }
+                            }
+                        case .Topic:
+                            if SurveyReferences.shared.all.filter({ $0 == instance }).isEmpty {
+                                SurveyReferences.shared.all.append(instance)
                             }
                         default:
                             fatalError()

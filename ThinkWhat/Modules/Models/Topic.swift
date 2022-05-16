@@ -13,6 +13,9 @@ class Topics {
     static let shared = Topics()
     private init() {}
     var all: [Topic] = []
+    var active: Int {
+        return all.filter({ $0.isParentNode }).reduce(into: 0) { $0 += $1.active }
+    }
 //    var tree: [[String: [Topic]]] = [[:]]
     
     //var _categories: [SurveyCategory: [SurveyCategory?]] = [:]
@@ -54,15 +57,15 @@ class Topics {
         if let _categories = json["categories"] as? JSON {
             if !_categories.isEmpty {
                 for cat in all {
-                    cat.totalCount = 0
-                    cat.activeCount = 0
+                    cat.total = 0
+                    cat.active = 0
                 }
                 for cat in _categories {
                     if let category = self[Int(cat.0)!] as? Topic, let total = cat.1["total"].intValue as? Int, let active = cat.1["active"].intValue as? Int {
-                        category.totalCount = total
-                        category.activeCount = active
-                        category.parent?.totalCount += total
-                        category.parent?.activeCount += active
+                        category.total = total
+                        category.active = active
+                        category.parent?.total += total
+                        category.parent?.active += active
                     }
                 }
             }
@@ -92,6 +95,8 @@ class Topic: Decodable {
         case createdAt      = "created_at"
         case ageRestriction = "age_restriction"
         case tagColor       = "tag_color"
+        case total          = "total_count"
+        case active         = "active_count"
     }
     
     let id: Int
@@ -102,9 +107,11 @@ class Topic: Decodable {
     var children: [Topic] = []
     var ageRestriction: Int
     var tagColor: UIColor
-    var totalCount: Int = 0
-    var activeCount: Int = 0
-    var hasNoChildren = false
+    var total: Int = 0
+    var active: Int = 0
+    var isParentNode: Bool {
+        return !children.isEmpty
+    }
     
     required init(from decoder: Decoder) throws {
         do {
@@ -114,6 +121,8 @@ class Topic: Decodable {
             tagColor        = try container.decode(String.self, forKey: .tagColor).hexColor ?? K_COLOR_GRAY
             ageRestriction  = (try? container.decode(Int.self, forKey: .ageRestriction)) ?? 0
             children        = (try? container.decode([Topic].self, forKey: .children)) ?? []
+            total           = try container.decode(Int.self, forKey: .total)
+            active           = try container.decode(Int.self, forKey: .active)
             if Topics.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 Topics.shared.all.append(self)
             }

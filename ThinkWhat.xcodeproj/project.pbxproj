@@ -1094,6 +1094,15 @@
 			path = Transitions;
 			sourceTree = "<group>";
 		};
+		AB1E201B2832594A00C4E43D /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				AB51605D24EFF610006A07B7 /* CategoryCollectionViewCell.swift */,
+				AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
 		AB21795927577E7B00D19567 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -1546,8 +1555,6 @@
 			isa = PBXGroup;
 			children = (
 				AB51605B24EFEC79006A07B7 /* CategoryCollectionViewController.swift */,
-				AB51605D24EFF610006A07B7 /* CategoryCollectionViewCell.swift */,
-				AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */,
 				AB92237324F3EB4900F38936 /* SubcategoryViewController.swift */,
 			);
 			path = CategoryCollectionController;
@@ -1680,6 +1687,7 @@
 		AB72963127DB5ED800D45B54 /* Topics */ = {
 			isa = PBXGroup;
 			children = (
+				AB1E201B2832594A00C4E43D /* Cells */,
 				AB72963227DB5EFB00D45B54 /* TopicsController.swift */,
 				AB72963327DB5EFB00D45B54 /* TopicsController.xib */,
 				AB72963627DB5F0B00D45B54 /* TopicsContract.swift */,

@@ -13,48 +13,55 @@
                 <outlet property="bg" destination="KnL-UL-irc" id="z5F-84-SAT"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="wbI-cH-vYa"/>
                 <outlet property="new" destination="211-XY-UVY" id="Nwt-Fn-uEs"/>
-                <outlet property="top" destination="BHQ-vZ-UKL" id="Mwc-Mg-PNn"/>
+                <outlet property="own" destination="BHQ-vZ-UKL" id="pin-2V-eQs"/>
+                <outlet property="top" destination="ykx-bs-vIz" id="YbN-ef-rdQ"/>
                 <outlet property="watching" destination="vdq-X8-xpY" id="Kgc-qB-J7D"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
-            <rect key="frame" x="0.0" y="0.0" width="200" height="50"/>
+            <rect key="frame" x="0.0" y="0.0" width="250" height="50"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KnL-UL-irc">
-                    <rect key="frame" x="0.0" y="0.0" width="200" height="50"/>
+                    <rect key="frame" x="0.0" y="0.0" width="250" height="50"/>
                     <subviews>
-                        <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BHQ-vZ-UKL">
-                            <rect key="frame" x="75" y="0.0" width="50" height="50"/>
+                        <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" baselineRelativeArrangement="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kj0-lT-hHf">
+                            <rect key="frame" x="0.0" y="0.0" width="250" height="50"/>
+                            <subviews>
+                                <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="211-XY-UVY">
+                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="211-XY-UVY" secondAttribute="height" multiplier="1:1" identifier="first" id="J2y-Qn-fCG"/>
+                                    </constraints>
+                                </imageView>
+                                <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ykx-bs-vIz">
+                                    <rect key="frame" x="66.5" y="0.0" width="50" height="50"/>
+                                </imageView>
+                                <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BHQ-vZ-UKL">
+                                    <rect key="frame" x="133.5" y="0.0" width="50" height="50"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="BHQ-vZ-UKL" secondAttribute="height" multiplier="1:1" identifier="third" id="FhW-vR-OAU"/>
+                                    </constraints>
+                                </imageView>
+                                <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vdq-X8-xpY">
+                                    <rect key="frame" x="200" y="0.0" width="50" height="50"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="vdq-X8-xpY" secondAttribute="height" multiplier="1:1" identifier="fourth" id="pXN-G3-OfN"/>
+                                    </constraints>
+                                </imageView>
+                            </subviews>
                             <constraints>
-                                <constraint firstAttribute="width" secondItem="BHQ-vZ-UKL" secondAttribute="height" multiplier="1:1" id="FhW-vR-OAU"/>
+                                <constraint firstItem="ykx-bs-vIz" firstAttribute="width" secondItem="ykx-bs-vIz" secondAttribute="height" multiplier="1:1" identifier="second" id="KB3-4Q-IZl"/>
                             </constraints>
-                        </imageView>
-                        <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="211-XY-UVY">
-                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                            <constraints>
-                                <constraint firstAttribute="width" secondItem="211-XY-UVY" secondAttribute="height" multiplier="1:1" id="J2y-Qn-fCG"/>
-                            </constraints>
-                        </imageView>
-                        <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vdq-X8-xpY">
-                            <rect key="frame" x="150" y="0.0" width="50" height="50"/>
-                            <constraints>
-                                <constraint firstAttribute="width" secondItem="vdq-X8-xpY" secondAttribute="height" multiplier="1:1" id="pXN-G3-OfN"/>
-                            </constraints>
-                        </imageView>
+                        </stackView>
                     </subviews>
                     <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
                     <constraints>
-                        <constraint firstItem="211-XY-UVY" firstAttribute="centerY" secondItem="KnL-UL-irc" secondAttribute="centerY" id="42i-8k-qeD"/>
-                        <constraint firstItem="BHQ-vZ-UKL" firstAttribute="height" secondItem="211-XY-UVY" secondAttribute="height" id="Dej-gj-46o"/>
-                        <constraint firstItem="BHQ-vZ-UKL" firstAttribute="centerY" secondItem="KnL-UL-irc" secondAttribute="centerY" id="G6X-Es-zn2"/>
-                        <constraint firstItem="211-XY-UVY" firstAttribute="leading" secondItem="KnL-UL-irc" secondAttribute="leading" id="LWv-wy-fBc"/>
-                        <constraint firstItem="211-XY-UVY" firstAttribute="height" secondItem="KnL-UL-irc" secondAttribute="height" id="S1Z-LK-vgU"/>
-                        <constraint firstItem="vdq-X8-xpY" firstAttribute="height" secondItem="211-XY-UVY" secondAttribute="height" id="cZR-P4-nJ6"/>
-                        <constraint firstAttribute="trailing" secondItem="vdq-X8-xpY" secondAttribute="trailing" id="i6i-zU-jLS"/>
-                        <constraint firstItem="vdq-X8-xpY" firstAttribute="centerY" secondItem="KnL-UL-irc" secondAttribute="centerY" id="okx-yc-bOC"/>
-                        <constraint firstItem="BHQ-vZ-UKL" firstAttribute="centerX" secondItem="KnL-UL-irc" secondAttribute="centerX" id="vzQ-Mf-YKe"/>
+                        <constraint firstItem="kj0-lT-hHf" firstAttribute="height" secondItem="KnL-UL-irc" secondAttribute="height" id="2ED-Rx-CsF"/>
+                        <constraint firstItem="kj0-lT-hHf" firstAttribute="centerY" secondItem="KnL-UL-irc" secondAttribute="centerY" id="ES6-rK-GQX"/>
+                        <constraint firstItem="kj0-lT-hHf" firstAttribute="width" secondItem="KnL-UL-irc" secondAttribute="width" id="RWj-D5-cpu"/>
+                        <constraint firstItem="kj0-lT-hHf" firstAttribute="centerX" secondItem="KnL-UL-irc" secondAttribute="centerX" id="Rnz-Cx-6Oz"/>
                     </constraints>
                 </view>
             </subviews>

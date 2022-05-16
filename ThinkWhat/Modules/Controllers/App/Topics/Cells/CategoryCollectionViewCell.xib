@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
-        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -21,39 +22,29 @@
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hbk-PG-lQe" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                        <rect key="frame" x="15" y="30" width="70" height="70"/>
+                        <rect key="frame" x="15" y="0.0" width="70" height="70"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="Hbk-PG-lQe" secondAttribute="height" multiplier="1:1" id="bwb-iE-bo2"/>
                         </constraints>
                     </view>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0LY-59-bgI">
-                        <rect key="frame" x="0.0" y="100" width="100" height="30"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0LY-59-bgI">
+                        <rect key="frame" x="0.0" y="78" width="100" height="14"/>
                         <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="10"/>
                         <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="123" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vtO-Rz-aCP">
-                        <rect key="frame" x="64" y="6" width="28" height="20.5"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
             </view>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
-                <constraint firstItem="Hbk-PG-lQe" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="05j-4d-VuV"/>
-                <constraint firstItem="vtO-Rz-aCP" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="6" id="7bU-2u-1Wb"/>
-                <constraint firstAttribute="trailing" secondItem="vtO-Rz-aCP" secondAttribute="trailing" constant="8" id="9jS-Yt-GAJ"/>
+                <constraint firstItem="Hbk-PG-lQe" firstAttribute="centerX" secondItem="gTV-IL-0wX" secondAttribute="centerX" id="05j-4d-VuV"/>
+                <constraint firstItem="Hbk-PG-lQe" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="3hJ-O8-zky"/>
                 <constraint firstItem="Hbk-PG-lQe" firstAttribute="width" secondItem="gTV-IL-0wX" secondAttribute="width" multiplier="0.7" id="EYm-nV-imI"/>
                 <constraint firstItem="0LY-59-bgI" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="EhL-WT-Azo"/>
-                <constraint firstItem="Hbk-PG-lQe" firstAttribute="centerY" secondItem="ZTg-uK-7eu" secondAttribute="centerY" id="L5U-i2-TpM"/>
                 <constraint firstAttribute="trailing" secondItem="0LY-59-bgI" secondAttribute="trailing" id="RIC-jm-e5V"/>
-                <constraint firstItem="0LY-59-bgI" firstAttribute="top" secondItem="Hbk-PG-lQe" secondAttribute="bottom" id="Sex-a9-VXo"/>
-                <constraint firstAttribute="bottom" secondItem="0LY-59-bgI" secondAttribute="bottom" id="d0a-dm-jGb"/>
+                <constraint firstItem="0LY-59-bgI" firstAttribute="top" secondItem="Hbk-PG-lQe" secondAttribute="bottom" constant="8" id="Sex-a9-VXo"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="100" height="130"/>
             <userDefinedRuntimeAttributes>
                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -64,7 +55,6 @@
                 <outlet property="constraint" destination="EYm-nV-imI" id="eBW-dh-FNs"/>
                 <outlet property="icon" destination="Hbk-PG-lQe" id="8RO-oJ-W1t"/>
                 <outlet property="title" destination="0LY-59-bgI" id="xDQ-Y1-BGc"/>
-                <outlet property="total" destination="vtO-Rz-aCP" id="xZO-VX-vRl"/>
             </connections>
             <point key="canvasLocation" x="140.80000000000001" y="161.91904047976013"/>
         </collectionViewCell>

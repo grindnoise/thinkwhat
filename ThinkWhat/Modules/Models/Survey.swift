@@ -11,9 +11,9 @@ import SwiftyJSON
 
 class Survey: Decodable {
     enum SurveyCategory: String, CaseIterable {
-        case Hot, New, Top, Own, Favorite, Subscriptions, All
+        case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic
         
-        var dataItems: [SurveyReference] {
+        func dataItems(_ topic: Topic? = nil) -> [SurveyReference] {
             switch self {
             case .Hot:
                 return Surveys.shared.hot.map { return $0.reference }
@@ -25,13 +25,37 @@ class Survey: Decodable {
                 return Surveys.shared.ownReferences
             case .Favorite:
                 return Surveys.shared.favoriteReferences
-//                return Surveys.shared.favoriteReferences.keys.compactMap { $0 }
             case .Subscriptions:
                 return Surveys.shared.subscriptions
             case .All:
                 return SurveyReferences.shared.all
+            case .Topic:
+                guard !topic.isNil else { return [] }
+                return SurveyReferences.shared.all.filter({ $0.topic == topic! })
             }
         }
+
+        
+//        var dataItems: [SurveyReference] {
+//            switch self {
+//            case .Hot:
+//                return Surveys.shared.hot.map { return $0.reference }
+//            case .New:
+//                return Surveys.shared.newReferences
+//            case .Top:
+//                return Surveys.shared.topReferences
+//            case .Own:
+//                return Surveys.shared.ownReferences
+//            case .Favorite:
+//                return Surveys.shared.favoriteReferences
+//            case .Subscriptions:
+//                return Surveys.shared.subscriptions
+//            case .All:
+//                return SurveyReferences.shared.all
+//            case .Topic:
+//                return []
+//            }
+//        }
         
         var url: URL? {
             switch self {
@@ -49,6 +73,8 @@ class Survey: Decodable {
                 return API_URLS.Surveys.subscriptions
             case .All:
                 return API_URLS.Surveys.all
+            case .Topic:
+                return API_URLS.Surveys.topic
             }
         }
     }

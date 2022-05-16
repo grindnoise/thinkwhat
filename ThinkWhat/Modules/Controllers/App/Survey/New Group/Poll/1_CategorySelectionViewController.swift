@@ -201,7 +201,7 @@ class CategorySelectionViewController: UIViewController {
 extension CategorySelectionViewController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let _category = sender as? Topic {
-            if _category.hasNoChildren {
+            if _category.isParentNode {
                 category = _category
             } else if parentCategory == nil {
                 parentCategory = _category

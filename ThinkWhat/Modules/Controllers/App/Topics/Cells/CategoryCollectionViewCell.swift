@@ -12,15 +12,19 @@ class CategoryCollectionViewCell: UICollectionViewCell {
 
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var icon: Icon!
-    @IBOutlet weak var total: UILabel!
+//    @IBOutlet weak var total: UILabel!
     @IBOutlet weak var constraint: NSLayoutConstraint!
     var childColor: UIColor?
     var category: Topic! {
         didSet {
             icon.backgroundColor = childColor ?? category.tagColor
             icon.category = Icon.Category(rawValue: category.id) ?? .Null
-            title.attributedText = NSAttributedString(string: "\(category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 10), foregroundColor: .darkGray, backgroundColor: .clear))
-            total.attributedText = NSAttributedString(string: "\(category.totalCount)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 9), foregroundColor: .lightGray, backgroundColor: .clear))
+            let attributedText = NSMutableAttributedString()
+            attributedText.append(NSAttributedString(string: "\(category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.1), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            attributedText.append(NSAttributedString(string: "\n\(category.total)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.1), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            
+            title.textAlignment = .center
+            title.attributedText = attributedText
         }
     }
     var selectionMode = false
