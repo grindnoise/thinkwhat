@@ -52,4 +52,5 @@ protocol ListControllerOutput: class {
     func onDidLoad()
     func onDataSourceChanged()
     func onError()
+    func updateStats()
 }

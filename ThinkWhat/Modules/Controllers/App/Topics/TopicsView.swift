@@ -38,6 +38,14 @@ class TopicsView: UIView {
         setupUI()
     }
 
+    @objc
+    func updateStats() {
+        if mode == .Parent {
+            UIView.transition(with: label, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                self.setText()
+            }) { _ in }
+        }
+    }
     
     override func layoutSubviews() {
         
@@ -409,6 +417,7 @@ extension TopicsView: UICollectionViewDelegate, UICollectionViewDataSource {
                 cell.childColor = category.tagColor
                 cell.category = category
             }
+            cell.setObservers()
             return cell
         }
         return UICollectionViewCell()

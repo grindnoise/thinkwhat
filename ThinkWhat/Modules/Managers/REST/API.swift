@@ -1160,6 +1160,12 @@ class API {
     class Polls {
         weak var parent: API! = nil
         
+        public func updateStats() async throws -> Data {
+            guard let url = API_URLS.System.updateStats else { throw APIError.invalidURL }
+            
+            return try await parent.requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: parent.headers())
+        }
+        
         public func loadSurveys(type: SurveyType, parameters: Parameters? = nil) async throws -> Data{
             return try await parent.requestAsync(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
         }

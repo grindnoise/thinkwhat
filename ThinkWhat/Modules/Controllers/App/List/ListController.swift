@@ -47,7 +47,8 @@ class ListController: UIViewController {
     }
     
     private func setObservers() {
-//        NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscribedForUpdated), name: Notifications.Userprofiles.SubscribedForUpdated, object: nil)
+        let names = [Notifications.System.UpdateStats]
+        names.forEach { NotificationCenter.default.addObserver(view, selector: #selector(ListView.updateStats), name: $0, object: nil) }
     }
 
     private func setupUI() {
@@ -63,6 +64,13 @@ class ListController: UIViewController {
             listSwitch.widthAnchor.constraint(equalTo: listSwitch.heightAnchor, multiplier: 4.2)
             ])
     }
+    
+//    @objc
+//    func updateStats() {
+//        controllerOutput?.updateStats()
+//    }
+
+    
     // MARK: - Properties
     var controllerOutput: ListControllerOutput?
     var controllerInput: ListControllerInput?

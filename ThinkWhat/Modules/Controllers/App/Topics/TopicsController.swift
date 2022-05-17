@@ -28,6 +28,7 @@ class TopicsController: UIViewController {
         
         title = "topics".localized
         ProtocolSubscriptions.subscribe(self)
+        setObservers()
         setupUI()
     }
     
@@ -36,6 +37,9 @@ class TopicsController: UIViewController {
         barButton.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
         controllerOutput?.onWillAppear()
+        if mode == .Search {
+            searchField.alpha = 1
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -46,8 +50,17 @@ class TopicsController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         barButton.alpha = 0
+        if mode == .Search {
+            searchField.alpha = 0
+            searchField.resignFirstResponder()
+        }
     }
 
+    private func setObservers() {
+        let names = [Notifications.System.UpdateStats]
+        names.forEach { NotificationCenter.default.addObserver(view, selector: #selector(TopicsView.updateStats), name: $0, object: nil) }
+    }
+    
     private func setupUI() {
         navigationController?.navigationBar.prefersLargeTitles = true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
@@ -108,9 +121,6 @@ class TopicsController: UIViewController {
             case .Parent:
                 navigationItem.title = "topics".localized
                 if oldValue == .Search {
-                    if let recognizer = view.gestureRecognizers?.first {
-                        view.removeGestureRecognizer(recognizer)
-                    }
                     controllerOutput?.onSearchToParentMode()
                     searchField.resignFirstResponder()
                     UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
@@ -234,8 +244,13 @@ extension TopicsController: DataObservable {
 
 extension TopicsController: UITextFieldDelegate {
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        if let recognizers = view.gestureRecognizers, recognizers.isEmpty {
+            let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
+            view.addGestureRecognizer(touch)
+        }
         return !isSearching
     }
+    
     
     @objc
     func textFieldDidChange(_ textField: UITextField) {
@@ -251,6 +266,9 @@ extension TopicsController: UITextFieldDelegate {
     @objc private func hideKeyboard() {
         if mode == .Search {
 //            mode = .Parent
+            if let recognizer = view.gestureRecognizers?.first {
+                view.removeGestureRecognizer(recognizer)
+            }
             searchField.resignFirstResponder()
         }
     }
@@ -258,8 +276,6 @@ extension TopicsController: UITextFieldDelegate {
     private func setupTextField(textField: UnderlinedSignTextField) {
         guard !textFieldIsSetup else { return }
         textFieldIsSetup = true
-//        let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
-//        view.addGestureRecognizer(touch)
         textField.delegate = self
         textField.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
         textField.activeLineColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED

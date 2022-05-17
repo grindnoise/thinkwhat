@@ -14,7 +14,8 @@ class Topics {
     private init() {}
     var all: [Topic] = []
     var active: Int {
-        return all.filter({ $0.isParentNode }).reduce(into: 0) { $0 += $1.active }
+        Topics.shared.all.filter({ !$0.isParentNode}).reduce(into: 0) { $0 += $1.active }
+//        return all.filter({ $0.isParentNode }).reduce(into: 0) { $0 += $1.active }
     }
 //    var tree: [[String: [Topic]]] = [[:]]
     

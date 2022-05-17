@@ -23,8 +23,9 @@ struct ImageSigns {
     static let chevronUpFilled              = UIImageView(image: UIImage(systemName: "chevron.up.circle.fill"))
     static let chevronDownFilled            = UIImageView(image: UIImage(systemName: "chevron.down.circle.fill"))
     static let plusFilled                   = UIImageView(image: UIImage(systemName: "plus.circle.fill"))
-    static let pencil                       = UIImageView(image: UIImage(systemName: "pencil.circle"))
-    static let pencilFilled                 = UIImageView(image: UIImage(systemName: "pencil.circle.fill"))
+    static let pencil                       = UIImageView(image: UIImage(systemName: "pencil"))
+    static let pencilCircle                 = UIImageView(image: UIImage(systemName: "pencil.circle"))
+    static let pencilCircleFilled           = UIImageView(image: UIImage(systemName: "pencil.circle.fill"))
     static let checkmarkFilled              = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
     static let checkmarkSealFilled          = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
     static let speedometer                  = UIImageView(image: UIImage(systemName: "speedometer"))
@@ -35,5 +36,5 @@ struct ImageSigns {
     static let figureWave                   = UIImageView(image: UIImage(systemName: "figure.wave"))
     static let magnifyingGlassFilled        = UIImageView(image: UIImage(systemName: "magnifyingglass.circle.fill"))
     static let arrowLeft                    = UIImageView(image: UIImage(systemName: "arrowshape.turn.up.backward.circle.fill"))
-    
+    static let gear                         = UIImageView(image: UIImage(systemName: "gear"))
 }

@@ -257,6 +257,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "CategoryCollectionViewCell.setText():CategoryCollectionViewCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "category">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "SideApp.app.didset:SideApp.swift">
          <PersistentStrings>
             <PersistentString
@@ -629,6 +637,14 @@
          <PersistentStrings>
             <PersistentString
                value = "tableView.headerView(forSection: 1)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "CategoryCollectionViewCell.updateStats():CategoryCollectionViewCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "category.total">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

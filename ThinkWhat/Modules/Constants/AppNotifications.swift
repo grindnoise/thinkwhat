@@ -34,6 +34,10 @@ struct Notifications {
         static let SubscribersUpdated               = Notification.Name("NotificationSubscribersUpdated")
     }
     
+    struct System {
+        static let UpdateStats                      = Notification.Name("NotificationUpdateStats")
+    }
+    
     struct Surveys {
         static let UpdateFavorite                   = Notification.Name("NotificationFavoriteSurveysUpdated")
         static let UpdateTopSurveys                 = Notification.Name("NotificationTopSurveysUpdated")

@@ -10,6 +10,7 @@ import Foundation
 
 import UIKit
 import UserNotifications
+import SwiftyJSON
 
 class MainController: UITabBarController {//}, StorageProtocol {
     
@@ -78,20 +79,15 @@ class MainController: UITabBarController {//}, StorageProtocol {
 
         delegate = self//_delegate
         navigationItem.setHidesBackButton(true, animated: false)
-//        navigationController?.navigationBar.prefersLargeTitles = true
         UITabBar.appearance().barTintColor = .systemBackground
         
         loadingIndicator = LoadingIndicator()//CGSize(width: view.frame.width, height: container.frame.height)))
         loadingIndicator!.alpha = 0
-//        loadingIndicator!.layoutCentered(in: view, multiplier: 0.6)
-//        loadingIndicator!.addEnableAnimation()
         setTabBarVisible(visible: false, animated: false)
-//        rootViewController.navigationItem.title = title
     }
     
     public func loadData() {
         if loadingIndicator.isNil || loadingIndicator?.alpha != 1 {
-//            loadingIndicator = LoadingIndicator()//CGSize(width: view.frame.width, height: container.frame.height)))
             loadingIndicator!.alpha = 1
             loadingIndicator!.layoutCentered(in: view, multiplier: 0.6)
             loadingIndicator!.addEnableAnimation()
@@ -128,6 +124,26 @@ class MainController: UITabBarController {//}, StorageProtocol {
         requestAttempt = 0
     }
     
+    @objc private func updateStats() {
+        Task {
+            do {
+                let data = try await API.shared.surveys.updateStats()
+                let json = try JSON(data: data, options: .mutableContainers)
+//#if DEBUG
+//                print(json)
+//#endif
+                await MainActor.run {
+                    Topics.shared.updateCount(json)
+                    Notification.send(names: [Notifications.System.UpdateStats])
+                }
+            } catch {
+#if DEBUG
+                print(error.localizedDescription)
+#endif
+            }
+        }
+    }
+    
     func appLaunch() async throws {
         do {
             let json = try await API.shared.appLaunch()
@@ -158,6 +174,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
                         self.viewControllers?.forEach {
                             guard let nav = $0 as? CustomNavigationController, let target = nav.viewControllers.first as? DataObservable else { return }
                             target.onDataLoaded()
+                            self.timers.forEach { $0.fire() }
                         }
                     }
                 } catch {
@@ -175,14 +192,12 @@ class MainController: UITabBarController {//}, StorageProtocol {
     private var requestAttempt = 0
     private var loadingIndicator: LoadingIndicator?
     private var apiUnavailableView: APIUnavailableView?
-    
-    //    private let _delegate = ScrollingTabBarControllerDelegate()
-    
-//    override func present(_ viewControllerToPresent: UIViewController,
-//                          animated flag: Bool,
-//                          completion: (() -> Void)? = nil) {
-//        viewControllerToPresent.modalPresentationStyle = .fullScreen
-//        super.present(viewControllerToPresent, animated: flag, completion: completion)
+    private lazy var timers: [Timer] = {
+        var array: [Timer] = []
+        let t = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(MainController.updateStats), userInfo: nil, repeats: true)
+        array.append(t)
+        return array
+    }()
 }
 
 //MARK: -  UITabBarControllerDelegate
@@ -214,3 +229,4 @@ extension MainController: CallbackObservable {
         }
     }
 }
+

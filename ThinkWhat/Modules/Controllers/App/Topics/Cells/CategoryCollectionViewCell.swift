@@ -10,6 +10,10 @@ import UIKit
 
 class CategoryCollectionViewCell: UICollectionViewCell {
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var icon: Icon!
 //    @IBOutlet weak var total: UILabel!
@@ -19,12 +23,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         didSet {
             icon.backgroundColor = childColor ?? category.tagColor
             icon.category = Icon.Category(rawValue: category.id) ?? .Null
-            let attributedText = NSMutableAttributedString()
-            attributedText.append(NSAttributedString(string: "\(category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.1), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            attributedText.append(NSAttributedString(string: "\n\(category.total)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.1), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            
-            title.textAlignment = .center
-            title.attributedText = attributedText
+            setText()
         }
     }
     var selectionMode = false
@@ -64,7 +63,26 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         // Initialization code
     }
 
+    public func setObservers() {
+        let names = [Notifications.System.UpdateStats]
+        names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.updateStats), name: $0, object: nil) }
+    }
     
+    @objc
+    private func updateStats() {
+        UIView.transition(with: title, duration: 0.3, options: .transitionCrossDissolve, animations: {
+            self.setText()
+        }) { _ in }
+    }
+    
+    private func setText() {
+        let attributedText = NSMutableAttributedString()
+        attributedText.append(NSAttributedString(string: "\(category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.1), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\n\(category.active)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.1), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        
+        title.textAlignment = .center
+        title.attributedText = attributedText
+    }
 }
 
 //extension CategoryCollectionViewCell: CAAnimationDelegate {

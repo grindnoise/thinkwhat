@@ -101,6 +101,11 @@ extension ListView: ListControllerOutput {
             self.transform = .identity
         } completion: { _ in }
     }
+    
+    @objc
+    func updateStats() {
+//        print("forceUpdate")
+    }
 }
 
 // MARK: - UI Setup

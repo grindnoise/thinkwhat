@@ -230,6 +230,8 @@
 		AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7478C12428962700317EB6 /* CameraLoadingIndicator.swift */; };
 		AB7478C52428D0A300317EB6 /* FilmIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7478C42428D0A300317EB6 /* FilmIcon.swift */; };
 		AB7478C724290D8600317EB6 /* SurveyAnswerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7478C624290D8600317EB6 /* SurveyAnswerCell.swift */; };
+		AB74A7F52833F2EB00B93522 /* SettingsSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB74A7F42833F2EB00B93522 /* SettingsSwitch.swift */; };
+		AB74A7F72833F4B300B93522 /* SettingsSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB74A7F62833F4B300B93522 /* SettingsSwitch.xib */; };
 		AB75838024E5661D004367DF /* ScrollArrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB75837F24E5661D004367DF /* ScrollArrow.swift */; };
 		AB75838224E6AB8A004367DF /* CompletedSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB75838124E6AB8A004367DF /* CompletedSign.swift */; };
 		AB7599ED245B29FE008B0569 /* SurveyPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7599EC245B29FE008B0569 /* SurveyPreview.swift */; };
@@ -698,6 +700,8 @@
 		AB7478C12428962700317EB6 /* CameraLoadingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraLoadingIndicator.swift; sourceTree = "<group>"; };
 		AB7478C42428D0A300317EB6 /* FilmIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmIcon.swift; sourceTree = "<group>"; };
 		AB7478C624290D8600317EB6 /* SurveyAnswerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SurveyAnswerCell.swift; path = "../New Group/SurveyAnswerCell.swift"; sourceTree = "<group>"; };
+		AB74A7F42833F2EB00B93522 /* SettingsSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSwitch.swift; sourceTree = "<group>"; };
+		AB74A7F62833F4B300B93522 /* SettingsSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsSwitch.xib; sourceTree = "<group>"; };
 		AB75837F24E5661D004367DF /* ScrollArrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollArrow.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB75838124E6AB8A004367DF /* CompletedSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedSign.swift; sourceTree = "<group>"; };
 		AB7599EC245B29FE008B0569 /* SurveyPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyPreview.swift; sourceTree = "<group>"; };
@@ -1701,6 +1705,7 @@
 		AB72964027DB60B400D45B54 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				AB74A7F32833F2D100B93522 /* Switch */,
 				AB72964127DB60C800D45B54 /* SettingsController.swift */,
 				AB72964227DB60C800D45B54 /* SettingsController.xib */,
 				AB72964527DB612000D45B54 /* SettingsContract.swift */,
@@ -1764,6 +1769,15 @@
 				AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */,
 			);
 			path = Icons;
+			sourceTree = "<group>";
+		};
+		AB74A7F32833F2D100B93522 /* Switch */ = {
+			isa = PBXGroup;
+			children = (
+				AB74A7F42833F2EB00B93522 /* SettingsSwitch.swift */,
+				AB74A7F62833F4B300B93522 /* SettingsSwitch.xib */,
+			);
+			path = Switch;
 			sourceTree = "<group>";
 		};
 		AB75837E24E51C7F004367DF /* Animated */ = {
@@ -2658,6 +2672,7 @@
 				AB91195726C3AB50007ED54A /* VotesFormula.xib in Resources */,
 				AB7085E926CB9A75006F020F /* SideApp.xib in Resources */,
 				AB72963027DB5A9B00D45B54 /* ListView.xib in Resources */,
+				AB74A7F72833F4B300B93522 /* SettingsSwitch.xib in Resources */,
 				AB25AC36282BC01F00050907 /* SurveyTable.xib in Resources */,
 				ABA448EB27EE030B00F8E00D /* PollController.xib in Resources */,
 				AB8DA34827A1839000F92C18 /* SignupView.xib in Resources */,
@@ -3088,6 +3103,7 @@
 				AB8DA33527A17F0E00F92C18 /* GetStartedViewController.swift in Sources */,
 				AB48B90624348CDC00A27B0D /* SurveyTotalCell.swift in Sources */,
 				AB98308C27B9385B002C5132 /* RecoverModel.swift in Sources */,
+				AB74A7F52833F2EB00B93522 /* SettingsSwitch.swift in Sources */,
 				AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */,
 				ABA448E027E874BD00F8E00D /* StarView.swift in Sources */,
 				AB229D842464512500968D52 /* del_Segues.swift in Sources */,

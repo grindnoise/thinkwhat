@@ -50,6 +50,8 @@
 "votes" = "votes";
 "publications" = "Publications";
 "search" = "Поиск";
+"profile" = "Profile";
+"edit" = "Edit";
 
 
 //Welcome VC

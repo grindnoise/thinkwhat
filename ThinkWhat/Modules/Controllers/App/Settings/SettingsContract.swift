@@ -43,4 +43,6 @@ protocol SettingsControllerOutput: class {
     var viewInput: SettingsViewInput? { get set }
     
     func onDidLayout()
+    func onWillAppear()
+//    func onDidLoad()
 }

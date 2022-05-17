@@ -101,7 +101,7 @@ class SubscribersController: UIViewController {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(SubscribersController.switchEditing))
         barButton.addGestureRecognizer(gesture)
         barButton.contentMode = .scaleAspectFit
-        barButton.image = ImageSigns.pencil.image
+        barButton.image = ImageSigns.pencilCircle.image
         barButton.tintColor = .systemGray
         navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: barButton)]
     }
@@ -127,7 +127,7 @@ class SubscribersController: UIViewController {
         controllerInput?.unsubscribe(list)
         navigationController?.setToolbarHidden(true, animated: true)
         UIView.transition(with: barButton, duration: 0.3, options: [.transitionCrossDissolve]) {
-            self.barButton.image = ImageSigns.pencil.image
+            self.barButton.image = ImageSigns.pencilCircle.image
             self.barButton.tintColor = .systemGray
         } completion: { _ in
             self.controllerOutput?.disableEditing()
@@ -143,7 +143,7 @@ class SubscribersController: UIViewController {
     private func cancel() {
         navigationController?.setToolbarHidden(true, animated: true)
         UIView.transition(with: barButton, duration: 0.3, options: [.transitionCrossDissolve]) {
-            self.barButton.image = ImageSigns.pencil.image
+            self.barButton.image = ImageSigns.pencilCircle.image
             self.barButton.tintColor = .systemGray
         } completion: { _ in
             self.controllerOutput?.disableEditing()
@@ -165,7 +165,7 @@ class SubscribersController: UIViewController {
     private func switchEditing() {
         isEditingEnabled = !isEditingEnabled
         UIView.transition(with: barButton, duration: 0.3, options: [.transitionCrossDissolve]) {
-            self.barButton.image = self.isEditingEnabled ? ImageSigns.pencilFilled.image : ImageSigns.pencil.image
+            self.barButton.image = self.isEditingEnabled ? ImageSigns.pencilCircleFilled.image : ImageSigns.pencilCircle.image
             self.barButton.tintColor = self.isEditingEnabled ? .systemBlue : .systemGray
         } completion: { _ in }
         navigationController?.setToolbarHidden(isEditingEnabled ? false : true, animated: true)
