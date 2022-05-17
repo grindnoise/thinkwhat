@@ -11,7 +11,7 @@ import UIKit
 class TopicsView: UIView {
     
     enum Mode {
-        case Parent, Child, List
+        case Parent, Child, List, Search
     }
     
     // MARK: - Initialization
@@ -99,6 +99,10 @@ class TopicsView: UIView {
 
 // MARK: - Controller Output
 extension TopicsView: TopicsControllerOutput {
+    var topic: Topic? {
+        return child
+    }
+    
     func onWillAppear() {
         setText()
     }
@@ -129,6 +133,7 @@ extension TopicsView: TopicsControllerOutput {
         
         icon.backgroundColor = currentCell.icon.backgroundColor
         icon.category = currentCell.icon.category
+        icon.alpha = 0
         
         let temp = Icon(frame: CGRect(origin: currentCell.icon.superview!.convert(currentCell.icon.frame.origin, to: card),
                                                     size: currentCell.icon.frame.size))
@@ -193,7 +198,7 @@ extension TopicsView: TopicsControllerOutput {
         let anim = Animations.get(property: .Path,
                                       fromValue: (icon.icon as! CAShapeLayer).path as Any,
                                       toValue: destinationPath as Any,
-                                      duration: 0.28,
+                                      duration: 0.23,
                                       delay: 0,
                                       repeatCount: 0,
                                       autoreverses: false,
@@ -211,7 +216,7 @@ extension TopicsView: TopicsControllerOutput {
 //            self.back.alpha = 0
         }) { _ in }
 
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
             self.label.setNeedsLayout()
             self.labelConstraint.constant -= self.icon.frame.width
             self.label.layoutIfNeeded()
@@ -249,6 +254,7 @@ extension TopicsView: TopicsControllerOutput {
     }
     
     func onListToChildMode() {
+        
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
             self.collectionView.alpha = 1
             self.collectionView.transform = .identity
@@ -262,6 +268,48 @@ extension TopicsView: TopicsControllerOutput {
             self.list.removeFromSuperview()
             self.list = nil
         }
+    }
+    
+    func onSearchToParentMode() {
+        guard !list.isNil else { return }
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+            self.collectionView.alpha = 1
+            self.collectionView.transform = .identity
+            self.label.alpha = 1
+            self.label.transform = .identity
+            self.list.alpha = 0
+            self.list.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        } completion: { _ in
+            self.list.removeFromSuperview()
+            self.list = nil
+        }
+    }
+    
+    func onSearchMode() {
+        if list.isNil {
+            if #available(iOS 14, *)  {
+                list = SurveysCollection(delegate: self, items: [])
+            } else {
+                list = SurveyTable(delegate: self, items: [])//topic: child), topic: child)
+            }
+        }
+
+        list.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+            self.collectionView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            self.collectionView.alpha = 0
+            self.icon.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            self.icon.alpha = 0
+            self.label.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+            self.label.alpha = 0
+            self.list.alpha = 1
+            self.list.transform = .identity
+        } completion: { _ in }
+    }
+    
+    func onSearchCompleted(_ items: [SurveyReference]) {
+        guard mode == .Search, !list.isNil else { return }
+        list.fetchResult = items
     }
     
     func onError() {
@@ -310,11 +358,19 @@ extension TopicsView: CallbackObservable {
             viewInput?.onSurveyTapped(instance)
         } else if #available(iOS 14, *) {
             if sender is SurveysCollection || sender is SurveyTable {
-                viewInput?.onDataSourceRequest(child)
+                if mode == .Search {
+                    
+                } else {
+                    viewInput?.onDataSourceRequest(child)
+                }
             }
         } else {
             if sender is SurveyTable {
-                viewInput?.onDataSourceRequest(child)
+                if mode == .Search {
+                    
+                } else {
+                    viewInput?.onDataSourceRequest(child)
+                }
             }
         }
     }

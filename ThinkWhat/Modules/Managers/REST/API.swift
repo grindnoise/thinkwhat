@@ -753,7 +753,7 @@ class API {
     }
     
     func downloadSurveysAsync(type: SurveyType, parameters: Parameters? = nil) async throws -> Data{
-        return try await requestAsync(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers())
+        return try await requestAsync(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: headers())
     }
     
     func appLaunch() async throws -> JSON {
@@ -1160,6 +1160,10 @@ class API {
     class Polls {
         weak var parent: API! = nil
         
+        public func loadSurveys(type: SurveyType, parameters: Parameters? = nil) async throws -> Data{
+            return try await parent.requestAsync(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+        }
+        
         public func loadSurveyReferences(_ category: Survey.SurveyCategory, _ topic: Topic? = nil) async throws {
             guard let url = category.url else { throw APIError.invalidURL }
             var parameters: Parameters!
@@ -1175,14 +1179,15 @@ class API {
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
                                                            DateFormatter.dateTimeFormatter,
                                                            DateFormatter.dateFormatter ]
-                let instances = try decoder.decode([SurveyReference].self, from: data)
-                guard !instances.isEmpty else {
-                    await MainActor.run {
+                try await MainActor.run {
+                    let instances = try decoder.decode([SurveyReference].self, from: data)
+                    guard !instances.isEmpty else {
+                        //                    await MainActor.run {
                         Notification.send(names: [Notifications.Surveys.ZeroSubscriptions])
+                        //                    }
+                        return
                     }
-                    return
-                }
-                await MainActor.run {
+                    //                await MainActor.run {
                     instances.forEach { instance in
                         switch category {
                         case .Subscriptions:
@@ -1254,7 +1259,35 @@ class API {
             }
             return data
         }
-
+        
+        func search(substring: String, excludedIds: [Int]) async throws -> [SurveyReference] {
+            guard let url = API_URLS.Surveys.search else { throw APIError.invalidURL }
+            var parameters: Parameters = ["substring": substring]
+            if !excludedIds.isEmpty { parameters["ids"] = excludedIds }
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                
+                let instances = try decoder.decode([SurveyReference].self, from: data)
+                guard !instances.isEmpty else {
+                    return []
+                }
+                return {
+                    var array: [SurveyReference] = []
+                    instances.forEach { instance in array.append(SurveyReferences.shared.all.filter({ $0 == instance }).first ?? instance)
+                    }
+                    return array
+                }()
+            } catch let error {
+#if DEBUG
+                print(error)
+#endif
+                throw error
+            }
+        }
     }
     
     public func getBalanceAndPrice() {

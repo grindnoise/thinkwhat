@@ -26,7 +26,8 @@ extension HotModel: HotControllerInput {
                 if !list.isEmpty {
                     parameters["ids"] = list
                 }
-                let data = try await API.shared.downloadSurveysAsync(type: .Hot, parameters: parameters)
+//                let data = try await API.shared.downloadSurveysAsync(type: .Hot, parameters: parameters)
+                let data = try await API.shared.surveys.loadSurveys(type: .Hot, parameters: parameters)
                 let json = try JSON(data: data, options: .mutableContainers)
                 await MainActor.run {
                     Surveys.shared.load(json)

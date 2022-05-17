@@ -15,6 +15,21 @@ class TopicsModel {
 
 // MARK: - Controller Input
 extension TopicsModel: TopicsControllerInput {
+    func search(substring: String, excludedIds: [Int] = []) {
+        Task {
+            do {
+                let instances = try await API.shared.surveys.search(substring: substring, excludedIds: excludedIds)
+                await MainActor.run {
+                    modelOutput?.onSearchCompleted(instances)
+                }
+            } catch {
+                await MainActor.run {
+                    modelOutput?.onError(error)
+                }
+            }
+        }
+    }
+    
     func onDataSourceRequest(_ topic: Topic) {
         Task {
             do {

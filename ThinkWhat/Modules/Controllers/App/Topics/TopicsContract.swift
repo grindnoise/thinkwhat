@@ -30,6 +30,7 @@ protocol TopicsControllerInput: class {
     var modelOutput: TopicsModelOutput? { get set }
     
     func onDataSourceRequest(_: Topic)
+    func search(substring: String, excludedIds: [Int])
 }
 
 /// *Model* returns the result to the *Controller*
@@ -37,6 +38,7 @@ protocol TopicsControllerInput: class {
 /// **Controller** conforms to this protocol
 protocol TopicsModelOutput: class {
     func onError(_: Error)
+    func onSearchCompleted(_: [SurveyReference])
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -44,6 +46,7 @@ protocol TopicsModelOutput: class {
 /// **View** conforms to this protocol
 protocol TopicsControllerOutput: class {
     var viewInput: TopicsViewInput? { get set }
+    var topic: Topic? { get }
     
     func onDidLayout()
     func onWillAppear()
@@ -51,5 +54,8 @@ protocol TopicsControllerOutput: class {
     func onChildMode()
     func onListMode()
     func onListToChildMode()
+    func onSearchToParentMode()
+    func onSearchMode()
+    func onSearchCompleted(_: [SurveyReference])
     func onError()
 }

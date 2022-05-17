@@ -65,6 +65,14 @@ class TopicsController: UIViewController {
             barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
             barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
         ])
+        navigationBar.addSubview(searchField)
+        searchField.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            searchField.rightAnchor.constraint(equalTo: barButton.leftAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
+            searchField.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            searchField.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
+            searchField.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageRightMargin),
+        ])
     }
     
     
@@ -73,14 +81,21 @@ class TopicsController: UIViewController {
             mode = .Parent
         } else if mode == .List {
             mode = .Child
+        } else if mode == .Parent {
+            mode = .Search
+        } else if mode == .Search {
+            mode = .Parent
         } else {
             mode = .List
         }
     }
     
-    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        searchField.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
+        searchField.activeLineColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
+        searchField.line.layer.strokeColor = UIColor.systemGray.cgColor
+        searchField.color = traitCollection.userInterfaceStyle == .dark ? UIColor.systemYellow : K_COLOR_RED
     }
 
     // MARK: - Properties
@@ -88,12 +103,26 @@ class TopicsController: UIViewController {
     var controllerInput: TopicsControllerInput?
     var mode: Mode = .Parent {
         didSet {
+            guard oldValue != mode else { return }
             switch mode {
             case .Parent:
-                guard oldValue != mode else { return }
-                onParentMode()
-                controllerOutput?.onParentMode()
+                navigationItem.title = "topics".localized
+                if oldValue == .Search {
+                    if let recognizer = view.gestureRecognizers?.first {
+                        view.removeGestureRecognizer(recognizer)
+                    }
+                    controllerOutput?.onSearchToParentMode()
+                    searchField.resignFirstResponder()
+                    UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
+                        self.searchField.alpha = 0
+                        self.barButton.image = ImageSigns.magnifyingGlassFilled.image
+                    } completion: { _ in }
+                } else {
+                    onParentMode()
+                    controllerOutput?.onParentMode()
+                }
             case .Child:
+                navigationItem.title = "topics".localized
                 if oldValue == .List {
                     controllerOutput?.onListToChildMode()
                 } else {
@@ -101,9 +130,24 @@ class TopicsController: UIViewController {
                     controllerOutput?.onChildMode()
                 }
             case .List:
+                if let topic = controllerOutput?.topic {
+                    navigationItem.title = topic.title
+                } else {
+                    navigationItem.title = "topics".localized
+                }
                 controllerOutput?.onListMode()
             case .Search:
-                fatalError()
+                controllerOutput?.onSearchMode()
+                let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
+                view.addGestureRecognizer(touch)
+                setupTextField(textField: searchField)
+                searchField.text = ""
+                searchField.becomeFirstResponder()
+                navigationItem.title = ""
+                UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
+                    self.searchField.alpha = 1
+                    self.barButton.image = ImageSigns.arrowLeft.image
+                } completion: { _ in }
             }
         }
     }
@@ -115,6 +159,18 @@ class TopicsController: UIViewController {
         v.isUserInteractionEnabled = true
         return v
     }()
+    private let searchField: UnderlinedSignTextField = {
+        let v = UnderlinedSignTextField()
+        v.placeholder = "search".localized
+        v.alpha = 0
+        return v
+    }()
+    private var textFieldIsSetup = false
+    private var isSearching = false {
+        didSet {
+            searchField.isShowingSpinner = isSearching
+        }
+    }
 }
 
 // MARK: - View Input
@@ -151,8 +207,17 @@ extension TopicsController: TopicsViewInput {
 
 // MARK: - Model Output
 extension TopicsController: TopicsModelOutput {
+    func onSearchCompleted(_ instances: [SurveyReference]) {
+        controllerOutput?.onSearchCompleted(instances)
+        isSearching = false
+#if DEBUG
+        print(instances.map{ $0.title })
+#endif
+    }
+    
     func onError(_: Error) {
         func onError(_ error: Error) {
+            if isSearching { isSearching = false }
     #if DEBUG
             print(error.localizedDescription)
     #endif
@@ -164,5 +229,42 @@ extension TopicsController: TopicsModelOutput {
 extension TopicsController: DataObservable {
     func onDataLoaded() {
         navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+}
+
+extension TopicsController: UITextFieldDelegate {
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        return !isSearching
+    }
+    
+    @objc
+    func textFieldDidChange(_ textField: UITextField) {
+        guard let textField = textField as? UnderlinedSignTextField else { return }
+        if textField.text!.count > 3 {
+            isSearching = true
+            controllerInput?.search(substring: searchField.text!, excludedIds: [])
+        } else {
+            isSearching = false
+        }
+    }
+    
+    @objc private func hideKeyboard() {
+        if mode == .Search {
+//            mode = .Parent
+            searchField.resignFirstResponder()
+        }
+    }
+    
+    private func setupTextField(textField: UnderlinedSignTextField) {
+        guard !textFieldIsSetup else { return }
+        textFieldIsSetup = true
+//        let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
+//        view.addGestureRecognizer(touch)
+        textField.delegate = self
+        textField.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
+        textField.activeLineColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
+        textField.line.layer.strokeColor = UIColor.systemGray.cgColor
+        textField.color = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
+        textField.addTarget(self, action: #selector(TopicsController.textFieldDidChange(_:)), for: .editingChanged)
     }
 }

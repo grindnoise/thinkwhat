@@ -49,6 +49,7 @@
 "user" = "User";
 "votes" = "votes";
 "publications" = "Publications";
+"search" = "Поиск";
 
 
 //Welcome VC

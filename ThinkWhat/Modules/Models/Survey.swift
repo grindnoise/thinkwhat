@@ -11,7 +11,7 @@ import SwiftyJSON
 
 class Survey: Decodable {
     enum SurveyCategory: String, CaseIterable {
-        case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic
+        case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic, Search
         
         func dataItems(_ topic: Topic? = nil) -> [SurveyReference] {
             switch self {
@@ -32,6 +32,8 @@ class Survey: Decodable {
             case .Topic:
                 guard !topic.isNil else { return [] }
                 return SurveyReferences.shared.all.filter({ $0.topic == topic! })
+            case .Search:
+                fatalError()
             }
         }
 
@@ -75,6 +77,8 @@ class Survey: Decodable {
                 return API_URLS.Surveys.all
             case .Topic:
                 return API_URLS.Surveys.topic
+            case .Search:
+                return API_URLS.Surveys.search
             }
         }
     }
@@ -452,6 +456,9 @@ class Surveys {
             }
             Notification.send(names: notifications.uniqued())
         } catch {
+            #if DEBUG
+            print(error.localizedDescription)
+            #endif
             fatalError("Survey init() threw error: \(error)")
         }
     }

@@ -11,6 +11,7 @@ import UIKit
 protocol SurveyDataSource: class {
     var category: Survey.SurveyCategory { get set }
     var topic: Topic? { get set }
+    var fetchResult: [SurveyReference] { get set }
     
     func reload()
 }
@@ -48,6 +49,13 @@ class SurveysCollection: UIView, SurveyDataSource {
         commonInit()
     }
 
+    init(delegate: CallbackObservable, items: [SurveyReference]) {
+        self.fetchResult = items
+        self.category = .Search
+        super.init(frame: .zero)
+        callbackDelegate = delegate
+        commonInit()
+    }
     
     required init?(coder: NSCoder) {
         self.category = .All
@@ -130,6 +138,7 @@ class SurveysCollection: UIView, SurveyDataSource {
             collectionView.collectionViewLayout = listLayout
             collectionView.delegate = self
             
+            guard category != .Search else { return }
             refreshControl.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
             collectionView.refreshControl = refreshControl
         }
@@ -145,9 +154,20 @@ class SurveysCollection: UIView, SurveyDataSource {
             collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         }
     }
+    var fetchResult: [SurveyReference] = [] {
+        didSet {
+            setDataSource()
+        }
+    }
+    
     private var dataItems: [SurveyReference] {
         if category == .Topic {
-            return category.dataItems(topic)
+            let items = category.dataItems(topic)
+            collectionView.alpha = items.isEmpty ? 0 : 1
+            return items
+        } else if category == .Search {
+            collectionView.alpha = fetchResult.isEmpty ? 0 : 1
+            return fetchResult
         }
         return category.dataItems()
     }

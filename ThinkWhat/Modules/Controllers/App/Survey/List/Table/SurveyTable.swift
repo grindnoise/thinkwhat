@@ -9,6 +9,13 @@
 import UIKit
 
 class SurveyTable: UIView, SurveyDataSource {
+    
+    var fetchResult: [SurveyReference] = [] {
+        didSet {
+            tableView.reloadSections(IndexSet(arrayLiteral: 0), with: .automatic)
+        }
+    }
+    
 
     deinit {
         print("HotView deinit")
@@ -26,6 +33,14 @@ class SurveyTable: UIView, SurveyDataSource {
     init(delegate: CallbackObservable, topic: Topic) {
         self.topic = topic
         self.category = .Topic
+        super.init(frame: .zero)
+        callbackDelegate = delegate
+        commonInit()
+    }
+    
+    init(delegate: CallbackObservable, items: [SurveyReference]) {
+        self.fetchResult = items
+        self.category = .Search
         super.init(frame: .zero)
         callbackDelegate = delegate
         commonInit()
@@ -71,6 +86,7 @@ class SurveyTable: UIView, SurveyDataSource {
                           Notifications.Surveys.UpdateTopSurveys,
                           Notifications.Surveys.UpdateOwn,
                           Notifications.Surveys.UpdateFavorite,
+                          Notifications.Surveys.UpdateAll,
                           Notifications.Surveys.UpdateNewSurveys,]
         let zeroEmitted = [Notifications.Surveys.ZeroSubscriptions]
         
@@ -105,10 +121,14 @@ class SurveyTable: UIView, SurveyDataSource {
     
     private var dataItems: [SurveyReference] {
         if category == .Topic {
-            return category.dataItems(topic)
+            let items = category.dataItems(topic)
+            tableView.alpha = items.isEmpty ? 0 : 1
+            return items
+        } else if category == .Search {
+            tableView.alpha = fetchResult.isEmpty ? 0 : 1
+            return fetchResult
         }
-        return category.dataItems()
-    }
+        return category.dataItems()    }
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -138,7 +158,9 @@ extension SurveyTable: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let biggestRow = tableView.indexPathsForVisibleRows?.sorted{ $1.row < $0.row }.first?.row, indexPath.row == biggestRow && indexPath.row == dataItems.count - 1 {
+        if dataItems.count < 10 {
+            callbackDelegate?.callbackReceived(self)
+        } else if let biggestRow = tableView.indexPathsForVisibleRows?.sorted{ $1.row < $0.row }.first?.row, indexPath.row == biggestRow && indexPath.row == dataItems.count - 1 {
             callbackDelegate?.callbackReceived(self)
         }
     }
