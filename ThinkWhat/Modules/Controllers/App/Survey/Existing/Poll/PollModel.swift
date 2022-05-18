@@ -107,7 +107,7 @@ extension PollModel: PollControllerInput {
     func claim(_ reason: Claim) {
         guard !survey.isNil else { return }
         Task {
-            let json = try await API.shared.claim(survey: survey!, reason: reason)
+            let json = try await API.shared.surveys.claim(survey: survey!, reason: reason)
             guard let value = json["status"].string else { throw "Unknown error" }
             guard value == "ok" else {
                 guard let error = json["error"].string else { throw "Unknown error" }

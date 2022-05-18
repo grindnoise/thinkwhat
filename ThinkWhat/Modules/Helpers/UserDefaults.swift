@@ -28,8 +28,7 @@ extension UserDefaults {
         static var email: String?
         
         @UserDefault(key: "city", defaultValue: nil)
-        static var city: String?
-        
+        static var city: String?        
         @UserDefault(key: "image_path", defaultValue: nil)
         static var imagePath: String?
         
@@ -138,7 +137,7 @@ extension UserDefaults {
             UserDefaults.Profile.firstName      = profile.firstName
             UserDefaults.Profile.lastName       = profile.lastName
             UserDefaults.Profile.email          = profile.email
-            UserDefaults.Profile.city           = profile.city?.localized ?? profile.city?.name
+            UserDefaults.Profile.city           = profile.cityTitle
             UserDefaults.Profile.birthDate      = profile.birthDate
 //            UserDefaults.Profile.username       = profile.username
             UserDefaults.Profile.gender         = profile.gender

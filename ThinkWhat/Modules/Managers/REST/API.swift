@@ -1030,19 +1030,7 @@ class API {
     }
     
     
-    public func claim(survey: Survey, reason: Claim) async throws -> JSON {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_CLAIM) else { throw APIError.notFound }
-        let parameters: Parameters = ["survey": survey.id, "claim": reason.id]
-        
-        do {
-            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers())
-            Surveys.shared.banned.append(survey)
-            let json = try JSON(data: data, options: .mutableContainers)
-            return json
-        } catch let error {
-            throw error
-        }
-    }
+    
     
     public func getUserStats(user: Userprofile, completion: @escaping(Result<JSON, Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.USER_PROFILE_STATS) else { completion(.failure(APIError.invalidURL)); return }
@@ -1159,6 +1147,22 @@ class API {
     
     class Polls {
         weak var parent: API! = nil
+        
+        public func claim(survey: Survey, reason: Claim) async throws -> JSON {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_CLAIM) else { throw APIError.notFound }
+            let parameters: Parameters = ["survey": survey.id, "claim": reason.id]
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                await MainActor.run {
+                    Surveys.shared.banned.append(survey)
+                }
+                let json = try JSON(data: data, options: .mutableContainers)
+                return json
+            } catch let error {
+                throw error
+            }
+        }
         
         public func updateStats() async throws -> Data {
             guard let url = API_URLS.System.updateStats else { throw APIError.invalidURL }

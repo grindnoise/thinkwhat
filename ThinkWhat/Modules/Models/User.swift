@@ -102,9 +102,10 @@ class Userprofile: Decodable {
              tiktokURL = "tiktok_url",
              vkURL = "vk_url",
              facebookURL = "facebook_url",
-             completeTotal = "surveys_results_count",
+             completeTotal = "completed_surveys_count",
              favoritesTotal = "favorite_surveys_count",
-             publicationsTotal = "surveys_count",
+             publicationsTotal = "own_surveys_count",
+             subscribersTotal = "subscribers_count",
              lastVisit = "last_visit",
              topPublicationCategories = "top_pub_categories",
              wasEdited = "is_edited",
@@ -135,7 +136,7 @@ class Userprofile: Decodable {
     var city:               City? {
         didSet {
             if !city.isNil {
-                cityTitle = city!.localized
+                cityTitle = city!.localized ?? city!.name
             }
         }
     }
@@ -159,6 +160,7 @@ class Userprofile: Decodable {
     var completeTotal:      Int = 0
     var favoritesTotal:     Int = 0
     var publicationsTotal:  Int = 0
+    var subscribersTotal:   Int = 0
     var lastVisit:          Date
     var wasEdited:          Bool?
     var isBanned:           Bool
@@ -275,6 +277,7 @@ class Userprofile: Decodable {
             favoritesTotal      = try container.decode(Int.self, forKey: .favoritesTotal)
             completeTotal       = try container.decode(Int.self, forKey: .completeTotal)
             publicationsTotal   = try container.decode(Int.self, forKey: .publicationsTotal)
+            subscribersTotal    = try container.decode(Int.self, forKey: .subscribersTotal)
             tiktokURL           = URL(string: try container.decodeIfPresent(String.self, forKey: .tiktokURL) ?? "")
             instagramURL        = URL(string: try container.decodeIfPresent(String.self, forKey: .instagramURL) ?? "")
             facebookURL         = URL(string: try container.decodeIfPresent(String.self, forKey: .facebookURL) ?? "")
@@ -302,6 +305,21 @@ class Userprofile: Decodable {
 #endif
             throw error
         }
+    }
+    
+    func updateCount(_ json: JSON) {
+        guard let _subscribersTotal = json["subscribers_count"].int,
+              let _publicationsTotal = json["own_surveys_count"].int,
+              let _favoritesTotal = json["favorite_surveys_count"].int,
+              let _completeTotal = json["completed_surveys_count"].int,
+              let _balance = json["balance"].int,
+              let _isBanned = json["is_banned"].bool else { return }
+        subscribersTotal = _subscribersTotal
+        publicationsTotal = _publicationsTotal
+        favoritesTotal = _favoritesTotal
+        completeTotal = _completeTotal
+        balance = _balance
+        isBanned = _isBanned
     }
     
     func loadSurveys(data: Data) {

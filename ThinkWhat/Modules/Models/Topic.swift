@@ -55,13 +55,13 @@ class Topics {
 //    }
     
     func updateCount(_ json: JSON) {
-        if let _categories = json["categories"] as? JSON {
-            if !_categories.isEmpty {
+//        if let _categories = json["categories"] as? JSON {
+            if !json.isEmpty {
                 for cat in all {
                     cat.total = 0
                     cat.active = 0
                 }
-                for cat in _categories {
+                for cat in json {
                     if let category = self[Int(cat.0)!] as? Topic, let total = cat.1["total"].intValue as? Int, let active = cat.1["active"].intValue as? Int {
                         category.total = total
                         category.active = active
@@ -70,7 +70,7 @@ class Topics {
                     }
                 }
             }
-        }
+//        }
     }
     
     subscript (ID: Int) -> Topic? {

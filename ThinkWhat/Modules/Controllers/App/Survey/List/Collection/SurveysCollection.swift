@@ -81,10 +81,13 @@ class SurveysCollection: UIView, SurveyDataSource {
                           Notifications.Surveys.UpdateFavorite,
                           Notifications.Surveys.UpdateAll,
                           Notifications.Surveys.UpdateNewSurveys,]
+        let remove      = [Notifications.Surveys.Claimed,
+                           Notifications.Surveys.Rejected]
         let zeroEmitted = [Notifications.Surveys.ZeroSubscriptions]
         
         pagination.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onPagination), name: $0, object: nil) }
         zeroEmitted.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.endRefreshing), name: $0, object: nil) }
+        remove.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onRemove), name: $0, object: nil) }
     }
     
     private func setupUI() {
@@ -113,6 +116,8 @@ class SurveysCollection: UIView, SurveyDataSource {
         // Display data in the collection view by applying the snapshot to data source
         dataSource.apply(snapshot, animatingDifferences: false)
         refreshControl.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
+        guard category != .Search, dataItems.isEmpty else { return }
+        callbackDelegate?.callbackReceived(self)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -213,21 +218,33 @@ extension SurveysCollection: UICollectionViewDelegate {
     }
     
     @objc
+    private func onRemove() {
+//        setDataSource()
+        let instance = Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
+        var snapshot = dataSource.snapshot()
+        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
+        snapshot.deleteItems([instance!])
+
+        // Display data in the collection view by applying the snapshot to data source
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    @objc
     private func onPagination() {
         endRefreshing()
         appendToDataSource()
     }
     
     func appendToDataSource() {
-        guard let newInstance = dataItems.last else { return }
         var snapshot = dataSource.snapshot()
+        guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }
         snapshot.appendItems([newInstance], toSection: .main)
 
         // Display data in the collection view by applying the snapshot to data source
         dataSource.apply(snapshot, animatingDifferences: true)
     }
     
-    func setDataSource() {
+    private func setDataSource() {
         snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
         snapshot.appendSections([.main])
         snapshot.appendItems(dataItems, toSection: .main)

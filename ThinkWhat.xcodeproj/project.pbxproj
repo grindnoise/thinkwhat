@@ -100,6 +100,9 @@
 		AB38DD722819538A00FFEB3F /* Confirm.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB38DD712819538A00FFEB3F /* Confirm.xib */; };
 		AB38DD76281A776900FFEB3F /* SurveysCollection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB38DD75281A776900FFEB3F /* SurveysCollection.xib */; };
 		AB38DD78281A777200FFEB3F /* SurveysCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB38DD77281A777200FFEB3F /* SurveysCollection.swift */; };
+		AB3AF3672834E05F00160F0C /* OrderedSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3AF3662834E05F00160F0C /* OrderedSet.swift */; };
+		AB3AF36A2834FAD900160F0C /* CurrentUserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3AF3692834FAD900160F0C /* CurrentUserProfileView.swift */; };
+		AB3AF36C2834FC5900160F0C /* CurrentUserProfileView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB3AF36B2834FC5900160F0C /* CurrentUserProfileView.xib */; };
 		AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67DE223FBB6400B57580 /* AppDelegate.swift */; };
 		AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C67E2223FBB6400B57580 /* Main.storyboard */; };
 		AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */; };
@@ -563,6 +566,9 @@
 		AB38DD712819538A00FFEB3F /* Confirm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Confirm.xib; sourceTree = "<group>"; };
 		AB38DD75281A776900FFEB3F /* SurveysCollection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveysCollection.xib; sourceTree = "<group>"; };
 		AB38DD77281A777200FFEB3F /* SurveysCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveysCollection.swift; sourceTree = "<group>"; };
+		AB3AF3662834E05F00160F0C /* OrderedSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderedSet.swift; sourceTree = "<group>"; };
+		AB3AF3692834FAD900160F0C /* CurrentUserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentUserProfileView.swift; sourceTree = "<group>"; };
+		AB3AF36B2834FC5900160F0C /* CurrentUserProfileView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CurrentUserProfileView.xib; sourceTree = "<group>"; };
 		AB3C67DB223FBB6400B57580 /* ThinkWhat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThinkWhat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3C67DE223FBB6400B57580 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AB3C67E3223FBB6400B57580 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -1010,6 +1016,7 @@
 				AB0AB63427B4E37C006FD33F /* TimeoutTask.swift */,
 				AB72960227DA0DD500D45B54 /* Common.swift */,
 				ABF27573280E8D230023CD1F /* AppErrors.swift */,
+				AB3AF3662834E05F00160F0C /* OrderedSet.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1307,6 +1314,15 @@
 				AB29925A28228723009E0834 /* TriangleView.swift */,
 			);
 			path = Collection;
+			sourceTree = "<group>";
+		};
+		AB3AF3682834FA7600160F0C /* Read */ = {
+			isa = PBXGroup;
+			children = (
+				AB3AF3692834FAD900160F0C /* CurrentUserProfileView.swift */,
+				AB3AF36B2834FC5900160F0C /* CurrentUserProfileView.xib */,
+			);
+			path = Read;
 			sourceTree = "<group>";
 		};
 		AB3C67D2223FBB6400B57580 = {
@@ -1774,6 +1790,7 @@
 		AB74A7F32833F2D100B93522 /* Switch */ = {
 			isa = PBXGroup;
 			children = (
+				AB3AF3682834FA7600160F0C /* Read */,
 				AB74A7F42833F2EB00B93522 /* SettingsSwitch.swift */,
 				AB74A7F62833F4B300B93522 /* SettingsSwitch.xib */,
 			);
@@ -2706,6 +2723,7 @@
 				AB3C684C223FD3EE00B57580 /* OpenSans-Italic.ttf in Resources */,
 				AB2AA1B9235D94DF0086D16C /* SurveyTableViewCell.xib in Resources */,
 				ABADF5A027F7074100A26474 /* Banner.xib in Resources */,
+				AB3AF36C2834FC5900160F0C /* CurrentUserProfileView.xib in Resources */,
 				AB5EB60223630AC0000D4D96 /* SubcategoryTableViewCell.xib in Resources */,
 				AB9998C82805B1AC009D0E4F /* ClaimCell.xib in Resources */,
 				AB913F8328086E1A00609D51 /* StatisticsCell.xib in Resources */,
@@ -2897,6 +2915,7 @@
 				AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */,
 				AB98307027B54D43002C5132 /* ContentLoader.swift in Sources */,
 				ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */,
+				AB3AF3672834E05F00160F0C /* OrderedSet.swift in Sources */,
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
 				AB19B6412432222300999917 /* SurveyResultCell.swift in Sources */,
 				AB38DD702819535C00FFEB3F /* Confirm.swift in Sources */,
@@ -3085,6 +3104,7 @@
 				AB7AEFB7273BDB1400431E85 /* delUsersCell.swift in Sources */,
 				AB72961E27DA3F2C00D45B54 /* SubsciptionsView.swift in Sources */,
 				AB99A95424C6CCE800814F96 /* UserLogoHeader.swift in Sources */,
+				AB3AF36A2834FAD900160F0C /* CurrentUserProfileView.swift in Sources */,
 				ABEDC4E32450168D00FA9128 /* User.swift in Sources */,
 				AB10030D27BF762400338EE4 /* String.swift in Sources */,
 				AB21970326BC2EEF005A7BA8 /* delBanner.swift in Sources */,

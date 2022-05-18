@@ -70,6 +70,11 @@ class SurveyTable: UIView, SurveyDataSource {
         ])
         setObservers()
         setupUI()
+        if category != .Search {
+            if dataItems.isEmpty {
+                callbackDelegate?.callbackReceived(self)
+            }
+        }
     }
     
     private func setupUI() {
@@ -88,9 +93,12 @@ class SurveyTable: UIView, SurveyDataSource {
                           Notifications.Surveys.UpdateFavorite,
                           Notifications.Surveys.UpdateAll,
                           Notifications.Surveys.UpdateNewSurveys,]
+        let remove      = [Notifications.Surveys.Claimed,
+                           Notifications.Surveys.Rejected]
         let zeroEmitted = [Notifications.Surveys.ZeroSubscriptions]
         
-        pagination.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onPagination), name: $0, object: nil) }
+        pagination.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.reloadItems), name: $0, object: nil) }
+        remove.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.reloadItems), name: $0, object: nil) }
         zeroEmitted.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.endRefreshing), name: $0, object: nil) }
     }
     
@@ -99,7 +107,7 @@ class SurveyTable: UIView, SurveyDataSource {
     }
     
     @objc
-    private func onPagination() {
+    private func reloadItems() {
         endRefreshing()
         tableView.reloadData()
     }
@@ -128,7 +136,8 @@ class SurveyTable: UIView, SurveyDataSource {
             tableView.alpha = fetchResult.isEmpty ? 0 : 1
             return fetchResult
         }
-        return category.dataItems()    }
+        return category.dataItems()
+    }
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -141,7 +150,7 @@ extension SurveyTable: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        dataItems.count
+        return dataItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

@@ -18,6 +18,14 @@ class Survey: Decodable {
             case .Hot:
                 return Surveys.shared.hot.map { return $0.reference }
             case .New:
+//                var new: Set<SurveyReference>      = Set(Surveys.shared.newReferences)
+//                let banned: Set<SurveyReference>   = Set(Surveys.shared.banned.map({ return $0.reference }))
+//                let rejected: Set<SurveyReference> = Set(Surveys.shared.rejected.map({ return $0.reference }))
+//
+//                new.subtract(banned)
+//                new.subtract(rejected)
+//
+//                return Array(new)
                 return Surveys.shared.newReferences
             case .Top:
                 return Surveys.shared.topReferences
@@ -380,14 +388,50 @@ class Surveys {
     }
     var all:                     [Survey] = []
     var hot:                     [Survey] = []
-    var banned:                  [Survey] = []///Banned by user
-    var rejected:                [Survey]  = [] {//Local list of rejected surveys, should be cleared periodically
+    var banned:                  [Survey] = [] {///Banned by user
         didSet {
-            if !rejected.isEmpty, rejected.count != oldValue.count {
-                if let survey = rejected.last {
-                    hot.remove(object: survey)
+            if !banned.isEmpty {
+                if let instance = banned.last {
+                    hot.remove(object: instance)
+                    ///Remove from lists
+                    ///Top
+                    if topReferences.contains(instance.reference) {
+                        topReferences.remove(object: instance.reference)
+                    } else if let existing = topReferences.filter({ $0 == instance.reference }).first {
+                        topReferences.remove(object: existing)
+                    }
+                    ///New
+                    if newReferences.contains(instance.reference) {
+                        newReferences.remove(object: instance.reference)
+                    } else if let existing = newReferences.filter({ $0 == instance.reference }).first {
+                        newReferences.remove(object: existing)
+                    }
                 }
             }
+            Notification.send(names: [Notifications.Surveys.Claimed])
+        }
+    }
+    var rejected:                [Survey]  = [] {//Local list of rejected surveys, should be cleared periodically
+        didSet {
+            if !rejected.isEmpty {
+                if let instance = rejected.last {
+                    hot.remove(object: instance)
+                    ///Remove from lists
+                    ///Top
+                    if topReferences.contains(instance.reference) {
+                        topReferences.remove(object: instance.reference)
+                    } else if let existing = topReferences.filter({ $0 == instance.reference }).first {
+                        topReferences.remove(object: existing)
+                    }
+                    ///New
+                    if newReferences.contains(instance.reference) {
+                        newReferences.remove(object: instance.reference)
+                    } else if let existing = newReferences.filter({ $0 == instance.reference }).first {
+                        newReferences.remove(object: existing)
+                    }
+                }
+            }
+            Notification.send(names: [Notifications.Surveys.Rejected])
         }
     }
     

@@ -264,11 +264,10 @@ extension TopicsController: UITextFieldDelegate {
     }
     
     @objc private func hideKeyboard() {
+        if let recognizer = view.gestureRecognizers?.first {
+            view.removeGestureRecognizer(recognizer)
+        }
         if mode == .Search {
-//            mode = .Parent
-            if let recognizer = view.gestureRecognizers?.first {
-                view.removeGestureRecognizer(recognizer)
-            }
             searchField.resignFirstResponder()
         }
     }

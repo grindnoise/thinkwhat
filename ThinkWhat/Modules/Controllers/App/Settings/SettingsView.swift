@@ -42,6 +42,7 @@ class SettingsView: UIView {
     weak var viewInput: SettingsViewInput?
     private var shadowPath: CGPath!
     private var isSetupCompleted = false
+    private var read: CurrentUserProfileView!
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -56,13 +57,7 @@ class SettingsView: UIView {
 // MARK: - Controller Output
 extension SettingsView: SettingsControllerOutput {
     func onWillAppear() {
-        if #available(iOS 14, *) {
-            guard let v = card.subviews.filter({ $0.isKind(of: SurveysCollection.self) }).first as? SurveysCollection else { return }
-            v.deselect()
-        } else {
-            guard let v = card.subviews.filter({ $0.isKind(of: SurveyTable.self) }).first as? SurveyTable else { return }
-            v.deselect()
-        }
+        
     }
     
     func onDidLayout() {
@@ -91,6 +86,9 @@ extension SettingsView {
         card.layer.masksToBounds = true
         card.layer.cornerRadius = card.frame.width * 0.05
         alpha = 0
+        
+        read = CurrentUserProfileView()
+        read.addEquallyTo(to: card)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

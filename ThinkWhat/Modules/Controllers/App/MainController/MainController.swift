@@ -56,9 +56,9 @@ class MainController: UITabBarController {//}, StorageProtocol {
         }
         viewControllers = [
             createNavigationController(for: HotController(), title: "hot", image: UIImage(systemName: "flame"), selectedImage: UIImage(systemName: "flame.fill")),
-            createNavigationController(for: SubsciptionsController(), title: "subscriptions", image: UIImage(systemName: "person.2"), selectedImage: UIImage(systemName: "person.2.fill")),
-            createNavigationController(for: ListController(), title: "list", image: UIImage(systemName: "tray.full"), selectedImage: UIImage(systemName: "tray.full.fill")),
-            createNavigationController(for: TopicsController(), title: "topics", image: UIImage(systemName: "circle.grid.2x2"), selectedImage: UIImage(systemName: "circle.grid.2x2.fill")),
+            createNavigationController(for: SubsciptionsController(), title: "subscriptions", image: UIImage(systemName: "bell"), selectedImage: UIImage(systemName: "bell.fill")),
+            createNavigationController(for: ListController(), title: "list", image: UIImage(systemName: "square.stack.3d.up"), selectedImage: UIImage(systemName: "square.stack.3d.up.fill")),
+            createNavigationController(for: TopicsController(), title: "topics", image: UIImage(systemName: "circle.grid.3x3"), selectedImage: UIImage(systemName: "circle.grid.3x3.fill")),
             createNavigationController(for: SettingsController(), title: "settings", image: UIImage(systemName: "gearshape"), selectedImage: UIImage(systemName: "gearshape.fill"))
         ]
     }
@@ -129,11 +129,9 @@ class MainController: UITabBarController {//}, StorageProtocol {
             do {
                 let data = try await API.shared.surveys.updateStats()
                 let json = try JSON(data: data, options: .mutableContainers)
-//#if DEBUG
-//                print(json)
-//#endif
                 await MainActor.run {
-                    Topics.shared.updateCount(json)
+                    Topics.shared.updateCount(json["count_by_categories"])
+                    Userprofiles.shared.current?.updateCount(json["userprofile"])
                     Notification.send(names: [Notifications.System.UpdateStats])
                 }
             } catch {

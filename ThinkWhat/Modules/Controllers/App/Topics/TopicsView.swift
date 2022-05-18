@@ -156,7 +156,7 @@ extension TopicsView: TopicsControllerOutput {
         let anim = Animations.get(property: .Path,
                                   fromValue: (currentCell.icon.icon as! CAShapeLayer).path as Any,
                                       toValue: destinationPath as Any,
-                                      duration: 0.28,
+                                      duration: 0.25,
                                       delay: 0,
                                       repeatCount: 0,
                                       autoreverses: false,
@@ -174,7 +174,7 @@ extension TopicsView: TopicsControllerOutput {
 
         collectionView.reloadSections(IndexSet(arrayLiteral: 0))
         
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
             self.label.setNeedsLayout()
             self.labelConstraint.constant += self.icon.frame.width
             self.label.layoutIfNeeded()
@@ -206,7 +206,7 @@ extension TopicsView: TopicsControllerOutput {
         let anim = Animations.get(property: .Path,
                                       fromValue: (icon.icon as! CAShapeLayer).path as Any,
                                       toValue: destinationPath as Any,
-                                      duration: 0.23,
+                                      duration: 0.25,
                                       delay: 0,
                                       repeatCount: 0,
                                       autoreverses: false,
@@ -221,7 +221,6 @@ extension TopicsView: TopicsControllerOutput {
         
         UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve, animations: {
             self.setText()
-//            self.back.alpha = 0
         }) { _ in }
 
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
@@ -242,7 +241,7 @@ extension TopicsView: TopicsControllerOutput {
             if #available(iOS 14, *)  {
                 list = SurveysCollection(delegate: self, topic: child)
             } else {
-                list = SurveyTable(delegate: self, category: .Topic)//topic: child), topic: child)
+                list = SurveyTable(delegate: self, topic: child)
             }
         }
 
