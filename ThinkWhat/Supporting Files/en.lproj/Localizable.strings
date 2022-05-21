@@ -49,6 +49,7 @@
 "user" = "User";
 "votes" = "votes";
 "publications" = "Publications";
+"publications_active_total" = "Active publications:";
 "search" = "Поиск";
 "profile" = "Profile";
 "edit" = "Edit";
@@ -146,3 +147,10 @@
 "subscribed_for" = "Subscribed for";
 "unsubscribe" = "Unsubscribe";
 "unsubscribe_question" = "Are you sure to unsubscribe?";
+
+//Settings VC
+"completed" = "Сompleted";
+"preferences" = "My preferences:";
+"my_balance" = "My balance:";
+"points" = "Points";
+"top_up" = "Top up";

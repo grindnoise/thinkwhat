@@ -37,9 +37,13 @@ class UnderlinedSignTextField: UnderlinedTextField {
         didSet {
             UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut]) {
                 if self.isShowingSpinner {
-                    self.spinner = UIActivityIndicatorView(frame: self.rightView!.frame)
-                    self.spinner?.color = self.color
-                    self.spinner?.addEquallyTo(to: self.rightView!)
+                    if self.spinner.isNil {
+                        self.spinner = UIActivityIndicatorView(frame: self.rightView!.frame)
+                        self.spinner?.color = self.color
+                        self.spinner?.addEquallyTo(to: self.rightView!)
+                        self.spinner?.alpha = 0
+                    }
+                    self.spinner?.alpha = 1
                     self.spinner?.startAnimating()
                     self.rightView?.subviews.filter{ $0.isKind(of: Icon.self) }.forEach{ $0.transform = CGAffineTransform(scaleX: 0, y: 0)}
                 } else {
@@ -49,7 +53,8 @@ class UnderlinedSignTextField: UnderlinedTextField {
             } completion: { _ in
                 UIView.animate(withDuration: 0.2) {
                     if !self.isShowingSpinner {
-                        self.spinner?.removeFromSuperview()
+                        self.spinner?.stopAnimating()
+//                        self.spinner?.removeFromSuperview()
                     }
                 }
             }

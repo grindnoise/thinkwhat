@@ -150,6 +150,7 @@
 		AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB3C6868223FDDAF00B57580 /* App.storyboard */; };
 		AB3C686B223FDEEA00B57580 /* _AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C686A223FDEEA00B57580 /* _AuthViewController.swift */; };
 		AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C686C223FDF3D00B57580 /* AppLogo.swift */; };
+		AB3CCB3428376EDA0024372B /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3CCB3328376EDA0024372B /* Device.swift */; };
 		AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF63D22F4213C004BA878 /* EmailResponse.swift */; };
 		AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */; };
 		AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */; };
@@ -622,6 +623,7 @@
 		AB3C6868223FDDAF00B57580 /* App.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = App.storyboard; sourceTree = "<group>"; };
 		AB3C686A223FDEEA00B57580 /* _AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _AuthViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3C686C223FDF3D00B57580 /* AppLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogo.swift; sourceTree = "<group>"; };
+		AB3CCB3328376EDA0024372B /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		AB3EF63D22F4213C004BA878 /* EmailResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailResponse.swift; sourceTree = "<group>"; };
 		AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailValidationViewController.swift; sourceTree = "<group>"; };
 		AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationCodeTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -1017,6 +1019,7 @@
 				AB72960227DA0DD500D45B54 /* Common.swift */,
 				ABF27573280E8D230023CD1F /* AppErrors.swift */,
 				AB3AF3662834E05F00160F0C /* OrderedSet.swift */,
+				AB3CCB3328376EDA0024372B /* Device.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2962,6 +2965,7 @@
 				AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */,
 				ABF27574280E8D230023CD1F /* AppErrors.swift in Sources */,
 				ABD639A527A5B0C50020958F /* ReCAPTCHAViewController.swift in Sources */,
+				AB3CCB3428376EDA0024372B /* Device.swift in Sources */,
 				AB6083C122410131002C0D7E /* ValidSign.swift in Sources */,
 				ABF2758B28102AE40023CD1F /* VotersFilter.swift in Sources */,
 				AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */,

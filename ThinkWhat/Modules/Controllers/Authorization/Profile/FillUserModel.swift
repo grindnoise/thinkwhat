@@ -51,7 +51,7 @@ extension FillUserModel: FillUserControllerInput {
 #if DEBUG
                     print(parameters)
 #endif
-                let data = try await API.shared.updateUserprofileAsync(data: parameters, uploadProgress: { progress in
+                let data = try await API.shared.profiles.updateUserprofileAsync(data: parameters, uploadProgress: { progress in
 #if DEBUG
                     print(progress)
 #endif

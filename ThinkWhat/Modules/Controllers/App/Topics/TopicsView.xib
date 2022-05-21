@@ -39,7 +39,7 @@
                             <rect key="frame" x="10" y="10" width="394" height="798"/>
                             <subviews>
                                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="TVD-hx-sPu">
-                                    <rect key="frame" x="10" y="161" width="374" height="627"/>
+                                    <rect key="frame" x="0.0" y="148" width="394" height="650"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="6UE-je-x5H">
                                         <size key="itemSize" width="128" height="128"/>
@@ -49,14 +49,15 @@
                                     </collectionViewFlowLayout>
                                 </collectionView>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HVK-x2-GvO" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                                    <rect key="frame" x="10" y="10" width="111" height="111"/>
+                                    <rect key="frame" x="10" y="10" width="118" height="118"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="HVK-x2-GvO" secondAttribute="height" multiplier="1:1" id="RLf-tn-q3x"/>
                                     </constraints>
                                 </view>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dt9-Bz-ENi">
-                                    <rect key="frame" x="10" y="10" width="374" height="111"/>
+                                    <rect key="frame" x="10" y="10" width="374" height="118"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
@@ -64,15 +65,15 @@
                             </subviews>
                             <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
                             <constraints>
-                                <constraint firstAttribute="bottom" secondItem="TVD-hx-sPu" secondAttribute="bottom" constant="10" id="0XL-qa-pf7"/>
-                                <constraint firstItem="TVD-hx-sPu" firstAttribute="leading" secondItem="1UE-IK-zZc" secondAttribute="leading" constant="10" id="6PM-va-pJm"/>
+                                <constraint firstAttribute="bottom" secondItem="TVD-hx-sPu" secondAttribute="bottom" id="0XL-qa-pf7"/>
+                                <constraint firstItem="TVD-hx-sPu" firstAttribute="leading" secondItem="1UE-IK-zZc" secondAttribute="leading" id="6PM-va-pJm"/>
                                 <constraint firstItem="Dt9-Bz-ENi" firstAttribute="leading" secondItem="1UE-IK-zZc" secondAttribute="leading" priority="999" constant="10" id="9bT-YW-mu9"/>
                                 <constraint firstItem="Dt9-Bz-ENi" firstAttribute="height" secondItem="HVK-x2-GvO" secondAttribute="height" id="Dsr-mI-wwf"/>
-                                <constraint firstAttribute="trailing" secondItem="TVD-hx-sPu" secondAttribute="trailing" constant="10" id="JOP-7O-E0B"/>
+                                <constraint firstAttribute="trailing" secondItem="TVD-hx-sPu" secondAttribute="trailing" id="JOP-7O-E0B"/>
                                 <constraint firstAttribute="trailing" secondItem="Dt9-Bz-ENi" secondAttribute="trailing" constant="10" id="PNN-2U-f79"/>
                                 <constraint firstItem="Dt9-Bz-ENi" firstAttribute="height" secondItem="HVK-x2-GvO" secondAttribute="height" id="Sxg-x7-E67"/>
-                                <constraint firstItem="TVD-hx-sPu" firstAttribute="top" secondItem="HVK-x2-GvO" secondAttribute="bottom" constant="40" id="UxN-aG-tfr"/>
-                                <constraint firstItem="HVK-x2-GvO" firstAttribute="width" secondItem="1UE-IK-zZc" secondAttribute="width" multiplier="0.281726" id="YC8-vo-o2X"/>
+                                <constraint firstItem="TVD-hx-sPu" firstAttribute="top" secondItem="HVK-x2-GvO" secondAttribute="bottom" constant="20" id="UxN-aG-tfr"/>
+                                <constraint firstItem="HVK-x2-GvO" firstAttribute="width" secondItem="1UE-IK-zZc" secondAttribute="width" multiplier="0.3" id="YC8-vo-o2X"/>
                                 <constraint firstItem="HVK-x2-GvO" firstAttribute="leading" secondItem="1UE-IK-zZc" secondAttribute="leading" constant="10" id="ioE-6t-PA4"/>
                                 <constraint firstItem="HVK-x2-GvO" firstAttribute="top" secondItem="1UE-IK-zZc" secondAttribute="top" constant="10" id="m5N-I4-mI6"/>
                                 <constraint firstItem="Dt9-Bz-ENi" firstAttribute="top" secondItem="1UE-IK-zZc" secondAttribute="top" constant="10" id="sI3-bn-4GZ"/>

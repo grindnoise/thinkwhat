@@ -53,13 +53,13 @@ class ListController: UIViewController {
 
     private func setupUI() {
 //        listSwitch = ListSwitch(callbackDelegate: self)
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(listSwitch)
         listSwitch.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             listSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            listSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            listSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
             listSwitch.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState * 0.97),
             listSwitch.widthAnchor.constraint(equalTo: listSwitch.heightAnchor, multiplier: 4.2)
             ])

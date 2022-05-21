@@ -65,7 +65,7 @@ class HotController: UIViewController {
     }
     
     private func setupUI() {
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(barButton)
         barButton.layer.cornerRadius = UINavigationController.Constants.ImageSizeForLargeState / 2
@@ -75,13 +75,17 @@ class HotController: UIViewController {
         barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         NSLayoutConstraint.activate([
             barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
             barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
             barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
             ])
     }
     
     private func addObservers() {
+//        let remove      = [Notifications.Surveys.Claimed,
+//                           Notifications.Surveys.Completed,
+//                           Notifications.Surveys.Rejected]
+//        remove.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onRemove), name: $0, object: nil) }
 //        NotificationCenter.default.addObserver(self,
 //                                               selector: #selector(HotController.makePreviewStack),
 //                                               name: Notifications.Surveys.UpdateHotSurveys,
@@ -95,6 +99,8 @@ class HotController: UIViewController {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
+    
+    
     
     // MARK: - Properties
     var controllerOutput: HotControllerOutput?

@@ -32,11 +32,22 @@ class SubscribersView: UIView {
         contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(contentView)
         setupUI()
+//        setObservers()
     }
     
     override func layoutSubviews() {
         
     }
+    
+//    private func setObservers() {
+//        let names = [Notifications.System.UpdateStats]
+//        names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.updateStats), name: $0, object: nil) }
+//    }
+//
+//    @objc
+//    private func updateStats() {
+//
+//    }
     
     // MARK: - Properties
     weak var viewInput: SubscribersViewInput?

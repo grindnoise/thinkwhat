@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SafariServices
 
 class SettingsController: UIViewController {
     
@@ -28,7 +29,7 @@ class SettingsController: UIViewController {
         
         navigationItem.title = "profile".localized
         setupUI()
-        setObservers()
+//        setObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -42,27 +43,19 @@ class SettingsController: UIViewController {
         controllerOutput?.onDidLayout()
     }
     
-    private func setObservers() {
-        let names = [Notifications.System.UpdateStats]
-        names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.forceUpdate), name: $0, object: nil) }
-    }
+    
 
     private func setupUI() {
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(settingsSwitch)
         settingsSwitch.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             settingsSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            settingsSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            settingsSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
             settingsSwitch.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState * 0.97),
             settingsSwitch.widthAnchor.constraint(equalTo: settingsSwitch.heightAnchor, multiplier: 3)
             ])
-    }
-    
-    @objc
-    private func forceUpdate() {
-        
     }
 
     // MARK: - Properties
@@ -77,7 +70,13 @@ class SettingsController: UIViewController {
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
-    // Implement methods
+    func onSocialTapped(_ url: URL) {
+        var vc: SFSafariViewController!
+        let config = SFSafariViewController.Configuration()
+        config.entersReaderIfAvailable = true
+        vc = SFSafariViewController(url: url, configuration: config)
+        present(vc, animated: true)
+    }
 }
 
 // MARK: - Model Output

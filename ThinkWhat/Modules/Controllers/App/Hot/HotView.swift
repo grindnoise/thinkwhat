@@ -32,10 +32,30 @@ class HotView: UIView {
         contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(contentView)
         setupUI()
+        setObservers()
     }
     
     override func layoutSubviews() {
         
+    }
+    
+    private func setObservers() {
+        let remove = [Notifications.Surveys.Claimed,
+                           Notifications.Surveys.Completed,
+                           Notifications.Surveys.Rejected]
+        remove.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onRemove), name: $0, object: nil) }
+    }
+    
+    @objc
+    private func onRemove(_ notification: Notification) {
+        guard let instance = notification.object as? SurveyReference,
+              let survey = instance.survey else { return }
+        if currentCard.survey == survey {
+            skipCard()
+        }
+        else {
+            surveyStack.remove(object: survey)
+        }
     }
     
     // MARK: - Properties

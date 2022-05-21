@@ -607,43 +607,7 @@ class API {
         }
     }
     
-    func updateUserprofileAsync(data: [String: Any], uploadProgress: @escaping(Double) -> ()) async throws -> Data {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/") else { throw APIError.invalidURL
-        }
-        
-        var dict = data
-        if let image = dict.removeValue(forKey: "image") as? UIImage {
-            assert(dict["image"] == nil)
-            let multipartFormData = MultipartFormData()
-            var fileFormat: FileFormat = .Unknown
-            var imageData: Data!
-            if let data = image.jpegData(compressionQuality: 1) {
-                imageData = data
-                fileFormat = .JPEG
-            } else if let data = image.pngData() {
-                imageData = data
-                fileFormat = .PNG
-            }
-            guard imageData != nil, fileFormat != .Unknown else { throw APIError.badData }
-            multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(fileFormat)", mimeType: "jpg/png")
-            for (key, value) in dict {
-                if value is String || value is Int {
-                    multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
-                }
-            }
-            do {
-                return try await uploadMultipartFormDataAsync(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) })
-            } catch {
-                throw error
-            }
-        } else {
-            do {
-            return try await requestAsync(url: url, httpMethod: .patch, parameters: dict, encoding: JSONEncoding.default, headers: headers())//JSON(data: responseData, options: .mutableContainers)
-            } catch {
-                throw error
-            }
-        }
-    }
+    
     
     func getEmailVerification(completion: @escaping (Result<Bool, Error>) -> ()) {
         request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.GET_EMAIL_VERIFIED), httpMethod: .get) { result in
@@ -1052,6 +1016,44 @@ class API {
     class Profiles {
         weak var parent: API! = nil
         
+        public func updateUserprofileAsync(data: [String: Any], uploadProgress: @escaping(Double) -> ()) async throws -> Data {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/") else { throw APIError.invalidURL
+            }
+            
+            var dict = data
+            if let image = dict.removeValue(forKey: "image") as? UIImage {
+                assert(dict["image"] == nil)
+                let multipartFormData = MultipartFormData()
+                var fileFormat: FileFormat = .Unknown
+                var imageData: Data!
+                if let data = image.jpegData(compressionQuality: 1) {
+                    imageData = data
+                    fileFormat = .JPEG
+                } else if let data = image.pngData() {
+                    imageData = data
+                    fileFormat = .PNG
+                }
+                guard imageData != nil, fileFormat != .Unknown else { throw APIError.badData }
+                multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(fileFormat)", mimeType: "jpg/png")
+                for (key, value) in dict {
+                    if value is String || value is Int {
+                        multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
+                    }
+                }
+                do {
+                    return try await parent.uploadMultipartFormDataAsync(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) })
+                } catch {
+                    throw error
+                }
+            } else {
+                do {
+                    return try await parent.requestAsync(url: url, httpMethod: .patch, parameters: dict, encoding: JSONEncoding.default, headers: parent.headers())//JSON(data: responseData, options: .mutableContainers)
+                } catch {
+                    throw error
+                }
+            }
+        }
+        
         public func subscribedFor() async throws {
             guard let url = API_URLS.Profiles.subscribedFor else { throw APIError.invalidURL }
             let parameters: Parameters = ["ids": Userprofiles.shared.subscribedFor.map{ return $0.id}]
@@ -1114,7 +1116,7 @@ class API {
             guard let url = API_URLS.Profiles.subscribe else { throw APIError.invalidURL }
             let parameters: Parameters = ["userprofile_id": userprofile.id]
             do {
-                try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default, headers: parent.headers())
+                let _ = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default, headers: parent.headers())
                 await MainActor.run {
                     Userprofiles.shared.subscribedFor.append(userprofile)
                 }
@@ -1130,7 +1132,7 @@ class API {
             guard let url = API_URLS.Profiles.unsubscribe else { throw APIError.invalidURL }
             let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
             do {
-                try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
                 await MainActor.run {
                     userprofiles.forEach {
                         Userprofiles.shared.subscribedFor.remove(object: $0)
@@ -1185,69 +1187,72 @@ class API {
             }
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
-                let decoder = JSONDecoder()
-                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                           DateFormatter.dateTimeFormatter,
-                                                           DateFormatter.dateFormatter ]
-                try await MainActor.run {
-                    let instances = try decoder.decode([SurveyReference].self, from: data)
-                    guard !instances.isEmpty else {
-                        //                    await MainActor.run {
-                        Notification.send(names: [Notifications.Surveys.ZeroSubscriptions])
-                        //                    }
-                        return
-                    }
-                    //                await MainActor.run {
-                    instances.forEach { instance in
-                        switch category {
-                        case .Subscriptions:
-                            if Surveys.shared.subscriptions.filter({ $0 == instance }).isEmpty {
-                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-                                    Surveys.shared.subscriptions.append(existing)
-                                } else {
-                                    Surveys.shared.subscriptions.append(instance)
-                                }
-                            }
-                        case .Favorite:
-                            if Surveys.shared.favoriteReferences.filter({ $0 == instance }).isEmpty {
-                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-                                    Surveys.shared.favoriteReferences.append(existing)
-                                } else {
-                                    Surveys.shared.favoriteReferences.append(instance)
-                                }
-                            }
-                        case .Top:
-                            if Surveys.shared.topReferences.filter({ $0 == instance }).isEmpty {
-                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-                                    Surveys.shared.topReferences.append(existing)
-                                } else {
-                                    Surveys.shared.topReferences.append(instance)
-                                }
-                            }
-                        case .Own:
-                            if Surveys.shared.ownReferences.filter({ $0 == instance }).isEmpty {
-                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-                                    Surveys.shared.ownReferences.append(existing)
-                                } else {
-                                    Surveys.shared.ownReferences.append(instance)
-                                }
-                            }
-                        case .New:
-                            if Surveys.shared.newReferences.filter({ $0 == instance }).isEmpty {
-                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-                                    Surveys.shared.newReferences.append(existing)
-                                } else {
-                                    Surveys.shared.newReferences.append(instance)
-                                }
-                            }
-                        case .Topic:
-                            if SurveyReferences.shared.all.filter({ $0 == instance }).isEmpty {
-                                SurveyReferences.shared.all.append(instance)
-                            }
-                        default:
-                            fatalError()
-                        }
-                    }
+//                let decoder = JSONDecoder()
+//                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+//                                                           DateFormatter.dateTimeFormatter,
+//                                                           DateFormatter.dateFormatter ]
+                let json = try JSON(data: data, options: .mutableContainers)
+                
+                await MainActor.run {
+                    Surveys.shared.load(json)
+//                    let instances = try decoder.decode([SurveyReference].self, from: data)
+//                    guard !instances.isEmpty else {
+//                        //                    await MainActor.run {
+//                        Notification.send(names: [Notifications.Surveys.ZeroSubscriptions])
+//                        //                    }
+//                        return
+//                    }
+//                    //                await MainActor.run {
+//                    instances.forEach { instance in
+//                        switch category {
+//                        case .Subscriptions:
+//                            if Surveys.shared.subscriptions.filter({ $0 == instance }).isEmpty {
+//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+//                                    Surveys.shared.subscriptions.append(existing)
+//                                } else {
+//                                    Surveys.shared.subscriptions.append(instance)
+//                                }
+//                            }
+//                        case .Favorite:
+//                            if Surveys.shared.favoriteReferences.filter({ $0 == instance }).isEmpty {
+//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+//                                    Surveys.shared.favoriteReferences.append(existing)
+//                                } else {
+//                                    Surveys.shared.favoriteReferences.append(instance)
+//                                }
+//                            }
+//                        case .Top:
+//                            if Surveys.shared.topReferences.filter({ $0 == instance }).isEmpty {
+//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+//                                    Surveys.shared.topReferences.append(existing)
+//                                } else {
+//                                    Surveys.shared.topReferences.append(instance)
+//                                }
+//                            }
+//                        case .Own:
+//                            if Surveys.shared.ownReferences.filter({ $0 == instance }).isEmpty {
+//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+//                                    Surveys.shared.ownReferences.append(existing)
+//                                } else {
+//                                    Surveys.shared.ownReferences.append(instance)
+//                                }
+//                            }
+//                        case .New:
+//                            if Surveys.shared.newReferences.filter({ $0 == instance }).isEmpty {
+//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
+//                                    Surveys.shared.newReferences.append(existing)
+//                                } else {
+//                                    Surveys.shared.newReferences.append(instance)
+//                                }
+//                            }
+//                        case .Topic:
+//                            if SurveyReferences.shared.all.filter({ $0 == instance }).isEmpty {
+//                                SurveyReferences.shared.all.append(instance)
+//                            }
+//                        default:
+//                            fatalError()
+//                        }
+//                    }
                 }
             } catch let error {
     #if DEBUG

@@ -39,7 +39,8 @@ class SurveyReference: Decodable {
     var isComplete: Bool {
         didSet {
             guard oldValue != isComplete else { return }
-            Notification.send(names: [Notifications.Surveys.Completed])
+            NotificationCenter.default.post(name: Notifications.Surveys.Completed, object: self)
+//            Notification.send(names: [Notifications.Surveys.Completed])
         }
     }
     var isOwn: Bool
@@ -71,7 +72,8 @@ class SurveyReference: Decodable {
     required init(from decoder: Decoder) throws {
         do {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            guard let topicId = try container.decode(Int.self, forKey: .category) as? Int, let _topic = Topics.shared.all.filter({ $0.id == topicId }).first else {
+            guard let topicId = try container.decode(Int.self, forKey: .category) as? Int,
+                  let _topic = Topics.shared.all.filter({ $0.id == topicId }).first else {
                 throw "Topic not found"
             }
             guard let _type = Survey.SurveyType(rawValue: try container.decode(String.self, forKey: .type)) else {

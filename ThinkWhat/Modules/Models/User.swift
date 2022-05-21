@@ -30,7 +30,7 @@ class Userprofiles {
     var current: Userprofile? {
         didSet {
             guard shouldImportUserDefaults, !current.isNil else { return }
-            UserDefaults.Profile.load(from: current!)
+            UserDefaults.Profile.importData(from: current!)
         }
     }
     lazy var anonymous: Userprofile = {
@@ -40,6 +40,7 @@ class Userprofiles {
         user!.lastName = "user".localized
         user!.id = 1010000110010011
         user!.gender = .Unassigned
+        user!.cityTitle = ""
         user!.email = ""
         return user!
     }()
@@ -106,6 +107,7 @@ class Userprofile: Decodable {
              favoritesTotal = "favorite_surveys_count",
              publicationsTotal = "own_surveys_count",
              subscribersTotal = "subscribers_count",
+             subscriptionsTotal = "subscribed_at_count",
              lastVisit = "last_visit",
              topPublicationCategories = "top_pub_categories",
              wasEdited = "is_edited",
@@ -161,6 +163,7 @@ class Userprofile: Decodable {
     var favoritesTotal:     Int = 0
     var publicationsTotal:  Int = 0
     var subscribersTotal:   Int = 0
+    var subscriptionsTotal: Int = 0
     var lastVisit:          Date
     var wasEdited:          Bool?
     var isBanned:           Bool
@@ -170,9 +173,9 @@ class Userprofile: Decodable {
     }
     var surveys:      [SurveyReference]   = []
     var favorites:    [Date: [SurveyReference]]   = [:]
-    var topPublicationCategories: [[Topic: Int]] = [[:]]
-    var sortedTopPublicationCategories: [[Topic: Int]] {
-        return topPublicationCategories.sorted { (first, second) in
+    var topPublicationCategories: [[Topic: Int]]?// = [[:]]
+    var sortedTopPublicationCategories: [[Topic: Int]]? {
+        return topPublicationCategories?.sorted { (first, second) in
             first.first!.value > second.first!.value
         }
     }
@@ -278,6 +281,7 @@ class Userprofile: Decodable {
             completeTotal       = try container.decode(Int.self, forKey: .completeTotal)
             publicationsTotal   = try container.decode(Int.self, forKey: .publicationsTotal)
             subscribersTotal    = try container.decode(Int.self, forKey: .subscribersTotal)
+            subscriptionsTotal  = try container.decode(Int.self, forKey: .subscriptionsTotal)
             tiktokURL           = URL(string: try container.decodeIfPresent(String.self, forKey: .tiktokURL) ?? "")
             instagramURL        = URL(string: try container.decodeIfPresent(String.self, forKey: .instagramURL) ?? "")
             facebookURL         = URL(string: try container.decodeIfPresent(String.self, forKey: .facebookURL) ?? "")
@@ -286,14 +290,17 @@ class Userprofile: Decodable {
             isBanned            = try container.decode(Bool.self, forKey: .isBanned)
             gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
             ///City decoding
-            if let cityInstance = try? container.decodeIfPresent(City.self, forKey: .city) {
+            if let cityInstance = try? container.decodeIfPresent(City.self, forKey: .city), !cityInstance.isNil {
                 city = Cities.shared.all.filter({ $0 == cityInstance }).first ?? cityInstance
+                cityTitle = city!.localized ?? city!.name
             }
-            topPublicationCategories.removeAll()
-            let topics          = try container.decode([String: Int].self, forKey: .topPublicationCategories)
-            topics.forEach { dict in
-                if let topic = Topics.shared.all.filter({ $0.id == Int(dict.key) }).first {
-                    topPublicationCategories.append([topic: dict.value])
+//            topPublicationCategories.removeAll()
+            if let topics = try container.decodeIfPresent([String: Int].self, forKey: .topPublicationCategories), topics != nil, !topics.isEmpty {
+                topPublicationCategories = []
+                topics.forEach { dict in
+                    if let topic = Topics.shared.all.filter({ $0.id == Int(dict.key) }).first {
+                        topPublicationCategories!.append([topic: dict.value])
+                    }
                 }
             }
             if Userprofiles.shared.all.filter({ $0 == self }).isEmpty {
@@ -307,19 +314,34 @@ class Userprofile: Decodable {
         }
     }
     
-    func updateCount(_ json: JSON) {
+    func updateStats(_ json: JSON) {
         guard let _subscribersTotal = json["subscribers_count"].int,
+              let _subscriptionsTotal = json["subscribed_at_count"].int,
               let _publicationsTotal = json["own_surveys_count"].int,
               let _favoritesTotal = json["favorite_surveys_count"].int,
               let _completeTotal = json["completed_surveys_count"].int,
               let _balance = json["balance"].int,
+              let _top_preferences = json["top_preferences"] as? JSON,
               let _isBanned = json["is_banned"].bool else { return }
         subscribersTotal = _subscribersTotal
+        subscriptionsTotal = _subscriptionsTotal
         publicationsTotal = _publicationsTotal
         favoritesTotal = _favoritesTotal
         completeTotal = _completeTotal
         balance = _balance
         isBanned = _isBanned
+        updateTopCategories(_top_preferences)
+    }
+    
+    func updateTopCategories(_ json: JSON) {
+        guard !json.isEmpty, let container = json.dictionary else { return }
+        topPublicationCategories = []
+        container.forEach {
+            guard let key = Int($0.key),
+                  let topic = Topics.shared.all.filter({ $0.id == key }).first,
+                  let value = Int($0.key) else { return }
+            topPublicationCategories!.append([topic: value])
+        }
     }
     
     func loadSurveys(data: Data) {
@@ -340,18 +362,18 @@ class Userprofile: Decodable {
         }
     }
     
-    func updateStats(_ json: JSON) {
-        if let _surveysAnsweredTotal   = json[DjangoVariables.UserProfile.surveysAnsweredTotal].int,
-            let _favoriteSurveysTotal   = json[DjangoVariables.UserProfile.surveysFavoriteTotal].int,
-            let _surveysCreatedTotal    = json[DjangoVariables.UserProfile.surveysCreatedTotal].int {
-            completeTotal = _surveysAnsweredTotal
-            favoritesTotal = _favoriteSurveysTotal
-            publicationsTotal = _surveysCreatedTotal
-            if let _lastVisitString = json[DjangoVariables.UserProfile.lastVisit].string, let _lastVisit = Date(dateTimeString: _lastVisitString) {
-                lastVisit = _lastVisit
-            }
-        }
-    }
+//    func updateStats(_ json: JSON) {
+//        if let _surveysAnsweredTotal   = json[DjangoVariables.UserProfile.surveysAnsweredTotal].int,
+//            let _favoriteSurveysTotal   = json[DjangoVariables.UserProfile.surveysFavoriteTotal].int,
+//            let _surveysCreatedTotal    = json[DjangoVariables.UserProfile.surveysCreatedTotal].int {
+//            completeTotal = _surveysAnsweredTotal
+//            favoritesTotal = _favoriteSurveysTotal
+//            publicationsTotal = _surveysCreatedTotal
+//            if let _lastVisitString = json[DjangoVariables.UserProfile.lastVisit].string, let _lastVisit = Date(dateTimeString: _lastVisitString) {
+//                lastVisit = _lastVisit
+//            }
+//        }
+//    }
     
     func downloadImage(downloadProgress: @escaping(Double)->(), completion: @escaping (Result<UIImage, Error>) -> ()) {
         guard let url = imageURL else {

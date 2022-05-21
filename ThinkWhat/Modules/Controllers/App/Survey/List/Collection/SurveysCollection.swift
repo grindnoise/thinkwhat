@@ -82,6 +82,7 @@ class SurveysCollection: UIView, SurveyDataSource {
                           Notifications.Surveys.UpdateAll,
                           Notifications.Surveys.UpdateNewSurveys,]
         let remove      = [Notifications.Surveys.Claimed,
+                           Notifications.Surveys.Completed,
                            Notifications.Surveys.Rejected]
         let zeroEmitted = [Notifications.Surveys.ZeroSubscriptions]
         
@@ -218,9 +219,9 @@ extension SurveysCollection: UICollectionViewDelegate {
     }
     
     @objc
-    private func onRemove() {
+    private func onRemove(_ notification: Notification) {
 //        setDataSource()
-        let instance = Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
+        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
         var snapshot = dataSource.snapshot()
         guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
         snapshot.deleteItems([instance!])

@@ -47,6 +47,10 @@ class MainController: UITabBarController {//}, StorageProtocol {
             let navigationController = CustomNavigationController(rootViewController: rootViewController)
             navigationController.title = title.localized
             navigationController.tabBarItem.title = title.localized
+//            let attributedText = NSMutableAttributedString()
+//            attributedText.append(NSAttributedString(string: title.localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 10), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//            navigationController.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 10)] as [NSAttributedString.Key : Any], for: .normal)
+
             navigationController.tabBarItem.image = image
             navigationController.tabBarItem.selectedImage = selectedImage
             navigationController.navigationBar.prefersLargeTitles = true
@@ -74,8 +78,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 return K_COLOR_TABBAR
             }
         }
-        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "OpenSans-Semibold", size: 12)!], for: .normal)
-        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "OpenSans-Light", size: 12)!], for: .selected)
+        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 11)], for: .normal)
+        UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11)], for: .selected)
 
         delegate = self//_delegate
         navigationItem.setHidesBackButton(true, animated: false)
@@ -85,7 +89,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
         loadingIndicator!.alpha = 0
         setTabBarVisible(visible: false, animated: false)
     }
-    
+        
     public func loadData() {
         if loadingIndicator.isNil || loadingIndicator?.alpha != 1 {
             loadingIndicator!.alpha = 1
@@ -131,7 +135,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 let json = try JSON(data: data, options: .mutableContainers)
                 await MainActor.run {
                     Topics.shared.updateCount(json["count_by_categories"])
-                    Userprofiles.shared.current?.updateCount(json["userprofile"])
+                    Userprofiles.shared.current?.updateStats(json["userprofile"])
                     Notification.send(names: [Notifications.System.UpdateStats])
                 }
             } catch {
@@ -157,10 +161,12 @@ class MainController: UITabBarController {//}, StorageProtocol {
                     let claims          = try json["claim_categories"].rawData()
                     let subscribedFor   = try json["subscribed_for"].rawData()
                     let surveys         = json["surveys"]
+                    let topCategories   = json["top_preferences"]
                     Topics.shared.load(topics)
                     Claims.shared.load(claims)
                     Surveys.shared.load(surveys)
                     Userprofiles.shared.loadSubscribedFor(subscribedFor)
+                    Userprofiles.shared.current?.updateTopCategories(topCategories)
 
                     UIView.animate(withDuration: 0.2, delay: 0.5, options: .curveEaseInOut) {
                         self.loadingIndicator?.alpha = 0

@@ -14,7 +14,7 @@ class Topics {
     private init() {}
     var all: [Topic] = []
     var active: Int {
-        Topics.shared.all.filter({ !$0.isParentNode}).reduce(into: 0) { $0 += $1.active }
+        Topics.shared.all.filter({ !$0.isParentNode}).reduce(into: 0) { $0 += $1.activeAndFavorite }
 //        return all.filter({ $0.isParentNode }).reduce(into: 0) { $0 += $1.active }
     }
 //    var tree: [[String: [Topic]]] = [[:]]
@@ -55,22 +55,28 @@ class Topics {
 //    }
     
     func updateCount(_ json: JSON) {
-//        if let _categories = json["categories"] as? JSON {
-            if !json.isEmpty {
-                for cat in all {
-                    cat.total = 0
-                    cat.active = 0
-                }
-                for cat in json {
-                    if let category = self[Int(cat.0)!] as? Topic, let total = cat.1["total"].intValue as? Int, let active = cat.1["active"].intValue as? Int {
-                        category.total = total
-                        category.active = active
-                        category.parent?.total += total
-                        category.parent?.active += active
+        if !json.isEmpty {
+//            for cat in all {
+//                cat.total = 0
+//                cat.active = 0
+//            }
+            for cat in json {
+                if let category = self[Int(cat.0)!] as? Topic,
+                    let total = cat.1["total"].int,
+                    let active = cat.1["active"].int,
+                    let activeAndFavorite = cat.1["active_favorite"].int {
+                    category.total = total
+                    category.active = active
+                    category.activeAndFavorite = activeAndFavorite
+//                    category.parent?.total += total
+//                    category.parent?.active += active
+                    if let favorite = cat.1["favorite"].int {
+                        category.favorite = favorite
+//                        category.parent?.favorite += favorite
                     }
                 }
             }
-//        }
+        }
     }
     
     subscript (ID: Int) -> Topic? {
@@ -93,11 +99,13 @@ class Topics {
 class Topic: Decodable {
     private enum CodingKeys: String, CodingKey {
         case id, title, parent, children
-        case createdAt      = "created_at"
-        case ageRestriction = "age_restriction"
-        case tagColor       = "tag_color"
-        case total          = "total_count"
-        case active         = "active_count"
+        case createdAt          = "created_at"
+        case ageRestriction     = "age_restriction"
+        case tagColor           = "tag_color"
+        case total              = "total_count"
+        case active             = "active_count"
+        case favorite           = "favorite_count"
+        case activeAndFavorite  = "active_favorite_count"
     }
     
     let id: Int
@@ -110,6 +118,14 @@ class Topic: Decodable {
     var tagColor: UIColor
     var total: Int = 0
     var active: Int = 0
+    var favorite: Int = 0
+    var activeAndFavorite: Int = 0
+    var visibleCount: Int {
+        if isParentNode {
+            return children.reduce(into: 0) { $0 += $1.activeAndFavorite }
+        }
+        return activeAndFavorite
+    }
     var isParentNode: Bool {
         return !children.isEmpty
     }
@@ -123,7 +139,9 @@ class Topic: Decodable {
             ageRestriction  = (try? container.decode(Int.self, forKey: .ageRestriction)) ?? 0
             children        = (try? container.decode([Topic].self, forKey: .children)) ?? []
             total           = try container.decode(Int.self, forKey: .total)
-            active           = try container.decode(Int.self, forKey: .active)
+            active          = try container.decode(Int.self, forKey: .active)
+            favorite        = try container.decode(Int.self, forKey: .favorite)
+            activeAndFavorite        = try container.decode(Int.self, forKey: .activeAndFavorite)
             if Topics.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 Topics.shared.all.append(self)
             }

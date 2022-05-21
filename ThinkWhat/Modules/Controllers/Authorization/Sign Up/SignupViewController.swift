@@ -276,7 +276,7 @@ extension SignupViewController: SignupViewInput {
                         ///5.1. Get user's profile from provider
                         let providerData = try await getProviderData()
                         ///5.2. Feed data to our API
-                        let data = try await API.shared.updateUserprofileAsync(data: providerData) { progress in
+                        let data = try await API.shared.profiles.updateUserprofileAsync(data: providerData) { progress in
                             print(progress)
                         }
                         ///5.3. Import data

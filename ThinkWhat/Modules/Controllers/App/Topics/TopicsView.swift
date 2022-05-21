@@ -36,13 +36,22 @@ class TopicsView: UIView {
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
         setupUI()
+        setText()
+        setObservers()
+    }
+    
+    private func setObservers() {
+        let names = [Notifications.Surveys.Claimed,
+                     Notifications.Surveys.Completed,
+                     Notifications.Surveys.Rejected]
+        names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.updateStats), name: $0, object: nil) }
     }
 
     @objc
     func updateStats() {
-        if mode == .Parent {
+        if mode == .Parent || mode == .Child {
             UIView.transition(with: label, duration: 0.3, options: .transitionCrossDissolve, animations: {
-                self.setText()
+                self.mode == .Parent ? self.setText() : self.setChildText()
             }) { _ in }
         }
     }
@@ -95,14 +104,6 @@ class TopicsView: UIView {
     }
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var labelConstraint: NSLayoutConstraint!
-//    @IBOutlet weak var back: UIImageView! {
-//        didSet {
-//            back.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .secondaryLabel
-//            back.alpha = 0
-//            back.isUserInteractionEnabled = true
-//            back.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.backTapped)))
-//        }
-//    }
 }
 
 // MARK: - Controller Output
@@ -112,7 +113,7 @@ extension TopicsView: TopicsControllerOutput {
     }
     
     func onWillAppear() {
-        setText()
+//        setText()
     }
     
     func onDidLayout() {
@@ -149,14 +150,14 @@ extension TopicsView: TopicsControllerOutput {
         temp.backgroundColor = currentCell.icon.backgroundColor
         temp.category = currentCell.icon.category
         card.addSubview(temp)
-        currentCell.icon.alpha = 0
+        currentCell.alpha = 0
         
         let destinationLayer = icon.icon as! CAShapeLayer
         let destinationPath = destinationLayer.path
         let anim = Animations.get(property: .Path,
                                   fromValue: (currentCell.icon.icon as! CAShapeLayer).path as Any,
                                       toValue: destinationPath as Any,
-                                      duration: 0.25,
+                                      duration: 0.225,
                                       delay: 0,
                                       repeatCount: 0,
                                       autoreverses: false,
@@ -168,13 +169,14 @@ extension TopicsView: TopicsControllerOutput {
             
         let destinationOrigin = icon.superview!.convert(icon.frame.origin, to: card)
         let destinationSize = icon.frame.size
-        UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve, animations: {
-            self.label.text = currentCell.category.title.uppercased()
+        UIView.transition(with: label, duration: 0.225, options: .transitionCrossDissolve, animations: {
+//            self.label.text = currentCell.category.title.uppercased()
+            self.setChildText()
         }) { _ in }
 
         collectionView.reloadSections(IndexSet(arrayLiteral: 0))
         
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.225, delay: 0, options: .curveEaseInOut) {
             self.label.setNeedsLayout()
             self.labelConstraint.constant += self.icon.frame.width
             self.label.layoutIfNeeded()
@@ -184,11 +186,11 @@ extension TopicsView: TopicsControllerOutput {
         } completion: { _ in
             temp.removeFromSuperview()
             self.icon.alpha = 1
-            currentCell.icon.alpha = 1
         }
     }
     
     func onParentMode() {
+//        setText()
         collectionView.reloadSections(IndexSet(arrayLiteral: 0))
         guard let currentCell = collectionView.cellForItem(at: currentIndex) as? CategoryCollectionViewCell else { return }
         
@@ -199,14 +201,13 @@ extension TopicsView: TopicsControllerOutput {
         temp.category = currentCell.icon.category
         card.addSubview(temp)
         icon.alpha = 0
-        currentCell.icon.alpha = 0
         
         let destinationLayer = currentCell.icon.icon as! CAShapeLayer
         let destinationPath = destinationLayer.path
         let anim = Animations.get(property: .Path,
                                       fromValue: (icon.icon as! CAShapeLayer).path as Any,
                                       toValue: destinationPath as Any,
-                                      duration: 0.25,
+                                      duration: 0.225,
                                       delay: 0,
                                       repeatCount: 0,
                                       autoreverses: false,
@@ -219,20 +220,21 @@ extension TopicsView: TopicsControllerOutput {
         let destinationOrigin = currentCell.icon.superview!.convert(currentCell.icon.frame.origin, to: card)
         let destinationSize = currentCell.icon.frame.size
         
-        UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve, animations: {
+        UIView.transition(with: label, duration: 0.225, options: .transitionCrossDissolve, animations: {
             self.setText()
         }) { _ in }
 
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.225, delay: 0, options: .curveEaseInOut) {
             self.label.setNeedsLayout()
             self.labelConstraint.constant -= self.icon.frame.width
             self.label.layoutIfNeeded()
             temp.frame.origin = destinationOrigin
             temp.frame.size = destinationSize
+//            currentCell.alpha = 0
         } completion: { _ in
             temp.removeFromSuperview()
-            currentCell.icon.alpha = 1
-            
+//            currentCell.alpha = 1
+//            currentCell.alpha = 1
         }
     }
     
@@ -261,7 +263,7 @@ extension TopicsView: TopicsControllerOutput {
     }
     
     func onListToChildMode() {
-        
+        setChildText()
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
             self.collectionView.alpha = 1
             self.collectionView.transform = .identity
@@ -341,22 +343,21 @@ extension TopicsView {
     }
     
     private func setText() {
-//        let paragraph = NSMutableParagraphStyle()
-//        if #available(iOS 15.0, *) {
-//            paragraph.usesDefaultHyphenation = true
-//        } else {
-//            paragraph.hyphenationFactor = 1
-//        }
-//        paragraph.alignment = .center
-//        let string = text
-//        let attributedText = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-//        attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 14), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
-//        label.attributedText = attributedText
         let attributedText = NSMutableAttributedString()
-        attributedText.append(NSAttributedString(string: "\(Topics.shared.active) " + "publications".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: label.frame.height * 0.2), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "publications_active_total".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: UIScreen.main.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\n\(Topics.shared.active)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: UIScreen.main.bounds.width * 0.05), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         label.textAlignment = .center
         label.attributedText = attributedText
     }
+    
+    private func setChildText() {
+        let attributedText = NSMutableAttributedString()
+        attributedText.append(NSAttributedString(string: parent.title.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: UIScreen.main.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\n\(parent.visibleCount)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: UIScreen.main.bounds.width * 0.05), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        label.textAlignment = .center
+        label.attributedText = attributedText
+    }
+    
 }
 
 extension TopicsView: CallbackObservable {
@@ -412,11 +413,12 @@ extension TopicsView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? CategoryCollectionViewCell {
             let dataItems = mode == .Parent ? parents : parent.children
+            cell.setupUI()
+//            cell.setObservers()
             if let category = dataItems[indexPath.row] as? Topic {
                 cell.childColor = category.tagColor
                 cell.category = category
             }
-            cell.setObservers()
             return cell
         }
         return UICollectionViewCell()

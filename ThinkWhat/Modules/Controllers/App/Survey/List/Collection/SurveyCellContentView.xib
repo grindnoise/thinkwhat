@@ -12,6 +12,7 @@
             <connections>
                 <outlet property="avatar" destination="8pF-U5-G1t" id="Oe1-jK-7Wl"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Bxy-fg-DQi"/>
+                <outlet property="height" destination="qDs-uB-7W8" id="u5T-zJ-7ST"/>
                 <outlet property="heightConstraint" destination="qDs-uB-7W8" id="JpI-lz-zS3"/>
                 <outlet property="hotIcon" destination="uPn-dI-0kl" id="TwJ-Nc-3qx"/>
                 <outlet property="hotIconWidth" destination="bjT-kX-xjD" id="hgE-Do-pto"/>

@@ -16,7 +16,7 @@ protocol SettingsViewInput: class {
     var controllerOutput: SettingsControllerOutput? { get set }
     var controllerInput: SettingsControllerInput? { get set }
     
-    // View input methods here
+    func onSocialTapped(_: URL)
 }
 
 /// *Controller* tells the *Model* what to do based on the input

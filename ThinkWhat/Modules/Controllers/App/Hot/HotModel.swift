@@ -29,6 +29,9 @@ extension HotModel: HotControllerInput {
 //                let data = try await API.shared.downloadSurveysAsync(type: .Hot, parameters: parameters)
                 let data = try await API.shared.surveys.loadSurveys(type: .Hot, parameters: parameters)
                 let json = try JSON(data: data, options: .mutableContainers)
+#if DEBUG
+                print(json)
+#endif
                 await MainActor.run {
                     Surveys.shared.load(json)
                     modelOutput?.onRequestCompleted()

@@ -48,7 +48,8 @@
 "anonymous" = "Анонимный";
 "user" = "Пользователь";
 "votes" = "голосов";
-"publications" = "Публикаций";
+"publications" = "Публикации";
+"publications_active_total" = "Активных публикаций:";
 "search" = "Поиск";
 "profile" = "Профиль";
 "edit" = "Изменить";
@@ -146,3 +147,10 @@
 "subscribed_for" = "Подписки";
 "unsubscribe" = "Отписаться";
 "unsubscribe_question" = "Вы уверены, что хотите отписаться?";
+
+//Settings VC
+"completed" = "Пройдено";
+"preferences" = "Мои предпочтения:";
+"my_balance" = "Мой баланс:";
+"points" = "Баллов";
+"top_up" = "Пополнить";

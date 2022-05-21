@@ -51,7 +51,7 @@ class SubsciptionsController: UIViewController {
     }
 
     private func setupUI() {
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(barButton)
         barButton.layer.cornerRadius = UINavigationController.Constants.ImageSizeForLargeState / 2
@@ -63,7 +63,7 @@ class SubsciptionsController: UIViewController {
         barButton.addGestureRecognizer(gesture)
         NSLayoutConstraint.activate([
             barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
             barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
             barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
             ])

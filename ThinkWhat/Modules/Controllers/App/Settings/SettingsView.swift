@@ -87,7 +87,7 @@ extension SettingsView {
         card.layer.cornerRadius = card.frame.width * 0.05
         alpha = 0
         
-        read = CurrentUserProfileView()
+        read = CurrentUserProfileView(frame: card.frame, callbackDelegate: self)
         read.addEquallyTo(to: card)
     }
     
@@ -97,4 +97,10 @@ extension SettingsView {
     }
 }
 
-
+extension SettingsView: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        if let url = sender as? URL {
+            viewInput?.onSocialTapped(url)
+        }
+    }
+}

@@ -62,7 +62,7 @@ class TopicsController: UIViewController {
     }
     
     private func setupUI() {
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(barButton)
         barButton.layer.cornerRadius = UINavigationController.Constants.ImageSizeForLargeState / 2
@@ -74,7 +74,7 @@ class TopicsController: UIViewController {
         barButton.addGestureRecognizer(gesture)
         NSLayoutConstraint.activate([
             barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
             barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
             barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
         ])
@@ -82,7 +82,7 @@ class TopicsController: UIViewController {
         searchField.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             searchField.rightAnchor.constraint(equalTo: barButton.leftAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            searchField.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            searchField.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
             searchField.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
             searchField.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageRightMargin),
         ])
@@ -227,7 +227,7 @@ extension TopicsController: TopicsModelOutput {
     
     func onError(_: Error) {
         func onError(_ error: Error) {
-            if isSearching { isSearching = false }
+            isSearching = false
     #if DEBUG
             print(error.localizedDescription)
     #endif

@@ -94,6 +94,7 @@ class SurveyTable: UIView, SurveyDataSource {
                           Notifications.Surveys.UpdateAll,
                           Notifications.Surveys.UpdateNewSurveys,]
         let remove      = [Notifications.Surveys.Claimed,
+                           Notifications.Surveys.Completed,
                            Notifications.Surveys.Rejected]
         let zeroEmitted = [Notifications.Surveys.ZeroSubscriptions]
         
@@ -175,7 +176,7 @@ extension SurveyTable: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 130
+        return deviceType == .iPhoneSE ? 120 : 130
     }
     
     func deselect() {

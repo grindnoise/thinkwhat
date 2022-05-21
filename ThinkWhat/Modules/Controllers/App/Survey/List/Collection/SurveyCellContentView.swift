@@ -132,6 +132,11 @@ class SurveyCellContentView: UIView, UIContentView {
     @IBOutlet weak var hotIconWidth: NSLayoutConstraint!
     //    @IBOutlet weak var labelWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var hotSpacer: NSLayoutConstraint!
+    @IBOutlet weak var height: NSLayoutConstraint! {
+        didSet {
+            height.constant = deviceType == .iPhoneSE ? 120 : 130
+        }
+    }
 }
 
 @available(iOS 14.0, *)
@@ -169,7 +174,7 @@ private extension SurveyCellContentView {
     
     
     private func setupUI() {
-        titleFontSize = heightConstraint.constant * 0.16
+        titleFontSize = heightConstraint.constant * (deviceType == .iPhoneSE ? 0.13 : 0.16)
         lowerLabelsFontSize = votesLimitLabel.frame.height * 0.83
         topicFontSize = heightConstraint.constant * 0.07
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground

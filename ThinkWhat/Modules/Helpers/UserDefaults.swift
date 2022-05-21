@@ -28,7 +28,13 @@ extension UserDefaults {
         static var email: String?
         
         @UserDefault(key: "city", defaultValue: nil)
-        static var city: String?        
+        static var city: String? {
+            didSet {
+                print(oldValue)
+                print(city)
+            }
+        }
+        
         @UserDefault(key: "image_path", defaultValue: nil)
         static var imagePath: String?
         
@@ -132,7 +138,7 @@ extension UserDefaults {
 //            UserDefaults.Profile.facebookURL    = URL(string: json["facebook_url"].string ?? "") ?? UserDefaults.Profile.facebookURL
 //        }
         
-        static func load(from profile: Userprofile) {
+        static func importData(from profile: Userprofile) {
             UserDefaults.Profile.id             = profile.id
             UserDefaults.Profile.firstName      = profile.firstName
             UserDefaults.Profile.lastName       = profile.lastName

@@ -16,6 +16,7 @@ import SwiftyVK
 import GoogleSignIn
 
 //var vkDelegateReference : SwiftyVKDelegate?
+let deviceType = UIDevice().type
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

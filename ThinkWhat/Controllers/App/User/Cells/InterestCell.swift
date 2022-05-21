@@ -72,17 +72,17 @@ class InterestCell: UITableViewCell {
 
 extension InterestCell: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return userprofile?.topPublicationCategories.count ?? 0
+        return userprofile?.topPublicationCategories?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "category", for: indexPath) as? InterestCollectionCell, let strongUserprofile = userprofile {
-            if let dict = strongUserprofile.sortedTopPublicationCategories[indexPath.row] as? [Topic: Int], let category = dict.first?.key {
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "category", for: indexPath) as? InterestCollectionCell, let strongUserprofile = userprofile, let categories = strongUserprofile.sortedTopPublicationCategories {
+            if let dict = categories[indexPath.row] as? [Topic: Int], let category = dict.first?.key {
                 let attrString = NSMutableAttributedString()
-                attrString.append(NSAttributedString(string: category.title.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 10), foregroundColor: .white, backgroundColor: .clear)))
-                attrString.append(NSAttributedString(string: "/", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 10), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: category.title.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: UIScreen.main.bounds.width * 0.004), foregroundColor: .white, backgroundColor: .clear)))
+                attrString.append(NSAttributedString(string: "/", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: UIScreen.main.bounds.width * 0.004), foregroundColor: .white, backgroundColor: .clear)))
                 attrString.append(NSAttributedString(string: category.parent!.title.uppercased(),
-                                                     attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 10), foregroundColor: .white, backgroundColor: .clear)))
+                                                     attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: UIScreen.main.bounds.width * 0.004), foregroundColor: .white, backgroundColor: .clear)))
                 
                 cell.categoryLabel.attributedText = attrString
 //                cell.categoryLabel.text = category.title.lowercased()//" \(category.title.lowercased()) "

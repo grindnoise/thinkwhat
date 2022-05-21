@@ -27,6 +27,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         }
     }
     var selectionMode = false
+    private var isSetupComplete = false
     
     override var isSelected: Bool {
         didSet {
@@ -58,13 +59,19 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+    public func setupUI() {
+        setObservers()
+        guard !isSetupComplete else { return }
+        isSetupComplete = true
+        setNeedsLayout()
+        layoutIfNeeded()
     }
 
-    public func setObservers() {
-        let names = [Notifications.System.UpdateStats]
+    private func setObservers() {
+        let names = [Notifications.Surveys.Claimed,
+                     Notifications.Surveys.Completed,
+                     Notifications.System.UpdateStats,
+                     Notifications.Surveys.Rejected]
         names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.updateStats), name: $0, object: nil) }
     }
     
@@ -77,8 +84,8 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     
     private func setText() {
         let attributedText = NSMutableAttributedString()
-        attributedText.append(NSAttributedString(string: "\(category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.1), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        attributedText.append(NSAttributedString(string: "\n\(category.active)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.1), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\(category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.125), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\n\(category.visibleCount)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.125), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         
         title.textAlignment = .center
         title.attributedText = attributedText

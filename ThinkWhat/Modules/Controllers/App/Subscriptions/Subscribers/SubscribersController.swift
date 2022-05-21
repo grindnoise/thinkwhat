@@ -53,12 +53,20 @@ class SubscribersController: UIViewController {
         case .Subscriptions:
             NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscribedForUpdated), name: Notifications.Userprofiles.SubscribedForUpdated, object: nil)
         case.Subscribers:
+            let names = [Notifications.System.UpdateStats,
+                         Notifications.Userprofiles.SubscribersUpdated]
+            names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.updateStats), name: $0, object: nil) }
             NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscribedForUpdated), name: Notifications.Userprofiles.SubscribersUpdated, object: nil)
         }
     }
     
     private func setupUI() {
         navigationItem.largeTitleDisplayMode = .never
+    }
+    
+    @objc
+    private func updateStats() {
+        
     }
     
     private func loadData() {
@@ -136,6 +144,7 @@ class SubscribersController: UIViewController {
     
     @objc
     private func onSubscribedForUpdated() {
+        setTitle()
         controllerOutput?.onSubscribedForUpdated()
     }
     

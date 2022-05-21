@@ -178,7 +178,7 @@ extension SubsciptionsView: SubsciptionsControllerOutput {
             cardBlur.alpha = !reveal ? 0 : 1
             menuBlur.effect = reveal ? nil : UIBlurEffect(style: .prominent)
             self.setNeedsLayout()
-            self.upperContainerHeightConstraint.constant += reveal ? self.frame.height * 0.15 : -self.upperContainerHeightConstraint.constant
+            self.upperContainerHeightConstraint.constant += reveal ? self.frame.height * 0.2 : -self.upperContainerHeightConstraint.constant
             self.layoutIfNeeded()
             self.upperContainer.subviews.forEach {
                 $0.alpha = reveal ? 1 : 0
