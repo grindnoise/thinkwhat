@@ -150,6 +150,7 @@ extension HotController: DataObservable {
     func onDataLoaded() {
         navigationController?.setNavigationBarHidden(false, animated: true)
         controllerOutput?.populateStack()
+        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(HotController.populateStack),
                                                name: Notifications.Surveys.UpdateHotSurveys,

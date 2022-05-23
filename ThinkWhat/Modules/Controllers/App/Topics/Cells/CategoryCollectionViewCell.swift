@@ -69,7 +69,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
 
     private func setObservers() {
         let names = [Notifications.Surveys.Claimed,
-                     Notifications.Surveys.Completed,
+//                     Notifications.Surveys.Completed,
                      Notifications.System.UpdateStats,
                      Notifications.Surveys.Rejected]
         names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.updateStats), name: $0, object: nil) }

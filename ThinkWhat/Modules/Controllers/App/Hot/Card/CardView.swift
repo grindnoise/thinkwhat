@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CardView: UIView {
+class CardView: UIView, HotCard {
 
     deinit {
         print("CardView deinit")
@@ -29,7 +29,7 @@ class CardView: UIView {
         self.survey = survey
         super.init(frame: frame)
         commonInit()
-        self.delegate = delegate
+        self.callbackDelegate = delegate
         self.titleLabel.text = survey.title
         self.user.text = survey.owner.firstName
         if survey.owner.lastName.count > 0 {
@@ -210,15 +210,15 @@ class CardView: UIView {
     // MARK: - IB actions
     @IBAction func buttonTapped(_ sender: UIButton) {
         if sender == voteButton {
-            delegate?.callbackReceived(survey)
+            callbackDelegate?.callbackReceived(survey)
 //            sender.accessibilityIdentifier = "Vote"
         } else {
             sender.accessibilityIdentifier = "Reject"
         }
-        delegate?.callbackReceived(sender as AnyObject)
+        callbackDelegate?.callbackReceived(sender as AnyObject)
     }
     
     // MARK: - Properties
-    weak private var delegate: CallbackObservable?
-    public var survey: Survey!
+    weak var callbackDelegate: CallbackObservable?
+    var survey: Survey!
 }

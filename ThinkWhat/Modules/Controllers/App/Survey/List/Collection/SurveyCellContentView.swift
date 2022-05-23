@@ -192,7 +192,7 @@ private extension SurveyCellContentView {
         paragraph.alignment = .center
         let string = currentConfiguration.title!
         let titleAttrString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-        titleAttrString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: currentConfiguration.isComplete! ? .secondaryLabel : .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
+        titleAttrString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: currentConfiguration.isComplete ? StringAttributes.Fonts.Style.Light : StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
 //        titleAttrString.append(NSAttributedString(string: string, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: currentConfiguration.isComplete! ? .secondaryLabel : .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         titleLabel.attributedText = titleAttrString
 //        guard titleLabel.numberOfTotatLines > 1 else { return }
@@ -209,11 +209,11 @@ private extension SurveyCellContentView {
         topicLabel.attributedText = topicAttrString
         
         let limitsAttrString = NSMutableAttributedString()
-        limitsAttrString.append(NSAttributedString(string: "\(String(describing: currentConfiguration.votesLimit!))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        limitsAttrString.append(NSAttributedString(string: "\(String(describing: currentConfiguration.votesLimit!.roundedWithAbbreviations))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         votesLimitLabel.attributedText = limitsAttrString
         
         let viewsAttrString = NSMutableAttributedString()
-        viewsAttrString.append(NSAttributedString(string: "\(String(describing: currentConfiguration.views!))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        viewsAttrString.append(NSAttributedString(string: "\(String(describing: currentConfiguration.views!.roundedWithAbbreviations))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         viewsLabel.attributedText = viewsAttrString
         
         userCredentials.numberOfLines = 2

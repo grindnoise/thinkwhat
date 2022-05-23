@@ -90,13 +90,15 @@ class SurveyTable: UIView, SurveyDataSource {
         let pagination = [Notifications.Surveys.UpdateSubscriptions,
                           Notifications.Surveys.UpdateTopSurveys,
                           Notifications.Surveys.UpdateOwn,
-                          Notifications.Surveys.UpdateFavorite,
+//                          Notifications.Surveys.UpdateFavorite,
+                          Notifications.Surveys.SetFavorite,
                           Notifications.Surveys.UpdateAll,
                           Notifications.Surveys.UpdateNewSurveys,]
         let remove      = [Notifications.Surveys.Claimed,
-                           Notifications.Surveys.Completed,
+                           Notifications.Surveys.UnsetFavorite,
+//                           Notifications.Surveys.Completed,
                            Notifications.Surveys.Rejected]
-        let zeroEmitted = [Notifications.Surveys.ZeroSubscriptions]
+        let zeroEmitted = [Notifications.Surveys.Empty]
         
         pagination.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.reloadItems), name: $0, object: nil) }
         remove.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.reloadItems), name: $0, object: nil) }

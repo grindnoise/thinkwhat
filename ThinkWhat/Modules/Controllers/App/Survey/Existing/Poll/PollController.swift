@@ -82,21 +82,13 @@ class PollController: UIViewController {
 //                                               name: Notifications.UI.SuveyViewsCountReceived,
 //                                               object: nil)
         navigationItem.largeTitleDisplayMode = .never
-        guard _surveyReference.isOwn else {
-            if Surveys.shared.favoriteReferences.filter({ $0 == _surveyReference }).isEmpty {
-                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
-                    self.watchButton.image = ImageSigns.binoculars.image
-                } completion: { _ in}
-                isAddedToFavorite = false
-            } else {
-                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
-                    self.watchButton.image = ImageSigns.binocularsFilled.image
-                } completion: { _ in}
-                isAddedToFavorite = true
-            }
-//            if Surveys.shared.favoriteReferences.filter({ (ref, date) in
-//                ref == _surveyReference
-//            }).isEmpty {
+        
+        watchButton.image = _surveyReference.isFavorite ? ImageSigns.binocularsFilled.image : ImageSigns.binoculars.image
+        isAddedToFavorite = _surveyReference.isFavorite ? true : false
+        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
+        
+//        guard _surveyReference.isOwn else {
+//            if Surveys.shared.favoriteReferences.filter({ $0 == _surveyReference }).isEmpty {
 //                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
 //                    self.watchButton.image = ImageSigns.binoculars.image
 //                } completion: { _ in}
@@ -107,9 +99,22 @@ class PollController: UIViewController {
 //                } completion: { _ in}
 //                isAddedToFavorite = true
 //            }
-            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
-            return
-        }
+////            if Surveys.shared.favoriteReferences.filter({ (ref, date) in
+////                ref == _surveyReference
+////            }).isEmpty {
+////                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
+////                    self.watchButton.image = ImageSigns.binoculars.image
+////                } completion: { _ in}
+////                isAddedToFavorite = false
+////            } else {
+////                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
+////                    self.watchButton.image = ImageSigns.binocularsFilled.image
+////                } completion: { _ in}
+////                isAddedToFavorite = true
+////            }
+//            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
+//            return
+//        }
     }
     
     private func performChecks() {
@@ -153,7 +158,7 @@ class PollController: UIViewController {
 //            }
         }
         isAddedToFavorite = !isAddedToFavorite
-        NotificationCenter.default.post(name: Notifications.Surveys.UpdateFavorite, object: nil)
+//        NotificationCenter.default.post(name: Notifications.Surveys.UpdateFavorite, object: nil)
         controllerInput?.addFavorite(mark)
     }
 
@@ -193,7 +198,7 @@ class PollController: UIViewController {
     private var isLoading = false
     private let watchButton: UIImageView = {
         let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
-        v.contentMode = .scaleAspectFill
+        v.contentMode = .center
         return v
     }()
     private var isAddedToFavorite = false {

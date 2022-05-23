@@ -24,64 +24,36 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7iH-Gm-pgH">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="300"/>
                         <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AmN-8h-uqf" customClass="ArcLabel" customModule="ThinkWhat" customModuleProvider="target">
+                                <rect key="frame" x="-21" y="0.0" width="192" height="192"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="AmN-8h-uqf" secondAttribute="height" multiplier="1:1" id="cGx-dz-HY7"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="20"/>
+                                <color key="textColor" systemColor="secondaryLabelColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Проголосовало(ли)" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R8B-8k-Rs3">
+                                <rect key="frame" x="150.5" y="69" width="161.5" height="54.5"/>
+                                <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="20"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ff3-2K-nvR" customClass="ProgressCircle" customModule="ThinkWhat" customModuleProvider="target">
-                                <rect key="frame" x="182" y="8" width="84" height="84"/>
+                                <rect key="frame" x="8" y="29" width="134.5" height="134"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Ff3-2K-nvR" secondAttribute="height" multiplier="1:1" id="Pjk-ba-7hT"/>
                                 </constraints>
                             </view>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AmN-8h-uqf">
-                                <rect key="frame" x="113.5" y="8" width="52.5" height="84"/>
-                                <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="20"/>
-                                <color key="textColor" systemColor="secondaryLabelColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstItem="Ff3-2K-nvR" firstAttribute="centerX" secondItem="7iH-Gm-pgH" secondAttribute="centerX" multiplier="1.4" id="7Ga-YB-n54"/>
-                            <constraint firstItem="Ff3-2K-nvR" firstAttribute="leading" secondItem="AmN-8h-uqf" secondAttribute="trailing" constant="16" id="eTu-fA-X8p"/>
-                            <constraint firstAttribute="bottom" secondItem="Ff3-2K-nvR" secondAttribute="bottom" constant="8" id="goH-H1-UGD"/>
-                            <constraint firstItem="AmN-8h-uqf" firstAttribute="top" secondItem="7iH-Gm-pgH" secondAttribute="top" constant="8" id="t8L-uE-mSs"/>
-                            <constraint firstItem="Ff3-2K-nvR" firstAttribute="top" secondItem="7iH-Gm-pgH" secondAttribute="top" constant="8" id="vD8-Ir-PJh"/>
-                            <constraint firstAttribute="bottom" secondItem="AmN-8h-uqf" secondAttribute="bottom" constant="8" id="zfS-r3-ysa"/>
-                        </constraints>
-                    </view>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bkc-i1-eVj">
-                        <rect key="frame" x="0.0" y="100" width="320" height="100"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Проголосовало(ли)" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mLU-PY-KuH">
-                                <rect key="frame" x="-82.5" y="8" width="194" height="84"/>
-                                <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="20"/>
-                                <color key="textColor" systemColor="secondaryLabelColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Проголосовало(ли)" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R8B-8k-Rs3">
-                                <rect key="frame" x="127.5" y="8" width="193.5" height="84"/>
-                                <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="20"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstItem="R8B-8k-Rs3" firstAttribute="centerX" secondItem="bkc-i1-eVj" secondAttribute="centerX" multiplier="1.4" id="9LG-Nm-X0T"/>
-                            <constraint firstItem="R8B-8k-Rs3" firstAttribute="leading" secondItem="mLU-PY-KuH" secondAttribute="trailing" constant="16" id="Qjp-bC-tmN"/>
-                            <constraint firstAttribute="bottom" secondItem="mLU-PY-KuH" secondAttribute="bottom" constant="8" id="akL-aW-Gro"/>
-                            <constraint firstAttribute="bottom" secondItem="R8B-8k-Rs3" secondAttribute="bottom" constant="8" id="axV-Ck-1Zk"/>
-                            <constraint firstItem="R8B-8k-Rs3" firstAttribute="top" secondItem="bkc-i1-eVj" secondAttribute="top" constant="8" id="p1t-VK-PYq"/>
-                            <constraint firstItem="mLU-PY-KuH" firstAttribute="top" secondItem="bkc-i1-eVj" secondAttribute="top" constant="8" id="z05-IG-UYG"/>
-                        </constraints>
-                    </view>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Brf-Za-XnY">
-                        <rect key="frame" x="0.0" y="200" width="320" height="100"/>
-                        <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0xS-z4-Res">
-                                <rect key="frame" x="64" y="27" width="192" height="46"/>
+                                <rect key="frame" x="64" y="192" width="192" height="56"/>
                                 <color key="backgroundColor" red="0.75294117650000003" green="0.24313725489999999" blue="0.27058823529999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="0xS-z4-Res" secondAttribute="height" multiplier="24:7" id="jVo-h9-0jF"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" name="OpenSans-Semibold" family="Open Sans" pointSize="17"/>
                                 <state key="normal" title="ПОДДЕРЖАТЬ ОПРОС">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -93,26 +65,26 @@
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="0xS-z4-Res" firstAttribute="centerY" secondItem="Brf-Za-XnY" secondAttribute="centerY" id="73u-LA-hpk"/>
-                            <constraint firstItem="0xS-z4-Res" firstAttribute="width" secondItem="Brf-Za-XnY" secondAttribute="width" multiplier="0.6" id="8Ck-md-qzi"/>
-                            <constraint firstItem="0xS-z4-Res" firstAttribute="width" secondItem="0xS-z4-Res" secondAttribute="height" multiplier="29:7" id="FB6-o8-cDo"/>
-                            <constraint firstItem="0xS-z4-Res" firstAttribute="centerX" secondItem="Brf-Za-XnY" secondAttribute="centerX" id="aof-kS-8iH"/>
+                            <constraint firstItem="0xS-z4-Res" firstAttribute="top" secondItem="AmN-8h-uqf" secondAttribute="bottom" id="0S6-od-W2K"/>
+                            <constraint firstItem="AmN-8h-uqf" firstAttribute="width" secondItem="7iH-Gm-pgH" secondAttribute="width" multiplier="0.6" id="2aI-cn-dwd"/>
+                            <constraint firstItem="R8B-8k-Rs3" firstAttribute="leading" secondItem="Ff3-2K-nvR" secondAttribute="trailing" constant="8" symbolic="YES" id="4EH-yb-Zmg"/>
+                            <constraint firstItem="Ff3-2K-nvR" firstAttribute="height" secondItem="AmN-8h-uqf" secondAttribute="height" multiplier="0.7" id="7I7-9i-dOG"/>
+                            <constraint firstAttribute="trailing" secondItem="R8B-8k-Rs3" secondAttribute="trailing" constant="8" id="8eP-iV-PdG"/>
+                            <constraint firstItem="0xS-z4-Res" firstAttribute="centerX" secondItem="7iH-Gm-pgH" secondAttribute="centerX" id="Q7D-5q-UmF"/>
+                            <constraint firstItem="0xS-z4-Res" firstAttribute="width" secondItem="7iH-Gm-pgH" secondAttribute="width" multiplier="0.6" id="g6z-wg-Fbk"/>
+                            <constraint firstItem="Ff3-2K-nvR" firstAttribute="leading" secondItem="7iH-Gm-pgH" secondAttribute="leading" constant="8" id="iXl-jN-ubk"/>
+                            <constraint firstItem="R8B-8k-Rs3" firstAttribute="centerY" secondItem="Ff3-2K-nvR" secondAttribute="centerY" id="qQC-cT-aZE"/>
+                            <constraint firstItem="Ff3-2K-nvR" firstAttribute="centerX" secondItem="AmN-8h-uqf" secondAttribute="centerX" id="rTl-ol-tGm"/>
+                            <constraint firstItem="Ff3-2K-nvR" firstAttribute="centerY" secondItem="AmN-8h-uqf" secondAttribute="centerY" id="wxo-q1-hOg"/>
+                            <constraint firstItem="AmN-8h-uqf" firstAttribute="top" secondItem="7iH-Gm-pgH" secondAttribute="top" id="xQt-d3-7DF"/>
                         </constraints>
                     </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
-                    <constraint firstItem="Brf-Za-XnY" firstAttribute="top" secondItem="bkc-i1-eVj" secondAttribute="bottom" id="2O6-zp-s5X"/>
-                    <constraint firstItem="bkc-i1-eVj" firstAttribute="height" secondItem="7iH-Gm-pgH" secondAttribute="height" id="ImS-yr-2eP"/>
-                    <constraint firstItem="bkc-i1-eVj" firstAttribute="top" secondItem="7iH-Gm-pgH" secondAttribute="bottom" id="R7G-Cr-gX0"/>
-                    <constraint firstItem="7iH-Gm-pgH" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.333333" id="S59-4S-Iml"/>
-                    <constraint firstAttribute="bottom" secondItem="Brf-Za-XnY" secondAttribute="bottom" id="Uyf-K9-gzD"/>
-                    <constraint firstAttribute="trailing" secondItem="bkc-i1-eVj" secondAttribute="trailing" id="bLg-QO-t8d"/>
+                    <constraint firstItem="7iH-Gm-pgH" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" id="S59-4S-Iml"/>
                     <constraint firstAttribute="trailing" secondItem="7iH-Gm-pgH" secondAttribute="trailing" id="mLa-VY-BAG"/>
-                    <constraint firstItem="Brf-Za-XnY" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="mPP-Ru-e48"/>
-                    <constraint firstAttribute="trailing" secondItem="Brf-Za-XnY" secondAttribute="trailing" id="r89-vT-2r8"/>
                     <constraint firstItem="7iH-Gm-pgH" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="rXh-8N-VVe"/>
-                    <constraint firstItem="bkc-i1-eVj" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="xZn-ac-PwD"/>
                     <constraint firstItem="7iH-Gm-pgH" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="y7m-1U-EyO"/>
                 </constraints>
             </tableViewCellContentView>
@@ -122,12 +94,16 @@
                 <outlet property="btn" destination="0xS-z4-Res" id="FZy-y4-wdY"/>
                 <outlet property="completionLabel" destination="AmN-8h-uqf" id="lvz-2S-8Lp"/>
                 <outlet property="progressCircle" destination="Ff3-2K-nvR" id="C7K-uc-wgs"/>
-                <outlet property="votedLabel" destination="mLU-PY-KuH" id="2Gq-Dv-eS8"/>
                 <outlet property="votersLabel" destination="R8B-8k-Rs3" id="tLh-X4-zoF"/>
             </connections>
             <point key="canvasLocation" x="137.68115942028987" y="83.705357142857139"/>
         </tableViewCell>
     </objects>
+    <designables>
+        <designable name="AmN-8h-uqf">
+            <size key="intrinsicContentSize" width="52.5" height="27.5"/>
+        </designable>
+    </designables>
     <resources>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>

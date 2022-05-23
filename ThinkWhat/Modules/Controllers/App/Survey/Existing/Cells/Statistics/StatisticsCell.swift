@@ -12,15 +12,14 @@ class StatisticsCell: UITableViewCell {
     
     
 
-    @IBOutlet weak var progressCircle: ProgressCircle!
-    @IBOutlet weak var completionLabel: UILabel! {
+    @IBOutlet weak var progressCircle: ProgressCircle! {
         didSet {
-            completionLabel.text = "poll_complete_at".localized
+            progressCircle.clipsToBounds = false
         }
     }
-    @IBOutlet weak var votedLabel: UILabel! {
+    @IBOutlet weak var completionLabel: ArcLabel! {
         didSet {
-            votedLabel.text = "voted".localized
+            completionLabel.text = "progress".localized
         }
     }
     @IBOutlet weak var votersLabel: UILabel!
@@ -45,17 +44,18 @@ class StatisticsCell: UITableViewCell {
         layoutIfNeeded()
         delegate = callbackDelegate
         color = _color
-        progressCircle.setupUI(foregroundColor: color, progress: _progress)
+        progressCircle.setupUI(foregroundColor: color, progress: _progress, lineWidthFactor: 0.1)
         btn.cornerRadius = btn.frame.height / 2.25
         btn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        let fontSize = completionLabel.frame.height * 0.15 * 1.5
+        let fontSize = completionLabel.frame.height * 0.08
         completionLabel.font = StringAttributes.font(name: StringAttributes.FontStyle.Semibold.rawValue, size: fontSize)
-        votedLabel.font = StringAttributes.font(name: StringAttributes.FontStyle.Semibold.rawValue, size: fontSize)
-        //        votersLabel.font = StringAttributes.font(name: StringAttributes.FontStyle.Bold.rawValue, size: completionLabel.frame.height * 0.15 * 2)
-        //        votersLabel.text = "\(voters)/\(total)"
+        completionLabel.textColor = .secondaryLabel
+        
         let attributedText = NSMutableAttributedString()
-        attributedText.append(NSAttributedString(string: "\(voters)/".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: completionLabel.frame.height * 0.3), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        attributedText.append(NSAttributedString(string: "\(total)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: completionLabel.frame.height * 0.3), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "voted".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: completionLabel.frame.height * 0.1), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\n\(voters.roundedWithAbbreviations)/".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: completionLabel.frame.height * 0.12), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\(total.roundedWithAbbreviations)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: completionLabel.frame.height * 0.12), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\n" + "people_voted".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: completionLabel.frame.height * 0.1), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         votersLabel.attributedText = attributedText
 //        votersLabel.sizeToFit()
         isSetupComplete = true

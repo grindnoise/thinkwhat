@@ -112,7 +112,8 @@ class PollView: UIView {
     @IBOutlet weak var tableView: UITableView! {
         didSet {
             ///Set bottom inset for safe area
-            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: UIApplication.shared.windows[0].safeAreaInsets.bottom, right: 0.0)
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
+//            UIApplication.shared.windows[0].safeAreaInsets.bottom, right: 0.0)
         }
     }
 }

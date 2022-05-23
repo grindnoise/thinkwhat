@@ -28,9 +28,13 @@ class HotView: UIView {
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
-        contentView.frame = self.bounds
-        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        self.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
         setupUI()
         setObservers()
     }
@@ -75,23 +79,26 @@ class HotView: UIView {
     private var surveyPreviewInitialRect: CGRect {
         let indent: CGFloat = 10
         let origin = navigationController.isNil ? frame.origin : CGPoint(x: indent + frame.origin.x + frame.size.width,
-                                                                         y: indent + navigationController!.navigationBar.frame.height + statusBarFrame.height)
+                                                                         y: indent + (deviceType == .iPhoneSE ? UINavigationController.Constants.NavBarHeightSmallState : UINavigationController.Constants.NavBarHeightLargeState) + statusBarFrame.height)
+//                                                                         y: indent + navigationController!.navigationBar.frame.height + statusBarFrame.height)
         let size = tabBarController.isNil ? frame.size : CGSize(width: frame.size.width - indent*2,
-                                                                height: frame.size.height - (tabBarController!.tabBar.isHidden ? 0 : tabBarController!.tabBar.frame.height) - origin.y - indent)
+                                                                height: frame.size.height - tabBarController!.tabBar.frame.height - origin.y - indent)
+//    height: frame.size.height - (tabBarController!.tabBar.isHidden ? 0 : tabBarController!.tabBar.frame.height) - origin.y - indent)
         return CGRect(origin: origin, size: size)
     }
     private var surveyPreviewCurrentOrigin: CGPoint {
         let indent: CGFloat = 10
         return navigationController.isNil ? frame.origin : CGPoint(x: indent + frame.origin.x,
-                                                                   y: indent + navigationController!.navigationBar.frame.height + statusBarFrame.height)
+                                                                   y: indent + (deviceType == .iPhoneSE ? UINavigationController.Constants.NavBarHeightSmallState : UINavigationController.Constants.NavBarHeightLargeState) + statusBarFrame.height)
     }
-    private var previousCard: CardView?
-    private var currentCard: CardView!
-    private var nextCard: CardView?
+    private var previousCard: (HotCard & UIView)?
+    private var currentCard: (HotCard & UIView)!
+    private var nextCard: (HotCard & UIView)?
     private lazy var emptyCard: EmptyCard = self.createLoadingView()
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
+    @IBOutlet weak var destinationView: UIView!
 }
 
 // MARK: - Controller Output
@@ -138,9 +145,22 @@ extension HotView: HotControllerOutput {
         }
     }
     
-    func getCard() -> CardView? {
+    func getCard() -> (HotCard & UIView)? {
         guard !surveyStack.isEmpty, let survey = surveyStack.removeFirst() as? Survey else { return nil }
-        let card = CardView(frame: surveyPreviewInitialRect, survey: survey, delegate: self)
+        let card: (UIView & HotCard) = deviceType == .iPhoneSE ? CardView(frame: destinationView.frame, survey: survey, delegate: self) : LargeCard(frame: destinationView.bounds, survey: survey, delegate: self)
+        addSubview(card)
+        card.translatesAutoresizingMaskIntoConstraints = false
+        card.widthAnchor.constraint(equalTo: destinationView.widthAnchor).isActive = true
+        card.heightAnchor.constraint(equalTo: destinationView.heightAnchor).isActive = true
+//        card.centerXAnchor.constraint(equalTo: destinationView.centerXAnchor).isActive = true
+        card.centerYAnchor.constraint(equalTo: destinationView.centerYAnchor).isActive = true
+        
+        let centerX = card.centerXAnchor.constraint(equalTo: destinationView.centerXAnchor, constant: destinationView.bounds.width + 10)
+        centerX.identifier = "centerX"
+        centerX.isActive = true
+        self.setNeedsLayout()
+        self.layoutIfNeeded()
+
         card.background.layer.masksToBounds = true
         card.background.layer.cornerRadius = card.frame.width * 0.05
         ///Add shadow
@@ -152,16 +172,28 @@ extension HotView: HotControllerOutput {
         return card
     }
     
-    func onNext(_ card: CardView?) {
+    func onNext(_ card: (HotCard & UIView)?) {
         func nextFrame() {
             UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
                 card!.transform  = .identity
-                card!.frame.origin = self.surveyPreviewCurrentOrigin
+                if let constraint = card?.getAllConstraints().filter({$0.identifier == "centerX"}).first {
+                    self.setNeedsLayout()
+                    constraint.constant = 0
+                    self.layoutIfNeeded()
+                }
+//                self.setNeedsLayout()
+//                card!.centerXAnchor.constraint(equalTo: self.destinationView.centerXAnchor).isActive = true
+//                self.layoutIfNeeded()
+//                card!.frame.origin = self.surveyPreviewCurrentOrigin
                 if !self.previousCard.isNil {
+                    if let constraint = self.previousCard!.getAllConstraints().filter({$0.identifier == "centerX"}).first {
+                        self.setNeedsLayout()
+                        constraint.constant -= self.destinationView.bounds.width + 10
+                        self.layoutIfNeeded()
+                    }
                     self.previousCard!.alpha = 0
-                    self.previousCard!.voteButton.backgroundColor = K_COLOR_GRAY
-                    self.previousCard!.nextButton.tintColor = K_COLOR_GRAY
-                    self.previousCard!.frame.origin.x -= self.frame.width
+//                    self.previousCard!.voteButton.backgroundColor = K_COLOR_GRAY
+//                    self.previousCard!.nextButton.tintColor = K_COLOR_GRAY
                     self.previousCard!.transform = self.previousCard!.transform.scaledBy(x: 0.85, y: 0.85)
                     self.surveyStack.remove(object: self.previousCard!.survey)
                 }
@@ -182,7 +214,7 @@ extension HotView: HotControllerOutput {
         
         guard card.isNil else {
             card!.transform = card!.transform.scaledBy(x: 0.85, y: 0.85)
-            addSubview(card!)
+//            addSubview(card!)
             emptyCard.setEnabled(false) { _ in
                 nextFrame()
             }

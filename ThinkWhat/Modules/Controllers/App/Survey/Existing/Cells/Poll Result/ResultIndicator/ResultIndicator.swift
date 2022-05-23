@@ -135,7 +135,7 @@ class ResultIndicator: UIView {
             label.alpha = 1
             label.text = answer.totalVotes == 0 ? "no_votes".localized : "\(answer.totalVotes)\n" + "votes".localized
         default:
-            if !answer.voters.isEmpty {
+            guard !answer.voters.isEmpty else { label.alpha = 1; return }
                 if isSelected {
                     if !answer.voters.filter({ $0 == Userprofiles.shared.current! }).isEmpty {
                         if let index = answer.voters.firstIndex(where: { $0 == Userprofiles.shared.current!/*Userprofiles.shared.own?.id*/ }) {
@@ -239,7 +239,7 @@ class ResultIndicator: UIView {
                 tapGesture = UITapGestureRecognizer(target: self, action: #selector(ResultIndicator.handleTap(recognizer:)))
                 tapGesture.delegate = self
                 actionView.addGestureRecognizer(tapGesture)
-            }
+//            }
         }
     }
     var isSelected = false {

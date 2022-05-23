@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -12,14 +12,40 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="HotView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
                 <outlet property="contentView" destination="iN0-l3-epB" id="dj6-yH-6ug"/>
+                <outlet property="destinationView" destination="3bf-7e-QSv" id="9Zt-dx-KGd"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4bw-1Z-4rR">
+                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3bf-7e-QSv">
+                            <rect key="frame" x="10" y="10" width="394" height="798"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <accessibility key="accessibilityConfiguration" identifier="dest"/>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="3bf-7e-QSv" firstAttribute="leading" secondItem="4bw-1Z-4rR" secondAttribute="leading" constant="10" id="9SR-ol-q87"/>
+                        <constraint firstAttribute="bottom" secondItem="3bf-7e-QSv" secondAttribute="bottom" constant="10" id="LF1-Ds-q1f"/>
+                        <constraint firstAttribute="trailing" secondItem="3bf-7e-QSv" secondAttribute="trailing" constant="10" id="TXK-cu-b5x"/>
+                        <constraint firstItem="3bf-7e-QSv" firstAttribute="top" secondItem="4bw-1Z-4rR" secondAttribute="top" constant="10" id="zIN-zh-GIv"/>
+                    </constraints>
+                </view>
+            </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="4bw-1Z-4rR" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="RCH-ff-qMg"/>
+                <constraint firstItem="4bw-1Z-4rR" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="SU8-nl-XHe"/>
+                <constraint firstItem="4bw-1Z-4rR" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="cwZ-Sz-oHb"/>
+                <constraint firstItem="4bw-1Z-4rR" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="wk5-Kf-fI2"/>
+            </constraints>
             <point key="canvasLocation" x="139" y="107"/>
         </view>
     </objects>

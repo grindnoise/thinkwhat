@@ -446,6 +446,10 @@
 		ABF2758B28102AE40023CD1F /* VotersFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF2758A28102AE40023CD1F /* VotersFilter.swift */; };
 		ABF2758D28102AF20023CD1F /* VotersFilter.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABF2758C28102AF20023CD1F /* VotersFilter.xib */; };
 		ABF2758F28151EE50023CD1F /* UINavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF2758E28151EE50023CD1F /* UINavigationController.swift */; };
+		ABF3DF17283BA4A200309AA9 /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF3DF16283BA4A200309AA9 /* Int.swift */; };
+		ABF3DF1B283BB11800309AA9 /* LargeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF3DF1A283BB11800309AA9 /* LargeCard.swift */; };
+		ABF3DF1D283BB13300309AA9 /* LargeCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABF3DF1C283BB13300309AA9 /* LargeCard.xib */; };
+		ABF3DF1F283BC2DA00309AA9 /* HotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF3DF1E283BC2DA00309AA9 /* HotCard.swift */; };
 		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
 		ABF73549270DC1F700F7C308 /* ClaimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF73548270DC1F700F7C308 /* ClaimView.swift */; };
 		ABF7354B270DC26E00F7C308 /* ClaimView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABF7354A270DC26E00F7C308 /* ClaimView.xib */; };
@@ -924,6 +928,10 @@
 		ABF2758A28102AE40023CD1F /* VotersFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotersFilter.swift; sourceTree = "<group>"; };
 		ABF2758C28102AF20023CD1F /* VotersFilter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VotersFilter.xib; sourceTree = "<group>"; };
 		ABF2758E28151EE50023CD1F /* UINavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UINavigationController.swift; sourceTree = "<group>"; };
+		ABF3DF16283BA4A200309AA9 /* Int.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Int.swift; sourceTree = "<group>"; };
+		ABF3DF1A283BB11800309AA9 /* LargeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeCard.swift; sourceTree = "<group>"; };
+		ABF3DF1C283BB13300309AA9 /* LargeCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LargeCard.xib; sourceTree = "<group>"; };
+		ABF3DF1E283BC2DA00309AA9 /* HotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotCard.swift; sourceTree = "<group>"; };
 		ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysTableViewController.swift; sourceTree = "<group>"; };
 		ABF73548270DC1F700F7C308 /* ClaimView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimView.swift; sourceTree = "<group>"; };
 		ABF7354A270DC26E00F7C308 /* ClaimView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ClaimView.xib; sourceTree = "<group>"; };
@@ -1065,6 +1073,7 @@
 				AB913F782806FADF00609D51 /* UIViewController.swift */,
 				ABF2758E28151EE50023CD1F /* UINavigationController.swift */,
 				AB38DD6C2819420000FFEB3F /* Notification.swift */,
+				ABF3DF16283BA4A200309AA9 /* Int.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2125,9 +2134,12 @@
 		ABA448D527E46F0C00F8E00D /* Card */ = {
 			isa = PBXGroup;
 			children = (
+				ABF3DF19283BB0CC00309AA9 /* Small */,
+				ABF3DF18283BB0BE00309AA9 /* Large */,
 				ABA448DA27E8742E00F8E00D /* UI */,
 				ABA448D627E46F2A00F8E00D /* CardView.xib */,
 				ABA448D827E46F3B00F8E00D /* CardView.swift */,
+				ABF3DF1E283BC2DA00309AA9 /* HotCard.swift */,
 			);
 			path = Card;
 			sourceTree = "<group>";
@@ -2519,6 +2531,22 @@
 			path = VotersFilter;
 			sourceTree = "<group>";
 		};
+		ABF3DF18283BB0BE00309AA9 /* Large */ = {
+			isa = PBXGroup;
+			children = (
+				ABF3DF1A283BB11800309AA9 /* LargeCard.swift */,
+				ABF3DF1C283BB13300309AA9 /* LargeCard.xib */,
+			);
+			path = Large;
+			sourceTree = "<group>";
+		};
+		ABF3DF19283BB0CC00309AA9 /* Small */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Small;
+			sourceTree = "<group>";
+		};
 		ABF51D26237EB2260053EB75 /* Feed */ = {
 			isa = PBXGroup;
 			children = (
@@ -2760,6 +2788,7 @@
 				AB72962127DA418700D45B54 /* SubsciptionsView.xib in Resources */,
 				AB8DA34627A1836900F92C18 /* SignupViewController.xib in Resources */,
 				ABADF59827F4A8D500A26474 /* VoteCell.xib in Resources */,
+				ABF3DF1D283BB13300309AA9 /* LargeCard.xib in Resources */,
 				AB3C6850223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf in Resources */,
 				ABF27572280D76720023CD1F /* NextCell.xib in Resources */,
 				ABADF59327F361AE00A26474 /* ChoiceCell.xib in Resources */,
@@ -2941,6 +2970,7 @@
 				AB72963D27DB5F0B00D45B54 /* TopicsModel.swift in Sources */,
 				ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */,
 				AB98308B27B9385B002C5132 /* RecoverView.swift in Sources */,
+				ABF3DF1B283BB11800309AA9 /* LargeCard.swift in Sources */,
 				AB9998BE28058FA5009D0E4F /* Double.swift in Sources */,
 				AB00FFD52587A6320071C7DE /* BlurTransition.swift in Sources */,
 				ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */,
@@ -3052,6 +3082,7 @@
 				AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */,
 				AB72963427DB5EFB00D45B54 /* TopicsController.swift in Sources */,
 				ABAEEE5A27A5D4A100E4EF29 /* VKDelegate.swift in Sources */,
+				ABF3DF17283BA4A200309AA9 /* Int.swift in Sources */,
 				AB19B6432432282B00999917 /* PercentageLabel.swift in Sources */,
 				AB8FD485241F761F00BB74EF /* SurveyLinkCell.swift in Sources */,
 				AB8DA32E27A15BAD00F92C18 /* Basic.swift in Sources */,
@@ -3171,6 +3202,7 @@
 				ABF27580280EB2D40023CD1F /* VotersView.swift in Sources */,
 				AB9DBF7826A197D600EFA66D /* Segues.swift in Sources */,
 				AB9CADC125F755CE002AFD19 /* CircleButton.swift in Sources */,
+				ABF3DF1F283BC2DA00309AA9 /* HotCard.swift in Sources */,
 				ABB4AAAA2666335600D4738D /* NewSurveyTitle.swift in Sources */,
 				ABF20FBA24CAE8610092B223 /* UserSubscriptionCell.swift in Sources */,
 				ABF27587280EDC810023CD1F /* VoterCell.swift in Sources */,

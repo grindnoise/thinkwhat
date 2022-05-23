@@ -45,7 +45,9 @@ class SurveyCollectionCell: UICollectionViewListCell {
     private func setObservers() {
         let names = [Notifications.Surveys.Completed,
                      Notifications.Surveys.Views,
-                     Notifications.Surveys.UpdateFavorite,
+//                     Notifications.Surveys.UpdateFavorite,
+                     Notifications.Surveys.UnsetFavorite,
+                     Notifications.Surveys.SetFavorite,
                      Notifications.Surveys.UpdateHotSurveys]
         names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.forceUpdate), name: $0, object: nil) }
     }

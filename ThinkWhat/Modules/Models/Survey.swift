@@ -19,10 +19,10 @@ class Survey: Decodable {
                 return Surveys.shared.hot.map { return $0.reference }
             case .New:
 //                return Surveys.shared.newReferences
-                return Surveys.shared.newReferences.filter({ $0.isFavorite || !$0.isComplete })
+                return Surveys.shared.newReferences//.filter({ $0.isFavorite })// || !$0.isComplete })
             case .Top:
 //                return Surveys.shared.topReferences
-                return Surveys.shared.topReferences.filter({ $0.isFavorite || !$0.isComplete })
+                return Surveys.shared.topReferences//.filter({ $0.isFavorite })// || !$0.isComplete })
             case .Own:
                 return Surveys.shared.ownReferences
             case .Favorite:
@@ -33,16 +33,17 @@ class Survey: Decodable {
                 return SurveyReferences.shared.all
             case .Topic:
                 guard !topic.isNil else { return [] }
-                var all = SurveyReferences.shared.all.filter({ $0.topic == topic! })
-                var completed = all.filter({ $0.isComplete })
-                let favorite = all.filter({ $0.isFavorite })
-                favorite.forEach {
-                    completed.remove(object: $0)
-                }
-                completed.forEach {
-                    all.remove(object: $0)
-                }
-                return all
+//                var all = SurveyReferences.shared.all.filter({ $0.topic == topic! })
+//                var completed = all.filter({ $0.isComplete })
+//                let favorite = all.filter({ $0.isFavorite })
+//                favorite.forEach {
+//                    completed.remove(object: $0)
+//                }
+//                completed.forEach {
+//                    all.remove(object: $0)
+//                }
+//                return all
+                return SurveyReferences.shared.all.filter({ $0.topic == topic! })
             case .Search:
                 fatalError()
             }
@@ -81,7 +82,7 @@ class Survey: Decodable {
             case .Own:
                 return API_URLS.Surveys.own
             case .Favorite:
-                return API_URLS.Surveys.own
+                return API_URLS.Surveys.favorite
             case .Subscriptions:
                 return API_URLS.Surveys.subscriptions
             case .All:
@@ -112,6 +113,7 @@ class Survey: Decodable {
              media,
              answers,
              result,
+             rating,
              startDate = "start_date",
              url = "hlink",
              voteCapacity = "vote_capacity",
@@ -131,6 +133,7 @@ class Survey: Decodable {
     var topic:                  Topic
     var description:            String
     var question:               String
+    var rating:                 Double
     var media:                  [Mediafile] = []
     var mediaSortedByOrder:     [Mediafile] {
         return media.sorted { $0.order < $1.order }
@@ -216,7 +219,8 @@ class Survey: Decodable {
         didSet {
             guard oldValue != isFavorite else { return }
             reference.isFavorite = isFavorite
-            Notification.send(names: [Notifications.Surveys.UpdateFavorite])
+            NotificationCenter.default.post(name: isFavorite ? Notifications.Surveys.SetFavorite : Notifications.Surveys.UnsetFavorite, object: self.reference)
+//            Notification.send(names: [Notifications.Surveys.UpdateFavorite])
         }
 //        return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
     }
@@ -233,7 +237,8 @@ class Survey: Decodable {
     required init(from decoder: Decoder) throws {
         do {
             let container   = try decoder.container(keyedBy: CodingKeys.self)
-            guard let topicId = try container.decode(Int.self, forKey: .category) as? Int, let _topic = Topics.shared.all.filter({ $0.id == topicId }).first else {
+            guard let topicId = try container.decode(Int.self, forKey: .category) as? Int,
+                  let _topic = Topics.shared.all.filter({ $0.id == topicId }).first else {
                 throw "Topic not found"
             }
             guard let _type = SurveyType(rawValue: try container.decode(String.self, forKey: .type)) else {
@@ -261,6 +266,7 @@ class Survey: Decodable {
             watchers                = try container.decode(Int.self, forKey: .watchers)
             likes                   = try container.decode(Int.self, forKey: .likes)
             views                   = try container.decode(Int.self, forKey: .views)
+            rating                  = Double(try container.decode(String.self, forKey: .rating)) ?? 0
             isPrivate               = try container.decode(Bool.self, forKey: .isPrivate)
             isCommentingAllowed     = try container.decode(Bool.self, forKey: .isCommentingAllowed)
             isFavorite              = try container.decode(Bool.self, forKey: .isFavorite)
@@ -284,6 +290,7 @@ class Survey: Decodable {
     }
     
     init(type _type: SurveyType, title _title: String, topic _topic: Topic, description _description: String, question _question: String, answers _answers: [String], media _media: [Int: [UIImage: String]], url _url: URL?, voteCapacity _voteCapacity: Int, isPrivate _isPrivate: Bool, isAnonymous _isAnonymous: Bool, isCommentingAllowed _isCommentingAllowed: Bool, isHot _isHot: Bool, isFavorite _isFavorite: Bool) {
+        rating              = 0
         owner               = Userprofiles.shared.current!
         topic               = _topic
         active              = true
@@ -449,6 +456,11 @@ class Surveys {
             for (key, value) in json {
                 if key == Category.Hot.rawValue {
                     let instances = try decoder.decode([Survey].self, from: value.rawData())
+                    guard !instances.isEmpty else {
+                        notifications.append(Notifications.Surveys.Empty)
+                        Notification.send(names: notifications.uniqued())
+                        return
+                    }
                     for instance in instances {
                         if hot.filter({ $0.hashValue == instance.hashValue }).isEmpty {
                             hot.append(Surveys.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
@@ -456,49 +468,40 @@ class Surveys {
                         }
                     }
                 } else {
-//                    switch key {
-//                    case Category.Favorite.rawValue:
-//                        for entry in value.arrayValue {
-//                            guard let dateStr = entry["timestamp"].rawString(), let date = Date(dateTimeString: dateStr) as? Date, let instance = try decoder.decode(SurveyReference.self, from: entry["survey"].rawData()) as? SurveyReference else {
-//                                continue
-//                            }
-//                            if favoriteReferences.keys.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-//                                favoriteReferences[SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance] = date
-//                                notifications.append(Notifications.Surveys.UpdateFavorite)
-//                            }
-//                        }
-//                    default:
-                        let instances = try decoder.decode([SurveyReference].self, from: value.rawData())
-                        for instance in instances {
-    //                        let surveyReference = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first!
-                            if key == Category.Top.rawValue {//} && !value.isEmpty {
-                                if topReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                    topReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-//                                    notifications.append(Notifications.Surveys.UpdateTopSurveys)
-                                }
-                            } else if key == Category.New.rawValue {
-                                if newReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                    newReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-//                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
-                                }
-                            } else if key == Category.Own.rawValue {
-                                if ownReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                    ownReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-//                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
-                                }
-                            } else if key == Category.Subscriptions.rawValue {
-                                if subscriptions.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                    subscriptions.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-//                                    notifications.append(Notifications.Surveys.UpdateSubscriptions)
-                                }
-                            } else if key == Category.Favorite.rawValue {
-                                if favoriteReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                    favoriteReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-//                                    notifications.append(Notifications.Surveys.UpdateFavorite)
-                                }
+                    let instances = try decoder.decode([SurveyReference].self, from: value.rawData())
+                    guard !instances.isEmpty else {
+                        notifications.append(Notifications.Surveys.Empty)
+                        Notification.send(names: notifications.uniqued())
+                        return
+                    }
+                    for instance in instances {
+                        if key == Category.Top.rawValue {//} && !value.isEmpty {
+                            if topReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+                                topReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+                                //                                    notifications.append(Notifications.Surveys.UpdateTopSurveys)
+                            }
+                        } else if key == Category.New.rawValue {
+                            if newReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+                                newReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+                                //                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
+                            }
+                        } else if key == Category.Own.rawValue {
+                            if ownReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+                                ownReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+                                //                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
+                            }
+                        } else if key == Category.Subscriptions.rawValue {
+                            if subscriptions.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+                                subscriptions.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+                                //                                    notifications.append(Notifications.Surveys.UpdateSubscriptions)
+                            }
+                        } else if key == Category.Favorite.rawValue {
+                            if favoriteReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+                                favoriteReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+                                //                                    notifications.append(Notifications.Surveys.UpdateFavorite)
                             }
                         }
-//                    }
+                    }
                 }
             }
             Notification.send(names: notifications.uniqued())
@@ -512,12 +515,10 @@ class Surveys {
     
     ///Remove from lists & notify
     func banSurvey(object: Survey) {
-        guard let instance = hot.filter({$0.hashValue == object.hashValue}).first, let reference = instance.reference as? SurveyReference else {
-            return
-        }
+        guard let instance = hot.filter({$0.hashValue == object.hashValue}).first else { return }
         ///Clear new/top/hot
-        newReferences.remove(object: reference)
-        newReferences.remove(object: reference)
+        newReferences.remove(object: instance.reference)
+        newReferences.remove(object: instance.reference)
         hot.remove(object: instance)
         Notification.send(names: [Notifications.Surveys.UpdateNewSurveys, Notifications.Surveys.UpdateTopSurveys])
     }

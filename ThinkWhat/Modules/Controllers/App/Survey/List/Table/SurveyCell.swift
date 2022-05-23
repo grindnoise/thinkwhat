@@ -13,7 +13,9 @@ class SurveyCell: UITableViewCell {
     public func setupUI() {
         let names = [Notifications.Surveys.Completed,
                      Notifications.Surveys.Views,
-                     Notifications.Surveys.UpdateFavorite,
+//                     Notifications.Surveys.UpdateFavorite,
+                     Notifications.Surveys.SetFavorite,
+                     Notifications.Surveys.UnsetFavorite,
                      Notifications.Surveys.UpdateHotSurveys]
         names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.forceUpdate), name: $0, object: nil) }
         
@@ -74,6 +76,16 @@ class SurveyCell: UITableViewCell {
         hotIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
     }
     
+    private func setObservers() {
+        let names = [Notifications.Surveys.Completed]
+        names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onCompletion), name: $0, object: nil) }
+    }
+    
+    @objc
+    private func onCompletion() {
+        
+    }
+    
     private func setText() {
         guard !surveyReference.isNil else { return }
         let paragraph = NSMutableParagraphStyle()
@@ -85,7 +97,7 @@ class SurveyCell: UITableViewCell {
         paragraph.alignment = .center
         let string = surveyReference.title
         let titleAttrString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-        titleAttrString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: surveyReference.isComplete ? .secondaryLabel : .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
+        titleAttrString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: surveyReference.isComplete ? StringAttributes.Fonts.Style.Light : StringAttributes.Fonts.Style.Semibold, size: titleFontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
         titleLabel.attributedText = titleAttrString
         titleLabel.textAlignment = .left
         
@@ -96,11 +108,11 @@ class SurveyCell: UITableViewCell {
         topicLabel.attributedText = topicAttrString
         
         let limitsAttrString = NSMutableAttributedString()
-        limitsAttrString.append(NSAttributedString(string: "\(String(describing: surveyReference.votesLimit))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        limitsAttrString.append(NSAttributedString(string: "\(String(describing: surveyReference.votesLimit.roundedWithAbbreviations))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         votesLimitLabel.attributedText = limitsAttrString
         
         let viewsAttrString = NSMutableAttributedString()
-        viewsAttrString.append(NSAttributedString(string: "\(String(describing: surveyReference.views))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        viewsAttrString.append(NSAttributedString(string: "\(String(describing: surveyReference.views.roundedWithAbbreviations))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         viewsLabel.attributedText = viewsAttrString
         
         userCredentials.numberOfLines = 2

@@ -53,6 +53,9 @@
 "search" = "Поиск";
 "profile" = "Profile";
 "edit" = "Edit";
+"progress" = "Progress";
+"people_voted" = "persons";
+
 
 
 //Welcome VC
