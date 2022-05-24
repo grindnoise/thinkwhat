@@ -229,7 +229,7 @@ extension PollView: PollControllerOutput {
                 return
             }
             
-            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightMultiplictator: 1.25)
+            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
             banner.accessibilityIdentifier = "vote"
             banner.present(subview: VoteMessage(imageContent: ImageSigns.flameFilled, color: survey?.topic.tagColor ?? K_COLOR_RED, callbackDelegate: banner))
         case .failure:
@@ -544,7 +544,7 @@ extension PollView: CallbackObservable {
                 viewInput?.onVote(choice)
                 return
             } else if button.accessibilityIdentifier == "claim" {
-                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightMultiplictator: 1.5)
+                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                 banner.accessibilityIdentifier = "claim"
                 banner.present(subview: ClaimSelection(callbackDelegate: banner))
             } else if button.accessibilityIdentifier == "next" {

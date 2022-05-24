@@ -23,7 +23,7 @@ class SurveyCell: UITableViewCell {
         isSetupComplete = true
         setNeedsLayout()
         layoutIfNeeded()
-        titleFontSize = frame.height * 0.17
+        titleFontSize = frame.height * (deviceType == .iPhoneSE ? 0.15 : 0.17)
         lowerLabelsFontSize = votesLimitLabel.frame.height * 0.85
         topicFontSize = frame.height * 0.08
 //        surveyReference = _surveyReference
@@ -115,12 +115,13 @@ class SurveyCell: UITableViewCell {
         viewsAttrString.append(NSAttributedString(string: "\(String(describing: surveyReference.views.roundedWithAbbreviations))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         viewsLabel.attributedText = viewsAttrString
         
-        userCredentials.numberOfLines = 2
-        userCredentials.textAlignment = .center
-        let userText = "\(surveyReference.owner.firstName)" + (!surveyReference.owner.lastName.isEmpty ? "\n\(surveyReference.owner.lastName)" : "")
-        let userAttrString = NSMutableAttributedString()
-        userAttrString.append(NSAttributedString(string: userText, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: lowerLabelsFontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        userCredentials.attributedText = userAttrString
+        let firstNameString = NSMutableAttributedString()
+        firstNameString.append(NSAttributedString(string: "\(surveyReference.owner.firstNameSingleWord.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : surveyReference.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        firstName.attributedText = firstNameString
+        
+        let lastNameString = NSMutableAttributedString()
+        lastNameString.append(NSAttributedString(string: "\(surveyReference.owner.lastNameSingleWord.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : surveyReference.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        lastName.attributedText = lastNameString
     }
     
     private var isSetupComplete = false
@@ -176,7 +177,8 @@ class SurveyCell: UITableViewCell {
             hotIcon.image = ImageSigns.flameFilled.image
         }
     }
-    @IBOutlet weak var userCredentials: UILabel!
+    @IBOutlet weak var firstName: ArcLabel!
+    @IBOutlet weak var lastName: ArcLabel!
     @IBOutlet weak var mark: UIImageView! {
         didSet {
             mark.contentMode = .scaleAspectFit

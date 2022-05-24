@@ -9,6 +9,18 @@
 import UIKit
 
 class CardView: UIView, HotCard {
+    func onVote() {
+        
+    }
+    
+    func onClaim() {
+        
+    }
+    
+    func onNext() {
+        
+    }
+    
 
     deinit {
         print("CardView deinit")

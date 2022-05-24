@@ -12,6 +12,9 @@ protocol HotCard: class {
     var callbackDelegate: CallbackObservable? { get set }
     var survey: Survey! { get set }
     var background: UIView! { get set }
-    var voteButton: UIButton! { get set }
-    var nextButton: UIButton! { get set }
+
+    func onVote()
+    func onClaim()
+    func onNext()
 }
+

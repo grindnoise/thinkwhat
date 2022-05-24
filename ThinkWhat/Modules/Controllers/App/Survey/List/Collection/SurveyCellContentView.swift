@@ -115,7 +115,8 @@ class SurveyCellContentView: UIView, UIContentView {
             hotIcon.image = ImageSigns.flameFilled.image
         }
     }
-    @IBOutlet weak var userCredentials: UILabel!
+    @IBOutlet weak var firstName: ArcLabel!
+    @IBOutlet weak var lastName: ArcLabel!
     @IBOutlet weak var heightConstraint: NSLayoutConstraint!
     @IBOutlet weak var mark: UIImageView! {
         didSet {
@@ -216,11 +217,13 @@ private extension SurveyCellContentView {
         viewsAttrString.append(NSAttributedString(string: "\(String(describing: currentConfiguration.views!.roundedWithAbbreviations))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: lowerLabelsFontSize), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         viewsLabel.attributedText = viewsAttrString
         
-        userCredentials.numberOfLines = 2
-        userCredentials.textAlignment = .center
-        let userText = "\(currentConfiguration.firstName!)" + (!currentConfiguration.lastName.isEmpty ? "\n\(currentConfiguration.lastName!)" : "")
-        let userAttrString = NSMutableAttributedString()
-        userAttrString.append(NSAttributedString(string: userText, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: lowerLabelsFontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        userCredentials.attributedText = userAttrString
+        
+        let firstNameString = NSMutableAttributedString()
+        firstNameString.append(NSAttributedString(string: "\(currentConfiguration.firstName.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : currentConfiguration.color, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        firstName.attributedText = firstNameString
+        
+        let lastNameString = NSMutableAttributedString()
+        lastNameString.append(NSAttributedString(string: "\(currentConfiguration.lastName.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: topicFontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : currentConfiguration.color, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        lastName.attributedText = lastNameString
     }
 }

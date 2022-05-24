@@ -46,4 +46,21 @@ extension HotModel: HotControllerInput {
             }
         }
     }
+    
+    func claim(survey: Survey, reason: Claim) {
+        Task {
+            let json = try await API.shared.surveys.claim(survey: survey, reason: reason)
+            guard let value = json["status"].string else { throw "Unknown error" }
+            guard value == "ok" else {
+                guard let error = json["error"].string else { throw "Unknown error" }
+                await MainActor.run {
+                    modelOutput?.onClaimCallback(.failure(error))
+                }
+                return
+            }
+            await MainActor.run {
+                modelOutput?.onClaimCallback(.success(true))
+            }
+        }
+    }
 }

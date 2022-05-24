@@ -973,7 +973,7 @@ class API {
 //
     public func rejectSurvey(survey: Survey, completion: @escaping(Result<JSON, Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_REJECT) else { completion(.failure(APIError.invalidURL)); return }
-        var parameters: [String: Any] = ["survey": survey.id as Any]
+        var parameters: Parameters = ["survey": survey.id]
         if Surveys.shared.hot.count <= MIN_STACK_SIZE {
             let stackList = Surveys.shared.hot.map { $0.id }
             let rejectedList = Surveys.shared.rejected.map { $0.id }

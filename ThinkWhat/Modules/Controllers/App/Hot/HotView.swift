@@ -72,6 +72,14 @@ class HotView: UIView {
     }
     var surveyStack: [Survey] = [] {
         didSet {
+            var stack = surveyStack.uniqued()
+            if !currentCard.isNil, let current = currentCard.survey {
+                stack.remove(object: current)
+            }
+            if !nextCard.isNil, let next = nextCard?.survey {
+                stack.remove(object: next)
+            }
+            surveyStack = stack
             guard surveyStack.isEmpty else { return }
             viewInput?.onEmptyStack()
         }
@@ -110,6 +118,7 @@ extension HotView: HotControllerOutput {
     
     
     func skipCard() {
+        setObservers()
         previousCard = currentCard
         onNext(nextCard)
     }
@@ -118,7 +127,7 @@ extension HotView: HotControllerOutput {
         let stackSet: Set<Survey>    = Set(surveyStack)
         var hotSet: Set<Survey>      = Set(Surveys.shared.hot)
         let rejectedSet: Set<Survey> = Set(Surveys.shared.rejected)
-        let completedSet: Set<Survey> = Set(Surveys.shared.completed)
+        let completedSet: Set<Survey> = Set(Surveys.shared.all.filter({ $0.isComplete }))//Surveys.shared.completed)
         
         hotSet.subtract(rejectedSet)
         hotSet.subtract(completedSet)
@@ -132,13 +141,19 @@ extension HotView: HotControllerOutput {
         guard currentCard.isNil || nextCard.isNil else {
             return
         }
+        
         if let card = getCard() {
-            if emptyCard.isEnabled {
-                self.emptyCard.setEnabled(false) { _ in
-                    self.onNext(card)
-                }
+            if !currentCard.isNil, nextCard.isNil {
+                nextCard = card
             } else {
-                onNext(card)
+                if emptyCard.isEnabled {
+                    self.emptyCard.setEnabled(false) { _ in
+                        self.onNext(card)
+                    }
+                } else {
+                    guard currentCard.isNil else { return }
+                    onNext(card)
+                }
             }
         } else {
             emptyCard.setEnabled(true) { _ in }
@@ -147,7 +162,7 @@ extension HotView: HotControllerOutput {
     
     func getCard() -> (HotCard & UIView)? {
         guard !surveyStack.isEmpty, let survey = surveyStack.removeFirst() as? Survey else { return nil }
-        let card: (UIView & HotCard) = deviceType == .iPhoneSE ? CardView(frame: destinationView.frame, survey: survey, delegate: self) : LargeCard(frame: destinationView.bounds, survey: survey, delegate: self)
+        let card: (UIView & HotCard) = LargeCard(frame: destinationView.bounds, survey: survey, delegate: self)
         addSubview(card)
         card.translatesAutoresizingMaskIntoConstraints = false
         card.widthAnchor.constraint(equalTo: destinationView.widthAnchor).isActive = true
@@ -212,19 +227,34 @@ extension HotView: HotControllerOutput {
             }
         }
         
-        guard card.isNil else {
+        if !card.isNil {
             card!.transform = card!.transform.scaledBy(x: 0.85, y: 0.85)
-//            addSubview(card!)
             emptyCard.setEnabled(false) { _ in
                 nextFrame()
             }
             return
-        }
+        } else if card.isNil, let card = getCard() {
+            if emptyCard.isEnabled {
+                self.emptyCard.setEnabled(false) { _ in
+                    self.onNext(card)
+                }
+            } else {
+                guard currentCard.isNil else { return }
+                onNext(card)
+            }
+        } else {
+        
+//        guard card.isNil else {
+//            card!.transform = card!.transform.scaledBy(x: 0.85, y: 0.85)
+////            addSubview(card!)
+//            emptyCard.setEnabled(false) { _ in
+//                nextFrame()
+//            }
+//            return
+//        }
         UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
             if !self.previousCard.isNil {
                 self.previousCard!.alpha = 0
-                self.previousCard!.voteButton.backgroundColor = K_COLOR_GRAY
-                self.previousCard!.nextButton.tintColor = K_COLOR_GRAY
                 self.previousCard!.frame.origin.x -= self.frame.width
                 self.previousCard!.transform = self.previousCard!.transform.scaledBy(x: 0.85, y: 0.85)
             }
@@ -240,6 +270,7 @@ extension HotView: HotControllerOutput {
             self.previousCard!.removeFromSuperview()
         }
         return
+        }
     }
     
     func onDidLayout() { }
@@ -278,10 +309,13 @@ extension HotView {
 
 extension HotView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
-        if let button = sender as? UIButton, let accessibilityIdentifier = button.accessibilityIdentifier {
-            if accessibilityIdentifier == "Vote" {//Vote
-//                viewInput?.onVote()
-            } else if accessibilityIdentifier == "Reject" {//Reject
+        if let string = sender as? String {
+            if string == "claim" {
+                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+                banner.accessibilityIdentifier = "claim"
+                banner.present(subview: ClaimSelection(callbackDelegate: banner))
+            } else if string == "next" {
+                NotificationCenter.default.removeObserver(self)
                 Surveys.shared.rejected.append(currentCard.survey)
                 API.shared.rejectSurvey(survey: currentCard.survey) { result in
                     switch result {
@@ -292,22 +326,40 @@ extension HotView: CallbackObservable {
                     }
                 }
                 previousCard = currentCard
+                if nextCard.isNil, !surveyStack.isEmpty, let card = getCard() {
+                    nextCard = card
+                }
                 onNext(nextCard)
             }
         } else if sender is Userprofile {
 //            delegate.performSegue(withIdentifier: Segues.App.FeedToUser, sender: sender)
         } else if let _view = sender as? EmptyCard  {
-//            isMakingStackPaused = true
             _view.startingPoint = convert(_view.createButton.center, to: tabBarController?.view)
-
-//            delegate.performSegue(withIdentifier: Segues.App.FeedToNewSurvey, sender: _view)
-        } else if sender is Claim { //Claim
-            previousCard = currentCard
-            delay(seconds: 0.5) {
-//                self.nextSurvey(self.nextCardView)
-            }
+        } else if let claim = sender as? Claim {
+            NotificationCenter.default.removeObserver(self)
+            viewInput?.onClaim(survey: currentCard.survey, reason: claim)
         } else if let survey = sender as? Survey {
+            NotificationCenter.default.removeObserver(self)
             viewInput?.onVote(survey: survey)
+        }
+    }
+}
+
+extension HotView: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+            if popup.accessibilityIdentifier == "exit" {
+                skipCard()
+            }
         }
     }
 }

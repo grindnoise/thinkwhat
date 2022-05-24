@@ -26,15 +26,31 @@
                         </constraints>
                     </imageView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dO9-2m-2cG" customClass="Avatar" customModule="ThinkWhat" customModuleProvider="target">
-                        <rect key="frame" x="244" y="17.5" width="40" height="40"/>
+                        <rect key="frame" x="244" y="30" width="40" height="40"/>
                         <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Aus-Lg-nvc">
-                        <rect key="frame" x="248.5" y="61.5" width="31" height="14.5"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Aus-Lg-nvc" customClass="ArcLabel" customModule="ThinkWhat" customModuleProvider="target">
+                        <rect key="frame" x="232" y="18" width="64" height="64"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="Aus-Lg-nvc" secondAttribute="height" multiplier="1:1" id="w71-fi-WuL"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="enh-D8-9ut" customClass="ArcLabel" customModule="ThinkWhat" customModuleProvider="target">
+                        <rect key="frame" x="232" y="18" width="64" height="64"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="clockwise" value="NO"/>
+                            <userDefinedRuntimeAttribute type="number" keyPath="angle">
+                                <real key="value" value="4.6699999999999999"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FUT-8u-Psk">
                         <rect key="frame" x="35" y="20" width="201" height="60"/>
@@ -102,21 +118,26 @@
                     <constraint firstItem="STk-xA-PYA" firstAttribute="width" secondItem="STk-xA-PYA" secondAttribute="height" multiplier="1:1" id="KFg-4w-o0y"/>
                     <constraint firstItem="FUT-8u-Psk" firstAttribute="centerY" secondItem="TQe-qm-M2p" secondAttribute="centerY" id="L0c-d6-d86"/>
                     <constraint firstItem="mSx-6m-3Ju" firstAttribute="width" secondItem="mSx-6m-3Ju" secondAttribute="height" multiplier="1:1" id="NFt-6o-P5o"/>
+                    <constraint firstItem="enh-D8-9ut" firstAttribute="width" secondItem="Aus-Lg-nvc" secondAttribute="width" id="Oy6-ht-PJf"/>
+                    <constraint firstItem="enh-D8-9ut" firstAttribute="centerX" secondItem="dO9-2m-2cG" secondAttribute="centerX" id="PBu-jN-uYI"/>
                     <constraint firstItem="rS5-Gq-1UX" firstAttribute="width" secondItem="rS5-Gq-1UX" secondAttribute="height" multiplier="1:1" id="Q5R-jg-nMy"/>
                     <constraint firstItem="dO9-2m-2cG" firstAttribute="leading" secondItem="FUT-8u-Psk" secondAttribute="trailing" constant="8" id="StL-A1-ew9"/>
                     <constraint firstItem="rS5-Gq-1UX" firstAttribute="height" secondItem="al8-u5-tyL" secondAttribute="height" multiplier="1.75" id="Trg-uP-W1Z"/>
+                    <constraint firstItem="enh-D8-9ut" firstAttribute="width" secondItem="enh-D8-9ut" secondAttribute="height" multiplier="1:1" id="VDO-lA-F9c"/>
                     <constraint firstItem="dO9-2m-2cG" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.4" id="Wfu-WK-Wja"/>
                     <constraint firstItem="8cQ-4o-A7Q" firstAttribute="leading" secondItem="mSx-6m-3Ju" secondAttribute="trailing" constant="2" id="XUV-M2-tlF"/>
                     <constraint firstItem="mSx-6m-3Ju" firstAttribute="width" secondItem="mSx-6m-3Ju" secondAttribute="height" multiplier="1:1" id="Z8o-kt-6fz"/>
                     <constraint firstItem="8cQ-4o-A7Q" firstAttribute="centerY" secondItem="mSx-6m-3Ju" secondAttribute="centerY" id="Zfb-uu-jIM"/>
                     <constraint firstItem="f12-sb-toj" firstAttribute="leading" secondItem="8cQ-4o-A7Q" secondAttribute="trailing" constant="4" id="a4L-Zq-cdy"/>
+                    <constraint firstItem="enh-D8-9ut" firstAttribute="centerY" secondItem="dO9-2m-2cG" secondAttribute="centerY" id="ams-aH-Epw"/>
                     <constraint firstItem="TQe-qm-M2p" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="dfh-jp-ZUj"/>
                     <constraint firstItem="mSx-6m-3Ju" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="drW-po-ekB"/>
                     <constraint firstItem="dO9-2m-2cG" firstAttribute="width" secondItem="dO9-2m-2cG" secondAttribute="height" multiplier="1:1" id="eg1-1U-uM1"/>
                     <constraint firstItem="u2M-4R-J0n" firstAttribute="leading" secondItem="al8-u5-tyL" secondAttribute="trailing" constant="8" id="epo-k8-W5D"/>
                     <constraint firstItem="Dko-uL-nAZ" firstAttribute="leading" secondItem="u2M-4R-J0n" secondAttribute="trailing" constant="4" id="fDi-dZ-efV"/>
+                    <constraint firstItem="Aus-Lg-nvc" firstAttribute="centerY" secondItem="dO9-2m-2cG" secondAttribute="centerY" id="fEk-Rg-h5a"/>
                     <constraint firstItem="Dko-uL-nAZ" firstAttribute="centerY" secondItem="u2M-4R-J0n" secondAttribute="centerY" id="hMz-AS-AdS"/>
-                    <constraint firstItem="dO9-2m-2cG" firstAttribute="centerY" secondItem="FUT-8u-Psk" secondAttribute="centerY" multiplier="0.75" id="iNN-er-a9v"/>
+                    <constraint firstItem="dO9-2m-2cG" firstAttribute="centerY" secondItem="FUT-8u-Psk" secondAttribute="centerY" id="iNN-er-a9v"/>
                     <constraint firstItem="al8-u5-tyL" firstAttribute="height" secondItem="H2p-sc-9uM" secondAttribute="height" multiplier="0.15" id="khn-xX-qfD"/>
                     <constraint firstItem="STk-xA-PYA" firstAttribute="leading" secondItem="Dko-uL-nAZ" secondAttribute="trailing" constant="6" id="kvB-GU-HGY"/>
                     <constraint firstItem="rS5-Gq-1UX" firstAttribute="centerX" secondItem="al8-u5-tyL" secondAttribute="centerX" id="lgj-7c-cqm"/>
@@ -125,11 +146,11 @@
                     <constraint firstItem="FUT-8u-Psk" firstAttribute="leading" secondItem="TQe-qm-M2p" secondAttribute="trailing" constant="4" id="p5D-SL-EbC"/>
                     <constraint firstItem="mSx-6m-3Ju" firstAttribute="height" secondItem="al8-u5-tyL" secondAttribute="height" multiplier="0.9" id="tNQ-8k-596"/>
                     <constraint firstItem="f12-sb-toj" firstAttribute="width" secondItem="f12-sb-toj" secondAttribute="height" multiplier="1:1" id="uKp-OS-bhN"/>
-                    <constraint firstItem="Aus-Lg-nvc" firstAttribute="top" secondItem="dO9-2m-2cG" secondAttribute="bottom" constant="4" id="uLC-Ud-b0I"/>
                     <constraint firstAttribute="trailing" secondItem="dO9-2m-2cG" secondAttribute="trailing" constant="16" id="usK-D0-FUj"/>
                     <constraint firstItem="STk-xA-PYA" firstAttribute="width" secondItem="Dko-uL-nAZ" secondAttribute="width" id="vjP-6W-VK2"/>
                     <constraint firstItem="al8-u5-tyL" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="vvu-05-3ld"/>
                     <constraint firstItem="al8-u5-tyL" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="16" id="w5P-38-khQ"/>
+                    <constraint firstItem="Aus-Lg-nvc" firstAttribute="width" secondItem="dO9-2m-2cG" secondAttribute="width" multiplier="1.6" id="wKx-Io-SCp"/>
                     <constraint firstItem="mSx-6m-3Ju" firstAttribute="width" secondItem="mSx-6m-3Ju" secondAttribute="height" multiplier="1:1" id="xcZ-hx-PqW"/>
                     <constraint firstItem="f12-sb-toj" firstAttribute="height" secondItem="mSx-6m-3Ju" secondAttribute="height" id="xgG-td-yWX"/>
                 </constraints>
@@ -137,24 +158,30 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="avatar" destination="dO9-2m-2cG" id="S9J-It-oLd"/>
+                <outlet property="firstName" destination="Aus-Lg-nvc" id="G3a-eD-MJj"/>
                 <outlet property="hotIcon" destination="TQe-qm-M2p" id="zEJ-wa-agG"/>
                 <outlet property="hotIconWidth" destination="Yfq-4E-r3h" id="lB7-Ds-6g8"/>
                 <outlet property="hotSpacer" destination="p5D-SL-EbC" id="9UX-4l-dUm"/>
+                <outlet property="lastName" destination="enh-D8-9ut" id="1if-gt-vhk"/>
                 <outlet property="mark" destination="Dko-uL-nAZ" id="tj2-l8-pYN"/>
                 <outlet property="progress" destination="rS5-Gq-1UX" id="bTT-PQ-mXq"/>
                 <outlet property="titleLabel" destination="FUT-8u-Psk" id="bMz-Rw-BPd"/>
                 <outlet property="topicIcon" destination="al8-u5-tyL" id="Ad2-DS-Fy7"/>
                 <outlet property="topicLabel" destination="u2M-4R-J0n" id="tjk-mu-0zo"/>
-                <outlet property="userCredentials" destination="Aus-Lg-nvc" id="G3a-eD-MJj"/>
                 <outlet property="viewsIcon" destination="f12-sb-toj" id="BUH-LY-tzn"/>
                 <outlet property="viewsLabel" destination="kMJ-MO-yxN" id="zE1-mk-2vR"/>
                 <outlet property="votesLimitIcon" destination="mSx-6m-3Ju" id="bs9-qW-8gj"/>
                 <outlet property="votesLimitLabel" destination="8cQ-4o-A7Q" id="ll2-EY-h7u"/>
                 <outlet property="watch" destination="STk-xA-PYA" id="D9l-0o-FaX"/>
             </connections>
-            <point key="canvasLocation" x="139" y="81"/>
+            <point key="canvasLocation" x="137.68115942028987" y="80.357142857142847"/>
         </tableViewCell>
     </objects>
+    <designables>
+        <designable name="enh-D8-9ut">
+            <size key="intrinsicContentSize" width="31" height="14.5"/>
+        </designable>
+    </designables>
     <resources>
         <systemColor name="systemGray2Color">
             <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

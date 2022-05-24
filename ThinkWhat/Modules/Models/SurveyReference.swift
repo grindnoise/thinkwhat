@@ -12,7 +12,7 @@ import SwiftyJSON
 class SurveyReference: Decodable {
 
     private enum CodingKeys: String, CodingKey {
-        case id, type, title, category, likes, views,
+        case id, type, title, category, likes, views, progress,
              startDate = "start_date",
              isComplete = "is_complete",
              isOwn = "is_own",
@@ -63,12 +63,7 @@ class SurveyReference: Decodable {
     var survey: Survey? {
         return Surveys.shared.all.filter{ $0.hashValue == hashValue }.first
     }
-    var progress: Int {
-        get {
-            return votesTotal * 100 / votesLimit
-        }
-    }
-    
+    var progress: Int
     required init(from decoder: Decoder) throws {
         do {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -100,6 +95,7 @@ class SurveyReference: Decodable {
             isOwn       = try container.decode(Bool.self, forKey: .isOwn)
             isFavorite  = try container.decode(Bool.self, forKey: .isFavorite)
             isHot       = try container.decode(Bool.self, forKey: .isHot)
+            progress    = try container.decode(Int.self, forKey: .progress)
             ///Check for existing instance by hashValue
             if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 SurveyReferences.shared.all.append(self)
@@ -126,6 +122,7 @@ class SurveyReference: Decodable {
 //        survey                  = _survey
         owner                   = _owner
         isAnonymous             = _isAnonymous
+        progress                = 0
         if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
             SurveyReferences.shared.all.append(self)
         }

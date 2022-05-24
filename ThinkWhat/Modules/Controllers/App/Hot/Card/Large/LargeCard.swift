@@ -54,6 +54,8 @@ class LargeCard: UIView, HotCard {
     
     private func setupUI() {
         guard !survey.isNil else { fatalError("survey.isNil") }
+        setNeedsLayout()
+        layoutIfNeeded()
         setTitle()
         setStats()
         topicIcon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : survey.topic.tagColor
@@ -61,10 +63,18 @@ class LargeCard: UIView, HotCard {
         topicIcon.category = Icon.Category(rawValue: survey.topic.id) ?? .Null
         avatar.lightColor = survey.topic.tagColor
         vote.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : survey.topic.tagColor
-        claim.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
-        reject.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
+        claim.tintColor = .systemGray
+        reject.tintColor = .systemGray
         
-        if let media = survey.mediaWithImageURLs.filter({ $0.order == 0}).first {
+        if let constraint = topContainer.getAllConstraints().filter({ $0.identifier == "topContainer"}).first {
+            let constant = topContainer.bounds.height
+            topContainer.removeConstraint(constraint)
+            constraint.isActive = false
+            topContainer.heightAnchor.constraint(equalToConstant: constant).isActive = true
+            topContainer.layoutIfNeeded()
+        }
+        
+        if !survey.media.isEmpty, let media = survey.mediaWithImageURLs.filter({ $0.order == 0}).first {
             if let image = media.image {
                 slide.image = image//survey!.images![index]?.keys.first
                 slide.progressIndicatorView.alpha = 0
@@ -84,6 +94,9 @@ class LargeCard: UIView, HotCard {
                     }
                 }
             }
+        } else if let constraint = slide.getAllConstraints().filter({ $0.identifier == "aspectRatio" }).first {
+            slide.removeConstraint(constraint)
+            slide.heightAnchor.constraint(equalToConstant: 0).isActive = true
         }
         
         guard let image = survey.owner.image else {
@@ -95,8 +108,6 @@ class LargeCard: UIView, HotCard {
             return
         }
         avatar.imageView.image = image
-        
-        
     }
     
     private func setTitle() {
@@ -122,9 +133,22 @@ class LargeCard: UIView, HotCard {
         titleString.append(NSAttributedString(string: "\(survey.title)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: titleLabel.bounds.width * 0.1), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         titleLabel.attributedText = titleString
         
-        let descriptionString = NSMutableAttributedString()
-        descriptionString.append(NSAttributedString(string: "\(survey.description)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: titleLabel.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        let paragraph = NSMutableParagraphStyle()
+        if #available(iOS 15.0, *) {
+            paragraph.usesDefaultHyphenation = true
+        } else {
+            paragraph.hyphenationFactor = 1
+        }
+        paragraph.alignment = .center
+        let string = survey.description
+        let descriptionString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
+        descriptionString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: titleLabel.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
         descriptionLabel.attributedText = descriptionString
+        descriptionLabel.textAlignment = .left
+        
+//        let descriptionString = NSMutableAttributedString()
+//        descriptionString.append(NSAttributedString(string: "\(survey.description)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: titleLabel.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//        descriptionLabel.attributedText = descriptionString
     }
     
     @objc
@@ -142,39 +166,27 @@ class LargeCard: UIView, HotCard {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        watchIcon.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         setTitle()
         topicIcon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : survey.topic.tagColor
-//        self.viewsIcon.setIconColor(.systemBlue)
         layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        
-        
-//        switch traitCollection.userInterfaceStyle {
-//        case .dark:
-//            self.background.backgroundColor = .secondarySystemBackground
-//            self.voteButton.backgroundColor = .systemBlue
-//            let categoryString = NSMutableAttributedString()
-//            categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            self.topic.attributedText = categoryString
-//            self.icon.setIconColor(.systemBlue)
-//            self.viewsIcon.setIconColor(.systemBlue)
-//            self.layer.shadowOpacity = 0
-//
-//        default:
-//            self.background.backgroundColor = .systemBackground
-//            self.voteButton.backgroundColor = self.survey.topic.tagColor
-//            let categoryString = NSMutableAttributedString()
-//            categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            self.topic.attributedText = categoryString
-//            self.icon.setIconColor(survey.topic.tagColor)
-//            self.viewsIcon.setIconColor(.black)
-//            self.layer.shadowOpacity = 1
-//        }
+        vote.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : survey.topic.tagColor
+//        backgroundImage.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemGray : survey.topic.tagColor
+    }
+    
+    @objc
+    func onNext() {
+        callbackDelegate?.callbackReceived("next" as Any)
+    }
+    
+    @objc
+    func onVote() {
+        callbackDelegate?.callbackReceived(survey as Any)
+    }
+    
+    @objc
+    func onClaim() {
+        callbackDelegate?.callbackReceived("claim" as Any)
     }
     
     // MARK: - Properties
@@ -205,8 +217,6 @@ class LargeCard: UIView, HotCard {
             avatar.backgroundColor = .clear
         }
     }
-    @IBOutlet weak var voteButton: UIButton!
-    @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var ratingView: UIImageView! {
         didSet {
             ratingView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
@@ -229,7 +239,29 @@ class LargeCard: UIView, HotCard {
             slide.cornerRadius = slide.frame.width * 0.05
         }
     }
-    @IBOutlet weak var claim: UIImageView!
-    @IBOutlet weak var vote: UIImageView!
-    @IBOutlet weak var reject: UIImageView!
+    @IBOutlet weak var claim: UIImageView! {
+        didSet {
+            claim.isUserInteractionEnabled = true
+            claim.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onClaim)))
+        }
+    }
+    @IBOutlet weak var vote: UIImageView! {
+        didSet {
+            vote.isUserInteractionEnabled = true
+            vote.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onVote)))
+            vote.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : survey.topic.tagColor
+        }
+    }
+    @IBOutlet weak var reject: UIImageView! {
+        didSet {
+            reject.isUserInteractionEnabled = true
+            reject.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onNext)))
+        }
+    }
+    @IBOutlet weak var topContainer: UIView!
+    //    @IBOutlet weak var backgroundImage: UIImageView! {
+    //        didSet {
+    //            backgroundImage.alpha = 0.025
+    //        }
+    //    }
 }

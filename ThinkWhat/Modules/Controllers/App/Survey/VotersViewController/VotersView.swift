@@ -92,7 +92,7 @@ extension VotersView: VotersControllerOutput {
     }
     
     func onFilterTapped() {
-        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightMultiplictator: 1.15)
+        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
         banner.accessibilityIdentifier = "claim"
         banner.present(subview: VotersFilter(imageContent: ImageSigns.filterFilled, color: answer.survey?.topic.tagColor ?? K_COLOR_RED, callbackDelegate: banner, voters: answer.voters, filters: filters))
     }

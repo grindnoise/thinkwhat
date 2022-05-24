@@ -14,8 +14,8 @@ class Popup: UIView {
         print("Popup deinit")
     }
     
-    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightMultiplictator _heightMultiplictator: CGFloat = 1) {
-        self.heightMultiplictator = _heightMultiplictator
+    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightScaleFactor _heightMultiplictator: CGFloat = 0.7) {
+        self.heightScaleFactor = _heightMultiplictator
         super.init(frame: frame)
         self.callbackDelegate = callbackDelegate
         self.bannerDelegate = bannerDelegate
@@ -38,7 +38,7 @@ class Popup: UIView {
         
         //Set default height
         setNeedsLayout()
-        height                      = body.frame.width * heightMultiplictator
+        height                      = UIScreen.main.bounds.height * heightScaleFactor//body.frame.width * heightScaleFactor
         heightConstraint.constant   = height
         centerYConstraint.constant  = yOrigin
         layoutIfNeeded()
@@ -76,7 +76,7 @@ class Popup: UIView {
     
     // MARK: - Properties
 //    private var isFolded = false
-    private let heightMultiplictator: CGFloat
+    private let heightScaleFactor: CGFloat
     private var yOrigin:    CGFloat = 0
     private var height:     CGFloat = 0 {
         didSet {

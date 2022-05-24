@@ -24,6 +24,8 @@
 		AB0BFDF3252DC9E400BD5EFF /* MegaphoneIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */; };
 		AB0BFDF5252EF20C00BD5EFF /* PieIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */; };
 		AB0BFDF7253093B000BD5EFF /* FlameBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF6253093B000BD5EFF /* FlameBadge.swift */; };
+		AB0F1E79283D2E550044BA97 /* SurveyCreationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0F1E77283D2E550044BA97 /* SurveyCreationController.swift */; };
+		AB0F1E7A283D2E550044BA97 /* SurveyCreationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB0F1E78283D2E550044BA97 /* SurveyCreationController.xib */; };
 		AB10030A27BEB83E00338EE4 /* Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB10030927BEB83E00338EE4 /* Localizable.swift */; };
 		AB10030D27BF762400338EE4 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB10030C27BF762400338EE4 /* String.swift */; };
 		AB10030F27BF772600338EE4 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB10030E27BF772600338EE4 /* Bundle.swift */; };
@@ -494,6 +496,8 @@
 		AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MegaphoneIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF6253093B000BD5EFF /* FlameBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameBadge.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB0F1E77283D2E550044BA97 /* SurveyCreationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCreationController.swift; sourceTree = "<group>"; };
+		AB0F1E78283D2E550044BA97 /* SurveyCreationController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyCreationController.xib; sourceTree = "<group>"; };
 		AB10030927BEB83E00338EE4 /* Localizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localizable.swift; sourceTree = "<group>"; };
 		AB10030C27BF762400338EE4 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		AB10030E27BF772600338EE4 /* Bundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bundle.swift; sourceTree = "<group>"; };
@@ -2457,6 +2461,8 @@
 				AB2BC364264D0A31009B44BA /* delImageViewController.swift */,
 				AB7CE6FA23A36123006FDBD8 /* Existing */,
 				AB54865E2694521700D30235 /* New */,
+				AB0F1E77283D2E550044BA97 /* SurveyCreationController.swift */,
+				AB0F1E78283D2E550044BA97 /* SurveyCreationController.xib */,
 			);
 			path = Survey;
 			sourceTree = "<group>";
@@ -2739,6 +2745,7 @@
 				AB38DD76281A776900FFEB3F /* SurveysCollection.xib in Resources */,
 				AB883B332804391D00DBE4EF /* VoteMessage.xib in Resources */,
 				ABF2758D28102AF20023CD1F /* VotersFilter.xib in Resources */,
+				AB0F1E7A283D2E550044BA97 /* SurveyCreationController.xib in Resources */,
 				AB3C684A223FD3EE00B57580 /* OpenSans-Semibold.ttf in Resources */,
 				AB3C6867223FDD9600B57580 /* Auth.storyboard in Resources */,
 				AB334FC3270C6F0400DD7332 /* Alert.xib in Resources */,
@@ -2961,6 +2968,7 @@
 				AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */,
 				AB9998C1280598D1009D0E4F /* ClaimSelection.swift in Sources */,
 				AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */,
+				AB0F1E79283D2E550044BA97 /* SurveyCreationController.swift in Sources */,
 				ABF2758F28151EE50023CD1F /* UINavigationController.swift in Sources */,
 				AB869F2826C53313008353B3 /* delPollController.swift in Sources */,
 				ABA448E327EC627D00F8E00D /* APIUnavailableView.swift in Sources */,

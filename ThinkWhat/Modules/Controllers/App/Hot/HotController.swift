@@ -21,7 +21,7 @@ class HotController: UIViewController {
         self.controllerInput = model
         self.controllerInput?
             .modelOutput = self
-        addObservers()
+        setObservers()
         setupUI()
     }
 
@@ -73,6 +73,7 @@ class HotController: UIViewController {
         barButton.translatesAutoresizingMaskIntoConstraints = false
         barButton.image = ImageSigns.plusFilled.image
         barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        barButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onCreate)))
         NSLayoutConstraint.activate([
             barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
@@ -81,7 +82,21 @@ class HotController: UIViewController {
             ])
     }
     
-    private func addObservers() {
+    @objc
+    private func onCreate() {
+        if let nav = navigationController as? CustomNavigationController {
+            nav.transitionStyle = .Default
+            nav.duration = 0.5
+//            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
+        }
+        let backItem = UIBarButtonItem()
+            backItem.title = ""
+            navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(SurveyCreationController(), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    private func setObservers() {
 //        let remove      = [Notifications.Surveys.Claimed,
 //                           Notifications.Surveys.Completed,
 //                           Notifications.Surveys.Rejected]
@@ -121,6 +136,10 @@ class HotController: UIViewController {
 // MARK: - View Input
 extension HotController: HotViewInput {
     
+    func onClaim(survey: Survey, reason: Claim) {
+        controllerInput?.claim(survey: survey, reason: reason)
+    }
+    
     func onVote(survey: Survey) {
         if let nav = navigationController as? CustomNavigationController {
             nav.transitionStyle = .Default
@@ -141,6 +160,19 @@ extension HotController: HotViewInput {
 
 // MARK: - Model Output
 extension HotController: HotModelOutput {
+    func onClaimCallback(_ result: Result<Bool, Error>) {
+        switch result {
+        case .success:
+#if DEBUG
+            print("")
+#endif
+        case .failure(let error):
+#if DEBUG
+            print(error.localizedDescription)
+#endif
+        }
+    }
+    
     func onRequestCompleted() {
         isNetworking = false
     }

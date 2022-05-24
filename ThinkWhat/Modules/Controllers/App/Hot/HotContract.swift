@@ -19,6 +19,7 @@ protocol HotViewInput: class {
 //    var surveyStack: [Survey] { get set }
     func onEmptyStack()
     func onVote(survey: Survey)
+    func onClaim(survey: Survey, reason: Claim)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -27,7 +28,8 @@ protocol HotViewInput: class {
 protocol HotControllerInput: class {
     
     var modelOutput: HotModelOutput? { get set }
-    func loadSurveys() 
+    func loadSurveys()
+    func claim(survey: Survey, reason: Claim)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -35,6 +37,7 @@ protocol HotControllerInput: class {
 /// **Controller** conforms to this protocol
 protocol HotModelOutput: class {
     func onRequestCompleted()
+    func onClaimCallback(_: Result<Bool,Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
