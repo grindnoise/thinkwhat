@@ -158,5 +158,8 @@
 "points" = "Баллов";
 "top_up" = "Пополнить";
 
+//New VC
 "rating" = "Рейтинг";
 "poll" = "Опрос";
+"new_single" = "Новый";
+"poll_rating_difference" = "В чем разница?";

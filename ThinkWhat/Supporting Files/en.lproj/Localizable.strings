@@ -158,5 +158,8 @@
 "points" = "Points";
 "top_up" = "Top up";
 
+//New VC
 "rating" = "Rating";
 "poll" = "Poll";
+"new_single" = "New";
+"poll_rating_difference" = "What's the difference?";

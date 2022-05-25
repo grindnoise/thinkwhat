@@ -11,106 +11,18 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SurveyCreationController" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
-                <outlet property="pollIcon" destination="i8Z-jv-g5S" id="KHW-4L-YNd"/>
-                <outlet property="pollLabel" destination="8o0-5d-yzm" id="8dA-H1-WuO"/>
-                <outlet property="ratingIcon" destination="Y3l-dD-ojv" id="cAg-R6-rdo"/>
-                <outlet property="ratingLabel" destination="Bf1-38-Tye" id="Uag-Uo-c6z"/>
-                <outlet property="stack" destination="0oi-2V-jfy" id="QaY-6B-4X6"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT" customClass="SurveyCreationView" customModule="ThinkWhat" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-            <subviews>
-                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" baselineRelativeArrangement="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0oi-2V-jfy">
-                    <rect key="frame" x="20.5" y="266.5" width="373" height="186.5"/>
-                    <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ygt-C3-HbD">
-                            <rect key="frame" x="0.0" y="0.0" width="186.5" height="186.5"/>
-                            <subviews>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bf1-38-Tye" customClass="ArcLabel" customModule="ThinkWhat" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="0.0" width="186.5" height="186.5"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" secondItem="Bf1-38-Tye" secondAttribute="height" multiplier="1:1" id="ypH-9D-L2Y"/>
-                                    </constraints>
-                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                    <nil key="textColor"/>
-                                    <nil key="highlightedColor"/>
-                                </label>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Y3l-dD-ojv" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="0.0" width="186.5" height="186.5"/>
-                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </view>
-                            </subviews>
-                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <constraints>
-                                <constraint firstItem="Bf1-38-Tye" firstAttribute="leading" secondItem="Ygt-C3-HbD" secondAttribute="leading" id="1AF-rE-UgT"/>
-                                <constraint firstItem="Y3l-dD-ojv" firstAttribute="width" secondItem="Y3l-dD-ojv" secondAttribute="height" multiplier="1:1" id="BeK-gR-hW1"/>
-                                <constraint firstItem="Y3l-dD-ojv" firstAttribute="centerY" secondItem="Ygt-C3-HbD" secondAttribute="centerY" id="Ck5-dJ-y5j"/>
-                                <constraint firstAttribute="bottom" secondItem="Bf1-38-Tye" secondAttribute="bottom" id="Mtm-6N-0qE"/>
-                                <constraint firstItem="Y3l-dD-ojv" firstAttribute="width" secondItem="Ygt-C3-HbD" secondAttribute="width" id="OxV-aJ-J6o"/>
-                                <constraint firstItem="Bf1-38-Tye" firstAttribute="top" secondItem="Ygt-C3-HbD" secondAttribute="top" id="pnj-J6-BqD"/>
-                                <constraint firstAttribute="trailing" secondItem="Bf1-38-Tye" secondAttribute="trailing" id="prl-Fg-Iek"/>
-                                <constraint firstAttribute="width" secondItem="Ygt-C3-HbD" secondAttribute="height" multiplier="1:1" id="v5z-SO-5aP"/>
-                                <constraint firstItem="Y3l-dD-ojv" firstAttribute="centerX" secondItem="Ygt-C3-HbD" secondAttribute="centerX" id="zQs-zO-wgk"/>
-                            </constraints>
-                        </view>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VTY-AT-C06">
-                            <rect key="frame" x="186.5" y="0.0" width="186.5" height="186.5"/>
-                            <subviews>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8o0-5d-yzm" customClass="ArcLabel" customModule="ThinkWhat" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="0.0" width="186.5" height="186.5"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" secondItem="8o0-5d-yzm" secondAttribute="height" multiplier="1:1" id="W5Y-6z-juF"/>
-                                    </constraints>
-                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                    <nil key="textColor"/>
-                                    <nil key="highlightedColor"/>
-                                </label>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="i8Z-jv-g5S" customClass="Icon" customModule="ThinkWhat" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="0.0" width="186.5" height="186.5"/>
-                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </view>
-                            </subviews>
-                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <constraints>
-                                <constraint firstAttribute="trailing" secondItem="8o0-5d-yzm" secondAttribute="trailing" id="6KO-fm-4gV"/>
-                                <constraint firstItem="8o0-5d-yzm" firstAttribute="top" secondItem="VTY-AT-C06" secondAttribute="top" id="ApI-P8-EHA"/>
-                                <constraint firstAttribute="width" secondItem="VTY-AT-C06" secondAttribute="height" multiplier="1:1" id="MqH-Oq-6ZB"/>
-                                <constraint firstItem="8o0-5d-yzm" firstAttribute="leading" secondItem="VTY-AT-C06" secondAttribute="leading" id="aYn-Oo-Xqp"/>
-                                <constraint firstItem="i8Z-jv-g5S" firstAttribute="centerY" secondItem="VTY-AT-C06" secondAttribute="centerY" id="cCh-3x-g0C"/>
-                                <constraint firstItem="i8Z-jv-g5S" firstAttribute="centerX" secondItem="VTY-AT-C06" secondAttribute="centerX" id="eIR-B7-mAb"/>
-                                <constraint firstAttribute="bottom" secondItem="8o0-5d-yzm" secondAttribute="bottom" id="hGi-GV-txz"/>
-                                <constraint firstItem="i8Z-jv-g5S" firstAttribute="width" secondItem="VTY-AT-C06" secondAttribute="width" id="kRP-BH-SnC"/>
-                                <constraint firstItem="i8Z-jv-g5S" firstAttribute="width" secondItem="i8Z-jv-g5S" secondAttribute="height" multiplier="1:1" id="pP8-cj-Eec"/>
-                            </constraints>
-                        </view>
-                    </subviews>
-                    <constraints>
-                        <constraint firstItem="VTY-AT-C06" firstAttribute="width" secondItem="VTY-AT-C06" secondAttribute="height" multiplier="1:1" id="jeP-FC-9fI"/>
-                    </constraints>
-                </stackView>
-            </subviews>
-            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
+            <viewLayoutGuide key="safeArea" id="q7C-2g-WBd"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-            <constraints>
-                <constraint firstItem="0oi-2V-jfy" firstAttribute="bottom" secondItem="fnl-2z-Ty3" secondAttribute="centerY" id="I1O-up-Hlf"/>
-                <constraint firstItem="0oi-2V-jfy" firstAttribute="width" secondItem="i5M-Pr-FkT" secondAttribute="width" multiplier="0.9" id="KP7-Vj-o0x"/>
-                <constraint firstItem="0oi-2V-jfy" firstAttribute="centerX" secondItem="fnl-2z-Ty3" secondAttribute="centerX" id="tLO-YO-Iz8"/>
-            </constraints>
             <point key="canvasLocation" x="137.68115942028987" y="106.47321428571428"/>
         </view>
     </objects>
-    <designables>
-        <designable name="8o0-5d-yzm">
-            <size key="intrinsicContentSize" width="41.5" height="20.5"/>
-        </designable>
-        <designable name="Bf1-38-Tye">
-            <size key="intrinsicContentSize" width="41.5" height="20.5"/>
-        </designable>
-    </designables>
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

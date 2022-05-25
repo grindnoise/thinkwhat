@@ -37,4 +37,5 @@ struct ImageSigns {
     static let magnifyingGlassFilled        = UIImageView(image: UIImage(systemName: "magnifyingglass.circle.fill"))
     static let arrowLeft                    = UIImageView(image: UIImage(systemName: "arrowshape.turn.up.backward.circle.fill"))
     static let gear                         = UIImageView(image: UIImage(systemName: "gear"))
+    static let infoСircle                   = UIImageView(image: UIImage(systemName: "info.circle"))
 }

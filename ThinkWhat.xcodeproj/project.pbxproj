@@ -355,6 +355,8 @@
 		ABA448FA27EF235300F8E00D /* AuthorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABA448F827EF235300F8E00D /* AuthorCell.xib */; };
 		ABA6B3B223FD1A8D00335074 /* LoadingTextIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA6B3B123FD1A8D00335074 /* LoadingTextIndicator.swift */; };
 		ABA6E18822FACAA200F8F39A /* ValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */; };
+		ABADB08A283E129F00A7F726 /* SurveyCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADB089283E129F00A7F726 /* SurveyCreationView.swift */; };
+		ABADB08C283E12AA00A7F726 /* SurveyCreationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADB08B283E12AA00A7F726 /* SurveyCreationView.xib */; };
 		ABADF56F27F1BC7500A26474 /* TitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF56D27F1BC7500A26474 /* TitleCell.swift */; };
 		ABADF57027F1BC7500A26474 /* TitleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF56E27F1BC7500A26474 /* TitleCell.xib */; };
 		ABADF57427F1D36100A26474 /* TextCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF57227F1D36100A26474 /* TextCell.swift */; };
@@ -838,6 +840,8 @@
 		ABA448F827EF235300F8E00D /* AuthorCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AuthorCell.xib; sourceTree = "<group>"; };
 		ABA6B3B123FD1A8D00335074 /* LoadingTextIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingTextIndicator.swift; sourceTree = "<group>"; };
 		ABA6E18722FACAA100F8F39A /* ValidationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidationViewController.swift; sourceTree = "<group>"; };
+		ABADB089283E129F00A7F726 /* SurveyCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCreationView.swift; sourceTree = "<group>"; };
+		ABADB08B283E12AA00A7F726 /* SurveyCreationView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyCreationView.xib; sourceTree = "<group>"; };
 		ABADF56D27F1BC7500A26474 /* TitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleCell.swift; sourceTree = "<group>"; };
 		ABADF56E27F1BC7500A26474 /* TitleCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TitleCell.xib; sourceTree = "<group>"; };
 		ABADF57227F1D36100A26474 /* TextCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextCell.swift; sourceTree = "<group>"; };
@@ -2463,6 +2467,8 @@
 				AB54865E2694521700D30235 /* New */,
 				AB0F1E77283D2E550044BA97 /* SurveyCreationController.swift */,
 				AB0F1E78283D2E550044BA97 /* SurveyCreationController.xib */,
+				ABADB089283E129F00A7F726 /* SurveyCreationView.swift */,
+				ABADB08B283E12AA00A7F726 /* SurveyCreationView.xib */,
 			);
 			path = Survey;
 			sourceTree = "<group>";
@@ -2738,6 +2744,7 @@
 				AB10031427BFAF2F00338EE4 /* FillProfileViewController.xib in Resources */,
 				AB3C6826223FD1E900B57580 /* CustomAlertView.xib in Resources */,
 				AB72961727DA3F2300D45B54 /* SubsciptionsController.xib in Resources */,
+				ABADB08C283E12AA00A7F726 /* SurveyCreationView.xib in Resources */,
 				ABA448E527EC62DC00F8E00D /* APIUnavailableView.xib in Resources */,
 				AB3C67E4223FBB6400B57580 /* Main.storyboard in Resources */,
 				AB98308427B935DA002C5132 /* RecoverAccontViewController.xib in Resources */,
@@ -3190,6 +3197,7 @@
 				AB98307C27B68811002C5132 /* LoginView.swift in Sources */,
 				ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */,
 				AB3C6812223FC71600B57580 /* Constants.swift in Sources */,
+				ABADB08A283E129F00A7F726 /* SurveyCreationView.swift in Sources */,
 				AB10031927BFBBDE00338EE4 /* FillUserContract.swift in Sources */,
 				ABF27581280EB2D40023CD1F /* VotersModel.swift in Sources */,
 				AB25AC33282BBFE700050907 /* SurveyTable.swift in Sources */,
