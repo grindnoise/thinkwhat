@@ -10,7 +10,7 @@ import UIKit
 
 class SurveyCreationView: UIView, SurveyCreationOutput {
     func onDidLoad() {
-        destinationPoint = (viewInput?.tabBarHeight ?? 0) + UIApplication.shared.windows.first!.safeAreaInsets.bottom
+        destinationPoint = (viewInput?.tabBarHeight ?? 0) + UIApplication.shared.windows.first!.safeAreaInsets.bottom + (deviceType == .iPhoneSE ? 20 : 0)
     }
     
     
@@ -141,11 +141,11 @@ class SurveyCreationView: UIView, SurveyCreationOutput {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         setText()
+        actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        //        info.setTitleColor(.systemRed, for: .normal)
         if !isRatingSelected.isNil {
         ratingIcon.setIconColor(isRatingSelected! ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED : .systemGray)
             pollIcon.setIconColor(!isRatingSelected! ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED : .systemGray)}
-        actionButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        info.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
 
     // MARK: - Properties
@@ -176,23 +176,14 @@ class SurveyCreationView: UIView, SurveyCreationOutput {
     
     @IBOutlet weak var actionButton: UIButton! {
         didSet {
-            actionButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
             actionButton.setTitle("continueButton".localized.uppercased(), for: .normal)
         }
     }
     @IBAction func actionButtonTapped(_ sender: Any) {
-        if isRatingSelected! {
-//            performSegue(withIdentifier: Segues.NewSurvey.NewRating, sender: nil)
-        } else {
-//            performSegue(withIdentifier: Segues.NewSurvey.NewPoll, sender: nil)
-        }
+        viewInput?.onNext(isRatingSelected! ? .Ranking : .Poll)
     }
-//    @IBOutlet weak var actionButtonTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var stack: UIStackView! {
-        didSet {
-//            stack.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor).isActive = true
-        }
-    }
+    @IBOutlet weak var stack: UIStackView!
     @IBOutlet weak var ratingLabel: ArcLabel!
     @IBOutlet weak var ratingIcon: Icon! {
         didSet {
@@ -223,12 +214,11 @@ class SurveyCreationView: UIView, SurveyCreationOutput {
         didSet {
 //            info.setImage(ImageSigns.infoСircle.image, for: .normal)
             info.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-
         }
     }
     @IBAction func infoTapped(_ sender: Any) {
         let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-        banner.accessibilityIdentifier = "claim"
+//        banner.accessibilityIdentifier = "claim"
         banner.present(subview: UIView(), shouldDismissAfter: 2)
     }
 }

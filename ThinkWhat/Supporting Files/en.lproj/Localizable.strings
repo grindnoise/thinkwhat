@@ -163,3 +163,16 @@
 "poll" = "Poll";
 "new_single" = "New";
 "poll_rating_difference" = "What's the difference?";
+
+//PollCreationView
+"topic" = "Topic";
+"options" = "Options";
+"poll_title" = "Title";
+"poll_description" = "Description";
+"poll_question" = "Question";
+"url" = "Hyperlink";
+"images" = "Images";
+"poll_choices" = "Choices";
+"comments" = "Comments";
+"voters_limit" = "Limits";
+"hot_option" = "Hot start";

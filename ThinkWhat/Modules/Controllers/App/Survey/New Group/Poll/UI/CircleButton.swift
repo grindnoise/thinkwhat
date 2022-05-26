@@ -65,7 +65,11 @@ class CircleButton: UIView, CAAnimationDelegate {
     
     
     //MARK: - Interface connections
-    @IBOutlet var contentView: UIView!
+    @IBOutlet var contentView: UIView! {
+        didSet {
+            contentView.backgroundColor = .systemBackground
+        }
+    }
 //    @IBOutlet weak var icon: SurveyCategoryIcon! {
 //        didSet {
 ////            icon.layer.zPosition = 3
@@ -146,16 +150,21 @@ class CircleButton: UIView, CAAnimationDelegate {
         }
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        resetLayerProperties(forLayerIdentifiers: ["oval"])
+        contentView.backgroundColor = .systemBackground
+    }
+    
     func resetLayerProperties(forLayerIdentifiers layerIds: [String]!){
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         
         if layerIds == nil || layerIds.contains("oval"){
             let oval = layers["oval"] as! CAShapeLayer
-            oval.fillColor   = UIColor(red:1.00, green: 1.00, blue:1.00, alpha:1.0).cgColor
+            oval.fillColor   = UIColor.systemBackground.cgColor
             oval.strokeColor = color.withAlphaComponent(0.3).cgColor//UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             oval.lineWidth   = lineWidth
-            oval.strokeStart = 1
+            oval.strokeStart = state == .On ? 0 : 1
         }
         
         CATransaction.commit()

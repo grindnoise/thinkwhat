@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="TopicSelection" customModule="ThinkWhat" customModuleProvider="target"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="400" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="FBs-ff-nve">
+                    <rect key="frame" x="0.0" y="0.0" width="400" height="480"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="wUh-Pv-7BH">
+                        <size key="itemSize" width="128" height="128"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                </collectionView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jc5-Ed-6p1">
+                    <rect key="frame" x="0.0" y="480" width="400" height="120"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Cjm-jR-w6b">
+                            <rect key="frame" x="149" y="9.5" width="102" height="101"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="Cjm-jR-w6b" secondAttribute="height" multiplier="1:1" id="7oG-lD-67K"/>
+                            </constraints>
+                        </imageView>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="6ST-GV-9dm">
+                            <rect key="frame" x="64.5" y="22" width="76.5" height="76.5"/>
+                        </imageView>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.counterclockwise.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="TPV-dr-35Q">
+                            <rect key="frame" x="259" y="22.5" width="76.5" height="75.5"/>
+                        </imageView>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="Cjm-jR-w6b" firstAttribute="leading" secondItem="6ST-GV-9dm" secondAttribute="trailing" constant="8" symbolic="YES" id="1OL-ze-eqm"/>
+                        <constraint firstItem="TPV-dr-35Q" firstAttribute="leading" secondItem="Cjm-jR-w6b" secondAttribute="trailing" constant="8" symbolic="YES" id="3w2-XC-BBZ"/>
+                        <constraint firstItem="6ST-GV-9dm" firstAttribute="height" secondItem="Cjm-jR-w6b" secondAttribute="height" multiplier="0.75" id="J3N-hQ-42z"/>
+                        <constraint firstItem="TPV-dr-35Q" firstAttribute="width" secondItem="TPV-dr-35Q" secondAttribute="height" multiplier="1:1" id="MTq-xw-aVj"/>
+                        <constraint firstItem="Cjm-jR-w6b" firstAttribute="centerX" secondItem="jc5-Ed-6p1" secondAttribute="centerX" id="Ogv-Ti-A8A"/>
+                        <constraint firstItem="TPV-dr-35Q" firstAttribute="centerY" secondItem="Cjm-jR-w6b" secondAttribute="centerY" id="OsM-1K-ho6"/>
+                        <constraint firstItem="6ST-GV-9dm" firstAttribute="centerY" secondItem="Cjm-jR-w6b" secondAttribute="centerY" id="U5A-P6-H2Q"/>
+                        <constraint firstItem="6ST-GV-9dm" firstAttribute="width" secondItem="6ST-GV-9dm" secondAttribute="height" multiplier="1:1" id="V1Y-jp-FjY"/>
+                        <constraint firstItem="TPV-dr-35Q" firstAttribute="height" secondItem="Cjm-jR-w6b" secondAttribute="height" multiplier="0.75" id="X4m-AA-r5G"/>
+                        <constraint firstItem="Cjm-jR-w6b" firstAttribute="height" secondItem="jc5-Ed-6p1" secondAttribute="height" multiplier="0.85" id="tRY-O6-EHK"/>
+                        <constraint firstItem="Cjm-jR-w6b" firstAttribute="centerY" secondItem="jc5-Ed-6p1" secondAttribute="centerY" id="yfI-8a-RkS"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="jc5-Ed-6p1" secondAttribute="trailing" id="2LM-w4-cVS"/>
+                <constraint firstItem="FBs-ff-nve" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="AdX-sQ-tEr"/>
+                <constraint firstItem="jc5-Ed-6p1" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.2" id="M15-fj-uTE"/>
+                <constraint firstItem="jc5-Ed-6p1" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Qh2-L9-9ad"/>
+                <constraint firstItem="FBs-ff-nve" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="dGe-f8-9ag"/>
+                <constraint firstItem="jc5-Ed-6p1" firstAttribute="top" secondItem="FBs-ff-nve" secondAttribute="bottom" id="dLC-p2-l9k"/>
+                <constraint firstItem="jc5-Ed-6p1" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="mKW-Hy-lK2"/>
+                <constraint firstItem="FBs-ff-nve" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="t3l-kv-lga"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="137.68115942028987" y="88.392857142857139"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="arrow.counterclockwise.circle" catalog="system" width="128" height="121"/>
+        <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

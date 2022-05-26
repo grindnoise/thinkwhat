@@ -10,6 +10,10 @@ import UIKit
 
 class SurveyCreationController: UIViewController {
     
+    enum Mode {
+        case Poll, Ranking
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.largeTitleDisplayMode = .never
@@ -31,6 +35,18 @@ class SurveyCreationController: UIViewController {
 }
 
 extension SurveyCreationController: SurveyCreationViewInput {
+    func onNext(_ mode: SurveyCreationController.Mode) {
+        if let nav = navigationController as? CustomNavigationController {
+            nav.transitionStyle = .Default
+            nav.duration = 0.5
+//            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
+        }
+        let backItem = UIBarButtonItem()
+            backItem.title = ""
+            navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(mode == .Poll ? PollCreationController() : RankingCreationController(), animated: true)
+    }
+    
     var tabBarHeight: CGFloat {
         return tabBarController?.tabBar.frame.height ?? 0
     }
@@ -40,10 +56,11 @@ protocol SurveyCreationOutput: class {
     var viewInput: SurveyCreationViewInput? { get set }
     
     func onDidLoad()
-    
 }
 
 protocol SurveyCreationViewInput: class {
     var controllerOutput: SurveyCreationOutput? { get set }
     var tabBarHeight: CGFloat { get }
+    
+    func onNext(_: SurveyCreationController.Mode)
 }

@@ -163,3 +163,16 @@
 "poll" = "Опрос";
 "new_single" = "Новый";
 "poll_rating_difference" = "В чем разница?";
+
+//PollCreationView
+"topic" = "Раздел";
+"options" = "Опции";
+"poll_title" = "Название";
+"poll_description" = "Описание";
+"poll_question" = "Вопрос";
+"url" = "Ссылка";
+"images" = "Изображения";
+"poll_choices" = "Варианты";
+"comments" = "Комментарии";
+"voters_limit" = "Лимит";
+"hot_option" = "Горячий старт";
