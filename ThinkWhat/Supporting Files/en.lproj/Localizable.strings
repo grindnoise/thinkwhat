@@ -14,6 +14,8 @@
 "timeout_error" = "Timeout exceeded";
 "tiktok_web_error" = "TikTok loading error";
 "image_loading_error" = "Image loading failed";
+"maximum_characters_exceeded" = "Maximum characters exceeded: ";
+"minimum_characters_needed" = "Minimum characters needed: ";
 
 //Common
 "ok" = "Ok";
@@ -176,3 +178,12 @@
 "comments" = "Comments";
 "voters_limit" = "Limits";
 "hot_option" = "Hot start";
+
+"choose_topic" = "Choose topic";
+"choose_option" = "Choose option";
+"anon_option" = "Anonymous";
+"anon_description" = "Poll's author and voters are hidden from each other";
+"default_option" = "Standart";
+"default_description" = "Public poll, no restrictions, non anonymous";
+"private_option" = "Private";
+"private_description" = "Private poll, access is granted via sharing link";

@@ -195,8 +195,18 @@ extension Popup: CallbackObservable {
             dismiss(btn.accessibilityIdentifier)// == "exit" ? "exit" : nil)
         } else if sender is Claim {
             callbackDelegate?.callbackReceived(sender)
+        } else if sender is Topic {
+            callbackDelegate?.callbackReceived(sender)
+            dismiss()
         } else if let votersFilter = sender as? VotersFilter {
             callbackDelegate?.callbackReceived(votersFilter.getData())
+            dismiss()
+        } else if let string = sender as? String {
+            if string == "exit" {
+                dismiss()
+            }
+        } else if sender is PollCreationController.Option {
+            callbackDelegate?.callbackReceived(sender)
             dismiss()
         }
     }

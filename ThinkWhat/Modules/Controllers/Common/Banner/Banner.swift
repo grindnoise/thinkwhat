@@ -227,6 +227,7 @@ class Banner: UIView {
     @objc private func updateTimer() {
         timeElapsed -= 0.5
         if timeElapsed <= 0 {
+            stopTimer()
             dismiss()
         }
     }

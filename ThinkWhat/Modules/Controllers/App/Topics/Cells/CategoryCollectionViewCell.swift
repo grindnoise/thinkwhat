@@ -14,7 +14,8 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         NotificationCenter.default.removeObserver(self)
     }
     
-    @IBOutlet weak var title: UILabel!
+    @IBOutlet weak var title: ArcLabel!
+    @IBOutlet weak var count: ArcLabel!
     @IBOutlet weak var icon: Icon!
 //    @IBOutlet weak var total: UILabel!
     @IBOutlet weak var constraint: NSLayoutConstraint!
@@ -28,27 +29,35 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     }
     var selectionMode = false
     private var isSetupComplete = false
+    private var fontSize: CGFloat = .zero
+    private var showCount = true {
+        didSet {
+            guard oldValue != showCount else { return }
+            count.alpha = showCount ? 1 : 0
+        }
+    }
     
     override var isSelected: Bool {
         didSet {
             if isSelected != oldValue {
                 if selectionMode {
                     if !isSelected {
-                        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
-                            self.icon.transform = .identity
-                            self.icon.backgroundColor = UIColor.lightGray.withAlphaComponent(0.5)
+                        UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
+                            self.transform = .identity
+                            self.backgroundColor = .clear
                         })
                     } else {
                         UIView.animate(
                             withDuration: 0.3,
                             delay: 0,
-                            usingSpringWithDamping: 0.7,
-                            initialSpringVelocity: 0.3,
+                            usingSpringWithDamping: 0.55,
+                            initialSpringVelocity: 2.5,
                             options: [.curveEaseInOut],
                             animations: {
-                                self.icon.transform = CGAffineTransform(scaleX: 1.15, y: 1.15)
-                                self.icon.backgroundColor = self.category.tagColor
-                        }) { _ in }
+                                self.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+                                self.backgroundColor = self.category.tagColor.withAlphaComponent(0.2)
+                            }) { _ in }
+                                
 //                        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut], animations: {
 //                            self.icon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
 //                            self.icon.backgroundColor = self.category.tagColor
@@ -59,12 +68,15 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    public func setupUI() {
+    public func setupUI(_ showCount: Bool = true, _ textScale: CGFloat = 0.11) {
         setObservers()
         guard !isSetupComplete else { return }
+        self.showCount = showCount
         isSetupComplete = true
         setNeedsLayout()
         layoutIfNeeded()
+        fontSize = bounds.width * textScale
+        setText()
     }
 
     private func setObservers() {
@@ -83,12 +95,16 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     }
     
     private func setText() {
-        let attributedText = NSMutableAttributedString()
-        attributedText.append(NSAttributedString(string: "\(category.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.125), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        attributedText.append(NSAttributedString(string: "\n\(category.visibleCount)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.125), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//        if fontSize == .zero { fontSize = bounds.width * 0.09 }
         
-        title.textAlignment = .center
-        title.attributedText = attributedText
+        ///Topic
+        let titleString = NSMutableAttributedString()
+        titleString.append(NSAttributedString(string: category.title.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : category.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        title.attributedText = titleString
+        
+        let countString = NSMutableAttributedString()
+        countString.append(NSAttributedString(string: String(describing: category.visibleCount.roundedWithAbbreviations), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : category.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        count.attributedText = countString
     }
 }
 

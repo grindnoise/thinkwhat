@@ -437,6 +437,8 @@
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
 		ABE000B227E0855300B6B4CB /* DataObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE000B127E0855300B6B4CB /* DataObservable.swift */; };
+		ABE065072844B57100877D92 /* OptionSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE065062844B57100877D92 /* OptionSelection.swift */; };
+		ABE065092844B58400877D92 /* OptionSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABE065082844B58400877D92 /* OptionSelection.xib */; };
 		ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE43694251C7FD300C1428D /* CustomSwitch.swift */; };
 		ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */; };
 		ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */; };
@@ -936,6 +938,8 @@
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
 		ABE000B127E0855300B6B4CB /* DataObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataObservable.swift; sourceTree = "<group>"; };
+		ABE065062844B57100877D92 /* OptionSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionSelection.swift; sourceTree = "<group>"; };
+		ABE065082844B58400877D92 /* OptionSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OptionSelection.xib; sourceTree = "<group>"; };
 		ABE43694251C7FD300C1428D /* CustomSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSwitch.swift; sourceTree = "<group>"; };
 		ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcLabel.swift; sourceTree = "<group>"; };
 		ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditingListTableViewController.swift; sourceTree = "<group>"; };
@@ -1710,8 +1714,8 @@
 		AB63D7D4283FBFB100173116 /* Popup content */ = {
 			isa = PBXGroup;
 			children = (
-				AB63D7D5283FC03A00173116 /* TopicSelection.swift */,
-				AB63D7D7283FC04F00173116 /* TopicSelection.xib */,
+				ABE065052844B55000877D92 /* Options selection */,
+				ABE065042844B54000877D92 /* Topic selection */,
 			);
 			path = "Popup content";
 			sourceTree = "<group>";
@@ -2569,6 +2573,24 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
+		ABE065042844B54000877D92 /* Topic selection */ = {
+			isa = PBXGroup;
+			children = (
+				AB63D7D5283FC03A00173116 /* TopicSelection.swift */,
+				AB63D7D7283FC04F00173116 /* TopicSelection.xib */,
+			);
+			path = "Topic selection";
+			sourceTree = "<group>";
+		};
+		ABE065052844B55000877D92 /* Options selection */ = {
+			isa = PBXGroup;
+			children = (
+				ABE065062844B57100877D92 /* OptionSelection.swift */,
+				ABE065082844B58400877D92 /* OptionSelection.xib */,
+			);
+			path = "Options selection";
+			sourceTree = "<group>";
+		};
 		ABF01A6A25418E1F009E2BC4 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -2790,6 +2812,7 @@
 				AB72961227DA311000D45B54 /* HotView.xib in Resources */,
 				AB98307F27B68B63002C5132 /* LoginView.xib in Resources */,
 				AB3A47E5283F5CF400106407 /* RankingCreationView.xib in Resources */,
+				ABE065092844B58400877D92 /* OptionSelection.xib in Resources */,
 				AB38DD722819538A00FFEB3F /* Confirm.xib in Resources */,
 				ABBA1989242B430100F11E0D /* AnswerHeaderCell.xib in Resources */,
 				ABADF57F27F2082B00A26474 /* HyperlinkCell.xib in Resources */,
@@ -3032,6 +3055,7 @@
 				AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */,
 				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
 				AB00FFD32583A4A50071C7DE /* TextViewController.swift in Sources */,
+				ABE065072844B57100877D92 /* OptionSelection.swift in Sources */,
 				AB791D7D243B1BF00085E00E /* VoteAnimationView.swift in Sources */,
 				AB3A47DA283F5C1E00106407 /* RankingCreationController.swift in Sources */,
 				AB463FB727C403A7007D7240 /* GeoNames.swift in Sources */,

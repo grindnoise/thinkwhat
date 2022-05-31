@@ -17,6 +17,14 @@ class PollCreationController: UIViewController {
     //Sequence of stages to post new survey
     enum Stage: Int, CaseIterable {
         case Topic, Options, Title, Description, Question, Hyperlink, Images, Choices, Comments, Limits, Hot, Ready
+        
+        func next() -> Stage? {
+            return Stage(rawValue: (self.rawValue + 1))
+        }
+    }
+    
+    enum Option: String {
+        case Null = "", Ordinary = "default_option", Anon = "anon_option", Private = "private_option"
     }
     
     // MARK: - Lifecycle Methods
@@ -43,12 +51,28 @@ class PollCreationController: UIViewController {
     // MARK: - Properties
     var controllerOutput: PollCreationControllerOutput?
     var controllerInput: PollCreationControllerInput?
-    var stage: Stage = .Title
+    var stage: Stage = .Topic
+    private var maximumStage: Stage = .Topic {
+        didSet {
+            if oldValue.rawValue >= maximumStage.rawValue {
+                maximumStage = oldValue
+            }
+        }
+    }
 }
 
 // MARK: - View Input
 extension PollCreationController: PollCreationViewInput {
-    // Implement methods
+    func onStageCompleted() {
+        guard let next = stage.next() else { return }
+        stage = next
+        Task {
+//            try await Task.sleep(nanoseconds: UInt64(0.5 * 1_000_000_000))
+            await MainActor.run {
+                controllerOutput?.onNextStage(stage)
+            }
+        }
+    }
 }
 
 // MARK: - Model Output

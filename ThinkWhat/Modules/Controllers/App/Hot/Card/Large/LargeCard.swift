@@ -172,6 +172,8 @@ class LargeCard: UIView, HotCard {
         layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         vote.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : survey.topic.tagColor
 //        backgroundImage.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemGray : survey.topic.tagColor
+        reject.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        claim.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
     }
     
     @objc
@@ -241,6 +243,7 @@ class LargeCard: UIView, HotCard {
     }
     @IBOutlet weak var claim: UIImageView! {
         didSet {
+            claim.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
             claim.isUserInteractionEnabled = true
             claim.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onClaim)))
         }
@@ -254,6 +257,7 @@ class LargeCard: UIView, HotCard {
     }
     @IBOutlet weak var reject: UIImageView! {
         didSet {
+            reject.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
             reject.isUserInteractionEnabled = true
             reject.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onNext)))
         }

@@ -16,7 +16,8 @@ protocol PollCreationViewInput: class {
     var controllerOutput: PollCreationControllerOutput? { get set }
     var controllerInput: PollCreationControllerInput? { get set }
     
-    // View input methods here
+    
+    func onStageCompleted()
 }
 
 /// *Controller* tells the *Model* what to do based on the input

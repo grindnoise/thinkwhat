@@ -413,12 +413,11 @@ extension TopicsView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? CategoryCollectionViewCell {
             let dataItems = mode == .Parent ? parents : parent.children
-            cell.setupUI()
-//            cell.setObservers()
             if let category = dataItems[indexPath.row] as? Topic {
                 cell.childColor = category.tagColor
                 cell.category = category
             }
+            cell.setupUI()
             return cell
         }
         return UICollectionViewCell()

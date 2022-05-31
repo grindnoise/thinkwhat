@@ -14,6 +14,8 @@
 "timeout_error" = "Превышено время ожидания";
 "tiktok_web_error" = "Ошибка при загрузке TikTok";
 "image_loading_error" = "Произошла ошибка, изображение не было загружено";
+"maximum_characters_exceeded" = "Превышено максимальное количество: ";
+"minimum_characters_needed" = "Минимальное количество симоволов: ";
 
 //Common
 "ok" = "Хорошо";
@@ -176,3 +178,12 @@
 "comments" = "Комментарии";
 "voters_limit" = "Лимит";
 "hot_option" = "Горячий старт";
+
+"choose_topic" = "Выберите раздел";
+"choose_option" = "Выберите опцию";
+"anon_option" = "Анонимный";
+"anon_description" = "Автор опроса и респонденты скрыты друг от друга";
+"default_option" = "Обычный";
+"default_description" = "Публичный опрос, участвовать могут все, не анонимный";
+"private_option" = "Частный";
+"private_description" = "Частный опрос, доступ предоставляется по ссылке";
