@@ -10,6 +10,10 @@ import UIKit
 
 class PollCreationView: UIView {
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -114,6 +118,11 @@ class PollCreationView: UIView {
             }
         }
     }
+    var imageItems: [ImageItem] = [
+                ImageItem(title: "One", image: UIImage(systemName: "mic.fill")!),
+                ImageItem(title: "Two", image: UIImage(systemName: "sunset.fill")!),
+//                ImageItem(title: "Three", image: UIImage(systemName: "message.fill")!)
+            ]
     
     // MARK: - UI Properties
     private var fontSize: CGFloat = .zero
@@ -132,7 +141,13 @@ class PollCreationView: UIView {
                 guard let v =  $0 as? UITextView else { return }
                 v.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             }
-//            pollURLSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+            pollURLSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+            if #available(iOS 14, *) {
+                guard let v = imagesContainer as? ImageSelectionCollectionView else { return }
+                v.color = color
+            } else {
+                // Fallback on earlier versions
+            }
         }
     }
     private var lines: [Line] = []
@@ -144,7 +159,9 @@ class PollCreationView: UIView {
     private var pollURLObserver: NSKeyValueObservation?
     private var pollImagesObserver: NSKeyValueObservation?
     private var pollChoicesObserver: NSKeyValueObservation?
+    private var pollURLTextFieldObserver: NSKeyValueObservation?
     private var isTextFieldEditingEnabled = true
+    private var imagesContainer: (UIView & ImageSelectionProvider)!
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -274,11 +291,11 @@ class PollCreationView: UIView {
             pollURLContainerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         }
     }
-    @IBOutlet weak var pollURLLabel: PaddingLabel! {
+    @IBOutlet weak var pollURLTextField: InsetTextField! {
         didSet {
-            pollURLLabel.isUserInteractionEnabled = true
-            let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
-            pollURLLabel.addGestureRecognizer(tap)
+            pollURLTextField.delegate = self
+            pollURLTextField.placeholder = "url_placeholder".localized
+            pollURLTextField.textColor = .systemBlue
         }
     }
     @IBOutlet weak var pollURLSkip: UIImageView! {
@@ -554,14 +571,15 @@ extension PollCreationView: PollCreationControllerOutput {
                 {
                     [weak self] in guard let self = self else { return }
                     animate(button: self.pollTitleButton, completionBlocks: [
+                        
+                    ])
+                },
+                {
+                    [weak self] in guard let self = self else { return }
+                    reveal(view: self.pollTitleBg, duration: 0.3, completionBlocks: [
                         {
                             [weak self] in guard let self = self else { return }
-                            reveal(view: self.pollTitleBg, duration: 0.2, completionBlocks: [
-                                {
-                                    [weak self] in guard let self = self else { return }
-                                    self.pollTitleTextView.becomeFirstResponder()
-                                }
-                            ])
+                            self.pollTitleTextView.becomeFirstResponder()
                         }
                     ])
                 }
@@ -578,17 +596,19 @@ extension PollCreationView: PollCreationControllerOutput {
                 {
                     [weak self] in guard let self = self else { return }
                     animate(button: self.pollDescriptionButton, completionBlocks: [
+                        
+                    ])
+                },
+                {
+                    [weak self] in guard let self = self else { return }
+                    reveal(view: self.pollDescriptionBg, duration: 0.3, completionBlocks: [
                         {
                             [weak self] in guard let self = self else { return }
-                            reveal(view: self.pollDescriptionBg, duration: 0.2, completionBlocks: [
-                                {
-                                    [weak self] in guard let self = self else { return }
-                                    self.pollDescriptionTextView.becomeFirstResponder()
-                                }
-                            ])
+                            self.pollDescriptionTextView.becomeFirstResponder()
                         }
                     ])
                 }
+
             ])
             
             var startPoint = pollTitleBg.superview!.convert(pollTitleBg.center, to: scrollContentView)
@@ -602,14 +622,15 @@ extension PollCreationView: PollCreationControllerOutput {
                 {
                     [weak self] in guard let self = self else { return }
                     animate(button: self.pollQuestionButton, completionBlocks: [
+                        
+                    ])
+                },
+                {
+                    [weak self] in guard let self = self else { return }
+                    reveal(view: self.pollQuestionBg, duration: 0.3, completionBlocks: [
                         {
                             [weak self] in guard let self = self else { return }
-                            reveal(view: self.pollQuestionBg, duration: 0.2, completionBlocks: [
-                                {
-                                    [weak self] in guard let self = self else { return }
-                                    self.pollQuestionTextView.becomeFirstResponder()
-                                }
-                            ])
+                            self.pollQuestionTextView.becomeFirstResponder()
                         }
                     ])
                 }
@@ -626,9 +647,18 @@ extension PollCreationView: PollCreationControllerOutput {
                 {
                     [weak self] in guard let self = self else { return }
                     animate(button: self.pollURLButton, completionBlocks: [
+//                        {
+//                            [weak self] in guard let self = self else { return }
+//                            reveal(view: self.pollURLBg, duration: 0.2, completionBlocks: [])
+//                        }
+                    ])
+                },
+                {
+                    [weak self] in guard let self = self else { return }
+                    reveal(view: self.pollURLBg, duration: 0.3, completionBlocks: [
                         {
                             [weak self] in guard let self = self else { return }
-                            reveal(view: self.pollURLBg, duration: 0.2, completionBlocks: [])
+                            self.pollURLTextField.becomeFirstResponder()
                         }
                     ])
                 }
@@ -639,6 +669,31 @@ extension PollCreationView: PollCreationControllerOutput {
             var endPoint = pollURLView.superview!.convert(pollURLView.center, to: scrollContentView)
             endPoint.y -= (pollURLStaticLabel.bounds.height + lineWidth)/2
             animateTransition(lineStart: startPoint, lineEnd: endPoint, lineCompletionBlocks: [], animationBlocks: [], completionBlocks: [])
+        case .Images:
+            let scrollPoint = pollImagesView.superview!.convert(pollImagesView.frame.origin, to: scrollContentView)
+            scrollToPoint(y: scrollPoint.y - 30, completionBlocks: [
+                {
+                    [weak self] in guard let self = self else { return }
+                    animate(button: self.pollImagesButton, completionBlocks: [
+                        {
+//                            [weak self] in guard let self = self else { return }
+//                            reveal(view: self.pollImagesBg, duration: 0.2, completionBlocks: [])
+                        }
+                    ])
+                },
+                {
+                    [weak self] in guard let self = self else { return }
+                    reveal(view: self.pollImagesBg, duration: 0.3, completionBlocks: [])
+                }
+            ])
+            
+            var startPoint = pollURLBg.superview!.convert(pollURLBg.center, to: scrollContentView)
+            startPoint.y += (pollURLBg.bounds.height + lineWidth + 30)/2
+            var endPoint = pollImagesView.superview!.convert(pollImagesView.center, to: scrollContentView)
+            endPoint.y -= (pollImagesStaticLabel.bounds.height + lineWidth)/2
+            animateTransition(lineStart: startPoint, lineEnd: endPoint, lineCompletionBlocks: [], animationBlocks: [], completionBlocks: [])
+        case .Ready:
+            scrollView.isScrollEnabled = true
         default:
             fatalError()
         }
@@ -660,6 +715,7 @@ extension PollCreationView {
             guard let v =  $0 as? UITextView else { return }
             v.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
+        pollURLSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     }
     
     private func setupUI() {
@@ -680,6 +736,18 @@ extension PollCreationView {
                                                              size: pollDescriptionTextView.frame.width * 0.05)
         pollQuestionTextView.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold,
                                                        size: pollQuestionTextView.frame.width * 0.075)
+        pollURLTextField.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular,
+                                                       size: pollURLTextField.frame.height * 0.35)
+        pollURLTextField.cornerRadius = pollURLTextField.frame.height / 2
+        
+        ///Disable till all stages are completed
+        scrollView.isScrollEnabled = false
+        if #available(iOS 14, *) {
+            imagesContainer = ImageSelectionCollectionView(dataProvider: self, callbackDelegate: self, color: color)
+            imagesContainer.addEquallyTo(to: pollImagesContainerView)
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
     private func setObservers() {
@@ -725,6 +793,11 @@ extension PollCreationView {
             self.pollChoicesBg.layer.shadowRadius = 7
             self.pollChoicesBg.layer.shadowOffset = .zero
         }
+        pollURLTextFieldObserver = pollURLTextField.observe(\InsetTextField.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+            self.pollURLTextField.cornerRadius = self.pollURLTextField.frame.height / 2
+        }
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidHide), name: UIResponder.keyboardDidHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
     }
     
     private func setupInputViews() {
@@ -833,15 +906,34 @@ extension PollCreationView {
         hotOptionString.append(NSAttributedString(string: "hot_option".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         hotOptionLabel.attributedText = hotOptionString
         
-        
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0) {
-            
-//        }
+        let urlPlaceholder = NSMutableAttributedString()
+        urlPlaceholder.append(NSAttributedString(string: "url_placeholder".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: pollURLTextField.frame.height * 0.35), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        pollURLTextField.attributedPlaceholder = urlPlaceholder
     }
     
     @objc
     private func handleTap(_ recognizer: UITapGestureRecognizer) {
-        print("Tap")
+        guard let v = recognizer.view else { return }
+        if v == pollURLSkip, pollURLTextField.isFirstResponder {
+            pollURLTextField.resignFirstResponder()
+        }
+    }
+    
+    @objc private func keyboardDidHide() {
+        if let recognizer = gestureRecognizers?.filter({ $0.accessibilityValue == "hideKeyboard" }).first {
+            gestureRecognizers?.remove(object: recognizer)
+        }
+    }
+    
+    @objc private func keyboardDidShow() {
+        guard gestureRecognizers.isNil || gestureRecognizers!.filter({ $0.accessibilityValue == "hideKeyboard" }).isEmpty else { return }
+        let touch = UITapGestureRecognizer(target:self, action: #selector(self.hideKeyboard))
+        touch.accessibilityValue = "hideKeyboard"
+        self.addGestureRecognizer(touch)
+    }
+    
+    @objc private func hideKeyboard() {
+        endEditing(true)
     }
 }
 
@@ -969,5 +1061,87 @@ extension PollCreationView: UITextViewDelegate {
         }
         viewInput?.onStageCompleted()
         return true
+    }
+}
+
+extension PollCreationView: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard isTextFieldEditingEnabled else { return false }
+        return true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField === pollURLTextField, let text = textField.text {
+            if !text.isEmpty {
+                guard !text.isValidURL, isTextFieldEditingEnabled else {
+                    pollURLTextField.resignFirstResponder()
+                    UIView.animate(withDuration: 0.15) {
+                        self.pollURLSkip.alpha = 0
+                        self.pollURLSkip.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+                    }
+                    viewInput?.onStageCompleted()
+                    return true
+                }
+                showBanner(bannerDelegate: self,
+                           text: AppError.invalidURL.localizedDescription,
+                           imageContent: ImageSigns.exclamationMark,
+                           shouldDismissAfter: 0.5,
+                           accessibilityIdentifier: "isTextFieldEditingEnabled")
+                isTextFieldEditingEnabled = false
+                return false
+            } else {
+                pollURLTextField.resignFirstResponder()
+                UIView.animate(withDuration: 0.15) {
+                    self.pollURLSkip.alpha = 0
+                    self.pollURLSkip.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+                }
+                viewInput?.onStageCompleted()
+                return true
+            }
+        }
+        return true
+    }
+    
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if textField === pollURLTextField, let text = textField.text {
+            if !text.isEmpty {
+                guard !text.isValidURL, isTextFieldEditingEnabled else {
+                    pollURLTextField.resignFirstResponder()
+                    UIView.animate(withDuration: 0.15) {
+                        self.pollURLSkip.alpha = 0
+                        self.pollURLSkip.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+                    }
+                    viewInput?.onStageCompleted()
+                    return true
+                }
+                showBanner(bannerDelegate: self,
+                           text: AppError.invalidURL.localizedDescription,
+                           imageContent: ImageSigns.exclamationMark,
+                           shouldDismissAfter: 0.5,
+                           accessibilityIdentifier: "isTextFieldEditingEnabled")
+                isTextFieldEditingEnabled = false
+                return false
+            } else {
+                pollURLTextField.resignFirstResponder()
+                UIView.animate(withDuration: 0.15) {
+                    self.pollURLSkip.alpha = 0
+                    self.pollURLSkip.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+                }
+                viewInput?.onStageCompleted()
+                return true
+            }
+        }
+        return true
+    }
+}
+
+extension PollCreationView: ImageSelectionListener {
+    func addImage() {
+        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+            banner.present(subview: UIView(), shouldDismissAfter: 1)
+    }
+    
+    func deleteImage(_ imageItem: ImageItem) {
+        imageItems.remove(object: imageItem)
     }
 }

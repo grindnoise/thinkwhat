@@ -16,6 +16,7 @@
 "image_loading_error" = "Image loading failed";
 "maximum_characters_exceeded" = "Maximum characters exceeded: ";
 "minimum_characters_needed" = "Minimum characters needed: ";
+"invalid_url" = "Invalid URL format";
 
 //Common
 "ok" = "Ok";
@@ -57,7 +58,7 @@
 "edit" = "Edit";
 "progress" = "Progress";
 "people_voted" = "persons";
-
+"delete" = "Delete";
 
 
 //Welcome VC
@@ -187,3 +188,5 @@
 "default_description" = "Public poll, no restrictions, non anonymous";
 "private_option" = "Private";
 "private_description" = "Private poll, access is granted via sharing link";
+
+"url_placeholder" = "Paste URL";

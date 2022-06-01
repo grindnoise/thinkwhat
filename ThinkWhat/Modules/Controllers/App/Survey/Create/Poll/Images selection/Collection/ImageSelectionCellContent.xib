@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ImageSelectionCellContent" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="contentView" destination="iN0-l3-epB" id="IS1-3T-3Jg"/>
+                <outlet property="heightConstraint" destination="OoL-Xv-7DE" id="f3S-am-oF5"/>
+                <outlet property="imageView" destination="Q64-Ed-p2F" id="n6L-pi-qUX"/>
+                <outlet property="textView" destination="L8t-Xk-MOW" id="Sde-bi-JjL"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="300" height="100"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AZd-j2-3sV">
+                    <rect key="frame" x="0.0" y="0.0" width="300" height="100"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Q64-Ed-p2F">
+                            <rect key="frame" x="8" y="8" width="84" height="84"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="Q64-Ed-p2F" secondAttribute="height" multiplier="1:1" id="IGP-rS-A31"/>
+                            </constraints>
+                        </imageView>
+                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="L8t-Xk-MOW">
+                            <rect key="frame" x="100" y="8" width="192" height="84"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                            <color key="textColor" systemColor="labelColor"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                        </textView>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" priority="999" constant="70" id="OoL-Xv-7DE"/>
+                        <constraint firstAttribute="bottom" secondItem="L8t-Xk-MOW" secondAttribute="bottom" constant="8" id="TSo-UX-iSw"/>
+                        <constraint firstItem="Q64-Ed-p2F" firstAttribute="leading" secondItem="AZd-j2-3sV" secondAttribute="leading" constant="8" id="Wi4-cc-tlh"/>
+                        <constraint firstItem="L8t-Xk-MOW" firstAttribute="top" secondItem="AZd-j2-3sV" secondAttribute="top" constant="8" id="Zfq-IO-I9H"/>
+                        <constraint firstAttribute="trailing" secondItem="L8t-Xk-MOW" secondAttribute="trailing" constant="8" id="cWg-H7-OQk"/>
+                        <constraint firstItem="Q64-Ed-p2F" firstAttribute="top" secondItem="AZd-j2-3sV" secondAttribute="top" constant="8" id="dDS-4C-1Zj"/>
+                        <constraint firstAttribute="bottom" secondItem="Q64-Ed-p2F" secondAttribute="bottom" constant="8" id="guS-zn-G0t"/>
+                        <constraint firstItem="L8t-Xk-MOW" firstAttribute="leading" secondItem="Q64-Ed-p2F" secondAttribute="trailing" constant="8" id="qRP-za-SKU"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="AZd-j2-3sV" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="MLp-C0-3PL"/>
+                <constraint firstAttribute="bottom" secondItem="AZd-j2-3sV" secondAttribute="bottom" id="cux-Zf-rag"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="AZd-j2-3sV" secondAttribute="trailing" id="hfm-KY-oNO"/>
+                <constraint firstItem="AZd-j2-3sV" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="jbl-Ch-Goe"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="137.68115942028987" y="83.705357142857139"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

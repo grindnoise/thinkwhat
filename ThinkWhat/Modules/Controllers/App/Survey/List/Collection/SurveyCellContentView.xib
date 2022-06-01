@@ -199,6 +199,9 @@
         <designable name="8dE-Z4-hmW">
             <size key="intrinsicContentSize" width="31" height="14.5"/>
         </designable>
+        <designable name="n48-2N-oRL">
+            <size key="intrinsicContentSize" width="31" height="14.5"/>
+        </designable>
     </designables>
     <resources>
         <systemColor name="systemGray2Color">

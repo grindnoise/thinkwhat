@@ -102,6 +102,12 @@
 		AB38DD722819538A00FFEB3F /* Confirm.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB38DD712819538A00FFEB3F /* Confirm.xib */; };
 		AB38DD76281A776900FFEB3F /* SurveysCollection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB38DD75281A776900FFEB3F /* SurveysCollection.xib */; };
 		AB38DD78281A777200FFEB3F /* SurveysCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB38DD77281A777200FFEB3F /* SurveysCollection.swift */; };
+		AB39F40F2847457200DEE0ED /* InsetTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F40E2847457200DEE0ED /* InsetTextField.swift */; };
+		AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F4112847830300DEE0ED /* ImageSelectionCollectionView.swift */; };
+		AB39F41428478B5C00DEE0ED /* ImageSelectionCellContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F41328478B5C00DEE0ED /* ImageSelectionCellContent.swift */; };
+		AB39F41628478B6400DEE0ED /* ImageSelectionCellContent.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB39F41528478B6400DEE0ED /* ImageSelectionCellContent.xib */; };
+		AB39F4182847A96400DEE0ED /* ImageSelectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F4172847A96400DEE0ED /* ImageSelectionHeader.swift */; };
+		AB39F41B2847C02A00DEE0ED /* ImageSelectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F41A2847C02A00DEE0ED /* ImageSelectionProvider.swift */; };
 		AB3A47CB283F599C00106407 /* PollCreationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A47C9283F599C00106407 /* PollCreationController.swift */; };
 		AB3A47CC283F599C00106407 /* PollCreationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB3A47CA283F599C00106407 /* PollCreationController.xib */; };
 		AB3A47D1283F59D200106407 /* PollCreationContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A47CD283F59D200106407 /* PollCreationContract.swift */; };
@@ -593,6 +599,12 @@
 		AB38DD712819538A00FFEB3F /* Confirm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Confirm.xib; sourceTree = "<group>"; };
 		AB38DD75281A776900FFEB3F /* SurveysCollection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveysCollection.xib; sourceTree = "<group>"; };
 		AB38DD77281A777200FFEB3F /* SurveysCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveysCollection.swift; sourceTree = "<group>"; };
+		AB39F40E2847457200DEE0ED /* InsetTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetTextField.swift; sourceTree = "<group>"; };
+		AB39F4112847830300DEE0ED /* ImageSelectionCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionCollectionView.swift; sourceTree = "<group>"; };
+		AB39F41328478B5C00DEE0ED /* ImageSelectionCellContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionCellContent.swift; sourceTree = "<group>"; };
+		AB39F41528478B6400DEE0ED /* ImageSelectionCellContent.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageSelectionCellContent.xib; sourceTree = "<group>"; };
+		AB39F4172847A96400DEE0ED /* ImageSelectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionHeader.swift; sourceTree = "<group>"; };
+		AB39F41A2847C02A00DEE0ED /* ImageSelectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionProvider.swift; sourceTree = "<group>"; };
 		AB3A47C9283F599C00106407 /* PollCreationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollCreationController.swift; sourceTree = "<group>"; };
 		AB3A47CA283F599C00106407 /* PollCreationController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PollCreationController.xib; sourceTree = "<group>"; };
 		AB3A47CD283F59D200106407 /* PollCreationContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollCreationContract.swift; sourceTree = "<group>"; };
@@ -1351,6 +1363,7 @@
 		AB38DD73281A76FE00FFEB3F /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				AB39F40E2847457200DEE0ED /* InsetTextField.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1364,6 +1377,26 @@
 				AB16401D281A9C8D001F33F8 /* SurveyCellContentView.swift */,
 				AB16401F281A9C95001F33F8 /* SurveyCellContentView.xib */,
 				AB29925A28228723009E0834 /* TriangleView.swift */,
+			);
+			path = Collection;
+			sourceTree = "<group>";
+		};
+		AB39F410284782AE00DEE0ED /* Images selection */ = {
+			isa = PBXGroup;
+			children = (
+				AB39F41A2847C02A00DEE0ED /* ImageSelectionProvider.swift */,
+				AB39F4192847BFB700DEE0ED /* Collection */,
+			);
+			path = "Images selection";
+			sourceTree = "<group>";
+		};
+		AB39F4192847BFB700DEE0ED /* Collection */ = {
+			isa = PBXGroup;
+			children = (
+				AB39F4112847830300DEE0ED /* ImageSelectionCollectionView.swift */,
+				AB39F41328478B5C00DEE0ED /* ImageSelectionCellContent.swift */,
+				AB39F41528478B6400DEE0ED /* ImageSelectionCellContent.xib */,
+				AB39F4172847A96400DEE0ED /* ImageSelectionHeader.swift */,
 			);
 			path = Collection;
 			sourceTree = "<group>";
@@ -1392,6 +1425,7 @@
 		AB3A47C8283F597800106407 /* Poll */ = {
 			isa = PBXGroup;
 			children = (
+				AB39F410284782AE00DEE0ED /* Images selection */,
 				AB63D7D4283FBFB100173116 /* Popup content */,
 				AB3A47C9283F599C00106407 /* PollCreationController.swift */,
 				AB3A47CA283F599C00106407 /* PollCreationController.xib */,
@@ -2869,6 +2903,7 @@
 				AB217964275797F700D19567 /* InterestCollectionCell.xib in Resources */,
 				ABF27579280EB0B80023CD1F /* VotersController.xib in Resources */,
 				AB3C6851223FD3EF00B57580 /* OpenSans-ExtraBoldItalic.ttf in Resources */,
+				AB39F41628478B6400DEE0ED /* ImageSelectionCellContent.xib in Resources */,
 				ABA448DF27E874BD00F8E00D /* StarView.xib in Resources */,
 				ABADF5A827F73CCB00A26474 /* PlainBannerContent.xib in Resources */,
 				AB7AEFB8273BDB1400431E85 /* delUserCell.xib in Resources */,
@@ -3091,6 +3126,7 @@
 				AB0F1E79283D2E550044BA97 /* SurveyCreationController.swift in Sources */,
 				ABF2758F28151EE50023CD1F /* UINavigationController.swift in Sources */,
 				AB869F2826C53313008353B3 /* delPollController.swift in Sources */,
+				AB39F4182847A96400DEE0ED /* ImageSelectionHeader.swift in Sources */,
 				ABA448E327EC627D00F8E00D /* APIUnavailableView.swift in Sources */,
 				ABB9E885279EA6510018BB2E /* WelcomeContract.swift in Sources */,
 				AB883B312804391200DBE4EF /* VoteMessage.swift in Sources */,
@@ -3185,6 +3221,7 @@
 				AB52B734240E5D4B006DBDA8 /* ReadySign.swift in Sources */,
 				AB016BFE26CA73BA005C5A87 /* ButtonWithImage.swift in Sources */,
 				AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */,
+				AB39F41428478B5C00DEE0ED /* ImageSelectionCellContent.swift in Sources */,
 				AB38DD5C2817F15400FFEB3F /* SubscribersController.swift in Sources */,
 				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
 				AB2AA1AE235605FD0086D16C /* InfoViewController.swift in Sources */,
@@ -3261,6 +3298,7 @@
 				AB72961027DA2F0F00D45B54 /* HotModel.swift in Sources */,
 				ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */,
 				ABF01A6C25418E2C009E2BC4 /* BackRoundedButton.swift in Sources */,
+				AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */,
 				AB6B071F247688600095721B /* delUserViewController.swift in Sources */,
 				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
@@ -3282,6 +3320,7 @@
 				AB10030A27BEB83E00338EE4 /* Localizable.swift in Sources */,
 				AB63D7D6283FC03A00173116 /* TopicSelection.swift in Sources */,
 				AB238D1C27905859009E49C2 /* AppSettings.swift in Sources */,
+				AB39F40F2847457200DEE0ED /* InsetTextField.swift in Sources */,
 				AB29925B28228723009E0834 /* TriangleView.swift in Sources */,
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				AB4727A9268C6444002A9563 /* UI.swift in Sources */,
@@ -3363,6 +3402,7 @@
 				AB334FB9270C423400DD7332 /* ClockIndicator.swift in Sources */,
 				ABADF59C27F7066300A26474 /* Banner.swift in Sources */,
 				AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */,
+				AB39F41B2847C02A00DEE0ED /* ImageSelectionProvider.swift in Sources */,
 				AB463FB327C3FADD007D7240 /* SearchTextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

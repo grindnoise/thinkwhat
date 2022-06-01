@@ -16,6 +16,7 @@
 "image_loading_error" = "Произошла ошибка, изображение не было загружено";
 "maximum_characters_exceeded" = "Превышено максимальное количество: ";
 "minimum_characters_needed" = "Минимальное количество симоволов: ";
+"invalid_url" = "Некорректный формат ссылки";
 
 //Common
 "ok" = "Хорошо";
@@ -57,7 +58,7 @@
 "edit" = "Изменить";
 "progress" = "Прогресс";
 "people_voted" = "человек";
-
+"delete" = "Удалить";
 
 
 //Welcome VC
@@ -187,3 +188,5 @@
 "default_description" = "Публичный опрос, участвовать могут все, не анонимный";
 "private_option" = "Частный";
 "private_description" = "Частный опрос, доступ предоставляется по ссылке";
+
+"url_placeholder" = "Вставьте ссылку";

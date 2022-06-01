@@ -163,6 +163,13 @@ extension String {
         return emailTest.evaluate(with: self)
     }
     
+    var isValidURL: Bool {
+        if let url = URL(string: self) {
+            return UIApplication.shared.canOpenURL(url)
+        }
+        return false
+    }
+    
     var encodedURL : String
     {
         return self.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed)!

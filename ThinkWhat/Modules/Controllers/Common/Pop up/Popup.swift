@@ -118,7 +118,7 @@ class Popup: UIView {
         bannerDelegate?.onBannerWillAppear(self)
         alpha = 1
         UIView.animate(
-            withDuration: 0.4,
+            withDuration: 0.45,
             delay: 0,
             usingSpringWithDamping: 0.7,
             initialSpringVelocity: 0.4,
@@ -133,7 +133,7 @@ class Popup: UIView {
             self.bannerDelegate?.onBannerDidAppear(self)
         }
         
-        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
             self.background.alpha = 1
         })
     }
@@ -147,7 +147,7 @@ class Popup: UIView {
             self.accessibilityIdentifier = sender as? String
             self.bannerDelegate?.onBannerDidDisappear(self)
         }
-        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
             self.setNeedsLayout()
             self.centerYConstraint.constant += abs(self.yOrigin)
             self.layoutIfNeeded()

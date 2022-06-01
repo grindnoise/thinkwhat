@@ -1,0 +1,24 @@
+//
+//  ImageSelection.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 01.06.2022.
+//  Copyright © 2022 Pavel Bukharov. All rights reserved.
+//
+
+import Foundation
+import UIKit
+
+protocol ImageSelectionProvider: class {
+    var dataItems: [ImageItem] { get }
+    var callbackDelegate: CallbackObservable? { get set }
+    var listener: ImageSelectionListener! { get }
+}
+
+protocol ImageSelectionListener: class {
+    var imageItems: [ImageItem] { get set }
+    
+    func addImage()
+    func deleteImage(_: ImageItem)
+}
+

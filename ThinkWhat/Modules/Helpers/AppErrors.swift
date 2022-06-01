@@ -12,6 +12,7 @@ enum AppError: Error {
     case webContent
     case tikTokContent
     case imageDownload
+    case invalidURL
     case server
     case maximumCharactersExceeded(maxValue: Int)
     case minimumCharactersExceeded(minValue: Int)
@@ -32,6 +33,8 @@ extension AppError: LocalizedError {
             return "maximum_characters_exceeded".localized + String(describing: maxValue)
         case .minimumCharactersExceeded(let minValue):
             return "minimum_characters_needed".localized + String(describing: minValue)
+        case .invalidURL:
+            return "invalid_url".localized
         }
     }
 }
