@@ -116,7 +116,8 @@ class ModelProperties {
     private var _surveyAnswerTextMinLength:  Int = 0
     private var _surveyAnswerTextMaxLength:  Int = 0
     private var _surveyAnswerMaxFreeCount:   Int = 0
-    
+    private var _surveyMediaTitleMinLength:  Int = 0
+    private var _surveyMediaTitleMaxLength:  Int = 0
 
     var surveyTitleMinLength:       Int { return { _surveyTitleMinLength }()}
     var surveyTitleMaxLength:       Int { return { _surveyTitleMaxLength }()}
@@ -127,8 +128,10 @@ class ModelProperties {
     var surveyAnswerTextMinLength:  Int { return { _surveyAnswerTextMinLength }()}
     var surveyAnswerTextMaxLength:  Int { return { _surveyAnswerTextMaxLength }()}
     var surveyAnswerMaxFreeCount:   Int { return { _surveyAnswerMaxFreeCount }()}
-    var surveyQuestionMinLength:  Int { return { _surveyQuestionMinLength }()}
-    var surveyQuestionMaxLength:   Int { return { _surveyQuestionMaxLength }()}
+    var surveyQuestionMinLength:    Int { return { _surveyQuestionMinLength }()}
+    var surveyQuestionMaxLength:    Int { return { _surveyQuestionMaxLength }()}
+    var surveyMediaTitleMinLength:  Int { return { _surveyMediaTitleMinLength }()}
+    var surveyMediaTitleMaxLength:  Int { return { _surveyMediaTitleMaxLength }()}
     
     func importJson(_ json: JSON) {
         for i in json {
@@ -155,6 +158,13 @@ class ModelProperties {
                         _surveyAnswerTextMaxLength = dict["max_length"]!
                     } else if j.0 == "free_count", let value = j.1.intValue as? Int {
                         _surveyAnswerMaxFreeCount = value
+                    }
+                }
+            } else if i.0 == "survey_media" {
+                for j in i.1 {
+                    if j.0 == "title", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
+                        _surveyMediaTitleMinLength = dict["min_length"]!
+                        _surveyMediaTitleMaxLength = dict["max_length"]!
                     }
                 }
             }

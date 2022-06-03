@@ -17,6 +17,7 @@
 "maximum_characters_exceeded" = "Maximum characters exceeded: ";
 "minimum_characters_needed" = "Minimum characters needed: ";
 "invalid_url" = "Invalid URL format";
+"images_limit" = "You can attach no maore than 3 images";
 
 //Common
 "ok" = "Ok";
@@ -190,3 +191,7 @@
 "private_description" = "Private poll, access is granted via sharing link";
 
 "url_placeholder" = "Paste URL";
+"choose_image" = "Сhoose image";
+"edit_image" = "Edit image";
+
+"total_images" = " images";

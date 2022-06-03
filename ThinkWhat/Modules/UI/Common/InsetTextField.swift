@@ -10,7 +10,7 @@ import UIKit
 
 class InsetTextField: UITextField {
 
-    var padding: UIEdgeInsets = UIEdgeInsets(top: 0, left: 18, bottom: 0, right: 20) {
+    var insets: UIEdgeInsets = UIEdgeInsets(top: 0, left: 18, bottom: 0, right: 20) {
         didSet {
             setNeedsLayout()
             layoutIfNeeded()
@@ -18,14 +18,14 @@ class InsetTextField: UITextField {
     }
 
     override open func textRect(forBounds bounds: CGRect) -> CGRect {
-        return bounds.inset(by: padding)
+        return bounds.inset(by: insets)
     }
 
     override open func placeholderRect(forBounds bounds: CGRect) -> CGRect {
-        return bounds.inset(by: padding)
+        return bounds.inset(by: insets)
     }
 
     override open func editingRect(forBounds bounds: CGRect) -> CGRect {
-        return bounds.inset(by: padding)
+        return bounds.inset(by: insets)
     }
 }

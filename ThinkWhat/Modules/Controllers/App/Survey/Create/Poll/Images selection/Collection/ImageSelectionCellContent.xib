@@ -12,9 +12,9 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ImageSelectionCellContent" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
                 <outlet property="contentView" destination="iN0-l3-epB" id="IS1-3T-3Jg"/>
+                <outlet property="descriptionLabel" destination="3Fr-R8-2nQ" id="3cf-4I-vKZ"/>
                 <outlet property="heightConstraint" destination="OoL-Xv-7DE" id="f3S-am-oF5"/>
                 <outlet property="imageView" destination="Q64-Ed-p2F" id="n6L-pi-qUX"/>
-                <outlet property="textView" destination="L8t-Xk-MOW" id="Sde-bi-JjL"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -31,25 +31,23 @@
                                 <constraint firstAttribute="width" secondItem="Q64-Ed-p2F" secondAttribute="height" multiplier="1:1" id="IGP-rS-A31"/>
                             </constraints>
                         </imageView>
-                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="L8t-Xk-MOW">
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Fr-R8-2nQ" customClass="InsetLabel" customModule="ThinkWhat" customModuleProvider="target">
                             <rect key="frame" x="100" y="8" width="192" height="84"/>
-                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
-                            <color key="textColor" systemColor="labelColor"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                        </textView>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
+                        <constraint firstItem="3Fr-R8-2nQ" firstAttribute="leading" secondItem="Q64-Ed-p2F" secondAttribute="trailing" constant="8" id="FMg-3B-1Yc"/>
+                        <constraint firstAttribute="bottom" secondItem="3Fr-R8-2nQ" secondAttribute="bottom" constant="8" id="Lek-Qe-tI3"/>
                         <constraint firstAttribute="height" priority="999" constant="70" id="OoL-Xv-7DE"/>
-                        <constraint firstAttribute="bottom" secondItem="L8t-Xk-MOW" secondAttribute="bottom" constant="8" id="TSo-UX-iSw"/>
                         <constraint firstItem="Q64-Ed-p2F" firstAttribute="leading" secondItem="AZd-j2-3sV" secondAttribute="leading" constant="8" id="Wi4-cc-tlh"/>
-                        <constraint firstItem="L8t-Xk-MOW" firstAttribute="top" secondItem="AZd-j2-3sV" secondAttribute="top" constant="8" id="Zfq-IO-I9H"/>
-                        <constraint firstAttribute="trailing" secondItem="L8t-Xk-MOW" secondAttribute="trailing" constant="8" id="cWg-H7-OQk"/>
                         <constraint firstItem="Q64-Ed-p2F" firstAttribute="top" secondItem="AZd-j2-3sV" secondAttribute="top" constant="8" id="dDS-4C-1Zj"/>
                         <constraint firstAttribute="bottom" secondItem="Q64-Ed-p2F" secondAttribute="bottom" constant="8" id="guS-zn-G0t"/>
-                        <constraint firstItem="L8t-Xk-MOW" firstAttribute="leading" secondItem="Q64-Ed-p2F" secondAttribute="trailing" constant="8" id="qRP-za-SKU"/>
+                        <constraint firstAttribute="trailing" secondItem="3Fr-R8-2nQ" secondAttribute="trailing" constant="8" id="n1W-ji-V1m"/>
+                        <constraint firstItem="3Fr-R8-2nQ" firstAttribute="top" secondItem="AZd-j2-3sV" secondAttribute="top" constant="8" id="nfC-SL-7dc"/>
                     </constraints>
                 </view>
             </subviews>
@@ -66,9 +64,6 @@
         </view>
     </objects>
     <resources>
-        <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

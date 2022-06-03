@@ -15,7 +15,7 @@ class HyperlinkSelectionViewController: UIViewController {
         print("***HyperlinkSelectionViewController deinit***")
     }
 
-    @IBOutlet weak var hyperlinkLabel: PaddingLabel! {
+    @IBOutlet weak var hyperlinkLabel: InsetLabel! {
         didSet {
             hyperlinkLabel.font = font
             hyperlinkLabel.textColor = textColor

@@ -120,7 +120,7 @@ class Popup: UIView {
         UIView.animate(
             withDuration: 0.45,
             delay: 0,
-            usingSpringWithDamping: 0.7,
+            usingSpringWithDamping: 0.75,
             initialSpringVelocity: 0.4,
             options: [.curveEaseInOut],
             animations: {
@@ -140,14 +140,14 @@ class Popup: UIView {
     
     func dismiss(_ sender: Optional<Any> = nil) {
         bannerDelegate?.onBannerWillDisappear(self)
-        UIView.animate(withDuration: 0.4, delay: 0, options: [.curveLinear], animations: {
+        UIView.animate(withDuration: 0.35, delay: 0, options: [.curveLinear], animations: {
             self.background.alpha = 0
         }) {
             _ in
             self.accessibilityIdentifier = sender as? String
             self.bannerDelegate?.onBannerDidDisappear(self)
         }
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+        UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
             self.setNeedsLayout()
             self.centerYConstraint.constant += abs(self.yOrigin)
             self.layoutIfNeeded()
@@ -206,6 +206,9 @@ extension Popup: CallbackObservable {
                 dismiss()
             }
         } else if sender is PollCreationController.Option {
+            callbackDelegate?.callbackReceived(sender)
+            dismiss()
+        } else if sender is ImageItem {
             callbackDelegate?.callbackReceived(sender)
             dismiss()
         }

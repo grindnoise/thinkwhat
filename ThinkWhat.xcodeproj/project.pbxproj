@@ -175,6 +175,8 @@
 		AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */; };
 		AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */; };
 		AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */; };
+		AB42E339284A45C600F4487B /* TopicSelectionModernCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB42E338284A45C600F4487B /* TopicSelectionModernCollectionView.swift */; };
+		AB42E33B284A4ED200F4487B /* TopicSelectionModernContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB42E33A284A4ED200F4487B /* TopicSelectionModernContent.swift */; };
 		AB43A56025E63BB800BF8749 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */; };
 		AB4428B2282BCBD500D5628E /* SurveyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4428B0282BCBD500D5628E /* SurveyCell.swift */; };
 		AB4428B3282BCBD500D5628E /* SurveyCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB4428B1282BCBD500D5628E /* SurveyCell.xib */; };
@@ -433,6 +435,9 @@
 		ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC571235EE99B00E6A118 /* TagLabel.swift */; };
 		ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC573235F384600E6A118 /* ProgressCirle.swift */; };
 		ABCDE35F260C7D3300ACF5A6 /* VerticalTextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDE35E260C7D3300ACF5A6 /* VerticalTextLayer.swift */; };
+		ABCE775928488C8E001E3413 /* ImageSelectionPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCE775828488C8E001E3413 /* ImageSelectionPopup.swift */; };
+		ABCE775B28489342001E3413 /* ImageSelectionPopup.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */; };
+		ABCE775D2848D378001E3413 /* InsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCE775C2848D378001E3413 /* InsetLabel.swift */; };
 		ABD639A427A5B0C50020958F /* ReCAPTCHAViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD639A127A5B0C40020958F /* ReCAPTCHAViewModel.swift */; };
 		ABD639A527A5B0C50020958F /* ReCAPTCHAViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD639A227A5B0C50020958F /* ReCAPTCHAViewController.swift */; };
 		ABD639A627A5B0C50020958F /* recaptcha.html in Resources */ = {isa = PBXBuildFile; fileRef = ABD639A327A5B0C50020958F /* recaptcha.html */; };
@@ -678,6 +683,8 @@
 		AB3EF63F22F4480C004BA878 /* MailValidationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailValidationViewController.swift; sourceTree = "<group>"; };
 		AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationCodeTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryUserCredentials.swift; sourceTree = "<group>"; };
+		AB42E338284A45C600F4487B /* TopicSelectionModernCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelectionModernCollectionView.swift; sourceTree = "<group>"; };
+		AB42E33A284A4ED200F4487B /* TopicSelectionModernContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelectionModernContent.swift; sourceTree = "<group>"; };
 		AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
 		AB4428B0282BCBD500D5628E /* SurveyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCell.swift; sourceTree = "<group>"; };
 		AB4428B1282BCBD500D5628E /* SurveyCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyCell.xib; sourceTree = "<group>"; };
@@ -940,6 +947,9 @@
 		ABCAC571235EE99B00E6A118 /* TagLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagLabel.swift; sourceTree = "<group>"; };
 		ABCAC573235F384600E6A118 /* ProgressCirle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCirle.swift; sourceTree = "<group>"; };
 		ABCDE35E260C7D3300ACF5A6 /* VerticalTextLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalTextLayer.swift; sourceTree = "<group>"; };
+		ABCE775828488C8E001E3413 /* ImageSelectionPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionPopup.swift; sourceTree = "<group>"; };
+		ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageSelectionPopup.xib; sourceTree = "<group>"; };
+		ABCE775C2848D378001E3413 /* InsetLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetLabel.swift; sourceTree = "<group>"; };
 		ABD639A127A5B0C40020958F /* ReCAPTCHAViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReCAPTCHAViewModel.swift; sourceTree = "<group>"; };
 		ABD639A227A5B0C50020958F /* ReCAPTCHAViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReCAPTCHAViewController.swift; sourceTree = "<group>"; };
 		ABD639A327A5B0C50020958F /* recaptcha.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = recaptcha.html; sourceTree = "<group>"; };
@@ -1364,6 +1374,7 @@
 			isa = PBXGroup;
 			children = (
 				AB39F40E2847457200DEE0ED /* InsetTextField.swift */,
+				ABCE775C2848D378001E3413 /* InsetLabel.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1688,6 +1699,15 @@
 			path = Storyboards;
 			sourceTree = "<group>";
 		};
+		AB42E337284A458400F4487B /* Topic selection modern */ = {
+			isa = PBXGroup;
+			children = (
+				AB42E338284A45C600F4487B /* TopicSelectionModernCollectionView.swift */,
+				AB42E33A284A4ED200F4487B /* TopicSelectionModernContent.swift */,
+			);
+			path = "Topic selection modern";
+			sourceTree = "<group>";
+		};
 		AB463FB127C3FABF007D7240 /* Custom classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -1748,6 +1768,8 @@
 		AB63D7D4283FBFB100173116 /* Popup content */ = {
 			isa = PBXGroup;
 			children = (
+				AB42E337284A458400F4487B /* Topic selection modern */,
+				ABCE775728488C4F001E3413 /* Image selection */,
 				ABE065052844B55000877D92 /* Options selection */,
 				ABE065042844B54000877D92 /* Topic selection */,
 			);
@@ -2551,6 +2573,15 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		ABCE775728488C4F001E3413 /* Image selection */ = {
+			isa = PBXGroup;
+			children = (
+				ABCE775828488C8E001E3413 /* ImageSelectionPopup.swift */,
+				ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */,
+			);
+			path = "Image selection";
+			sourceTree = "<group>";
+		};
 		ABD6399A27A5B0590020958F /* Captcha */ = {
 			isa = PBXGroup;
 			children = (
@@ -2915,6 +2946,7 @@
 				ABADF5A027F7074100A26474 /* Banner.xib in Resources */,
 				AB3AF36C2834FC5900160F0C /* CurrentUserProfileView.xib in Resources */,
 				AB5EB60223630AC0000D4D96 /* SubcategoryTableViewCell.xib in Resources */,
+				ABCE775B28489342001E3413 /* ImageSelectionPopup.xib in Resources */,
 				AB9998C82805B1AC009D0E4F /* ClaimCell.xib in Resources */,
 				AB913F8328086E1A00609D51 /* StatisticsCell.xib in Resources */,
 				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
@@ -3163,6 +3195,7 @@
 				AB3CCB3428376EDA0024372B /* Device.swift in Sources */,
 				AB6083C122410131002C0D7E /* ValidSign.swift in Sources */,
 				ABF2758B28102AE40023CD1F /* VotersFilter.swift in Sources */,
+				AB42E33B284A4ED200F4487B /* TopicSelectionModernContent.swift in Sources */,
 				AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
 				AB0AB63227B3DF2B006FD33F /* GoogleWorker.swift in Sources */,
@@ -3260,6 +3293,7 @@
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
 				AB72964327DB60C800D45B54 /* SettingsController.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */,
+				ABCE775D2848D378001E3413 /* InsetLabel.swift in Sources */,
 				AB16401A281A9B86001F33F8 /* SurveyCollectionCell.swift in Sources */,
 				ABADF57E27F2082B00A26474 /* HyperlinkCell.swift in Sources */,
 				AB38DD652817F18900FFEB3F /* SubscribersView.swift in Sources */,
@@ -3300,6 +3334,7 @@
 				ABF01A6C25418E2C009E2BC4 /* BackRoundedButton.swift in Sources */,
 				AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */,
 				AB6B071F247688600095721B /* delUserViewController.swift in Sources */,
+				ABCE775928488C8E001E3413 /* ImageSelectionPopup.swift in Sources */,
 				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
 				AB91195526C3AB1D007ED54A /* VotesFormula.swift in Sources */,
@@ -3333,6 +3368,7 @@
 				AB74A7F52833F2EB00B93522 /* SettingsSwitch.swift in Sources */,
 				AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */,
 				ABA448E027E874BD00F8E00D /* StarView.swift in Sources */,
+				AB42E339284A45C600F4487B /* TopicSelectionModernCollectionView.swift in Sources */,
 				AB229D842464512500968D52 /* del_Segues.swift in Sources */,
 				AB98307D27B68811002C5132 /* LoginModel.swift in Sources */,
 				ABADF5A227F7097F00A26474 /* BannerObservable.swift in Sources */,

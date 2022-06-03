@@ -1635,22 +1635,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "E776F81A-A145-4A9D-A76F-D9B1D6B4A307"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Survey/List/Collection/SurveyCollectionCell.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "76"
-            endingLineNumber = "76"
-            landmarkName = "updateConfiguration(using:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "F1C7BA25-9E98-49BF-862A-830005F6A6D2"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -2272,16 +2256,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "19945970-953E-45B6-83D5-E1D1460F9199"
+            uuid = "E80730CD-01FF-40A4-88B0-4CA5E2BA550B"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Create/Poll/PollCreationView.swift"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/List/Collection/SurveyCollectionCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1074"
-            endingLineNumber = "1074"
-            landmarkName = "textFieldShouldReturn(_:)"
+            startingLineNumber = "111"
+            endingLineNumber = "111"
+            landmarkName = "updated(for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

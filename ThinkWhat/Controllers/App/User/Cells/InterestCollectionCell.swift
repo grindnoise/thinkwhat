@@ -17,7 +17,7 @@ class InterestCollectionCell: UICollectionViewCell, CollectionCellAutoLayout {
         return preferredLayoutAttributes(layoutAttributes)
     }
     
-    @IBOutlet weak var categoryLabel: InsetLabel! {
+    @IBOutlet weak var categoryLabel: InsetLabelDesignable! {
         didSet {
             categoryLabel.leftInset = 6
             categoryLabel.rightInset = 6

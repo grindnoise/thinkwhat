@@ -111,18 +111,14 @@ class PollCreationView: UIView {
 //                        self.viewInput?.onStageCompleted()
                     }
                 }
-                try await Task.sleep(nanoseconds: UInt64(0.5 * 1_000_000_000))
+                try await Task.sleep(nanoseconds: UInt64(0.25 * 1_000_000_000))
                 await MainActor.run {
                     viewInput?.onStageCompleted()
                 }
             }
         }
     }
-    var imageItems: [ImageItem] = [
-                ImageItem(title: "One", image: UIImage(systemName: "mic.fill")!),
-                ImageItem(title: "Two", image: UIImage(systemName: "sunset.fill")!),
-//                ImageItem(title: "Three", image: UIImage(systemName: "message.fill")!)
-            ]
+    var imageItems: [ImageItem] = []
     
     // MARK: - UI Properties
     private var fontSize: CGFloat = .zero
@@ -142,6 +138,7 @@ class PollCreationView: UIView {
                 v.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             }
             pollURLSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+            pollImagesSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             if #available(iOS 14, *) {
                 guard let v = imagesContainer as? ImageSelectionCollectionView else { return }
                 v.color = color
@@ -153,13 +150,14 @@ class PollCreationView: UIView {
     private var lines: [Line] = []
     private var lineWidth: CGFloat = .zero
     private var lineAnimationDuration = 0.3
-    private var pollTitleObserver: NSKeyValueObservation?
-    private var pollDescriptionObserver: NSKeyValueObservation?
-    private var pollQuestionObserver: NSKeyValueObservation?
-    private var pollURLObserver: NSKeyValueObservation?
-    private var pollImagesObserver: NSKeyValueObservation?
-    private var pollChoicesObserver: NSKeyValueObservation?
-    private var pollURLTextFieldObserver: NSKeyValueObservation?
+    private var observers: [NSKeyValueObservation] = []
+//    private var pollTitleObserver: NSKeyValueObservation?
+//    private var pollDescriptionObserver: NSKeyValueObservation?
+//    private var pollQuestionObserver: NSKeyValueObservation?
+//    private var pollURLObserver: NSKeyValueObservation?
+//    private var pollImagesObserver: NSKeyValueObservation?
+//    private var pollChoicesObserver: NSKeyValueObservation?
+//    private var pollURLTextFieldObserver: NSKeyValueObservation?
     private var isTextFieldEditingEnabled = true
     private var imagesContainer: (UIView & ImageSelectionProvider)!
     
@@ -322,11 +320,22 @@ class PollCreationView: UIView {
         }
     }
     @IBOutlet weak var pollImagesBg: UIView!
-    @IBOutlet weak var pollImagesContainerView: UIView! {
+    @IBOutlet weak var pollImagesFg: UIView! {
         didSet {
-            pollImagesContainerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+            pollImagesFg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         }
     }
+    @IBOutlet weak var pollImagesTemp: UIView!
+    @IBOutlet weak var pollImagesContainerView: UIView!
+    @IBOutlet weak var pollImagesSkip: UIImageView! {
+        didSet {
+            pollImagesSkip.isUserInteractionEnabled = true
+            let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+            pollImagesSkip.addGestureRecognizer(tap)
+            pollImagesSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        }
+    }
+    
     
     ///Poll description
     @IBOutlet weak var pollChoicesView: UIView!
@@ -550,8 +559,14 @@ extension PollCreationView: PollCreationControllerOutput {
         case .Topic:
             animate(button: topicButton, completionBlocks: [
                 { [weak self] in guard let self = self else { return }; self.topicButton.state = .On},
-                { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-                    banner.present(subview: TopicSelection(isModal: true, callbackDelegate: banner))}
+                { [weak self] in guard let self = self else { return }
+                    let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+                    if #available(iOS 14, *) {
+                        banner.present(subview: TopicSelectionModernCollectionView(callbackDelegate: banner))
+                    } else {
+                        banner.present(subview: TopicSelection(isModal: true, callbackDelegate: banner))
+                    }
+                }
             ])
             
         case .Options:
@@ -716,6 +731,7 @@ extension PollCreationView {
             v.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
         pollURLSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        pollImagesSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     }
     
     private func setupUI() {
@@ -751,51 +767,60 @@ extension PollCreationView {
     }
     
     private func setObservers() {
-        pollTitleObserver = pollTitleBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+        observers.append(pollTitleBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             self.pollTitleBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
             self.pollTitleBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollTitleBg.bounds,
                                                              cornerRadius: self.pollTitleBg.frame.width * 0.05).cgPath
             self.pollTitleBg.layer.shadowRadius = 7
             self.pollTitleBg.layer.shadowOffset = .zero
-        }
-        pollDescriptionObserver = pollDescriptionBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+        })
+        observers.append(pollDescriptionBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             self.pollDescriptionBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
             self.pollDescriptionBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollDescriptionBg.bounds,
                                                              cornerRadius: self.pollDescriptionBg.frame.width * 0.05).cgPath
             self.pollDescriptionBg.layer.shadowRadius = 7
             self.pollDescriptionBg.layer.shadowOffset = .zero
-        }
-        pollQuestionObserver = pollQuestionBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+        })
+        observers.append(pollQuestionBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             self.pollQuestionBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
             self.pollQuestionBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollQuestionBg.bounds,
                                                              cornerRadius: self.pollQuestionBg.frame.width * 0.05).cgPath
             self.pollQuestionBg.layer.shadowRadius = 7
             self.pollQuestionBg.layer.shadowOffset = .zero
-        }
-        pollURLObserver = pollURLBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+        })
+        observers.append(pollURLBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             self.pollURLBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
             self.pollURLBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollURLBg.bounds,
                                                              cornerRadius: self.pollURLBg.frame.width * 0.05).cgPath
             self.pollURLBg.layer.shadowRadius = 7
             self.pollURLBg.layer.shadowOffset = .zero
-        }
-        pollImagesObserver = pollImagesBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+        })
+        observers.append(pollImagesBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             self.pollImagesBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
             self.pollImagesBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollImagesBg.bounds,
-                                                             cornerRadius: self.pollImagesBg.frame.width * 0.05).cgPath
+                                                              cornerRadius: self.pollImagesBg.frame.width * 0.05).cgPath
             self.pollImagesBg.layer.shadowRadius = 7
             self.pollImagesBg.layer.shadowOffset = .zero
-        }
-        pollChoicesObserver = pollChoicesBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+        })
+        observers.append(pollChoicesBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             self.pollChoicesBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
             self.pollChoicesBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollChoicesBg.bounds,
-                                                             cornerRadius: self.pollChoicesBg.frame.width * 0.05).cgPath
+                                                               cornerRadius: self.pollChoicesBg.frame.width * 0.05).cgPath
             self.pollChoicesBg.layer.shadowRadius = 7
             self.pollChoicesBg.layer.shadowOffset = .zero
-        }
-        pollURLTextFieldObserver = pollURLTextField.observe(\InsetTextField.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+        })
+        observers.append(pollURLTextField.observe(\InsetTextField.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             self.pollURLTextField.cornerRadius = self.pollURLTextField.frame.height / 2
-        }
+        })
+        observers.append(pollImagesTemp.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+            guard let constraint = self.pollImagesTemp.getAllConstraints().filter({ $0.identifier == "height" }).first,
+            let value = change.newValue else { return }
+            self.pollImagesTemp.removeConstraint(constraint)
+            let newConstraint = self.pollImagesTemp.heightAnchor.constraint(equalToConstant: value.height)
+            newConstraint.identifier = "height"
+            newConstraint.isActive = true
+        })
+        
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidHide), name: UIResponder.keyboardDidHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
     }
@@ -817,8 +842,8 @@ extension PollCreationView {
         pollURLContainerView.layer.cornerRadius = pollURLContainerView.frame.width * 0.05
         pollURLBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         
-        pollImagesContainerView.layer.masksToBounds = true
-        pollImagesContainerView.layer.cornerRadius = pollImagesContainerView.frame.width * 0.05
+        pollImagesFg.layer.masksToBounds = true
+        pollImagesFg.layer.cornerRadius = pollImagesContainerView.frame.width * 0.05
         pollImagesBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         
         pollChoicesContainerView.layer.masksToBounds = true
@@ -916,6 +941,17 @@ extension PollCreationView {
         guard let v = recognizer.view else { return }
         if v == pollURLSkip, pollURLTextField.isFirstResponder {
             pollURLTextField.resignFirstResponder()
+        } else if v == pollImagesSkip {
+            guard let constraint = self.pollImagesTemp.getAllConstraints().filter({ $0.identifier == "height" }).first else { return }
+            UIView.animate(withDuration: 0.25, animations: {
+                self.pollImagesFg.setNeedsLayout()
+                constraint.constant = 0
+                self.pollImagesFg.layoutIfNeeded()
+                self.pollImagesTemp.alpha = 0
+//                self.pollImagesTemp.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+            }) { _ in
+                //self.viewInput?.onStageCompleted()
+            }
         }
     }
     
@@ -962,6 +998,23 @@ extension PollCreationView: CallbackObservable {
             topic = _topic
         } else if let _option = sender as? PollCreationController.Option {
             option = _option
+        } else if let imageItem = sender as? ImageItem {
+            if let _existing = imageItems.filter({ $0.id == imageItem.id }).first {
+                var existing = _existing
+                guard imageItem.shouldBeDeleted else {
+                    guard let index = imageItems.firstIndex(where: {$0.id == imageItem.id}) else { return }
+                    imageItems[index].image = imageItem.image
+                    imageItems[index].title = imageItem.title
+                    imagesContainer.reload()
+                    return
+                }
+                guard let index = imageItems.firstIndex(where: {$0.id == imageItem.id}) else { return }
+                imageItems.remove(at: index)
+                imagesContainer.delete(imageItem)
+            } else {
+                imageItems.append(imageItem)
+                imagesContainer.append(imageItem)
+            }
         }
     }
 }
@@ -1137,11 +1190,24 @@ extension PollCreationView: UITextFieldDelegate {
 
 extension PollCreationView: ImageSelectionListener {
     func addImage() {
+        guard imageItems.count < 3 else {
+            showBanner(bannerDelegate: self,
+                       text: AppError.maximumImages.localizedDescription,
+                       imageContent: ImageSigns.exclamationMark,
+                       shouldDismissAfter: 0.5)
+            return
+        }
         let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-            banner.present(subview: UIView(), shouldDismissAfter: 1)
+        banner.present(subview: ImageSelectionPopup(controller: viewInput as? UIViewController, callbackDelegate: banner))
     }
     
     func deleteImage(_ imageItem: ImageItem) {
         imageItems.remove(object: imageItem)
     }
+    
+    func editImage(_ item: ImageItem) {
+        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+        banner.present(subview: ImageSelectionPopup(controller: viewInput as? UIViewController, callbackDelegate: banner, item: item))
+    }
 }
+

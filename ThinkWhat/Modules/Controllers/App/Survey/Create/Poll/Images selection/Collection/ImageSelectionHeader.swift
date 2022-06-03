@@ -12,21 +12,26 @@ import UIKit
 class ImageSelectionHeader: UICollectionReusableView {
     
     let titleLabel = UILabel()
-    let addButton = UIButton()
+//    let addButton = UIButton()
+    let addButton = UIImageView(image: UIImage(systemName: "plus.circle.fill"))
     var color = UIColor.systemYellow {
         didSet {
-//            let largeConfig = UIImage.SymbolConfiguration(scale: .large)
-//            let infoImage = UIImage(systemName: "plus.circle.fill", withConfiguration: largeConfig)?.withTintColor(.systemGreen, renderingMode: .alwaysOriginal)
-//             for: .normal)
-            addButton.setImage(addButton.image(for: .normal)?.withTintColor(color), for: .normal)
-//            guard let image = addButton.currentImage else { return }
-//            image.
+            addButton.tintColor = color
+//            addButton.setImage(addButton.image(for: .normal)?.withTintColor(color), for: .normal)
         }
     }
     
     // Callback closure to handle info button tap
     var addButtonTapCallback: Closure?//(() -> Void)?
-
+    private var currentConfiguration: ImageSelectionHeaderConfiguration!
+    private var observers: [NSKeyValueObservation] = []
+    
+    init(configuration: ImageSelectionHeaderConfiguration) {
+        super.init(frame: .zero)
+        configure()
+        apply(configuration: configuration)
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -73,27 +78,78 @@ extension ImageSelectionHeader {
             bottomAnchor,
         ])
 
-        // Setup label and add to stack view
-        titleLabel.font = UIFont.preferredFont(forTextStyle: .headline)
         stackView.addArrangedSubview(titleLabel)
-
-        // Set button image
-        let largeConfig = UIImage.SymbolConfiguration(scale: .large)
-        let infoImage = UIImage(systemName: "plus.circle.fill", withConfiguration: largeConfig)?.withTintColor(.systemGreen, renderingMode: .alwaysOriginal)
-        addButton.setImage(infoImage, for: .normal)
-        
-        // Set button action
-        addButton.addAction(UIAction(handler: { [unowned self] (_) in
-            // Trigger callback when button tapped
-            self.addButtonTapCallback?()
-        }), for: .touchUpInside)
+        titleLabel.textColor = .secondaryLabel
+//        // Set button image
+//        let largeConfig = UIImage.SymbolConfiguration(scale: .large)
+//        let infoImage = UIImage(systemName: "plus.circle.fill", withConfiguration: largeConfig)?.withTintColor(.systemGreen, renderingMode: .alwaysOriginal)
+//        addButton.setImage(infoImage, for: .normal)
+//
+//        // Set button action
+//        addButton.addAction(UIAction(handler: { [unowned self] (_) in
+//            // Trigger callback when button tapped
+//            self.addButtonTapCallback?()
+//        }), for: .touchUpInside)
+        addButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        addButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
         
         // Add button to stack view
         stackView.addArrangedSubview(addButton)
+        addButton.isUserInteractionEnabled = true
         NSLayoutConstraint.activate([
-            addButton.heightAnchor.constraint(equalTo: stackView.heightAnchor)
+            addButton.heightAnchor.constraint(equalTo: stackView.heightAnchor),
+            addButton.widthAnchor.constraint(equalTo: stackView.heightAnchor)
         ])
         backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        
+        observers.append(titleLabel.observe(\UILabel.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+            guard let self = self, let rect = change.newValue else { return }
+            self.titleLabel.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: rect.height * 0.5)
+        })
+    }
+    
+    @objc
+    private func handleTap() {
+        addButtonTapCallback?()
     }
 }
 
+@available(iOS 14.0, *)
+extension ImageSelectionHeader: UIContentView {
+    var configuration: UIContentConfiguration {
+        get {
+            currentConfiguration
+        }
+        set {
+            guard let newConfiguration = newValue as? ImageSelectionHeaderConfiguration else {
+                return
+            }
+            apply(configuration: newConfiguration)
+        }
+    }
+    
+    func apply(configuration: ImageSelectionHeaderConfiguration) {
+        guard currentConfiguration != configuration else { return }
+        currentConfiguration = configuration
+        titleLabel.text = "total_images".localized.capitalized +  ": \(currentConfiguration.count!)/3"
+    }
+    
+}
+
+@available(iOS 14.0, *)
+struct ImageSelectionHeaderConfiguration: UIContentConfiguration, Hashable {
+
+    var count: Int!
+    
+    func makeContentView() -> UIView & UIContentView {
+        return ImageSelectionHeader(configuration: self)
+    }
+
+    func updated(for state: UIConfigurationState) -> Self {
+        guard state is UICellConfigurationState else {
+                return self
+            }
+        let updatedConfiguration = self
+        return updatedConfiguration
+    }
+}

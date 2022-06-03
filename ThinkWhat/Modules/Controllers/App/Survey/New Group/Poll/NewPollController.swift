@@ -419,8 +419,9 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
             hyperlinkView.alpha = 0
         }
     }
-    @IBOutlet weak var hyperlinkLabel: PaddingLabel! {
+    @IBOutlet weak var hyperlinkLabel: InsetLabel! {
         didSet {
+            hyperlinkLabel.insets = UIEdgeInsets(top: hyperlinkLabel.insets.top, left: 15, bottom: hyperlinkLabel.insets.bottom, right: 20)
             hyperlinkLabel.isUserInteractionEnabled = true
             let tap = UITapGestureRecognizer(target: self, action: #selector(NewPollController.viewTapped(gesture:)))
             hyperlinkLabel.addGestureRecognizer(tap)

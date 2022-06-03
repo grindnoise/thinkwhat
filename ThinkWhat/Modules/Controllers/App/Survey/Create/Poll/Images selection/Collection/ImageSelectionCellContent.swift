@@ -14,6 +14,7 @@ class ImageSelectionCellContent: UIView {
     init(configuration: ImageSelectionCellConfiguration) {
         super.init(frame: .zero)
         commonInit()
+        setObservers()
         setupUI()
         apply(configuration: configuration)
     }
@@ -34,6 +35,10 @@ class ImageSelectionCellContent: UIView {
         ])
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    }
+    
     private var currentConfiguration: ImageSelectionCellConfiguration!
     var configuration: UIContentConfiguration {
         get {
@@ -46,12 +51,20 @@ class ImageSelectionCellContent: UIView {
             apply(configuration: newConfiguration)
         }
     }
-    
+    private var observers: [NSKeyValueObservation] = []
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var textView: UITextView!
+    @IBOutlet weak var imageView: UIImageView! {
+        didSet {
+            imageView.contentMode = .scaleAspectFill
+        }
+    }
+    @IBOutlet weak var descriptionLabel: InsetLabel! {
+        didSet {
+            descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        }
+    }
     @IBOutlet weak var heightConstraint: NSLayoutConstraint!
 }
 
@@ -61,10 +74,25 @@ extension ImageSelectionCellContent: UIContentView {
         guard currentConfiguration != configuration else { return }
         currentConfiguration = configuration
         imageView.image = currentConfiguration.image
-        textView.text = currentConfiguration.title
+        descriptionLabel.text = currentConfiguration.title
     }
     
     private func setupUI() {
         
+    }
+    
+    private func setObservers() {
+        observers.append(imageView.observe(\UIImageView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+            guard let self = self,
+            let rect = change.newValue else { return }
+            self.imageView.cornerRadius = rect.height * 0.25
+        })
+        observers.append(descriptionLabel.observe(\InsetLabel.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+            guard let self = self,
+            let rect = change.newValue else { return }
+            let value = rect.height * 0.1
+            self.descriptionLabel.cornerRadius = rect.height * 0.25
+            self.descriptionLabel.insets = UIEdgeInsets(top: value, left: value, bottom: value, right: value)
+        })
     }
 }

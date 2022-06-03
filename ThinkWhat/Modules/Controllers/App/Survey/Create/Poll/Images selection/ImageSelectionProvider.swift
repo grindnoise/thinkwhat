@@ -13,6 +13,10 @@ protocol ImageSelectionProvider: class {
     var dataItems: [ImageItem] { get }
     var callbackDelegate: CallbackObservable? { get set }
     var listener: ImageSelectionListener! { get }
+    
+    func reload()
+    func append(_: ImageItem)
+    func delete(_: ImageItem)
 }
 
 protocol ImageSelectionListener: class {
@@ -20,5 +24,6 @@ protocol ImageSelectionListener: class {
     
     func addImage()
     func deleteImage(_: ImageItem)
+    func editImage(_: ImageItem)
 }
 
