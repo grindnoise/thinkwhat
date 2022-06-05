@@ -148,6 +148,7 @@ class ImageSelectionPopup: UIView, UINavigationControllerDelegate {
         textView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         cancel.tintColor =  traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
         confirm.tintColor =  traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     }
     
     
@@ -192,7 +193,7 @@ class ImageSelectionPopup: UIView, UINavigationControllerDelegate {
                                                  left: 8,
                                                  bottom: 10,
                                                  right: 10)
-            textView.backgroundColor = .secondarySystemBackground
+            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
             textView.text = item?.title ?? ""
             textView.delegate = self
         }

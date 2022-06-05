@@ -1,17 +1,18 @@
 //
-//  TopicSelectionModernContent.swift
+//  TopicSelectionHeaderModernContent.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 03.06.2022.
+//  Created by Pavel Bukharov on 04.06.2022.
 //  Copyright © 2022 Pavel Bukharov. All rights reserved.
 //
+
 
 import UIKit
 
 @available(iOS 14.0, *)
-class TopicSelectionModernContent: UIView {
+class TopicSelectionHeaderModernContent: UIView {
 
-    init(configuration: TopicSelectionModernCellConfiguration) {
+    init(configuration: TopicSelectionModernHeaderConfiguration) {
         super.init(frame: .zero)
         commonInit()
         setObservers()
@@ -35,17 +36,17 @@ class TopicSelectionModernContent: UIView {
         ])
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        backgroundColor = .tertiarySystemBackground
-    }
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        contentView.backgroundColor = .tertiarySystemBackground
+//    }
 
-    private var currentConfiguration: TopicSelectionModernCellConfiguration!
+    private var currentConfiguration: TopicSelectionModernHeaderConfiguration!
     var configuration: UIContentConfiguration {
         get {
             currentConfiguration
         }
         set {
-            guard let newConfiguration = newValue as? TopicSelectionModernCellConfiguration else {
+            guard let newConfiguration = newValue as? TopicSelectionModernHeaderConfiguration else {
                 return
             }
             apply(configuration: newConfiguration)
@@ -57,7 +58,7 @@ class TopicSelectionModernContent: UIView {
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var icon: Icon! {
         didSet {
-//            icon.scaleMultiplicator = 1
+            icon.scaleMultiplicator = 1.3
             icon.isRounded = false
         }
     }
@@ -67,33 +68,27 @@ class TopicSelectionModernContent: UIView {
 }
 
 @available(iOS 14.0, *)
-extension TopicSelectionModernContent: UIContentView {
-    func apply(configuration: TopicSelectionModernCellConfiguration) {
+extension TopicSelectionHeaderModernContent: UIContentView {
+    func apply(configuration: TopicSelectionModernHeaderConfiguration) {
         guard currentConfiguration != configuration else { return }
         currentConfiguration = configuration
-        icon.iconColor = currentConfiguration.topicItem.topic.parent?.tagColor ?? .systemGray
+
+        icon.iconColor = currentConfiguration.topicItem.topic.tagColor
         icon.category = Icon.Category(rawValue: currentConfiguration.topicItem.topic.id) ?? .Null
-        titleLabel.text = currentConfiguration.topicItem.title
+        titleLabel.text = currentConfiguration.topicItem.title.uppercased()
         height.constant = 60
-        leading.constant = 8
+        leading.constant = 0
     }
 
     private func setupUI() {
-//        backgroundColor = .tertiarySystemBackground
+//        contentView.backgroundColor = .blue
     }
 
     private func setObservers() {
         observers.append(titleLabel.observe(\InsetLabel.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             guard let self = self,
             let rect = change.newValue else { return }
-            self.titleLabel.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: rect.height * 0.4)
+            self.titleLabel.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: rect.height * 0.4)
         })
-//        observers.append(descriptionLabel.observe(\InsetLabel.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
-//            guard let self = self,
-//            let rect = change.newValue else { return }
-//            let value = rect.height * 0.1
-//            self.descriptionLabel.cornerRadius = rect.height * 0.25
-//            self.descriptionLabel.insets = UIEdgeInsets(top: value, left: value, bottom: value, right: value)
-//        })
     }
 }

@@ -212,9 +212,15 @@ class PollCreationView: UIView {
             pollTitleButton.category = .Abc
         }
     }
-    @IBOutlet weak var pollTitleBg: UIView!
+    @IBOutlet weak var pollTitleBg: UIView! {
+        didSet {
+            pollTitleBg.accessibilityIdentifier = "shadow"
+            pollTitleBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        }
+    }
     @IBOutlet weak var pollTitleTextView: UITextView! {
         didSet {
+            pollTitleTextView.accessibilityIdentifier = "front"
             pollTitleTextView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
             pollTitleTextView.delegate = self
             pollTitleTextView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
@@ -235,9 +241,15 @@ class PollCreationView: UIView {
             pollDescriptionButton.category = .Paragraph
         }
     }
-    @IBOutlet weak var pollDescriptionBg: UIView!
+    @IBOutlet weak var pollDescriptionBg: UIView! {
+        didSet {
+            pollDescriptionBg.accessibilityIdentifier = "shadow"
+            pollDescriptionBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        }
+    }
     @IBOutlet weak var pollDescriptionTextView: UITextView! {
         didSet {
+            pollDescriptionTextView.accessibilityIdentifier = "front"
             pollDescriptionTextView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
             pollDescriptionTextView.delegate = self
             pollDescriptionTextView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
@@ -259,9 +271,15 @@ class PollCreationView: UIView {
             pollQuestionButton.category = .QuestionMark
         }
     }
-    @IBOutlet weak var pollQuestionBg: UIView!
+    @IBOutlet weak var pollQuestionBg: UIView! {
+        didSet {
+            pollQuestionBg.accessibilityIdentifier = "shadow"
+            pollQuestionBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        }
+    }
     @IBOutlet weak var pollQuestionTextView: UITextView! {
         didSet {
+            pollQuestionTextView.accessibilityIdentifier = "front"
             pollQuestionTextView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
             pollQuestionTextView.delegate = self
             pollQuestionTextView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
@@ -283,14 +301,21 @@ class PollCreationView: UIView {
             pollURLButton.category = .Hyperlink
         }
     }
-    @IBOutlet weak var pollURLBg: UIView!
+    @IBOutlet weak var pollURLBg: UIView! {
+        didSet {
+            pollURLBg.accessibilityIdentifier = "shadow"
+            pollURLBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        }
+    }
     @IBOutlet weak var pollURLContainerView: UIView! {
         didSet {
+            pollURLContainerView.accessibilityIdentifier = "front"
             pollURLContainerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         }
     }
     @IBOutlet weak var pollURLTextField: InsetTextField! {
         didSet {
+            pollURLTextField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
             pollURLTextField.delegate = self
             pollURLTextField.placeholder = "url_placeholder".localized
             pollURLTextField.textColor = .systemBlue
@@ -319,9 +344,15 @@ class PollCreationView: UIView {
             pollImagesButton.category = .Picture
         }
     }
-    @IBOutlet weak var pollImagesBg: UIView!
+    @IBOutlet weak var pollImagesBg: UIView! {
+        didSet {
+            pollImagesBg.accessibilityIdentifier = "shadow"
+            pollImagesBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        }
+    }
     @IBOutlet weak var pollImagesFg: UIView! {
         didSet {
+            pollImagesFg.accessibilityIdentifier = "front"
             pollImagesFg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         }
     }
@@ -562,7 +593,7 @@ extension PollCreationView: PollCreationControllerOutput {
                 { [weak self] in guard let self = self else { return }
                     let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                     if #available(iOS 14, *) {
-                        banner.present(subview: TopicSelectionModernCollectionView(callbackDelegate: banner))
+                        banner.present(subview: TopicSelectionModernContainer(isModal: true, callbackDelegate: banner))
                     } else {
                         banner.present(subview: TopicSelection(isModal: true, callbackDelegate: banner))
                     }
@@ -723,7 +754,7 @@ extension PollCreationView: PollCreationControllerOutput {
 // MARK: - UI Setup
 extension PollCreationView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        pollTitleBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+//        pollTitleBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         pollTitleTextView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         
         scrollContentView.get(all: [UITextView.self]).forEach {
@@ -732,6 +763,15 @@ extension PollCreationView {
         }
         pollURLSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         pollImagesSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        pollURLTextField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        scrollContentView.get(all: [UIView.self]).filter({ $0.accessibilityIdentifier == "front" }).forEach { [weak self] v in
+            guard let self = self else { return }
+            v.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        }
+        scrollContentView.get(all: [UIView.self]).filter({ $0.accessibilityIdentifier == "shadow" }).forEach { [weak self] v in
+            guard let self = self else { return }
+            v.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        }
     }
     
     private func setupUI() {
@@ -1144,11 +1184,11 @@ extension PollCreationView: UITextFieldDelegate {
                 return false
             } else {
                 pollURLTextField.resignFirstResponder()
-                UIView.animate(withDuration: 0.15) {
-                    self.pollURLSkip.alpha = 0
-                    self.pollURLSkip.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
-                }
-                viewInput?.onStageCompleted()
+//                UIView.animate(withDuration: 0.15) {
+//                    self.pollURLSkip.alpha = 0
+//                    self.pollURLSkip.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+//                }
+//                viewInput?.onStageCompleted()
                 return true
             }
         }

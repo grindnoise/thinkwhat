@@ -28,41 +28,63 @@ class TopicSelectionModernCollectionView: UICollectionView {
     }
     
     private func setupUI() {
+
         backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
-        layoutConfig.headerMode = .firstItemInSection
-        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+//        layoutConfig.headerMode = .firstItemInSection
+//        layoutConfig.backgroundColor = .clear
+//        layoutConfig.showsSeparators = false
         
-        let listLayout = UICollectionViewCompositionalLayout.list(using: layoutConfig)
-        collectionViewLayout = listLayout
-        delegate = self
+//        let listLayout = UICollectionViewCompositionalLayout.list(using: layoutConfig)
+//        listLayout.register(RoundedBackgroundView.self, forDecorationViewOfKind: RoundedBackgroundView.reuseIdentifier)
+//        collectionViewLayout = listLayout
         
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, TopicItem> {
+        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+            self.layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+            self.layoutConfig.headerMode = .firstItemInSection
+            self.layoutConfig.backgroundColor = .clear
+            self.layoutConfig.showsSeparators = false
+            let section = NSCollectionLayoutSection.list(using: self.layoutConfig, layoutEnvironment: env)
+//            section.decorationItems = [
+//                NSCollectionLayoutDecorationItem.background(elementKind: RoundedBackgroundView.reuseIdentifier)
+//            ]
+            return section //NSCollectionLayoutSection.list(using: listConfig, layoutEnvironment: env)
+        }
+//        collectionViewLayout.register(RoundedBackgroundView.self, forDecorationViewOfKind: RoundedBackgroundView.reuseIdentifier)
+        collectionViewLayout.collectionView?.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        allowsMultipleSelection = false
+        
+        let cellRegistration = UICollectionView.CellRegistration<TopicSelectionModernCell, TopicItem> {
             (cell, indexPath, item) in
             
-            // Set symbolItem's data to cell
-            var content = cell.defaultContentConfiguration()
-            content.text = item.title
-            cell.contentConfiguration = content
+            cell.item = item
+//            cell.backgroundView = UIView()
+//            cell.backgroundView?.backgroundColor = .lightGray.withAlphaComponent(0.1)
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+            backgroundConfig.backgroundColor = .lightGray.withAlphaComponent(0.1)
+            //            backgroundConfig.backgroundColorTransformer = .grayscale
+            cell.backgroundConfiguration = backgroundConfig
+            cell.callback = { [weak self] in
+                guard let self = self else { return }
+                self.callbackDelegate?.callbackReceived(cell.item.topic as Any)
+            }
+            //            let headerDisclosureOption = UICellAccessory.CheckmarkOptions(isHidden: false, reservedLayoutWidth: .standard)
+////            let reorder = UICellAccessory.reorder(displayed: .always, options: UICellAccessory.ReorderOptions.init())
+////            cell.accessories = [reorder]
+//            cell.accessories = [.checkmark()]
         }
-        
-//        let cellRegistration = UICollectionView.CellRegistration<TopicSelectionModernCell, TopicItem> { (cell, indexPath, item) in
-//            cell.topic = item
-//        }
-        let headerCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, TopicHeaderItem> {
+
+        let headerCellRegistration = UICollectionView.CellRegistration<TopicSelectionModernHeader, TopicHeaderItem> {
             (cell, indexPath, headerItem) in
             
-            // Set headerItem's data to cell
-            var content = cell.defaultContentConfiguration()
-            content.text = headerItem.title
-            cell.contentConfiguration = content
-            
-            // Add outline disclosure accessory
-            // With this accessory, the header cell's children will expand / collapse when the header cell is tapped.
+            cell.item = headerItem
             let headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+            backgroundConfig.backgroundColor = .red
+            cell.backgroundConfiguration = backgroundConfig
             cell.accessories = [.outlineDisclosure(options:headerDisclosureOption)]
         }
-        
+
         source = UICollectionViewDiffableDataSource<TopicHeaderItem, TopicListItem>(collectionView: self) {
             (collectionView, indexPath, listItem) -> UICollectionViewCell? in
             
@@ -84,28 +106,11 @@ class TopicSelectionModernCollectionView: UICollectionView {
                 return cell
             }
         }
-//        let headerCellRegistration = UICollectionView.CellRegistration <TopicSelectionModernCell, TopicHeaderItem> { [weak self] (headerView, indexPath, topic) in
-//            guard let self = self else { return }
-//
-//            headerView.configuration = TopicSelectionModernCellConfiguration(topic: topic.topic)
-//        }
-
-        
-        
-//        source = UICollectionViewDiffableDataSource<TopicHeaderItem, TopicItem>(collectionView: self) {
-//            (collectionView: UICollectionView, indexPath: IndexPath, identifier: TopicItem) -> TopicSelectionModernCell? in
-//
-//            // Dequeue reusable cell using cell registration (Reuse identifier no longer needed)
-//            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
-//                                                                    for: indexPath,
-//                                                                    item: identifier)
-//            return cell
-//        }
         
         var snapshot = NSDiffableDataSourceSnapshot<TopicHeaderItem, TopicListItem>()
         snapshot.appendSections(modelObjects)
         source.apply(snapshot)
-        
+
         // Loop through each header item so that we can create a section snapshot for each respective header item.
         for headerItem in modelObjects {
             
@@ -126,22 +131,23 @@ class TopicSelectionModernCollectionView: UICollectionView {
             // Apply section snapshot to the respective collection view section
             source.apply(sectionSnapshot, to: headerItem, animatingDifferences: false)
         }
-        
+//        isEditing = true
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+        collectionViewLayout.collectionView?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        collectionViewLayout.collectionView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    }
+    
     weak var callbackDelegate: CallbackObservable?
     var source: UICollectionViewDiffableDataSource<TopicHeaderItem, TopicListItem>!
-}
-
-@available(iOS 14, *)
-extension TopicSelectionModernCollectionView: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-    }
+    private var layoutConfig: UICollectionLayoutListConfiguration!
 }
 
 @available(iOS 14.0, *)
@@ -154,33 +160,57 @@ class TopicSelectionModernCell: UICollectionViewListCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    var item: TopicItem!
     
-    private var currentConfiguration: TopicSelectionModernCellConfiguration!
-    var configuration: UIContentConfiguration {
-        get {
-            currentConfiguration
-        }
-        set {
-            guard let newConfiguration = newValue as? TopicSelectionModernCellConfiguration else {
-                return
-            }
-            apply(configuration: newConfiguration)
-        }
-    }
+    var callback: Closure?
     
-    func apply(configuration: TopicSelectionModernCellConfiguration) {
-        guard currentConfiguration != configuration else { return }
-        currentConfiguration = configuration
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        automaticallyUpdatesBackgroundConfiguration = false
         
+        
+//        var modifiedState = state
+//        modifiedState.isFocused = false
+//        modifiedState.isHighlighted = false
+//        modifiedState.isSelected = false
+//        modifiedState.isEditing = true
+        
+//        var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+//        backgroundConfig.backgroundColor = .lightGray.withAlphaComponent(0.1)
+        
+//        // Customize the background color to use the tint color when the cell is highlighted or selected.
+//        if state.isSelected {
+//            backgroundConfig.backgroundColor = .red
+            accessories = state.isSelected ? [.checkmark()] : []
+//        }
+        
+        if state.isSelected, !callback.isNil { callback!() }
+    
+//        backgroundConfiguration = backgroundConfig
+        var newConfiguration = TopicSelectionModernCellConfiguration().updated(for: state)
+        newConfiguration.topicItem = item
+        
+        contentConfiguration = newConfiguration
+    }
+}
+
+@available(iOS 14.0, *)
+class TopicSelectionModernHeader: UICollectionViewListCell {
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
     }
     
-    var topic: Topic!
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    var item: TopicHeaderItem!
     
     override func updateConfiguration(using state: UICellConfigurationState) {
         backgroundColor = .clear
-        var newConfiguration = TopicSelectionModernCellConfiguration().updated(for: state)
-        newConfiguration.topic = topic
-        
+        var newConfiguration = TopicSelectionModernHeaderConfiguration().updated(for: state)
+        newConfiguration.topicItem = item
         contentConfiguration = newConfiguration
     }
 }
@@ -188,10 +218,28 @@ class TopicSelectionModernCell: UICollectionViewListCell {
 @available(iOS 14.0, *)
 struct TopicSelectionModernCellConfiguration: UIContentConfiguration, Hashable {
 
-    var topic: Topic!
+    var topicItem: TopicItem!
     
     func makeContentView() -> UIView & UIContentView {
         return TopicSelectionModernContent(configuration: self)
+    }
+
+    func updated(for state: UIConfigurationState) -> Self {
+        guard state is UICellConfigurationState else {
+                return self
+            }
+        let updatedConfiguration = self
+        return updatedConfiguration
+    }
+}
+
+@available(iOS 14.0, *)
+struct TopicSelectionModernHeaderConfiguration: UIContentConfiguration, Hashable {
+
+    var topicItem: TopicHeaderItem!
+    
+    func makeContentView() -> UIView & UIContentView {
+        return TopicSelectionHeaderModernContent(configuration: self)
     }
 
     func updated(for state: UIConfigurationState) -> Self {
@@ -230,5 +278,40 @@ struct TopicItem: Hashable {
     init(topic: Topic) {
         self.topic = topic
         self.title = topic.title
+    }
+}
+
+extension UICollectionReusableView {
+    static var reuseIdentifier: String {
+        return String(describing: Self.self)
+    }
+}
+
+class RoundedBackgroundView: UICollectionReusableView {
+
+    private var insetView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .secondarySystemFill
+        view.layer.cornerRadius = 15
+        view.clipsToBounds = true
+        return view
+    }()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .red
+        addSubview(insetView)
+
+        NSLayoutConstraint.activate([
+            insetView.leadingAnchor.constraint(equalTo: leadingAnchor),//, constant: 15),
+            trailingAnchor.constraint(equalTo: insetView.trailingAnchor),//, constant: 15),
+            insetView.topAnchor.constraint(equalTo: topAnchor),
+            insetView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

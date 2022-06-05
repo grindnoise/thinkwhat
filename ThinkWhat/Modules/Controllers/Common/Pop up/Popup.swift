@@ -175,12 +175,7 @@ class Popup: UIView {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        switch traitCollection.userInterfaceStyle {
-        case .dark:
-            self.body.backgroundColor = .tertiarySystemBackground
-        default:
-            self.body.backgroundColor = .systemBackground
-        }
+        body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
     }
 }
 

@@ -137,9 +137,9 @@ class OptionSelection: UIView {
         let outerColor = UIColor.clear.cgColor
         let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
         hMaskLayer.colors = [outerColor, innerColor,innerColor,outerColor]
-        anonIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
-        privacyIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
-        ordinaryIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
+        anonIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .white : .label)
+        privacyIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .white : .label)
+        ordinaryIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .white : .label)
     }
     
     @objc
@@ -207,7 +207,7 @@ class OptionSelection: UIView {
     @IBOutlet weak var anonConstraint: NSLayoutConstraint!
     @IBOutlet weak var anonIcon: Icon! {
         didSet {
-            anonIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+            anonIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
             anonIcon.category = .Anon
             anonIcon.isRounded = false
         }
@@ -220,7 +220,7 @@ class OptionSelection: UIView {
     @IBOutlet weak var ordinaryConstraint: NSLayoutConstraint!
     @IBOutlet weak var ordinaryIcon: Icon! {
         didSet {
-            ordinaryIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+            ordinaryIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
             ordinaryIcon.category = .ManFace
             ordinaryIcon.isRounded = false
         }
@@ -231,7 +231,7 @@ class OptionSelection: UIView {
     @IBOutlet weak var privacyConstraint: NSLayoutConstraint!
     @IBOutlet weak var privacyIcon: Icon! {
         didSet {
-            privacyIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+            privacyIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
             privacyIcon.category = .Locked
             privacyIcon.isRounded = false
         }

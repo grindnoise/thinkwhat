@@ -45,6 +45,7 @@ class PollCreationController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        guard stage == .Topic else { return }
         controllerOutput?.onNextStage(.Topic)
     }
 

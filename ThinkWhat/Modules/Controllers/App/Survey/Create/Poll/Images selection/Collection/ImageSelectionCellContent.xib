@@ -5,7 +5,6 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -38,7 +37,7 @@
                             <nil key="highlightedColor"/>
                         </label>
                     </subviews>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstItem="3Fr-R8-2nQ" firstAttribute="leading" secondItem="Q64-Ed-p2F" secondAttribute="trailing" constant="8" id="FMg-3B-1Yc"/>
                         <constraint firstAttribute="bottom" secondItem="3Fr-R8-2nQ" secondAttribute="bottom" constant="8" id="Lek-Qe-tI3"/>
@@ -52,7 +51,7 @@
                 </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
-            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="AZd-j2-3sV" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="MLp-C0-3PL"/>
                 <constraint firstAttribute="bottom" secondItem="AZd-j2-3sV" secondAttribute="bottom" id="cux-Zf-rag"/>
@@ -63,9 +62,4 @@
             <point key="canvasLocation" x="137.68115942028987" y="83.705357142857139"/>
         </view>
     </objects>
-    <resources>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-    </resources>
 </document>

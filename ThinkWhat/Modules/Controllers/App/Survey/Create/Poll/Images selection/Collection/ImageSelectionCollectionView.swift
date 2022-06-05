@@ -61,7 +61,8 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
     private func commonInit() {
         backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebarPlain)
-        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+//        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        layoutConfig.backgroundColor = .clear
         layoutConfig.headerMode = .supplementary
         layoutConfig.showsSeparators = false
         layoutConfig.trailingSwipeActionsConfigurationProvider = { [weak self] (indexPath) in
@@ -97,6 +98,10 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
         
         let cellRegistration = UICollectionView.CellRegistration<ImageSelectionCell, ImageItem> { (cell, indexPath, item) in
             cell.item = item
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+            backgroundConfig.backgroundColor = .clear
+            //            backgroundConfig.backgroundColorTransformer = .grayscale
+            cell.backgroundConfiguration = backgroundConfig
 //            cell.selectedCallback = { [weak self] in
 //                guard let self = self else { return }
 //                self.listener.editImage(cell.item)
@@ -111,6 +116,11 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
             
 //            headerView.titleLabel.text = "Count: \(self.dataItems.count)"
             headerView.color = self.color
+            headerView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+//            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+//            backgroundConfig.backgroundColor = .clear
+//            //            backgroundConfig.backgroundColorTransformer = .grayscale
+//            headerView.backgroundConfiguration = backgroundConfig
             self.observers.append(self.observe(self.colorKeyPath, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<UIColor>) in guard let self = self else { return }
                 headerView.color = self.color
             })
