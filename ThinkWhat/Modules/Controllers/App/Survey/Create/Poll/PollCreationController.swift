@@ -68,7 +68,6 @@ extension PollCreationController: PollCreationViewInput {
         guard let next = stage.next() else { return }
         stage = next
         Task {
-//            try await Task.sleep(nanoseconds: UInt64(0.5 * 1_000_000_000))
             await MainActor.run {
                 controllerOutput?.onNextStage(stage)
             }

@@ -216,6 +216,21 @@ class PollCreationView: UIView {
         didSet {
             pollTitleBg.accessibilityIdentifier = "shadow"
             pollTitleBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+            pollTitleBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            pollTitleBg.layer.shadowRadius = 7
+            pollTitleBg.layer.shadowOffset = .zero
+
+        }
+    }
+    @IBOutlet weak var pollTitleFg: UIView! {
+        didSet {
+            pollTitleFg.accessibilityIdentifier = "front"
+            pollTitleFg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        }
+    }
+    @IBOutlet weak var pollTitleHeight: NSLayoutConstraint! {
+        didSet {
+            pollDescriptionHeight.constant = 90
         }
     }
     @IBOutlet weak var pollTitleTextView: UITextView! {
@@ -245,6 +260,20 @@ class PollCreationView: UIView {
         didSet {
             pollDescriptionBg.accessibilityIdentifier = "shadow"
             pollDescriptionBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+            pollDescriptionBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            pollDescriptionBg.layer.shadowRadius = 7
+            pollDescriptionBg.layer.shadowOffset = .zero
+        }
+    }
+    @IBOutlet weak var pollDescriptionFg: UIView! {
+        didSet {
+            pollDescriptionFg.accessibilityIdentifier = "front"
+            pollDescriptionFg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        }
+    }
+    @IBOutlet weak var pollDescriptionHeight: NSLayoutConstraint! {
+        didSet {
+            pollDescriptionHeight.constant = 90
         }
     }
     @IBOutlet weak var pollDescriptionTextView: UITextView! {
@@ -254,7 +283,7 @@ class PollCreationView: UIView {
             pollDescriptionTextView.delegate = self
             pollDescriptionTextView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             pollDescriptionTextView.text = ""
-            pollDescriptionTextView.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+//            pollDescriptionTextView.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         }
     }
 
@@ -275,6 +304,20 @@ class PollCreationView: UIView {
         didSet {
             pollQuestionBg.accessibilityIdentifier = "shadow"
             pollQuestionBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+            pollQuestionBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            pollQuestionBg.layer.shadowRadius = 7
+            pollQuestionBg.layer.shadowOffset = .zero
+        }
+    }
+    @IBOutlet weak var pollQuestionFg: UIView! {
+        didSet {
+            pollQuestionFg.accessibilityIdentifier = "front"
+            pollQuestionFg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        }
+    }
+    @IBOutlet weak var pollQuestionHeight: NSLayoutConstraint! {
+        didSet {
+            pollQuestionHeight.constant = 90
         }
     }
     @IBOutlet weak var pollQuestionTextView: UITextView! {
@@ -284,7 +327,7 @@ class PollCreationView: UIView {
             pollQuestionTextView.delegate = self
             pollQuestionTextView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             pollQuestionTextView.text = ""
-            pollQuestionTextView.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+//            pollQuestionTextView.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         }
     }
     
@@ -533,7 +576,7 @@ extension PollCreationView: PollCreationControllerOutput {
         func reveal(view animatedView: UIView, duration: TimeInterval, completionBlocks: [Closure]) {
             
             let circlePathLayer = CAShapeLayer()
-            
+            var _completionBlocks = completionBlocks
             func circleFrameTopCenter() -> CGRect {
                 var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
                 let circlePathBounds = circlePathLayer.bounds
@@ -577,11 +620,12 @@ extension PollCreationView: PollCreationControllerOutput {
             maskLayerAnimation.toValue = toPath
             maskLayerAnimation.duration = duration
             maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
-            maskLayerAnimation.isRemovedOnCompletion = false
-            if !completionBlocks.isEmpty {
+            maskLayerAnimation.isRemovedOnCompletion = true
+//            if !completionBlocks.isEmpty {
+            _completionBlocks.append({ animatedView.layer.mask = nil })
                 maskLayerAnimation.delegate = self
-                maskLayerAnimation.setValue(completionBlocks, forKey: "maskCompletionBlocks")
-            }
+                maskLayerAnimation.setValue(_completionBlocks, forKey: "maskCompletionBlocks")
+//            }
             circlePathLayer.add(maskLayerAnimation, forKey: "path")
             circlePathLayer.path = toPath
         }
@@ -807,27 +851,27 @@ extension PollCreationView {
     }
     
     private func setObservers() {
-        observers.append(pollTitleBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
-            self.pollTitleBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-            self.pollTitleBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollTitleBg.bounds,
-                                                             cornerRadius: self.pollTitleBg.frame.width * 0.05).cgPath
-            self.pollTitleBg.layer.shadowRadius = 7
-            self.pollTitleBg.layer.shadowOffset = .zero
-        })
-        observers.append(pollDescriptionBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
-            self.pollDescriptionBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-            self.pollDescriptionBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollDescriptionBg.bounds,
-                                                             cornerRadius: self.pollDescriptionBg.frame.width * 0.05).cgPath
-            self.pollDescriptionBg.layer.shadowRadius = 7
-            self.pollDescriptionBg.layer.shadowOffset = .zero
-        })
-        observers.append(pollQuestionBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
-            self.pollQuestionBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-            self.pollQuestionBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollQuestionBg.bounds,
-                                                             cornerRadius: self.pollQuestionBg.frame.width * 0.05).cgPath
-            self.pollQuestionBg.layer.shadowRadius = 7
-            self.pollQuestionBg.layer.shadowOffset = .zero
-        })
+//        observers.append(pollTitleBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+//            self.pollTitleBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+//            self.pollTitleBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollTitleBg.bounds,
+//                                                             cornerRadius: self.pollTitleBg.frame.width * 0.05).cgPath
+//            self.pollTitleBg.layer.shadowRadius = 7
+//            self.pollTitleBg.layer.shadowOffset = .zero
+//        })
+//        observers.append(pollDescriptionBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+//            self.pollDescriptionBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+//            self.pollDescriptionBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollDescriptionBg.bounds,
+//                                                             cornerRadius: 0).cgPath
+//            self.pollDescriptionBg.layer.shadowRadius = 7
+//            self.pollDescriptionBg.layer.shadowOffset = .zero
+//        })
+//        observers.append(pollQuestionBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+//            self.pollQuestionBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+//            self.pollQuestionBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollQuestionBg.bounds,
+//                                                             cornerRadius: self.pollQuestionBg.frame.width * 0.05).cgPath
+//            self.pollQuestionBg.layer.shadowRadius = 7
+//            self.pollQuestionBg.layer.shadowOffset = .zero
+//        })
         observers.append(pollURLBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             self.pollURLBg.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
             self.pollURLBg.layer.shadowPath = UIBezierPath(roundedRect: self.pollURLBg.bounds,
@@ -860,22 +904,109 @@ extension PollCreationView {
             newConstraint.identifier = "height"
             newConstraint.isActive = true
         })
+        observers.append(pollDescriptionTextView.observe(\UITextView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
+            guard let self = self,
+                  let constraint = self.pollDescriptionBg.getAllConstraints().filter({ $0.identifier == "height" }).first,
+                  let value = change.newValue else { return }
+            UIView.animate(withDuration: 0.2, animations: {
+                self.scrollContentView.setNeedsLayout()
+                constraint.constant = value.height + 20
+                self.scrollContentView.layoutIfNeeded()
+//                self.pollDescriptionTextView.contentSize
+            }) { _ in
+                
+            }
+            
+            let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero,
+                                                                   size: CGSize(width: self.pollDescriptionBg.bounds.width,
+                                                                                height: value.height + 20)),
+                                               cornerRadius: self.pollDescriptionBg.frame.width * 0.05).cgPath
+            let anim = Animations.get(property: .ShadowPath,
+                                      fromValue: self.pollDescriptionBg.layer.shadowPath as Any,
+                                      toValue: destinationPath,
+                                      duration: 0.2,
+                                      delay: 0,
+                                      repeatCount: 0,
+                                      autoreverses: false,
+                                      timingFunction: .linear,
+                                      delegate: nil,
+                                      isRemovedOnCompletion: true,
+                                      completionBlocks: nil)
+            self.pollDescriptionBg.layer.add(anim, forKey: nil)
+            self.pollDescriptionBg.layer.shadowPath = destinationPath
+        })
+        observers.append(pollTitleTextView.observe(\UITextView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
+            guard let self = self,
+                  let constraint = self.pollTitleBg.getAllConstraints().filter({ $0.identifier == "height" }).first,
+                  let value = change.newValue else { return }
+            UIView.animate(withDuration: 0.2) {
+                self.scrollContentView.setNeedsLayout()
+                constraint.constant = value.height + 20
+                self.scrollContentView.layoutIfNeeded()
+            }
+            
+            let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero,
+                                                                   size: CGSize(width: self.pollTitleBg.bounds.width,
+                                                                                height: value.height + 20)),
+                                               cornerRadius: self.pollTitleBg.frame.width * 0.05).cgPath
+            let anim = Animations.get(property: .ShadowPath,
+                                      fromValue: self.pollTitleBg.layer.shadowPath as Any,
+                                      toValue: destinationPath,
+                                      duration: 0.2,
+                                      delay: 0,
+                                      repeatCount: 0,
+                                      autoreverses: false,
+                                      timingFunction: .linear,
+                                      delegate: nil,
+                                      isRemovedOnCompletion: true,
+                                      completionBlocks: nil)
+            self.pollTitleBg.layer.add(anim, forKey: nil)
+            self.pollTitleBg.layer.shadowPath = destinationPath
+        })
+        observers.append(pollQuestionTextView.observe(\UITextView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
+            guard let self = self,
+                  let constraint = self.pollQuestionBg.getAllConstraints().filter({ $0.identifier == "height" }).first,
+                  let value = change.newValue else { return }
+            UIView.animate(withDuration: 0.2) {
+                self.scrollContentView.setNeedsLayout()
+                constraint.constant = value.height + 20
+                self.scrollContentView.layoutIfNeeded()
+            }
+            
+            let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero,
+                                                                   size: CGSize(width: self.pollQuestionBg.bounds.width,
+                                                                                height: value.height + 20)),
+                                               cornerRadius: self.pollTitleBg.frame.width * 0.05).cgPath
+            let anim = Animations.get(property: .ShadowPath,
+                                      fromValue: self.pollQuestionBg.layer.shadowPath as Any,
+                                      toValue: destinationPath,
+                                      duration: 0.2,
+                                      delay: 0,
+                                      repeatCount: 0,
+                                      autoreverses: false,
+                                      timingFunction: .linear,
+                                      delegate: nil,
+                                      isRemovedOnCompletion: true,
+                                      completionBlocks: nil)
+            self.pollQuestionBg.layer.add(anim, forKey: nil)
+            self.pollQuestionBg.layer.shadowPath = destinationPath
+        })
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidHide), name: UIResponder.keyboardDidHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
     }
     
     private func setupInputViews() {
-        pollTitleTextView.layer.masksToBounds = true
-        pollTitleTextView.layer.cornerRadius = pollTitleTextView.frame.width * 0.05
+        pollTitleFg.layer.masksToBounds = true
+        pollTitleFg.layer.cornerRadius = pollTitleTextView.frame.width * 0.05
         pollTitleBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         
-        pollDescriptionTextView.layer.masksToBounds = true
-        pollDescriptionTextView.layer.cornerRadius = pollDescriptionTextView.frame.width * 0.05
+        pollDescriptionFg.layer.masksToBounds = true
+        pollDescriptionFg.layer.cornerRadius = pollDescriptionTextView.frame.width * 0.05
         pollDescriptionBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         
-        pollQuestionTextView.layer.masksToBounds = true
-        pollQuestionTextView.layer.cornerRadius = pollQuestionTextView.frame.width * 0.05
+        pollQuestionFg.layer.masksToBounds = true
+        pollQuestionFg.layer.cornerRadius = pollQuestionTextView.frame.width * 0.05
         pollQuestionBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         
         pollURLContainerView.layer.masksToBounds = true
