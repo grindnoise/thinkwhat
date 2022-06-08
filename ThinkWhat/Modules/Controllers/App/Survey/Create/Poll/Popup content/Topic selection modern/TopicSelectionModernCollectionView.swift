@@ -31,13 +31,6 @@ class TopicSelectionModernCollectionView: UICollectionView {
 
         backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
-//        layoutConfig.headerMode = .firstItemInSection
-//        layoutConfig.backgroundColor = .clear
-//        layoutConfig.showsSeparators = false
-        
-//        let listLayout = UICollectionViewCompositionalLayout.list(using: layoutConfig)
-//        listLayout.register(RoundedBackgroundView.self, forDecorationViewOfKind: RoundedBackgroundView.reuseIdentifier)
-//        collectionViewLayout = listLayout
         
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             self.layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
@@ -54,12 +47,9 @@ class TopicSelectionModernCollectionView: UICollectionView {
         collectionViewLayout.collectionView?.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         allowsMultipleSelection = false
         
-        let cellRegistration = UICollectionView.CellRegistration<TopicSelectionModernCell, TopicItem> {
-            (cell, indexPath, item) in
+        let cellRegistration = UICollectionView.CellRegistration<TopicSelectionModernCell, TopicItem> { (cell, indexPath, item) in
             
             cell.item = item
-//            cell.backgroundView = UIView()
-//            cell.backgroundView?.backgroundColor = .lightGray.withAlphaComponent(0.1)
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .lightGray.withAlphaComponent(0.1)
             //            backgroundConfig.backgroundColorTransformer = .grayscale
@@ -68,10 +58,6 @@ class TopicSelectionModernCollectionView: UICollectionView {
                 guard let self = self else { return }
                 self.callbackDelegate?.callbackReceived(cell.item.topic as Any)
             }
-            //            let headerDisclosureOption = UICellAccessory.CheckmarkOptions(isHidden: false, reservedLayoutWidth: .standard)
-////            let reorder = UICellAccessory.reorder(displayed: .always, options: UICellAccessory.ReorderOptions.init())
-////            cell.accessories = [reorder]
-//            cell.accessories = [.checkmark()]
         }
 
         let headerCellRegistration = UICollectionView.CellRegistration<TopicSelectionModernHeader, TopicHeaderItem> {
@@ -107,9 +93,9 @@ class TopicSelectionModernCollectionView: UICollectionView {
             }
         }
         
-        var snapshot = NSDiffableDataSourceSnapshot<TopicHeaderItem, TopicListItem>()
-        snapshot.appendSections(modelObjects)
-        source.apply(snapshot)
+//        var snapshot = NSDiffableDataSourceSnapshot<TopicHeaderItem, TopicListItem>()
+//        snapshot.appendSections(modelObjects)
+//        source.apply(snapshot)
 
         // Loop through each header item so that we can create a section snapshot for each respective header item.
         for headerItem in modelObjects {
@@ -122,11 +108,11 @@ class TopicSelectionModernCollectionView: UICollectionView {
             sectionSnapshot.append([headerListItem])
             
             // Create an array of symbol ListItem & append as child of headerListItem
-            let symbolListItemArray = headerItem.topics.map { TopicListItem.topic($0) }
-            sectionSnapshot.append(symbolListItemArray, to: headerListItem)
+            let topicListItemArray = headerItem.topics.map { TopicListItem.topic($0) }
+            sectionSnapshot.append(topicListItemArray, to: headerListItem)
             
             // Expand this section by default
-            sectionSnapshot.expand([headerListItem])
+            sectionSnapshot.collapse([headerListItem])//.expand([headerListItem])
             
             // Apply section snapshot to the respective collection view section
             source.apply(sectionSnapshot, to: headerItem, animatingDifferences: false)

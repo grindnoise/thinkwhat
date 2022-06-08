@@ -254,7 +254,7 @@ class ImageSelectionPopup: UIView, UINavigationControllerDelegate {
 extension ImageSelectionPopup: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let origImage = info[.editedImage] as? UIImage {
-            let resizedImage = origImage.resized(to: CGSize(width: 200, height: 200))
+            let resizedImage = origImage.resized(to: CGSize(width: 800, height: 800))
             guard let imageData = resizedImage.jpegData(compressionQuality: 0.4),
                   let image = UIImage(data: imageData) else { fatalError("") }
             guard item.isNil else { item!.image = image; return }

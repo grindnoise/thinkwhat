@@ -36,7 +36,7 @@ class ImageSelectionCellContent: UIView {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        descriptionLabel.backgroundColor = .secondarySystemBackground//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     }
     
     private var currentConfiguration: ImageSelectionCellConfiguration!
@@ -62,7 +62,7 @@ class ImageSelectionCellContent: UIView {
     }
     @IBOutlet weak var descriptionLabel: InsetLabel! {
         didSet {
-            descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+            descriptionLabel.backgroundColor = .secondarySystemBackground//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         }
     }
     @IBOutlet weak var heightConstraint: NSLayoutConstraint!

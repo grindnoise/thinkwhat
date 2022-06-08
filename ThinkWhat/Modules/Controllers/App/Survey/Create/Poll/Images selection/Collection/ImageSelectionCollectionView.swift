@@ -24,6 +24,16 @@ struct ImageItem: Hashable {
     }
 }
 
+struct ImageHeaderItem: Hashable {
+    var count: Int
+    var color: UIColor
+}
+
+enum ImageListItem: Hashable {
+    case headerItem(ImageHeaderItem)
+    case imageItem(ImageItem)
+}
+
 @available(iOS 14, *)
 class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
     
@@ -59,151 +69,165 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
     }
     
     private func commonInit() {
-        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebarPlain)
-//        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        layoutConfig.backgroundColor = .clear
-        layoutConfig.headerMode = .supplementary
-        layoutConfig.showsSeparators = false
-        layoutConfig.trailingSwipeActionsConfigurationProvider = { [weak self] (indexPath) in
-            guard let self = self else { return UISwipeActionsConfiguration(actions: []) }
-            // 1
-            guard let item = self.source.itemIdentifier(for: indexPath) else {
-                return nil
-            }
-            
-            // 2
-            // Create action 1
-            let action = UIContextualAction(style: .destructive, title: "delete".localized) { [weak self] (action, view, completion) in
-                guard let self = self else { return }
-                self.handleSwipe(for: action, item: item)
-                var snap = self.source.snapshot()
-                if let indent = self.source.itemIdentifier(for: indexPath) {
-                    snap.deleteItems([indent])
-                    snap.reloadSections([.main])
-                }
-                self.source.apply(snap)
-                completion(true)
-            }
-            action.backgroundColor = .systemRed
-            action.image = UIImage(systemName: "trash.fill")?.withTintColor(.white)
-            
-            return UISwipeActionsConfiguration(actions: [action])
-        }
+        isScrollEnabled = false
+        observers.append(observe(\ImageSelectionCollectionView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
+            guard let self = self else { return }
+            self.callbackDelegate?.callbackReceived(["imagesHeight": change.newValue?.height])
+        })
         
-        let listLayout = UICollectionViewCompositionalLayout.list(using: layoutConfig)
-        // Create collection view with list layout
-        collectionViewLayout = listLayout
+//        observers.append(observe(colorKeyPath, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<UIColor>) in
+//            guard let self = self else { return }
+//                    var snap = self.source.snapshot()
+//
+//                    snap.reloadSections([])
+//        })
+        
+        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+        
+        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+            self.layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+            self.layoutConfig.headerMode = .firstItemInSection
+            self.layoutConfig.backgroundColor = .clear
+            self.layoutConfig.showsSeparators = false
+//            self.layoutConfig.trailingSwipeActionsConfigurationProvider = { [weak self] (indexPath) in
+//                guard let self = self else { return UISwipeActionsConfiguration(actions: []) }
+//                guard let item = self.source.itemIdentifier(for: indexPath) else {
+//                    return nil
+//                }
+//
+//                let action = UIContextualAction(style: .destructive, title: "delete".localized) { [weak self] (action, view, completion) in
+//                    guard let self = self else { return }
+//                    self.handleSwipe(for: action, item: item)
+//                    var snap = self.source.snapshot()
+//                    if let indent = self.source.itemIdentifier(for: indexPath) {
+//                        snap.deleteItems([indent])
+//                        snap.reloadSections([.main])
+//                    }
+//                    self.source.apply(snap)
+//                    completion(true)
+//                }
+//                action.backgroundColor = .systemRed
+//                action.image = UIImage(systemName: "trash.fill")?.withTintColor(.white)
+//
+//                return UISwipeActionsConfiguration(actions: [action])
+//            }
+            return NSCollectionLayoutSection.list(using: self.layoutConfig, layoutEnvironment: env)
+        }
         delegate = self
         
         let cellRegistration = UICollectionView.CellRegistration<ImageSelectionCell, ImageItem> { (cell, indexPath, item) in
             cell.item = item
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-            backgroundConfig.backgroundColor = .clear
-            //            backgroundConfig.backgroundColorTransformer = .grayscale
+            backgroundConfig.backgroundColor = .lightGray.withAlphaComponent(0.1)
             cell.backgroundConfiguration = backgroundConfig
-//            cell.selectedCallback = { [weak self] in
-//                guard let self = self else { return }
-//                self.listener.editImage(cell.item)
-//            }
         }
         
-        headerRegistration = UICollectionView.SupplementaryRegistration
-        <ImageSelectionHeader>(elementKind: UICollectionView.elementKindSectionHeader) {
-            [weak self] (headerView, elementKind, indexPath) in guard let self = self else { return }
-
-//            let totalCount = self.source.snapshot().itemIdentifiers.count
+        let headerCellRegistration = UICollectionView.CellRegistration<ImageSelectionHeader, ImageHeaderItem> {
+            (cell, indexPath, headerItem) in
+            cell.item = headerItem
+//            cell
+//            print(cell.contentView as! ImageSelectionHeaderContent)
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+            backgroundConfig.backgroundColor = .red
+            cell.backgroundConfiguration = backgroundConfig
+        }
+        
+        source = UICollectionViewDiffableDataSource<ImageHeaderItem, ImageListItem>(collectionView: self) {
+            (collectionView, indexPath, listItem) -> UICollectionViewCell? in
             
-//            headerView.titleLabel.text = "Count: \(self.dataItems.count)"
-            headerView.color = self.color
-            headerView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-//            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-//            backgroundConfig.backgroundColor = .clear
-//            //            backgroundConfig.backgroundColorTransformer = .grayscale
-//            headerView.backgroundConfiguration = backgroundConfig
-            self.observers.append(self.observe(self.colorKeyPath, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<UIColor>) in guard let self = self else { return }
-                headerView.color = self.color
-            })
-//            self.observers.append(self.observe(self.colorKeyPath, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<UIColor>) in guard let self = self else { return }
-//                headerView.color = self.color
-//            })
-                        
-            headerView.addButtonTapCallback = { [weak self] in
-                guard let self = self else { return }
-                self.listener.addImage()
+            switch listItem {
+            case .headerItem(let headerItem):
+            
+                // Dequeue header cell
+                let cell = collectionView.dequeueConfiguredReusableCell(using: headerCellRegistration,
+                                                                        for: indexPath,
+                                                                        item: headerItem)
+                return cell
+            
+            case .imageItem(let item):
+                
+                // Dequeue symbol cell
+                let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
+                                                                        for: indexPath,
+                                                                        item: item)
+                return cell
             }
-            headerView.configuration = ImageSelectionHeaderConfiguration(count: self.dataItems.count)
         }
+        let headerItem = ImageHeaderItem(count: dataItems.count, color: color)
+//        var snapshot = NSDiffableDataSourceSnapshot<ImageHeaderItem, ImageListItem>()
+//        snapshot.appendSections([headerItem])
+//        source.apply(snapshot)
         
-        source = UICollectionViewDiffableDataSource<Section, ImageItem>(collectionView: self) {
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: ImageItem) -> ImageSelectionCell? in
-            
-            // Dequeue reusable cell using cell registration (Reuse identifier no longer needed)
-            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
-            return cell
-        }
         
-        // MARK: Define supplementary view provider
-        source.supplementaryViewProvider = { [unowned self]
-            (collectionView, elementKind, indexPath) -> UICollectionReusableView? in
-            
-            return self.dequeueConfiguredReusableSupplementary(
-                using: headerRegistration, for: indexPath)
-        }
-//        // Create a snapshot that define the current state of data source's data
-//        snapshot = NSDiffableDataSourceSnapshot<Section, ImageItem>()
-//        snapshot.appendSections([.main])
-//        snapshot.appendItems(dataItems, toSection: .main)
-//
-//        // Display data in the collection view by applying the snapshot to data source
-//        source.apply(snapshot, animatingDifferences: false)
-        reload()
+////        let headerItem = ImageHeaderItem(count: 0)
+        var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<ImageListItem>()
+        let headerListItem = ImageListItem.headerItem(headerItem)
+        sectionSnapshot.append([headerListItem])
+
+        let imageListItemArray = dataItems.map({ ImageListItem.imageItem($0) })
+        sectionSnapshot.append(imageListItemArray, to: headerListItem)
+
+        sectionSnapshot.expand([headerListItem])
+        source.apply(sectionSnapshot, to: headerItem, animatingDifferences: false)
     }
     
     func reload() {
-        snapshot = NSDiffableDataSourceSnapshot<Section, ImageItem>()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(dataItems, toSection: .main)
-//        snapshot.reloadSections([.main])
-        source.apply(snapshot, animatingDifferences: true)
+        var snapshot = source.snapshot()
+        snapshot.deleteSections(snapshot.sectionIdentifiers)
+        source.apply(snapshot)
+        let headerItem = ImageHeaderItem(count: dataItems.count, color: color)
+//        var snapshot = NSDiffableDataSourceSnapshot<ImageHeaderItem, ImageListItem>()
+//        snapshot.appendSections([headerItem])
+//        source.apply(snapshot)
+        
+        
+////        let headerItem = ImageHeaderItem(count: 0)
+        var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<ImageListItem>()
+        let headerListItem = ImageListItem.headerItem(headerItem)
+        sectionSnapshot.append([headerListItem])
+
+        let imageListItemArray = dataItems.map({ ImageListItem.imageItem($0) })
+        sectionSnapshot.append(imageListItemArray, to: headerListItem)
+
+        sectionSnapshot.expand([headerListItem])
+        source.apply(sectionSnapshot, to: headerItem, animatingDifferences: false)
     }
     
     func append(_ item: ImageItem) {
         var snapshot = source.snapshot()
-        guard !snapshot.itemIdentifiers.contains(item) else { return }
-        snapshot.appendItems([item], toSection: .main)
-        snapshot.reloadSections([.main])
-        source.apply(snapshot, animatingDifferences: true)
+//        snapshot.reloadSections([snapshot.sectionIdentifiers.first])
+//        var snapshot = source.snapshot()
+//        guard !snapshot.itemIdentifiers.contains(item) else { return }
+//        snapshot.appendItems([item], toSection: .main)
+//        snapshot.reloadSections([.main])
+//        source.apply(snapshot, animatingDifferences: true)
     }
     
     func delete(_ item: ImageItem) {
-        var snap = self.source.snapshot()
-        guard let existing = snap.itemIdentifiers.filter({ $0.id == item.id }).first else { return }
-        snap.deleteItems([existing])
-        snap.reloadSections([.main])
-        source.apply(snap, animatingDifferences: true)
+//        var snap = self.source.snapshot()
+//        guard let existing = snap.itemIdentifiers.filter({ $0.id == item.id }).first else { return }
+//        snap.deleteItems([existing])
+//        snap.reloadSections([.main])
+//        source.apply(snap, animatingDifferences: true)
     }
     
     weak var callbackDelegate: CallbackObservable?
-//    var dataItems: [ImageItem] = [
-//        ImageItem(title: "One", image: UIImage(systemName: "mic.fill")!),
-//        ImageItem(title: "Two", image: UIImage(systemName: "sunset.fill")!),
-//        ImageItem(title: "Three", image: UIImage(systemName: "message.fill")!)
-//    ]
     var listener: ImageSelectionListener!
     var dataItems: [ImageItem] {
         return listener.imageItems
     }
-    var source: UICollectionViewDiffableDataSource<Section, ImageItem>!
-    var snapshot: NSDiffableDataSourceSnapshot<Section, ImageItem>!
+    var source: UICollectionViewDiffableDataSource<ImageHeaderItem, ImageListItem>!
     private var layoutConfig: UICollectionLayoutListConfiguration!
-    @objc dynamic var color: UIColor = .systemGreen
-    private let colorKeyPath = \ImageSelectionCollectionView.color
+//    @objc dynamic var color: UIColor = .systemGreen
+    var color: UIColor = .systemGreen {
+        didSet {
+            print(color)
+            reload()
+        }
+    }
+//    private let colorKeyPath = \ImageSelectionCollectionView.color
     private var observers: [NSKeyValueObservation] = []
-    private var headerRegistration: UICollectionView.SupplementaryRegistration
-    <ImageSelectionHeader>!
 }
 
 @available(iOS 14, *)
@@ -236,7 +260,7 @@ class ImageSelectionCell: UICollectionViewListCell {
 //    }
     
     override func updateConfiguration(using state: UICellConfigurationState) {
-        backgroundColor = .clear
+        automaticallyUpdatesBackgroundConfiguration = false
         var newConfiguration = ImageSelectionCellConfiguration().updated(for: state)
         newConfiguration.title = item.title
         newConfiguration.image = item.image
@@ -253,6 +277,48 @@ struct ImageSelectionCellConfiguration: UIContentConfiguration, Hashable {
     
     func makeContentView() -> UIView & UIContentView {
         return ImageSelectionCellContent(configuration: self)
+    }
+
+    func updated(for state: UIConfigurationState) -> Self {
+        guard state is UICellConfigurationState else {
+                return self
+            }
+        let updatedConfiguration = self
+        return updatedConfiguration
+    }
+}
+
+@available(iOS 14.0, *)
+class ImageSelectionHeader: UICollectionViewListCell {
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    var item: ImageHeaderItem!
+    
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        backgroundColor = .clear
+        var newConfiguration = ImageSelectionHeaderConfiguration().updated(for: state)
+        newConfiguration.count = item.count
+        newConfiguration.color = item.color
+        
+        contentConfiguration = newConfiguration
+    }
+}
+
+@available(iOS 14.0, *)
+struct ImageSelectionHeaderConfiguration: UIContentConfiguration, Hashable {
+
+    var count: Int!
+    var color: UIColor!
+    
+    func makeContentView() -> UIView & UIContentView {
+        return ImageSelectionHeaderContent(configuration: self)
     }
 
     func updated(for state: UIConfigurationState) -> Self {

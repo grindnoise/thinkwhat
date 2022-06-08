@@ -9,7 +9,7 @@
 import UIKit
 
 @available(iOS 14.0, *)
-class ImageSelectionHeader: UICollectionReusableView {
+class delImageSelectionHeader: UICollectionReusableView {
     
     let titleLabel = UILabel()
 //    let addButton = UIButton()
@@ -23,10 +23,10 @@ class ImageSelectionHeader: UICollectionReusableView {
     
     // Callback closure to handle info button tap
     var addButtonTapCallback: Closure?//(() -> Void)?
-    private var currentConfiguration: ImageSelectionHeaderConfiguration!
+    private var currentConfiguration: delImageSelectionHeaderConfiguration!
     private var observers: [NSKeyValueObservation] = []
     
-    init(configuration: ImageSelectionHeaderConfiguration) {
+    init(configuration: delImageSelectionHeaderConfiguration) {
         super.init(frame: .zero)
         configure()
         apply(configuration: configuration)
@@ -52,7 +52,7 @@ class ImageSelectionHeader: UICollectionReusableView {
 }
 
 @available(iOS 14.0, *)
-extension ImageSelectionHeader {
+extension delImageSelectionHeader {
     
     func configure() {
         
@@ -115,20 +115,20 @@ extension ImageSelectionHeader {
 }
 
 @available(iOS 14.0, *)
-extension ImageSelectionHeader: UIContentView {
+extension delImageSelectionHeader: UIContentView {
     var configuration: UIContentConfiguration {
         get {
             currentConfiguration
         }
         set {
-            guard let newConfiguration = newValue as? ImageSelectionHeaderConfiguration else {
+            guard let newConfiguration = newValue as? delImageSelectionHeaderConfiguration else {
                 return
             }
             apply(configuration: newConfiguration)
         }
     }
     
-    func apply(configuration: ImageSelectionHeaderConfiguration) {
+    func apply(configuration: delImageSelectionHeaderConfiguration) {
         guard currentConfiguration != configuration else { return }
         currentConfiguration = configuration
         titleLabel.text = "total_images".localized.capitalized +  ": \(currentConfiguration.count!)/3"
@@ -137,12 +137,12 @@ extension ImageSelectionHeader: UIContentView {
 }
 
 @available(iOS 14.0, *)
-struct ImageSelectionHeaderConfiguration: UIContentConfiguration, Hashable {
+struct delImageSelectionHeaderConfiguration: UIContentConfiguration, Hashable {
 
     var count: Int!
     
     func makeContentView() -> UIView & UIContentView {
-        return ImageSelectionHeader(configuration: self)
+        return delImageSelectionHeader(configuration: self)
     }
 
     func updated(for state: UIConfigurationState) -> Self {
