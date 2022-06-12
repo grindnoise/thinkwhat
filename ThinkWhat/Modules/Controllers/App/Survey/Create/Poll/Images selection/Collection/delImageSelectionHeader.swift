@@ -12,12 +12,10 @@ import UIKit
 class delImageSelectionHeader: UICollectionReusableView {
     
     let titleLabel = UILabel()
-//    let addButton = UIButton()
     let addButton = UIImageView(image: UIImage(systemName: "plus.circle.fill"))
     var color = UIColor.systemYellow {
         didSet {
             addButton.tintColor = color
-//            addButton.setImage(addButton.image(for: .normal)?.withTintColor(color), for: .normal)
         }
     }
     

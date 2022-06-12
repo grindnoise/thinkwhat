@@ -383,40 +383,40 @@ class SurveysViewController: UIViewController/*, CircleTransitionable*/ {
             nc.duration = 0.3
             nc.transitionStyle = .Icon
             destinationVC.delegate = self
-        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? delPollController, let surveyRef = sender as? SurveyReference {
-//            let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
-            navigationController?.setNavigationBarHidden(false, animated: true)
-            nc.duration = 0.2
-            nc.transitionStyle = .Icon
-            destinationVC.mode = surveyRef.isComplete ? .ReadOnly : .Write
-            destinationVC.surveyRef = surveyRef
-            tabBarController?.setTabBarVisible(visible: false, animated: true)
-        
-        
-        
-        /*else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? SurveyViewController {
-            switch currentIcon {
-            case .New:
-                if let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
-                    destinationVC.surveyLink = cell.survey
-                    destinationVC.apiManager = apiManager
-                }
-//            case.Top:
-//                if let cell = topTableVC.tableView.cellForRow(at: topTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+//        } else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? delPollController, let surveyRef = sender as? SurveyReference {
+////            let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+//            navigationController?.setNavigationBarHidden(false, animated: true)
+//            nc.duration = 0.2
+//            nc.transitionStyle = .Icon
+//            destinationVC.mode = surveyRef.isComplete ? .ReadOnly : .Write
+//            destinationVC.surveyRef = surveyRef
+//            tabBarController?.setTabBarVisible(visible: false, animated: true)
+//
+//
+//
+//        /*else if segue.identifier == Segues.App.FeedToSurvey, let destinationVC = segue.destination as? SurveyViewController {
+//            switch currentIcon {
+//            case .New:
+//                if let cell = tableVC.tableView.cellForRow(at: tableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
 //                    destinationVC.surveyLink = cell.survey
 //                    destinationVC.apiManager = apiManager
 //                }
-            default:
-                print("s")
-            }
-            tabBarController?.setTabBarVisible(visible: false, animated: true)*/
-//        } else if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController, let sender = sender as? SurveyStackViewController {
-//            destinationVC.shouldDownloadImages = false
-//            destinationVC.survey = sender.surveyPreview.survey
-//            destinationVC.delegate = sender
-//            destinationVC.isNavTitleEnabled = false
-//            nc.transitionStyle = .Icon
-//            nc.duration = 0.25//5.4//
+////            case.Top:
+////                if let cell = topTableVC.tableView.cellForRow(at: topTableVC.tableView.indexPathForSelectedRow!) as? SurveyTableViewCell {
+////                    destinationVC.surveyLink = cell.survey
+////                    destinationVC.apiManager = apiManager
+////                }
+//            default:
+//                print("s")
+//            }
+//            tabBarController?.setTabBarVisible(visible: false, animated: true)*/
+////        } else if segue.identifier == Segues.App.FeedToSurveyFromTop, let destinationVC = segue.destination as? SurveyViewController, let sender = sender as? SurveyStackViewController {
+////            destinationVC.shouldDownloadImages = false
+////            destinationVC.survey = sender.surveyPreview.survey
+////            destinationVC.delegate = sender
+////            destinationVC.isNavTitleEnabled = false
+////            nc.transitionStyle = .Icon
+////            nc.duration = 0.25//5.4//
         } else if segue.identifier == Segues.App.FeedToNewSurvey {
             nc.transitionStyle = .Icon
             nc.duration = 0.4

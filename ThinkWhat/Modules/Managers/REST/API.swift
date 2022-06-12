@@ -1192,9 +1192,9 @@ class API {
 //                                                           DateFormatter.dateTimeFormatter,
 //                                                           DateFormatter.dateFormatter ]
                 let json = try JSON(data: data, options: .mutableContainers)
-                
+                let container = JSON(["by_category": json])
                 await MainActor.run {
-                    Surveys.shared.load(json)
+                    Surveys.shared.load(container)
 //                    let instances = try decoder.decode([SurveyReference].self, from: data)
 //                    guard !instances.isEmpty else {
 //                        //                    await MainActor.run {

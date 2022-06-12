@@ -8,8 +8,6 @@
 
 import UIKit
 
-
-
 //@available(iOS 14, *)
 struct ImageItem: Hashable {
     
@@ -24,11 +22,14 @@ struct ImageItem: Hashable {
     }
 }
 
+@available(iOS 14, *)
 struct ImageHeaderItem: Hashable {
     var count: Int
     var color: UIColor
+    var collectionView: ImageSelectionCollectionView
 }
 
+@available(iOS 14, *)
 enum ImageListItem: Hashable {
     case headerItem(ImageHeaderItem)
     case imageItem(ImageItem)
@@ -123,11 +124,45 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
             cell.backgroundConfiguration = backgroundConfig
         }
         
+//        let headerRegistration = UICollectionView.SupplementaryRegistration
+//        <_ImageSelectionHeaderContent>(elementKind: UICollectionView.elementKindSectionHeader) {
+//            [unowned self] (headerView, elementKind, indexPath) in
+//
+//            // Obtain header item using index path
+//            let headerItem = self.source.snapshot().sectionIdentifiers[indexPath.section]
+//
+//            headerView.addButtonTapCallback = { [weak self] in
+//                guard self = self else { return }
+//                self?.callbackDelegate?.callbackReceived(<#T##sender: Any##Any#>)
+//
+//            }
+//            headerView.titleLabel.text = headerItem.title
+//            headerView.infoButtonDidTappedCallback = { [unowned self] in
+//
+//                // Show an alert when user tap on infoButton
+//                let symbolCount = headerItem.symbols.count
+//                let alert = UIAlertController(title: "Info", message: "This section has \(symbolCount) symbols.", preferredStyle: .alert)
+//                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+//                alert.addAction(okAction)
+//
+//                self.present(alert, animated: true)
+//            }
+//        }
+        
+//        let headerCellRegistration = UICollectionView.CellRegistration<ImageSelectionHeader, ImageHeaderItem> {
+//            (cell, indexPath, headerItem) in
+//            cell.item = headerItem
+////            cell
+////            print(cell.contentView as! ImageSelectionHeaderContent)
+//            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+//            backgroundConfig.backgroundColor = .red
+//            cell.backgroundConfiguration = backgroundConfig
+//        }
+        
         let headerCellRegistration = UICollectionView.CellRegistration<ImageSelectionHeader, ImageHeaderItem> {
             (cell, indexPath, headerItem) in
             cell.item = headerItem
-//            cell
-//            print(cell.contentView as! ImageSelectionHeaderContent)
+            cell.collectionView = self
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .red
             cell.backgroundConfiguration = backgroundConfig
@@ -154,7 +189,7 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
                 return cell
             }
         }
-        let headerItem = ImageHeaderItem(count: dataItems.count, color: color)
+        let headerItem = ImageHeaderItem(count: dataItems.count, color: color, collectionView: self)
 //        var snapshot = NSDiffableDataSourceSnapshot<ImageHeaderItem, ImageListItem>()
 //        snapshot.appendSections([headerItem])
 //        source.apply(snapshot)
@@ -176,7 +211,7 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
         var snapshot = source.snapshot()
         snapshot.deleteSections(snapshot.sectionIdentifiers)
         source.apply(snapshot)
-        let headerItem = ImageHeaderItem(count: dataItems.count, color: color)
+        let headerItem = ImageHeaderItem(count: dataItems.count, color: color, collectionView: self)
 //        var snapshot = NSDiffableDataSourceSnapshot<ImageHeaderItem, ImageListItem>()
 //        snapshot.appendSections([headerItem])
 //        source.apply(snapshot)
@@ -300,12 +335,15 @@ class ImageSelectionHeader: UICollectionViewListCell {
     }
     
     var item: ImageHeaderItem!
+    var collectionView: ImageSelectionCollectionView!
+//    var callback: Closure!
     
     override func updateConfiguration(using state: UICellConfigurationState) {
         backgroundColor = .clear
         var newConfiguration = ImageSelectionHeaderConfiguration().updated(for: state)
         newConfiguration.count = item.count
         newConfiguration.color = item.color
+        newConfiguration.collectionView = collectionView
         
         contentConfiguration = newConfiguration
     }
@@ -316,6 +354,7 @@ struct ImageSelectionHeaderConfiguration: UIContentConfiguration, Hashable {
 
     var count: Int!
     var color: UIColor!
+    var collectionView: ImageSelectionCollectionView!
     
     func makeContentView() -> UIView & UIContentView {
         return ImageSelectionHeaderContent(configuration: self)

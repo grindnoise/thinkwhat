@@ -8,6 +8,66 @@
 
 import UIKit
 
+
+
+@available(iOS 14.0, *)
+class _ImageSelectionHeaderContent: UICollectionReusableView {
+
+    init(configuration: ImageSelectionHeaderConfiguration) {
+        super.init(frame: .zero)
+        commonInit()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func commonInit() {
+        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        addButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+    }
+
+    @objc
+    private func handleTap() {
+//        addButtonTapCallback?()
+    }
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        contentView.backgroundColor = .tertiarySystemBackground
+//    }
+
+//    var addButtonTapCallback: Closure?
+    var color = UIColor.systemYellow {
+        didSet {
+            print(color)
+            addButton.tintColor = color
+        }
+    }
+    private var observers: [NSKeyValueObservation] = []
+//    private weak var collectionView: ImageSelectionCollectionView?
+    // MARK: - IB outlets
+    @IBOutlet var contentView: UIView!
+    @IBOutlet weak var addButton: UIImageView! {
+        didSet {
+            addButton.isUserInteractionEnabled = true
+            addButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+            addButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+        }
+    }
+    @IBOutlet weak var titleLabel: InsetLabel!
+    @IBOutlet weak var height: NSLayoutConstraint!
+}
+
 @available(iOS 14.0, *)
 class ImageSelectionHeaderContent: UIView {
 
@@ -41,7 +101,8 @@ class ImageSelectionHeaderContent: UIView {
 
     @objc
     private func handleTap() {
-        addButtonTapCallback?()
+//        addButtonTapCallback?()
+        collectionView?.listener.addImage()
     }
 //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 //        contentView.backgroundColor = .tertiarySystemBackground
@@ -59,7 +120,8 @@ class ImageSelectionHeaderContent: UIView {
             apply(configuration: newConfiguration)
         }
     }
-    var addButtonTapCallback: Closure?
+//    var addButtonTapCallback: Closure?
+    private weak var collectionView: ImageSelectionCollectionView?
     var color = UIColor.systemYellow {
         didSet {
             print(color)
@@ -86,7 +148,7 @@ extension ImageSelectionHeaderContent: UIContentView {
     func apply(configuration: ImageSelectionHeaderConfiguration) {
         guard currentConfiguration != configuration else { return }
         currentConfiguration = configuration
-        
+        collectionView = currentConfiguration.collectionView
         titleLabel.text = "total_images".localized.capitalized +  ": \(currentConfiguration.count!)/3"
         color = currentConfiguration.color
         height.constant = 60

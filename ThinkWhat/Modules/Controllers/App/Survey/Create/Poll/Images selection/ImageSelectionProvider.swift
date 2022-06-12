@@ -6,7 +6,6 @@
 //  Copyright © 2022 Pavel Bukharov. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 protocol ImageSelectionProvider: class {

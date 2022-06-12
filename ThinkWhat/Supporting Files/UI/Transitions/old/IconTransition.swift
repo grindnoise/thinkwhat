@@ -554,49 +554,49 @@ class IconTransition: delBasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? delImageViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let initialView = cell.scrollView {
-                toVC.view.setNeedsLayout()
-                toVC.view.layoutIfNeeded()
-                
-                vc_2.view.alpha = 0
-                vc_2.scrollView.alpha = 0
-                let imageView = UIImageView(frame: initialView.frame)
-                imageView.backgroundColor = .black
-                imageView.frame.origin = initialView.superview!.convert(initialView.frame.origin, to: containerView)
-                imageView.layer.masksToBounds = true
-                imageView.image = vc_2.image
-                imageView.cornerRadius = initialView.cornerRadius
-                imageView.contentMode = .scaleAspectFill
-                containerView.addSubview(imageView)
-                initialView.alpha = 0
-
-                let blackScreen = UIView(frame: vc_1.view.frame)
-                blackScreen.addEquallyTo(to: vc_1.view)
-                blackScreen.backgroundColor = .black
-                blackScreen.alpha = 0
-                let destinationSize = vc_2.scrollView.imageView.getImageRect().size//CGSize(width: vc_2.view.frame.width, height: vc_2.view.frame.width)//vc_2.scrollView.frame.size
-                let destinationOrigin = toVC.view.convert(CGPoint(x: 0, y: vc_2.scrollView.imageView.getImageRect().origin.y), to: navigationController?.view)// - navigationController!.navigationBar.frame.height - 12)
-//                toVC.view.convert(destinationOrigin, to: navigationController?.view)
-                
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
-                    self.navigationController?.navigationBar.setNeedsLayout()
-                    self.navigationController?.navigationBar.backgroundColor = .black
-                    self.navigationController?.navigationBar.tintColor = .white
-                    self.navigationController?.tabBarController?.view.backgroundColor = .black
-                    toVC.navigationController?.navigationBar.barStyle = .black
-                    self.navigationController?.navigationBar.layoutIfNeeded()
-                    imageView.frame.origin = destinationOrigin
-                    imageView.frame.size = destinationSize
-                    imageView.cornerRadius = 0
-                    blackScreen.alpha = 1
-                }) {
-                    _ in
-                    blackScreen.removeFromSuperview()
-                    imageView.removeFromSuperview()
-                    vc_2.view.alpha = 1
-                    vc_2.scrollView.alpha = 1
-                    self.context?.completeTransition(true)
-                }
+//            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? delImageViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let initialView = cell.scrollView {
+//                toVC.view.setNeedsLayout()
+//                toVC.view.layoutIfNeeded()
+//
+//                vc_2.view.alpha = 0
+//                vc_2.scrollView.alpha = 0
+//                let imageView = UIImageView(frame: initialView.frame)
+//                imageView.backgroundColor = .black
+//                imageView.frame.origin = initialView.superview!.convert(initialView.frame.origin, to: containerView)
+//                imageView.layer.masksToBounds = true
+//                imageView.image = vc_2.image
+//                imageView.cornerRadius = initialView.cornerRadius
+//                imageView.contentMode = .scaleAspectFill
+//                containerView.addSubview(imageView)
+//                initialView.alpha = 0
+//
+//                let blackScreen = UIView(frame: vc_1.view.frame)
+//                blackScreen.addEquallyTo(to: vc_1.view)
+//                blackScreen.backgroundColor = .black
+//                blackScreen.alpha = 0
+//                let destinationSize = vc_2.scrollView.imageView.getImageRect().size//CGSize(width: vc_2.view.frame.width, height: vc_2.view.frame.width)//vc_2.scrollView.frame.size
+//                let destinationOrigin = toVC.view.convert(CGPoint(x: 0, y: vc_2.scrollView.imageView.getImageRect().origin.y), to: navigationController?.view)// - navigationController!.navigationBar.frame.height - 12)
+////                toVC.view.convert(destinationOrigin, to: navigationController?.view)
+//
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
+//                    self.navigationController?.navigationBar.setNeedsLayout()
+//                    self.navigationController?.navigationBar.backgroundColor = .black
+//                    self.navigationController?.navigationBar.tintColor = .white
+//                    self.navigationController?.tabBarController?.view.backgroundColor = .black
+//                    toVC.navigationController?.navigationBar.barStyle = .black
+//                    self.navigationController?.navigationBar.layoutIfNeeded()
+//                    imageView.frame.origin = destinationOrigin
+//                    imageView.frame.size = destinationSize
+//                    imageView.cornerRadius = 0
+//                    blackScreen.alpha = 1
+//                }) {
+//                    _ in
+//                    blackScreen.removeFromSuperview()
+//                    imageView.removeFromSuperview()
+//                    vc_2.view.alpha = 1
+//                    vc_2.scrollView.alpha = 1
+//                    self.context?.completeTransition(true)
+//                }
             } else if let vc_1 = fromVC as? SurveysViewController, let initialIcon = vc_1.navigationItem.rightBarButtonItem?.value(forKey: "view") as? Icon, let vc_2 = toVC as? NewSurveySelectionTypeController, let keyWindow = navigationController?.view.window {
                 vc_2.view.setNeedsLayout()
                 vc_2.view.layoutIfNeeded()
@@ -885,110 +885,110 @@ class IconTransition: delBasicTransition {
                     }
                 }
                 animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-            } else if let vc_1 = fromVC as? SurveysViewController, let vc_2 = toVC as? delPollController {
-                var animationBlocks: [Closure] = []
-                vc_2.tableView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5 )
-                animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseOut], animations: {
-                        vc_2.tableView.transform = .identity
-                        fromVC.view.transform = CGAffineTransform(scaleX: 0.97, y: 0.97)
-                    }) {
-                        _ in
-                        fromVC.view.transform = .identity
-                        self.context?.completeTransition(true)
-                    }
-                }
-                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: false) { _ in }
-            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? delVotersViewController, let initialCell = vc_1.tableView.cellForRow(at: vc_2.initialIndex) as? ChoiceResultCell, let resultIndicator = initialCell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_2.collectionView as? UICollectionView {
-
-                vc_2.view.setNeedsLayout()
-                vc_2.view.layoutIfNeeded()
-
-                var tempImageViews: [UIImageView] = []
-                for (i, imageView) in imageViews.enumerated() {
-                    let tempImageView = UIImageView(frame: CGRect(origin: imageView.superview!.convert(imageView.frame.origin, to: containerView), size: imageView.frame.size))
-                    tempImageView.image = imageView.image
-                    tempImageView.layer.zPosition = CGFloat(100 - i)
-                    containerView.addSubview(tempImageView)
-                    tempImageViews.append(tempImageView)
-                    imageView.alpha = 0
-                }
-//                for i in 0..<imageViews.count {
-////                    let tempImageView = initialImageView.copyView() as! UIImageView
-//                    if let _cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? UserCell {
-//                        let tempImageView = UIImageView(frame: CGRect(origin: _cell.convert(_cell.imageView.frame.origin, to: containerView), size: _cell.imageView.frame.size))
-//                        tempImageView.image = _cell.imageView.image
-////                        tempImageView.frame.origin = initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView)
-//                        tempImageView.layer.zPosition = CGFloat(100 - i)
-//                        containerView.addSubview(tempImageView)
-//                        tempImageViews.append(tempImageView)
-//                        _cell.imageView.alpha = 0
+//            } else if let vc_1 = fromVC as? SurveysViewController, let vc_2 = toVC as? delPollController {
+//                var animationBlocks: [Closure] = []
+//                vc_2.tableView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5 )
+//                animationBlocks.append {
+//                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseOut], animations: {
+//                        vc_2.tableView.transform = .identity
+//                        fromVC.view.transform = CGAffineTransform(scaleX: 0.97, y: 0.97)
+//                    }) {
+//                        _ in
+//                        fromVC.view.transform = .identity
+//                        self.context?.completeTransition(true)
 //                    }
 //                }
-
-                var destinationOrigins: [CGPoint] = []
-                var destinationSize: CGSize = .zero
-                var destinationImageViews: [UIImageView] = []
-                for i in 0..<tempImageViews.count {
-                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? delUserCell, let imageView = cell.imageView as? UIImageView{
-                        if destinationSize == .zero { destinationSize = imageView.frame.size }
-                        imageView.alpha = 0
-                        destinationOrigins.append(cell.convert(imageView.frame.origin, to: containerView))
-                        destinationImageViews.append(imageView)
-                    }
-                }
-//                for (i,cell) in collectionView.visibleCells.enumerated() {
-//                    if i == tempImageViews.count { break }
-//                    if let downcastedCell = cell as? UserCell, let imageView = downcastedCell.imageView as? UIImageView {
+//                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks, withIncomingBlurEffect: false) { _ in }
+//            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? delVotersViewController, let initialCell = vc_1.tableView.cellForRow(at: vc_2.initialIndex) as? ChoiceResultCell, let resultIndicator = initialCell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_2.collectionView as? UICollectionView {
+//
+//                vc_2.view.setNeedsLayout()
+//                vc_2.view.layoutIfNeeded()
+//
+//                var tempImageViews: [UIImageView] = []
+//                for (i, imageView) in imageViews.enumerated() {
+//                    let tempImageView = UIImageView(frame: CGRect(origin: imageView.superview!.convert(imageView.frame.origin, to: containerView), size: imageView.frame.size))
+//                    tempImageView.image = imageView.image
+//                    tempImageView.layer.zPosition = CGFloat(100 - i)
+//                    containerView.addSubview(tempImageView)
+//                    tempImageViews.append(tempImageView)
+//                    imageView.alpha = 0
+//                }
+////                for i in 0..<imageViews.count {
+//////                    let tempImageView = initialImageView.copyView() as! UIImageView
+////                    if let _cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? UserCell {
+////                        let tempImageView = UIImageView(frame: CGRect(origin: _cell.convert(_cell.imageView.frame.origin, to: containerView), size: _cell.imageView.frame.size))
+////                        tempImageView.image = _cell.imageView.image
+//////                        tempImageView.frame.origin = initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView)
+////                        tempImageView.layer.zPosition = CGFloat(100 - i)
+////                        containerView.addSubview(tempImageView)
+////                        tempImageViews.append(tempImageView)
+////                        _cell.imageView.alpha = 0
+////                    }
+////                }
+//
+//                var destinationOrigins: [CGPoint] = []
+//                var destinationSize: CGSize = .zero
+//                var destinationImageViews: [UIImageView] = []
+//                for i in 0..<tempImageViews.count {
+//                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? delUserCell, let imageView = cell.imageView as? UIImageView{
 //                        if destinationSize == .zero { destinationSize = imageView.frame.size }
 //                        imageView.alpha = 0
-//                        destinationOrigins.append(downcastedCell.convert(imageView.frame.origin, to: containerView))
+//                        destinationOrigins.append(cell.convert(imageView.frame.origin, to: containerView))
 //                        destinationImageViews.append(imageView)
 //                    }
 //                }
-
-                var animationBlocks: [Closure] = []
-                animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration*0.9, delay: 0, options: [.curveEaseInOut], animations: {
-                            tempImageViews.enumerated().forEach({
-                                (i, imageView) in
-                                imageView.frame.origin = destinationOrigins[i]
-                                imageView.frame.size = destinationSize
-                            })
-                    }) {
-                        _ in
-                        destinationImageViews.forEach({ $0.alpha = 1 })
-                        tempImageViews.forEach({ $0.removeFromSuperview() })
-                        imageViews.forEach({ $0.alpha = 1 })
-                        self.context?.completeTransition(true)
-                    }
-                }
-                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? UserViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = cell.avatar, let destinationImageView = vc_2.imageView {
-                let imageView = UIImageView(frame: CGRect(origin: initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView), size: initialImageView.frame.size))
-                if let image = vc_1.survey?.owner.image {
-                    imageView.image = image.circularImage(size: initialImageView.frame.size, frameColor: vc_1.survey?.topic.tagColor ?? K_COLOR_RED)
-                }
-                initialImageView.alpha = 0
-                destinationImageView.alpha = 0
-                containerView.addSubview(imageView)
-                
-                let destinationOrigin = destinationImageView.superview!.convert(destinationImageView.frame.origin, to: containerView)
-                let destinationSize = destinationImageView.frame.size
-                
-                var animationBlocks: [Closure] = []
-                animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: .curveEaseInOut) {
-                        imageView.frame.origin = destinationOrigin
-                        imageView.frame.size = destinationSize
-                    } completion: {
-                        _ in
-                        imageView.removeFromSuperview()
-                        destinationImageView.alpha = 1
-                        self.context?.completeTransition(true)
-                    }
-                }
-                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: animationBlocks) { _ in }
+////                for (i,cell) in collectionView.visibleCells.enumerated() {
+////                    if i == tempImageViews.count { break }
+////                    if let downcastedCell = cell as? UserCell, let imageView = downcastedCell.imageView as? UIImageView {
+////                        if destinationSize == .zero { destinationSize = imageView.frame.size }
+////                        imageView.alpha = 0
+////                        destinationOrigins.append(downcastedCell.convert(imageView.frame.origin, to: containerView))
+////                        destinationImageViews.append(imageView)
+////                    }
+////                }
+//
+//                var animationBlocks: [Closure] = []
+//                animationBlocks.append {
+//                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration*0.9, delay: 0, options: [.curveEaseInOut], animations: {
+//                            tempImageViews.enumerated().forEach({
+//                                (i, imageView) in
+//                                imageView.frame.origin = destinationOrigins[i]
+//                                imageView.frame.size = destinationSize
+//                            })
+//                    }) {
+//                        _ in
+//                        destinationImageViews.forEach({ $0.alpha = 1 })
+//                        tempImageViews.forEach({ $0.removeFromSuperview() })
+//                        imageViews.forEach({ $0.alpha = 1 })
+//                        self.context?.completeTransition(true)
+//                    }
+//                }
+//                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
+//            } else if let vc_1 = fromVC as? delPollController, let vc_2 = toVC as? UserViewController, let cell = vc_1.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = cell.avatar, let destinationImageView = vc_2.imageView {
+//                let imageView = UIImageView(frame: CGRect(origin: initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView), size: initialImageView.frame.size))
+//                if let image = vc_1.survey?.owner.image {
+//                    imageView.image = image.circularImage(size: initialImageView.frame.size, frameColor: vc_1.survey?.topic.tagColor ?? K_COLOR_RED)
+//                }
+//                initialImageView.alpha = 0
+//                destinationImageView.alpha = 0
+//                containerView.addSubview(imageView)
+//                
+//                let destinationOrigin = destinationImageView.superview!.convert(destinationImageView.frame.origin, to: containerView)
+//                let destinationSize = destinationImageView.frame.size
+//                
+//                var animationBlocks: [Closure] = []
+//                animationBlocks.append {
+//                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: .curveEaseInOut) {
+//                        imageView.frame.origin = destinationOrigin
+//                        imageView.frame.size = destinationSize
+//                    } completion: {
+//                        _ in
+//                        imageView.removeFromSuperview()
+//                        destinationImageView.alpha = 1
+//                        self.context?.completeTransition(true)
+//                    }
+//                }
+//                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: animationBlocks) { _ in }
             } else {
                 animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: []) { _ in self.context?.completeTransition(true)}
             }
@@ -1509,53 +1509,53 @@ class IconTransition: delBasicTransition {
 //                        toVC.view.subviews.map {$0.isUserInteractionEnabled = true}
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? delImageViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let destinationView = cell.scrollView {
-                toVC.view.alpha = 1
-                
-                let blackScreen = UIView(frame: vc_1.view.frame)
-                vc_1.view.alpha = 0
-                blackScreen.addEquallyTo(to: vc_2.view)
-                blackScreen.backgroundColor = .black
-                blackScreen.alpha = 1
-                let initialFrame = vc_1.scrollView.imageView.getImageRect()
-                let imageView = UIImageView(frame: CGRect(origin: fromVC.view.convert(initialFrame.origin, to: navigationController.view), size: initialFrame.size))
-                imageView.layer.masksToBounds = true
-                imageView.image = vc_1.scrollView.image
-                imageView.contentMode = .scaleAspectFill
-                containerView.addSubview(imageView)
-      
-                let destinationSize = destinationView.frame.size
-                let destinationOrigin = destinationView.superview!.convert(destinationView.frame.origin, to: containerView)
-                
-//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0.1, options: [.curveEaseInOut], animations: {
-//                    self.navigationController?.navigationBar.setNeedsLayout()
-//                    self.navigationController?.navigationBar.barTintColor = .white
+//            } else if let vc_1 = fromVC as? delImageViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 3, section: 0)) as? ImagesCell, let destinationView = cell.scrollView {
+//                toVC.view.alpha = 1
+//
+//                let blackScreen = UIView(frame: vc_1.view.frame)
+//                vc_1.view.alpha = 0
+//                blackScreen.addEquallyTo(to: vc_2.view)
+//                blackScreen.backgroundColor = .black
+//                blackScreen.alpha = 1
+//                let initialFrame = vc_1.scrollView.imageView.getImageRect()
+//                let imageView = UIImageView(frame: CGRect(origin: fromVC.view.convert(initialFrame.origin, to: navigationController.view), size: initialFrame.size))
+//                imageView.layer.masksToBounds = true
+//                imageView.image = vc_1.scrollView.image
+//                imageView.contentMode = .scaleAspectFill
+//                containerView.addSubview(imageView)
+//
+//                let destinationSize = destinationView.frame.size
+//                let destinationOrigin = destinationView.superview!.convert(destinationView.frame.origin, to: containerView)
+//
+////                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0.1, options: [.curveEaseInOut], animations: {
+////                    self.navigationController?.navigationBar.setNeedsLayout()
+////                    self.navigationController?.navigationBar.barTintColor = .white
+////                    self.navigationController?.navigationBar.tintColor = .black
+////                    self.navigationController?.navigationBar.layoutIfNeeded()
+////                })
+//
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
+////                                        self.navigationController?.navigationBar.setNeedsLayout()
+////                                        self.navigationController?.navigationBar.barTintColor = .white
+////                                        self.navigationController?.navigationBar.tintColor = .black
+////                                        self.navigationController?.navigationBar.layoutIfNeeded()
+//                    UIApplication.shared.statusBarView?.backgroundColor = .white
+//                    imageView.frame.origin = destinationOrigin
+//                    imageView.frame.size = destinationSize
+//                    imageView.cornerRadius = destinationView.cornerRadius
+//                    self.navigationController?.navigationBar.backgroundColor = .white
 //                    self.navigationController?.navigationBar.tintColor = .black
-//                    self.navigationController?.navigationBar.layoutIfNeeded()
-//                })
-                
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
-//                                        self.navigationController?.navigationBar.setNeedsLayout()
-//                                        self.navigationController?.navigationBar.barTintColor = .white
-//                                        self.navigationController?.navigationBar.tintColor = .black
-//                                        self.navigationController?.navigationBar.layoutIfNeeded()
-                    UIApplication.shared.statusBarView?.backgroundColor = .white
-                    imageView.frame.origin = destinationOrigin
-                    imageView.frame.size = destinationSize
-                    imageView.cornerRadius = destinationView.cornerRadius
-                    self.navigationController?.navigationBar.backgroundColor = .white
-                    self.navigationController?.navigationBar.tintColor = .black
-                    self.navigationController?.tabBarController?.view.backgroundColor = .white
-                    blackScreen.alpha = 0
-                }) {
-                    _ in
-                    
-
-                    blackScreen.removeFromSuperview()
-                    imageView.removeFromSuperview()
-                    destinationView.alpha = 1
-                    self.context?.completeTransition(true)
-                }
+//                    self.navigationController?.tabBarController?.view.backgroundColor = .white
+//                    blackScreen.alpha = 0
+//                }) {
+//                    _ in
+//
+//
+//                    blackScreen.removeFromSuperview()
+//                    imageView.removeFromSuperview()
+//                    destinationView.alpha = 1
+//                    self.context?.completeTransition(true)
+//                }
             } else if let vc_1 = fromVC as? NewSurveySelectionTypeController, let vc_2 = toVC as? SurveysViewController, let destinationIcon = vc_2.navigationItem.rightBarButtonItem?.value(forKey: "view") as? Icon, let keyWindow = navigationController?.view.window {
                 
                 let ratingIcon = Icon(frame: CGRect(origin: vc_1.view.convert(vc_1.ratingIcon.frame.origin, to: keyWindow),
@@ -1828,93 +1828,93 @@ class IconTransition: delBasicTransition {
                         self.context?.completeTransition(true)
                 })
                 
-            }  else if fromVC is delPollController, toVC is SurveysViewController {
-                var animationBlocks: [Closure] = []
-                toVC.view.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
-                animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration/2, delay: 0, options: [.curveEaseInOut], animations: {
-                        fromVC.view.alpha = 0
-                    }) { _ in }
-                }
-                animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
-                        fromVC.view.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-                        toVC.view.transform = .identity
-                    }) {
-                        _ in
-                        self.context?.completeTransition(true)
-                    }
-                }
-                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: animationBlocks, withIncomingBlurEffect: true) { _ in }
+//            }  else if fromVC is delPollController, toVC is SurveysViewController {
+//                var animationBlocks: [Closure] = []
+//                toVC.view.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+//                animationBlocks.append {
+//                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration/2, delay: 0, options: [.curveEaseInOut], animations: {
+//                        fromVC.view.alpha = 0
+//                    }) { _ in }
+//                }
+//                animationBlocks.append {
+//                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: [.curveEaseInOut], animations: {
+//                        fromVC.view.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+//                        toVC.view.transform = .identity
+//                    }) {
+//                        _ in
+//                        self.context?.completeTransition(true)
+//                    }
+//                }
+//                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: animationBlocks, withIncomingBlurEffect: true) { _ in }
             } else if let vc_1 = fromVC as? ClaimViewController, let vc_2 = toVC as? SurveysViewController {
                 animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: [], withIncomingBlurEffect: false) {
                     _ in
                     self.context?.completeTransition(true)
                 }
-            } else if let vc_1 = fromVC as? delVotersViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: vc_1.initialIndex) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_1.collectionView as? UICollectionView {
-                
-                var tempImageViews: [UIImageView] = []
-                for (i, initialImageView) in imageViews.enumerated() {
-                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? delUserCell {
-                        let tempImageView = UIImageView(frame: CGRect(origin: cell.convert(cell.imageView.frame.origin, to: containerView), size: cell.imageView.frame.size))
-                        tempImageView.image = cell.imageView.image
-//                        tempImageView.frame.origin = cell.convert(cell.imageView.frame.origin, to: containerView)
-                        tempImageView.layer.zPosition = CGFloat(100 - i)
-                        containerView.addSubview(tempImageView)
-                        tempImageViews.append(tempImageView)
-                        cell.imageView.alpha = 0
-                    }
-                }
-
-
-                var destinationOrigins: [CGPoint] = []
-                var destinationSize: CGSize = .zero
-                for imageView in imageViews {
-                        if destinationSize == .zero { destinationSize = imageView.frame.size }
-                        destinationOrigins.append(imageView.superview!.convert(imageView.frame.origin, to: containerView))
-                }
-                var animationBlocks: [Closure] = []
-                animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration*0.9, delay: 0, options: [.curveEaseInOut], animations: {
-                        tempImageViews.enumerated().forEach({
-                            (i, imageView) in
-                            imageView.frame.origin = destinationOrigins[i]
-                            imageView.frame.size = destinationSize
-                        })
-                    }) {
-                        _ in
-                        imageViews.forEach({ $0.alpha = 1 })
-                        tempImageViews.forEach({ $0.removeFromSuperview() })
-                        self.context?.completeTransition(true)
-                    }
-                }
-                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
-//                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: []) { _ in self.context?.completeTransition(true) }
-            } else if let vc_1 = fromVC as? UserViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = vc_1.imageView, let destinationImageView = cell.avatar {
-                let imageView = UIImageView(frame: CGRect(origin: initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView), size: initialImageView.frame.size))
-                if let image = vc_1.userprofile.image {
-                    imageView.image = image.circularImage(size: initialImageView.frame.size, frameColor: vc_1.color)
-                }
-                initialImageView.alpha = 0
-                destinationImageView.alpha = 0
-                containerView.addSubview(imageView)
-                
-                let destinationOrigin = destinationImageView.superview!.convert(destinationImageView.frame.origin, to: containerView)
-                let destinationSize = destinationImageView.frame.size
-                
-                var animationBlocks: [Closure] = []
-                animationBlocks.append {
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: .curveEaseInOut) {
-                        imageView.frame.origin = destinationOrigin
-                        imageView.frame.size = destinationSize
-                    } completion: {
-                        _ in
-                        imageView.removeFromSuperview()
-                        destinationImageView.alpha = 1
-                        self.context?.completeTransition(true)
-                    }
-                }
-                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: animationBlocks) { _ in }
+//            } else if let vc_1 = fromVC as? delVotersViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: vc_1.initialIndex) as? ChoiceResultCell, let resultIndicator = cell.getResultIndicator() as? ResultIndicator, let imageViews = resultIndicator.actionView.subviews.filter({  $0 is UIImageView }) as? [UIImageView], let collectionView = vc_1.collectionView as? UICollectionView {
+//                
+//                var tempImageViews: [UIImageView] = []
+//                for (i, initialImageView) in imageViews.enumerated() {
+//                    if let cell = collectionView.cellForItem(at: IndexPath(row: i, section: 0)) as? delUserCell {
+//                        let tempImageView = UIImageView(frame: CGRect(origin: cell.convert(cell.imageView.frame.origin, to: containerView), size: cell.imageView.frame.size))
+//                        tempImageView.image = cell.imageView.image
+////                        tempImageView.frame.origin = cell.convert(cell.imageView.frame.origin, to: containerView)
+//                        tempImageView.layer.zPosition = CGFloat(100 - i)
+//                        containerView.addSubview(tempImageView)
+//                        tempImageViews.append(tempImageView)
+//                        cell.imageView.alpha = 0
+//                    }
+//                }
+//
+//
+//                var destinationOrigins: [CGPoint] = []
+//                var destinationSize: CGSize = .zero
+//                for imageView in imageViews {
+//                        if destinationSize == .zero { destinationSize = imageView.frame.size }
+//                        destinationOrigins.append(imageView.superview!.convert(imageView.frame.origin, to: containerView))
+//                }
+//                var animationBlocks: [Closure] = []
+//                animationBlocks.append {
+//                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration*0.9, delay: 0, options: [.curveEaseInOut], animations: {
+//                        tempImageViews.enumerated().forEach({
+//                            (i, imageView) in
+//                            imageView.frame.origin = destinationOrigins[i]
+//                            imageView.frame.size = destinationSize
+//                        })
+//                    }) {
+//                        _ in
+//                        imageViews.forEach({ $0.alpha = 1 })
+//                        tempImageViews.forEach({ $0.removeFromSuperview() })
+//                        self.context?.completeTransition(true)
+//                    }
+//                }
+//                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: animationBlocks) { _ in }
+////                animateWithBlurEffect(fromView: fromVC.view, toView: vc_2.view, animationBlocks: []) { _ in self.context?.completeTransition(true) }
+////            } else if let vc_1 = fromVC as? UserViewController, let vc_2 = toVC as? delPollController, let cell = vc_2.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AuthorCell, let initialImageView = vc_1.imageView, let destinationImageView = cell.avatar {
+////                let imageView = UIImageView(frame: CGRect(origin: initialImageView.superview!.convert(initialImageView.frame.origin, to: containerView), size: initialImageView.frame.size))
+////                if let image = vc_1.userprofile.image {
+////                    imageView.image = image.circularImage(size: initialImageView.frame.size, frameColor: vc_1.color)
+////                }
+////                initialImageView.alpha = 0
+////                destinationImageView.alpha = 0
+////                containerView.addSubview(imageView)
+////
+////                let destinationOrigin = destinationImageView.superview!.convert(destinationImageView.frame.origin, to: containerView)
+////                let destinationSize = destinationImageView.frame.size
+////
+////                var animationBlocks: [Closure] = []
+////                animationBlocks.append {
+////                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: self.duration, delay: 0, options: .curveEaseInOut) {
+////                        imageView.frame.origin = destinationOrigin
+////                        imageView.frame.size = destinationSize
+////                    } completion: {
+////                        _ in
+////                        imageView.removeFromSuperview()
+////                        destinationImageView.alpha = 1
+////                        self.context?.completeTransition(true)
+////                    }
+////                }
+////                animateWithBlurEffect(fromView: fromVC.view, toView: toVC.view, animationBlocks: animationBlocks) { _ in }
             } else {
                 context?.completeTransition(true)
             }
