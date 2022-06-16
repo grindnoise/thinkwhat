@@ -8,6 +8,19 @@
 
 import UIKit
 
+struct ImageItem: Hashable {
+    
+    var title: String
+    var image: UIImage
+    var shouldBeDeleted = false
+    let id: UUID = UUID()
+    
+    init(title: String, image: UIImage) {
+        self.title = title
+        self.image = image
+    }
+}
+
 protocol ImageSelectionProvider: class {
     var dataItems: [ImageItem] { get }
     var callbackDelegate: CallbackObservable? { get set }

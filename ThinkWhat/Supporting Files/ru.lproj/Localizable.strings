@@ -195,4 +195,7 @@
 "edit_image" = "Изменить изображение";
 
 "total_images" = " изображений";
-
+"total_choices" = "Вариантов";
+"total" = "Всего";
+"new_choice" = "Введите текст";
+"edit_choice" = "Вариант";

@@ -195,3 +195,7 @@
 "edit_image" = "Edit image";
 
 "total_images" = " images";
+"total_choices" = "Choices";
+"total" = "Total";
+"new_choice" = "Enter text";
+"edit_choice" = "Choice";

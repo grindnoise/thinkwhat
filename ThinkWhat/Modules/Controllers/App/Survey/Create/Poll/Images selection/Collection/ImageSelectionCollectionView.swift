@@ -8,20 +8,6 @@
 
 import UIKit
 
-//@available(iOS 14, *)
-struct ImageItem: Hashable {
-    
-    var title: String
-    var image: UIImage
-    var shouldBeDeleted = false
-    let id: UUID = UUID()
-    
-    init(title: String, image: UIImage) {
-        self.title = title
-        self.image = image
-    }
-}
-
 @available(iOS 14, *)
 struct ImageHeaderItem: Hashable {
     var count: Int
@@ -61,7 +47,6 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
     
     private func handleSwipe(for action: UIContextualAction, item: ImageItem) {
         listener.deleteImage(item)
-        
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -91,14 +76,14 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
             self.layoutConfig.headerMode = .firstItemInSection
             self.layoutConfig.backgroundColor = .clear
             self.layoutConfig.showsSeparators = false
-//            self.layoutConfig.trailingSwipeActionsConfigurationProvider = { [weak self] (indexPath) in
-//                guard let self = self else { return UISwipeActionsConfiguration(actions: []) }
-//                guard let item = self.source.itemIdentifier(for: indexPath) else {
-//                    return nil
-//                }
-//
-//                let action = UIContextualAction(style: .destructive, title: "delete".localized) { [weak self] (action, view, completion) in
-//                    guard let self = self else { return }
+            self.layoutConfig.trailingSwipeActionsConfigurationProvider = { [weak self] (indexPath) in
+                guard let self = self else { return UISwipeActionsConfiguration(actions: []) }
+                guard let item = self.source.itemIdentifier(for: indexPath) else {
+                    return nil
+                }
+
+                let action = UIContextualAction(style: .destructive, title: "delete".localized) { [weak self] (action, view, completion) in
+                    guard let self = self else { return }
 //                    self.handleSwipe(for: action, item: item)
 //                    var snap = self.source.snapshot()
 //                    if let indent = self.source.itemIdentifier(for: indexPath) {
@@ -107,12 +92,12 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
 //                    }
 //                    self.source.apply(snap)
 //                    completion(true)
-//                }
-//                action.backgroundColor = .systemRed
-//                action.image = UIImage(systemName: "trash.fill")?.withTintColor(.white)
-//
-//                return UISwipeActionsConfiguration(actions: [action])
-//            }
+                }
+                action.backgroundColor = .systemRed
+                action.image = UIImage(systemName: "trash.fill")?.withTintColor(.white)
+
+                return UISwipeActionsConfiguration(actions: [action])
+            }
             return NSCollectionLayoutSection.list(using: self.layoutConfig, layoutEnvironment: env)
         }
         delegate = self
