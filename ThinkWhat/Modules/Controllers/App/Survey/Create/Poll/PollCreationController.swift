@@ -27,6 +27,10 @@ class PollCreationController: UIViewController {
         case Null = "", Ordinary = "default_option", Anon = "anon_option", Private = "private_option"
     }
     
+    enum Comments {
+        case On, Off
+    }
+    
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()

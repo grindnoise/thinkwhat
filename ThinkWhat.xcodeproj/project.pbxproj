@@ -217,6 +217,8 @@
 		AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BC2240FF14002C0D7E /* UnderlinedTextField.swift */; };
 		AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */; };
 		AB6083C122410131002C0D7E /* ValidSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6083C022410130002C0D7E /* ValidSign.swift */; };
+		AB60B5BD285CD6150023C99B /* CommentsSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB60B5BC285CD6150023C99B /* CommentsSelection.swift */; };
+		AB60B5BF285CD81F0023C99B /* CommentsSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB60B5BE285CD81F0023C99B /* CommentsSelection.xib */; };
 		AB61BA2F2782DDA200F89C4C /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB61BA2E2782DDA200F89C4C /* Media.swift */; };
 		AB63D7D6283FC03A00173116 /* TopicSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB63D7D5283FC03A00173116 /* TopicSelection.swift */; };
 		AB63D7D8283FC04F00173116 /* TopicSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB63D7D7283FC04F00173116 /* TopicSelection.xib */; };
@@ -739,6 +741,8 @@
 		AB6083BC2240FF14002C0D7E /* UnderlinedTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderlinedTextField.swift; sourceTree = "<group>"; };
 		AB6083BD2240FF14002C0D7E /* UnderlinedSignTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderlinedSignTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB6083C022410130002C0D7E /* ValidSign.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidSign.swift; sourceTree = "<group>"; };
+		AB60B5BC285CD6150023C99B /* CommentsSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsSelection.swift; sourceTree = "<group>"; };
+		AB60B5BE285CD81F0023C99B /* CommentsSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CommentsSelection.xib; sourceTree = "<group>"; };
 		AB61BA2E2782DDA200F89C4C /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		AB63D7D5283FC03A00173116 /* TopicSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelection.swift; sourceTree = "<group>"; };
 		AB63D7D7283FC04F00173116 /* TopicSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TopicSelection.xib; sourceTree = "<group>"; };
@@ -1809,6 +1813,15 @@
 			path = Choice;
 			sourceTree = "<group>";
 		};
+		AB60B5BB285CD5E20023C99B /* Comments */ = {
+			isa = PBXGroup;
+			children = (
+				AB60B5BC285CD6150023C99B /* CommentsSelection.swift */,
+				AB60B5BE285CD81F0023C99B /* CommentsSelection.xib */,
+			);
+			path = Comments;
+			sourceTree = "<group>";
+		};
 		AB6224A326BACB8700056097 /* Banners */ = {
 			isa = PBXGroup;
 			children = (
@@ -1822,6 +1835,7 @@
 		AB63D7D4283FBFB100173116 /* Popup content */ = {
 			isa = PBXGroup;
 			children = (
+				AB60B5BB285CD5E20023C99B /* Comments */,
 				AB54F47B285B120B00C620B3 /* Choice */,
 				AB42E337284A458400F4487B /* Topic selection modern */,
 				ABCE775728488C4F001E3413 /* Image selection */,
@@ -3027,6 +3041,7 @@
 				AB98308E27B94BBA002C5132 /* RecoverView.xib in Resources */,
 				AB72963527DB5EFB00D45B54 /* TopicsController.xib in Resources */,
 				AB4428B3282BCBD500D5628E /* SurveyCell.xib in Resources */,
+				AB60B5BF285CD81F0023C99B /* CommentsSelection.xib in Resources */,
 				AB38DD682817F35E00FFEB3F /* SubscribersView.xib in Resources */,
 				AB3C6869223FDDAF00B57580 /* App.storyboard in Resources */,
 				AB869F2326C3C68E008353B3 /* Warning.xib in Resources */,
@@ -3197,6 +3212,7 @@
 				ABA448EA27EE030B00F8E00D /* PollController.swift in Sources */,
 				ABA7829928589D3600964FDE /* AddChoiceContentView.swift in Sources */,
 				AB8DA34227A182D300F92C18 /* SignupModel.swift in Sources */,
+				AB60B5BD285CD6150023C99B /* CommentsSelection.swift in Sources */,
 				ABB46F3E2346373700AF212B /* TabBarController.swift in Sources */,
 				AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */,
 				AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */,

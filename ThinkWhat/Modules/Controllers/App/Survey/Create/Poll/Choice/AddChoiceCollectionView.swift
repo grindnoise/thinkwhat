@@ -31,9 +31,15 @@ class AddChoiceCollectionView: UICollectionView {
     }
     weak var callbackDelegate: CallbackObservable?
     var listener: ChoiceListener!
-    var color: UIColor!
+    @objc dynamic var color: UIColor = .label
+//        didSet {
+////            guard !oldValue.isNil else { return }
+////            reload()
+//        }
+//    }
     var source: UICollectionViewDiffableDataSource<Section, ChoiceItem>!
     private var observers: [NSKeyValueObservation] = []
+    private let colorKeyPath = \AddChoiceCollectionView.color
     private let padding: CGFloat = 12
     
     init(dataProvider: ChoiceListener, callbackDelegate: CallbackObservable, color: UIColor) {
@@ -79,9 +85,14 @@ class AddChoiceCollectionView: UICollectionView {
                 var snap = self.source.snapshot()
                 if let indent = self.source.itemIdentifier(for: indexPath) {
                     snap.deleteItems([indent])
+                    self.listener.deleteChoice(indent)
+//                    snap.reloadItems(snap.itemIdentifiers)
                 }
+//                snap.reloadItems(snap.itemIdentifiers)
                 self.source.apply(snap, animatingDifferences: true, completion: {
                     self.listener.onChoicesHeightChange(self.contentSize.height)
+//                    snap.reloadItems(snap.itemIdentifiers)
+                    self.reload()
                 })
                 completion(true)
             }
@@ -95,7 +106,14 @@ class AddChoiceCollectionView: UICollectionView {
         collectionViewLayout = listLayout//createLayout()//
         let cellRegistration = UICollectionView.CellRegistration<AddChoiceCell, ChoiceItem> { (cell, indexPath, item) in
             cell.item = item
-            cell.index = indexPath.row + 1
+//            cell.index = indexPath.row + 1
+            cell.color = self.color
+            cell.collectionView = self
+            self.observers.append(self.observe(self.colorKeyPath, options: [.new], changeHandler: { [weak self] (color, change) in
+                guard let self = self,
+                      let newColor = change.newValue else { return }
+                cell.color = newColor
+            }))
         }
 
         delegate = self
@@ -105,8 +123,7 @@ class AddChoiceCollectionView: UICollectionView {
                                                                     for: indexPath,
                                                                     item: identifier)
 //            cell.item = identifier
-            
-            cell.collectionView = self
+            cell.index = indexPath.row + 1
             return cell
         }
         
@@ -195,6 +212,11 @@ extension AddChoiceCollectionView: UICollectionViewDelegate {
 //    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 //        guard let cell = cellForItem(at: indexPath) as? AddChoiceCell else { return }
 //    }
+    
+//    func cellForItem(at indexPath: IndexPath) -> UICollectionViewCell? {
+//        guard let cell = dequeueReusableCell(withReuseIdentifier: AddChoiceCell.self, for: indexPath) as? AddChoiceCell else { return UICollectionViewCell() }
+//        cell.index = indexPath.row + 1
+//    }
 }
 
 extension UICollectionViewDiffableDataSource {
@@ -213,6 +235,7 @@ extension AddChoiceCollectionView: ChoiceProvider {
         var snapshot = NSDiffableDataSourceSnapshot<Section, ChoiceItem>()
         snapshot.appendSections([.main])
         snapshot.appendItems(dataItems, toSection: .main)
+        snapshot.reloadItems(dataItems)
         source.apply(snapshot, animatingDifferences: false)
         source.refresh() {
             self.listener.onChoicesHeightChange(self.contentSize.height)

@@ -209,6 +209,9 @@ extension Popup: CallbackObservable {
         } else if sender is ChoiceItem {
             callbackDelegate?.callbackReceived(sender)
             dismiss()
+        } else if sender is PollCreationController.Comments {
+            callbackDelegate?.callbackReceived(sender)
+            dismiss()
         }
     }
 }

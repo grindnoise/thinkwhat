@@ -18,6 +18,7 @@
 "minimum_characters_needed" = "Minimum characters needed: ";
 "invalid_url" = "Invalid URL format";
 "images_limit" = "You can attach no maore than 3 images";
+"minimum_choices" = "2 choices are required at least";
 
 //Common
 "ok" = "Ok";
@@ -199,3 +200,5 @@
 "total" = "Total";
 "new_choice" = "Enter text";
 "edit_choice" = "Choice";
+"are_on" = "On";
+"are_off" = "Off";

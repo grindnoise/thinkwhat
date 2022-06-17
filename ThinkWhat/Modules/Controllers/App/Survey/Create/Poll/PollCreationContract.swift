@@ -15,7 +15,7 @@ protocol PollCreationViewInput: class {
     
     var controllerOutput: PollCreationControllerOutput? { get set }
     var controllerInput: PollCreationControllerInput? { get set }
-    
+    var stage: PollCreationController.Stage { get }
     
     func onStageCompleted()
 }

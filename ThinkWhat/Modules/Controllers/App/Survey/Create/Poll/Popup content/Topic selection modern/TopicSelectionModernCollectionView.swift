@@ -118,6 +118,7 @@ class TopicSelectionModernCollectionView: UICollectionView {
             source.apply(sectionSnapshot, to: headerItem, animatingDifferences: false)
         }
 //        isEditing = true
+        delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -134,6 +135,13 @@ class TopicSelectionModernCollectionView: UICollectionView {
     weak var callbackDelegate: CallbackObservable?
     var source: UICollectionViewDiffableDataSource<TopicHeaderItem, TopicListItem>!
     private var layoutConfig: UICollectionLayoutListConfiguration!
+}
+
+@available(iOS 14, *)
+extension TopicSelectionModernCollectionView: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        scrollToItem(at: indexPath, at: .centeredVertically, animated: true)
+    }
 }
 
 @available(iOS 14.0, *)

@@ -25,7 +25,15 @@ class AddChoiceCell: UICollectionViewCell {
     }
     var index = 0 {
         didSet {
-            orderLabel.text = "edit_choice".localized + " " + String(describing: index)
+//            guard oldValue != index else { return }
+//            UIView.transition(with: orderLabel, duration: 0.3, options: .transitionCrossDissolve) {
+                self.orderLabel.text = "edit_choice".localized + " #" + String(describing: self.index)
+//            } completion: { _ in }
+        }
+    }
+    var color: UIColor = .label {
+        didSet {
+            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
     override var isSelected: Bool { didSet { updateAppearance() } }
@@ -150,7 +158,7 @@ class AddChoiceCell: UICollectionViewCell {
             guard let self = self, let value = change.newValue else { return }
             self.textView.cornerRadius = value.width * 0.05
             self.textView.font = UIFont(name: Fonts.Regular,
-                                        size: self.textView.frame.width * 0.06)
+                                        size: self.textView.frame.width * 0.05)
         }))
         observers.append(orderLabel.observe(\UILabel.bounds, options: .new, changeHandler: { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             guard let self = self else { return }
@@ -158,16 +166,29 @@ class AddChoiceCell: UICollectionViewCell {
                                           size: self.orderLabel.frame.width * 0.06)
 
         }))
+//        NotificationCenter.default.addObserver(self, selector: #selector(setNewIndex), name: Notification.Name("ChoiceItemIndex"), object: nil)
+//        observers.append(item.observe(\ChoiceItem.index, options: .new, changeHandler: { [weak self] (_, index) in
+//            guard let self = self else { return }
+//            self.orderLabel.font = UIFont(name: Fonts.Regular,
+//                                          size: self.orderLabel.frame.width * 0.06)
+//
+//        }))
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     }
     
     @objc
     private func performCallback() {
         collectionView?.listener.editChoice(item)
     }
+    
+//    @objc
+//    private func setNewIndex() {
+//        index = item.index
+//    }
 }
 
 

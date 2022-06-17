@@ -60,7 +60,7 @@ class ChoiceEditingPopup: UIView {
         }))
         observers.append(textView.observe(\UITextView.bounds, options: .new, changeHandler: { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             guard let self = self else { return }
-            self.textView.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: self.textView.bounds.width * 0.1)
+            self.textView.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: self.textView.bounds.width * 0.075)
         }))
 
         
@@ -84,7 +84,7 @@ class ChoiceEditingPopup: UIView {
         let fontSize: CGFloat = title.bounds.height * 0.4
         
         let topicTitleString = NSMutableAttributedString()
-        topicTitleString.append(NSAttributedString(string: mode == .Create ? "new_choice".localized : "edit_choice".localized + " \(index)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicTitleString.append(NSAttributedString(string: mode == .Create ? "new_choice".localized : "edit_choice".localized + " #\(index)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         title.attributedText = topicTitleString
 
         textView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
@@ -187,6 +187,7 @@ class ChoiceEditingPopup: UIView {
             mode = .Create
         }
     }
+    private var isTextFieldEditingEnabled = true
     private var index = 0
     private var observers: [NSKeyValueObservation] = []
     private var offsetY:    CGFloat = 0
@@ -241,6 +242,8 @@ extension ChoiceEditingPopup: UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        guard isTextFieldEditingEnabled else { return false }
+
         if text == "\n" {
             textView.resignFirstResponder()
             return false
@@ -249,7 +252,7 @@ extension ChoiceEditingPopup: UITextViewDelegate {
         let currentText = textView.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
-        if updatedText.count <= ModelProperties.shared.surveyAnswerTextMaxLength, !updatedText.isEmpty {
+        if updatedText.count <= ModelProperties.shared.surveyAnswerTitleMaxLength, !updatedText.isEmpty {
             if !buttonsStackView.arrangedSubviews.contains(confirm) {
                 buttonsStackView.addArrangedSubview(confirm)
                 confirm.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
@@ -274,4 +277,39 @@ extension ChoiceEditingPopup: UITextViewDelegate {
         }
         return false
     }
+    
+    func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
+        let minCharacters = ModelProperties.shared.surveyAnswerTitleMinLength
+        
+        if textView.text.count < minCharacters {
+            showBanner(bannerDelegate: self,
+                       text: AppError.minimumCharactersExceeded(minValue: minCharacters).localizedDescription,
+                       imageContent: ImageSigns.exclamationMark,
+                       shouldDismissAfter: 0.5,
+                       accessibilityIdentifier: "isTextFieldEditingEnabled")
+            isTextFieldEditingEnabled = false
+            return false
+        }
+        return true
+    }
+}
+
+extension ChoiceEditingPopup: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            if banner.accessibilityIdentifier == "isTextFieldEditingEnabled" {
+                isTextFieldEditingEnabled = true
+            }
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
+    }
+
 }
