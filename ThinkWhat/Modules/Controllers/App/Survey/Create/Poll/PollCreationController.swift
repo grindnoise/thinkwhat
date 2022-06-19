@@ -31,6 +31,10 @@ class PollCreationController: UIViewController {
         case On, Off
     }
     
+    enum Hot {
+        case On, Off
+    }
+    
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,6 +49,22 @@ class PollCreationController: UIViewController {
             .modelOutput = self
         
         self.view = view as UIView
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
+        title = "new_poll".localized
+        navigationItem.largeTitleDisplayMode = .always
+//        DispatchQueue.main.async { [weak self] in
+//            self?.navigationController?.navigationBar.sizeToFit()
+//        }
+        let navigationBar = navigationController?.navigationBar
+        let navigationBarAppearance = UINavigationBarAppearance()
+        navigationBarAppearance.shadowColor = .systemGray
+        navigationBar?.scrollEdgeAppearance = navigationBarAppearance
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -82,4 +102,19 @@ extension PollCreationController: PollCreationViewInput {
 // MARK: - Model Output
 extension PollCreationController: PollCreationModelOutput {
     // Implement methods
+}
+
+extension UIColor {
+
+    /// Converts this `UIColor` instance to a 1x1 `UIImage` instance and returns it.
+    ///
+    /// - Returns: `self` as a 1x1 `UIImage`.
+    func as1ptImage() -> UIImage {
+        UIGraphicsBeginImageContext(CGSize(width: 1, height: 1))
+        setFill()
+        UIGraphicsGetCurrentContext()?.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        let image = UIGraphicsGetImageFromCurrentImageContext() ?? UIImage()
+        UIGraphicsEndImageContext()
+        return image
+    }
 }

@@ -212,6 +212,12 @@ extension Popup: CallbackObservable {
         } else if sender is PollCreationController.Comments {
             callbackDelegate?.callbackReceived(sender)
             dismiss()
+        } else if sender is Int {
+            callbackDelegate?.callbackReceived(sender)
+            dismiss()
+        } else if sender is PollCreationController.Hot {
+            callbackDelegate?.callbackReceived(sender)
+            dismiss()
         }
     }
 }

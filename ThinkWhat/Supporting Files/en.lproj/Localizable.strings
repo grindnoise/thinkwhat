@@ -170,6 +170,7 @@
 "poll_rating_difference" = "What's the difference?";
 
 //PollCreationView
+"new_poll" = "Новый опрос";
 "topic" = "Topic";
 "options" = "Options";
 "poll_title" = "Title";
@@ -180,6 +181,7 @@
 "poll_choices" = "Choices";
 "comments" = "Comments";
 "voters_limit" = "Limits";
+"voters_limit_description" = "Voters limit";
 "hot_option" = "Hot start";
 
 "choose_topic" = "Choose topic";
@@ -202,3 +204,9 @@
 "edit_choice" = "Choice";
 "are_on" = "On";
 "are_off" = "Off";
+"is_on" = "On";
+"is_off" = "Off";
+
+"hot_is_on_description" = "Get guaranteed fast by getting into Hot feed, extra points will be needed";
+"hot_is_off_description" = "Poll may get into Hot feed, if it will be rated  greater than 4 stars";
+"post_poll" = "Post";

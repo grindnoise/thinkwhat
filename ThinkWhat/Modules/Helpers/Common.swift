@@ -9,6 +9,10 @@
 import Foundation
 import UIKit
 
+enum EditMode {
+    case Create, Edit
+}
+
 func setRootViewController(_ viewController: UIViewController) {
     guard let keyWindow = UIApplication.shared.connectedScenes
             .filter({$0.activationState == .foregroundActive})

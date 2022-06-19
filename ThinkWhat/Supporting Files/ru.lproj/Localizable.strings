@@ -170,6 +170,7 @@
 "poll_rating_difference" = "В чем разница?";
 
 //PollCreationView
+"new_poll" = "Новый опрос";
 "topic" = "Раздел";
 "options" = "Опции";
 "poll_title" = "Название";
@@ -180,6 +181,7 @@
 "poll_choices" = "Варианты";
 "comments" = "Комментарии";
 "voters_limit" = "Лимит";
+"voters_limit_description" = "Лимит участников";
 "hot_option" = "Горячий старт";
 
 "choose_topic" = "Выберите раздел";
@@ -202,4 +204,9 @@
 "edit_choice" = "Вариант";
 "are_on" = "Включены";
 "are_off" = "Выключены";
+"is_on" = "Включен";
+"is_off" = "Выключен";
 
+"hot_is_on_description" = "Опрос гарантированно попадет в список Горячих, будут списаны дополнительные баллы";
+"hot_is_off_description" = "Опрос может попасть в список Горячих, если его рейтинг будет выше 4 звезд";
+"post_poll" = "Опубликовать";

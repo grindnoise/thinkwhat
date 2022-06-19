@@ -467,6 +467,10 @@
 		ABE065092844B58400877D92 /* OptionSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABE065082844B58400877D92 /* OptionSelection.xib */; };
 		ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE43694251C7FD300C1428D /* CustomSwitch.swift */; };
 		ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */; };
+		ABEB5F7F285E1E0600C75C31 /* LimitsSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEB5F7E285E1E0600C75C31 /* LimitsSelectionView.swift */; };
+		ABEB5F81285E22FA00C75C31 /* LimitsSelectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABEB5F80285E22FA00C75C31 /* LimitsSelectionView.xib */; };
+		ABEB5F84285E4F4100C75C31 /* HotSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEB5F83285E4F4100C75C31 /* HotSelectionView.swift */; };
+		ABEB5F86285E4FA100C75C31 /* HotSelectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABEB5F85285E4FA100C75C31 /* HotSelectionView.xib */; };
 		ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */; };
 		ABEDC4E32450168D00FA9128 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEDC4E22450168D00FA9128 /* User.swift */; };
 		ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEDC4E42450608700FA9128 /* SurveyInfoCell.swift */; };
@@ -994,6 +998,10 @@
 		ABE065082844B58400877D92 /* OptionSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OptionSelection.xib; sourceTree = "<group>"; };
 		ABE43694251C7FD300C1428D /* CustomSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSwitch.swift; sourceTree = "<group>"; };
 		ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcLabel.swift; sourceTree = "<group>"; };
+		ABEB5F7E285E1E0600C75C31 /* LimitsSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitsSelectionView.swift; sourceTree = "<group>"; };
+		ABEB5F80285E22FA00C75C31 /* LimitsSelectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LimitsSelectionView.xib; sourceTree = "<group>"; };
+		ABEB5F83285E4F4100C75C31 /* HotSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotSelectionView.swift; sourceTree = "<group>"; };
+		ABEB5F85285E4FA100C75C31 /* HotSelectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HotSelectionView.xib; sourceTree = "<group>"; };
 		ABEBC5E9263AD58100CE3F7A /* ImageEditingListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditingListTableViewController.swift; sourceTree = "<group>"; };
 		ABEDC4E22450168D00FA9128 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		ABEDC4E42450608700FA9128 /* SurveyInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyInfoCell.swift; sourceTree = "<group>"; };
@@ -1835,6 +1843,8 @@
 		AB63D7D4283FBFB100173116 /* Popup content */ = {
 			isa = PBXGroup;
 			children = (
+				ABEB5F82285E4F0F00C75C31 /* Hot */,
+				ABEB5F7D285E1DE600C75C31 /* Limits */,
 				AB60B5BB285CD5E20023C99B /* Comments */,
 				AB54F47B285B120B00C620B3 /* Choice */,
 				AB42E337284A458400F4487B /* Topic selection modern */,
@@ -2725,6 +2735,24 @@
 			path = "Options selection";
 			sourceTree = "<group>";
 		};
+		ABEB5F7D285E1DE600C75C31 /* Limits */ = {
+			isa = PBXGroup;
+			children = (
+				ABEB5F7E285E1E0600C75C31 /* LimitsSelectionView.swift */,
+				ABEB5F80285E22FA00C75C31 /* LimitsSelectionView.xib */,
+			);
+			path = Limits;
+			sourceTree = "<group>";
+		};
+		ABEB5F82285E4F0F00C75C31 /* Hot */ = {
+			isa = PBXGroup;
+			children = (
+				ABEB5F83285E4F4100C75C31 /* HotSelectionView.swift */,
+				ABEB5F85285E4FA100C75C31 /* HotSelectionView.xib */,
+			);
+			path = Hot;
+			sourceTree = "<group>";
+		};
 		ABF01A6A25418E1F009E2BC4 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -2965,6 +2993,7 @@
 				AB8DA31727A0325D00F92C18 /* Localizable.strings in Resources */,
 				AB164020281A9C95001F33F8 /* SurveyCellContentView.xib in Resources */,
 				AB63D7D8283FC04F00173116 /* TopicSelection.xib in Resources */,
+				ABEB5F81285E22FA00C75C31 /* LimitsSelectionView.xib in Resources */,
 				AB38DD5D2817F15400FFEB3F /* SubscribersController.xib in Resources */,
 				AB9998C32805A117009D0E4F /* ClaimSelection.xib in Resources */,
 				ABF7354B270DC26E00F7C308 /* ClaimView.xib in Resources */,
@@ -3022,6 +3051,7 @@
 				AB913F8328086E1A00609D51 /* StatisticsCell.xib in Resources */,
 				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
 				AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */,
+				ABEB5F86285E4FA100C75C31 /* HotSelectionView.xib in Resources */,
 				AB30A5022731472800A7DCC0 /* ResultIndicator.xib in Resources */,
 				AB8994F126C2BE5300F03375 /* InsufficientBalance.xib in Resources */,
 				ABB8B1932423D13900E8DFF3 /* Slide.xib in Resources */,
@@ -3172,6 +3202,7 @@
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
 				AB868A6A23EB04A3008DEB84 /* 1_CategorySelectionViewController.swift in Sources */,
 				AB10031C27BFBBDE00338EE4 /* FillUserModel.swift in Sources */,
+				ABEB5F84285E4F4100C75C31 /* HotSelectionView.swift in Sources */,
 				AB334FC1270C6EDC00DD7332 /* AlertController.swift in Sources */,
 				AB75838024E5661D004367DF /* ScrollArrow.swift in Sources */,
 				AB9DBF7B26A58C8C00EFA66D /* Django.swift in Sources */,
@@ -3505,6 +3536,7 @@
 				ABF27571280D76720023CD1F /* NextCell.swift in Sources */,
 				ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */,
 				AB7478BF2428951F00317EB6 /* CircularIndicatorImageView.swift in Sources */,
+				ABEB5F7F285E1E0600C75C31 /* LimitsSelectionView.swift in Sources */,
 				AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */,
 				AB16401E281A9C8D001F33F8 /* SurveyCellContentView.swift in Sources */,
 				ABF20FB824C994250092B223 /* UserSurveysCell.swift in Sources */,

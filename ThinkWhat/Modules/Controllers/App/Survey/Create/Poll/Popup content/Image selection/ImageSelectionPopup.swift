@@ -10,10 +10,6 @@ import UIKit
 
 class ImageSelectionPopup: UIView, UINavigationControllerDelegate {
     
-    enum Mode {
-        case Create, Edit
-    }
-    
     // MARK: - Initialization
     init(controller: UIViewController?, callbackDelegate: CallbackObservable, item: ImageItem? = nil) {
         super.init(frame: .zero)
@@ -221,7 +217,7 @@ class ImageSelectionPopup: UIView, UINavigationControllerDelegate {
         }
     }
     
-    private var mode: ImageSelectionPopup.Mode = .Create {
+    private var mode: EditMode = .Create {
         didSet {
             guard !previewStackView.isNil, !sourceStackView.isNil else { return }
             previewStackView.alpha = mode == .Edit ? 1 : 0

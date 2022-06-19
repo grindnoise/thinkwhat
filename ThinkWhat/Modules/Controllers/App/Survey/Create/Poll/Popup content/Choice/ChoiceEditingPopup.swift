@@ -9,16 +9,15 @@
 import UIKit
 
 class ChoiceEditingPopup: UIView {
-    enum Mode {
-        case Create, Edit
-    }
+    
     
     // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable, item: ChoiceItem? = nil, index: Int = 0, forceEditing: Bool = false) {
+    init(callbackDelegate: CallbackObservable, item: ChoiceItem? = nil, index: Int = 0, forceEditing: Bool = false, mode: EditMode? = nil) {
         super.init(frame: .zero)
         self.item = item
         self.index = index
         self.mode = item.isNil ? .Create : .Edit
+        if !mode.isNil { self.mode = mode! }
         self.forceEditing = forceEditing
         self.callbackDelegate = callbackDelegate
         commonInit()
@@ -74,9 +73,11 @@ class ChoiceEditingPopup: UIView {
         setText()
         if mode == .Create {
             buttonsStackView.removeArrangedSubview(delete)
+            buttonsStackView.removeArrangedSubview(cancel)
             buttonsStackView.removeArrangedSubview(confirm)
             delete.alpha = 0
             confirm.alpha = 0
+            cancel.alpha = 0
         }
     }
     
@@ -84,7 +85,7 @@ class ChoiceEditingPopup: UIView {
         let fontSize: CGFloat = title.bounds.height * 0.4
         
         let topicTitleString = NSMutableAttributedString()
-        topicTitleString.append(NSAttributedString(string: mode == .Create ? "new_choice".localized : "edit_choice".localized + " #\(index)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicTitleString.append(NSAttributedString(string: "edit_choice".localized + " #\(index)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         title.attributedText = topicTitleString
 
         textView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
@@ -94,7 +95,8 @@ class ChoiceEditingPopup: UIView {
     private func handleTap(_ recognizer: UITapGestureRecognizer) {
         if let v = recognizer.view {
             if v === confirm {
-                if mode == .Create { item = ChoiceItem(text: textView.text) }
+                item?.text = textView.text
+//                if mode == .Create { item = ChoiceItem(text: textView.text) }
                 callbackDelegate?.callbackReceived(item as Any)
             } else if v === cancel {
                 callbackDelegate?.callbackReceived("exit" as Any)
@@ -168,7 +170,7 @@ class ChoiceEditingPopup: UIView {
         }
     }
     
-    private var mode: ImageSelectionPopup.Mode = .Create {
+    private var mode: EditMode = .Create {
         didSet {
         }
     }
@@ -182,11 +184,7 @@ class ChoiceEditingPopup: UIView {
             }
         }
     }
-    private var forceEditing = false {
-        didSet {
-            mode = .Create
-        }
-    }
+    private var forceEditing = false
     private var isTextFieldEditingEnabled = true
     private var index = 0
     private var observers: [NSKeyValueObservation] = []
