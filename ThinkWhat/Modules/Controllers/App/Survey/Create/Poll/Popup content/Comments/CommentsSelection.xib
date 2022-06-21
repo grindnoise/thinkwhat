@@ -12,6 +12,7 @@
             <connections>
                 <outlet property="confirm" destination="Syi-OM-5z4" id="RrY-qr-tJT"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Zf4-XR-mtB"/>
+                <outlet property="descriptionLabel" destination="vq9-bn-eGf" id="8Mj-2P-b4j"/>
                 <outlet property="offIcon" destination="ofa-3M-58a" id="7dM-0v-Uqh"/>
                 <outlet property="offTitle" destination="vd7-ps-KgS" id="ma5-5a-Dfs"/>
                 <outlet property="onIcon" destination="zct-R7-SMA" id="but-lH-oFx"/>
@@ -124,9 +125,18 @@
                                 <constraint firstItem="54A-Wf-0yG" firstAttribute="width" secondItem="54A-Wf-0yG" secondAttribute="height" multiplier="1:1" id="bsl-xO-1Pr"/>
                             </constraints>
                         </stackView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vq9-bn-eGf">
+                            <rect key="frame" x="13.5" y="311.5" width="373" height="100.5"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
+                        <constraint firstAttribute="bottom" secondItem="vq9-bn-eGf" secondAttribute="bottom" constant="8" id="CVj-JI-rJR"/>
+                        <constraint firstItem="vq9-bn-eGf" firstAttribute="top" secondItem="btw-fb-JU2" secondAttribute="bottom" constant="8" id="QIT-H7-f0j"/>
+                        <constraint firstItem="vq9-bn-eGf" firstAttribute="width" secondItem="btw-fb-JU2" secondAttribute="width" id="Yhy-wc-mUL"/>
                         <constraint firstItem="btw-fb-JU2" firstAttribute="centerX" secondItem="p2U-va-qWx" secondAttribute="centerX" id="i0f-Zp-LAq"/>
                         <constraint firstItem="btw-fb-JU2" firstAttribute="width" secondItem="p2U-va-qWx" secondAttribute="width" multiplier="0.9325" id="tg8-LR-3QK"/>
                         <constraint firstItem="btw-fb-JU2" firstAttribute="centerY" secondItem="p2U-va-qWx" secondAttribute="centerY" id="wAH-wr-7Jp"/>
@@ -138,6 +148,7 @@
             <constraints>
                 <constraint firstItem="cW6-Bz-ytI" firstAttribute="top" secondItem="p2U-va-qWx" secondAttribute="bottom" id="1Rj-u3-6bY"/>
                 <constraint firstItem="bBx-3N-Ovy" firstAttribute="height" secondItem="cW6-Bz-ytI" secondAttribute="height" id="2Nw-M3-H6I"/>
+                <constraint firstItem="vq9-bn-eGf" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="4Ib-BE-RCg"/>
                 <constraint firstItem="cW6-Bz-ytI" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="5AU-Od-MAW"/>
                 <constraint firstItem="bBx-3N-Ovy" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="Nhk-VH-V2t"/>
                 <constraint firstItem="cW6-Bz-ytI" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="VMv-Iw-6ea"/>

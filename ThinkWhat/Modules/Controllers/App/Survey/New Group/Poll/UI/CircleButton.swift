@@ -15,7 +15,11 @@ class CircleButton: UIView, CAAnimationDelegate {
         case On, Off
     }
 
-    var oval: CAShapeLayer!
+    var oval: CAShapeLayer! {
+        didSet {
+            oval.masksToBounds = false
+        }
+    }
     var iconProportionConstraint = NSLayoutConstraint()
     var scaleColorAnim: CAAnimationGroup?
     
@@ -51,7 +55,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     var completionBlocks = [CAAnimation: (Bool) -> Void]()
     var updateLayerValueForCompletedAnimation : Bool = false
     var useAutoLayout = true
-    private var pathTransitionDuration: TimeInterval = 0.3
+    private var pathTransitionDuration: TimeInterval = 0.2
     
     //MARK: - Interface properties
     @IBInspectable var lineWidth: CGFloat = 5 {
@@ -67,6 +71,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     //MARK: - Interface connections
     @IBOutlet var contentView: UIView! {
         didSet {
+            contentView.clipsToBounds = false
             contentView.backgroundColor = .systemBackground
         }
     }
@@ -129,7 +134,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         
         resetLayerProperties(forLayerIdentifiers: nil)
         setupLayerFrames()
-        clipsToBounds = true
+//        clipsToBounds = true
         if useAutoLayout {
             NotificationCenter.default.addObserver(self, selector: #selector(CircleButton.lineWidthChanged(_:)), name: Notifications.UI.LineWidth, object: nil)
 //            clipsToBounds = false
@@ -175,7 +180,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         CATransaction.setDisableActions(true)
         
         if let oval = layers["oval"] as? CAShapeLayer{
-            oval.frame = CGRect(x: 0.025 * oval.superlayer!.bounds.width, y: 0.025 * oval.superlayer!.bounds.height, width: 0.95 * oval.superlayer!.bounds.width, height: 0.95 * oval.superlayer!.bounds.height)
+            oval.frame = CGRect(x: 0.05 * oval.superlayer!.bounds.width, y: 0.05 * oval.superlayer!.bounds.height, width: 0.9 * oval.superlayer!.bounds.width, height: 0.9 * oval.superlayer!.bounds.height)
             oval.path  = ovalPath(bounds: layers["oval"]!.bounds).cgPath
         }
         

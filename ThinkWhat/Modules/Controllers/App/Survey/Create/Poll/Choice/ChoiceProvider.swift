@@ -22,7 +22,7 @@ struct ChoiceItem: Hashable {
 protocol ChoiceProvider: class {
     var dataItems: [ChoiceItem] { get }
     var callbackDelegate: CallbackObservable? { get set }
-    var listener: ChoiceListener! { get }
+    var listener: ChoiceListener? { get }
     var color: UIColor { get set }
     
     func reload()

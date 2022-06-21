@@ -51,7 +51,7 @@ class TopicSelectionModernCollectionView: UICollectionView {
             
             cell.item = item
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-            backgroundConfig.backgroundColor = .lightGray.withAlphaComponent(0.1)
+            backgroundConfig.backgroundColor = item.topic.tagColor.withAlphaComponent(0.05)
             //            backgroundConfig.backgroundColorTransformer = .grayscale
             cell.backgroundConfiguration = backgroundConfig
             cell.callback = { [weak self] in
@@ -81,6 +81,7 @@ class TopicSelectionModernCollectionView: UICollectionView {
                 let cell = collectionView.dequeueConfiguredReusableCell(using: headerCellRegistration,
                                                                         for: indexPath,
                                                                         item: headerItem)
+                cell.tintColor = headerItem.topic.tagColor
                 return cell
             
             case .topic(let symbolItem):

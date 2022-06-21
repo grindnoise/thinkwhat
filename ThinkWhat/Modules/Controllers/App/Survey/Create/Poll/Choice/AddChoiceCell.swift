@@ -182,7 +182,7 @@ class AddChoiceCell: UICollectionViewCell {
     
     @objc
     private func performCallback() {
-        collectionView?.listener.editChoice(item)
+        collectionView?.listener?.editChoice(item)
     }
     
 //    @objc

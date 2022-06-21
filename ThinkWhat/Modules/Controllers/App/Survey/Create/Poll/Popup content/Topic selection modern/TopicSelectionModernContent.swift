@@ -86,7 +86,7 @@ extension TopicSelectionModernContent: UIContentView {
         observers.append(titleLabel.observe(\InsetLabel.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             guard let self = self,
             let rect = change.newValue else { return }
-            self.titleLabel.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: rect.height * 0.4)
+            self.titleLabel.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: rect.height * 0.35)
         })
 //        observers.append(descriptionLabel.observe(\InsetLabel.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
 //            guard let self = self,

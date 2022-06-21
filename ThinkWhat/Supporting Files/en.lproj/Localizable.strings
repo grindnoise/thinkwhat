@@ -192,6 +192,7 @@
 "default_description" = "Public poll, no restrictions, non anonymous";
 "private_option" = "Private";
 "private_description" = "Private poll, access is granted via sharing link";
+"ask_question" = "Ask question";
 
 "url_placeholder" = "Paste URL";
 "choose_image" = "Сhoose image";
@@ -210,3 +211,9 @@
 "hot_is_on_description" = "Get guaranteed fast by getting into Hot feed, extra points will be needed";
 "hot_is_off_description" = "Poll may get into Hot feed, if it will be rated  greater than 4 stars";
 "post_poll" = "Post";
+"optional" = "Optional";
+"open_safari" = "Open browser";
+"open_hyperlink" = "Open hyperlink";
+"limits_description" = "Limit for participants, upon reaching which the poll closes";
+"comments_on_description" = "Participants can post comments";
+"comments_off_description" = "Comments closed";

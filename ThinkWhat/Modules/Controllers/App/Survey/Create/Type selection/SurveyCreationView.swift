@@ -9,6 +9,13 @@
 import UIKit
 
 class SurveyCreationView: UIView, SurveyCreationOutput {
+    
+    deinit {
+#if DEBUG
+        print("SurveyCreationView deinit")
+#endif
+    }
+    
     func onDidLoad() {
         destinationPoint = (viewInput?.tabBarHeight ?? 0) + UIApplication.shared.windows.first!.safeAreaInsets.bottom + (deviceType == .iPhoneSE ? 20 : 0)
     }

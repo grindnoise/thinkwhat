@@ -63,6 +63,10 @@ class LimitsSelectionView: UIView {
         let titleString = NSMutableAttributedString()
         titleString.append(NSAttributedString(string: "voters_limit".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: title.bounds.height * 0.4), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         title.attributedText = titleString
+        
+        let description = NSMutableAttributedString()
+        description.append(NSAttributedString(string: "limits_description".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Light, size: descriptionLabel.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        descriptionLabel.attributedText = description
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

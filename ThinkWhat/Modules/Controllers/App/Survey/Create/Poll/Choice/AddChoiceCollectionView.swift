@@ -27,10 +27,11 @@ class AddChoiceCollectionView: UICollectionView {
     //        }
     //    }
     var dataItems: [ChoiceItem] {
-        return listener.choiceItems
+        guard !listener.isNil else { return [] }
+        return listener!.choiceItems
     }
     weak var callbackDelegate: CallbackObservable?
-    var listener: ChoiceListener!
+    weak var listener: ChoiceListener?
     @objc dynamic var color: UIColor = .label
 //        didSet {
 ////            guard !oldValue.isNil else { return }
@@ -62,7 +63,7 @@ class AddChoiceCollectionView: UICollectionView {
     }
     
     private func handleSwipe(for action: UIContextualAction, item: ChoiceItem) {
-        listener.deleteChoice(item)
+        listener?.deleteChoice(item)
     }
     
     private func commonInit() {
@@ -85,12 +86,12 @@ class AddChoiceCollectionView: UICollectionView {
                 var snap = self.source.snapshot()
                 if let indent = self.source.itemIdentifier(for: indexPath) {
                     snap.deleteItems([indent])
-                    self.listener.deleteChoice(indent)
+                    self.listener?.deleteChoice(indent)
 //                    snap.reloadItems(snap.itemIdentifiers)
                 }
 //                snap.reloadItems(snap.itemIdentifiers)
                 self.source.apply(snap, animatingDifferences: true, completion: {
-                    self.listener.onChoicesHeightChange(self.contentSize.height)
+                    self.listener?.onChoicesHeightChange(self.contentSize.height)
 //                    snap.reloadItems(snap.itemIdentifiers)
                     self.reload()
                 })
@@ -204,7 +205,7 @@ extension AddChoiceCollectionView: UICollectionViewDelegate {
             collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
         }
         
-        dataSource.refresh() { self.listener.onChoicesHeightChange(self.contentSize.height) }
+        dataSource.refresh() { self.listener?.onChoicesHeightChange(self.contentSize.height) }
         
         return false // The selecting or deselecting is already performed above
     }
@@ -238,7 +239,7 @@ extension AddChoiceCollectionView: ChoiceProvider {
         snapshot.reloadItems(dataItems)
         source.apply(snapshot, animatingDifferences: false)
         source.refresh() {
-            self.listener.onChoicesHeightChange(self.contentSize.height)
+            self.listener?.onChoicesHeightChange(self.contentSize.height)
         }
     }
     

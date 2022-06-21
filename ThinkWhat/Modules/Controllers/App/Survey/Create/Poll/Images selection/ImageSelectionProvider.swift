@@ -24,7 +24,7 @@ struct ImageItem: Hashable {
 protocol ImageSelectionProvider: class {
     var dataItems: [ImageItem] { get }
     var callbackDelegate: CallbackObservable? { get set }
-    var listener: ImageSelectionListener! { get }
+    var listener: ImageSelectionListener? { get }
     
     func reload()
     func append(_: ImageItem)

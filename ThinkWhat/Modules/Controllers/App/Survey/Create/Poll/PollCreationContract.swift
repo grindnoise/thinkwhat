@@ -18,6 +18,7 @@ protocol PollCreationViewInput: class {
     var stage: PollCreationController.Stage { get }
     
     func onStageCompleted()
+    func onURLTapped(_: URL?)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -44,4 +45,5 @@ protocol PollCreationControllerOutput: class {
     var viewInput: PollCreationViewInput? { get set }
     
     func onNextStage(_: PollCreationController.Stage)
+    func onDeinit()
 }

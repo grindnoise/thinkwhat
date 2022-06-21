@@ -46,7 +46,7 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
     }
     
     private func handleSwipe(for action: UIContextualAction, item: ImageItem) {
-        listener.deleteImage(item)
+        listener?.deleteImage(item)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -233,9 +233,10 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
     }
     
     weak var callbackDelegate: CallbackObservable?
-    var listener: ImageSelectionListener!
+    weak var listener: ImageSelectionListener?
     var dataItems: [ImageItem] {
-        return listener.imageItems
+        guard !listener.isNil else { return [] }
+        return listener!.imageItems
     }
     var source: UICollectionViewDiffableDataSource<ImageHeaderItem, ImageListItem>!
     private var layoutConfig: UICollectionLayoutListConfiguration!
@@ -254,7 +255,7 @@ class ImageSelectionCollectionView: UICollectionView, ImageSelectionProvider {
 extension ImageSelectionCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.cellForItem(at: indexPath) as? ImageSelectionCell else { return }
-        listener.editImage(cell.item)
+        listener?.editImage(cell.item)
     }
 }
 

@@ -2231,8 +2231,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Survey/Create/Poll/PollCreationView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1386"
-            endingLineNumber = "1386"
+            startingLineNumber = "1496"
+            endingLineNumber = "1496"
             landmarkName = "setObservers()"
             landmarkType = "7">
          </BreakpointContent>
@@ -2327,8 +2327,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Survey/Create/Poll/PollCreationView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1452"
-            endingLineNumber = "1452"
+            startingLineNumber = "1562"
+            endingLineNumber = "1562"
             landmarkName = "setObservers()"
             landmarkType = "7">
          </BreakpointContent>

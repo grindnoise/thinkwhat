@@ -74,8 +74,8 @@ class OptionSelection: UIView {
     }
     
     private func setObservers() {
-        boundsObserver = contentView.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
-            guard !self.hMaskLayer.isNil else { return }
+        boundsObserver = contentView.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view, change) in
+            guard let self = self, !self.hMaskLayer.isNil else { return }
             self.hMaskLayer.frame = self.contentView.frame
             guard !self.scrollView.isNil, !self.anon.isNil, !self.privacy.isNil, !self.ordinary.isNil else { return }
             switch self.option {
@@ -91,13 +91,13 @@ class OptionSelection: UIView {
     
     private func setText() {
         let fontSize: CGFloat = title.bounds.height * 0.3
-        let paragraph = NSMutableParagraphStyle()
-        if #available(iOS 15.0, *) {
-            paragraph.usesDefaultHyphenation = true
-        } else {
-            paragraph.hyphenationFactor = 1
-        }
-        paragraph.alignment = .center
+//        let paragraph = NSMutableParagraphStyle()
+//        if #available(iOS 15.0, *) {
+//            paragraph.usesDefaultHyphenation = true
+//        } else {
+//            paragraph.hyphenationFactor = 1
+//        }
+//        paragraph.alignment = .center
         
         let topicTitleString = NSMutableAttributedString()
         topicTitleString.append(NSAttributedString(string: "choose_option".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
@@ -107,28 +107,25 @@ class OptionSelection: UIView {
         anonString.append(NSAttributedString(string: "anon_option".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: anonTitle.bounds.width * 0.06), foregroundColor: .label/*color*/, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         anonTitle.attributedText = anonString
         
-        let string_1 = "anon_description".localized
-        let anonDescriptionString = NSMutableAttributedString(string: string_1, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-        anonDescriptionString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: anonTitle.bounds.width * 0.07), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string_1.fullRange())
+        let anonDescriptionString = NSAttributedString(string: "anon_description".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Light, size: anonTitle.bounds.width * 0.07), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any])
         anonDescription.attributedText = anonDescriptionString
+        anonDescription.textAlignment = .center
         
         let defaultString = NSMutableAttributedString()
         defaultString.append(NSAttributedString(string: "default_option".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: anonTitle.bounds.width * 0.06), foregroundColor: .label/*color*/, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         ordinaryTitle.attributedText = defaultString
         
-        let string_2 = "default_description".localized
-        let ordinaryDescriptionString = NSMutableAttributedString(string: string_2, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-        ordinaryDescriptionString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: anonTitle.bounds.width * 0.07), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string_2.fullRange())
+        let ordinaryDescriptionString = NSMutableAttributedString(string: "default_description".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Light, size: anonTitle.bounds.width * 0.07), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any])
         ordinaryDescription.attributedText = ordinaryDescriptionString
+        ordinaryDescription.textAlignment = .center
         
         let privacyString = NSMutableAttributedString()
         privacyString.append(NSAttributedString(string: "private_option".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: anonTitle.bounds.width * 0.06), foregroundColor: .label/*color*/, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         privacyTitle.attributedText = privacyString
         
-        let string_3 = "private_description".localized
-        let privateDescriptionString = NSMutableAttributedString(string: string_3, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-        privateDescriptionString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: anonTitle.bounds.width * 0.07), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string_3.fullRange())
+        let privateDescriptionString = NSMutableAttributedString(string: "private_description".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Light, size: anonTitle.bounds.width * 0.07), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any])
         privacyDescription.attributedText = privateDescriptionString
+        privacyDescription.textAlignment = .center
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

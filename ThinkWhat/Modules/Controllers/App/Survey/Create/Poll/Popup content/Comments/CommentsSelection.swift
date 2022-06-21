@@ -43,23 +43,14 @@ class CommentsSelection: UIView {
     }
     
     private func setupUI() {
-        setText()
+//        setText()
     }
     
     private func setObservers() {
-//        boundsObserver = contentView.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
-//            guard !self.hMaskLayer.isNil else { return }
-//            self.hMaskLayer.frame = self.contentView.frame
-//            guard !self.scrollView.isNil, !self.anon.isNil, !self.privacy.isNil, !self.ordinary.isNil else { return }
-//            switch self.option {
-//            case .Anon:
-//                self.scrollView.scrollRectToVisible(self.anon.superview!.frame, animated: true)
-//            case .Private:
-//                self.scrollView.scrollRectToVisible(self.privacy.superview!.frame, animated: true)
-//            default:
-//                self.scrollView.scrollRectToVisible(self.ordinary.superview!.frame, animated: true)
-//            }
-//        }
+        observers.append(contentView.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self ] (view, change) in
+            guard let self = self else { return }
+            self.setText()
+        })
     }
     
     private func setText() {
@@ -74,6 +65,10 @@ class CommentsSelection: UIView {
         let offString = NSMutableAttributedString()
         offString.append(NSAttributedString(string: "are_off".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: offTitle.bounds.width * 0.06), foregroundColor: !isOn ? .label : .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         offTitle.attributedText = offString
+        
+        let description = NSMutableAttributedString()
+        description.append(NSAttributedString(string: option == .On ? "comments_on_description".localized : "comments_off_description".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Light, size: descriptionLabel.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        descriptionLabel.attributedText = description
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -169,6 +164,7 @@ class CommentsSelection: UIView {
         }
     }
     @IBOutlet weak var offTitle: ArcLabel!
+    @IBOutlet weak var descriptionLabel: UILabel!
     
     // MARK: - Properties
     private var isOn: Bool {
@@ -177,7 +173,13 @@ class CommentsSelection: UIView {
         }
     }
     private var isFirstSelection = true
-    private var option: PollCreationController.Comments = .On
+    private var option: PollCreationController.Comments = .On {
+        didSet {
+            UIView.transition(with: descriptionLabel, duration: 0.2, options: .transitionCrossDissolve) {
+                self.setText()
+            } completion: { _ in }
+        }
+    }
     private weak var callbackDelegate: CallbackObservable?
-    private var boundsObserver: NSKeyValueObservation?
+    private var observers: [NSKeyValueObservation] = []
 }

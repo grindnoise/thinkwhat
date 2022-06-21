@@ -58,8 +58,8 @@
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <textInputTraits key="textInputTraits" keyboardType="numberPad" returnKeyType="done"/>
                         </textField>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3DK-MG-ptu">
-                            <rect key="frame" x="8" y="8" width="384" height="152"/>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3DK-MG-ptu">
+                            <rect key="frame" x="0.0" y="260" width="400" height="152"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
@@ -67,14 +67,14 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstItem="Shp-fJ-r8n" firstAttribute="top" secondItem="3DK-MG-ptu" secondAttribute="bottom" constant="8" id="018-q1-GG7"/>
                         <constraint firstItem="Shp-fJ-r8n" firstAttribute="centerY" secondItem="IYG-sb-Kve" secondAttribute="centerY" id="GdQ-yw-xSp"/>
-                        <constraint firstItem="3DK-MG-ptu" firstAttribute="leading" secondItem="IYG-sb-Kve" secondAttribute="leading" constant="8" id="OvO-B2-8c9"/>
+                        <constraint firstItem="3DK-MG-ptu" firstAttribute="top" secondItem="Shp-fJ-r8n" secondAttribute="bottom" constant="8" id="KWX-fq-Mbi"/>
+                        <constraint firstItem="3DK-MG-ptu" firstAttribute="leading" secondItem="IYG-sb-Kve" secondAttribute="leading" id="OvO-B2-8c9"/>
                         <constraint firstItem="Shp-fJ-r8n" firstAttribute="centerX" secondItem="IYG-sb-Kve" secondAttribute="centerX" id="Y8W-3Y-4V8"/>
                         <constraint firstItem="Shp-fJ-r8n" firstAttribute="width" secondItem="IYG-sb-Kve" secondAttribute="width" multiplier="0.7" id="iRo-BI-rzW"/>
                         <constraint firstItem="Shp-fJ-r8n" firstAttribute="height" secondItem="IYG-sb-Kve" secondAttribute="height" multiplier="0.2" id="kof-S1-73s"/>
-                        <constraint firstAttribute="trailing" secondItem="3DK-MG-ptu" secondAttribute="trailing" constant="8" id="nG2-oH-oiz"/>
-                        <constraint firstItem="3DK-MG-ptu" firstAttribute="top" secondItem="IYG-sb-Kve" secondAttribute="top" constant="8" id="vrs-J6-I4V"/>
+                        <constraint firstAttribute="trailing" secondItem="3DK-MG-ptu" secondAttribute="trailing" id="nG2-oH-oiz"/>
+                        <constraint firstAttribute="bottom" secondItem="3DK-MG-ptu" secondAttribute="bottom" constant="8" id="yye-yg-zPc"/>
                     </constraints>
                 </view>
             </subviews>

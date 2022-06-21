@@ -18,6 +18,7 @@ struct Animations {
         case Path            = "path"
         case BackgroundColor = "backgroundColor"
         case StrokeStart     = "strokeStart"
+        case StrokeColor     = "strokeColor"
         case LineWidth       = "lineWidth"
     }
     static func group(animations: [CAAnimation], repeatCount: Float = 0, autoreverses: Bool = false, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CAAnimationGroup {
@@ -54,7 +55,6 @@ struct Animations {
         anim.timingFunction = CAMediaTimingFunction(name: timingFunction)
         
         return anim
-        
     }
     
     static func fadeInFadeOut(layer: CALayer, fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, keyValue: String = "", isRemovedOnCompletion: Bool = true) -> CABasicAnimation {

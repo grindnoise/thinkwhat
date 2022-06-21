@@ -64,7 +64,7 @@ class _ImageSelectionHeaderContent: UICollectionReusableView {
             addButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
         }
     }
-    @IBOutlet weak var titleLabel: InsetLabel!
+    @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var height: NSLayoutConstraint!
 }
 
@@ -102,7 +102,7 @@ class ImageSelectionHeaderContent: UIView {
     @objc
     private func handleTap() {
 //        addButtonTapCallback?()
-        collectionView?.listener.addImage()
+        collectionView?.listener?.addImage()
     }
 //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 //        contentView.backgroundColor = .tertiarySystemBackground
@@ -139,7 +139,7 @@ class ImageSelectionHeaderContent: UIView {
             addButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
         }
     }
-    @IBOutlet weak var titleLabel: InsetLabel!
+    @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var height: NSLayoutConstraint!
 }
 
