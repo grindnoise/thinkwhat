@@ -8,7 +8,6 @@
 
 import UIKit
 
-@available(iOS 14, *)
 class TopicSelectionModernCollectionView: UICollectionView {
     
     enum Section {
@@ -68,7 +67,26 @@ class TopicSelectionModernCollectionView: UICollectionView {
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .red
             cell.backgroundConfiguration = backgroundConfig
-            cell.accessories = [.outlineDisclosure(options:headerDisclosureOption)]
+            cell.accessories = [.outlineDisclosure(options:headerDisclosureOption) {
+                self.scrollToItem(at: indexPath, at: .top, animated: true)
+                var currentSectionSnapshot = self.source.snapshot(for: headerItem)
+                if currentSectionSnapshot.items.filter { currentSectionSnapshot.isExpanded($0) }.isEmpty {
+                    currentSectionSnapshot.expand(currentSectionSnapshot.items)
+//                    let otherHeaders = self.source.snapshot().sectionIdentifiers.filter({ $0 != headerItem })
+//                    otherHeaders.forEach { otherHeader in
+//                        var otherSectionSnapshot = self.source.snapshot(for: otherHeader)
+//                        otherSectionSnapshot.items.forEach { otherItem in
+//                            if otherSectionSnapshot.isExpanded(otherItem) {
+//                                otherSectionSnapshot.collapse(otherSectionSnapshot.items)
+//                                self.source.apply(otherSectionSnapshot, to: otherHeader, animatingDifferences: true)
+//                            }
+//                        }
+//                    }
+                } else {
+                    currentSectionSnapshot.collapse(currentSectionSnapshot.items)
+                }
+                self.source.apply(currentSectionSnapshot, to: headerItem, animatingDifferences: true)
+            }]
         }
 
         source = UICollectionViewDiffableDataSource<TopicHeaderItem, TopicListItem>(collectionView: self) {
@@ -134,18 +152,16 @@ class TopicSelectionModernCollectionView: UICollectionView {
     }
     
     weak var callbackDelegate: CallbackObservable?
-    var source: UICollectionViewDiffableDataSource<TopicHeaderItem, TopicListItem>!
+    private var source: UICollectionViewDiffableDataSource<TopicHeaderItem, TopicListItem>!
     private var layoutConfig: UICollectionLayoutListConfiguration!
 }
 
-@available(iOS 14, *)
 extension TopicSelectionModernCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         scrollToItem(at: indexPath, at: .centeredVertically, animated: true)
     }
 }
 
-@available(iOS 14.0, *)
 class TopicSelectionModernCell: UICollectionViewListCell {
     
     override init(frame: CGRect) {
@@ -176,7 +192,7 @@ class TopicSelectionModernCell: UICollectionViewListCell {
 //        // Customize the background color to use the tint color when the cell is highlighted or selected.
 //        if state.isSelected {
 //            backgroundConfig.backgroundColor = .red
-            accessories = state.isSelected ? [.checkmark()] : []
+        accessories = state.isSelected ? [.checkmark(displayed: .always, options: UICellAccessory.CheckmarkOptions(isHidden: false, reservedLayoutWidth: nil, tintColor: item.topic.tagColor))] : []
 //        }
         
         if state.isSelected, !callback.isNil { callback!() }
@@ -189,7 +205,6 @@ class TopicSelectionModernCell: UICollectionViewListCell {
     }
 }
 
-@available(iOS 14.0, *)
 class TopicSelectionModernHeader: UICollectionViewListCell {
     
     override init(frame: CGRect) {
@@ -210,7 +225,6 @@ class TopicSelectionModernHeader: UICollectionViewListCell {
     }
 }
 
-@available(iOS 14.0, *)
 struct TopicSelectionModernCellConfiguration: UIContentConfiguration, Hashable {
 
     var topicItem: TopicItem!
@@ -228,7 +242,6 @@ struct TopicSelectionModernCellConfiguration: UIContentConfiguration, Hashable {
     }
 }
 
-@available(iOS 14.0, *)
 struct TopicSelectionModernHeaderConfiguration: UIContentConfiguration, Hashable {
 
     var topicItem: TopicHeaderItem!

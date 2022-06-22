@@ -218,7 +218,7 @@ class OptionSelection: UIView {
     @IBOutlet weak var ordinaryIcon: Icon! {
         didSet {
             ordinaryIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
-            ordinaryIcon.category = .ManFace
+            ordinaryIcon.category = .Unlocked
             ordinaryIcon.isRounded = false
         }
     }

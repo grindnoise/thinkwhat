@@ -147,7 +147,7 @@ class CommentsSelection: UIView {
     @IBOutlet weak var onIcon: Icon! {
         didSet {
             onIcon.iconColor = isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : UIColor.label) : .systemGray
-            onIcon.category = .Comment
+            onIcon.category = .Comments
             onIcon.isRounded = false
             onIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
             onIcon.superview!.transform = isOn ? CGAffineTransform(scaleX: 1.3, y: 1.3) : .identity
@@ -157,7 +157,7 @@ class CommentsSelection: UIView {
     @IBOutlet weak var offIcon: Icon! {
         didSet {
             offIcon.iconColor = !isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : UIColor.label) : .systemGray
-            offIcon.category = .CommentDisabled
+            offIcon.category = .CommentsDisabled
             offIcon.isRounded = false
             offIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
             offIcon.superview!.transform = !isOn ? CGAffineTransform(scaleX: 1.3, y: 1.3) : .identity

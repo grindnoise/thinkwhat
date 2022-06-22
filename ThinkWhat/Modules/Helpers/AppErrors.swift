@@ -18,6 +18,7 @@ enum AppError: Error {
     case maximumCharactersExceeded(maxValue: Int)
     case minimumCharactersExceeded(minValue: Int)
     case minimumChoices
+    case minimumLimits
 }
 
 extension AppError: LocalizedError {
@@ -41,6 +42,8 @@ extension AppError: LocalizedError {
             return "images_limit".localized
         case .minimumChoices:
             return "minimum_choices".localized
+        case .minimumLimits:
+            return "minimum_limits".localized
         }
     }
 }

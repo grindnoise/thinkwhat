@@ -129,7 +129,7 @@ class PollCreationController: UIViewController {
         didSet {
             guard oldValue != stage else { return }
             if stage == .Ready {
-                let strokeAnim = Animations.get(property: .StrokeStart, fromValue: progressIndicator.oval.strokeStart, toValue: 1, duration: 0.5, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [{
+                let strokeAnim = Animations.get(property: .StrokeStart, fromValue: progressIndicator.oval.strokeStart, toValue: 1, duration: 0.4, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [{
                     
 //                    delay(seconds: 0.3) {
 //                        self.progressIndicator.oval.opacity = 0
@@ -142,10 +142,17 @@ class PollCreationController: UIViewController {
                 progressIndicator.oval.add(strokeColorAnim, forKey: nil)
                 progressIndicator.oval.opacity = 0
                 
-                let destinationPath = (self.progressIndicator.icon.getLayer(.Rocket) as! CAShapeLayer).path!
-                let pathAnim = Animations.get(property: .Path, fromValue: (self.progressIndicator.icon.icon as! CAShapeLayer).path!, toValue: destinationPath, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: true)
-                progressIndicator.icon.icon.add(pathAnim, forKey: nil)
-                (progressIndicator.icon.icon as! CAShapeLayer).path = destinationPath
+                guard let icon = self.progressIndicator.icon.icon as? CAShapeLayer else { return }
+                let color = self.traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : UIColor.systemGreen
+                
+                let fillColorAnim = Animations.get(property: .StrokeColor, fromValue: icon.fillColor as Any, toValue: color.cgColor, duration: 0.5, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [])
+                icon.add(fillColorAnim, forKey: nil)
+                icon.fillColor = color.cgColor
+                
+                let destinationPath = (self.progressIndicator.icon.getLayer(.Checkmark) as! CAShapeLayer).path!
+                let pathAnim = Animations.get(property: .Path, fromValue: icon.path!, toValue: destinationPath, duration: 0.4, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: true)
+                icon.add(pathAnim, forKey: nil)
+                icon.path = destinationPath
             } else {
                 animateProgress()
             }

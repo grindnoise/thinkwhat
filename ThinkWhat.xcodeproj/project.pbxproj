@@ -102,6 +102,9 @@
 		AB38DD722819538A00FFEB3F /* Confirm.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB38DD712819538A00FFEB3F /* Confirm.xib */; };
 		AB38DD76281A776900FFEB3F /* SurveysCollection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB38DD75281A776900FFEB3F /* SurveysCollection.xib */; };
 		AB38DD78281A777200FFEB3F /* SurveysCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB38DD77281A777200FFEB3F /* SurveysCollection.swift */; };
+		AB39899728636A70004C958E /* CostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39899628636A70004C958E /* CostView.swift */; };
+		AB398999286370D9004C958E /* CostView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB398998286370D9004C958E /* CostView.xib */; };
+		AB39899B28637E4F004C958E /* CostCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39899A28637E4F004C958E /* CostCollectionView.swift */; };
 		AB39F40F2847457200DEE0ED /* InsetTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F40E2847457200DEE0ED /* InsetTextField.swift */; };
 		AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F4112847830300DEE0ED /* ImageSelectionCollectionView.swift */; };
 		AB39F41428478B5C00DEE0ED /* ImageSelectionCellContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F41328478B5C00DEE0ED /* ImageSelectionCellContent.swift */; };
@@ -229,6 +232,7 @@
 		AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */; };
 		AB7085E726CB9A1F006F020F /* SideApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7085E626CB9A1F006F020F /* SideApp.swift */; };
 		AB7085E926CB9A75006F020F /* SideApp.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7085E826CB9A75006F020F /* SideApp.xib */; };
+		AB70BFDE28631F41001F0B2B /* DisabledPasteTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB70BFDD28631F41001F0B2B /* DisabledPasteTextField.swift */; };
 		AB72960127DA096200D45B54 /* MainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72960027DA096200D45B54 /* MainController.swift */; };
 		AB72960327DA0DD500D45B54 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72960227DA0DD500D45B54 /* Common.swift */; };
 		AB72960727DA2EE600D45B54 /* HotController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72960527DA2EE600D45B54 /* HotController.swift */; };
@@ -623,6 +627,9 @@
 		AB38DD712819538A00FFEB3F /* Confirm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Confirm.xib; sourceTree = "<group>"; };
 		AB38DD75281A776900FFEB3F /* SurveysCollection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveysCollection.xib; sourceTree = "<group>"; };
 		AB38DD77281A777200FFEB3F /* SurveysCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveysCollection.swift; sourceTree = "<group>"; };
+		AB39899628636A70004C958E /* CostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostView.swift; sourceTree = "<group>"; };
+		AB398998286370D9004C958E /* CostView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CostView.xib; sourceTree = "<group>"; };
+		AB39899A28637E4F004C958E /* CostCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostCollectionView.swift; sourceTree = "<group>"; };
 		AB39F40E2847457200DEE0ED /* InsetTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetTextField.swift; sourceTree = "<group>"; };
 		AB39F4112847830300DEE0ED /* ImageSelectionCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionCollectionView.swift; sourceTree = "<group>"; };
 		AB39F41328478B5C00DEE0ED /* ImageSelectionCellContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionCellContent.swift; sourceTree = "<group>"; };
@@ -757,6 +764,7 @@
 		AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyIcons.swift; sourceTree = "<group>"; };
 		AB7085E626CB9A1F006F020F /* SideApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideApp.swift; sourceTree = "<group>"; };
 		AB7085E826CB9A75006F020F /* SideApp.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SideApp.xib; sourceTree = "<group>"; };
+		AB70BFDD28631F41001F0B2B /* DisabledPasteTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisabledPasteTextField.swift; sourceTree = "<group>"; };
 		AB72960027DA096200D45B54 /* MainController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainController.swift; sourceTree = "<group>"; };
 		AB72960227DA0DD500D45B54 /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		AB72960527DA2EE600D45B54 /* HotController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotController.swift; sourceTree = "<group>"; };
@@ -1430,6 +1438,16 @@
 			path = Collection;
 			sourceTree = "<group>";
 		};
+		AB39899528636A28004C958E /* Cost */ = {
+			isa = PBXGroup;
+			children = (
+				AB39899628636A70004C958E /* CostView.swift */,
+				AB398998286370D9004C958E /* CostView.xib */,
+				AB39899A28637E4F004C958E /* CostCollectionView.swift */,
+			);
+			path = Cost;
+			sourceTree = "<group>";
+		};
 		AB39F410284782AE00DEE0ED /* Images selection */ = {
 			isa = PBXGroup;
 			children = (
@@ -1843,6 +1861,7 @@
 		AB63D7D4283FBFB100173116 /* Popup content */ = {
 			isa = PBXGroup;
 			children = (
+				AB39899528636A28004C958E /* Cost */,
 				ABEB5F82285E4F0F00C75C31 /* Hot */,
 				ABEB5F7D285E1DE600C75C31 /* Limits */,
 				AB60B5BB285CD5E20023C99B /* Comments */,
@@ -2438,6 +2457,7 @@
 				AB6083C022410130002C0D7E /* ValidSign.swift */,
 				ABBCF4132431F1F300BFEAB9 /* VerticallyCenteredTextView.swift */,
 				ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */,
+				AB70BFDD28631F41001F0B2B /* DisabledPasteTextField.swift */,
 			);
 			path = TextFields;
 			sourceTree = "<group>";
@@ -2990,6 +3010,7 @@
 				ABD639A627A5B0C50020958F /* recaptcha.html in Resources */,
 				ABF27583280EB42C0023CD1F /* VotersView.xib in Resources */,
 				AB99A95924C8154A00814F96 /* UserLogoHeader.xib in Resources */,
+				AB398999286370D9004C958E /* CostView.xib in Resources */,
 				AB8DA31727A0325D00F92C18 /* Localizable.strings in Resources */,
 				AB164020281A9C95001F33F8 /* SurveyCellContentView.xib in Resources */,
 				AB63D7D8283FC04F00173116 /* TopicSelection.xib in Resources */,
@@ -3249,6 +3270,7 @@
 				AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */,
 				AB98307027B54D43002C5132 /* ContentLoader.swift in Sources */,
 				ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */,
+				AB39899728636A70004C958E /* CostView.swift in Sources */,
 				AB3AF3672834E05F00160F0C /* OrderedSet.swift in Sources */,
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
 				AB19B6412432222300999917 /* SurveyResultCell.swift in Sources */,
@@ -3257,6 +3279,7 @@
 				ABBA1988242B430100F11E0D /* AnswerHeaderCell.swift in Sources */,
 				AB463FB527C3FDB3007D7240 /* UnderlinedSearchTextField.swift in Sources */,
 				AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */,
+				AB39899B28637E4F004C958E /* CostCollectionView.swift in Sources */,
 				AB82C368259C826100888C74 /* TrashIcon.swift in Sources */,
 				ABBCF4142431F1F300BFEAB9 /* VerticallyCenteredTextView.swift in Sources */,
 				ABADF59727F4A8D500A26474 /* VoteCell.swift in Sources */,
@@ -3276,6 +3299,7 @@
 				AB72963D27DB5F0B00D45B54 /* TopicsModel.swift in Sources */,
 				ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */,
 				AB98308B27B9385B002C5132 /* RecoverView.swift in Sources */,
+				AB70BFDE28631F41001F0B2B /* DisabledPasteTextField.swift in Sources */,
 				ABF3DF1B283BB11800309AA9 /* LargeCard.swift in Sources */,
 				AB9998BE28058FA5009D0E4F /* Double.swift in Sources */,
 				AB00FFD52587A6320071C7DE /* BlurTransition.swift in Sources */,
@@ -3763,7 +3787,7 @@
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3777,7 +3801,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -3794,7 +3818,7 @@
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3807,7 +3831,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

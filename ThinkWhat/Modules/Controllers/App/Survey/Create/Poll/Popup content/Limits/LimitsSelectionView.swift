@@ -47,7 +47,7 @@ class LimitsSelectionView: UIView {
     }
     
     private func setObservers() {
-        observers.append(textField.observe(\UITextField.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+        observers.append(textField.observe(\DisabledPasteTextField.bounds, options: [NSKeyValueObservingOptions.new]) { (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             self.textField.cornerRadius = self.textField.frame.height / 2
             self.textField.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Bold,
                                                            size: self.textField.frame.height * 0.6)
@@ -112,7 +112,7 @@ class LimitsSelectionView: UIView {
             confirm.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         }
     }
-    @IBOutlet weak var textField: UITextField! {
+    @IBOutlet weak var textField: DisabledPasteTextField! {
         didSet {
             textField.text = "\(value)"
             textField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
@@ -135,7 +135,16 @@ extension LimitsSelectionView: UITextFieldDelegate {
         guard let text = textField.text else { return true }
         guard !text.isEmpty else {
             showBanner(bannerDelegate: self,
-                       text: AppError.invalidURL.localizedDescription,
+                       text: AppError.minimumLimits.localizedDescription,
+                       imageContent: ImageSigns.exclamationMark,
+                       shouldDismissAfter: 0.5,
+                       accessibilityIdentifier: "isTextFieldEditingEnabled")
+            isTextFieldEditingEnabled = false
+            return false
+        }
+        guard let count = Int(text), count >= 10 else {
+            showBanner(bannerDelegate: self,
+                       text: AppError.minimumLimits.localizedDescription,
                        imageContent: ImageSigns.exclamationMark,
                        shouldDismissAfter: 0.5,
                        accessibilityIdentifier: "isTextFieldEditingEnabled")
@@ -149,6 +158,7 @@ extension LimitsSelectionView: UITextFieldDelegate {
         guard isTextFieldEditingEnabled else { return false }
         return true
     }
+
 }
 
 extension LimitsSelectionView: BannerObservable {

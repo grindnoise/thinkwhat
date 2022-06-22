@@ -19,6 +19,7 @@
 "invalid_url" = "Invalid URL format";
 "images_limit" = "You can attach no maore than 3 images";
 "minimum_choices" = "2 choices are required at least";
+"minimum_limits" = "At least 10 participants required";
 
 //Common
 "ok" = "Ok";
@@ -173,6 +174,7 @@
 "new_poll" = "Новый опрос";
 "topic" = "Topic";
 "options" = "Options";
+"accessibility" = "Accessibility";
 "poll_title" = "Title";
 "poll_description" = "Description";
 "poll_question" = "Question";
@@ -193,6 +195,7 @@
 "private_option" = "Private";
 "private_description" = "Private poll, access is granted via sharing link";
 "ask_question" = "Ask question";
+"description_explanation" = "Detailed information concerning poll, optional";
 
 "url_placeholder" = "Paste URL";
 "choose_image" = "Сhoose image";
@@ -207,6 +210,8 @@
 "are_off" = "Off";
 "is_on" = "On";
 "is_off" = "Off";
+"images_explanation" = "Add images for more information, optional";
+"url_explanation" = "Attach hyperlink, optional";
 
 "hot_is_on_description" = "Get guaranteed fast by getting into Hot feed, extra points will be needed";
 "hot_is_off_description" = "Poll may get into Hot feed, if it will be rated  greater than 4 stars";
@@ -217,3 +222,4 @@
 "limits_description" = "Limit for participants, upon reaching which the poll closes";
 "comments_on_description" = "Participants can post comments";
 "comments_off_description" = "Comments closed";
+"cost" = "Cost";
