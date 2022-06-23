@@ -10,6 +10,7 @@ import UIKit
 
 class Popup: UIView {
     
+    // MARK: - Initialization
     deinit {
         print("Popup deinit")
     }
@@ -26,7 +27,6 @@ class Popup: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Initialization
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         backgroundColor             = .clear
@@ -43,6 +43,8 @@ class Popup: UIView {
         centerYConstraint.constant  = yOrigin
         layoutIfNeeded()
         body.cornerRadius = body.frame.width * 0.07
+//        guard let constraint = container.getAllConstraints().filter({ $0.identifier == "height" }).first else { return }
+        originalContainerHeight     = container.bounds.height//constraint.constant
     }
     
     // MARK: - IB Outlets
@@ -74,8 +76,7 @@ class Popup: UIView {
 //        }
 //    }
     
-    // MARK: - Properties
-//    private var isFolded = false
+    // MARK: - Private properties
     private let heightScaleFactor: CGFloat
     private var yOrigin:    CGFloat = 0
     private var height:     CGFloat = 0 {
@@ -85,6 +86,11 @@ class Popup: UIView {
             }
         }
     }
+    private var originalContainerHeight = CGFloat.zero
+    private var padding: CGFloat = 8
+    private var isDismissing = false
+    private var lastHeight: CGFloat = 0
+    
     //Use for auto dismiss
     private var timer:  Timer?
     private var timeElapsed: TimeInterval = 0
@@ -139,6 +145,7 @@ class Popup: UIView {
     }
     
     func dismiss(_ sender: Optional<Any> = nil) {
+        isDismissing = true
         bannerDelegate?.onBannerWillDisappear(self)
         UIView.animate(withDuration: 0.35, delay: 0, options: [.curveLinear], animations: {
             self.background.alpha = 0
@@ -176,6 +183,17 @@ class Popup: UIView {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+    }
+    
+    public func onContainerHeightChange(_ height: CGFloat) {
+//        guard !isDismissing else { return }
+        guard lastHeight != height else { return }
+        lastHeight = height
+        setNeedsLayout()
+        self.height = min((height + padding*2), UIScreen.main.bounds.height * 0.8)//body.frame.width * heightScaleFactor
+        heightConstraint.constant = self.height
+        centerYConstraint.constant = yOrigin
+        layoutIfNeeded()
     }
 }
 

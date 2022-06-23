@@ -20,6 +20,7 @@
 "images_limit" = "You can attach no maore than 3 images";
 "minimum_choices" = "2 choices are required at least";
 "minimum_limits" = "At least 10 participants required";
+"insufficient_balance" = "You don't have enough points for this publication";
 
 //Common
 "ok" = "Ok";
@@ -185,6 +186,8 @@
 "voters_limit" = "Limits";
 "voters_limit_description" = "Voters limit";
 "hot_option" = "Hot start";
+"voters_option" = "Number of participants";
+
 
 "choose_topic" = "Choose topic";
 "choose_option" = "Choose option";
@@ -223,3 +226,4 @@
 "comments_on_description" = "Participants can post comments";
 "comments_off_description" = "Comments closed";
 "cost" = "Cost";
+"total_bill" = "Total:";

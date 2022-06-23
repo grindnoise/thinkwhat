@@ -213,6 +213,21 @@ class PollCreationView: UIView {
             }
         }
     }
+    
+    var costItems: [CostItem] = [
+//        CostItem(title: "One", cost: 12),
+//        CostItem(title: "Two", cost: 36),
+//        CostItem(title: "Two", cost: 982),
+//        CostItem(title: "Two", cost: 982),
+//        CostItem(title: "Two", cost: 982),
+//        CostItem(title: "Two", cost: 982),
+//        CostItem(title: "Two", cost: 982),
+//        CostItem(title: "Two", cost: 982),
+    ]
+    var balance: Int {
+        return viewInput?.balance ?? 0
+    }
+    
     var imageItems: [ImageItem] = [
 //                ImageItem(title: "One", image: UIImage(systemName: "mic.fill")!),
 //                ImageItem(title: "Two", image: UIImage(systemName: "sunset.fill")!),
@@ -247,6 +262,7 @@ class PollCreationView: UIView {
             pollChoicesHeaderLabel.text = "total".localized.capitalized +  ": \(choiceItems.count)"
         }
     }
+    weak var poll: Survey?
     
     // MARK: - Private properties
     private var fontSize: CGFloat = .zero
@@ -774,13 +790,26 @@ class PollCreationView: UIView {
         }
     }
     @IBAction func publicationButtonTapped(_ sender: Any) {
+        costItems.removeAll()
+        if hot == .On {
+            costItems.append(CostItem(title: "hot_option".localized, cost: PriceList.shared.hotPost))
+        }
+        costItems.append(CostItem(title: "voters_option".localized, cost: limits))
+        
         let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-        banner.present(subview: CostView(callbackDelegate: banner, controller: viewInput!, poll: nil))
+        if viewInput?.balance ?? 0 <  costItems.reduce(into: 0) { $0 += $1.cost } {
+            banner.accessibilityIdentifier = "insufficient_balance"
+        }
+        banner.present(subview: CostView(callbackDelegate: banner, dataProvider: self, parent: banner))
     }
 }
 
 // MARK: - Controller Output
 extension PollCreationView: PollCreationControllerOutput {
+    func post() {
+        viewInput?.post(createTemporaryPoll())
+    }
+    
     func onDeinit() {
         observers.forEach{ $0.invalidate() }
     }
@@ -952,6 +981,9 @@ extension PollCreationView: PollCreationControllerOutput {
         
         switch stage {
         case .Topic:
+//            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+//            banner.present(subview: CostView(callbackDelegate: banner, dataProvider: self, parent: banner))
+
             animate(button: topicButton, completionBlocks: [
                 { [weak self] in guard let self = self else { return }; self.topicButton.state = .On},
                 { [weak self] in guard let self = self else { return }
@@ -1827,7 +1859,8 @@ extension PollCreationView {
                            shouldDismissAfter: 1)
                 return
             }
-            if pollURLTextField.isFirstResponder { pollURLTextField.resignFirstResponder() }
+            pollURLTextField.resignFirstResponder()
+            guard !pollURLTextField.isFirstResponder else { return }
             UIView.transition(with: pollURLSkip, duration: 0.2, options: .transitionCrossDissolve, animations: {
                 self.pollURLSkip.image = UIImage(systemName: "info")
             }, completion: {_ in self.viewInput?.onStageCompleted()})
@@ -1941,12 +1974,19 @@ extension PollCreationView {
     }
 }
 
+// MARK: - BannerObservable
 extension PollCreationView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     
     func onBannerWillDisappear(_ sender: Any) {}
     
-    func onBannerDidAppear(_ sender: Any) {}
+    func onBannerDidAppear(_ sender: Any) {
+        guard let v = sender as? UIView, v.accessibilityIdentifier == "insufficient_balance" else { return }
+        showBanner(bannerDelegate: self,
+                   text: AppError.insufficientBalance.localizedDescription,
+                   imageContent: ImageSigns.exclamationMark,
+                   shouldDismissAfter: 1)
+    }
     
     func onBannerDidDisappear(_ sender: Any) {
         if let banner = sender as? Banner {
@@ -1960,6 +2000,7 @@ extension PollCreationView: BannerObservable {
     }
 }
 
+// MARK: - CallbackObservable
 extension PollCreationView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let _topic = sender as? Topic {
@@ -2012,6 +2053,7 @@ extension PollCreationView: CallbackObservable {
     }
 }
 
+// MARK: - CAAnimationDelegate
 extension PollCreationView: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
@@ -2027,6 +2069,7 @@ extension PollCreationView: CAAnimationDelegate {
     }
 }
 
+// MARK: - UITextViewDelegate
 extension PollCreationView: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         guard isTextFieldEditingEnabled else { return false }
@@ -2225,6 +2268,7 @@ extension PollCreationView: UITextViewDelegate {
     }
 }
 
+// MARK: - UITextFieldDelegate
 extension PollCreationView: UITextFieldDelegate {
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         if textField == pollURLTextField {
@@ -2324,6 +2368,7 @@ extension PollCreationView: UITextFieldDelegate {
     }
 }
 
+// MARK: - ImageSelectionListener
 extension PollCreationView: ImageSelectionListener {
     func addImage() {
         guard imageItems.count < 3 else {
@@ -2347,6 +2392,7 @@ extension PollCreationView: ImageSelectionListener {
     }
 }
 
+// MARK: - ChoiceListener
 extension PollCreationView: ChoiceListener {
     func deleteChoice(_ choiceItem: ChoiceItem) {
         choiceItems.remove(object: choiceItem)
@@ -2358,6 +2404,7 @@ extension PollCreationView: ChoiceListener {
     }
 }
 
+// MARK: - UIScrollViewDelegate
 extension PollCreationView: UIScrollViewDelegate {
 //    func scrollViewDidScroll(_ scrollView: UIScrollView) {
 //        print("df")
@@ -2374,4 +2421,47 @@ extension PollCreationView: UIScrollViewDelegate {
 //    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
 //        lastContentOffsetY = scrollView.contentOffset.y
 //    }
+}
+
+// MARK: - Logic
+extension PollCreationView {
+    private func createTemporaryPoll() -> [String: Any] {
+        
+        var dict: [String: Any] = [:]
+        dict["category"] = topic.id
+        dict["type"] = Survey.SurveyType.Poll.rawValue
+        dict["is_private"] = option == .Private
+        dict["is_anonymous"] = option == .Anon
+        dict["isCommentingAllowed"] = comments == .On
+        dict["post_hot"] = hot == .On
+        dict["vote_capacity"] = limits
+        dict["hlink"] = URL(string: pollURLTextField.text ?? "")?.absoluteString
+        dict["title"] = pollTitleTextView.text ?? ""
+        dict["question"] = pollQuestionTextView.text ?? ""
+        dict["description"] = pollDescriptionTextView.text ?? ""
+        dict["answers"] = choiceItems.map() { ["description": $0.text] }
+        
+        return dict
+        
+        
+//        var images: [Int: [UIImage: String]] = [:]
+//        imageItems.enumerated().forEach() { index, item in
+//            images[index + 1] = [item.image: item.title]
+//        }
+//
+//        poll = Survey(type: .Poll,
+//                      title: pollTitleTextView.text ?? "",
+//                      topic: topic,
+//                      description: description,
+//                      question: pollQuestionTextView.text ?? "",
+//                      answers: choiceItems.map { return $0.text},
+//                      media: images,
+//                      url: URL(string: pollURLTextField.text ?? ""),
+//                      voteCapacity: limits,
+//                      isPrivate: option == .Private,
+//                      isAnonymous: option == .Anon,
+//                      isCommentingAllowed: comments == .On,
+//                      isHot: hot == .On,
+//                      isFavorite: false)
+    }
 }

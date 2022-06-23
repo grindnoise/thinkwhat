@@ -16,12 +16,14 @@ struct CostItem: Hashable {
 
 class CostView: UIView {
     
+    private weak var parent: Popup?
+    
     // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable, controller: PollCreationViewInput?, poll: Survey?) {
+    init(callbackDelegate: CallbackObservable, dataProvider: PollCreationControllerOutput?, parent: Popup) {
         super.init(frame: .zero)
-        self.callbackDelegate   = callbackDelegate
-        self.controller         = controller
-        self.poll               = poll
+        self.callbackDelegate = callbackDelegate
+        self.dataProvider = dataProvider
+        self.parent = parent
         commonInit()
     }
     
@@ -35,6 +37,7 @@ class CostView: UIView {
         commonInit()
     }
     
+    // MARK: - Private methods
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
@@ -45,18 +48,20 @@ class CostView: UIView {
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
+        collectionView = CostCollectionView(dataProvider: dataProvider, parent: self)
         setObservers()
         setupUI()
     }
     
     private func setupUI() {
-        guard !poll.isNil else {
-            stackView.removeArrangedSubview(confirm)
-            confirm.alpha = 0
-            return
-        }
-        stackView.removeArrangedSubview(cancel)
-        cancel.alpha = 0
+        guard let balance = dataProvider?.balance,
+        let costItems = dataProvider?.costItems,
+            let cost = costItems.reduce(into: 0) { $0 += $1.cost } as? Int,
+            balance < cost else { return }
+        stackView.removeArrangedSubview(confirm)
+        confirm.alpha = 0
+        //        stackView.removeArrangedSubview(cancel)
+        //        cancel.alpha = 0
     }
     
     private func setObservers() {
@@ -74,7 +79,7 @@ class CostView: UIView {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         confirm.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        cancel.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
+        cancel.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
     }
     
     @objc
@@ -82,11 +87,16 @@ class CostView: UIView {
         if recognizer.state == .ended {
             guard let v = recognizer.view else { return }
             if v == confirm {
-//                controller?.post(poll)
+                dataProvider?.post()
             } else if v == cancel {
                 callbackDelegate?.callbackReceived("exit")
             }
         }
+    }
+    
+    // MARK: - Public methods
+    public func onChildHeightChange(_ height: CGFloat) {
+        parent?.onContainerHeightChange(height + title.bounds.height*2)
     }
     
     // MARK: - IB outlets
@@ -111,9 +121,12 @@ class CostView: UIView {
     
     // MARK: - Properties
     private weak var callbackDelegate: CallbackObservable?
-    private weak var controller: PollCreationViewInput?
-    private weak var collectionView: UICollectionView?
+    private weak var dataProvider: PollCreationControllerOutput?
+    private weak var collectionView: UICollectionView? {
+        didSet {
+            collectionView?.addEquallyTo(to: collectionContainer)
+        }
+    }
     private var observers: [NSKeyValueObservation] = []
-    private var poll: Survey?
 }
 

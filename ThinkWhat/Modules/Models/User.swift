@@ -290,7 +290,7 @@ class Userprofile: Decodable {
             isBanned            = try container.decode(Bool.self, forKey: .isBanned)
             gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
             ///City decoding
-            if let cityInstance = try? container.decodeIfPresent(City.self, forKey: .city), !cityInstance.isNil {
+            if let cityInstance = try? container.decodeIfPresent(City.self, forKey: .city) {
                 city = Cities.shared.all.filter({ $0 == cityInstance }).first ?? cityInstance
                 cityTitle = city!.localized ?? city!.name
             }

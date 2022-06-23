@@ -38,8 +38,10 @@ class AddChoiceCell: UICollectionViewCell {
     }
     override var isSelected: Bool { didSet { updateAppearance() } }
     weak var collectionView: AddChoiceCollectionView?
-    // MARK: - Private Properties
     
+    
+    // MARK: - Private Properties
+
     // Views
     private let orderLabel = UILabel()
     private let textView: UITextView = {
@@ -80,7 +82,7 @@ class AddChoiceCell: UICollectionViewCell {
     // Layout
     private let padding: CGFloat = 8
     
-    // MARK: - Init
+    // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -95,7 +97,7 @@ class AddChoiceCell: UICollectionViewCell {
 //        setupUI()
 //    }
     
-    // MARK: - Private Methods
+    // MARK: - Private methods
     private func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true

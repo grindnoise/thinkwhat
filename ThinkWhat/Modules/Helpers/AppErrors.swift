@@ -19,6 +19,7 @@ enum AppError: Error {
     case minimumCharactersExceeded(minValue: Int)
     case minimumChoices
     case minimumLimits
+    case insufficientBalance
 }
 
 extension AppError: LocalizedError {
@@ -44,6 +45,8 @@ extension AppError: LocalizedError {
             return "minimum_choices".localized
         case .minimumLimits:
             return "minimum_limits".localized
+        case .insufficientBalance:
+            return "insufficient_balance".localized
         }
     }
 }

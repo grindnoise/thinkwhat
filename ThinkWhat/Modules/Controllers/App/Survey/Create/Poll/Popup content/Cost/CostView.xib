@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -25,6 +26,9 @@
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ie6-pC-VXF">
                     <rect key="frame" x="0.0" y="0.0" width="400" height="90"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="90" id="Z4C-f0-4xH"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -33,13 +37,14 @@
                     <rect key="frame" x="0.0" y="510" width="400" height="90"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" baselineRelativeArrangement="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3nu-Uf-ZWu">
-                            <rect key="frame" x="110.5" y="2.5" width="179" height="85.5"/>
+                            <rect key="frame" x="128.5" y="11.5" width="143" height="67.5"/>
                             <subviews>
-                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="xmark.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="uHF-Q5-sq9">
-                                    <rect key="frame" x="0.0" y="0.5" width="85.5" height="84.5"/>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="uHF-Q5-sq9">
+                                    <rect key="frame" x="0.0" y="0.5" width="67.5" height="66.5"/>
+                                    <imageReference key="image" image="arrow.uturn.left.circle.fill" catalog="system" symbolScale="default"/>
                                 </imageView>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="On4-MG-hw5">
-                                    <rect key="frame" x="93.5" y="0.5" width="85.5" height="84.5"/>
+                                    <rect key="frame" x="75.5" y="0.5" width="67.5" height="66.5"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="On4-MG-hw5" secondAttribute="height" multiplier="1:1" id="5ng-X7-maS"/>
                                     </constraints>
@@ -54,7 +59,7 @@
                     <constraints>
                         <constraint firstItem="3nu-Uf-ZWu" firstAttribute="centerX" secondItem="tJA-sn-Qu4" secondAttribute="centerX" id="Qtm-lO-cU7"/>
                         <constraint firstItem="3nu-Uf-ZWu" firstAttribute="centerY" secondItem="tJA-sn-Qu4" secondAttribute="centerY" id="aBF-Rb-ETN"/>
-                        <constraint firstItem="3nu-Uf-ZWu" firstAttribute="height" secondItem="tJA-sn-Qu4" secondAttribute="height" multiplier="0.95" id="jLv-MT-j3s"/>
+                        <constraint firstItem="3nu-Uf-ZWu" firstAttribute="height" secondItem="tJA-sn-Qu4" secondAttribute="height" multiplier="0.75" id="jLv-MT-j3s"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iuK-Vh-nUc">
@@ -65,14 +70,13 @@
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
-                <constraint firstItem="Ie6-pC-VXF" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.15" id="1iV-kl-syw"/>
                 <constraint firstItem="tJA-sn-Qu4" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="2SG-74-zKs"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="iuK-Vh-nUc" secondAttribute="trailing" id="BvL-iT-H1y"/>
                 <constraint firstItem="iuK-Vh-nUc" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Pvd-Ip-dzm"/>
                 <constraint firstItem="tJA-sn-Qu4" firstAttribute="top" secondItem="iuK-Vh-nUc" secondAttribute="bottom" id="QNv-Jc-2vu"/>
                 <constraint firstItem="Ie6-pC-VXF" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="WJB-e8-iPf"/>
                 <constraint firstItem="iuK-Vh-nUc" firstAttribute="top" secondItem="Ie6-pC-VXF" secondAttribute="bottom" id="X9t-CO-o2o"/>
-                <constraint firstItem="tJA-sn-Qu4" firstAttribute="height" secondItem="Ie6-pC-VXF" secondAttribute="height" id="Yow-qM-c6w"/>
+                <constraint firstItem="tJA-sn-Qu4" firstAttribute="height" secondItem="Ie6-pC-VXF" secondAttribute="height" identifier="height" id="Yow-qM-c6w"/>
                 <constraint firstItem="tJA-sn-Qu4" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="cnV-l8-IUr"/>
                 <constraint firstItem="tJA-sn-Qu4" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="o6H-af-b5W"/>
                 <constraint firstItem="Ie6-pC-VXF" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="pyO-Ve-p5y"/>
@@ -83,7 +87,7 @@
         </view>
     </objects>
     <resources>
+        <image name="arrow.uturn.left.circle.fill" catalog="system" width="128" height="121"/>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="xmark.circle" catalog="system" width="128" height="121"/>
     </resources>
 </document>

@@ -28,9 +28,8 @@ class FillUserView: UIView {
             avatar.delegate = self
             guard let path = UserDefaults.Profile.imagePath,
                   let url = URL(string: path),
-                  let data = try? Data(contentsOf: url) as? Data,
-                  data != nil,
-                  let image = UIImage(data: data!) else {
+                  let data = try? Data(contentsOf: url),
+                  let image = UIImage(data: data) else {
                       avatar.imageView.image = UIImage(named: "anon")
                       return
             }

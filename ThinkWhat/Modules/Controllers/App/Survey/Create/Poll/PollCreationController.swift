@@ -185,6 +185,14 @@ class PollCreationController: UIViewController {
 
 // MARK: - View Input
 extension PollCreationController: PollCreationViewInput {
+    func post(_ dict: [String: Any]) {
+        controllerInput?.post(dict)
+    }
+    
+    var balance: Int {
+        return controllerInput?.balance ?? 0
+    }
+    
     func onURLTapped(_ url: URL?) {
         var vc: SFSafariViewController!
         let config = SFSafariViewController.Configuration()

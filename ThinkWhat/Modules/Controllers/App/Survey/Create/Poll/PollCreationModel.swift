@@ -15,5 +15,24 @@ class PollCreationModel {
 
 // MARK: - Controller Input
 extension PollCreationModel: PollCreationControllerInput {
-    // Implement methods
+    func post(_ dict: [String: Any]) {
+        Task {
+            do {
+                try await API.shared.surveys.post(dict)
+//                await MainActor.run {
+//                    modelOutput?.onCountUpdateCallback(.success(true))
+//                }
+            } catch {
+//                await MainActor.run {
+//                    modelOutput?.onCountUpdateCallback(.failure(error))
+//                }
+            }
+        }
+
+    }
+    
+    var balance: Int {
+        return Userprofiles.shared.current?.balance ?? 0
+    }
+    
 }

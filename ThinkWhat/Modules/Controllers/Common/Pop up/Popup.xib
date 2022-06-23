@@ -32,17 +32,17 @@
                     <rect key="frame" x="15.5" y="268.5" width="383" height="359"/>
                     <subviews>
                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="R6y-UU-KN5">
-                            <rect key="frame" x="19" y="18" width="345" height="323"/>
+                            <rect key="frame" x="8" y="8" width="367" height="343"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </view>
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
-                        <constraint firstItem="R6y-UU-KN5" firstAttribute="height" secondItem="J0d-KJ-2ol" secondAttribute="height" multiplier="0.9" id="57I-ub-pID"/>
-                        <constraint firstItem="R6y-UU-KN5" firstAttribute="centerY" secondItem="J0d-KJ-2ol" secondAttribute="centerY" id="U5o-k7-c2i"/>
-                        <constraint firstItem="R6y-UU-KN5" firstAttribute="width" secondItem="J0d-KJ-2ol" secondAttribute="width" multiplier="0.9" id="UdX-yP-KiX"/>
-                        <constraint firstItem="R6y-UU-KN5" firstAttribute="centerX" secondItem="J0d-KJ-2ol" secondAttribute="centerX" id="sG0-s8-Z9E"/>
-                        <constraint firstAttribute="height" constant="359" id="uQC-SG-ur4"/>
+                        <constraint firstAttribute="bottom" secondItem="R6y-UU-KN5" secondAttribute="bottom" constant="8" id="Unc-Bs-z3a"/>
+                        <constraint firstItem="R6y-UU-KN5" firstAttribute="top" secondItem="J0d-KJ-2ol" secondAttribute="top" constant="8" id="ddv-WJ-WEu"/>
+                        <constraint firstItem="R6y-UU-KN5" firstAttribute="leading" secondItem="J0d-KJ-2ol" secondAttribute="leading" constant="8" id="kxi-B6-zP6"/>
+                        <constraint firstAttribute="trailing" secondItem="R6y-UU-KN5" secondAttribute="trailing" constant="8" id="s4u-Th-1XA"/>
+                        <constraint firstAttribute="height" constant="359" identifier="height" id="uQC-SG-ur4"/>
                     </constraints>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">

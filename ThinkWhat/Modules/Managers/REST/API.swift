@@ -1149,6 +1149,9 @@ class API {
     
     class Polls {
         weak var parent: API! = nil
+        var headers: HTTPHeaders {
+            return parent.headers()
+        }
         
         public func claim(survey: Survey, reason: Claim) async throws -> JSON {
             guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_CLAIM) else { throw APIError.notFound }
@@ -1303,6 +1306,58 @@ class API {
                 throw error
             }
         }
+        
+        func post(_ dict: Parameters) async throws {
+            guard let url = API_URLS.Surveys.root else { throw APIError.invalidURL }
+            var parameters = dict
+            do {
+                try await parent.requestAsync(url: url,
+                             httpMethod: .post,
+                             parameters: parameters,
+                             encoding: JSONEncoding.default,
+                             headers: headers,
+                             accessControl: true)
+            } catch {
+#if DEBUG
+                print(error)
+#endif
+                throw error
+            }
+        }
+        
+        
+//        func postPoll(survey: Survey, uploadProgress: @escaping(Double)->()?, completion: @escaping(Result<JSON, Error>)->()) {
+//            //TODO: - postSurvey replace dict()
+//            var dict: [String: AnyObject] = [:]//survey.dict
+//            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS) else { completion(.failure(APIError.invalidURL)); return }
+//            request(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default) { result in
+//                switch result {
+//                case .success(let json):
+//                    completion(.success(json))
+//                    if !survey.images.isEmpty {
+//                        for mediafile in survey.mediaWithImagesSortedByOrder {
+//                            let multipartFormData = MultipartFormData()
+//                            var imgExt: FileFormat = .Unknown
+//                            var imageData: Data?
+//                            if let data = mediafile.image!.jpegData(compressionQuality: 1) {
+//                                imageData = data
+//                                imgExt = .JPEG
+//                            } else if let data = mediafile.image!.pngData() {
+//                                imageData = data
+//                                imgExt = .PNG
+//                            }
+//                            multipartFormData.append(imageData!, withName: "image", fileName: "\(UserDefaults.Profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
+//                            multipartFormData.append("\(survey.id)".data(using: .utf8)!, withName: "survey")
+//                            multipartFormData.append("\(mediafile.order)".data(using: .utf8)!, withName: "order")
+//                            multipartFormData.append("\(mediafile.title)".data(using: .utf8)!, withName: "title")
+//                            self.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) }) { completion($0) }
+//                        }
+//                    }
+//                case .failure(let error):
+//                    completion(.failure(error))
+//                }
+//            }
+//        }
     }
     
     public func getBalanceAndPrice() {

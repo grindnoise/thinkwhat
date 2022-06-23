@@ -232,6 +232,37 @@ class Survey: Decodable {
             return votesTotal * 100 / votesLimit
         }
     }
+    ///Convert to dict to create new survey
+//    var dict: [String: Any] {
+//        var _dict: [String: Any] = [:]
+//        ///Necessary data
+//        _dict[DjangoVariables.Survey.title] = title
+//        _dict[DjangoVariables.Survey.category] = topic.id
+//        _dict[DjangoVariables.Survey.description] = description
+//        _dict[DjangoVariables.Survey.voteCapacity] = votesLimit
+//        _dict[DjangoVariables.Survey.isPrivate] = isPrivate
+//        _dict[DjangoVariables.Survey.postHot] = isHot
+//        _dict[DjangoVariables.Survey.type] = type
+//
+//
+//        _dict[DjangoVariables.Survey.startDate] = startDate.toDateTimeString()
+//        var _answers: [[String: String]] = []
+//        for answer in answersWithoutID {
+//            _answers.append(["text" : answer])
+//        }
+//        _dict[DjangoVariables.Survey.answers] = _answers
+//
+//        ///Optional
+//        if images != nil {
+//            _dict[DjangoVariables.Survey.images] = images!
+//        }
+//        if !url.isNil { _dict[DjangoVariables.Survey.hlink] = url! }
+////        if endDate != nil {
+////            _dict[DjangoVariables.Survey.endDate] = endDate!.toDateTimeString()
+////        }
+//        return _dict
+//    }
+    
     private let tempId = 999999
     
     required init(from decoder: Decoder) throws {

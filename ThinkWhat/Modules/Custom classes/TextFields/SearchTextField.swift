@@ -144,7 +144,7 @@ open class SearchTextField: UITextField {
     fileprivate var timer: Timer? = nil
     public var placeholderLabel: UILabel?
     fileprivate static let cellIdentifier = "APSearchTextFieldCell"
-    open let indicator = UIActivityIndicatorView(style: .gray)
+    public let indicator = UIActivityIndicatorView(style: .gray)
     fileprivate var maxTableViewSize: CGFloat = 0
     
     fileprivate var filteredResults = [SearchTextFieldItem]()
