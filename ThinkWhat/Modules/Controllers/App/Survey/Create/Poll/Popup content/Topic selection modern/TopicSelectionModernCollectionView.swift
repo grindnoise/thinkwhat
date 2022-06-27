@@ -46,15 +46,13 @@ class TopicSelectionModernCollectionView: UICollectionView {
         collectionViewLayout.collectionView?.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         allowsMultipleSelection = false
         
-        let cellRegistration = UICollectionView.CellRegistration<TopicSelectionModernCell, TopicItem> { (cell, indexPath, item) in
-            
+        let cellRegistration = UICollectionView.CellRegistration<TopicSelectionModernCell, TopicItem> { [weak self ] cell, indexPath, item in
+            guard let self = self else { return }
             cell.item = item
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-            backgroundConfig.backgroundColor = item.topic.tagColor.withAlphaComponent(0.05)
-            //            backgroundConfig.backgroundColorTransformer = .grayscale
+            backgroundConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground//item.topic.tagColor.withAlphaComponent(0.05)
             cell.backgroundConfiguration = backgroundConfig
-            cell.callback = { [weak self] in
-                guard let self = self else { return }
+            cell.callback = {
                 self.callbackDelegate?.callbackReceived(cell.item.topic as Any)
             }
         }
@@ -99,7 +97,7 @@ class TopicSelectionModernCollectionView: UICollectionView {
                 let cell = collectionView.dequeueConfiguredReusableCell(using: headerCellRegistration,
                                                                         for: indexPath,
                                                                         item: headerItem)
-                cell.tintColor = headerItem.topic.tagColor
+                cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : headerItem.topic.tagColor
                 return cell
             
             case .topic(let symbolItem):
@@ -192,7 +190,9 @@ class TopicSelectionModernCell: UICollectionViewListCell {
 //        // Customize the background color to use the tint color when the cell is highlighted or selected.
 //        if state.isSelected {
 //            backgroundConfig.backgroundColor = .red
-        accessories = state.isSelected ? [.checkmark(displayed: .always, options: UICellAccessory.CheckmarkOptions(isHidden: false, reservedLayoutWidth: nil, tintColor: item.topic.tagColor))] : []
+        accessories = state.isSelected ? [.checkmark(displayed: .always, options: UICellAccessory.CheckmarkOptions(isHidden: false,
+                                                                                                                   reservedLayoutWidth: nil,
+                                                                                                                   tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor))] : []
 //        }
         
         if state.isSelected, !callback.isNil { callback!() }
@@ -217,7 +217,16 @@ class TopicSelectionModernHeader: UICollectionViewListCell {
 
     var item: TopicHeaderItem!
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.isNil ? .systemGray : item.topic.tagColor
+    }
+    
     override func updateConfiguration(using state: UICellConfigurationState) {
+        
+//        accessories = [.disclosureIndicator(displayed: .always, options: UICellAccessory.DisclosureIndicatorOptions(isHidden: false,
+//                                                                                                                    reservedLayoutWidth: nil,
+//                                                                                                                    tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor))]
+        
         backgroundColor = .clear
         var newConfiguration = TopicSelectionModernHeaderConfiguration().updated(for: state)
         newConfiguration.topicItem = item

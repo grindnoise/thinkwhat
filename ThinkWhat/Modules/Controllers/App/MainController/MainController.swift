@@ -140,13 +140,14 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 }
             } catch {
 #if DEBUG
-                print(error.localizedDescription)
+                error.printLocalized(class: type(of: self), functionName: #function)
 #endif
             }
         }
     }
     
     func appLaunch() async throws {
+        
         do {
             let json = try await API.shared.appLaunch()
             UserDefaults.App.minAPIVersion = json["api_version"].double

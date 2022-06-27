@@ -16,6 +16,19 @@ class HotModel {
 
 // MARK: - Controller Input
 extension HotModel: HotControllerInput {
+    func reject(_ survey: Survey) {
+        Task {
+            do {
+                try await API.shared.surveys.reject(survey: survey)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+
+            }
+        }
+    }
+    
     func loadSurveys() {
         Task {
             do {

@@ -19,13 +19,13 @@ extension PollCreationModel: PollCreationControllerInput {
         Task {
             do {
                 try await API.shared.surveys.post(dict)
-//                await MainActor.run {
-//                    modelOutput?.onCountUpdateCallback(.success(true))
-//                }
+                await MainActor.run {
+                    modelOutput?.onSuccess()
+                }
             } catch {
-//                await MainActor.run {
-//                    modelOutput?.onCountUpdateCallback(.failure(error))
-//                }
+                await MainActor.run {
+                    modelOutput?.onError(error)
+                }
             }
         }
 

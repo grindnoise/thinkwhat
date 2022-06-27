@@ -12,8 +12,8 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CostView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
                 <outlet property="cancel" destination="uHF-Q5-sq9" id="sgi-u1-4yI"/>
-                <outlet property="collectionContainer" destination="iuK-Vh-nUc" id="3md-W2-n7Z"/>
                 <outlet property="confirm" destination="On4-MG-hw5" id="FIk-Eg-w5k"/>
+                <outlet property="container" destination="iuK-Vh-nUc" id="3md-W2-n7Z"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="aRD-rd-5ec"/>
                 <outlet property="stackView" destination="3nu-Uf-ZWu" id="2CB-9l-qkj"/>
                 <outlet property="title" destination="Ie6-pC-VXF" id="jqi-RI-OrQ"/>

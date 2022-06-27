@@ -77,6 +77,26 @@ class PollCreationController: UIViewController {
         controllerOutput?.onNextStage(.Topic)
     }
     
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//
+//        ///User refused to accept terms & conditions -> log out
+//        if isMovingToParent {
+////            UIView.animate(withDuration: 0.15, delay: 0) {
+////                self.progressIndicator.alpha = 0
+////                self.progressIndicator.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+////            } completion: { _ in
+//
+////            }
+//        }
+//    }
+    
+    override func willMove(toParent parent: UIViewController?) {
+        willMoveToParent = parent.isNil ? true : false
+        super.willMove(toParent: parent)
+        self.progressIndicator.removeFromSuperview()
+    }
+    
     private func setupUI() {
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(progressIndicator)
@@ -87,18 +107,18 @@ class PollCreationController: UIViewController {
             progressIndicator.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 0),// -UINavigationController.Constants.ImageBottomMarginForSmallState),
             progressIndicator.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState*3.5),
             progressIndicator.widthAnchor.constraint(equalTo: progressIndicator.heightAnchor, multiplier: 1.0/1.0)
-            
-//            progressIndicator.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
-//            progressIndicator.widthAnchor.constraint(equalToConstant: navigationBar.frame.height)
             ])
         progressIndicator.layer.masksToBounds = false
-//        progressIndicator.layer.masksToBounds = false
-//        progressIndicator.setNeedsLayout()
-//        progressIndicator.layoutIfNeeded()
         progressIndicator.lineWidth = progressIndicator.frame.width * 0.1
     }
     
-    private func animateProgress() {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        progressIndicator.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : stage == .Ready ? .systemGreen : K_COLOR_RED)
+        progressIndicator.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
+        animateProgress(false)
+    }
+    
+    private func animateProgress(_ animated: Bool = true) {
         let total = Stage.allCases.count - 1
         let current = stage.rawValue
         
@@ -106,20 +126,15 @@ class PollCreationController: UIViewController {
         let strokeStart = CGFloat(1.0 - Double(percentage) / 100.0)
         
         //1 -> 0
+        if animated {
         let anim = Animations.get(property: .StrokeStart, fromValue: progressIndicator.oval.strokeStart, toValue: strokeStart, duration: 0.3, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [])
         progressIndicator.oval.add(anim, forKey: nil)
+        }
         self.progressIndicator.oval.strokeStart = strokeStart
+        if animated {
         let scaleAnim = Animations.get(property: .Scale, fromValue: 1.0, toValue: 1.05, duration: 0.15, autoreverses: true, timingFunction: CAMediaTimingFunctionName.easeOut, delegate: nil, isRemovedOnCompletion: true, completionBlocks: [])
         progressIndicator.layer.add(scaleAnim, forKey: nil)
-//        let animation = CAKeyframeAnimation()
-//        animation.keyPath = Animations.AnimationProperty.Scale.rawValue
-//        animation.values = [1, 1.1]
-//        animation.keyTimes = [0, 1]
-//        animation.duration = 0.2
-////        animation.isAdditive = true
-//        animation.autoreverses = true
-//
-//        progressIndicator.layer.add(animation, forKey: nil)
+        }
     }
     
     // MARK: - Properties
@@ -130,10 +145,6 @@ class PollCreationController: UIViewController {
             guard oldValue != stage else { return }
             if stage == .Ready {
                 let strokeAnim = Animations.get(property: .StrokeStart, fromValue: progressIndicator.oval.strokeStart, toValue: 1, duration: 0.4, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [{
-                    
-//                    delay(seconds: 0.3) {
-//                        self.progressIndicator.oval.opacity = 0
-//                    }
                 }])
                 progressIndicator.oval.add(strokeAnim, forKey: nil)
                 progressIndicator.oval.strokeStart = 1
@@ -158,17 +169,11 @@ class PollCreationController: UIViewController {
             }
         }
     }
-//    private var maximumStage: Stage = .Topic {
-//        didSet {
-//            if oldValue.rawValue >= maximumStage.rawValue {
-//                maximumStage = oldValue
-//            }
-//        }
-//    }
-    private let progressIndicator: CircleButton = {
+
+    private lazy var progressIndicator: CircleButton = {
         let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: true)
         customTitle.color = .white
-        customTitle.icon.iconColor = K_COLOR_RED
+        customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         customTitle.icon.backgroundColor = .clear
         customTitle.layer.masksToBounds = false
         customTitle.icon.layer.masksToBounds = false
@@ -177,10 +182,11 @@ class PollCreationController: UIViewController {
         customTitle.category = .Poll
         customTitle.state = .Off
         customTitle.contentView.backgroundColor = .clear
-        customTitle.oval.strokeColor = K_COLOR_RED.cgColor
+        customTitle.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
         customTitle.oval.lineCap = .round
         return customTitle
     }()
+    var willMoveToParent = false
 }
 
 // MARK: - View Input
@@ -215,9 +221,9 @@ extension PollCreationController: PollCreationViewInput {
 extension PollCreationController: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-            completionBlocks.map{ $0() }
+            completionBlocks.forEach{ $0() }
         } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
-            completionBlocks.map{ $0() }
+            completionBlocks.forEach{ $0() }
         } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
             initialLayer.path = path as! CGPath
             if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
@@ -229,7 +235,17 @@ extension PollCreationController: CAAnimationDelegate {
 
 // MARK: - Model Output
 extension PollCreationController: PollCreationModelOutput {
-    // Implement methods
+    func onContinue() {
+        navigationController?.popToRootViewController(animated: true)
+    }
+    
+    func onSuccess() {
+        controllerOutput?.onSuccess()
+    }
+    
+    func onError(_ error: Error) {
+        controllerOutput?.onError(error)
+    }
 }
 
 extension UIColor {

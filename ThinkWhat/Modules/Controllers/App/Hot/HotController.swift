@@ -135,6 +135,10 @@ class HotController: UIViewController {
 
 // MARK: - View Input
 extension HotController: HotViewInput {
+    func onReject(_ survey: Survey) {
+        controllerInput?.reject(survey)
+    }
+    
     
     func onClaim(survey: Survey, reason: Claim) {
         controllerInput?.claim(survey: survey, reason: reason)

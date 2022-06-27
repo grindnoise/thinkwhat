@@ -11,13 +11,17 @@ import UIKit
 struct ImageItem: Hashable {
     
     var title: String
-    var image: UIImage
+    var image: UIImage!
     var shouldBeDeleted = false
     let id: UUID = UUID()
     
     init(title: String, image: UIImage) {
         self.title = title
         self.image = image
+    }
+    
+    init(title: String) {
+        self.title = title
     }
 }
 
@@ -37,5 +41,6 @@ protocol ImageSelectionListener: class {
     func addImage()
     func deleteImage(_: ImageItem)
     func editImage(_: ImageItem)
+    func onImagesHeightChange(_: CGFloat)
 }
 

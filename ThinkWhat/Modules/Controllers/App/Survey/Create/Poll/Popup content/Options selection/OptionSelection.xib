@@ -43,13 +43,13 @@
                     <rect key="frame" x="0.0" y="510" width="400" height="90"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" baselineRelativeArrangement="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qId-XJ-WZa">
-                            <rect key="frame" x="110.5" y="2.5" width="179" height="85.5"/>
+                            <rect key="frame" x="128.5" y="11.5" width="143" height="67.5"/>
                             <subviews>
-                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="xmark.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="E3Q-QZ-goT">
-                                    <rect key="frame" x="0.0" y="0.5" width="85.5" height="84.5"/>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.uturn.left.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="E3Q-QZ-goT">
+                                    <rect key="frame" x="0.0" y="0.5" width="67.5" height="66.5"/>
                                 </imageView>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Jtj-uX-w5J">
-                                    <rect key="frame" x="93.5" y="0.5" width="85.5" height="84.5"/>
+                                    <rect key="frame" x="75.5" y="0.5" width="67.5" height="66.5"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="Jtj-uX-w5J" secondAttribute="height" multiplier="1:1" id="DzI-iz-zdQ"/>
                                     </constraints>
@@ -63,12 +63,15 @@
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstItem="qId-XJ-WZa" firstAttribute="centerY" secondItem="SFz-cL-mpv" secondAttribute="centerY" id="ESz-0h-bD6"/>
-                        <constraint firstItem="qId-XJ-WZa" firstAttribute="height" secondItem="SFz-cL-mpv" secondAttribute="height" multiplier="0.95" id="Ghk-VI-uha"/>
+                        <constraint firstItem="qId-XJ-WZa" firstAttribute="height" secondItem="SFz-cL-mpv" secondAttribute="height" multiplier="0.75" id="Ghk-VI-uha"/>
                         <constraint firstItem="qId-XJ-WZa" firstAttribute="centerX" secondItem="SFz-cL-mpv" secondAttribute="centerX" id="eUG-9p-1sg"/>
                     </constraints>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dK8-b4-eLg">
                     <rect key="frame" x="0.0" y="0.0" width="400" height="90"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="90" id="PKB-9g-3Pb"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -252,7 +255,6 @@
                 <constraint firstItem="dK8-b4-eLg" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="4Le-vv-k5c"/>
                 <constraint firstItem="SFz-cL-mpv" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="EaU-Hu-EM8"/>
                 <constraint firstItem="SFz-cL-mpv" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="Hr7-L1-xbw"/>
-                <constraint firstItem="SFz-cL-mpv" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.15" id="NrC-GQ-NIW"/>
                 <constraint firstItem="dK8-b4-eLg" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="Stw-Py-e5K"/>
                 <constraint firstItem="SFz-cL-mpv" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="YmC-Uo-B88"/>
                 <constraint firstItem="dRX-HB-edl" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="b0Z-tE-bkH"/>
@@ -278,7 +280,7 @@
         </designable>
     </designables>
     <resources>
+        <image name="arrow.uturn.left.circle.fill" catalog="system" width="128" height="121"/>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="xmark.circle" catalog="system" width="128" height="121"/>
     </resources>
 </document>

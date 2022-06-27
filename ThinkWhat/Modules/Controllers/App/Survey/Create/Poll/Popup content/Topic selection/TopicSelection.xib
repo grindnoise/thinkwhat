@@ -11,7 +11,6 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="TopicSelection" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
-                <outlet property="back" destination="TPV-dr-35Q" id="6nl-b5-luH"/>
                 <outlet property="cancel" destination="6ST-GV-9dm" id="PqT-RG-Z5b"/>
                 <outlet property="collectionView" destination="FBs-ff-nve" id="ehl-My-M9I"/>
                 <outlet property="confirm" destination="Cjm-jR-w6b" id="pVj-0M-k1H"/>
@@ -25,7 +24,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="FBs-ff-nve">
-                    <rect key="frame" x="0.0" y="81" width="400" height="438"/>
+                    <rect key="frame" x="0.0" y="90" width="400" height="420"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="wUh-Pv-7BH">
                         <size key="itemSize" width="128" height="128"/>
@@ -35,38 +34,39 @@
                     </collectionViewFlowLayout>
                 </collectionView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jc5-Ed-6p1">
-                    <rect key="frame" x="0.0" y="519" width="400" height="81"/>
+                    <rect key="frame" x="0.0" y="510" width="400" height="90"/>
                     <subviews>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Cjm-jR-w6b">
-                            <rect key="frame" x="161.5" y="2.5" width="77" height="76"/>
+                        <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="lIG-6O-aCS">
+                            <rect key="frame" x="128.5" y="11.5" width="143" height="67.5"/>
+                            <subviews>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.uturn.left.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="6ST-GV-9dm">
+                                    <rect key="frame" x="0.0" y="0.5" width="67.5" height="66.5"/>
+                                </imageView>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Cjm-jR-w6b">
+                                    <rect key="frame" x="75.5" y="0.5" width="67.5" height="66.5"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="Cjm-jR-w6b" secondAttribute="height" multiplier="1:1" id="7oG-lD-67K"/>
+                                    </constraints>
+                                </imageView>
+                            </subviews>
                             <constraints>
-                                <constraint firstAttribute="width" secondItem="Cjm-jR-w6b" secondAttribute="height" multiplier="1:1" id="7oG-lD-67K"/>
+                                <constraint firstItem="6ST-GV-9dm" firstAttribute="height" secondItem="Cjm-jR-w6b" secondAttribute="height" id="E67-LV-yrI"/>
+                                <constraint firstItem="6ST-GV-9dm" firstAttribute="width" secondItem="6ST-GV-9dm" secondAttribute="height" multiplier="1:1" id="vMD-i5-vWb"/>
                             </constraints>
-                        </imageView>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="xmark.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="6ST-GV-9dm">
-                            <rect key="frame" x="96" y="12" width="57.5" height="57"/>
-                        </imageView>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.counterclockwise.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="TPV-dr-35Q">
-                            <rect key="frame" x="246.5" y="12" width="57.5" height="57"/>
-                        </imageView>
+                        </stackView>
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
-                        <constraint firstItem="Cjm-jR-w6b" firstAttribute="leading" secondItem="6ST-GV-9dm" secondAttribute="trailing" constant="8" symbolic="YES" id="1OL-ze-eqm"/>
-                        <constraint firstItem="TPV-dr-35Q" firstAttribute="leading" secondItem="Cjm-jR-w6b" secondAttribute="trailing" constant="8" symbolic="YES" id="3w2-XC-BBZ"/>
-                        <constraint firstItem="6ST-GV-9dm" firstAttribute="height" secondItem="Cjm-jR-w6b" secondAttribute="height" multiplier="0.75" id="J3N-hQ-42z"/>
-                        <constraint firstItem="TPV-dr-35Q" firstAttribute="width" secondItem="TPV-dr-35Q" secondAttribute="height" multiplier="1:1" id="MTq-xw-aVj"/>
-                        <constraint firstItem="Cjm-jR-w6b" firstAttribute="centerX" secondItem="jc5-Ed-6p1" secondAttribute="centerX" id="Ogv-Ti-A8A"/>
-                        <constraint firstItem="TPV-dr-35Q" firstAttribute="centerY" secondItem="Cjm-jR-w6b" secondAttribute="centerY" id="OsM-1K-ho6"/>
-                        <constraint firstItem="6ST-GV-9dm" firstAttribute="centerY" secondItem="Cjm-jR-w6b" secondAttribute="centerY" id="U5A-P6-H2Q"/>
-                        <constraint firstItem="6ST-GV-9dm" firstAttribute="width" secondItem="6ST-GV-9dm" secondAttribute="height" multiplier="1:1" id="V1Y-jp-FjY"/>
-                        <constraint firstItem="TPV-dr-35Q" firstAttribute="height" secondItem="Cjm-jR-w6b" secondAttribute="height" multiplier="0.75" id="X4m-AA-r5G"/>
-                        <constraint firstItem="Cjm-jR-w6b" firstAttribute="height" secondItem="jc5-Ed-6p1" secondAttribute="height" multiplier="0.95" id="tRY-O6-EHK"/>
-                        <constraint firstItem="Cjm-jR-w6b" firstAttribute="centerY" secondItem="jc5-Ed-6p1" secondAttribute="centerY" id="yfI-8a-RkS"/>
+                        <constraint firstItem="lIG-6O-aCS" firstAttribute="centerY" secondItem="jc5-Ed-6p1" secondAttribute="centerY" id="Gcq-Cj-DaP"/>
+                        <constraint firstItem="lIG-6O-aCS" firstAttribute="centerX" secondItem="jc5-Ed-6p1" secondAttribute="centerX" id="KMA-eE-gHi"/>
+                        <constraint firstItem="lIG-6O-aCS" firstAttribute="height" secondItem="jc5-Ed-6p1" secondAttribute="height" multiplier="0.75" id="ZDf-hi-09a"/>
                     </constraints>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Doi-Bf-Pe2">
-                    <rect key="frame" x="0.0" y="0.0" width="400" height="81"/>
+                    <rect key="frame" x="0.0" y="0.0" width="400" height="90"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="90" id="Rwt-4J-nAb"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -80,7 +80,6 @@
                 <constraint firstItem="FBs-ff-nve" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="AdX-sQ-tEr"/>
                 <constraint firstItem="FBs-ff-nve" firstAttribute="top" secondItem="Doi-Bf-Pe2" secondAttribute="bottom" id="JyN-xs-Wpt"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="Doi-Bf-Pe2" secondAttribute="trailing" id="KH6-hv-LJv"/>
-                <constraint firstItem="jc5-Ed-6p1" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.135" id="M15-fj-uTE"/>
                 <constraint firstItem="jc5-Ed-6p1" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Qh2-L9-9ad"/>
                 <constraint firstItem="jc5-Ed-6p1" firstAttribute="top" secondItem="FBs-ff-nve" secondAttribute="bottom" id="dLC-p2-l9k"/>
                 <constraint firstItem="Doi-Bf-Pe2" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="kQ6-rN-fAY"/>
@@ -93,9 +92,8 @@
         </view>
     </objects>
     <resources>
-        <image name="arrow.counterclockwise.circle" catalog="system" width="128" height="121"/>
+        <image name="arrow.uturn.left.circle.fill" catalog="system" width="128" height="121"/>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="xmark.circle" catalog="system" width="128" height="121"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

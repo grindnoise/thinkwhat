@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreML
 
 class OptionSelection: UIView {
     
@@ -48,14 +49,25 @@ class OptionSelection: UIView {
         guard !isCancelEnabled else { return }
         stackView.removeArrangedSubview(cancel)
         cancel.alpha = 0
-        switch option {
-        case .Anon:
-            scrollView.scrollRectToVisible(anon.superview!.frame, animated: true)
-        case .Private:
-            scrollView.scrollRectToVisible(privacy.superview!.frame, animated: true)
-        default:
-            scrollView.scrollRectToVisible(ordinary.superview!.frame, animated: true)
-        }
+//        scrollView.scrollRectToVisible(.infinite, animated: true)
+        
+//        delayAsync(delay: 0.3) { [weak self] in
+//            guard let self = self else { return }
+            switch self.option {
+            case .Anon:
+                (anonIcon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
+                ordinary.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                ordinary.alpha = 0.5
+                ordinaryDescription.alpha = 0
+                ordinaryConstraint.constant = -ordinary.frame.width/2
+                self.scrollView.scrollRectToVisible(self.anon.superview!.frame, animated: true)
+            case .Private:
+                self.scrollView.scrollRectToVisible(self.privacy.superview!.frame, animated: true)
+            default:
+                self.scrollView.scrollRectToVisible(self.ordinary.superview!.frame, animated: true)
+            }
+//        }
+        
         let outerColor = UIColor.clear.cgColor
         let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
         
@@ -134,9 +146,9 @@ class OptionSelection: UIView {
         let outerColor = UIColor.clear.cgColor
         let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
         hMaskLayer.colors = [outerColor, innerColor,innerColor,outerColor]
-        anonIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .white : .label)
-        privacyIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .white : .label)
-        ordinaryIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .white : .label)
+        anonIcon.setIconColor(option == .Anon ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED : .systemGray)
+        privacyIcon.setIconColor(option == .Private ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED : .systemGray)
+        ordinaryIcon.setIconColor(option == .Ordinary ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED : .systemGray)
     }
     
     @objc
@@ -204,7 +216,7 @@ class OptionSelection: UIView {
     @IBOutlet weak var anonConstraint: NSLayoutConstraint!
     @IBOutlet weak var anonIcon: Icon! {
         didSet {
-            anonIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
+            anonIcon.iconColor = .systemGray//traitCollection.userInterfaceStyle == .dark ? .white : .black
             anonIcon.category = .Anon
             anonIcon.isRounded = false
         }
@@ -217,7 +229,7 @@ class OptionSelection: UIView {
     @IBOutlet weak var ordinaryConstraint: NSLayoutConstraint!
     @IBOutlet weak var ordinaryIcon: Icon! {
         didSet {
-            ordinaryIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
+            ordinaryIcon.iconColor = .systemGray//traitCollection.userInterfaceStyle == .dark ? .white : .black
             ordinaryIcon.category = .Unlocked
             ordinaryIcon.isRounded = false
         }
@@ -228,7 +240,7 @@ class OptionSelection: UIView {
     @IBOutlet weak var privacyConstraint: NSLayoutConstraint!
     @IBOutlet weak var privacyIcon: Icon! {
         didSet {
-            privacyIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
+            privacyIcon.iconColor = .systemGray//traitCollection.userInterfaceStyle == .dark ? .white : .black
             privacyIcon.category = .Locked
             privacyIcon.isRounded = false
         }
@@ -243,13 +255,43 @@ class OptionSelection: UIView {
     private var boundsObserver: NSKeyValueObservation?
     private var pageIndex: Int = 0 {
         didSet {
+            guard oldValue != pageIndex  else { return }
+            
+            var previous: CAShapeLayer!
+            
+            if oldValue == 0 {
+                previous = anonIcon.icon as? CAShapeLayer
+            } else if oldValue == 1 {
+                previous = ordinaryIcon.icon as? CAShapeLayer
+            } else {
+                previous = privacyIcon.icon as? CAShapeLayer
+            }
+
+            previous.add(Animations.get(property: .FillColor, fromValue: previous.fillColor, toValue: UIColor.systemGray.cgColor, duration: 0.15, delegate: nil),
+                         forKey: nil)
+            previous.fillColor = UIColor.systemGray.cgColor
+            
+            var current: CAShapeLayer!
+            
             if pageIndex == 0 {
+                current = anonIcon.icon as? CAShapeLayer
                 option = .Anon
             } else if pageIndex == 1 {
+                current = ordinaryIcon.icon as? CAShapeLayer
                 option = .Ordinary
             } else if pageIndex == 2 {
+                current = privacyIcon.icon as? CAShapeLayer
                 option = .Private
+
+                
+                guard let icon = privacyIcon.icon as? CAShapeLayer else { return }
+                
             }
+            
+            let color = self.traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
+            current.add(Animations.get(property: .FillColor, fromValue: current.fillColor, toValue: color, duration: 0.15, delegate: nil)
+                        , forKey: nil)
+            current.fillColor = color
         }
     }
 }

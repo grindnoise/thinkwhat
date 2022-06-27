@@ -19,11 +19,12 @@ class CostView: UIView {
     private weak var parent: Popup?
     
     // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable, dataProvider: PollCreationControllerOutput?, parent: Popup) {
+    init(callbackDelegate: CallbackObservable, dataProvider: PollCreationControllerOutput?, parent: Popup?) {//}, result: Result<Bool,Error>?) {
         super.init(frame: .zero)
         self.callbackDelegate = callbackDelegate
         self.dataProvider = dataProvider
         self.parent = parent
+//        self.result = result
         commonInit()
     }
     
@@ -54,6 +55,9 @@ class CostView: UIView {
     }
     
     private func setupUI() {
+//        delayAsync(delay: 4) {
+//            print(self.dataProvider?.result)
+//        }
         guard let balance = dataProvider?.balance,
         let costItems = dataProvider?.costItems,
             let cost = costItems.reduce(into: 0) { $0 += $1.cost } as? Int,
@@ -62,12 +66,55 @@ class CostView: UIView {
         confirm.alpha = 0
         //        stackView.removeArrangedSubview(cancel)
         //        cancel.alpha = 0
+        
     }
     
     private func setObservers() {
         observers.append(observe(\CostView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view, change) in
             guard let self = self else { return }
             self.setText()
+        })
+
+        guard let c = dataProvider as? PollCreationView else { return }
+        observers.append(c.observe(\PollCreationView.completed) { [weak self] (_,_) in
+            guard let self = self,
+            let indicator = self.contentView.get(all: LoadingIndicator.self).first as? LoadingIndicator else { return }
+            let label = UILabel()
+            label.alpha = 0
+            label.textAlignment = .center
+            label.addEquallyTo(to: self.container)
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 1, options: .curveEaseOut) {
+                indicator.alpha = 0
+            } completion: { _ in
+                indicator.removeAllAnimations()
+                indicator.removeFromSuperview()
+                
+                switch c.result {
+                case .success:
+                    self.success = true
+                    self.stackView.removeArrangedSubview(self.cancel)
+                    self.cancel.alpha = 0
+                    self.title.text = "success".localized
+                    let attrString = NSMutableAttributedString()
+                    attrString.append(NSAttributedString(string: "poll_launched".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Light, size: self.container.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+                    label.attributedText = attrString
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    self.stackView.removeArrangedSubview(self.confirm)
+                    self.confirm.alpha = 0
+                    self.title.text = "error"
+                    let attrString = NSMutableAttributedString()
+                    attrString.append(NSAttributedString(string: "backend_error".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Light, size: self.container.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+                    label.attributedText = attrString
+                case .none:
+                    print("")
+                }
+                UIView.animate(withDuration: 0.2, delay: 0) {
+                    self.stackView.alpha = 1
+                    self.title.alpha = 1
+                    label.alpha = 1
+                }
+            }
         })
     }
     
@@ -87,7 +134,32 @@ class CostView: UIView {
         if recognizer.state == .ended {
             guard let v = recognizer.view else { return }
             if v == confirm {
-                dataProvider?.post()
+                guard success else {
+                    dataProvider?.post()
+                    let indicator = LoadingIndicator(frame: .zero)
+                    indicator.alpha = 0
+                    indicator.addEnableAnimation()
+                    contentView.addSubview(indicator)
+                    indicator.translatesAutoresizingMaskIntoConstraints = false
+                    NSLayoutConstraint.activate([
+                        indicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+                        indicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+                        indicator.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.75),
+                        indicator.widthAnchor.constraint(equalTo: indicator.heightAnchor, multiplier: 1.0/1.0),
+                    ])
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) { [weak self] in
+                        guard let self = self else { return }
+                        self.collectionView?.alpha = 0
+                        self.title.alpha = 0
+                        self.stackView.alpha = 0
+                    } completion: { _ in
+                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
+                            indicator.alpha = 1
+                        }
+                    }
+                    return
+                }
+                callbackDelegate?.callbackReceived("pop")
             } else if v == cancel {
                 callbackDelegate?.callbackReceived("exit")
             }
@@ -102,7 +174,7 @@ class CostView: UIView {
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var title: UILabel!
-    @IBOutlet weak var collectionContainer: UIView!
+    @IBOutlet weak var container: UIView!
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var confirm: UIImageView! {
         didSet {
@@ -124,9 +196,21 @@ class CostView: UIView {
     private weak var dataProvider: PollCreationControllerOutput?
     private weak var collectionView: UICollectionView? {
         didSet {
-            collectionView?.addEquallyTo(to: collectionContainer)
+            collectionView?.addEquallyTo(to: container)
         }
     }
     private var observers: [NSKeyValueObservation] = []
+    private var success = false
+//    public var result: Result<Bool, Error>? {
+//        didSet {
+//            guard !result.isNil else { return }
+//            switch result! {
+//            case .success:
+//                print("success")
+//            default:
+//                fatalError()
+//            }
+//        }
+//    }
 }
 

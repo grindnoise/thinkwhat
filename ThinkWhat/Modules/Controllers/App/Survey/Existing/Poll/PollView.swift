@@ -299,7 +299,8 @@ extension PollView {
             if let found = resultIndicators.filter({ $0.answer === answer }).first {
                 resultIndicator = found
             } else {
-                resultIndicator = ResultIndicator(delegate: self, answer: answer, color: Colors.tags()[i], isSelected: answer.id == survey!.result!.keys.first, mode: survey!.isAnonymous ? .Anon : .Stock)
+                guard let answerId = survey!.result!.keys.first else { return }
+                resultIndicator = ResultIndicator(delegate: self, answer: answer, color: Colors.tags()[i], isSelected: answer.id == answerId, mode: survey!.isAnonymous ? .Anon : .Stock)
                 resultIndicators.append(resultIndicator)
             }
             resultIndicator.needsUIUpdate = true

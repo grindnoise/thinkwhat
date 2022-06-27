@@ -9,7 +9,7 @@
 //Errors
 "web" = "Error loading web content";
 "invalid_url_error" = "Invalid link";
-"backend_error" = "Error occured, try again";
+"backend_error" = "Error occured, try again later";
 "provider_authorization_failure" = "Error";
 "timeout_error" = "Timeout exceeded";
 "tiktok_web_error" = "TikTok loading error";
@@ -193,7 +193,7 @@
 "choose_option" = "Choose option";
 "anon_option" = "Anonymous";
 "anon_description" = "Poll's author and voters are hidden from each other";
-"default_option" = "Standart";
+"default_option" = "Public";
 "default_description" = "Public poll, no restrictions, non anonymous";
 "private_option" = "Private";
 "private_description" = "Private poll, access is granted via sharing link";
@@ -204,11 +204,12 @@
 "choose_image" = "Сhoose image";
 "edit_image" = "Edit image";
 
-"total_images" = " images";
+"total_images" = " Images";
 "total_choices" = "Choices";
 "total" = "Total";
 "new_choice" = "Enter text";
 "edit_choice" = "Choice";
+"image" = "Image";
 "are_on" = "On";
 "are_off" = "Off";
 "is_on" = "On";
@@ -227,3 +228,4 @@
 "comments_off_description" = "Comments closed";
 "cost" = "Cost";
 "total_bill" = "Total:";
+"poll_launched" = "Poll has been launched";

@@ -24,3 +24,4 @@ func setRootViewController(_ viewController: UIViewController) {
     keyWindow.rootViewController = viewController
     keyWindow.makeKeyAndVisible()
 }
+

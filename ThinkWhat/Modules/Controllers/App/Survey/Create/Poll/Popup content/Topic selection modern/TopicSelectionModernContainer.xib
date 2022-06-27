@@ -25,8 +25,11 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ibg-Op-eFO">
-                    <rect key="frame" x="0.0" y="0.0" width="400" height="81"/>
+                    <rect key="frame" x="0.0" y="0.0" width="400" height="90"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="90" id="5Cj-Ht-Cf3"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -37,7 +40,7 @@
                         <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="qco-yq-P2C">
                             <rect key="frame" x="196" y="0.0" width="8" height="0.0"/>
                             <subviews>
-                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="xmark.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Gyk-UM-pOk">
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.uturn.left.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Gyk-UM-pOk">
                                     <rect key="frame" x="0.0" y="-0.5" width="0.0" height="1"/>
                                 </imageView>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="d4E-lN-obI">
@@ -54,14 +57,14 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstItem="qco-yq-P2C" firstAttribute="height" secondItem="GZV-e0-giY" secondAttribute="height" multiplier="0.9" id="akD-tg-HzI"/>
+                        <constraint firstItem="qco-yq-P2C" firstAttribute="height" secondItem="GZV-e0-giY" secondAttribute="height" multiplier="0.75" id="akD-tg-HzI"/>
                         <constraint firstItem="qco-yq-P2C" firstAttribute="centerX" secondItem="GZV-e0-giY" secondAttribute="centerX" id="iEo-Ex-UDp"/>
                         <constraint firstItem="qco-yq-P2C" firstAttribute="centerY" secondItem="GZV-e0-giY" secondAttribute="centerY" id="vlx-6w-yKd"/>
                         <constraint firstAttribute="height" identifier="height" id="x49-wO-CPP"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ffO-3z-CEc">
-                    <rect key="frame" x="0.0" y="81" width="400" height="519"/>
+                    <rect key="frame" x="0.0" y="90" width="400" height="510"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
             </subviews>
@@ -70,7 +73,6 @@
             <constraints>
                 <constraint firstItem="ffO-3z-CEc" firstAttribute="top" secondItem="ibg-Op-eFO" secondAttribute="bottom" id="7fm-fn-9fW"/>
                 <constraint firstItem="ffO-3z-CEc" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="MDu-gD-SCN"/>
-                <constraint firstItem="ibg-Op-eFO" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.135" id="ObH-52-pF5"/>
                 <constraint firstItem="GZV-e0-giY" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="PqA-XD-SLw"/>
                 <constraint firstItem="ibg-Op-eFO" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="ZTq-Gm-pEy"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="ffO-3z-CEc" secondAttribute="trailing" id="iJf-Jp-Bgb"/>
@@ -85,7 +87,7 @@
         </view>
     </objects>
     <resources>
+        <image name="arrow.uturn.left.circle.fill" catalog="system" width="128" height="121"/>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="xmark.circle" catalog="system" width="128" height="121"/>
     </resources>
 </document>

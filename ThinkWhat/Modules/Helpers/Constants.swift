@@ -33,6 +33,15 @@ func delay(seconds: Double, completion:@escaping ()->()) {
     }
 }
 
+func delayAsync(delay: Double, completion:@escaping ()->()) {
+    Task {
+        try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        await MainActor.run {
+            completion()
+        }
+    }
+}
+
 //Open side app or embedded html
 enum SideAppPreference: String {
     case Embedded = "embedded"

@@ -1527,8 +1527,8 @@
             filePath = "ThinkWhat/Modules/Managers/REST/API.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1275"
-            endingLineNumber = "1275"
+            startingLineNumber = "1309"
+            endingLineNumber = "1309"
             landmarkName = "markFavoriteAsync(mark:surveyReference:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1642,8 +1642,8 @@
             filePath = "ThinkWhat/Modules/Managers/REST/API.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1253"
-            endingLineNumber = "1253"
+            startingLineNumber = "1288"
+            endingLineNumber = "1288"
             landmarkName = "loadSurveyReferences(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1742,22 +1742,6 @@
             endingLineNumber = "34"
             landmarkName = "city"
             landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "D261337E-7AEE-4DEF-BA4E-AC5C365BF057"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/Authorization/Sign Up/SignupViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "287"
-            endingLineNumber = "287"
-            landmarkName = "onProviderAuth(provider:timeout:)"
-            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -2106,8 +2090,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Hot/HotModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "52"
-            endingLineNumber = "52"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
             landmarkName = "claim(survey:reason:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2224,22 +2208,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "201C6BFE-4C93-4CE5-9113-931AA11D326C"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Create/Poll/PollCreationView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1600"
-            endingLineNumber = "1600"
-            landmarkName = "setObservers()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "A3A717CF-DD44-4A1D-AF56-EDEA0272A85D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -2263,8 +2231,8 @@
             filePath = "ThinkWhat/Modules/Managers/REST/API.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1185"
-            endingLineNumber = "1185"
+            startingLineNumber = "1220"
+            endingLineNumber = "1220"
             landmarkName = "loadSurveyReferences(_:_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2320,31 +2288,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "BF897780-5B56-4BEE-BD00-4348B06658CB"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Create/Poll/PollCreationView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1667"
-            endingLineNumber = "1667"
-            landmarkName = "setObservers()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "5E858536-4551-4DF7-B942-18CEA604E22F"
+            uuid = "AE8DA07C-3FA7-484F-8FA6-A3DE458B4062"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Managers/REST/API.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1322"
-            endingLineNumber = "1322"
+            startingLineNumber = "1415"
+            endingLineNumber = "1415"
             landmarkName = "post(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2352,49 +2304,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A9D24F7B-454B-4AC7-B5EC-F791E2AA398C"
-            shouldBeEnabled = "No"
+            uuid = "63BD0183-E18A-46FA-AD13-F21F94654001"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Managers/REST/API.swift"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Create/Poll/Popup content/Topic selection modern/TopicSelectionModernContent.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "743"
-            endingLineNumber = "743"
-            landmarkName = "request()"
-            landmarkType = "9">
-            <Locations>
-               <Location
-                  uuid = "A9D24F7B-454B-4AC7-B5EC-F791E2AA398C - 3154f2ca0bd1be3e"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "request() async throws -&gt; Foundation.Data"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Managers/REST/API.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "743"
-                  endingLineNumber = "743"
-                  offsetFromSymbolStart = "480">
-               </Location>
-               <Location
-                  uuid = "A9D24F7B-454B-4AC7-B5EC-F791E2AA398C - a52632de45ed9357"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) await resume partial function for request() async throws -&gt; Foundation.Data"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Managers/REST/API.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "743"
-                  endingLineNumber = "743"
-                  offsetFromSymbolStart = "100">
-               </Location>
-            </Locations>
+            startingLineNumber = "40"
+            endingLineNumber = "40"
+            landmarkName = "traitCollectionDidChange(_:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

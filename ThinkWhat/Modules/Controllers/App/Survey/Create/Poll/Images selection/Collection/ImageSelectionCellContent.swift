@@ -23,6 +23,10 @@ class ImageSelectionCellContent: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .tertiarySystemBackground
+//    }
+    
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
@@ -35,9 +39,6 @@ class ImageSelectionCellContent: UIView {
         ])
     }
     
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        descriptionLabel.backgroundColor = .secondarySystemBackground//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//    }
 //
     private var currentConfiguration: ImageSelectionCellConfiguration!
     var configuration: UIContentConfiguration {

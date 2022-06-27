@@ -148,6 +148,7 @@ class SurveyCreationView: UIView, SurveyCreationOutput {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         setText()
+        info.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         //        info.setTitleColor(.systemRed, for: .normal)
         if !isRatingSelected.isNil {

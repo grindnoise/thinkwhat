@@ -37,6 +37,7 @@ class TopicSelectionModernContent: UIView {
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 //        backgroundColor = .tertiarySystemBackground
+        (icon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : currentConfiguration.topicItem.topic.parent?.tagColor.cgColor ?? UIColor.systemGray.cgColor
     }
 
     private var currentConfiguration: TopicSelectionModernCellConfiguration!
@@ -58,6 +59,7 @@ class TopicSelectionModernContent: UIView {
     @IBOutlet weak var icon: Icon! {
         didSet {
 //            icon.scaleMultiplicator = 1
+            icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.isNil ? .systemGray : currentConfiguration.topicItem.topic.tagColor
             icon.isRounded = false
         }
     }
@@ -71,7 +73,7 @@ extension TopicSelectionModernContent: UIContentView {
     func apply(configuration: TopicSelectionModernCellConfiguration) {
         guard currentConfiguration != configuration else { return }
         currentConfiguration = configuration
-        icon.iconColor = currentConfiguration.topicItem.topic.parent?.tagColor ?? .systemGray
+        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.topicItem.topic.tagColor
         icon.category = Icon.Category(rawValue: currentConfiguration.topicItem.topic.id) ?? .Null
         titleLabel.text = currentConfiguration.topicItem.title
         height.constant = 60

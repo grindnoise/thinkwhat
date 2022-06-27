@@ -192,7 +192,7 @@
 "choose_option" = "Выберите опцию";
 "anon_option" = "Анонимный";
 "anon_description" = "Автор опроса и респонденты скрыты друг от друга";
-"default_option" = "Обычный";
+"default_option" = "Публичный";
 "default_description" = "Публичный опрос, участвовать могут все, не анонимный";
 "private_option" = "Частный";
 "private_description" = "Частный опрос, доступ предоставляется по ссылке";
@@ -203,11 +203,12 @@
 "choose_image" = "Выберите изображение";
 "edit_image" = "Изменить изображение";
 
-"total_images" = " изображений";
+"total_images" = " Изображений";
 "total_choices" = "Вариантов";
 "total" = "Всего";
 "new_choice" = "Введите текст";
 "edit_choice" = "Вариант";
+"image" = "Изображение";
 "are_on" = "Включены";
 "are_off" = "Выключены";
 "is_on" = "Включен";
@@ -227,3 +228,4 @@
 "comments_off_description" = "Комментарии закрыты";
 "cost" = "Стоимость";
 "total_bill" = "Итого:";
+"poll_launched" = "Опрос стартовал";

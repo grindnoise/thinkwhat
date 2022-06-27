@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PollCreationView: UIView {
+class PollCreationView: UIView, UINavigationControllerDelegate {
     
     deinit {
 #if DEBUG
@@ -47,7 +47,7 @@ class PollCreationView: UIView {
     }
     
     // MARK: - Properties
-    weak var viewInput: PollCreationViewInput?
+    weak var viewInput: (PollCreationViewInput & UIViewController)?
     private var newInstance: Survey?
     private var topic: Topic! {
         didSet {
@@ -231,7 +231,12 @@ class PollCreationView: UIView {
     var imageItems: [ImageItem] = [
 //                ImageItem(title: "One", image: UIImage(systemName: "mic.fill")!),
 //                ImageItem(title: "Two", image: UIImage(systemName: "sunset.fill")!),
-    ]
+    ] {
+        didSet {
+            guard !pollImagesHeaderLabel.isNil else { return }
+            pollImagesHeaderLabel.text = "total_images".localized.capitalized +  ": \(imageItems.count)"
+        }
+    }
     var choiceItems: [ChoiceItem] = [
         ChoiceItem(text: ""),
     ] {
@@ -259,28 +264,42 @@ class PollCreationView: UIView {
             //                existing.index = index
 //            }
             guard !pollChoicesHeaderLabel.isNil else { return }
-            pollChoicesHeaderLabel.text = "total".localized.capitalized +  ": \(choiceItems.count)"
+            pollChoicesHeaderLabel.text = "total_choices".localized.capitalized +  ": \(choiceItems.count)"
         }
     }
-    weak var poll: Survey?
+//    private var callback: Closure? = {
+//        fatalError()
+//    }
+    public var result: Result<Bool, Error>! {
+        didSet {
+            completed = true
+        }
+    }
+//    private let resultKeyPath = \PollCreationView.result
+//
+    @objc dynamic var completed: Bool = false
+//    private let completedKeyPath = \PollCreationView.completed
+//    weak var poll: Survey?
     
     // MARK: - Private properties
     private var fontSize: CGFloat = .zero
     private var color: UIColor = .systemGray {
         didSet {
             guard oldValue != color else { return }
-            lines.forEach { $0.layer.strokeColor = color.withAlphaComponent(0.3).cgColor }
+//            lines.forEach { $0.layer.strokeColor = color.cgColor }
             guard !scrollContentView.isNil, oldValue != color else { return }
             scrollContentView.get(all: [CircleButton.self]).forEach {
                 guard let v =  $0 as? CircleButton else { return }
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-                    v.color = self.color
-                }
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                    v.color = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color
+                v.icon.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color
+//                }
             }
             scrollContentView.get(all: [UIView.self]).filter({
                 $0.accessibilityIdentifier == "line"
-            }).forEach({
-                $0.backgroundColor = self.color.withAlphaComponent(0.3)
+            }).forEach({ [weak self] in
+                guard let self = self else { return }
+                $0.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color
             })
             scrollContentView.get(all: [UIImageView.self]).filter({
                 $0.accessibilityIdentifier == "skip"
@@ -293,17 +312,13 @@ class PollCreationView: UIView {
             }
             pollURLSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             pollChoicesHeaderButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+            pollImagesHeaderButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             pollChoicesSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             pollImagesSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             choiceContainer?.color = color
             publicationButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            if #available(iOS 14, *) {
-                guard let v = imagesContainer as? ImageSelectionCollectionView else { return }
-                v.color = color
-//                v.reload()
-            } else {
-                // Fallback on earlier versions
-            }
+            guard let v = imagesContainer as? ImageSelectionCollectionView else { return }
+            v.color = color
         }
     }
     private var lines: [Line] = []
@@ -330,6 +345,12 @@ class PollCreationView: UIView {
     private var isTextFieldEditingEnabled = true
     private weak var imagesContainer: (UIScrollView & ImageSelectionProvider)?
     private weak var choiceContainer: (UIScrollView & ChoiceProvider)?
+    private lazy var imagePicker: UIImagePickerController = {
+        let picker = UIImagePickerController()
+        picker.allowsEditing = true
+        picker.delegate = self
+        return picker
+    }()
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -358,7 +379,7 @@ class PollCreationView: UIView {
     }
     @IBOutlet weak var topicLine: UIView! {
         didSet {
-            topicLine.backgroundColor = color.withAlphaComponent(0.3)
+            topicLine.accessibilityIdentifier = "line"
         }
     }
     
@@ -378,7 +399,11 @@ class PollCreationView: UIView {
             optionsButton.accessibilityIdentifier = "button"
         }
     }
-    @IBOutlet weak var optionsLine: UIView!
+    @IBOutlet weak var optionsLine: UIView! {
+        didSet {
+            optionsLine.accessibilityIdentifier = "line"
+        }
+    }
     
     ///Poll title
     @IBOutlet weak var pollTitleView: UIView!
@@ -436,7 +461,11 @@ class PollCreationView: UIView {
             pollTitleSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
-    @IBOutlet weak var pollTitleLine: UIView!
+    @IBOutlet weak var pollTitleLine: UIView! {
+        didSet {
+            pollTitleLine.accessibilityIdentifier = "line"
+        }
+    }
     
     ///Poll description
     @IBOutlet weak var pollDescriptionView: UIView!
@@ -493,8 +522,13 @@ class PollCreationView: UIView {
             pollDescriptionSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
-    @IBOutlet weak var pollDescriptionOptionalLabel: UILabel!
-    @IBOutlet weak var pollDescriptionLine: UIView!
+//    @IBOutlet weak var pollDescriptionOptionalLabel: UILabel!
+    @IBOutlet weak var pollDescriptionLine: UIView! {
+        didSet {
+            pollDescriptionLine.accessibilityIdentifier = "line"
+        }
+    }
+
 //    @IBOutlet weak var pollDescriptionSkip: UIImageView! {
 //        didSet {
 //            pollDescriptionSkip.accessibilityIdentifier = "skip"
@@ -560,7 +594,11 @@ class PollCreationView: UIView {
             pollQuestionSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
-    @IBOutlet weak var pollQuestionLine: UIView!
+    @IBOutlet weak var pollQuestionLine: UIView! {
+        didSet {
+            pollQuestionLine.accessibilityIdentifier = "line"
+        }
+    }
 //    @IBOutlet weak var pollQuestionSkip: UIImageView! {
 //        didSet {
 //            pollQuestionSkip.accessibilityIdentifier = "skip"
@@ -627,7 +665,11 @@ class PollCreationView: UIView {
             pollURLSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
-    @IBOutlet weak var pollURLLine: UIView!
+    @IBOutlet weak var pollURLLine: UIView! {
+        didSet {
+            pollURLLine.accessibilityIdentifier = "line"
+        }
+    }
     
     ///Poll images
     @IBOutlet weak var pollImagesView: UIView!
@@ -658,6 +700,20 @@ class PollCreationView: UIView {
         }
     }
     @IBOutlet weak var pollImagesTemp: UIView!
+    @IBOutlet weak var pollImagesHeader: UIView!
+    @IBOutlet weak var pollImagesHeaderLabel: UILabel! {
+        didSet {
+            pollImagesHeaderLabel.text = "total_images".localized.capitalized +  ": \(imageItems.count)"
+        }
+    }
+    @IBOutlet weak var pollImagesHeaderButton: UIImageView! {
+        didSet {
+            pollImagesHeaderButton.isUserInteractionEnabled = true
+            let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+            pollImagesHeaderButton.addGestureRecognizer(tap)
+            pollImagesHeaderButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        }
+    }
     @IBOutlet weak var pollImagesContainerView: UIView!
     @IBOutlet weak var pollImagesSkip: UIImageView! {
         didSet {
@@ -671,7 +727,11 @@ class PollCreationView: UIView {
         }
     }
     @IBOutlet weak var pollImagesOptionalLabel: UILabel!
-    @IBOutlet weak var pollImagesLine: UIView!
+    @IBOutlet weak var pollImagesLine: UIView! {
+        didSet {
+            pollImagesLine.accessibilityIdentifier = "line"
+        }
+    }
     
     ///Poll description
     @IBOutlet weak var pollChoicesView: UIView!
@@ -732,7 +792,11 @@ class PollCreationView: UIView {
             pollChoicesSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
-    @IBOutlet weak var pollChoicesLine: UIView!
+    @IBOutlet weak var pollChoicesLine: UIView! {
+        didSet {
+            pollChoicesLine.accessibilityIdentifier = "line"
+        }
+    }
     
     ///Limits
     @IBOutlet weak var limitsView: UIView!
@@ -748,7 +812,11 @@ class PollCreationView: UIView {
             limitsButton.accessibilityIdentifier = "button"
         }
     }
-    @IBOutlet weak var limitsLine: UIView!
+    @IBOutlet weak var limitsLine: UIView! {
+        didSet {
+            limitsLine.accessibilityIdentifier = "line"
+        }
+    }
     
     ///Comments
     @IBOutlet weak var commentsView: UIView!
@@ -765,7 +833,11 @@ class PollCreationView: UIView {
             commentsButton.accessibilityIdentifier = "button"
         }
     }
-    @IBOutlet weak var commentsLine: UIView!
+    @IBOutlet weak var commentsLine: UIView! {
+        didSet {
+            commentsLine.accessibilityIdentifier = "line"
+        }
+    }
     
     ///Hot option
     @IBOutlet weak var hotOptionView: UIView!
@@ -800,14 +872,22 @@ class PollCreationView: UIView {
         if viewInput?.balance ?? 0 <  costItems.reduce(into: 0) { $0 += $1.cost } {
             banner.accessibilityIdentifier = "insufficient_balance"
         }
-        banner.present(subview: CostView(callbackDelegate: banner, dataProvider: self, parent: banner))
+        banner.present(subview: CostView(callbackDelegate: banner, dataProvider: self, parent: banner))//, result: result))
     }
 }
 
 // MARK: - Controller Output
 extension PollCreationView: PollCreationControllerOutput {
+    func onSuccess() {
+        result = .success(true)
+    }
+    
+    func onError(_ error: Error) {
+        result = .failure(error)
+    }
+    
     func post() {
-        viewInput?.post(createTemporaryPoll())
+        viewInput?.post(prepareDict())
     }
     
     func onDeinit() {
@@ -981,17 +1061,17 @@ extension PollCreationView: PollCreationControllerOutput {
         
         switch stage {
         case .Topic:
+            
 //            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
 //            banner.present(subview: CostView(callbackDelegate: banner, dataProvider: self, parent: banner))
-
+            
             animate(button: topicButton, completionBlocks: [
                 { [weak self] in guard let self = self else { return }; self.topicButton.state = .On},
                 { [weak self] in guard let self = self else { return }
                     let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                     banner.present(subview: TopicSelectionModernContainer(isModal: true, callbackDelegate: banner))
                 }
-            ]
-            )
+            ])
         case .Options:
             animate(button: optionsButton, completionBlocks: [
                 { [weak self] in guard let self = self else { return }; self.optionsButton.state = .On},
@@ -1007,27 +1087,35 @@ extension PollCreationView: PollCreationControllerOutput {
         case .Title:
             let scrollPoint = pollTitleView.superview!.convert(pollTitleView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: scrollPoint.y - 30, completionBlocks: [
-                {
-                    [weak self] in guard let self = self else { return }
-                    animate(button: self.pollTitleButton, completionBlocks: [
-                        
-                    ])
-                },
-                {
-                    [weak self] in guard let self = self else { return }
-                    reveal(view: self.pollTitleBg, duration: 0.3, completionBlocks: [
-//                        {
-//                            [weak self] in guard let self = self else { return }
-//                            self.pollTitleTextView.becomeFirstResponder()
-//                        }
-                    ])
-                },
-                
-                    {
-                        [weak self] in guard let self = self else { return }
-                        self.pollTitleTextView.becomeFirstResponder()
-                    }
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    animate(button: self.pollTitleButton, completionBlocks: [
+//
+//                    ])
+//                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    reveal(view: self.pollTitleBg, duration: 0.3, completionBlocks: [
+////                        {
+////                            [weak self] in guard let self = self else { return }
+////                            self.pollTitleTextView.becomeFirstResponder()
+////                        }
+//                    ])
+//                },
+//
+//                    {
+//                        [weak self] in guard let self = self else { return }
+//                        self.pollTitleTextView.becomeFirstResponder()
+//                    }
             ])
+            
+            animate(button: self.pollTitleButton, completionBlocks: [])
+            reveal(view: self.pollTitleBg, duration: 0.3, completionBlocks: [])
+            delayAsync(delay: 0.1) { [weak self] in
+                guard let self = self else {return}
+                self.pollTitleTextView.becomeFirstResponder()
+            }
+            
             
             var startPoint = optionsView.superview!.convert(optionsView.center, to: scrollContentView)
             startPoint.y += (optionsView.bounds.height + lineWidth)/2
@@ -1038,21 +1126,28 @@ extension PollCreationView: PollCreationControllerOutput {
         case .Description:
             let scrollPoint = pollDescriptionView.superview!.convert(pollDescriptionView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: scrollPoint.y - 30, completionBlocks: [
-                {
-                    [weak self] in guard let self = self else { return }
-                    animate(button: self.pollDescriptionButton, completionBlocks: [
-                        
-                    ])
-                },
-                {
-                    [weak self] in guard let self = self else { return }
-                    reveal(view: self.pollDescriptionBg, duration: 0.3, completionBlocks: [])
-                },
-                {
-                    [weak self] in guard let self = self else { return }
-                    self.pollDescriptionTextView.becomeFirstResponder()
-                }
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    animate(button: self.pollDescriptionButton, completionBlocks: [
+//
+//                    ])
+//                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    reveal(view: self.pollDescriptionBg, duration: 0.3, completionBlocks: [])
+//                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    self.pollDescriptionTextView.becomeFirstResponder()
+//                }
             ])
+            
+            animate(button: self.pollDescriptionButton, completionBlocks: [])
+            reveal(view: self.pollDescriptionBg, duration: 0.3, completionBlocks: [])
+            delayAsync(delay: 0.1) { [weak self] in
+                guard let self = self else {return}
+                self.pollDescriptionTextView.becomeFirstResponder()
+            }
             
             var startPoint = pollTitleBg.superview!.convert(pollTitleBg.center, to: scrollContentView)
             startPoint.y += (pollTitleBg.bounds.height + lineWidth + 30)/2
@@ -1063,21 +1158,29 @@ extension PollCreationView: PollCreationControllerOutput {
         case .Question:
             let scrollPoint = pollQuestionView.superview!.convert(pollQuestionView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: scrollPoint.y - 30, completionBlocks: [
-                {
-                    [weak self] in guard let self = self else { return }
-                    animate(button: self.pollQuestionButton, completionBlocks: [
-                        
-                    ])
-                },
-                {
-                    [weak self] in guard let self = self else { return }
-                    reveal(view: self.pollQuestionBg, duration: 0.3, completionBlocks: [])
-                },
-                {
-                    [weak self] in guard let self = self else { return }
-                    self.pollQuestionTextView.becomeFirstResponder()
-                }
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    animate(button: self.pollQuestionButton, completionBlocks: [
+//
+//                    ])
+//                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    reveal(view: self.pollQuestionBg, duration: 0.3, completionBlocks: [])
+//                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    self.pollQuestionTextView.becomeFirstResponder()
+//                }
             ])
+            
+            
+            animate(button: self.pollQuestionButton, completionBlocks: [])
+            reveal(view: self.pollQuestionBg, duration: 0.3, completionBlocks: [])
+            delayAsync(delay: 0.1) { [weak self] in
+                guard let self = self else {return}
+                self.pollQuestionTextView.becomeFirstResponder()
+            }
             
             var startPoint = pollDescriptionBg.superview!.convert(pollDescriptionBg.center, to: scrollContentView)
             startPoint.y += (pollDescriptionBg.bounds.height + lineWidth + 30)/2
@@ -1088,24 +1191,31 @@ extension PollCreationView: PollCreationControllerOutput {
         case .Hyperlink:
             let scrollPoint = pollURLView.superview!.convert(pollURLView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: scrollPoint.y - 30, completionBlocks: [
-                {
-                    [weak self] in guard let self = self else { return }
-                    animate(button: self.pollURLButton, completionBlocks: [
-//                        {
-//                            [weak self] in guard let self = self else { return }
-//                            reveal(view: self.pollURLBg, duration: 0.2, completionBlocks: [])
-//                        }
-                    ])
-                },
-                {
-                    [weak self] in guard let self = self else { return }
-                    reveal(view: self.pollURLBg, duration: 0.3, completionBlocks: [])
-                },
-                {
-                    [weak self] in guard let self = self else { return }
-                    self.pollURLTextField.becomeFirstResponder()
-                }
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    animate(button: self.pollURLButton, completionBlocks: [
+////                        {
+////                            [weak self] in guard let self = self else { return }
+////                            reveal(view: self.pollURLBg, duration: 0.2, completionBlocks: [])
+////                        }
+//                    ])
+//                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    reveal(view: self.pollURLBg, duration: 0.3, completionBlocks: [])
+//                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    self.pollURLTextField.becomeFirstResponder()
+//                }
             ])
+            
+            animate(button: self.pollURLButton, completionBlocks: [])
+            reveal(view: self.pollURLBg, duration: 0.3, completionBlocks: [])
+            delayAsync(delay: 0.1) { [weak self] in
+                guard let self = self else {return}
+                self.pollURLTextField.becomeFirstResponder()
+            }
             
             var startPoint = pollQuestionBg.superview!.convert(pollQuestionBg.center, to: scrollContentView)
             startPoint.y += (pollQuestionBg.bounds.height + lineWidth + 30)/2
@@ -1116,15 +1226,18 @@ extension PollCreationView: PollCreationControllerOutput {
         case .Images:
             let scrollPoint = pollImagesView.superview!.convert(pollImagesView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: scrollPoint.y - 30, completionBlocks: [
-                {
-                    [weak self] in guard let self = self else { return }
-                    animate(button: self.pollImagesButton, completionBlocks: [])
-                },
-                {
-                    [weak self] in guard let self = self else { return }
-                    reveal(view: self.pollImagesBg, duration: 0.3, completionBlocks: [])
-                }
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    animate(button: self.pollImagesButton, completionBlocks: [])
+//                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    reveal(view: self.pollImagesBg, duration: 0.3, completionBlocks: [])
+//                }
             ])
+            
+            animate(button: self.pollImagesButton, completionBlocks: [])
+            reveal(view: self.pollImagesBg, duration: 0.3, completionBlocks: [])
             
             var startPoint = pollURLBg.superview!.convert(pollURLBg.center, to: scrollContentView)
             startPoint.y += (pollURLBg.bounds.height + lineWidth + 30)/2
@@ -1135,21 +1248,32 @@ extension PollCreationView: PollCreationControllerOutput {
         case .Choices:
             let scrollPoint = pollChoicesView.superview!.convert(pollChoicesView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: scrollPoint.y - 30, completionBlocks: [
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    animate(button: self.pollChoicesButton, completionBlocks: [])
+//                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    reveal(view: self.pollChoicesBg, duration: 0.3, completionBlocks: [
+//                        {
+//                            [weak self] in
+//                            guard let self = self else { return }
+//                            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.5)
+//
+//                            banner.present(subview: ChoiceEditingPopup(callbackDelegate: banner, item: self.choiceItems.first, index: self.choiceItems.firstIndex(of: self.choiceItems.first!)! + 1, forceEditing: true, mode:  .Create))
+//                        }
+//                    ])
+//                }
+            ])
+            
+            animate(button: self.pollChoicesButton, completionBlocks: [])
+            reveal(view: self.pollChoicesBg, duration: 0.3, completionBlocks: [
                 {
-                    [weak self] in guard let self = self else { return }
-                    animate(button: self.pollChoicesButton, completionBlocks: [])
-                },
-                {
-                    [weak self] in guard let self = self else { return }
-                    reveal(view: self.pollChoicesBg, duration: 0.3, completionBlocks: [
-                        {
-                            [weak self] in
-                            guard let self = self else { return }
-                            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.5)
+                    [weak self] in
+                    guard let self = self else { return }
+                    let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.5)
 
-                            banner.present(subview: ChoiceEditingPopup(callbackDelegate: banner, item: self.choiceItems.first, index: self.choiceItems.firstIndex(of: self.choiceItems.first!)! + 1 ?? 0, forceEditing: true, mode:  .Create))
-                        }
-                    ])
+                    banner.present(subview: ChoiceEditingPopup(callbackDelegate: banner, item: self.choiceItems.first, index: self.choiceItems.firstIndex(of: self.choiceItems.first!)! + 1, forceEditing: true, mode:  .Create))
                 }
             ])
             
@@ -1160,18 +1284,24 @@ extension PollCreationView: PollCreationControllerOutput {
 //            animateTransition(lineStart: startPoint, lineEnd: endPoint, lineCompletionBlocks: [], animationBlocks: [], completionBlocks: [])
             animateLine(line: pollImagesLine, lineCompletionBlocks: [], animationBlocks: [], completionBlocks: [])
         case .Comments:
-            safeAreaInsets.top
             let scrollPoint = commentsView.superview!.convert(commentsView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: min(scrollPoint.y - 30, CGPoint(x: .zero, y: scrollView.contentSize.height - (bounds.height - safeAreaInsets.bottom - safeAreaInsets.top)).y), completionBlocks: [
-                {
-                    [weak self] in guard let self = self else { return }
-                    animate(button: self.commentsButton, completionBlocks: [
-                        { [weak self] in guard let self = self else { return }; self.commentsButton.state = .On},
-                        { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-                            banner.present(subview: CommentsSelection(option: self.comments, callbackDelegate: banner))}
-                    ])
-                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    animate(button: self.commentsButton, completionBlocks: [
+//                        { [weak self] in guard let self = self else { return }; self.commentsButton.state = .On},
+//                        { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+//                            banner.present(subview: CommentsSelection(option: self.comments, callbackDelegate: banner))}
+//                    ])
+//                },
             ])
+            
+            animate(button: self.commentsButton, completionBlocks: [
+                { [weak self] in guard let self = self else { return }; self.commentsButton.state = .On},
+                { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+                    banner.present(subview: CommentsSelection(option: self.comments, callbackDelegate: banner))}
+            ])
+            
             var startPoint = pollChoicesBg.superview!.convert(pollChoicesBg.center, to: scrollContentView)
             startPoint.y += (pollChoicesBg.bounds.height + lineWidth + 30)/2
             var endPoint = commentsView.superview!.convert(commentsView.center, to: scrollContentView)
@@ -1181,15 +1311,22 @@ extension PollCreationView: PollCreationControllerOutput {
         case .Limits:
             let scrollPoint = limitsView.superview!.convert(limitsView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: min(scrollPoint.y - 30, CGPoint(x: .zero, y: scrollView.contentSize.height - (bounds.height - safeAreaInsets.bottom - safeAreaInsets.top)).y), completionBlocks: [
-                {
-                    [weak self] in guard let self = self else { return }
-                    animate(button: self.limitsButton, completionBlocks: [
-                        { [weak self] in guard let self = self else { return }; self.limitsButton.state = .On},
-                        { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-                            banner.present(subview: LimitsSelectionView(value: self.limits, callbackDelegate: banner))}
-                    ])
-                },
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    animate(button: self.limitsButton, completionBlocks: [
+//                        { [weak self] in guard let self = self else { return }; self.limitsButton.state = .On},
+//                        { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+//                            banner.present(subview: LimitsSelectionView(value: self.limits, callbackDelegate: banner))}
+//                    ])
+//                },
             ])
+            
+            animate(button: self.limitsButton, completionBlocks: [
+                { [weak self] in guard let self = self else { return }; self.limitsButton.state = .On},
+                { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+                    banner.present(subview: LimitsSelectionView(value: self.limits, callbackDelegate: banner))}
+            ])
+            
             var startPoint = commentsView.superview!.convert(commentsView.center, to: scrollContentView)
             startPoint.y += (commentsView.bounds.height + lineWidth)/2
             var endPoint = limitsView.superview!.convert(limitsView.center, to: scrollContentView)
@@ -1198,15 +1335,23 @@ extension PollCreationView: PollCreationControllerOutput {
             animateLine(line: commentsLine, lineCompletionBlocks: [], animationBlocks: [], completionBlocks: [])
         case .Hot:
             let scrollPoint = hotOptionView.superview!.convert(hotOptionView.frame.origin, to: scrollContentView)
-            scrollVerticalToPoint(y: min(scrollPoint.y - 30, CGPoint(x: .zero, y: scrollView.contentSize.height - (bounds.height - safeAreaInsets.bottom - safeAreaInsets.top)).y), completionBlocks: [                {
-                    [weak self] in guard let self = self else { return }
-                    animate(button: self.hotOptionButton, completionBlocks: [
-                        { [weak self] in guard let self = self else { return }; self.hotOptionButton.state = .On},
-                        { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-                            banner.present(subview: HotSelectionView(option: self.hot, callbackDelegate: banner))}
-                    ])
-                },
+            scrollVerticalToPoint(y: min(scrollPoint.y - 30, CGPoint(x: .zero, y: scrollView.contentSize.height - (bounds.height - safeAreaInsets.bottom - safeAreaInsets.top)).y), completionBlocks: [
+//                {
+//                    [weak self] in guard let self = self else { return }
+//                    animate(button: self.hotOptionButton, completionBlocks: [
+//                        { [weak self] in guard let self = self else { return }; self.hotOptionButton.state = .On},
+//                        { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+//                            banner.present(subview: HotSelectionView(option: self.hot, callbackDelegate: banner))}
+//                    ])
+//                },
             ])
+            
+            animate(button: self.hotOptionButton, completionBlocks: [
+                { [weak self] in guard let self = self else { return }; self.hotOptionButton.state = .On},
+                { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+                    banner.present(subview: HotSelectionView(option: self.hot, callbackDelegate: banner))}
+            ])
+            
             var startPoint = limitsView.superview!.convert(limitsView.center, to: scrollContentView)
             startPoint.y += (limitsView.bounds.height + lineWidth)/2
             var endPoint = hotOptionView.superview!.convert(hotOptionView.center, to: scrollContentView)
@@ -1234,8 +1379,7 @@ extension PollCreationView: PollCreationControllerOutput {
 // MARK: - UI Setup
 extension PollCreationView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        //        pollTitleBg.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        pollTitleTextView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//        pollTitleTextView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         scrollContentView.get(all: [UITextView.self]).forEach {
             guard let v =  $0 as? UITextView else { return }
             v.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
@@ -1244,6 +1388,15 @@ extension PollCreationView {
             $0.accessibilityIdentifier == "skip"
         }).forEach {
             $0.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        }
+        scrollContentView.get(all: [UITextView.self]).forEach {
+            guard let v = $0 as? UITextView else { return }
+            v.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        }
+        scrollContentView.get(all: [CircleButton.self]).forEach {
+            guard let v =  $0 as? CircleButton else { return }
+            v.color = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color
+            v.icon.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color
         }
         pollURLSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         pollImagesSkip.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
@@ -1256,7 +1409,14 @@ extension PollCreationView {
             guard let self = self else { return }
             v.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         }
+        scrollContentView.get(all: [UIView.self]).filter({ $0.accessibilityIdentifier == "line" }).forEach { [weak self] v in
+            guard let self = self else { return }
+            v.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        }
+
         publicationButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        pollImagesHeaderButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        pollChoicesHeaderButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     }
     
     private func setupUI() {
@@ -1264,6 +1424,8 @@ extension PollCreationView {
         layoutIfNeeded()
         setText()
         setupInputViews()
+        
+        color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         
         scrollContentView.subviews.forEach {
             $0.alpha = 0
@@ -1619,36 +1781,36 @@ extension PollCreationView {
 //            self.pollQuestionBg.layer.add(anim, forKey: nil)
 //            self.pollQuestionBg.layer.shadowPath = destinationPath
 //        })
-        observers.append((imagesContainer as! UIScrollView).observe(\UIScrollView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
-            guard let self = self,
-                  let constraint = self.pollImagesBg.getAllConstraints().filter({ $0.identifier == "height" }).first,
-                  let suppConstraint = self.pollImagesTemp.getAllConstraints().filter({ $0.identifier == "supp_height" }).first,
-                  let value = change.newValue,
-            round(constraint.constant) != round(value.height + suppConstraint.constant) else { return }
-            UIView.animate(withDuration: 0.2) {
-                self.scrollContentView.setNeedsLayout()
-                constraint.constant = value.height + suppConstraint.constant
-                self.scrollContentView.layoutIfNeeded()
-            }
-            
-            let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero,
-                                                                   size: CGSize(width: self.pollImagesBg.bounds.width,
-                                                                                height: value.height + suppConstraint.constant)),
-                                               cornerRadius: self.pollImagesBg.frame.width * 0.05).cgPath
-            let anim = Animations.get(property: .ShadowPath,
-                                      fromValue: self.pollImagesBg.layer.shadowPath as Any,
-                                      toValue: destinationPath,
-                                      duration: 0.2,
-                                      delay: 0,
-                                      repeatCount: 0,
-                                      autoreverses: false,
-                                      timingFunction: .linear,
-                                      delegate: nil,
-                                      isRemovedOnCompletion: true,
-                                      completionBlocks: nil)
-            self.pollImagesBg.layer.add(anim, forKey: nil)
-            self.pollImagesBg.layer.shadowPath = destinationPath
-        })
+//        observers.append((imagesContainer as! UIScrollView).observe(\UIScrollView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
+//            guard let self = self,
+//                  let constraint = self.pollImagesBg.getAllConstraints().filter({ $0.identifier == "height" }).first,
+//                  let suppConstraint = self.pollImagesTemp.getAllConstraints().filter({ $0.identifier == "supp_height" }).first,
+//                  let value = change.newValue,
+//            round(constraint.constant) != round(value.height + suppConstraint.constant) else { return }
+//            UIView.animate(withDuration: 0.2) {
+//                self.scrollContentView.setNeedsLayout()
+//                constraint.constant = value.height + suppConstraint.constant
+//                self.scrollContentView.layoutIfNeeded()
+//            }
+//
+//            let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero,
+//                                                                   size: CGSize(width: self.pollImagesBg.bounds.width,
+//                                                                                height: value.height + suppConstraint.constant)),
+//                                               cornerRadius: self.pollImagesBg.frame.width * 0.05).cgPath
+//            let anim = Animations.get(property: .ShadowPath,
+//                                      fromValue: self.pollImagesBg.layer.shadowPath as Any,
+//                                      toValue: destinationPath,
+//                                      duration: 0.2,
+//                                      delay: 0,
+//                                      repeatCount: 0,
+//                                      autoreverses: false,
+//                                      timingFunction: .linear,
+//                                      delegate: nil,
+//                                      isRemovedOnCompletion: true,
+//                                      completionBlocks: nil)
+//            self.pollImagesBg.layer.add(anim, forKey: nil)
+//            self.pollImagesBg.layer.shadowPath = destinationPath
+//        })
 //        observers.append((choiceContainer as! UIScrollView).observe(\UIScrollView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
 //            guard let self = self,
 //                              let constraint = self.pollChoicesBg.getAllConstraints().filter({ $0.identifier == "height" }).first,
@@ -1697,6 +1859,11 @@ extension PollCreationView {
 //                self.scrollContentView.layoutIfNeeded()
 //            }
 //        })
+        observers.append(pollImagesHeaderLabel.observe(\UILabel.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
+            guard let self = self,
+            let rect = change.newValue else { return }
+            self.pollImagesHeaderLabel.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: rect.height * 0.4)
+        })
         observers.append(pollChoicesHeaderLabel.observe(\UILabel.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             guard let self = self,
             let rect = change.newValue else { return }
@@ -1790,7 +1957,7 @@ extension PollCreationView {
         
         let optionalString = NSMutableAttributedString()
         optionalString.append(NSAttributedString(string: "*" + "optional".localized.lowercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: pollDescriptionTextView.frame.width * 0.035), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        pollDescriptionOptionalLabel.attributedText = optionalString
+//        pollDescriptionOptionalLabel.attributedText = optionalString
         pollURLOptionalLabel.attributedText = optionalString
         pollImagesOptionalLabel.attributedText = optionalString
         
@@ -1884,6 +2051,20 @@ extension PollCreationView {
             let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.5)
             
             banner.present(subview: ChoiceEditingPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1 , forceEditing: true, mode: .Create))
+        } else if v == pollImagesHeaderButton {
+            guard imageItems.count < 3 else {
+                showBanner(bannerDelegate: self,
+                           text: AppError.maximumImages.localizedDescription,
+                           imageContent: ImageSigns.exclamationMark,
+                           shouldDismissAfter: 1)
+                return
+            }
+//            let item = ImageItem(title: "")
+//            imageItems.append(item)
+//            imagesContainer?.reload()
+//            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.65)
+//            banner.present(subview: ImageSelectionPopup(controller: viewInput as? UIViewController, callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1))
+            onAddImageTap()
         } else if v == pollChoicesSkip {
             ///Check
             guard choiceItems.count >= 2 else {
@@ -1919,7 +2100,7 @@ extension PollCreationView {
             let scrollPoint = pollTitleView.superview!.convert(optionsView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: scrollPoint.y, completionBlocks: [])
             let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-            banner.present(subview: OptionSelection(isModal: true, option: .Ordinary, callbackDelegate: banner))
+            banner.present(subview: OptionSelection(isModal: true, option: option, callbackDelegate: banner))
         } else if v == commentsButton {
             let scrollPoint = commentsView.superview!.convert(commentsView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: min(scrollPoint.y - 30, CGPoint(x: .zero, y: scrollView.contentSize.height - (bounds.height - safeAreaInsets.bottom - safeAreaInsets.top)).y), completionBlocks: [])
@@ -1951,6 +2132,15 @@ extension PollCreationView {
         UIView.animate(withDuration: 0.2) {
             self.scrollContentView.setNeedsLayout()
             constraint.constant = height
+            self.scrollContentView.layoutIfNeeded()
+        }
+    }
+    
+    func onImagesHeightChange(_ height: CGFloat) {
+        guard let constraint = self.pollImagesContainerView.getAllConstraints().filter({ $0.identifier == "height" }).first else { return }
+        UIView.animate(withDuration: 0.2) {
+            self.scrollContentView.setNeedsLayout()
+            constraint.constant = self.imageItems.isEmpty ? 1 : height == 0 ? 1 : height
             self.scrollContentView.layoutIfNeeded()
         }
     }
@@ -1996,6 +2186,9 @@ extension PollCreationView: BannerObservable {
             banner.removeFromSuperview()
         } else if let popup = sender as? Popup {
             popup.removeFromSuperview()
+            if popup.accessibilityIdentifier == "pop" {
+                viewInput?.onContinue()
+            }
         }
     }
 }
@@ -2019,10 +2212,9 @@ extension PollCreationView: CallbackObservable {
                 }
                 guard let index = imageItems.firstIndex(where: {$0.id == imageItem.id}) else { return }
                 imageItems.remove(at: index)
-                imagesContainer?.delete(imageItem)
+                imagesContainer?.reload()
             } else {
                 imageItems.append(imageItem)
-//                imagesContainer.append(imageItem)
                 imagesContainer?.reload()
             }
         } else if let choiceItem = sender as? ChoiceItem {
@@ -2144,6 +2336,10 @@ extension PollCreationView: UITextViewDelegate {
     }
     
     func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
+        if viewInput?.willMoveToParent ?? false {
+            return true
+        }
+        
         var minCharacters = 0
         if textView === pollTitleTextView {
             minCharacters = ModelProperties.shared.surveyTitleMinLength
@@ -2226,7 +2422,7 @@ extension PollCreationView: UITextViewDelegate {
 //            self.pollDescriptionBg.layer.add(anim, forKey: nil)
 //            self.pollDescriptionBg.layer.shadowPath = destinationPath
             UIView.transition(with: pollDescriptionSkip, duration: 0.2, options: .transitionCrossDissolve, animations: {
-                self.pollDescriptionSkip.image = UIImage(systemName: "info")
+                self.pollDescriptionSkip.image = UIImage(systemName: "checkmark")
             }, completion: {_ in self.viewInput?.onStageCompleted()})
         } else if textView == pollQuestionTextView, viewInput?.stage == .Question {
 //                  let supplementaryConstraint = pollQuestionTemp.getAllConstraints().filter({ $0.identifier == "supp_height" }).first,
@@ -2328,6 +2524,10 @@ extension PollCreationView: UITextFieldDelegate {
     }
     
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if viewInput?.willMoveToParent ?? false {
+            return true
+        }
+        
         if textField === pollURLTextField, let text = textField.text {
             if !text.isEmpty {
                 guard !text.isValidURL, isTextFieldEditingEnabled else {
@@ -2371,15 +2571,15 @@ extension PollCreationView: UITextFieldDelegate {
 // MARK: - ImageSelectionListener
 extension PollCreationView: ImageSelectionListener {
     func addImage() {
-        guard imageItems.count < 3 else {
-            showBanner(bannerDelegate: self,
-                       text: AppError.maximumImages.localizedDescription,
-                       imageContent: ImageSigns.exclamationMark,
-                       shouldDismissAfter: 0.5)
-            return
-        }
-        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-        banner.present(subview: ImageSelectionPopup(controller: viewInput as? UIViewController, callbackDelegate: banner))
+//        guard imageItems.count < 3 else {
+//            showBanner(bannerDelegate: self,
+//                       text: AppError.maximumImages.localizedDescription,
+//                       imageContent: ImageSigns.exclamationMark,
+//                       shouldDismissAfter: 0.5)
+//            return
+//        }
+//        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+//        banner.present(subview: ImageSelectionPopup(controller: viewInput as? UIViewController, callbackDelegate: banner))
     }
     
     func deleteImage(_ imageItem: ImageItem) {
@@ -2387,8 +2587,8 @@ extension PollCreationView: ImageSelectionListener {
     }
     
     func editImage(_ item: ImageItem) {
-        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-        banner.present(subview: ImageSelectionPopup(controller: viewInput as? UIViewController, callbackDelegate: banner, item: item))
+        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.65)
+        banner.present(subview: ImageSelectionPopup(callbackDelegate: banner, item: item))
     }
 }
 
@@ -2425,14 +2625,14 @@ extension PollCreationView: UIScrollViewDelegate {
 
 // MARK: - Logic
 extension PollCreationView {
-    private func createTemporaryPoll() -> [String: Any] {
+    private func prepareDict() -> [String: Any] {
         
         var dict: [String: Any] = [:]
         dict["category"] = topic.id
         dict["type"] = Survey.SurveyType.Poll.rawValue
         dict["is_private"] = option == .Private
         dict["is_anonymous"] = option == .Anon
-        dict["isCommentingAllowed"] = comments == .On
+        dict["is_commenting_allowed"] = comments == .On
         dict["post_hot"] = hot == .On
         dict["vote_capacity"] = limits
         dict["hlink"] = URL(string: pollURLTextField.text ?? "")?.absoluteString
@@ -2440,6 +2640,9 @@ extension PollCreationView {
         dict["question"] = pollQuestionTextView.text ?? ""
         dict["description"] = pollDescriptionTextView.text ?? ""
         dict["answers"] = choiceItems.map() { ["description": $0.text] }
+        if !imageItems.isEmpty {
+            dict["media"] = imageItems.map() { ["title": $0.title, "image": $0.image] }
+        }
         
         return dict
         
@@ -2465,3 +2668,63 @@ extension PollCreationView {
 //                      isFavorite: false)
     }
 }
+
+extension PollCreationView: UIImagePickerControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        //        if let origImage = info[.cropRect] as? UIImage {
+        if let origImage = info[.originalImage] as? UIImage {
+            let resizedImage = origImage.resized(to: CGSize(width: 400, height: 400))
+            guard let imageData = resizedImage.jpegData(compressionQuality: 0.4),
+                  let image = UIImage(data: imageData) else { fatalError("") }
+            viewInput?.dismiss(animated: true)
+            
+            let item = ImageItem(title: "", image: image)
+            imageItems.append(item)
+            imagesContainer?.reload()
+            delayAsync(delay: 0.1) { [weak self] in
+                guard let self = self else { return }
+                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.65)
+                banner.present(subview: ImageSelectionPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1))
+            }
+            
+        }
+    }
+    
+    func onAddImageTap() {
+            imagePicker.allowsEditing = true
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertController.Style.actionSheet)
+        let photo = UIAlertAction(title: "photo_album".localized, style: UIAlertAction.Style.default, handler: {
+            (action: UIAlertAction) in
+            self.imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
+            self.viewInput?.present(self.imagePicker, animated: true, completion: nil)
+        })
+        photo.setValue(UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return UIColor.systemBlue
+            default:
+                return UIColor.label
+            }
+        }, forKey: "titleTextColor")
+        alert.addAction(photo)
+        let camera = UIAlertAction(title: "camera".localized, style: UIAlertAction.Style.default, handler: {
+            (action: UIAlertAction) in
+            self.imagePicker.sourceType = UIImagePickerController.SourceType.camera
+            self.viewInput?.present(self.imagePicker, animated: true, completion: nil)
+        })
+        camera.setValue(UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return UIColor.systemBlue
+                default:
+                    return UIColor.label
+                }
+            }, forKey: "titleTextColor")
+            alert.addAction(camera)
+        let cancel = UIAlertAction(title: "cancel".localized, style: UIAlertAction.Style.destructive, handler: nil)
+            alert.addAction(cancel)
+        self.viewInput?.present(alert, animated: true, completion: nil)
+    }
+
+}
+

@@ -17,10 +17,12 @@ protocol PollCreationViewInput: AnyObject {
     var controllerInput: PollCreationControllerInput? { get set }
     var stage: PollCreationController.Stage { get }
     var balance: Int { get }
+    var willMoveToParent: Bool { get }
     
     func onStageCompleted()
     func onURLTapped(_: URL?)
     func post(_: [String: Any])
+    func onContinue()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -39,17 +41,22 @@ protocol PollCreationControllerInput: AnyObject {
 /// **Controller** conforms to this protocol
 protocol PollCreationModelOutput: AnyObject {
     // Model output methods here
+    func onSuccess()
+    func onError(_: Error)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
 protocol PollCreationControllerOutput: AnyObject {
-    var viewInput: PollCreationViewInput? { get set }
+    var viewInput: (PollCreationViewInput & UIViewController)? { get set }
     var costItems: [CostItem] { get set }
     var balance: Int { get }
+    var completed: Bool { get set }
     
     func onNextStage(_: PollCreationController.Stage)
     func onDeinit()
     func post()
+    func onSuccess()
+    func onError(_: Error)
 }

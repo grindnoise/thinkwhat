@@ -36,9 +36,10 @@ class TopicSelectionHeaderModernContent: UIView {
         ])
     }
 
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        contentView.backgroundColor = .tertiarySystemBackground
-//    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        backgroundColor = .tertiarySystemBackground
+        (icon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : currentConfiguration.topicItem.topic.tagColor.cgColor
+    }
 
     private var currentConfiguration: TopicSelectionModernHeaderConfiguration!
     var configuration: UIContentConfiguration {
@@ -76,8 +77,7 @@ extension TopicSelectionHeaderModernContent: UIContentView {
     func apply(configuration: TopicSelectionModernHeaderConfiguration) {
         guard currentConfiguration != configuration else { return }
         currentConfiguration = configuration
-
-        icon.iconColor = currentConfiguration.topicItem.topic.tagColor
+        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.topicItem.topic.tagColor
         icon.category = Icon.Category(rawValue: currentConfiguration.topicItem.topic.id) ?? .Null
         titleLabel.text = currentConfiguration.topicItem.title.uppercased()
         height.constant = 60

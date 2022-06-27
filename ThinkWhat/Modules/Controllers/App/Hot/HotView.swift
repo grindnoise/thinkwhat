@@ -317,14 +317,16 @@ extension HotView: CallbackObservable {
             } else if string == "next" {
                 NotificationCenter.default.removeObserver(self)
                 Surveys.shared.rejected.append(currentCard.survey)
-                API.shared.rejectSurvey(survey: currentCard.survey) { result in
-                    switch result {
-                    case .success(let json):
-                        Surveys.shared.load(json)
-                    case .failure(let error):
-                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-                    }
-                }
+                viewInput?.onReject(currentCard.survey)
+                
+//                API.shared.rejectSurvey(survey: currentCard.survey) { result in
+//                    switch result {
+//                    case .success(let json):
+//                        Surveys.shared.load(json)
+//                    case .failure(let error):
+//                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+//                    }
+//                }
                 previousCard = currentCard
                 if nextCard.isNil, !surveyStack.isEmpty, let card = getCard() {
                     nextCard = card

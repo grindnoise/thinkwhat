@@ -73,8 +73,9 @@ class CommentsSelection: UIView {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         confirm.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//        onIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .white : .label)
-//        offIcon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .white : .label)
+        guard let selectedIcon = option == .On ? onIcon : offIcon,
+              let icon = selectedIcon.icon as? CAShapeLayer else { return }
+        icon.fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
     }
     
     @objc
@@ -91,7 +92,7 @@ class CommentsSelection: UIView {
                 
                 let enableAnim  = Animations.get(property: .FillColor,
                                                  fromValue: selectedIcon.iconColor.cgColor,
-                                                 toValue: traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : UIColor.label.cgColor,
+                                                 toValue: traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
                                                  duration: 0.3,
                                                  timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                                  delegate: nil,
@@ -105,7 +106,7 @@ class CommentsSelection: UIView {
                                                  isRemovedOnCompletion: true)
                 
                 selectedIcon.icon.add(enableAnim, forKey: nil)
-                (selectedIcon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : UIColor.label.cgColor
+                (selectedIcon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
                 deselectedIcon.icon.add(disableAnim, forKey: nil)
                 (deselectedIcon.icon as! CAShapeLayer).fillColor = UIColor.systemGray.cgColor
                 
@@ -146,7 +147,7 @@ class CommentsSelection: UIView {
     }
     @IBOutlet weak var onIcon: Icon! {
         didSet {
-            onIcon.iconColor = isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : UIColor.label) : .systemGray
+            onIcon.iconColor = isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED) : .systemGray
             onIcon.category = .Comments
             onIcon.isRounded = false
             onIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
@@ -156,7 +157,7 @@ class CommentsSelection: UIView {
     @IBOutlet weak var onTitle: ArcLabel!
     @IBOutlet weak var offIcon: Icon! {
         didSet {
-            offIcon.iconColor = !isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : UIColor.label) : .systemGray
+            offIcon.iconColor = !isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED) : .systemGray
             offIcon.category = .CommentsDisabled
             offIcon.isRounded = false
             offIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))

@@ -285,6 +285,7 @@
 		AB798C272248DCF30042BC7C /* MailRegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */; };
 		AB7AEFB7273BDB1400431E85 /* delUsersCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7AEFB5273BDB1400431E85 /* delUsersCell.swift */; };
 		AB7AEFB8273BDB1400431E85 /* delUserCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7AEFB6273BDB1400431E85 /* delUserCell.xib */; };
+		AB7C6FB42865AE3000000429 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7C6FB32865AE3000000429 /* Error.swift */; };
 		AB7F4B8A25B5D7230017573D /* 5_ImagesSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */; };
 		AB8238F927A914100061F7C6 /* URLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8238F827A914100061F7C6 /* URLs.swift */; };
 		AB82C368259C826100888C74 /* TrashIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB82C367259C826100888C74 /* TrashIcon.swift */; };
@@ -817,6 +818,7 @@
 		AB798C262248DCF30042BC7C /* MailRegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailRegistrationViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB7AEFB5273BDB1400431E85 /* delUsersCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delUsersCell.swift; sourceTree = "<group>"; };
 		AB7AEFB6273BDB1400431E85 /* delUserCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = delUserCell.xib; sourceTree = "<group>"; };
+		AB7C6FB32865AE3000000429 /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 5_ImagesSelectionViewController.swift; sourceTree = "<group>"; };
 		AB8238F827A914100061F7C6 /* URLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLs.swift; sourceTree = "<group>"; };
 		AB82C367259C826100888C74 /* TrashIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashIcon.swift; sourceTree = "<group>"; };
@@ -1182,6 +1184,7 @@
 				ABF2758E28151EE50023CD1F /* UINavigationController.swift */,
 				AB38DD6C2819420000FFEB3F /* Notification.swift */,
 				ABF3DF16283BA4A200309AA9 /* Int.swift */,
+				AB7C6FB32865AE3000000429 /* Error.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3552,6 +3555,7 @@
 				AB9CADC125F755CE002AFD19 /* CircleButton.swift in Sources */,
 				ABF3DF1F283BC2DA00309AA9 /* HotCard.swift in Sources */,
 				ABB4AAAA2666335600D4738D /* NewSurveyTitle.swift in Sources */,
+				AB7C6FB42865AE3000000429 /* Error.swift in Sources */,
 				ABF20FBA24CAE8610092B223 /* UserSubscriptionCell.swift in Sources */,
 				ABF27587280EDC810023CD1F /* VoterCell.swift in Sources */,
 				AB98308327B935DA002C5132 /* RecoverAccontViewController.swift in Sources */,

@@ -15,17 +15,6 @@ class AddChoiceCollectionView: UICollectionView {
         case main
     }
     
-    //    override var contentSize: CGSize {
-    //        didSet {
-    //            guard oldValue.height != contentSize.height else { return }
-    //            listener.test(contentSize.height)
-    //        }
-    //    }
-    //    override var frame: CGRect {
-    //        didSet {
-    //            print(frame.height)
-    //        }
-    //    }
     var dataItems: [ChoiceItem] {
         guard !listener.isNil else { return [] }
         return listener!.choiceItems
@@ -33,11 +22,6 @@ class AddChoiceCollectionView: UICollectionView {
     weak var callbackDelegate: CallbackObservable?
     weak var listener: ChoiceListener?
     @objc dynamic var color: UIColor = .label
-//        didSet {
-////            guard !oldValue.isNil else { return }
-////            reload()
-//        }
-//    }
     var source: UICollectionViewDiffableDataSource<Section, ChoiceItem>!
     private var observers: [NSKeyValueObservation] = []
     private let colorKeyPath = \AddChoiceCollectionView.color
@@ -49,28 +33,31 @@ class AddChoiceCollectionView: UICollectionView {
         self.callbackDelegate = callbackDelegate
         self.color = color
         commonInit()
-        //        setObservers()
     }
     
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
         commonInit()
-        //        setObservers()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+    }
+    
     private func handleSwipe(for action: UIContextualAction, item: ChoiceItem) {
         listener?.deleteChoice(item)
     }
     
+    
     private func commonInit() {
         isScrollEnabled = false
         bounces = false
-        register(AddChoiceCell.self, forCellWithReuseIdentifier: String(describing: AddChoiceCell.self))
-        // Create list layout
+//        register(AddChoiceCell.self, forCellWithReuseIdentifier: String(describing: AddChoiceCell.self))
+        
         var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
         layoutConfig.backgroundColor = .clear
         layoutConfig.showsSeparators = false
@@ -87,12 +74,9 @@ class AddChoiceCollectionView: UICollectionView {
                 if let indent = self.source.itemIdentifier(for: indexPath) {
                     snap.deleteItems([indent])
                     self.listener?.deleteChoice(indent)
-//                    snap.reloadItems(snap.itemIdentifiers)
                 }
-//                snap.reloadItems(snap.itemIdentifiers)
                 self.source.apply(snap, animatingDifferences: true, completion: {
                     self.listener?.onChoicesHeightChange(self.contentSize.height)
-//                    snap.reloadItems(snap.itemIdentifiers)
                     self.reload()
                 })
                 completion(true)
@@ -163,32 +147,8 @@ class AddChoiceCollectionView: UICollectionView {
         section.interGroupSpacing = 8
         section.contentInsets = .init(top: padding, leading: padding, bottom: padding, trailing: padding)
         
-//        UICollectionViewCompositionalLayout.list(using: <#T##UICollectionLayoutListConfiguration#>)
         let layout = UICollectionViewCompositionalLayout(section: section)
         return layout
-
-        //            self.layoutConfig.trailingSwipeActionsConfigurationProvider = { [weak self] (indexPath) in
-        //                guard let self = self else { return UISwipeActionsConfiguration(actions: []) }
-        //                guard let item = self.source.itemIdentifier(for: indexPath) else {
-        //                    return nil
-        //                }
-        //
-        //                let action = UIContextualAction(style: .destructive, title: "delete".localized) { [weak self] (action, view, completion) in
-        //                    guard let self = self else { return }
-        //                    self.handleSwipe(for: action, item: item)
-        //                    var snap = self.source.snapshot()
-        //                    if let indent = self.source.itemIdentifier(for: indexPath) {
-        //                        snap.deleteItems([indent])
-        //                        snap.reloadSections([.main])
-        //                    }
-        //                    self.source.apply(snap)
-        //                    completion(true)
-        //                }
-        //                action.backgroundColor = .systemRed
-        //                action.image = UIImage(systemName: "trash.fill")?.withTintColor(.white)
-        //
-        //                return UISwipeActionsConfiguration(actions: [action])
-        //            }
     }
 }
 
@@ -209,15 +169,6 @@ extension AddChoiceCollectionView: UICollectionViewDelegate {
         
         return false // The selecting or deselecting is already performed above
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        guard let cell = cellForItem(at: indexPath) as? AddChoiceCell else { return }
-//    }
-    
-//    func cellForItem(at indexPath: IndexPath) -> UICollectionViewCell? {
-//        guard let cell = dequeueReusableCell(withReuseIdentifier: AddChoiceCell.self, for: indexPath) as? AddChoiceCell else { return UICollectionViewCell() }
-//        cell.index = indexPath.row + 1
-//    }
 }
 
 extension UICollectionViewDiffableDataSource {

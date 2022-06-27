@@ -28,6 +28,9 @@
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mhS-9D-Sdf">
                     <rect key="frame" x="0.0" y="0.0" width="400" height="90"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="90" id="cln-dR-5wP"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -36,19 +39,19 @@
                     <rect key="frame" x="0.0" y="510" width="400" height="90"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" baselineRelativeArrangement="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s9h-C9-3fD">
-                            <rect key="frame" x="64" y="2.5" width="272.5" height="85.5"/>
+                            <rect key="frame" x="91" y="11.5" width="218.5" height="67.5"/>
                             <subviews>
-                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="xmark.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="o0q-gd-xWH">
-                                    <rect key="frame" x="0.0" y="0.5" width="85.5" height="84.5"/>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.uturn.left.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="o0q-gd-xWH">
+                                    <rect key="frame" x="0.0" y="0.5" width="67.5" height="66.5"/>
                                 </imageView>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Vrj-95-aNb">
-                                    <rect key="frame" x="93.5" y="0.5" width="85.5" height="84.5"/>
+                                    <rect key="frame" x="75.5" y="0.5" width="67.5" height="66.5"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="Vrj-95-aNb" secondAttribute="height" multiplier="1:1" id="w2U-fP-JPg"/>
                                     </constraints>
                                 </imageView>
-                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="trash.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="OaZ-Uf-zXo">
-                                    <rect key="frame" x="187" y="0.5" width="85.5" height="84.5"/>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="trash.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="OaZ-Uf-zXo">
+                                    <rect key="frame" x="151" y="0.5" width="67.5" height="66.5"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="OaZ-Uf-zXo" secondAttribute="height" multiplier="1:1" id="hJJ-Zg-Gga"/>
                                     </constraints>
@@ -64,7 +67,7 @@
                     <constraints>
                         <constraint firstItem="s9h-C9-3fD" firstAttribute="centerY" secondItem="jSu-pp-AGX" secondAttribute="centerY" id="NiL-JS-kxQ"/>
                         <constraint firstItem="s9h-C9-3fD" firstAttribute="centerX" secondItem="jSu-pp-AGX" secondAttribute="centerX" id="jMl-OM-1yQ"/>
-                        <constraint firstItem="s9h-C9-3fD" firstAttribute="height" secondItem="jSu-pp-AGX" secondAttribute="height" multiplier="0.95" id="vmY-P1-gXo"/>
+                        <constraint firstItem="s9h-C9-3fD" firstAttribute="height" secondItem="jSu-pp-AGX" secondAttribute="height" multiplier="0.75" id="vmY-P1-gXo"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Z9o-Q4-I9a">
@@ -92,7 +95,6 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="jSu-pp-AGX" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="3uJ-xJ-wll"/>
-                <constraint firstItem="mhS-9D-Sdf" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.15" id="5wm-BV-sIk"/>
                 <constraint firstItem="Z9o-Q4-I9a" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Igv-NY-6mO"/>
                 <constraint firstItem="jSu-pp-AGX" firstAttribute="height" secondItem="mhS-9D-Sdf" secondAttribute="height" id="Mx1-wS-b7o"/>
                 <constraint firstItem="mhS-9D-Sdf" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="dCR-IB-Z4R"/>
@@ -109,9 +111,9 @@
         </view>
     </objects>
     <resources>
+        <image name="arrow.uturn.left.circle.fill" catalog="system" width="128" height="121"/>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="trash.circle" catalog="system" width="128" height="121"/>
-        <image name="xmark.circle" catalog="system" width="128" height="121"/>
+        <image name="trash.circle.fill" catalog="system" width="128" height="121"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

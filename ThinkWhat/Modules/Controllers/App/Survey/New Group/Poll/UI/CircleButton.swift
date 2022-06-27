@@ -47,7 +47,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     var color: UIColor = K_COLOR_RED {
         didSet {
             icon.backgroundColor = color
-            oval.strokeColor = color.withAlphaComponent(0.3).cgColor
+            oval.strokeColor = color.cgColor
         }
     }
     
@@ -158,6 +158,8 @@ class CircleButton: UIView, CAAnimationDelegate {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         resetLayerProperties(forLayerIdentifiers: ["oval"])
         contentView.backgroundColor = .systemBackground
+        oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor
+//        icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : color
     }
     
     func resetLayerProperties(forLayerIdentifiers layerIds: [String]!){
@@ -192,7 +194,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     func addEnableAnimation(completionBlock: ((_ finished: Bool) -> Void)? = nil){
         if completionBlock != nil{
             let completionAnim = CABasicAnimation(keyPath:"completionAnim")
-            completionAnim.duration = 0.4
+            completionAnim.duration = 0.35
             completionAnim.delegate = self
             completionAnim.setValue("enable", forKey:"animId")
             completionAnim.setValue(false, forKey:"needEndAnim")
@@ -304,9 +306,9 @@ class CircleButton: UIView, CAAnimationDelegate {
             self.icon.backgroundColor = self.color
         })
         UIView.animate(
-            withDuration: 0.5,
+            withDuration: 0.45,
             delay: 0.1,
-            usingSpringWithDamping: 0.7,
+            usingSpringWithDamping: 0.6,
             initialSpringVelocity: 0.6,
             options: [.curveEaseOut],
             animations: {

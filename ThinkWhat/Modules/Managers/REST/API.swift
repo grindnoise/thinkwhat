@@ -1153,6 +1153,41 @@ class API {
             return parent.headers()
         }
         
+        public func reject(survey: Survey) async throws {
+            guard let url = API_URLS.Surveys.reject else { throw APIError.invalidURL }
+            var parameters: Parameters = ["survey": survey.id]
+            if Surveys.shared.hot.count <= MIN_STACK_SIZE {
+                let stackList = Surveys.shared.hot.map { $0.id }
+                let rejectedList = Surveys.shared.rejected.map { $0.id }
+                let list = Array(Set(stackList + rejectedList))//Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
+                if !list.isEmpty {
+                    let dict = list.asParameters(arrayParametersKey: "ids")
+                    parameters.merge(dict) {(current, _) in current}
+                }
+            }
+            do {
+                ///JSON with hot surveys returned
+                let data = try await parent.requestAsync(url: url,
+                                                         httpMethod: .post,
+                                                         parameters: parameters,
+                                                         encoding: JSONEncoding.default,
+                                                         headers: headers,
+                                                         accessControl: true)
+                do {
+                    let json = try JSON(data: data, options: .mutableContainers)
+                    await MainActor.run {
+                        Surveys.shared.load(json)
+                    }
+                } catch {}
+                
+            } catch {
+#if DEBUG
+                print(error.localizedDescription)
+#endif
+                throw error
+            }
+        }
+        
         public func claim(survey: Survey, reason: Claim) async throws -> JSON {
             guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_CLAIM) else { throw APIError.notFound }
             let parameters: Parameters = ["survey": survey.id, "claim": reason.id]
@@ -1266,8 +1301,7 @@ class API {
         }
         
         func markFavoriteAsync(mark: Bool, surveyReference: SurveyReference) async throws -> Data {
-            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(mark ? API_URLS.SURVEYS_ADD_FAVORITE : API_URLS.SURVEYS_REMOVE_FAVORITE) else { throw APIError.invalidURL }
-            
+            guard let url = mark ? API_URLS.Surveys.addFavorite : API_URLS.Surveys.removeFavorite else { throw APIError.invalidURL }
             
             let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default, headers: parent.headers())
             await MainActor.run {
@@ -1308,18 +1342,118 @@ class API {
         }
         
         func post(_ dict: Parameters) async throws {
-            guard let url = API_URLS.Surveys.root else { throw APIError.invalidURL }
+            func uploadFiles() {
+//                media.enumerated().forEach { index, dict in
+//                    guard let image = dict["image"] as? UIImage,
+//                          let title = dict["title"] as? String,
+//                          let imgData = image.jpegData(compressionQuality: 1) ?? image.pngData() else { return }
+//                    let multipartFormData = MultipartFormData()
+//
+//
+//                }
+//
+//                guard imageData != nil, fileFormat != .Unknown else { throw APIError.badData }
+//                multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(fileFormat)", mimeType: "jpg/png")
+//                for (key, value) in dict {
+//                    if value is String || value is Int {
+//                        multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
+//                    }
+//                }
+//                do {
+//                    return try await parent.uploadMultipartFormDataAsync(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) })
+//                } catch {
+//                    throw error
+//                }
+//
+////                for mediafile in media {
+////                    let multipartFormData = MultipartFormData()
+////                    var imgExt: FileFormat = .Unknown
+////                    var imageData: Data?
+////                    if let data = mediafile.image!.jpegData(compressionQuality: 1) {
+////                        imageData = data
+////
+////                    } else if let data = mediafile.image!.pngData() {
+////                        imageData = data
+////                        imgExt = .PNG
+////                    }
+//                    multipartFormData.append(imageData!, withName: "image", fileName: "\(UserDefaults.Profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
+//                    multipartFormData.append("\(survey.id)".data(using: .utf8)!, withName: "survey")
+//                    multipartFormData.append("\(mediafile.order)".data(using: .utf8)!, withName: "order")
+//                    multipartFormData.append("\(mediafile.title)".data(using: .utf8)!, withName: "title")
+//                    self.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) }) { completion($0) }
+//                }
+            }
+                
+            guard let url = API_URLS.Surveys.root, let mediaUrl = API_URLS.Surveys.media else { throw APIError.invalidURL }
             var parameters = dict
+            var media: [[String : Any]] = []
+            if parameters.keys.contains("media"), let _media = parameters.removeValue(forKey: "media") as? [[String : Any]] {
+                media = _media
+            }
             do {
-                try await parent.requestAsync(url: url,
+                let data = try await parent.requestAsync(url: url,
                              httpMethod: .post,
                              parameters: parameters,
                              encoding: JSONEncoding.default,
                              headers: headers,
                              accessControl: true)
+                let json = try JSON(data: data, options: .mutableContainers)
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+
+                var instance: Survey!
+                do {
+                    instance = try decoder.decode(Survey.self, from: json["survey"].rawData())
+                } catch {
+                    guard let errorText = json["error"].string else {
+                        throw APIError.badData
+                    }
+#if DEBUG
+                    print(errorText)
+                    errorText.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                    throw error
+                }
+                
+//                guard let instance = try decoder.decode(Survey.self, from: json["survey"].rawData()) as? Survey else {
+//                    guard let error = json["error"].string else {
+//                        throw APIError.badData
+//                    }
+//#if DEBUG
+//                    error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//                    throw error
+//                }
+               
+                
+                media.enumerated().forEach { index, dict in
+                    guard let image = dict["image"] as? UIImage,
+                          let title = dict["title"] as? String,
+                          let jpegData = image.jpegData(compressionQuality: 1) else { return }//?? image.pngData() else { return }
+                    let multipartFormData = MultipartFormData()
+                    multipartFormData.append(jpegData, withName: "image", fileName: "\(UUID().uuidString).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
+                    multipartFormData.append("\(instance.id)".data(using: .utf8)!, withName: "survey")
+                    multipartFormData.append("\(index)".data(using: .utf8)!, withName: "order")
+                    multipartFormData.append("\(title)".data(using: .utf8)!, withName: "title")
+                    Task {
+                        do {
+                        let data = try await parent.uploadMultipartFormDataAsync(url: mediaUrl, method: .post, multipartDataForm: multipartFormData, uploadProgress: {_ in})
+                        let _json = try JSON(data: data, options: .mutableContainers)
+                            print(_json)
+                        } catch {
+#if DEBUG
+                            error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                        }
+                    }
+
+                }
+                
             } catch {
 #if DEBUG
-                print(error)
+                error.printLocalized(class: type(of: self), functionName: #function)
 #endif
                 throw error
             }

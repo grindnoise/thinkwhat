@@ -17,6 +17,7 @@ protocol HotViewInput: class {
     var controllerInput: HotControllerInput? { get set }
     // View input methods here
 //    var surveyStack: [Survey] { get set }
+    func onReject(_: Survey)
     func onEmptyStack()
     func onVote(survey: Survey)
     func onClaim(survey: Survey, reason: Claim)
@@ -30,6 +31,7 @@ protocol HotControllerInput: class {
     var modelOutput: HotModelOutput? { get set }
     func loadSurveys()
     func claim(survey: Survey, reason: Claim)
+    func reject(_: Survey)
 }
 
 /// *Model* returns the result to the *Controller*

@@ -35,7 +35,7 @@ class CostCollectionView: UICollectionView {
     }
     
     private func setup() {
-        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+//        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         
         let layoutConfig: UICollectionLayoutListConfiguration = {
             var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
@@ -130,6 +130,12 @@ class CostCell: UICollectionViewListCell {
     var item: CostItem!
     var callback: Closure?
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        var config = UIBackgroundConfiguration.listGroupedHeaderFooter()
+        config.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        backgroundConfiguration = config
+    }
+    
     override func updateConfiguration(using state: UICellConfigurationState) {
         automaticallyUpdatesBackgroundConfiguration = false
         var newConfiguration = CostCellConfiguration().updated(for: state)
@@ -216,12 +222,14 @@ class CostContentView: UIView, UIContentView {
         let c = stackView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
         c.priority = .defaultLow
         c.isActive = true
+        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        backgroundColor = .tertiarySystemBackground
+        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         setText()
     }
+    
     
     // MARK: - Private methods
     private func setObservers() {
@@ -239,7 +247,7 @@ class CostContentView: UIView, UIContentView {
         itemLabel.attributedText = titleString
         
         let costString = NSMutableAttributedString()
-        costString.append(NSAttributedString(string: "-\(currentConfiguration.item.cost)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .label : .systemRed, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        costString.append(NSAttributedString(string: "-\(currentConfiguration.item.cost)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .systemRed, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         costLabel.attributedText = costString
         
     }
@@ -326,7 +334,7 @@ class CostHeaderFooter: UICollectionReusableView {
         itemLabel.attributedText = titleString
         
         let balanceString = NSMutableAttributedString()
-        balanceString.append(NSAttributedString(string: String(describing: intValue), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .label : (mode == .Header ? .systemGreen : isNegative ? .systemRed : .systemGreen), backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        balanceString.append(NSAttributedString(string: String(describing: intValue), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: mode == .Header ? .systemGreen : isNegative ? .systemRed : .systemGreen, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         balanceLabel.attributedText = balanceString
         
     }
