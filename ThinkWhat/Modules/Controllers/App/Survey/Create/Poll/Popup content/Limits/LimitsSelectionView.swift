@@ -73,6 +73,7 @@ class LimitsSelectionView: UIView {
         confirm.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         textField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         textField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+        info.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemYellow : K_COLOR_TABBAR
     }
     
     @objc
@@ -81,6 +82,8 @@ class LimitsSelectionView: UIView {
             guard let v = recognizer.view else { return }
             if v == confirm {
                 callbackDelegate?.callbackReceived(Int(textField.text!) as Any)
+            } else if v == info {
+                showTip(delegate: self, identifier: "limits_tip", force: true)
             }
         }
     }
@@ -122,6 +125,13 @@ class LimitsSelectionView: UIView {
         }
     }
     @IBOutlet weak var descriptionLabel: UILabel!
+    @IBOutlet weak var info: UIImageView! {
+        didSet {
+            info.isUserInteractionEnabled = true
+            info.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemYellow : K_COLOR_TABBAR
+            info.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer: ))))
+        }
+    }
     
     // MARK: - Properties
     private var value = 0

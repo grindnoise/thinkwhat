@@ -59,4 +59,6 @@ protocol PollCreationControllerOutput: AnyObject {
     func post()
     func onSuccess()
     func onError(_: Error)
+    func onURLCopiedToPasteBoard(_: URL)
+    func onImageCopiedToPasteBoard(_: UIImage)
 }

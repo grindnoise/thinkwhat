@@ -19,7 +19,7 @@ struct ChoiceItem: Hashable {
     let id: UUID = UUID()
 }
 
-protocol ChoiceProvider: class {
+protocol ChoiceProvider: AnyObject {
     var dataItems: [ChoiceItem] { get }
     var callbackDelegate: CallbackObservable? { get set }
     var listener: ChoiceListener? { get }
@@ -29,7 +29,7 @@ protocol ChoiceProvider: class {
     func append(_: ChoiceItem)
 }
 
-protocol ChoiceListener: class {
+protocol ChoiceListener: AnyObject {
     var choiceItems: [ChoiceItem] { get set }
     
     func onChoicesHeightChange(_: CGFloat)

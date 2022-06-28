@@ -46,6 +46,10 @@
 		AB1D844E24EA7FD500B75929 /* NavigationButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1D844D24EA7FD500B75929 /* NavigationButtons.swift */; };
 		AB1D845024EA90C200B75929 /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1D844F24EA90C200B75929 /* Icon.swift */; };
 		AB1D845224EA91D200B75929 /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1D845124EA91D200B75929 /* Topic.swift */; };
+		AB1F34CE286B1D080086969E /* URLPasteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1F34CD286B1D080086969E /* URLPasteView.swift */; };
+		AB1F34D0286B1DC60086969E /* URLPasteView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB1F34CF286B1DC60086969E /* URLPasteView.xib */; };
+		AB1F34D3286B25C50086969E /* ImagePasteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1F34D2286B25C50086969E /* ImagePasteView.swift */; };
+		AB1F34D5286B273B0086969E /* ImagePasteView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB1F34D4286B273B0086969E /* ImagePasteView.xib */; };
 		AB1F75832594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1F75822594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift */; };
 		AB21795B27577ED300D19567 /* InterestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB21795A27577ED300D19567 /* InterestCell.swift */; };
 		AB217963275797F700D19567 /* InterestCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB217961275797F700D19567 /* InterestCollectionCell.swift */; };
@@ -571,6 +575,10 @@
 		AB1D844D24EA7FD500B75929 /* NavigationButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButtons.swift; sourceTree = "<group>"; };
 		AB1D844F24EA90C200B75929 /* Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icon.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB1D845124EA91D200B75929 /* Topic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Topic.swift; sourceTree = "<group>"; };
+		AB1F34CD286B1D080086969E /* URLPasteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLPasteView.swift; sourceTree = "<group>"; };
+		AB1F34CF286B1DC60086969E /* URLPasteView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = URLPasteView.xib; sourceTree = "<group>"; };
+		AB1F34D2286B25C50086969E /* ImagePasteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePasteView.swift; sourceTree = "<group>"; };
+		AB1F34D4286B273B0086969E /* ImagePasteView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImagePasteView.xib; sourceTree = "<group>"; };
 		AB1F75822594DC7F002DCA9D /* 4_HyperlinkSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 4_HyperlinkSelectionViewController.swift; sourceTree = "<group>"; };
 		AB21795A27577ED300D19567 /* InterestCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestCell.swift; sourceTree = "<group>"; };
 		AB217961275797F700D19567 /* InterestCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestCollectionCell.swift; sourceTree = "<group>"; };
@@ -1235,6 +1243,24 @@
 				AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */,
 			);
 			path = Cells;
+			sourceTree = "<group>";
+		};
+		AB1F34CC286B1CE80086969E /* URL paste */ = {
+			isa = PBXGroup;
+			children = (
+				AB1F34CD286B1D080086969E /* URLPasteView.swift */,
+				AB1F34CF286B1DC60086969E /* URLPasteView.xib */,
+			);
+			path = "URL paste";
+			sourceTree = "<group>";
+		};
+		AB1F34D1286B25A30086969E /* Image paste */ = {
+			isa = PBXGroup;
+			children = (
+				AB1F34D2286B25C50086969E /* ImagePasteView.swift */,
+				AB1F34D4286B273B0086969E /* ImagePasteView.xib */,
+			);
+			path = "Image paste";
 			sourceTree = "<group>";
 		};
 		AB21795927577E7B00D19567 /* Cells */ = {
@@ -2561,6 +2587,8 @@
 		ABADF5A327F73C7400A26474 /* Content */ = {
 			isa = PBXGroup;
 			children = (
+				AB1F34D1286B25A30086969E /* Image paste */,
+				AB1F34CC286B1CE80086969E /* URL paste */,
 				AB38DD6E2819531900FFEB3F /* Confirm */,
 				ABF2758928102AC60023CD1F /* VotersFilter */,
 				AB9998BF2805989E009D0E4F /* Claim */,
@@ -2994,6 +3022,7 @@
 				AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */,
 				ABADF57527F1D36100A26474 /* TextCell.xib in Resources */,
 				AB3A47DB283F5C1E00106407 /* RankingCreationController.xib in Resources */,
+				AB1F34D5286B273B0086969E /* ImagePasteView.xib in Resources */,
 				AB72961227DA311000D45B54 /* HotView.xib in Resources */,
 				AB98307F27B68B63002C5132 /* LoginView.xib in Resources */,
 				AB3A47E5283F5CF400106407 /* RankingCreationView.xib in Resources */,
@@ -3034,6 +3063,7 @@
 				AB8DA34827A1839000F92C18 /* SignupView.xib in Resources */,
 				AB72962627DB5A6100D45B54 /* ListController.xib in Resources */,
 				AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */,
+				AB1F34D0286B1DC60086969E /* URLPasteView.xib in Resources */,
 				AB72964427DB60C800D45B54 /* SettingsController.xib in Resources */,
 				ABA448F527EE044B00F8E00D /* PollView.xib in Resources */,
 				AB3C684D223FD3EE00B57580 /* OpenSans-ExtraBold.ttf in Resources */,
@@ -3234,6 +3264,7 @@
 				ABA448F927EF235300F8E00D /* AuthorCell.swift in Sources */,
 				AB7F4B8A25B5D7230017573D /* 5_ImagesSelectionViewController.swift in Sources */,
 				ABB4C3F82653C40800C2B1BF /* delBasic.swift in Sources */,
+				AB1F34D3286B25C50086969E /* ImagePasteView.swift in Sources */,
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
 				AB0BFDF7253093B000BD5EFF /* FlameBadge.swift in Sources */,
 				AB72960327DA0DD500D45B54 /* Common.swift in Sources */,
@@ -3337,6 +3368,7 @@
 				AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
 				AB0AB63227B3DF2B006FD33F /* GoogleWorker.swift in Sources */,
+				AB1F34CE286B1D080086969E /* URLPasteView.swift in Sources */,
 				AB72964B27DB612000D45B54 /* SettingsView.swift in Sources */,
 				AB0980DC24CF04A100A02405 /* UserActivityCell.swift in Sources */,
 				AB04144F244EF3A600336857 /* SurveyStackViewController.swift in Sources */,

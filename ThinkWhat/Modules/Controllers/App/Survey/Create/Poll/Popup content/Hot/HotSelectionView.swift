@@ -75,7 +75,8 @@ class HotSelectionView: UIView {
         confirm.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         guard let selectedIcon = option == .On ? onIcon : offIcon,
               let icon = selectedIcon.icon as? CAShapeLayer else { return }
-        icon.fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
+        icon.fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : UIColor.systemRed.cgColor
+        info.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemYellow : K_COLOR_TABBAR
     }
     
     @objc
@@ -92,13 +93,13 @@ class HotSelectionView: UIView {
                 
                 let enableAnim  = Animations.get(property: .FillColor,
                                                  fromValue: selectedIcon.iconColor.cgColor,
-                                                 toValue: traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+                                                 toValue: traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : UIColor.systemRed.cgColor,
                                                  duration: 0.3,
                                                  timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                                  delegate: nil,
                                                  isRemovedOnCompletion: true)
                 let disableAnim = Animations.get(property: .FillColor,
-                                                 fromValue: deselectedIcon.iconColor.cgColor,//K_COLOR_RED.cgColor,
+                                                 fromValue: deselectedIcon.iconColor.cgColor,//UIColor.systemRed.cgColor,
                                                  toValue: UIColor.systemGray.cgColor,
                                                  duration: 0.3,
                                                  timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
@@ -106,7 +107,7 @@ class HotSelectionView: UIView {
                                                  isRemovedOnCompletion: true)
                 
                 selectedIcon.icon.add(enableAnim, forKey: nil)
-                (selectedIcon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
+                (selectedIcon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : UIColor.systemRed.cgColor
                 deselectedIcon.icon.add(disableAnim, forKey: nil)
                 (deselectedIcon.icon as! CAShapeLayer).fillColor = UIColor.systemGray.cgColor
                 
@@ -133,6 +134,8 @@ class HotSelectionView: UIView {
                 //                isFirstSelection = false
             } else if v == confirm {
                 callbackDelegate?.callbackReceived(option as Any)
+            } else if v == info {
+                showTip(delegate: self, identifier: "hot_tip", force: true)
             }
         }
     }
@@ -150,7 +153,7 @@ class HotSelectionView: UIView {
     }
     @IBOutlet weak var onIcon: Icon! {
         didSet {
-            onIcon.iconColor = isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED) : .systemGray
+            onIcon.iconColor = isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : UIColor.systemRed) : .systemGray
             onIcon.category = .Hot
             onIcon.isRounded = false
             onIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
@@ -160,7 +163,7 @@ class HotSelectionView: UIView {
     @IBOutlet weak var onTitle: ArcLabel!
     @IBOutlet weak var offIcon: Icon! {
         didSet {
-            offIcon.iconColor = !isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED) : .systemGray
+            offIcon.iconColor = !isOn ? (traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : UIColor.systemRed) : .systemGray
             offIcon.category = .HotDisabled
             offIcon.isRounded = false
             offIcon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
@@ -169,6 +172,13 @@ class HotSelectionView: UIView {
     }
     @IBOutlet weak var offTitle: ArcLabel!
     @IBOutlet weak var descriptionLabel: UILabel!
+    @IBOutlet weak var info: UIImageView! {
+        didSet {
+            info.isUserInteractionEnabled = true
+            info.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemYellow : K_COLOR_TABBAR
+            info.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer: ))))
+        }
+    }
     
     // MARK: - Properties
     private var isOn: Bool {
@@ -182,3 +192,18 @@ class HotSelectionView: UIView {
     private var observers: [NSKeyValueObservation] = []
 }
 
+extension HotSelectionView: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
+    }
+}

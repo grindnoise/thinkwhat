@@ -25,10 +25,21 @@ class SurveyCreationController: UIViewController {
         controllerOutput?.onDidLoad()
         navigationItem.title = "new_single".localized
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        clearNavigationBar(clear: false)
+    }
+    
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//        clearNavigationBar(clear: true)
+//    }
 
     override func willMove(toParent parent: UIViewController?) {
         super.willMove(toParent: parent)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
+        clearNavigationBar(clear: true)
     }
     
     var controllerOutput: SurveyCreationOutput?

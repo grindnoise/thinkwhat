@@ -20,7 +20,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rEW-d2-shq">
-                    <rect key="frame" x="75" y="0.0" width="325" height="150"/>
+                    <rect key="frame" x="83" y="0.0" width="317" height="150"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -36,7 +36,7 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="p7h-jY-5Zi" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.5" id="1PD-XC-BNJ"/>
-                <constraint firstItem="rEW-d2-shq" firstAttribute="leading" secondItem="p7h-jY-5Zi" secondAttribute="trailing" id="28h-vs-kuM"/>
+                <constraint firstItem="rEW-d2-shq" firstAttribute="leading" secondItem="p7h-jY-5Zi" secondAttribute="trailing" constant="8" id="28h-vs-kuM"/>
                 <constraint firstAttribute="trailing" secondItem="rEW-d2-shq" secondAttribute="trailing" id="3Xf-Qh-81w"/>
                 <constraint firstAttribute="bottom" secondItem="rEW-d2-shq" secondAttribute="bottom" id="cP8-As-YL8"/>
                 <constraint firstItem="p7h-jY-5Zi" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="dbe-wU-kH4"/>

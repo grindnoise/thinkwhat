@@ -13,6 +13,7 @@
                 <outlet property="confirm" destination="2Dq-Ge-LZ8" id="MKz-Jx-Omv"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="R5d-PF-oYY"/>
                 <outlet property="descriptionLabel" destination="qt6-6b-a6o" id="jrv-mv-d6z"/>
+                <outlet property="info" destination="2yN-Ps-4t5" id="yUY-8n-rah"/>
                 <outlet property="offIcon" destination="C3Y-W5-LTI" id="B3E-Dg-xOW"/>
                 <outlet property="offTitle" destination="4Ab-6O-UWf" id="mxB-qA-bik"/>
                 <outlet property="onIcon" destination="OYZ-rh-hjD" id="Fcr-k5-1gb"/>
@@ -143,6 +144,9 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="info" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="2yN-Ps-4t5">
+                    <rect key="frame" x="357.5" y="25.5" width="42.5" height="38"/>
+                </imageView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -155,9 +159,13 @@
                 <constraint firstItem="5gx-qt-5NB" firstAttribute="top" secondItem="6TI-SY-vdA" secondAttribute="bottom" id="Iyu-xs-yDw"/>
                 <constraint firstItem="6TI-SY-vdA" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="LfC-Qy-14f"/>
                 <constraint firstItem="5gx-qt-5NB" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Moh-mo-qtr"/>
+                <constraint firstItem="2yN-Ps-4t5" firstAttribute="width" secondItem="2yN-Ps-4t5" secondAttribute="height" multiplier="1:1" id="NCs-2q-EcD"/>
+                <constraint firstItem="2yN-Ps-4t5" firstAttribute="centerY" secondItem="Co1-0c-fRH" secondAttribute="centerY" id="arg-yP-AzT"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="2yN-Ps-4t5" secondAttribute="trailing" id="dBA-4e-ZgA"/>
                 <constraint firstItem="Co1-0c-fRH" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="h5a-ld-koI"/>
                 <constraint firstItem="Co1-0c-fRH" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.15" id="nrd-Io-yVD"/>
                 <constraint firstItem="5gx-qt-5NB" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="qj2-9l-ZAG"/>
+                <constraint firstItem="2yN-Ps-4t5" firstAttribute="height" secondItem="2Dq-Ge-LZ8" secondAttribute="height" multiplier="0.5" id="rd3-k2-izX"/>
                 <constraint firstItem="6TI-SY-vdA" firstAttribute="top" secondItem="Co1-0c-fRH" secondAttribute="bottom" id="sZD-xE-rM5"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
@@ -174,5 +182,6 @@
     </designables>
     <resources>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="info" catalog="system" width="93" height="128"/>
     </resources>
 </document>

@@ -34,6 +34,22 @@ class PlainBannerContent: UIView {
         contentView.frame = bounds
         contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         addSubview(contentView)
+        observers.append(label.observe(\UILabel.bounds) { [weak self] (label, change) in
+            guard let self = self else { return }
+            let paragraph = NSMutableParagraphStyle()
+            if #available(iOS 15.0, *) {
+                paragraph.usesDefaultHyphenation = true
+            } else {
+                paragraph.hyphenationFactor = 1
+            }
+            paragraph.alignment = .center
+            let string = self.text
+            let attributedText = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
+            attributedText.addAttributes(StringAttributes.getAttributes(font: UIFont(name: StringAttributes.Fonts.Style.Regular, size: label.bounds.width * 0.045)!, foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
+            label.attributedText = attributedText
+            guard label.numberOfTotatLines > 1 else { return }
+            label.textAlignment = .left
+        })
     }
     
     // MARK: - IB Outlets
@@ -42,53 +58,17 @@ class PlainBannerContent: UIView {
         didSet {
             imageContent.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             imageContent.addEquallyTo(to: imageContainer)
+            guard imageContent.isKind(of: UIImageView.self) else { return }
+            (imageContent as! UIImageView).contentMode = .scaleAspectFit
         }
     }
-    @IBOutlet weak var label: UILabel! {
-        didSet {
-            let paragraph = NSMutableParagraphStyle()
-            if #available(iOS 15.0, *) {
-                paragraph.usesDefaultHyphenation = true
-            } else {
-                paragraph.hyphenationFactor = 1
-            }
-            paragraph.alignment = .center
-            let string = text
-            let attributedText = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-            attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 14), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
-            label.attributedText = attributedText
-            guard label.numberOfTotatLines > 1 else { return }
-            label.textAlignment = .left
-        }
-    }
-//    @IBOutlet weak var textView: UITextView! {
-//        didSet {
-//            let paragraph = NSMutableParagraphStyle()
-//            if #available(iOS 15.0, *) {
-//                paragraph.usesDefaultHyphenation = true
-//            } else {
-//                paragraph.hyphenationFactor = 1
-//            }
-//            paragraph.alignment = .center
-//            let string = "\t" + text
-//            let attributedText = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-//            attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 15), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
-//            textView.attributedText = attributedText
-//            textView.centerVertically()
-//
-//////            let string = text
-//////            let attributedText = NSMutableAttributedString(string: string)
-//////            attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 15), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
-//////            textView.attributedText = attributedText
-////            textView.text = text
-////            imageContent.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-//        }
-//    }
+    @IBOutlet weak var label: UILabel!
     
-    // MARK: - IB Outlets
+    // MARK: - Properties
     private let text: String
-    private let imageContent: UIView
+    private var imageContent: UIView!
     private let color: UIColor
+    private var observers: [NSKeyValueObservation] = []
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         imageContent.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color

@@ -77,6 +77,7 @@
                 <outlet property="pollQuestionHeight" destination="F70-gp-OTX" id="M7U-Sc-Ijy"/>
                 <outlet property="pollQuestionLine" destination="D03-BL-K9e" id="XnX-f7-oir"/>
                 <outlet property="pollQuestionSkip" destination="tJ5-xa-zt9" id="fJO-jM-gpf"/>
+                <outlet property="pollQuestionStandartQuestion" destination="SUm-xZ-Da8" id="QrO-lt-JhO"/>
                 <outlet property="pollQuestionStaticLabel" destination="7jG-Bo-TfM" id="vVA-KH-pBn"/>
                 <outlet property="pollQuestionTemp" destination="Ooz-CA-v50" id="oPf-YW-MMw"/>
                 <outlet property="pollQuestionTextView" destination="luh-Gs-fDg" id="lc7-Nl-hdo"/>
@@ -451,7 +452,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="373" height="186.5"/>
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="luh-Gs-fDg">
-                                                    <rect key="frame" x="10" y="10" width="353" height="116.5"/>
+                                                    <rect key="frame" x="10" y="10" width="353" height="76.5"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                                     <color key="textColor" systemColor="labelColor"/>
@@ -459,21 +460,43 @@
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="no" returnKeyType="done"/>
                                                 </textView>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ooz-CA-v50">
-                                                    <rect key="frame" x="0.0" y="136.5" width="373" height="50"/>
+                                                    <rect key="frame" x="0.0" y="96.5" width="373" height="90"/>
                                                     <subviews>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.down.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="tJ5-xa-zt9">
-                                                            <rect key="frame" x="166.5" y="0.5" width="40" height="39"/>
+                                                            <rect key="frame" x="166.5" y="40.5" width="40" height="39"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="40" id="RY1-6p-DjD"/>
                                                                 <constraint firstAttribute="width" secondItem="tJ5-xa-zt9" secondAttribute="height" multiplier="1:1" id="S5K-6B-6n4"/>
                                                             </constraints>
                                                         </imageView>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qaj-hT-oAE">
+                                                            <rect key="frame" x="0.0" y="0.0" width="373" height="40"/>
+                                                            <subviews>
+                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SUm-xZ-Da8">
+                                                                    <rect key="frame" x="153" y="4.5" width="67" height="31"/>
+                                                                    <state key="normal" title="Button"/>
+                                                                    <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                                                    <connections>
+                                                                        <action selector="pollQuestionStandartQuestionTapped:" destination="-1" eventType="touchUpInside" id="Hn6-dg-eEe"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                            <constraints>
+                                                                <constraint firstItem="SUm-xZ-Da8" firstAttribute="centerX" secondItem="qaj-hT-oAE" secondAttribute="centerX" id="YRK-Fe-J3i"/>
+                                                                <constraint firstItem="SUm-xZ-Da8" firstAttribute="centerY" secondItem="qaj-hT-oAE" secondAttribute="centerY" id="xbN-Hy-ZfN"/>
+                                                            </constraints>
+                                                        </view>
                                                     </subviews>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="50" identifier="supp_height" id="98M-CS-yZ1"/>
+                                                        <constraint firstAttribute="height" constant="90" identifier="supp_height" id="98M-CS-yZ1"/>
+                                                        <constraint firstAttribute="trailing" secondItem="qaj-hT-oAE" secondAttribute="trailing" id="Mwx-df-eEN"/>
                                                         <constraint firstAttribute="bottom" secondItem="tJ5-xa-zt9" secondAttribute="bottom" constant="10" id="Q9p-nr-bkk"/>
+                                                        <constraint firstItem="qaj-hT-oAE" firstAttribute="leading" secondItem="Ooz-CA-v50" secondAttribute="leading" id="nIz-6Q-BoZ"/>
                                                         <constraint firstItem="tJ5-xa-zt9" firstAttribute="centerX" secondItem="Ooz-CA-v50" secondAttribute="centerX" id="sh2-KJ-VWh"/>
+                                                        <constraint firstItem="tJ5-xa-zt9" firstAttribute="top" secondItem="qaj-hT-oAE" secondAttribute="bottom" id="v31-Zs-HOu"/>
+                                                        <constraint firstItem="qaj-hT-oAE" firstAttribute="top" secondItem="Ooz-CA-v50" secondAttribute="top" id="y8S-8j-Ve6"/>
                                                     </constraints>
                                                 </view>
                                             </subviews>

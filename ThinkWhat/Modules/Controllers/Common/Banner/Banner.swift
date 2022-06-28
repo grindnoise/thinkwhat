@@ -242,6 +242,22 @@ class Banner: UIView {
     }
 }
 
+extension Banner: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        if sender is URL {
+            callbackDelegate?.callbackReceived(sender)
+            dismiss()
+        } else if let string = sender as? String {
+            if string == "dismiss" {
+                dismiss()
+            }
+        } else if sender is UIImage {
+            callbackDelegate?.callbackReceived(sender)
+            dismiss()
+        }
+    }
+}
+
 func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, imageContent: UIView, color: UIColor = .systemRed, isModal: Bool = false, shouldDismissAfter: TimeInterval = 1, accessibilityIdentifier: String = "") {
     let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
     banner.accessibilityIdentifier = accessibilityIdentifier
@@ -260,4 +276,33 @@ func showPopup<C: UIView>(callbackDelegate: CallbackObservable? = nil, bannerDel
     banner.accessibilityIdentifier = accessibilityIdentifier
     subview.callbackDelegate = banner
     banner.present(subview: subview)
+}
+
+func showTip(delegate: BannerObservable, identifier: String, force: Bool = false, timeout: TimeInterval = 2) {
+    guard  force || UserDefaults.App.hasSeenAppIntroduction.isNil else { return }
+    guard identifier == "choices_tip" ||
+    identifier == "description_tip" ||
+    identifier == "url_tip" ||
+    identifier == "images_tip" ||
+    identifier == "limits_tip" ||
+    identifier == "question_tip" ||
+    identifier == "hot_tip" else { return }
+    var color = K_COLOR_TABBAR
+    var imageView = UIImageView(image: UIImage(systemName: "info.circle.fill"))
+    if identifier == "hot_tip" {
+        color = .systemRed
+        imageView = ImageSigns.flameFilled
+    } else if identifier == "question_tip" {
+        imageView = UIImageView(image: UIImage(systemName: "questionmark.circle.fill"))
+    } else if identifier == "limits_tip" {
+        imageView = ImageSigns.speedometer
+    } else if identifier == "url_tip" {
+        imageView = UIImageView(image: UIImage(systemName: "link.circle.fill"))
+    }
+    
+    showBanner(bannerDelegate: delegate,
+               text: identifier.localized,
+               imageContent: imageView,
+               color: color,
+               shouldDismissAfter: timeout)
 }

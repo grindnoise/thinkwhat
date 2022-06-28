@@ -18,7 +18,8 @@ extension PollCreationModel: PollCreationControllerInput {
     func post(_ dict: [String: Any]) {
         Task {
             do {
-                try await API.shared.surveys.post(dict)
+                try await API.shared.surveys.postMultipart(dict)
+//                try await API.shared.surveys.post(dict)
                 await MainActor.run {
                     modelOutput?.onSuccess()
                 }

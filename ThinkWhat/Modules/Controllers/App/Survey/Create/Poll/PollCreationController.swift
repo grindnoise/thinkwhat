@@ -52,6 +52,7 @@ class PollCreationController: UIViewController {
         
         self.view = view as UIView
         setupUI()
+        setObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -69,6 +70,7 @@ class PollCreationController: UIViewController {
         progressIndicator.clipsToBounds = false
         progressIndicator.layers.forEach{ $0.value.masksToBounds = false }
         progressIndicator.subviews.forEach{ $0.layer.masksToBounds = false }
+        readPasteboard()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -98,6 +100,10 @@ class PollCreationController: UIViewController {
     }
     
     private func setupUI() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+                    self.navigationController?.navigationBar.standardAppearance = appearance
+                    self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(progressIndicator)
         progressIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -111,6 +117,26 @@ class PollCreationController: UIViewController {
         progressIndicator.layer.masksToBounds = false
         progressIndicator.lineWidth = progressIndicator.frame.width * 0.1
     }
+    
+    private func setObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(self.readPasteboard),
+                                                       name: UIPasteboard.changedNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.readPasteboard),
+                                                       name: UIApplication.didBecomeActiveNotification, object: nil)
+    }
+    
+    @objc
+    private func readPasteboard() {
+        if let pasteboardString = UIPasteboard.general.string,
+           stage == .Hyperlink || stage == .Ready,
+           let url = URL(string: pasteboardString) {
+            pasteboardURL = url
+        } else if let image = UIPasteboard.general.image,
+                  stage == .Images || stage == .Ready {
+            pasteboardImage = image
+        }
+    }
+    
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         progressIndicator.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : stage == .Ready ? .systemGreen : K_COLOR_RED)
@@ -187,6 +213,18 @@ class PollCreationController: UIViewController {
         return customTitle
     }()
     var willMoveToParent = false
+    private var pasteboardURL: URL? {
+        didSet {
+            guard !pasteboardURL.isNil, oldValue != pasteboardURL else { return }
+            controllerOutput?.onURLCopiedToPasteBoard(pasteboardURL!)
+        }
+    }
+    private var pasteboardImage: UIImage? {
+        didSet {
+            guard !pasteboardImage.isNil, oldValue != pasteboardImage else { return }
+            controllerOutput?.onImageCopiedToPasteBoard(pasteboardImage!)
+        }
+    }
 }
 
 // MARK: - View Input

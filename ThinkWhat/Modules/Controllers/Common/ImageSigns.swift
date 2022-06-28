@@ -38,4 +38,6 @@ struct ImageSigns {
     static let arrowLeft                    = UIImageView(image: UIImage(systemName: "arrowshape.turn.up.backward.circle.fill"))
     static let gear                         = UIImageView(image: UIImage(systemName: "gear"))
     static let infoСircle                   = UIImageView(image: UIImage(systemName: "info.circle"))
+    static let lightbulbFilled               = UIImageView(image: UIImage(systemName: "lightbulb.fill"))
+    
 }

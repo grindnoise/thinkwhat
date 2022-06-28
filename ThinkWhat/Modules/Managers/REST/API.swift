@@ -1225,72 +1225,8 @@ class API {
             }
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
-//                let decoder = JSONDecoder()
-//                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-//                                                           DateFormatter.dateTimeFormatter,
-//                                                           DateFormatter.dateFormatter ]
-                let json = try JSON(data: data, options: .mutableContainers)
-                let container = JSON(["by_category": json])
-                await MainActor.run {
-                    Surveys.shared.load(container)
-//                    let instances = try decoder.decode([SurveyReference].self, from: data)
-//                    guard !instances.isEmpty else {
-//                        //                    await MainActor.run {
-//                        Notification.send(names: [Notifications.Surveys.ZeroSubscriptions])
-//                        //                    }
-//                        return
-//                    }
-//                    //                await MainActor.run {
-//                    instances.forEach { instance in
-//                        switch category {
-//                        case .Subscriptions:
-//                            if Surveys.shared.subscriptions.filter({ $0 == instance }).isEmpty {
-//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-//                                    Surveys.shared.subscriptions.append(existing)
-//                                } else {
-//                                    Surveys.shared.subscriptions.append(instance)
-//                                }
-//                            }
-//                        case .Favorite:
-//                            if Surveys.shared.favoriteReferences.filter({ $0 == instance }).isEmpty {
-//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-//                                    Surveys.shared.favoriteReferences.append(existing)
-//                                } else {
-//                                    Surveys.shared.favoriteReferences.append(instance)
-//                                }
-//                            }
-//                        case .Top:
-//                            if Surveys.shared.topReferences.filter({ $0 == instance }).isEmpty {
-//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-//                                    Surveys.shared.topReferences.append(existing)
-//                                } else {
-//                                    Surveys.shared.topReferences.append(instance)
-//                                }
-//                            }
-//                        case .Own:
-//                            if Surveys.shared.ownReferences.filter({ $0 == instance }).isEmpty {
-//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-//                                    Surveys.shared.ownReferences.append(existing)
-//                                } else {
-//                                    Surveys.shared.ownReferences.append(instance)
-//                                }
-//                            }
-//                        case .New:
-//                            if Surveys.shared.newReferences.filter({ $0 == instance }).isEmpty {
-//                                if let existing = SurveyReferences.shared.all.filter({ $0 == instance }).first {
-//                                    Surveys.shared.newReferences.append(existing)
-//                                } else {
-//                                    Surveys.shared.newReferences.append(instance)
-//                                }
-//                            }
-//                        case .Topic:
-//                            if SurveyReferences.shared.all.filter({ $0 == instance }).isEmpty {
-//                                SurveyReferences.shared.all.append(instance)
-//                            }
-//                        default:
-//                            fatalError()
-//                        }
-//                    }
+                try await MainActor.run {
+                    Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
                 }
             } catch let error {
     #if DEBUG
@@ -1342,48 +1278,6 @@ class API {
         }
         
         func post(_ dict: Parameters) async throws {
-            func uploadFiles() {
-//                media.enumerated().forEach { index, dict in
-//                    guard let image = dict["image"] as? UIImage,
-//                          let title = dict["title"] as? String,
-//                          let imgData = image.jpegData(compressionQuality: 1) ?? image.pngData() else { return }
-//                    let multipartFormData = MultipartFormData()
-//
-//
-//                }
-//
-//                guard imageData != nil, fileFormat != .Unknown else { throw APIError.badData }
-//                multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(fileFormat)", mimeType: "jpg/png")
-//                for (key, value) in dict {
-//                    if value is String || value is Int {
-//                        multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
-//                    }
-//                }
-//                do {
-//                    return try await parent.uploadMultipartFormDataAsync(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) })
-//                } catch {
-//                    throw error
-//                }
-//
-////                for mediafile in media {
-////                    let multipartFormData = MultipartFormData()
-////                    var imgExt: FileFormat = .Unknown
-////                    var imageData: Data?
-////                    if let data = mediafile.image!.jpegData(compressionQuality: 1) {
-////                        imageData = data
-////
-////                    } else if let data = mediafile.image!.pngData() {
-////                        imageData = data
-////                        imgExt = .PNG
-////                    }
-//                    multipartFormData.append(imageData!, withName: "image", fileName: "\(UserDefaults.Profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
-//                    multipartFormData.append("\(survey.id)".data(using: .utf8)!, withName: "survey")
-//                    multipartFormData.append("\(mediafile.order)".data(using: .utf8)!, withName: "order")
-//                    multipartFormData.append("\(mediafile.title)".data(using: .utf8)!, withName: "title")
-//                    self.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) }) { completion($0) }
-//                }
-            }
-                
             guard let url = API_URLS.Surveys.root, let mediaUrl = API_URLS.Surveys.media else { throw APIError.invalidURL }
             var parameters = dict
             var media: [[String : Any]] = []
@@ -1406,6 +1300,7 @@ class API {
                 var instance: Survey!
                 do {
                     instance = try decoder.decode(Survey.self, from: json["survey"].rawData())
+                    Surveys.shared.ownReferences.append(instance.reference)
                 } catch {
                     guard let errorText = json["error"].string else {
                         throw APIError.badData
@@ -1416,17 +1311,6 @@ class API {
 #endif
                     throw error
                 }
-                
-//                guard let instance = try decoder.decode(Survey.self, from: json["survey"].rawData()) as? Survey else {
-//                    guard let error = json["error"].string else {
-//                        throw APIError.badData
-//                    }
-//#if DEBUG
-//                    error.printLocalized(class: type(of: self), functionName: #function)
-//#endif
-//                    throw error
-//                }
-               
                 
                 media.enumerated().forEach { index, dict in
                     guard let image = dict["image"] as? UIImage,
@@ -1450,6 +1334,106 @@ class API {
                     }
 
                 }
+                
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                throw error
+            }
+        }
+        
+        func postMultipart(_ dict: Parameters) async throws {
+            guard let url = API_URLS.Surveys.root, let mediaUrl = API_URLS.Surveys.media else { throw APIError.invalidURL }
+            var parameters = dict
+            var media: [[String : Any]] = []
+            if parameters.keys.contains("media"), let _media = parameters.removeValue(forKey: "media") as? [[String : Any]] {
+                media = _media
+            }
+            do {
+                let multipartFormData = MultipartFormData()
+                guard let category = parameters["category"] as? Int,
+                      let type = parameters["type"] as? String,
+                      let is_private = parameters["is_private"] as? Bool,
+                      let is_anonymous = parameters["is_anonymous"] as? Bool,
+                      let is_commenting_allowed = parameters["is_commenting_allowed"] as? Bool,
+                      let post_hot = parameters["post_hot"] as? Bool,
+                      let vote_capacity = parameters["vote_capacity"] as? Int,
+                      let title = parameters["title"] as? String,
+                      let question = parameters["question"] as? String,
+                      let description = parameters["description"] as? String,
+                      let answers = parameters["answers"] as? [[String: String]] else {
+                    throw APIError.badData
+                }
+                multipartFormData.append("\(category)".data(using: .utf8)!, withName: "category")
+                multipartFormData.append("\(type)".data(using: .utf8)!, withName: "type")
+                multipartFormData.append("\(is_private)".data(using: .utf8)!, withName: "is_private")
+                multipartFormData.append("\(is_anonymous)".data(using: .utf8)!, withName: "is_anonymous")
+                multipartFormData.append("\(is_commenting_allowed)".data(using: .utf8)!, withName: "is_commenting_allowed")
+                multipartFormData.append("\(post_hot)".data(using: .utf8)!, withName: "post_hot")
+                multipartFormData.append("\(vote_capacity)".data(using: .utf8)!, withName: "vote_capacity")
+                multipartFormData.append("\(title)".data(using: .utf8)!, withName: "title")
+                multipartFormData.append("\(question)".data(using: .utf8)!, withName: "question")
+                multipartFormData.append("\(description)".data(using: .utf8)!, withName: "description")
+                
+                answers.enumerated().forEach { index, dict in
+                    guard let description = dict["description"] else { return }
+                    multipartFormData.append("\(index)".data(using: .utf8)!, withName: "answers[\(index)]order")
+                    multipartFormData.append(description.data(using: .utf8)!, withName: "answers[\(index)]description")
+
+                }
+                
+                if let hlink = parameters["hlink"] as? [Parameters] {
+                    multipartFormData.append("\(hlink)".data(using: .utf8)!, withName: "hlink")
+                }
+                if let media = parameters["media"] as? [Parameters] {
+                    
+                }
+                
+                        
+                Task {
+                    do {
+                        let data = try await parent.uploadMultipartFormDataAsync(url: url, method: .post, multipartDataForm: multipartFormData, uploadProgress: {_ in})
+                    } catch {
+#if DEBUG
+                        print(error)
+//                        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                        throw error
+                    }
+                }
+                
+            
+                        
+                        
+                        
+                
+//                dict.enumerated().forEach { index, key in
+//                    multipartFormData.append("\(index)".data(using: .utf8)!, withName: "category")
+//                }
+//
+//                media.enumerated().forEach { index, dict in
+//                    guard let image = dict["image"] as? UIImage,
+//                          let title = dict["title"] as? String,
+//                          let jpegData = image.jpegData(compressionQuality: 1) else { return }//?? image.pngData() else { return }
+//                    let multipartFormData = MultipartFormData()
+//                    multipartFormData.append(jpegData, withName: "image", fileName: "\(UUID().uuidString).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
+//                    multipartFormData.append("\(instance.id)".data(using: .utf8)!, withName: "survey")
+//                    multipartFormData.append("\(index)".data(using: .utf8)!, withName: "order")
+//                    multipartFormData.append("\(title)".data(using: .utf8)!, withName: "title")
+//                    Task {
+//                        do {
+//                        let data = try await parent.uploadMultipartFormDataAsync(url: mediaUrl, method: .post, multipartDataForm: multipartFormData, uploadProgress: {_ in})
+//                        let _json = try JSON(data: data, options: .mutableContainers)
+//                            print(_json)
+//                        } catch {
+//#if DEBUG
+//                            error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//                        }
+//                    }
+//
+//                }
                 
             } catch {
 #if DEBUG

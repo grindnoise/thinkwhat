@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="URLPasteView" customModule="ThinkWhat" customModuleProvider="target">
+            <connections>
+                <outlet property="cancelButton" destination="s8n-Ks-gI1" id="z0k-h8-XnE"/>
+                <outlet property="contentView" destination="iN0-l3-epB" id="Bn6-Gc-1LA"/>
+                <outlet property="imageContainer" destination="n6l-BV-3Eb" id="0ZS-hg-2CV"/>
+                <outlet property="pasteButton" destination="tWz-5q-S3d" id="mnK-Xw-uKk"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="400" height="150"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n6l-BV-3Eb">
+                    <rect key="frame" x="0.0" y="37.5" width="75" height="75"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hfj-Vh-fOX">
+                    <rect key="frame" x="75" y="0.0" width="325" height="150"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" alignment="center" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="sDs-mg-TCb">
+                            <rect key="frame" x="129" y="42" width="67" height="66"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tWz-5q-S3d">
+                                    <rect key="frame" x="0.0" y="0.0" width="67" height="31"/>
+                                    <state key="normal" title="Button"/>
+                                    <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                    <connections>
+                                        <action selector="pasteButtonTapped:" destination="-1" eventType="touchUpInside" id="M3N-wX-dy9"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s8n-Ks-gI1">
+                                    <rect key="frame" x="0.0" y="35" width="67" height="31"/>
+                                    <state key="normal" title="Button"/>
+                                    <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                    <connections>
+                                        <action selector="cancelButtonTapped:" destination="-1" eventType="touchUpInside" id="FMZ-M6-LkI"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="sDs-mg-TCb" firstAttribute="centerX" secondItem="hfj-Vh-fOX" secondAttribute="centerX" id="Cf8-UM-OhF"/>
+                        <constraint firstItem="sDs-mg-TCb" firstAttribute="centerY" secondItem="hfj-Vh-fOX" secondAttribute="centerY" id="Fsc-AA-suH"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="n6l-BV-3Eb" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="7pF-w8-XTT"/>
+                <constraint firstItem="hfj-Vh-fOX" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="D2M-Q6-Ddb"/>
+                <constraint firstItem="hfj-Vh-fOX" firstAttribute="leading" secondItem="n6l-BV-3Eb" secondAttribute="trailing" id="SrX-9W-prL"/>
+                <constraint firstItem="n6l-BV-3Eb" firstAttribute="width" secondItem="n6l-BV-3Eb" secondAttribute="height" multiplier="1:1" id="YaL-VT-aDh"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="hfj-Vh-fOX" secondAttribute="bottom" id="be5-f3-x1x"/>
+                <constraint firstItem="n6l-BV-3Eb" firstAttribute="height" secondItem="iN0-l3-epB" secondAttribute="height" multiplier="0.5" id="cWN-QW-8gc"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="hfj-Vh-fOX" secondAttribute="trailing" id="cco-kq-OpO"/>
+                <constraint firstItem="n6l-BV-3Eb" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="dA4-Rk-clL"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="137.68115942028987" y="84.375"/>
+        </view>
+    </objects>
+</document>

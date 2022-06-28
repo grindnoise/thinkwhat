@@ -66,9 +66,9 @@ class TopicSelectionModernCollectionView: UICollectionView {
             backgroundConfig.backgroundColor = .red
             cell.backgroundConfiguration = backgroundConfig
             cell.accessories = [.outlineDisclosure(options:headerDisclosureOption) {
-                self.scrollToItem(at: indexPath, at: .top, animated: true)
                 var currentSectionSnapshot = self.source.snapshot(for: headerItem)
                 if currentSectionSnapshot.items.filter { currentSectionSnapshot.isExpanded($0) }.isEmpty {
+                    self.scrollToItem(at: indexPath, at: .top, animated: true)
                     currentSectionSnapshot.expand(currentSectionSnapshot.items)
 //                    let otherHeaders = self.source.snapshot().sectionIdentifiers.filter({ $0 != headerItem })
 //                    otherHeaders.forEach { otherHeader in
@@ -152,11 +152,14 @@ class TopicSelectionModernCollectionView: UICollectionView {
     weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<TopicHeaderItem, TopicListItem>!
     private var layoutConfig: UICollectionLayoutListConfiguration!
+    private var isFirstSelection = true
 }
 
 extension TopicSelectionModernCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard isFirstSelection else { return }
         scrollToItem(at: indexPath, at: .centeredVertically, animated: true)
+        isFirstSelection = false
     }
 }
 

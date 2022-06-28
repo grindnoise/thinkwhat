@@ -190,7 +190,7 @@
 
 
 "choose_topic" = "Choose topic";
-"choose_option" = "Choose option";
+"choose_option" = "Choose oыption";
 "anon_option" = "Anonymous";
 "anon_description" = "Poll's author and voters are hidden from each other";
 "default_option" = "Public";
@@ -229,3 +229,17 @@
 "cost" = "Cost";
 "total_bill" = "Total:";
 "poll_launched" = "Poll has been launched";
+"poll_standart_question_button" = "Default question";
+"poll_standart_question" = "Choose the answer that best suits you";
+
+"choices_tip" = "Offer at least 2 options for participants";
+"description_tip" = "Add a detailed description to describe the issue";
+"url_tip" = "Add a link to a web resource\n(optional)";
+"images_tip" = "Attach images from gallery/camera\nOr you can paste image from clipboard, just copy it and come back to the app";
+"limits_tip" = "1 participant = 1 point of your balance";
+"question_tip" = "Formulate a question to the participants";
+"hot_tip" = "Get into the top Hot for a quick set of votes for additional debit points";
+"change_parameters" = "Change your poll settings";
+"paste_url" = "Paste link";
+"add_image" = "Add image";
+"hot_restricted" = "Private polls cannot be get into the Hot";
