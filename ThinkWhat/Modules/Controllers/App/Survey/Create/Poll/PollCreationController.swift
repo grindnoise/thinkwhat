@@ -126,14 +126,14 @@ class PollCreationController: UIViewController {
     }
     
     @objc
-    private func readPasteboard() {
-        if let pasteboardString = UIPasteboard.general.string,
+    public func readPasteboard() {
+        if let image = UIPasteboard.general.image,
+                  stage == .Images || stage == .Ready {
+            pasteboardImage = image
+        } else if let pasteboardString = UIPasteboard.general.string,
            stage == .Hyperlink || stage == .Ready,
            let url = URL(string: pasteboardString) {
             pasteboardURL = url
-        } else if let image = UIPasteboard.general.image,
-                  stage == .Images || stage == .Ready {
-            pasteboardImage = image
         }
     }
     

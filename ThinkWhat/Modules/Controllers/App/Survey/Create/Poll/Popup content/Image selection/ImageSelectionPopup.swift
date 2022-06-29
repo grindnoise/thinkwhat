@@ -46,10 +46,14 @@ class ImageSelectionPopup: UIView, UINavigationControllerDelegate {
             guard let self = self, let value = change.newValue else { return }
             self.imageView.cornerRadius = value.width * 0.05
         }))
-        observers.append(textView.observe(\UITextView.bounds, options: .new, changeHandler: { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
-            guard let self = self, let value = change.newValue else { return }
-            self.textView.cornerRadius = value.width * 0.05
-        }))
+        observers.append(textView.observe(\UITextView.bounds, options: .new) { [weak self] view, change in
+            guard !self.isNil, let newValue = change.newValue else { return }
+            view.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: newValue.width * 0.05)
+        })
+        observers.append(textViewBg.observe(\UIView.bounds, options: .new) { [weak self] view, change in
+            guard !self.isNil, !change.newValue.isNil else { return }
+            view.cornerRadius = change.newValue!.width * 0.05
+        })
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidHide), name: UIResponder.keyboardDidHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
     }
@@ -66,11 +70,8 @@ class ImageSelectionPopup: UIView, UINavigationControllerDelegate {
         title.attributedText = topicTitleString
         
         let descrAttrString = NSMutableAttributedString()
-        descrAttrString.append(NSAttributedString(string: "poll_description".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: descriptionLabel.bounds.width * 0.04), foregroundColor: .secondaryLabel/*color*/, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        descrAttrString.append(NSAttributedString(string: "caption".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: descriptionLabel.bounds.width * 0.04), foregroundColor: .label/*color*/, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         descriptionLabel.attributedText = descrAttrString
-
-        textView.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: textView.bounds.width * 0.04)
-        textView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
     @objc
@@ -129,13 +130,14 @@ class ImageSelectionPopup: UIView, UINavigationControllerDelegate {
         }
     }
     @IBOutlet weak var previewStackView: UIStackView!
+    @IBOutlet weak var textViewBg: UIView! {
+        didSet {
+            textViewBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        }
+    }
     @IBOutlet weak var textView: UITextView! {
         didSet {
-            textView.contentInset = UIEdgeInsets(top: 10,
-                                                 left: 8,
-                                                 bottom: 10,
-                                                 right: 10)
-            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+            textView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
             textView.text = item.title
             textView.delegate = self
         }

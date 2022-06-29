@@ -17,7 +17,15 @@ import UserNotifications
 
 typealias Closure = (()->())
 
-var localhost = true
+var localhost: Bool {
+    //    let dict = ProcessInfo.processInfo.environment
+    //    guard dict.keys.contains("localhost") else { return false }
+#if LOCAL
+    return true
+#else
+    return false
+#endif
+}
 
 let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()

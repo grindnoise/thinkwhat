@@ -11,7 +11,7 @@ import SwiftyJSON
 
 class Mediafile: Decodable {
     private enum CodingKeys: String, CodingKey {
-        case id, title, image, file, survey, order, url
+        case id, title, image, file, survey = "survey_id", order, url
     }
     var id: Int
     var title: String

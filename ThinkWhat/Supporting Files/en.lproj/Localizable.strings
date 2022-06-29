@@ -23,6 +23,8 @@
 "insufficient_balance" = "You don't have enough points for this publication";
 
 //Common
+"title" = "Title";
+"caption" = "Caption";
 "ok" = "Ok";
 "more" = "more";
 "results" = "Results";

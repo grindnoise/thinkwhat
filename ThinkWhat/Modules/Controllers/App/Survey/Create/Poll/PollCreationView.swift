@@ -1246,7 +1246,12 @@ extension PollCreationView: PollCreationControllerOutput {
             ])
             
             animate(button: self.pollImagesButton, completionBlocks: [])
-            reveal(view: self.pollImagesBg, duration: 0.3, completionBlocks: [])
+            reveal(view: self.pollImagesBg, duration: 0.3, completionBlocks: [
+                {
+                    [weak self] in guard let self = self else { return }
+                    self.viewInput?.readPasteboard()
+                }
+            ])
             showTip(delegate: self, identifier: "images_tip")
             
             var startPoint = pollURLBg.superview!.convert(pollURLBg.center, to: scrollContentView)
@@ -2018,7 +2023,7 @@ extension PollCreationView: CallbackObservable {
             imagesContainer?.reload()
             delayAsync(delay: 0.1) { [weak self] in
                 guard let self = self else { return }
-                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.65)
+                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                 banner.present(subview: ImageSelectionPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1))
             }
         }
@@ -2296,7 +2301,7 @@ extension PollCreationView: ImageSelectionListener {
     }
     
     func editImage(_ item: ImageItem) {
-        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.65)
+        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
         banner.present(subview: ImageSelectionPopup(callbackDelegate: banner, item: item))
     }
 }
@@ -2360,9 +2365,14 @@ extension PollCreationView {
         dict["title"] = pollTitleTextView.text ?? ""
         dict["question"] = pollQuestionTextView.text ?? ""
         dict["description"] = pollDescriptionTextView.text ?? ""
-        dict["answers"] = choiceItems.map() { ["description": $0.text] }
+        dict["answers"] = choiceItems.map() { [
+            "description": $0.text,
+        ] }
         if !imageItems.isEmpty {
-            dict["media"] = imageItems.map() { ["title": $0.title, "image": $0.image] }
+            dict["media"] = imageItems.map() {[
+                "title": $0.title,
+                "image": $0.image
+            ]}
         }
         
         return dict
@@ -2404,7 +2414,7 @@ extension PollCreationView: UIImagePickerControllerDelegate {
             imagesContainer?.reload()
             delayAsync(delay: 0.1) { [weak self] in
                 guard let self = self else { return }
-                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.65)
+                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                 banner.present(subview: ImageSelectionPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1))
             }
             

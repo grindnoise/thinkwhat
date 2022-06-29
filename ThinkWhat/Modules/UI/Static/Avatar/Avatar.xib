@@ -39,7 +39,7 @@
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
-                        <constraint firstItem="4eG-q8-nmk" firstAttribute="width" secondItem="gQv-EW-IX4" secondAttribute="width" multiplier="0.9" id="7rW-dP-Q4z"/>
+                        <constraint firstItem="4eG-q8-nmk" firstAttribute="width" secondItem="gQv-EW-IX4" secondAttribute="width" multiplier="0.9" identifier="ratio" id="7rW-dP-Q4z"/>
                         <constraint firstItem="4eG-q8-nmk" firstAttribute="centerY" secondItem="gQv-EW-IX4" secondAttribute="centerY" id="MCM-fE-K4J"/>
                         <constraint firstItem="4eG-q8-nmk" firstAttribute="centerX" secondItem="gQv-EW-IX4" secondAttribute="centerX" id="Ncp-IW-KMg"/>
                     </constraints>

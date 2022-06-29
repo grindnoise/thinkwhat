@@ -23,6 +23,7 @@ protocol PollCreationViewInput: AnyObject {
     func onURLTapped(_: URL?)
     func post(_: [String: Any])
     func onContinue()
+    func readPasteboard()
 }
 
 /// *Controller* tells the *Model* what to do based on the input

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
+		8A22AE464A3DA9E18DAF1148 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF39D3257CEBEE91B9088DE7 /* Pods_ThinkWhat.framework */; };
 		AB00FFD32583A4A50071C7DE /* TextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00FFD22583A4A50071C7DE /* TextViewController.swift */; };
 		AB00FFD52587A6320071C7DE /* BlurTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00FFD42587A6320071C7DE /* BlurTransition.swift */; };
 		AB016BFE26CA73BA005C5A87 /* ButtonWithImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB016BFD26CA73BA005C5A87 /* ButtonWithImage.swift */; };
@@ -424,6 +424,7 @@
 		ABADF5A827F73CCB00A26474 /* PlainBannerContent.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF5A727F73CCB00A26474 /* PlainBannerContent.xib */; };
 		ABAEEE5A27A5D4A100E4EF29 /* VKDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABAEEE5927A5D4A100E4EF29 /* VKDelegate.swift */; };
 		ABAEEE5C27A5D7ED00E4EF29 /* VKWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABAEEE5B27A5D7ED00E4EF29 /* VKWorker.swift */; };
+		ABB19148286C526200C89142 /* ProcessInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB19147286C526200C89142 /* ProcessInfo.swift */; };
 		ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */; };
 		ABB46F372344B1F900AF212B /* CallbackObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F362344B1F900AF212B /* CallbackObservable.swift */; };
 		ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F382344B2C300AF212B /* AuthNavigationController.swift */; };
@@ -457,7 +458,6 @@
 		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
 		ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC571235EE99B00E6A118 /* TagLabel.swift */; };
-		ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC573235F384600E6A118 /* ProgressCirle.swift */; };
 		ABCDE35F260C7D3300ACF5A6 /* VerticalTextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDE35E260C7D3300ACF5A6 /* VerticalTextLayer.swift */; };
 		ABCE775928488C8E001E3413 /* ImageSelectionPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCE775828488C8E001E3413 /* ImageSelectionPopup.swift */; };
 		ABCE775B28489342001E3413 /* ImageSelectionPopup.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */; };
@@ -513,7 +513,7 @@
 		ABF73549270DC1F700F7C308 /* ClaimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF73548270DC1F700F7C308 /* ClaimView.swift */; };
 		ABF7354B270DC26E00F7C308 /* ClaimView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABF7354A270DC26E00F7C308 /* ClaimView.xib */; };
 		ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFD793D25F8CD99009A2824 /* RoundIcon.swift */; };
-		E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */; };
+		B3C1FE5ED6DFA4C52CD0493D /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DDA2CA12CE1F821C3DA81D2 /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -534,9 +534,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0B8B18E3907FC78604B9BB73 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; sourceTree = "<group>"; };
-		10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
-		A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		191D60811ABD57A2EEBF83BD /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
+		4869026AC68AE423EAAC5F72 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; sourceTree = "<group>"; };
+		520F716438E0A418EA6F3A26 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig"; sourceTree = "<group>"; };
+		6B2AD8C737C5E0F520C362EC /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.local.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.local.xcconfig"; sourceTree = "<group>"; };
+		7DDA2CA12CE1F821C3DA81D2 /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB00FFD22583A4A50071C7DE /* TextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewController.swift; sourceTree = "<group>"; };
 		AB00FFD42587A6320071C7DE /* BlurTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurTransition.swift; sourceTree = "<group>"; };
 		AB016BFD26CA73BA005C5A87 /* ButtonWithImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonWithImage.swift; sourceTree = "<group>"; };
@@ -964,6 +966,7 @@
 		ABADF5A727F73CCB00A26474 /* PlainBannerContent.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlainBannerContent.xib; sourceTree = "<group>"; };
 		ABAEEE5927A5D4A100E4EF29 /* VKDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKDelegate.swift; sourceTree = "<group>"; };
 		ABAEEE5B27A5D7ED00E4EF29 /* VKWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKWorker.swift; sourceTree = "<group>"; };
+		ABB19147286C526200C89142 /* ProcessInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfo.swift; sourceTree = "<group>"; };
 		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABB46F362344B1F900AF212B /* CallbackObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallbackObservable.swift; sourceTree = "<group>"; };
 		ABB46F382344B2C300AF212B /* AuthNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNavigationController.swift; sourceTree = "<group>"; };
@@ -997,7 +1000,6 @@
 		ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSign.swift; sourceTree = "<group>"; };
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABCAC571235EE99B00E6A118 /* TagLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagLabel.swift; sourceTree = "<group>"; };
-		ABCAC573235F384600E6A118 /* ProgressCirle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCirle.swift; sourceTree = "<group>"; };
 		ABCDE35E260C7D3300ACF5A6 /* VerticalTextLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalTextLayer.swift; sourceTree = "<group>"; };
 		ABCE775828488C8E001E3413 /* ImageSelectionPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionPopup.swift; sourceTree = "<group>"; };
 		ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageSelectionPopup.xib; sourceTree = "<group>"; };
@@ -1054,9 +1056,11 @@
 		ABF73548270DC1F700F7C308 /* ClaimView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimView.swift; sourceTree = "<group>"; };
 		ABF7354A270DC26E00F7C308 /* ClaimView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ClaimView.xib; sourceTree = "<group>"; };
 		ABFD793D25F8CD99009A2824 /* RoundIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundIcon.swift; sourceTree = "<group>"; };
-		BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
-		C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Pods/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
-		CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF39D3257CEBEE91B9088DE7 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDF51F46589DDF15422A0A72 /* Pods-ThinkWhat.alpha.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.alpha.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.alpha.xcconfig"; sourceTree = "<group>"; };
+		D6CCA115D6708FB93518D66F /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
+		DF576775A809D6259D0A5995 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
+		E28B1AE8771195954BEB73AE /* Pods-ThinkWhat.local.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.local.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.local.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1064,7 +1068,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E52AB735D93E4348DC60F737 /* Pods_ThinkWhat.framework in Frameworks */,
+				8A22AE464A3DA9E18DAF1148 /* Pods_ThinkWhat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1072,7 +1076,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2ECF453519086F674BD166EC /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */,
+				B3C1FE5ED6DFA4C52CD0493D /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1086,24 +1090,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3BE0E5F06FA4B493FFF8C0E0 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */,
-				C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */,
-				10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */,
-				0B8B18E3907FC78604B9BB73 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 		69AB746D40F296BDC8D5D954 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				AB4B85DC27785ACE00884E65 /* libswiftCore.tbd */,
 				AB2BB282277856FB004606E3 /* libswift_Concurrency.tbd */,
-				A56A2C87CE7EB48BCFD8C7D8 /* Pods_ThinkWhat.framework */,
-				CD6CFAA2F8264B491626771A /* Pods_ThinkWhat_ThinkWhatTests.framework */,
+				AF39D3257CEBEE91B9088DE7 /* Pods_ThinkWhat.framework */,
+				7DDA2CA12CE1F821C3DA81D2 /* Pods_ThinkWhat_ThinkWhatTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1182,17 +1175,18 @@
 			children = (
 				AB10030E27BF772600338EE4 /* Bundle.swift */,
 				AB9998BD28058FA5009D0E4F /* Double.swift */,
+				AB7C6FB32865AE3000000429 /* Error.swift */,
 				AB3C681A223FD04500B57580 /* Extensions.swift */,
+				ABF3DF16283BA4A200309AA9 /* Int.swift */,
+				AB38DD6C2819420000FFEB3F /* Notification.swift */,
 				AB8F28AF27C0DEEB008E4ED0 /* NSLayoutConstraint.swift */,
+				ABB19147286C526200C89142 /* ProcessInfo.swift */,
 				AB10030C27BF762400338EE4 /* String.swift */,
 				AB9998BB280585B9009D0E4F /* UILabel.swift */,
+				ABF2758E28151EE50023CD1F /* UINavigationController.swift */,
 				ABF2756B280D62710023CD1F /* UITableView.swift */,
 				ABA448D327E331B000F8E00D /* UIView.swift */,
 				AB913F782806FADF00609D51 /* UIViewController.swift */,
-				ABF2758E28151EE50023CD1F /* UINavigationController.swift */,
-				AB38DD6C2819420000FFEB3F /* Notification.swift */,
-				ABF3DF16283BA4A200309AA9 /* Int.swift */,
-				AB7C6FB32865AE3000000429 /* Error.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1276,7 +1270,6 @@
 		AB21970126BC2EC7005A7BA8 /* Banner */ = {
 			isa = PBXGroup;
 			children = (
-				AB7085E526CB99EE006F020F /* SideApp */,
 				AB869F2126C3C660008353B3 /* Warning */,
 				AB21970226BC2EEF005A7BA8 /* delBanner.swift */,
 				AB21970426BC2F0B005A7BA8 /* delBanner.xib */,
@@ -1445,13 +1438,16 @@
 			path = Confirm;
 			sourceTree = "<group>";
 		};
-		AB38DD73281A76FE00FFEB3F /* Common */ = {
+		AB38DD73281A76FE00FFEB3F /* Subclasses */ = {
 			isa = PBXGroup;
 			children = (
+				ABCDE35E260C7D3300ACF5A6 /* VerticalTextLayer.swift */,
+				ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */,
+				AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */,
 				AB39F40E2847457200DEE0ED /* InsetTextField.swift */,
 				ABCE775C2848D378001E3413 /* InsetLabel.swift */,
 			);
-			path = Common;
+			path = Subclasses;
 			sourceTree = "<group>";
 		};
 		AB38DD74281A773D00FFEB3F /* Collection */ = {
@@ -1502,9 +1498,9 @@
 		AB3A47C6283F593F00106407 /* Create */ = {
 			isa = PBXGroup;
 			children = (
+				AB3A47C7283F596300106407 /* Type selection */,
 				AB3A47D7283F5BFA00106407 /* Ranking */,
 				AB3A47C8283F597800106407 /* Poll */,
-				AB3A47C7283F596300106407 /* Type selection */,
 			);
 			path = Create;
 			sourceTree = "<group>";
@@ -1565,8 +1561,8 @@
 				AB3C67F5223FBB6600B57580 /* ThinkWhatTests */,
 				AB3C6800223FBB6600B57580 /* ThinkWhatUITests */,
 				AB3C67DC223FBB6400B57580 /* Products */,
-				3BE0E5F06FA4B493FFF8C0E0 /* Pods */,
 				69AB746D40F296BDC8D5D954 /* Frameworks */,
+				E9FBECDA3D06FB129E6BE92E /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1678,32 +1674,24 @@
 		AB3C681F223FD1B100B57580 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				AB463FBC27C7E6B2007D7240 /* Avatar */,
 				AB3C67EA223FBB6600B57580 /* LaunchScreen.storyboard */,
 				ABA282EE274FD92100ED583F /* RangeSlider */,
 				AB334FBF270C6E9F00DD7332 /* Alert */,
 				AB21970126BC2EC7005A7BA8 /* Banner */,
 				AB3C6827223FD24A00B57580 /* BorderedView.swift */,
 				AB3C682E223FD3EE00B57580 /* Buttons */,
-				AB7478C02428958C00317EB6 /* CameraLoadingIndicator */,
 				AB7478BE2428951F00317EB6 /* CircularIndicatorImageView.swift */,
 				AB3C6820223FD1C000B57580 /* CustomAlertView */,
-				AB3C6835223FD3EE00B57580 /* Fonts */,
 				AB7478C32428D08B00317EB6 /* Icons */,
-				AB3C6829223FD37200B57580 /* Progress indicators */,
 				ABA6B3B023FD1A6000335074 /* LoadingTextIndicator */,
 				AB3C6840223FD3EE00B57580 /* Logos */,
 				AB19B6422432282B00999917 /* PercentageLabel.swift */,
-				ABCAC573235F384600E6A118 /* ProgressCirle.swift */,
 				AB229D832464512400968D52 /* del_Segues.swift */,
 				AB3C6857223FD6AB00B57580 /* Storyboards */,
 				ABCAC571235EE99B00E6A118 /* TagLabel.swift */,
 				AB1D7BA5248F606E00845F1C /* Transitions */,
 				AB791D7C243B1BF00085E00E /* VoteAnimationView.swift */,
 				ABE43694251C7FD300C1428D /* CustomSwitch.swift */,
-				AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */,
-				ABCDE35E260C7D3300ACF5A6 /* VerticalTextLayer.swift */,
-				ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */,
 				AB016BFD26CA73BA005C5A87 /* ButtonWithImage.swift */,
 			);
 			path = UI;
@@ -2054,14 +2042,6 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
-		AB7478C02428958C00317EB6 /* CameraLoadingIndicator */ = {
-			isa = PBXGroup;
-			children = (
-				AB7478C12428962700317EB6 /* CameraLoadingIndicator.swift */,
-			);
-			path = CameraLoadingIndicator;
-			sourceTree = "<group>";
-		};
 		AB7478C32428D08B00317EB6 /* Icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -2136,6 +2116,7 @@
 		AB7CE6FA23A36123006FDBD8 /* Existing */ = {
 			isa = PBXGroup;
 			children = (
+				ABB19149286CAADE00C89142 /* Poll v2 */,
 				ABA448E727EE02E600F8E00D /* Poll */,
 				AB72A8422418CF2D005B58F1 /* Cells */,
 				AB8C99552486760B00BC517B /* Claim */,
@@ -2175,13 +2156,16 @@
 			path = delPoll;
 			sourceTree = "<group>";
 		};
-		AB883B292800702500DBE4EF /* Pop up */ = {
+		AB883B292800702500DBE4EF /* Popup & Banner */ = {
 			isa = PBXGroup;
 			children = (
+				ABADF5A327F73C7400A26474 /* Content */,
+				ABADF59B27F7066300A26474 /* Banner.swift */,
+				ABADF59F27F7074100A26474 /* Banner.xib */,
 				AB883B2A2800704400DBE4EF /* Popup.swift */,
 				AB883B2C2800708500DBE4EF /* Popup.xib */,
 			);
-			path = "Pop up";
+			path = "Popup & Banner";
 			sourceTree = "<group>";
 		};
 		AB883B2F280438E300DBE4EF /* Vote message */ = {
@@ -2301,7 +2285,10 @@
 		AB913F8928097D8A00609D51 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				AB38DD73281A76FE00FFEB3F /* Common */,
+				AB3C6835223FD3EE00B57580 /* Fonts */,
+				AB883B292800702500DBE4EF /* Popup & Banner */,
+				AB883B2727FDB33600DBE4EF /* ImageSigns.swift */,
+				AB38DD73281A76FE00FFEB3F /* Subclasses */,
 				AB913F8D28097DAA00609D51 /* Animated */,
 				AB913F8C28097DA200609D51 /* Static */,
 			);
@@ -2311,6 +2298,7 @@
 		AB913F8C28097DA200609D51 /* Static */ = {
 			isa = PBXGroup;
 			children = (
+				AB463FBC27C7E6B2007D7240 /* Avatar */,
 				AB913F8A28097D9C00609D51 /* ProgressCircle.swift */,
 			);
 			path = Static;
@@ -2319,6 +2307,8 @@
 		AB913F8D28097DAA00609D51 /* Animated */ = {
 			isa = PBXGroup;
 			children = (
+				AB3C6829223FD37200B57580 /* Progress indicators */,
+				AB7478C12428962700317EB6 /* CameraLoadingIndicator.swift */,
 			);
 			path = Animated;
 			sourceTree = "<group>";
@@ -2567,26 +2557,14 @@
 			isa = PBXGroup;
 			children = (
 				AB883B3428047FC300DBE4EF /* Image */,
-				AB883B292800702500DBE4EF /* Pop up */,
-				ABADF59A27F700A000A26474 /* Banner */,
-				AB883B2727FDB33600DBE4EF /* ImageSigns.swift */,
 			);
 			path = Common;
-			sourceTree = "<group>";
-		};
-		ABADF59A27F700A000A26474 /* Banner */ = {
-			isa = PBXGroup;
-			children = (
-				ABADF5A327F73C7400A26474 /* Content */,
-				ABADF59B27F7066300A26474 /* Banner.swift */,
-				ABADF59F27F7074100A26474 /* Banner.xib */,
-			);
-			path = Banner;
 			sourceTree = "<group>";
 		};
 		ABADF5A327F73C7400A26474 /* Content */ = {
 			isa = PBXGroup;
 			children = (
+				AB7085E526CB99EE006F020F /* SideApp */,
 				AB1F34D1286B25A30086969E /* Image paste */,
 				AB1F34CC286B1CE80086969E /* URL paste */,
 				AB38DD6E2819531900FFEB3F /* Confirm */,
@@ -2614,6 +2592,13 @@
 				ABAEEE5B27A5D7ED00E4EF29 /* VKWorker.swift */,
 			);
 			path = VK;
+			sourceTree = "<group>";
+		};
+		ABB19149286CAADE00C89142 /* Poll v2 */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Poll v2";
 			sourceTree = "<group>";
 		};
 		ABB46F3C2345DDA000AF212B /* Managers */ = {
@@ -2901,6 +2886,21 @@
 			path = Own;
 			sourceTree = "<group>";
 		};
+		E9FBECDA3D06FB129E6BE92E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				DF576775A809D6259D0A5995 /* Pods-ThinkWhat.debug.xcconfig */,
+				E28B1AE8771195954BEB73AE /* Pods-ThinkWhat.local.xcconfig */,
+				BDF51F46589DDF15422A0A72 /* Pods-ThinkWhat.alpha.xcconfig */,
+				191D60811ABD57A2EEBF83BD /* Pods-ThinkWhat.release.xcconfig */,
+				D6CCA115D6708FB93518D66F /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */,
+				6B2AD8C737C5E0F520C362EC /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */,
+				520F716438E0A418EA6F3A26 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */,
+				4869026AC68AE423EAAC5F72 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2908,11 +2908,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB3C6806223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhat" */;
 			buildPhases = (
-				5632526F0839F50E39A91D2D /* [CP] Check Pods Manifest.lock */,
+				3DFC8B7CEDC53F92BD553115 /* [CP] Check Pods Manifest.lock */,
 				AB3C67D7223FBB6400B57580 /* Sources */,
 				AB3C67D8223FBB6400B57580 /* Frameworks */,
 				AB3C67D9223FBB6400B57580 /* Resources */,
-				A79FA05FB19CEB958411C690 /* [CP] Embed Pods Frameworks */,
+				333F72553BFCC6E6C4F0ACD4 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2927,11 +2927,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB3C6809223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhatTests" */;
 			buildPhases = (
-				9D36A2A888D3161A7069CD99 /* [CP] Check Pods Manifest.lock */,
+				3722EC4BD980BC8DC9D54274 /* [CP] Check Pods Manifest.lock */,
 				AB3C67EE223FBB6600B57580 /* Sources */,
 				AB3C67EF223FBB6600B57580 /* Frameworks */,
 				AB3C67F0223FBB6600B57580 /* Resources */,
-				BE710C01A172DC35015000B5 /* [CP] Embed Pods Frameworks */,
+				2C79F347DAB27C80DE15E6E8 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -3168,60 +3168,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		5632526F0839F50E39A91D2D /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ThinkWhat-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9D36A2A888D3161A7069CD99 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ThinkWhat-ThinkWhatTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A79FA05FB19CEB958411C690 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BE710C01A172DC35015000B5 /* [CP] Embed Pods Frameworks */ = {
+		2C79F347DAB27C80DE15E6E8 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3238,6 +3185,67 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		333F72553BFCC6E6C4F0ACD4 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3722EC4BD980BC8DC9D54274 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ThinkWhat-ThinkWhatTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3DFC8B7CEDC53F92BD553115 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ThinkWhat-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -3246,7 +3254,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AB72962E27DB5A6D00D45B54 /* ListModel.swift in Sources */,
-				ABCAC574235F384600E6A118 /* ProgressCirle.swift in Sources */,
 				AB10030F27BF772600338EE4 /* Bundle.swift in Sources */,
 				AB1D844E24EA7FD500B75929 /* NavigationButtons.swift in Sources */,
 				AB883B2827FDB33600DBE4EF /* ImageSigns.swift in Sources */,
@@ -3576,6 +3583,7 @@
 				AB38DD6B2819411A00FFEB3F /* AppNotifications.swift in Sources */,
 				AB72962527DB5A6100D45B54 /* ListController.swift in Sources */,
 				AB21795B27577ED300D19567 /* InterestCell.swift in Sources */,
+				ABB19148286C526200C89142 /* ProcessInfo.swift in Sources */,
 				ABF20FB624C993D60092B223 /* UserVotesCell.swift in Sources */,
 				AB735C0B241902E600776248 /* SurveyQuestionCell.swift in Sources */,
 				ABF2756C280D62710023CD1F /* UITableView.swift in Sources */,
@@ -3813,7 +3821,7 @@
 		};
 		AB3C6807223FBB6600B57580 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BEADFD153DC7111F78B91159 /* Pods-ThinkWhat.debug.xcconfig */;
+			baseConfigurationReference = DF576775A809D6259D0A5995 /* Pods-ThinkWhat.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -3833,7 +3841,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat;
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3844,7 +3852,7 @@
 		};
 		AB3C6808223FBB6600B57580 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C5B1E916BA117F1770CFB2B5 /* Pods-ThinkWhat.release.xcconfig */;
+			baseConfigurationReference = 191D60811ABD57A2EEBF83BD /* Pods-ThinkWhat.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -3874,7 +3882,7 @@
 		};
 		AB3C680A223FBB6600B57580 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 10EE74C776F2B6200CD557C8 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */;
+			baseConfigurationReference = D6CCA115D6708FB93518D66F /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -3897,7 +3905,7 @@
 		};
 		AB3C680B223FBB6600B57580 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0B8B18E3907FC78604B9BB73 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */;
+			baseConfigurationReference = 4869026AC68AE423EAAC5F72 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -3960,6 +3968,292 @@
 			};
 			name = Release;
 		};
+		AB864445286C40AF00C7A6F8 /* Alpha */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
+				ENABLE_BITCODE = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Alpha;
+		};
+		AB864446286C40AF00C7A6F8 /* Alpha */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BDF51F46589DDF15422A0A72 /* Pods-ThinkWhat.alpha.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
+				ENABLE_BITCODE = YES;
+				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/swift",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat.alpha;
+				PRODUCT_NAME = "$(TARGET_NAME) (alpha)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Alpha;
+		};
+		AB864447286C40AF00C7A6F8 /* Alpha */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 520F716438E0A418EA6F3A26 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ThinkWhatTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ThinkWhat.app/ThinkWhat";
+			};
+			name = Alpha;
+		};
+		AB864448286C40AF00C7A6F8 /* Alpha */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ThinkWhatUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ThinkWhat;
+			};
+			name = Alpha;
+		};
+		ABD5FD07286C4D2800BCC382 /* Local */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
+				ENABLE_BITCODE = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Local;
+		};
+		ABD5FD08286C4D2800BCC382 /* Local */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E28B1AE8771195954BEB73AE /* Pods-ThinkWhat.local.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
+				ENABLE_BITCODE = YES;
+				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/swift",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhat.local;
+				PRODUCT_NAME = "ThinkWhat (local)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG LOCAL";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Local;
+		};
+		ABD5FD09286C4D2800BCC382 /* Local */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6B2AD8C737C5E0F520C362EC /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ThinkWhatTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ThinkWhat.app/ThinkWhat";
+			};
+			name = Local;
+		};
+		ABD5FD0A286C4D2800BCC382 /* Local */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ThinkWhatUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = PB.ThinkWhatUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ThinkWhat;
+			};
+			name = Local;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3967,6 +4261,8 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AB3C6804223FBB6600B57580 /* Debug */,
+				ABD5FD07286C4D2800BCC382 /* Local */,
+				AB864445286C40AF00C7A6F8 /* Alpha */,
 				AB3C6805223FBB6600B57580 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3976,6 +4272,8 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AB3C6807223FBB6600B57580 /* Debug */,
+				ABD5FD08286C4D2800BCC382 /* Local */,
+				AB864446286C40AF00C7A6F8 /* Alpha */,
 				AB3C6808223FBB6600B57580 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3985,6 +4283,8 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AB3C680A223FBB6600B57580 /* Debug */,
+				ABD5FD09286C4D2800BCC382 /* Local */,
+				AB864447286C40AF00C7A6F8 /* Alpha */,
 				AB3C680B223FBB6600B57580 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3994,6 +4294,8 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AB3C680D223FBB6600B57580 /* Debug */,
+				ABD5FD0A286C4D2800BCC382 /* Local */,
+				AB864448286C40AF00C7A6F8 /* Alpha */,
 				AB3C680E223FBB6600B57580 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;

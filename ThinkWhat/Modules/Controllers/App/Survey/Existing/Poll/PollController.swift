@@ -15,6 +15,57 @@ class PollController: UIViewController {
         case ReadOnly, Write
     }
     
+    // MARK: - Properties
+    var controllerOutput: PollControllerOutput?
+    var controllerInput: PollControllerInput?
+    private var _mode: Mode = .Write
+    var mode: Mode {
+        return _mode
+    }
+    private var _survey: Survey!
+    private var _surveyReference: SurveyReference!
+    private var _showNext: Bool = false
+    private var isLoading = false
+    private let watchButton: UIImageView = {
+        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
+        v.contentMode = .center
+        return v
+    }()
+    private var isAddedToFavorite = false {
+        didSet {
+            if isAddedToFavorite {
+                watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+            } else {
+                watchButton.tintColor = .systemGray
+            }
+        }
+    }
+    
+    private lazy var avatar: Avatar = {
+        let avatar = Avatar(color: .label, image: UIImage(systemName: "person.circle.fill")!, isBordered: false)
+        avatar.tintColor = .systemGray
+        return avatar
+    }()
+    
+    private lazy var progressIndicator: CircleButton = {
+        let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: true)
+        customTitle.color = .clear
+        customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        customTitle.icon.backgroundColor = .clear
+        customTitle.layer.masksToBounds = false
+        customTitle.icon.layer.masksToBounds = false
+        customTitle.oval.masksToBounds = false
+        customTitle.icon.scaleMultiplicator = 1.7
+        customTitle.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
+        customTitle.state = .Off
+        customTitle.contentView.backgroundColor = .clear
+        customTitle.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : surveyReference.topic.tagColor.cgColor
+        customTitle.oval.lineCap = .round
+        customTitle.oval.strokeStart = survey.isNil ? 0 : CGFloat(survey!.progress)
+        return customTitle
+    }()
+    
+    // MARK: - Initialization
     deinit {
         print("PollController deinit")
     }
@@ -48,73 +99,76 @@ class PollController: UIViewController {
         navigationController?.delegate = self
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
+        title = "new_poll".localized
+        navigationItem.largeTitleDisplayMode = .always
+    }
+    
     private func setupUI() {
-//        //Set icon category in title
-        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-        icon.backgroundColor = .clear
-        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor
-        icon.isRounded = false
-        icon.scaleMultiplicator = 1.4
-        icon.category = Icon.Category(rawValue: _surveyReference.topic.id) ?? .Null
-        navigationItem.titleView = icon
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+                    self.navigationController?.navigationBar.standardAppearance = appearance
+                    self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        guard let navigationBar = self.navigationController?.navigationBar else { return }
+        
+        guard deviceType != .iPhoneSE else {
+                    ///Set icon category in title
+                    let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+                    icon.backgroundColor = .clear
+                    icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor
+                    icon.isRounded = false
+                    icon.scaleMultiplicator = 1.4
+                    icon.category = Icon.Category(rawValue: _surveyReference.topic.id) ?? .Null
+                    navigationItem.titleView = icon
+            
+                    navigationItem.titleView?.clipsToBounds = false
+                    navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
+            
+                    let gesture = UITapGestureRecognizer(target: self, action: #selector(PollController.addFavorite))
+                    watchButton.addGestureRecognizer(gesture)
+            
+                    if isAddedToFavorite {
+                        watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+                    } else {
+                        watchButton.tintColor = .systemGray
+                    }
+            
+                    if let nc = navigationController as? NavigationControllerPreloaded {
+                        nc.setNavigationBarHidden(false, animated: false)
+//                        nc.navigationBar.isTranslucent = false
+                    }
+                    navigationItem.largeTitleDisplayMode = .never
+                    watchButton.image = _surveyReference.isFavorite ? ImageSigns.binocularsFilled.image : ImageSigns.binoculars.image
+                    isAddedToFavorite = _surveyReference.isFavorite ? true : false
+                    navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
+            return
+        }
+        
+        navigationBar.addSubview(avatar)
+        avatar.translatesAutoresizingMaskIntoConstraints = false
 
-        navigationItem.titleView?.clipsToBounds = false
-//        navigationItem.backBarButtonItem?.title = ""
-        navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
+        NSLayoutConstraint.activate([
+            avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 0),// -UINavigationController.Constants.ImageBottomMarginForSmallState),
+            avatar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState*3.5),
+            avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1.0/1.0)
+            ])
+
+//        navigationBar.addSubview(progressIndicator)
+//        progressIndicator.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            progressIndicator.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState*2),
+//            progressIndicator.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 0),// -UINavigationController.Constants.ImageBottomMarginForSmallState),
+//            progressIndicator.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState*3.5),
+//            progressIndicator.widthAnchor.constraint(equalTo: progressIndicator.heightAnchor, multiplier: 1.0/1.0)
+//            ])
+//        progressIndicator.layer.masksToBounds = false
+//        progressIndicator.lineWidth = progressIndicator.frame.width * 0.1
         
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(PollController.addFavorite))
-        watchButton.addGestureRecognizer(gesture)
-        
-        if isAddedToFavorite {
-            watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
-        } else {
-            watchButton.tintColor = .systemGray
-        }
-        
-        if let nc = navigationController as? NavigationControllerPreloaded {
-            nc.setNavigationBarHidden(false, animated: false)
-//            nc.isShadowed = true
-            nc.navigationBar.isTranslucent = false
-        }
-        
-//        NotificationCenter.default.addObserver(self,
-//                                               selector: #selector(PollController.updateViewsCount(notification:)),
-//                                               name: Notifications.UI.SuveyViewsCountReceived,
-//                                               object: nil)
-        navigationItem.largeTitleDisplayMode = .never
-        
-        watchButton.image = _surveyReference.isFavorite ? ImageSigns.binocularsFilled.image : ImageSigns.binoculars.image
-        isAddedToFavorite = _surveyReference.isFavorite ? true : false
-        navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
-        
-//        guard _surveyReference.isOwn else {
-//            if Surveys.shared.favoriteReferences.filter({ $0 == _surveyReference }).isEmpty {
-//                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
-//                    self.watchButton.image = ImageSigns.binoculars.image
-//                } completion: { _ in}
-//                isAddedToFavorite = false
-//            } else {
-//                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
-//                    self.watchButton.image = ImageSigns.binocularsFilled.image
-//                } completion: { _ in}
-//                isAddedToFavorite = true
-//            }
-////            if Surveys.shared.favoriteReferences.filter({ (ref, date) in
-////                ref == _surveyReference
-////            }).isEmpty {
-////                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
-////                    self.watchButton.image = ImageSigns.binoculars.image
-////                } completion: { _ in}
-////                isAddedToFavorite = false
-////            } else {
-////                UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
-////                    self.watchButton.image = ImageSigns.binocularsFilled.image
-////                } completion: { _ in}
-////                isAddedToFavorite = true
-////            }
-//            navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
-//            return
-//        }
+
     }
     
     private func performChecks() {
@@ -169,9 +223,13 @@ class PollController: UIViewController {
 //
 //    }
     
+ 
+    
     override func willMove(toParent parent: UIViewController?) {
         super.willMove(toParent: parent)
+        clearNavigationBar(clear: true)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
+        self.progressIndicator.removeFromSuperview()
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -185,31 +243,7 @@ class PollController: UIViewController {
         }
     }
     
-    // MARK: - Properties
-    var controllerOutput: PollControllerOutput?
-    var controllerInput: PollControllerInput?
-    private var _mode: Mode = .Write
-    var mode: Mode {
-        return _mode
-    }
-    private var _survey: Survey!
-    private var _surveyReference: SurveyReference!
-    private var _showNext: Bool = false
-    private var isLoading = false
-    private let watchButton: UIImageView = {
-        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
-        v.contentMode = .center
-        return v
-    }()
-    private var isAddedToFavorite = false {
-        didSet {
-            if isAddedToFavorite {
-                watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
-            } else {
-                watchButton.tintColor = .systemGray
-            }
-        }
-    }
+    
 }
 
 // MARK: - View Input
