@@ -243,17 +243,8 @@ class Userprofile: Decodable {
             if let url = imageURL {
                 Task {
                     image = try await API.shared.downloadImageAsync(from: url)
+//                    await MainActor.run { image = data }
                 }
-//                API.shared.downloadImage(url: url) { _ in } completion: { result in
-//                    switch result {
-//                    case .success(let _image):
-//                        self.image = _image
-//                    case .failure(let error):
-//#if DEBUG
-//                        print(error.localizedDescription)
-//#endif
-//                    }
-//                }
             }
         }
         cityTitle       = UserDefaults.Profile.city
@@ -385,15 +376,14 @@ class Userprofile: Decodable {
     
     func downloadImageAsync() async throws -> UIImage {
         do {
-            guard let url =  imageURL else {
-                throw "Image URL is nil"
-            }
-            self.image = try await API.shared.downloadImageAsync(from: url)
-            let publisher = NotificationCenter.default
-                .publisher(for: Notifications.UI.ImageReceived, object: nil)
-            return self.image!
+            guard let url =  imageURL else { throw AppError.invalidURL }
+            image = try await API.shared.downloadImageAsync(from: url)
+            return image!
         } catch {
             throw error
+#if DEBUG
+            error.printLocalized(class: type(of: self), functionName: #function)
+#endif
         }
     }
 }

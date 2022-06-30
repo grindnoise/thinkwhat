@@ -313,7 +313,7 @@ extension HotView: CallbackObservable {
             if string == "claim" {
                 let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                 banner.accessibilityIdentifier = "claim"
-                banner.present(subview: ClaimSelection(callbackDelegate: banner))
+                banner.present(content: ClaimSelection(callbackDelegate: banner))
             } else if string == "next" {
                 NotificationCenter.default.removeObserver(self)
                 Surveys.shared.rejected.append(currentCard.survey)

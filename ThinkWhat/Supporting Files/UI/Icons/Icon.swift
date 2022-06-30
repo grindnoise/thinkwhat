@@ -18,6 +18,13 @@ import UIKit
 
 class Icon: UIView {
     
+    init(frame: CGRect = .zero, category: Category, scaleMultiplicator: CGFloat = .zero, iconColor: UIColor = .black) {
+        super.init(frame: frame)
+        self.iconColor = iconColor
+        self.scaleMultiplicator = scaleMultiplicator
+        self.category = category
+    }
+    
     class func getIcon(frame: CGRect, category: Icon.Category, backgroundColor: UIColor, pathColor: UIColor = .white, text: String = "", textSize: CGFloat = 43) -> Icon {
         let icon = Icon(frame: frame)
         icon.iconColor = pathColor
@@ -194,8 +201,9 @@ class Icon: UIView {
         }
     }
     var textSize: CGFloat = 43
-    var scaleMultiplicator: CGFloat = 0 {
+    var scaleMultiplicator: CGFloat = .zero {
         didSet {
+            guard oldValue != scaleMultiplicator else { return }
             icon = getLayer()
         }
     }

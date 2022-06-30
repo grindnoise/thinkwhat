@@ -15,7 +15,7 @@ class Popup: UIView {
         print("Popup deinit")
     }
     
-    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightScaleFactor _heightMultiplictator: CGFloat = 0.7) {
+    init(frame: CGRect = UIScreen.main.bounds, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightScaleFactor _heightMultiplictator: CGFloat = 0.7) {
         self.heightScaleFactor = _heightMultiplictator
         super.init(frame: frame)
         self.callbackDelegate = callbackDelegate
@@ -106,11 +106,11 @@ class Popup: UIView {
     private weak var callbackDelegate : CallbackObservable?
     private weak var bannerDelegate: BannerObservable?
     
-    func present(subview: UIView, isModal _isModal: Bool = false, shouldDismissAfter seconds: TimeInterval = 0) {
-        subview.frame = container.frame
-        subview.addEquallyTo(to: container)
-        subview.setNeedsLayout()
-        subview.layoutIfNeeded()
+    func present(content: UIView, isModal _isModal: Bool = false, dismissAfter seconds: TimeInterval = 0) {
+        content.frame = container.frame
+        content.addEquallyTo(to: container)
+        content.setNeedsLayout()
+        content.layoutIfNeeded()
         
         isInteracting = false
         isModal       = _isModal

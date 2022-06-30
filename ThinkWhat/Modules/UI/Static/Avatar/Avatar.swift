@@ -10,18 +10,31 @@ import UIKit
 
 class Avatar: UIView {
     
-    private var image: UIImage = UIImage(systemName: "person.circle.fill")!
-    override var frame: CGRect {
+    private var gender: Gender = .Male
+    @MainActor public var image: UIImage? {
         didSet {
-            layoutSubviews()
+            guard let image = image, !container.isNil else {
+                return
+            }
+            let imageView = UIImageView(image: image)
+            imageView.contentMode = .scaleAspectFill
+            imageView.alpha  = 0
+            imageView.isUserInteractionEnabled = true
+            imageView.backgroundColor = .tertiarySystemBackground
+            imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            imageView.addEquallyTo(to: container)
+            let icon = self.container.get(all: Icon.self).first
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) { [weak self] in guard !self.isNil else { return }
+                imageView.alpha = 1
+                imageView.transform = .identity
+                icon?.alpha = 0
+            } completion: { _ in
+                guard !icon.isNil else { return }
+                icon!.removeFromSuperview()
+            }
         }
     }
-    
-    override var bounds: CGRect {
-        didSet {
-            layoutSubviews()
-        }
-    }
+
     public var lightColor = K_COLOR_RED {
         didSet {
             border.backgroundColor = UIColor { traitCollection in
@@ -47,18 +60,14 @@ class Avatar: UIView {
         }
     }
     weak var delegate: CallbackObservable?
-    private var isBordered: Bool = true
+    private var isBordered: Bool = false
+    private var observers: [NSKeyValueObservation] = []
     
-    //
+    //MARK: - IB outlets
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var borderBg: UIView!
     @IBOutlet weak var border: UIView!
-    @IBOutlet weak var imageView: UIImageView! {
-        didSet {
-            imageView.isUserInteractionEnabled = true
-            imageView.contentMode = .scaleAspectFill
-        }
-    }
+    @IBOutlet weak var container: UIView!
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -66,11 +75,11 @@ class Avatar: UIView {
         commonInit()
     }
     
-    init(color: UIColor, image: UIImage, isBordered: Bool = true) {
+    init(gender: Gender, image: UIImage? = nil, borderColor: UIColor = .clear) {
         super.init(frame: .zero)
         self.image = image
-        self.isBordered = isBordered
-        self.lightColor = color
+        self.isBordered = borderColor != .clear
+        self.lightColor = borderColor
         commonInit()
     }
     
@@ -85,49 +94,60 @@ class Avatar: UIView {
         contentView.frame = self.bounds
         contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(contentView)
+        setObservers()
         setupUI()
     }
     
-    override func layoutSubviews() {
-        if !border.isNil { border.cornerRadius = border.bounds.height/2 }
-        if !imageView.isNil {
-            imageView.cornerRadius = imageView.bounds.width/2
-            borderBg.cornerRadius = borderBg.bounds.width/2
-        }
+    private func setObservers() {
+        observers.append(container.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
+            guard !self.isNil, let newValue = change.newValue else { return }
+            view.cornerRadius = newValue.height / 2
+        })
+        observers.append(borderBg.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
+            guard !self.isNil, let newValue = change.newValue else { return }
+            view.cornerRadius = newValue.height / 2
+        })
+        observers.append(border.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
+            guard !self.isNil, let newValue = change.newValue else { return }
+            view.cornerRadius = newValue.height / 2
+        })
     }
     
-    
-    
     private func setupUI() {
-        self.imageView.image = image
-        let touch = UITapGestureRecognizer(target:self, action:#selector(Avatar.handleTap))
-        imageView.addGestureRecognizer(touch)
+        var userPic: UIView!
+        if image.isNil {
+            userPic = Icon(category: gender == .Male ? .ManFace : .GirlFace, scaleMultiplicator: 1.5)
+        } else {
+            userPic = UIImageView(image: image)
+            userPic.isUserInteractionEnabled = true
+            userPic.contentMode = .scaleAspectFill
+        }
+        userPic.backgroundColor = .lightGray
+        userPic.addEquallyTo(to: container)
+        userPic.addGestureRecognizer(UITapGestureRecognizer(target:self, action:#selector(self.handleTap)))
         
-        border.backgroundColor = UIColor { traitCollection in
-            switch traitCollection.userInterfaceStyle {
-            case .dark:
-                return self.darkColor
-            default:
-                return self.lightColor
-            }
+        guard !isBordered else {
+            border.backgroundColor = traitCollection.userInterfaceStyle == .dark ? darkColor : lightColor
+            return
         }
         
-        guard !isBordered,
-              let constraint = imageView.getAllConstraints().filter({ $0.identifier == "ratio" }).first else { return }
-        imageView.removeConstraint(constraint)
-        imageView.heightAnchor.constraint(equalTo: border.heightAnchor).isActive = true
-        imageView.widthAnchor.constraint(equalTo: border.widthAnchor).isActive = true
-//        let newConstraint = constraint.setMultiplierWithFade(1, duration: 0)
-//        newConstraint.identifier = "ratio"
+//        container.getAllConstraints().forEach{ container.removeConstraint($0) }
+////        container.translatesAutoresizingMaskIntoConstraints = false
+//        container.leadingAnchor.constraint(equalTo: border.leadingAnchor).isActive = true
+//        container.trailingAnchor.constraint(equalTo: border.trailingAnchor).isActive = true
+//        container.topAnchor.constraint(equalTo: border.topAnchor).isActive = true
+//        container.bottomAnchor.constraint(equalTo: border.bottomAnchor).isActive = true
+        
+//        guard let constraint = container.getAllConstraints().filter({ $0.identifier == "ratio" }).first else { return }
+//        container.translatesAutoresizingMaskIntoConstraints = false
+//        container.removeConstraint(constraint)
+//        container.heightAnchor.constraint(equalTo: border.heightAnchor).isActive = true
+//        container.widthAnchor.constraint(equalTo: border.widthAnchor).isActive = true
+
     }
     
     @objc
     private func handleTap() {
         delegate?.callbackReceived(self)
-    }
-    
-    public func setImage(_ image: UIImage) {
-        guard !imageView.isNil else { return }
-        imageView.image = image
     }
 }

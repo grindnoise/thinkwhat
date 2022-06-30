@@ -100,14 +100,15 @@ class LargeCard: UIView, HotCard {
         }
         
         guard let image = survey.owner.image else {
-            //TODO: - Download
             Task {
-                let image = try await survey.owner.downloadImageAsync()
-                Animations.onImageLoaded(imageView: avatar.imageView, image: image)
+                do {
+                    let data = try await survey.owner.downloadImageAsync()
+                    await MainActor.run { avatar.image = data}
+                } catch {}
             }
             return
         }
-        avatar.imageView.image = image
+        avatar.image = image
     }
     
     private func setTitle() {

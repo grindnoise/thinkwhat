@@ -78,18 +78,19 @@ class VoterCell: UICollectionViewCell {
         guard !avatar.isNil else { return }
         avatar.lightColor = lightColor//color.withAlphaComponent(0.5)
         avatar.darkColor = darkColor//color.withAlphaComponent(0.5)
-        setImage()
         checkmarkBg.cornerRadius = checkmarkBg.bounds.height/2
+        Task {
+            do {
+                let data = try await user.downloadImageAsync()
+                await MainActor.run { avatar.image = data}
+            } catch {}
+        }
     }
     
     public func setSelectable(_ flag: Bool) {
         avatar.isUserInteractionEnabled = !flag
         label.isUserInteractionEnabled = !flag
     }
-    
-//    public func setSelected() {
-//        isSelected = !isSelected
-//    }
     
     private func setText() {
         let attributedText = NSMutableAttributedString()
@@ -109,27 +110,5 @@ class VoterCell: UICollectionViewCell {
         }
         attributedText.append(NSAttributedString(string: text, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.height * heightDivisor), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         label.attributedText = attributedText
-    }
-    
-    private func setImage() {
-        if let image = user.image {
-            avatar.setImage(image)
-        } else {
-            if let image = UIImage(named: "user") {
-                avatar.setImage(image)
-            }
-            Task {
-                do {
-                    let image = try await user.downloadImageAsync()
-                    await MainActor.run {
-                        Animations.onImageLoaded(imageView: avatar.imageView, image: image)
-                    }
-                } catch {
-#if DEBUG
-                    print(error)
-#endif
-                }
-            }
-        }
     }
 }

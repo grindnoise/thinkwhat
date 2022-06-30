@@ -30,4 +30,8 @@ extension UIViewController {
             self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         }
     }
+    
+    func setNavigationBarTintColor(_ color: UIColor) {
+        self.navigationController?.navigationBar.tintColor = color
+    }
 }

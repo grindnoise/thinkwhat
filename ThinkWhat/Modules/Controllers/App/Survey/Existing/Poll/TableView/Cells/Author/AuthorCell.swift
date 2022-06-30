@@ -78,15 +78,16 @@ class AuthorCell: UITableViewCell {
         avatar.lightColor = survey.isAnonymous ? .black : survey.topic.tagColor
         favoriteLabel.text = "\(survey.likes)"
         if survey.owner == Userprofiles.shared.anonymous {
-            avatar.setImage(UIImage(named: "anon")!)
+            avatar.image = UIImage(named: "anon")!
         } else if let image = survey.owner.image {
-            avatar.imageView.image = image
+            avatar.image = image
         } else {
             Task {
-                let image = try await survey.owner.downloadImageAsync()
-                Animations.onImageLoaded(imageView: avatar.imageView, image: image)
+                do {
+                    let data = try await survey.owner.downloadImageAsync()
+                    await MainActor.run { avatar.image = data}
+                } catch {}
             }
-            
         }
         let categoryString = NSMutableAttributedString()
         categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))

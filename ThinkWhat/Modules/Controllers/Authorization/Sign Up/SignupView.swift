@@ -505,7 +505,7 @@ extension SignupView: UITextFieldDelegate {
                         }
                     case .failure(let error):
                         let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-                        banner.present(subview: PlainBannerContent(text: error.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 10.5)
+                        banner.present(content: PlainBannerContent(text: error.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 10.5)
                     }
                     self.isPerformingChecks = false
                     textField.isShowingSpinner = false

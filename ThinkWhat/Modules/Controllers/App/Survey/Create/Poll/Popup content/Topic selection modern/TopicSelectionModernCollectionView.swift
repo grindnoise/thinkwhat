@@ -44,7 +44,6 @@ class TopicSelectionModernCollectionView: UICollectionView {
         }
 //        collectionViewLayout.register(RoundedBackgroundView.self, forDecorationViewOfKind: RoundedBackgroundView.reuseIdentifier)
         collectionViewLayout.collectionView?.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        allowsMultipleSelection = false
         
         let cellRegistration = UICollectionView.CellRegistration<TopicSelectionModernCell, TopicItem> { [weak self ] cell, indexPath, item in
             guard let self = self else { return }
@@ -149,7 +148,8 @@ class TopicSelectionModernCollectionView: UICollectionView {
         collectionViewLayout.collectionView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
-    weak var callbackDelegate: CallbackObservable?
+    // MARK: - Private properties
+    private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<TopicHeaderItem, TopicListItem>!
     private var layoutConfig: UICollectionLayoutListConfiguration!
     private var isFirstSelection = true

@@ -62,7 +62,7 @@ class ListView: UIView {
 // MARK: - Controller Output
 extension ListView: ListControllerOutput {
     func onError() {
-        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 1)
+        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark, dismissAfter: 1)
     }
     
     func onDataSourceChanged() {

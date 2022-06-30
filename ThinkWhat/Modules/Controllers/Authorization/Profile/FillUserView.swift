@@ -30,10 +30,9 @@ class FillUserView: UIView {
                   let url = URL(string: path),
                   let data = try? Data(contentsOf: url),
                   let image = UIImage(data: data) else {
-                      avatar.imageView.image = UIImage(named: "anon")
                       return
             }
-            avatar.imageView.image = image
+            avatar.image = image
         }
     }
     @IBOutlet weak var firstNameTF: UnderlinedSignTextField! {
@@ -205,7 +204,7 @@ class FillUserView: UIView {
             }
             return
         }
-        guard let image = avatar.imageView.image,
+        guard let image = avatar.image,
               let firstName = firstNameTF.text,
               let lastName = lastNameTF.text,
               !birthDateTF.text.isNil else {
@@ -351,8 +350,7 @@ extension FillUserView: FillUserControllerOutput {
     
     func onAvatarChange(_ image : UIImage) {
         isImageChanged = true
-        UIView.transition(with: avatar, duration: 0.3, options: [.transitionCrossDissolve]) {
-            self.avatar.imageView.image = image } completion: { _ in}
+        avatar.image = image
     }
     
     func onCityFetchResults(_ cities: [City]) {

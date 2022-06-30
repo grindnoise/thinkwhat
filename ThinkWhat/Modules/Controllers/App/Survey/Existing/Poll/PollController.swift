@@ -40,11 +40,14 @@ class PollController: UIViewController {
             }
         }
     }
+    private lazy var stackView: UIStackView = {
+        let v = UIStackView()
+        v.spacing = 8
+        return v
+    }()
     
     private lazy var avatar: Avatar = {
-        let avatar = Avatar(color: .label, image: UIImage(systemName: "person.circle.fill")!, isBordered: false)
-        avatar.tintColor = .systemGray
-        return avatar
+        return Avatar(gender: surveyReference.owner.gender, image: surveyReference.owner.image)
     }()
     
     private lazy var progressIndicator: CircleButton = {
@@ -64,6 +67,7 @@ class PollController: UIViewController {
         customTitle.oval.strokeStart = survey.isNil ? 0 : CGFloat(survey!.progress)
         return customTitle
     }()
+    private var observers: [NSKeyValueObservation] = []
     
     // MARK: - Initialization
     deinit {
@@ -95,14 +99,15 @@ class PollController: UIViewController {
             .modelOutput = self
         
         setupUI()
+        setObservers()
         performChecks()
-        navigationController?.delegate = self
+//        navigationController?.delegate = self
+        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
-        title = "new_poll".localized
         navigationItem.largeTitleDisplayMode = .always
     }
     
@@ -151,10 +156,44 @@ class PollController: UIViewController {
 
         NSLayoutConstraint.activate([
             avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
-            avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 0),// -UINavigationController.Constants.ImageBottomMarginForSmallState),
-            avatar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState*3.5),
+            avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            avatar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState),
             avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1.0/1.0)
             ])
+        
+        stackView.axis = .horizontal
+        navigationBar.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            stackView.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState),
+            stackView.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+            stackView.heightAnchor.constraint(equalToConstant: 52 - UINavigationController.Constants.ImageBottomMarginForLargeState),
+            stackView.trailingAnchor.constraint(equalTo: avatar.leadingAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForSmallState)
+        ])
+        
+        let indicator = CircleButton(frame: .zero)
+        indicator.color = surveyReference.topic.tagColor
+        indicator.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
+        indicator.oval.lineCap = .round
+        indicator.ovalBg.strokeStart = 0
+        indicator.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        indicator.icon.backgroundColor = .clear
+        indicator.backgroundColor = .clear
+        indicator.icon.scaleMultiplicator = 1.5
+        indicator.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
+        indicator.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
+        stackView.addArrangedSubview(indicator)
+        
+        let label = UILabel()
+        label.textColor = traitCollection.userInterfaceStyle == .dark ? .label : surveyReference.topic.tagColor
+        label.text = surveyReference.topic.title
+        stackView.addArrangedSubview(label)
+        
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.widthAnchor.constraint(equalTo: indicator.heightAnchor, multiplier: 1.0/1.0).isActive = true
+        
+//        navigationBar.set
 
 //        navigationBar.addSubview(progressIndicator)
 //        progressIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -169,6 +208,15 @@ class PollController: UIViewController {
 //        progressIndicator.lineWidth = progressIndicator.frame.width * 0.1
         
 
+    }
+    
+    private func setObservers() {
+        observers.append(stackView.observe(\UIStackView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
+            guard !self.isNil,
+                  let newValue = change.newValue,
+                  let label = view.arrangedSubviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel else { return }
+            label.font = UIFont(name: Fonts.Bold, size: newValue.width * 0.1)
+        })
     }
     
     private func performChecks() {
@@ -187,7 +235,7 @@ class PollController: UIViewController {
     @objc private func addFavorite() {
         guard !isLoading, !survey.isNil else { return }
         guard survey!.isComplete else {
-            showBanner(bannerDelegate: self, text: "finish_poll".localized, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 1)
+            showBanner(bannerDelegate: self, text: "finish_poll".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
             return
         }
 //        isLoading = true
@@ -227,12 +275,30 @@ class PollController: UIViewController {
     
     override func willMove(toParent parent: UIViewController?) {
         super.willMove(toParent: parent)
+        guard parent.isNil else { return }
         clearNavigationBar(clear: true)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
-        self.progressIndicator.removeFromSuperview()
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
+            self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            self.avatar.alpha = 0
+            self.stackView.alpha = 0
+        } completion: { _ in
+            self.avatar.removeFromSuperview()
+            self.stackView.removeFromSuperview()
+        }
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+        if let label = stackView.get(all: UILabel.self).first {
+            label.textColor = traitCollection.userInterfaceStyle == .dark ? .label : surveyReference.topic.tagColor
+        }
+        
+        if let indicator = stackView.get(all: CircleButton.self).first {
+            indicator.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+        }
+        
         if let icon = navigationItem.titleView as? Icon {
             icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor)
         }
@@ -243,7 +309,14 @@ class PollController: UIViewController {
         }
     }
     
-    
+    @objc
+    private func handleTap(_ recognizer: UITapGestureRecognizer) {
+        guard let sender = recognizer.view else { return }
+        if sender.isKind(of: CircleButton.self) {
+            let popup = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.5)
+            popup.present(content: UIView(), dismissAfter: 1)
+        }
+    }
 }
 
 // MARK: - View Input
@@ -352,6 +425,7 @@ extension PollController: PollModelOutput {
     }
 }
 
+// MARK: - BannerObservable
 extension PollController: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     
@@ -360,15 +434,26 @@ extension PollController: BannerObservable {
     func onBannerDidAppear(_ sender: Any) {}
     
     func onBannerDidDisappear(_ sender: Any) {
-        guard let banner = sender as? Banner else { return }
-        banner.removeFromSuperview()
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let banner = sender as? Popup {
+            banner.removeFromSuperview()
+        }
     }
 }
 
+// MARK: - UINavigationControllerDelegate
 extension PollController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         if let vc = viewController as? HotController, controllerOutput?.hasVoted == true {
             vc.shouldSkipCurrentCard = true
         }
+    }
+}
+
+// MARK: - CallbackObservable
+extension PollController: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        
     }
 }

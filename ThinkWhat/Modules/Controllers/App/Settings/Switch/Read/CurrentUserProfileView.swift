@@ -233,14 +233,7 @@ class CurrentUserProfileView: UIView {
 
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var avatar: Avatar! {
-        didSet {
-            avatar.backgroundColor = .clear
-//            avatar.darkColor = .clear
-//            avatar.lightColor = .clear
-            avatar.setImage(UIImage(named: "user")!)
-        }
-    }
+    @IBOutlet weak var avatar: Avatar! 
     @IBOutlet weak var name: UILabel! {
         didSet {
             name.numberOfLines = 0

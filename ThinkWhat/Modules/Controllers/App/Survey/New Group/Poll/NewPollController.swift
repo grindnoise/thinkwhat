@@ -2018,15 +2018,15 @@ class NewPollController: UIViewController, UINavigationControllerDelegate {
                 //                destinationVC.actionButton.lineWidth = lineWidth
                 destinationVC.actionButtonWidthConstant = votesIcon.frame.width
                 destinationVC.color = selectedColor
-            } else if segue.identifier == Segues.App.Image, let destinationVC = segue.destination as? delImageViewController, let image = sender as? UIImage {
-                nc.duration = 0.25
-                nc.transitionStyle = .Icon
-                destinationVC.image = image
-                images.forEach { (_, dict) in
-                    if !dict.isEmpty, dict.first?.key == image {
-                        destinationVC.titleString = dict.first!.value
-                    }
-                }
+//            } else if segue.identifier == Segues.App.Image, let destinationVC = segue.destination as? delImageViewController, let image = sender as? UIImage {
+//                nc.duration = 0.25
+//                nc.transitionStyle = .Icon
+//                destinationVC.image = image
+//                images.forEach { (_, dict) in
+//                    if !dict.isEmpty, dict.first?.key == image {
+//                        destinationVC.titleString = dict.first!.value
+//                    }
+//                }
 //            } else if segue.identifier == Segues.NewSurvey.Results, let destinationVC = segue.destination as? NewSurveyResultViewController, survey != nil {
 //                destinationVC.survey = survey!
             }

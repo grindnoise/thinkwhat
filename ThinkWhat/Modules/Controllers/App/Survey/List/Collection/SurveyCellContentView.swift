@@ -163,10 +163,8 @@ private extension SurveyCellContentView {
         
         
         avatar.lightColor = currentConfiguration.isAnonymous! ? .black : currentConfiguration.color!
-        if avatar.imageView.isNil, !currentConfiguration.avatar.isNil {
-            Animations.onImageLoaded(imageView: avatar.imageView, image: currentConfiguration.avatar!)
-        } else {
-            avatar.imageView.image = currentConfiguration.avatar
+        if avatar.image.isNil, !currentConfiguration.avatar.isNil {
+            avatar.image = currentConfiguration.avatar!
         }
         hotIcon.alpha = currentConfiguration.isHot! ? 1 : 0
         watch.alpha = currentConfiguration.isFavorite! ? 1 : 0

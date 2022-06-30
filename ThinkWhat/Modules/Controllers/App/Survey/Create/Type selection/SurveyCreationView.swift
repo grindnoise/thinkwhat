@@ -225,9 +225,9 @@ class SurveyCreationView: UIView, SurveyCreationOutput {
         }
     }
     @IBAction func infoTapped(_ sender: Any) {
-        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+        let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
 //        banner.accessibilityIdentifier = "claim"
-        banner.present(subview: UIView(), shouldDismissAfter: 2)
+        banner.present(content: UIView(), dismissAfter: 2)
     }
 }
 

@@ -87,7 +87,7 @@ extension SubscribersView: SubscribersControllerOutput {
     }
     
     func onAPIError() {
-        showBanner(callbackDelegate: nil, bannerDelegate: self, text: AppError.server.localizedDescription, imageContent: ImageSigns.exclamationMark)
+        showBanner(callbackDelegate: nil, bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark)
     }
     
     var unsubscribeList: [Userprofile] {
@@ -108,10 +108,10 @@ extension SubscribersView: SubscribersControllerOutput {
         case .failure:
             showBanner(callbackDelegate: nil,
                        bannerDelegate: self, text: "voters_load_error".localized,
-                       imageContent: ImageSigns.exclamationMark,
+                       content: ImageSigns.exclamationMark,
                        color: .systemRed,
                        isModal: false,
-                       shouldDismissAfter: 1)
+                       dismissAfter: 1)
         }
     }
     

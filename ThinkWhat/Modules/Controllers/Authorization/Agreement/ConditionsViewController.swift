@@ -61,12 +61,12 @@ extension ConditionsViewController: ConditionsViewInput {
     
     func onRefuse() {
         let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-        banner.present(subview: PlainBannerContent(text: "should_read_agreement_message".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, shouldDismissAfter: 1.5)
+        banner.present(content: PlainBannerContent(text: "should_read_agreement_message".localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 1.5)
     }
     
     func onTapWhileLoading() {
         let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-        banner.present(subview: PlainBannerContent(text: "wait_for_agreement".localized, imageContent: ImageSigns.exclamationMark, color: .systemOrange), isModal: false, shouldDismissAfter: 1.5)
+        banner.present(content: PlainBannerContent(text: "wait_for_agreement".localized, imageContent: ImageSigns.exclamationMark, color: .systemOrange), isModal: false, dismissAfter: 1.5)
     }
 }
 

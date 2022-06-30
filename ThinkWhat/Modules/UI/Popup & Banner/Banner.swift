@@ -103,11 +103,11 @@ class Banner: UIView {
     private weak var callbackDelegate : CallbackObservable?
     private weak var bannerDelegate: BannerObservable?
     
-    func present(subview: UIView, isModal _isModal: Bool = false, shouldDismissAfter seconds: TimeInterval = 0) {
-        subview.frame = container.frame
-        subview.addEquallyTo(to: container)
-        subview.setNeedsLayout()
-        subview.layoutIfNeeded()
+    func present(content: UIView, isModal _isModal: Bool = false, dismissAfter seconds: TimeInterval = 0) {
+        content.frame = container.frame
+        content.addEquallyTo(to: container)
+        content.setNeedsLayout()
+        content.layoutIfNeeded()
         
         isInteracting = false
         isModal       = _isModal
@@ -258,10 +258,10 @@ extension Banner: CallbackObservable {
     }
 }
 
-func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, imageContent: UIView, color: UIColor = .systemRed, isModal: Bool = false, shouldDismissAfter: TimeInterval = 1, accessibilityIdentifier: String = "") {
+func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, content: UIView, color: UIColor = .systemRed, isModal: Bool = false, dismissAfter: TimeInterval = 1, identifier: String = "") {
     let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
-    banner.accessibilityIdentifier = accessibilityIdentifier
-    banner.present(subview: PlainBannerContent(text: text, imageContent: imageContent, color: color), isModal: isModal, shouldDismissAfter: shouldDismissAfter)
+    banner.accessibilityIdentifier = identifier
+    banner.present(content: PlainBannerContent(text: text, imageContent: content, color: color), isModal: isModal, dismissAfter: dismissAfter)
 }
 //
 //func showPopup(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: UIView, color: UIColor = .systemRed, isModal: Bool = true, shouldDismissAfter: TimeInterval = 1, accessibilityIdentifier: String = "", callbackPassthrough: Bool = false) {
@@ -275,7 +275,7 @@ func showPopup<C: UIView>(callbackDelegate: CallbackObservable? = nil, bannerDel
     let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
     banner.accessibilityIdentifier = accessibilityIdentifier
     subview.callbackDelegate = banner
-    banner.present(subview: subview)
+    banner.present(content: subview)
 }
 
 func showTip(delegate: BannerObservable, identifier: String, force: Bool = false, timeout: TimeInterval = 2) {
@@ -302,7 +302,7 @@ func showTip(delegate: BannerObservable, identifier: String, force: Bool = false
     
     showBanner(bannerDelegate: delegate,
                text: identifier.localized,
-               imageContent: imageView,
+               content: imageView,
                color: color,
-               shouldDismissAfter: timeout)
+               dismissAfter: timeout)
 }

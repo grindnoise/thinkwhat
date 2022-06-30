@@ -60,7 +60,7 @@ extension LoginViewController: LoginViewInput {
     
     func onIncorrectFields() {
         let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-        banner.present(subview: PlainBannerContent(text: "check_fields".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, shouldDismissAfter: 1.5)
+        banner.present(content: PlainBannerContent(text: "check_fields".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, dismissAfter: 1.5)
     }
     
     func onLogin(username: String, password: String) {
@@ -77,7 +77,7 @@ extension LoginViewController: LoginModelOutput {
             try await Task.sleep(nanoseconds: UInt64(0.5 * 1_000_000_000))
             await MainActor.run {
                 let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-                banner.present(subview: PlainBannerContent(text: "log_in_error".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, shouldDismissAfter: 1.5)
+                banner.present(content: PlainBannerContent(text: "log_in_error".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, dismissAfter: 1.5)
             }
         }
     }

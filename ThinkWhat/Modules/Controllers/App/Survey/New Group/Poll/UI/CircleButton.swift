@@ -15,6 +15,11 @@ class CircleButton: UIView, CAAnimationDelegate {
         case On, Off
     }
 
+    var ovalBg: CAShapeLayer! {
+        didSet {
+            ovalBg.masksToBounds = false
+        }
+    }
     var oval: CAShapeLayer! {
         didSet {
             oval.masksToBounds = false
@@ -47,7 +52,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     var color: UIColor = K_COLOR_RED {
         didSet {
             icon.backgroundColor = color
-            oval.strokeColor = color.cgColor
+            oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor 
         }
     }
     
@@ -111,8 +116,11 @@ class CircleButton: UIView, CAAnimationDelegate {
         self.addSubview(content)
         self.backgroundColor = .clear//UIColor(red:1.00, green: 1.00, blue:1.00, alpha:0.0)
         
+        ovalBg = CAShapeLayer()
+        self.layer.insertSublayer(ovalBg, at: 1)//(oval)
+        layers["ovalBg"] = ovalBg
         oval = CAShapeLayer()
-        self.layer.insertSublayer(oval, at: 1)//(oval)
+        self.layer.insertSublayer(oval, at: 2)//(oval)
         layers["oval"] = oval
         
         icon = Icon.getIcon(frame: .zero, category: .Outdoor/*category*/, backgroundColor: color, text: text)//SurveyCategoryIcon(frame: self.bounds)//getIcon(frame: self.bounds, category: category, color: color)
@@ -156,9 +164,8 @@ class CircleButton: UIView, CAAnimationDelegate {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        resetLayerProperties(forLayerIdentifiers: ["oval"])
-        contentView.backgroundColor = .systemBackground
         oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor
+        oval.fillColor   = UIColor.clear.cgColor
 //        icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : color
     }
     
@@ -168,11 +175,20 @@ class CircleButton: UIView, CAAnimationDelegate {
         
         if layerIds == nil || layerIds.contains("oval"){
             let oval = layers["oval"] as! CAShapeLayer
-            oval.fillColor   = UIColor.systemBackground.cgColor
-            oval.strokeColor = color.withAlphaComponent(0.3).cgColor//UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
+            oval.fillColor   = UIColor.clear.cgColor
+            oval.strokeColor = color.cgColor//UIColor(red:0.404, green: 0.404, blue:0.404, alpha:1).cgColor
             oval.lineWidth   = lineWidth
             oval.strokeStart = state == .On ? 0 : 1
         }
+        
+        if layerIds == nil || layerIds.contains("ovalBg"){
+            let oval = layers["ovalBg"] as! CAShapeLayer
+            oval.fillColor   = UIColor.clear.cgColor
+            oval.strokeColor = UIColor.systemGray.withAlphaComponent(0.1).cgColor
+            oval.lineWidth   = lineWidth
+            oval.strokeStart = 1
+        }
+
         
         CATransaction.commit()
     }
@@ -181,7 +197,12 @@ class CircleButton: UIView, CAAnimationDelegate {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         
-        if let oval = layers["oval"] as? CAShapeLayer{
+        if let oval = layers["ovalBg"] as? CAShapeLayer {
+            oval.frame = CGRect(x: 0.05 * oval.superlayer!.bounds.width, y: 0.05 * oval.superlayer!.bounds.height, width: 0.9 * oval.superlayer!.bounds.width, height: 0.9 * oval.superlayer!.bounds.height)
+            oval.path  = ovalPath(bounds: layers["ovalBg"]!.bounds).cgPath
+        }
+        
+        if let oval = layers["oval"] as? CAShapeLayer {
             oval.frame = CGRect(x: 0.05 * oval.superlayer!.bounds.width, y: 0.05 * oval.superlayer!.bounds.height, width: 0.9 * oval.superlayer!.bounds.width, height: 0.9 * oval.superlayer!.bounds.height)
             oval.path  = ovalPath(bounds: layers["oval"]!.bounds).cgPath
         }

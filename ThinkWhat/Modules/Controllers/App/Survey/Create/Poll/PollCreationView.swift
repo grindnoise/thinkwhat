@@ -259,15 +259,15 @@ class PollCreationView: UIView, UINavigationControllerDelegate {
                 delay(seconds: 0.5) {
                     let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.5)
                     
-                    banner.present(subview: ChoiceEditingPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1 , forceEditing: true, mode: .Create))
+                    banner.present(content: ChoiceEditingPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1 , forceEditing: true, mode: .Create))
                 }
                 if viewInput?.stage != .Choices {
                     delay(seconds: 0.75) {
                         showBanner(bannerDelegate: self,
                                    text: AppError.minimumChoices.localizedDescription,
-                                   imageContent: ImageSigns.exclamationMark,
+                                   content: ImageSigns.exclamationMark,
                                    color: self.color,
-                                   shouldDismissAfter: 1)
+                                   dismissAfter: 1)
                     }
                 }
             }
@@ -886,7 +886,7 @@ class PollCreationView: UIView, UINavigationControllerDelegate {
         if viewInput?.balance ?? 0 <  costItems.reduce(into: 0) { $0 += $1.cost } {
             banner.accessibilityIdentifier = "insufficient_balance"
         }
-        banner.present(subview: CostView(callbackDelegate: banner, dataProvider: self, parent: banner))//, result: result))
+        banner.present(content: CostView(callbackDelegate: banner, dataProvider: self, parent: banner))//, result: result))
     }
 }
 
@@ -899,12 +899,12 @@ extension PollCreationView: PollCreationControllerOutput {
     func onImageCopiedToPasteBoard(_ image: UIImage) {
         guard imageItems.count < 3 else { return }
         let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self)
-        banner.present(subview: ImagePasteView(delegate: banner, image: image))
+        banner.present(content: ImagePasteView(delegate: banner, image: image))
     }
     
     func onURLCopiedToPasteBoard(_ url: URL) {
         let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self)
-        banner.present(subview: URLPasteView(delegate: banner, url: url, color: K_COLOR_TABBAR))
+        banner.present(content: URLPasteView(delegate: banner, url: url, color: K_COLOR_TABBAR))
     }
     
     func onSuccess() {
@@ -1097,7 +1097,7 @@ extension PollCreationView: PollCreationControllerOutput {
                 { [weak self] in guard let self = self else { return }
                     let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                     banner.accessibilityIdentifier = "topic_tip"
-                    banner.present(subview: TopicSelectionModernContainer(isModal: true, callbackDelegate: banner))
+                    banner.present(content: TopicSelectionModernContainer(isModal: true, callbackDelegate: banner))
                 }
             ])
         case .Options:
@@ -1105,7 +1105,7 @@ extension PollCreationView: PollCreationControllerOutput {
                 { [weak self] in guard let self = self else { return }; self.optionsButton.state = .On},
                 { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                     banner.accessibilityIdentifier = "options_tip"
-                    banner.present(subview: OptionSelection(isModal: true, option: .Ordinary, callbackDelegate: banner))}
+                    banner.present(content: OptionSelection(isModal: true, option: .Ordinary, callbackDelegate: banner))}
             ])
             var startPoint = topicView.superview!.convert(topicView.center, to: scrollContentView)
             startPoint.y += (topicView.bounds.height + lineWidth)/2//delta
@@ -1289,7 +1289,7 @@ extension PollCreationView: PollCreationControllerOutput {
                     let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.5)
                     banner.accessibilityIdentifier = "choices_tip"
                     delayAsync(delay: 0.25) {
-                        banner.present(subview: ChoiceEditingPopup(callbackDelegate: banner, item: self.choiceItems.first, index: self.choiceItems.firstIndex(of: self.choiceItems.first!)! + 1, forceEditing: true, mode:  .Create))
+                        banner.present(content: ChoiceEditingPopup(callbackDelegate: banner, item: self.choiceItems.first, index: self.choiceItems.firstIndex(of: self.choiceItems.first!)! + 1, forceEditing: true, mode:  .Create))
                     }
                 }
             ])
@@ -1316,7 +1316,7 @@ extension PollCreationView: PollCreationControllerOutput {
             animate(button: self.commentsButton, completionBlocks: [
                 { [weak self] in guard let self = self else { return }; self.commentsButton.state = .On},
                 { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-                    banner.present(subview: CommentsSelection(option: self.comments, callbackDelegate: banner))}
+                    banner.present(content: CommentsSelection(option: self.comments, callbackDelegate: banner))}
             ])
             
             var startPoint = pollChoicesBg.superview!.convert(pollChoicesBg.center, to: scrollContentView)
@@ -1342,7 +1342,7 @@ extension PollCreationView: PollCreationControllerOutput {
                 { [weak self] in guard let self = self else { return }; self.limitsButton.state = .On},
                 { [weak self] in guard let self = self else { return }; let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                     banner.accessibilityIdentifier = "limits_tip"
-                    banner.present(subview: LimitsSelectionView(value: self.limits, callbackDelegate: banner))}
+                    banner.present(content: LimitsSelectionView(value: self.limits, callbackDelegate: banner))}
             ])
             
             var startPoint = commentsView.superview!.convert(commentsView.center, to: scrollContentView)
@@ -1374,7 +1374,7 @@ extension PollCreationView: PollCreationControllerOutput {
                     guard self.option == .Private else {
                         let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
                         banner.accessibilityIdentifier = "hot_tip"
-                        banner.present(subview: HotSelectionView(option: self.hot, callbackDelegate: banner))
+                        banner.present(content: HotSelectionView(option: self.hot, callbackDelegate: banner))
                         return
                     }
                     self.hot = .Off
@@ -1800,13 +1800,13 @@ extension PollCreationView {
             choiceItems.append(item)
             let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.5)
             
-            banner.present(subview: ChoiceEditingPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1 , forceEditing: true, mode: .Create))
+            banner.present(content: ChoiceEditingPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1 , forceEditing: true, mode: .Create))
         } else if v == pollImagesHeaderButton {
             guard imageItems.count < 3 else {
                 showBanner(bannerDelegate: self,
                            text: AppError.maximumImages.localizedDescription,
-                           imageContent: ImageSigns.exclamationMark,
-                           shouldDismissAfter: 1)
+                           content: ImageSigns.exclamationMark,
+                           dismissAfter: 1)
                 return
             }
 //            let item = ImageItem(title: "")
@@ -1820,8 +1820,8 @@ extension PollCreationView {
             guard choiceItems.count >= 2 else {
                 showBanner(bannerDelegate: self,
                            text: AppError.minimumChoices.localizedDescription,
-                           imageContent: ImageSigns.exclamationMark,
-                           shouldDismissAfter: 1)
+                           content: ImageSigns.exclamationMark,
+                           dismissAfter: 1)
                 return
             }
             UIView.transition(with: pollChoicesSkip, duration: 0.2, options: .transitionCrossDissolve, animations: {
@@ -1841,34 +1841,34 @@ extension PollCreationView {
             let scrollPoint = pollTitleView.superview!.convert(topicView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: scrollPoint.y, completionBlocks: [])
             let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-            banner.present(subview: TopicSelectionModernContainer(isModal: true, callbackDelegate: banner))
+            banner.present(content: TopicSelectionModernContainer(isModal: true, callbackDelegate: banner))
         } else if v == optionsButton {
             let scrollPoint = pollTitleView.superview!.convert(optionsView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: scrollPoint.y, completionBlocks: [])
             let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-            banner.present(subview: OptionSelection(isModal: true, option: option, callbackDelegate: banner))
+            banner.present(content: OptionSelection(isModal: true, option: option, callbackDelegate: banner))
         } else if v == commentsButton {
             let scrollPoint = commentsView.superview!.convert(commentsView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: min(scrollPoint.y - 30, CGPoint(x: .zero, y: scrollView.contentSize.height - (bounds.height - safeAreaInsets.bottom - safeAreaInsets.top)).y), completionBlocks: [])
             let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-            banner.present(subview: CommentsSelection(option: self.comments, callbackDelegate: banner))
+            banner.present(content: CommentsSelection(option: self.comments, callbackDelegate: banner))
         } else if v == limitsButton {
             let scrollPoint = limitsView.superview!.convert(limitsView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: min(scrollPoint.y - 30, CGPoint(x: .zero, y: scrollView.contentSize.height - (bounds.height - safeAreaInsets.bottom - safeAreaInsets.top)).y), completionBlocks: [])
             let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-            banner.present(subview: LimitsSelectionView(value: self.limits, callbackDelegate: banner))
+            banner.present(content: LimitsSelectionView(value: self.limits, callbackDelegate: banner))
         } else if v == hotOptionButton {
             let scrollPoint = hotOptionView.superview!.convert(hotOptionView.frame.origin, to: scrollContentView)
             scrollVerticalToPoint(y: min(scrollPoint.y - 30, CGPoint(x: .zero, y: scrollView.contentSize.height - (bounds.height - safeAreaInsets.bottom - safeAreaInsets.top)).y), completionBlocks: [])
             guard option == .Private else {
                 let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-                banner.present(subview: HotSelectionView(option: self.hot, callbackDelegate: banner))
+                banner.present(content: HotSelectionView(option: self.hot, callbackDelegate: banner))
                 return
             }
             showBanner(bannerDelegate: self,
                        text: "hot_restricted".localized,
-                       imageContent: ImageSigns.exclamationMark,
-                       shouldDismissAfter: 2)
+                       content: ImageSigns.exclamationMark,
+                       dismissAfter: 2)
         } else if v == pollTitleButton {
             pollTitleTextView.becomeFirstResponder()
         } else if v == pollDescriptionButton {
@@ -1936,8 +1936,8 @@ extension PollCreationView: BannerObservable {
         if identifier == "insufficient_balance" {
             showBanner(bannerDelegate: self,
                        text: AppError.insufficientBalance.localizedDescription + ".\n" + "change_parameters".localized,
-                       imageContent: ImageSigns.exclamationMark,
-                       shouldDismissAfter: 3)
+                       content: ImageSigns.exclamationMark,
+                       dismissAfter: 3)
         } else {
             showTip(delegate: self, identifier: identifier)
         }
@@ -2024,7 +2024,7 @@ extension PollCreationView: CallbackObservable {
             delayAsync(delay: 0.1) { [weak self] in
                 guard let self = self else { return }
                 let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-                banner.present(subview: ImageSelectionPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1))
+                banner.present(content: ImageSelectionPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1))
             }
         }
     }
@@ -2088,9 +2088,9 @@ extension PollCreationView: UITextViewDelegate {
             if isTextFieldEditingEnabled {
                 showBanner(bannerDelegate: self,
                            text: AppError.maximumCharactersExceeded(maxValue: maxCharacters).localizedDescription,
-                           imageContent: ImageSigns.exclamationMark,
-                           shouldDismissAfter: 0.5,
-                           accessibilityIdentifier: "isTextFieldEditingEnabled")
+                           content: ImageSigns.exclamationMark,
+                           dismissAfter: 0.5,
+                           identifier: "isTextFieldEditingEnabled")
                 isTextFieldEditingEnabled = false
             }
         }
@@ -2145,9 +2145,9 @@ extension PollCreationView: UITextViewDelegate {
         if textView.text.count < minCharacters {
             showBanner(bannerDelegate: self,
                        text: AppError.minimumCharactersExceeded(minValue: minCharacters).localizedDescription,
-                       imageContent: ImageSigns.exclamationMark,
-                       shouldDismissAfter: 0.5,
-                       accessibilityIdentifier: "isTextFieldEditingEnabled")
+                       content: ImageSigns.exclamationMark,
+                       dismissAfter: 0.5,
+                       identifier: "isTextFieldEditingEnabled")
             isTextFieldEditingEnabled = false
             return false
         }
@@ -2211,9 +2211,9 @@ extension PollCreationView: UITextFieldDelegate {
                 }
                 showBanner(bannerDelegate: self,
                            text: AppError.invalidURL.localizedDescription,
-                           imageContent: ImageSigns.exclamationMark,
-                           shouldDismissAfter: 0.5,
-                           accessibilityIdentifier: "isTextFieldEditingEnabled")
+                           content: ImageSigns.exclamationMark,
+                           dismissAfter: 0.5,
+                           identifier: "isTextFieldEditingEnabled")
                 isTextFieldEditingEnabled = false
                 return false
             } else {
@@ -2255,9 +2255,9 @@ extension PollCreationView: UITextFieldDelegate {
                 }
                 showBanner(bannerDelegate: self,
                            text: AppError.invalidURL.localizedDescription,
-                           imageContent: ImageSigns.exclamationMark,
-                           shouldDismissAfter: 0.5,
-                           accessibilityIdentifier: "isTextFieldEditingEnabled")
+                           content: ImageSigns.exclamationMark,
+                           dismissAfter: 0.5,
+                           identifier: "isTextFieldEditingEnabled")
                 isTextFieldEditingEnabled = false
                 return false
             } else {
@@ -2302,7 +2302,7 @@ extension PollCreationView: ImageSelectionListener {
     
     func editImage(_ item: ImageItem) {
         let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-        banner.present(subview: ImageSelectionPopup(callbackDelegate: banner, item: item))
+        banner.present(content: ImageSelectionPopup(callbackDelegate: banner, item: item))
     }
 }
 
@@ -2318,7 +2318,7 @@ extension PollCreationView: ChoiceListener {
     
     func editChoice(_ choiceItem: ChoiceItem) {
         let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.5)
-        banner.present(subview: ChoiceEditingPopup(callbackDelegate: banner, item: choiceItem, index: self.choiceItems.firstIndex(of: choiceItem)! + 1 ?? 0))
+        banner.present(content: ChoiceEditingPopup(callbackDelegate: banner, item: choiceItem, index: self.choiceItems.firstIndex(of: choiceItem)! + 1 ?? 0))
     }
 }
 
@@ -2415,7 +2415,7 @@ extension PollCreationView: UIImagePickerControllerDelegate {
             delayAsync(delay: 0.1) { [weak self] in
                 guard let self = self else { return }
                 let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-                banner.present(subview: ImageSelectionPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1))
+                banner.present(content: ImageSelectionPopup(callbackDelegate: banner, item: item, index: self.choiceItems.firstIndex(of: self.choiceItems.last!)! + 1))
             }
             
         }

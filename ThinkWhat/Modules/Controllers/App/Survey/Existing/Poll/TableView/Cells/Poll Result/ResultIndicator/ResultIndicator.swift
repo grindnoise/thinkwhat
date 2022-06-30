@@ -193,29 +193,14 @@ class ResultIndicator: UIView {
                         label.centerYAnchor.constraint(equalTo: avatar.centerYAnchor)
                     ])
                     if answer.voters[i].image != nil {
-                        avatar.imageView.image = answer.voters[i].image!
-                    } else if let url = answer.voters[i].imageURL {
-                        avatar.imageView.image = UIImage(named: "user")!
-                        API.shared.downloadImage(url: url) { progress in
-                            //                        print(progress)
-                        } completion: { result in
-                            switch result {
-                            case .success(let image):
-                                self.answer.voters[i].image = image
-                                Animations.onImageLoaded(imageView: avatar.imageView, image: image)
-                                //                            UIView.transition(with: avatar,
-                                //                                              duration: 0.5,
-                                //                                              options: .transitionCrossDissolve,
-                                //                                              animations: { avatar.imageView.image = image },
-                                //                                              completion: nil)
-                            case .failure(let error):
-#if DEBUG
-                                print(error.localizedDescription)
-#endif
-                            }
-                        }
+                        avatar.image = answer.voters[i].image!
                     } else {
-                        avatar.imageView.image = UIImage(named: "user")!
+                        Task {
+                            do {
+                                let data = try await answer.voters[i].downloadImageAsync()
+                                await MainActor.run { avatar.image = data}
+                            } catch {}
+                        }
                     }
                 }
                 if answer.totalVotes > 5 {

@@ -146,18 +146,18 @@ extension LimitsSelectionView: UITextFieldDelegate {
         guard !text.isEmpty else {
             showBanner(bannerDelegate: self,
                        text: AppError.minimumLimits.localizedDescription,
-                       imageContent: ImageSigns.exclamationMark,
-                       shouldDismissAfter: 0.5,
-                       accessibilityIdentifier: "isTextFieldEditingEnabled")
+                       content: ImageSigns.exclamationMark,
+                       dismissAfter: 0.5,
+                       identifier: "isTextFieldEditingEnabled")
             isTextFieldEditingEnabled = false
             return false
         }
         guard let count = Int(text), count >= 10 else {
             showBanner(bannerDelegate: self,
                        text: AppError.minimumLimits.localizedDescription,
-                       imageContent: ImageSigns.exclamationMark,
-                       shouldDismissAfter: 0.5,
-                       accessibilityIdentifier: "isTextFieldEditingEnabled")
+                       content: ImageSigns.exclamationMark,
+                       dismissAfter: 0.5,
+                       identifier: "isTextFieldEditingEnabled")
             isTextFieldEditingEnabled = false
             return false
         }

@@ -282,9 +282,9 @@ extension ChoiceEditingPopup: UITextViewDelegate {
         if textView.text.count < minCharacters {
             showBanner(bannerDelegate: self,
                        text: AppError.minimumCharactersExceeded(minValue: minCharacters).localizedDescription,
-                       imageContent: ImageSigns.exclamationMark,
-                       shouldDismissAfter: 0.5,
-                       accessibilityIdentifier: "isTextFieldEditingEnabled")
+                       content: ImageSigns.exclamationMark,
+                       dismissAfter: 0.5,
+                       identifier: "isTextFieldEditingEnabled")
             isTextFieldEditingEnabled = false
             return false
         }

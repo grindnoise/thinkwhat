@@ -16,7 +16,6 @@ protocol SurveyDataSource: class {
     func reload()
 }
 
-@available(iOS 14, *)
 class SurveysCollection: UIView, SurveyDataSource {
     
     deinit {
@@ -171,7 +170,7 @@ class SurveysCollection: UIView, SurveyDataSource {
     private var dataItems: [SurveyReference] {
         if category == .Topic {
             let items = category.dataItems(topic)
-            collectionView.alpha = items.isEmpty ? 0 : 1
+//            collectionView.alpha = items.isEmpty ? 0 : 1
             return items
         } else if category == .Search {
             collectionView.alpha = fetchResult.isEmpty ? 0 : 1

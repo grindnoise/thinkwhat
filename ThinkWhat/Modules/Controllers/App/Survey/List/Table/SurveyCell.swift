@@ -38,17 +38,17 @@ class SurveyCell: UITableViewCell {
         progress.alpha = surveyReference.isComplete ? 1 : 0
         avatar.lightColor = surveyReference.isAnonymous ? .black : surveyReference.topic.tagColor
         if surveyReference.isAnonymous {
-            avatar.imageView.image = UIImage(named: "anon")
+            avatar.image = UIImage(named: "anon")
         } else if !surveyReference.owner.image.isNil {
-            avatar.imageView.image = surveyReference.owner.image
+            avatar.image = surveyReference.owner.image
         } else {
-            avatar.imageView.image = UIImage(named: "user")
+            avatar.image = UIImage(named: "user")
             if !surveyReference.owner.imageURL.isNil {
                 Task {
-                    let image = try await surveyReference.owner.downloadImageAsync()
-                    await MainActor.run {
-                        Animations.onImageLoaded(imageView: avatar.imageView, image: image)
-                    }
+                    do {
+                        let data = try await surveyReference.owner.downloadImageAsync()
+                        await MainActor.run { avatar.image = data}
+                    } catch {}
                 }
             }
         }

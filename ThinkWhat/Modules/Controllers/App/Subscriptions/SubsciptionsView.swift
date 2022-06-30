@@ -98,7 +98,7 @@ extension SubsciptionsView: SubsciptionsControllerOutput {
     
     
     func onError() {
-        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, imageContent: ImageSigns.exclamationMark, shouldDismissAfter: 1)
+        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark, dismissAfter: 1)
     }
     
     

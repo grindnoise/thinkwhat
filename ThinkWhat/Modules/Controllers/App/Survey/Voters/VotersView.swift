@@ -76,10 +76,10 @@ extension VotersView: VotersControllerOutput {
         case .failure:
             showBanner(callbackDelegate: nil,
                        bannerDelegate: self, text: "voters_load_error".localized,
-                       imageContent: ImageSigns.exclamationMark,
+                       content: ImageSigns.exclamationMark,
                        color: .systemRed,
                        isModal: false,
-                       shouldDismissAfter: 1)
+                       dismissAfter: 1)
         }
     }
     
@@ -94,7 +94,7 @@ extension VotersView: VotersControllerOutput {
     func onFilterTapped() {
         let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
         banner.accessibilityIdentifier = "claim"
-        banner.present(subview: VotersFilter(imageContent: ImageSigns.filterFilled, color: answer.survey?.topic.tagColor ?? K_COLOR_RED, callbackDelegate: banner, voters: answer.voters, filters: filters))
+        banner.present(content: VotersFilter(imageContent: ImageSigns.filterFilled, color: answer.survey?.topic.tagColor ?? K_COLOR_RED, callbackDelegate: banner, voters: answer.voters, filters: filters))
     }
 }
 

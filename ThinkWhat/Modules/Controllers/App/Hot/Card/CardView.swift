@@ -97,14 +97,15 @@ class CardView: UIView, HotCard {
         voteButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.survey.topic.tagColor
         avatar.lightColor = survey.topic.tagColor
         guard let image = survey.owner.image else {
-            //TODO: - Download
             Task {
-                 let image = try await survey.owner.downloadImageAsync()
-                Animations.onImageLoaded(imageView: avatar.imageView, image: image)
+                do {
+                    let data = try await survey.owner.downloadImageAsync()
+                    await MainActor.run { avatar.image = data}
+                } catch {}
             }
             return
         }
-        avatar.imageView.image = image
+        avatar.image = image
         
         
 //        descriptionTextView.text = survey.description

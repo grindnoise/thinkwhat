@@ -150,9 +150,9 @@ extension HotController: HotViewInput {
             nav.duration = 0.5
 //            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
         }
-//        let backItem = UIBarButtonItem()
-//            backItem.title = ""
-//            navigationItem.backBarButtonItem = backItem
+        let backItem = UIBarButtonItem()
+            backItem.title = ""
+            navigationItem.backBarButtonItem = backItem
         navigationController?.pushViewController(PollController(surveyReference: survey.reference, showNext: true), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
