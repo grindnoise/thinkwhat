@@ -64,14 +64,15 @@ protocol PollControllerOutput: class {
     var viewInput: PollViewInput? { get set }
     var survey: Survey? { get }
     var surveyReference: SurveyReference { get }
-    var hasVoted: Bool { get }
-    var showNext: Bool { get }
+//    var hasVoted: Bool { get }
+//    var showNext: Bool { get }
     var mode: PollController.Mode { get }
     
-    func onLoad(_: Result<Bool, Error>)
-    func onCountUpdated()
-    func onVote(_: Result<Bool,Error>)
-    func onClaim(_: Result<Bool,Error>)
-    func startLoading()
-    func onAddFavorite()
+//    func onSurveyLoaded()
+    func onLoadCallback(_: Result<Bool, Error>)
+    func onCountUpdatedCallback()
+    func onVoteCallback(_: Result<Bool,Error>)
+    func onClaimCallback(_: Result<Bool,Error>)
+//    func startLoading()
+    func onAddFavoriteCallback()
 }

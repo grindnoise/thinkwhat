@@ -179,6 +179,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
                         self.viewControllers?.forEach {
                             guard let nav = $0 as? CustomNavigationController, let target = nav.viewControllers.first as? DataObservable else { return }
                             target.onDataLoaded()
+                            Surveys.shared.newReferences
                             self.timers.forEach { $0.fire() }
                         }
                     }

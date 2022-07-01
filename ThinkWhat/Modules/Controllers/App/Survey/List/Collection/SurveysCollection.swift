@@ -126,11 +126,11 @@ class SurveysCollection: UIView, SurveyDataSource {
         refreshControl.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
         collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        collectionView.alpha = dataItems.isEmpty ? 0 : 1
+//        collectionView.alpha = dataItems.isEmpty ? 0 : 1
     }
     
     func reload() {
-        collectionView.reloadSections(IndexSet(arrayLiteral: 0))
+        collectionView.reloadData()//reloadSections(IndexSet(arrayLiteral: 0))
     }
     
     @IBOutlet var contentView: UIView!
@@ -155,7 +155,7 @@ class SurveysCollection: UIView, SurveyDataSource {
     var category: Survey.SurveyCategory {
         didSet {
             guard oldValue != category else { return }
-            collectionView.alpha = dataItems.isEmpty ? 0 : 1
+//            collectionView.alpha = dataItems.isEmpty ? 0 : 1
             setDataSource()
             guard !dataItems.isEmpty else { return }
             collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
@@ -173,7 +173,7 @@ class SurveysCollection: UIView, SurveyDataSource {
 //            collectionView.alpha = items.isEmpty ? 0 : 1
             return items
         } else if category == .Search {
-            collectionView.alpha = fetchResult.isEmpty ? 0 : 1
+//            collectionView.alpha = fetchResult.isEmpty ? 0 : 1
             return fetchResult
         }
         return category.dataItems()

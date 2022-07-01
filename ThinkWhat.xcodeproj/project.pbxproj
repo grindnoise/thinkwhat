@@ -125,6 +125,8 @@
 		AB3A47E2283F5CA700106407 /* RankingCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A47DE283F5CA700106407 /* RankingCreationView.swift */; };
 		AB3A47E3283F5CA700106407 /* RankingCreationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A47DF283F5CA700106407 /* RankingCreationModel.swift */; };
 		AB3A47E5283F5CF400106407 /* RankingCreationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB3A47E4283F5CF400106407 /* RankingCreationView.xib */; };
+		AB3A6F8A286F0F6B0073FFF7 /* PollDescriptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A6F89286F0F6B0073FFF7 /* PollDescriptionCell.swift */; };
+		AB3A6F8C286F444F0073FFF7 /* PollImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A6F8B286F444F0073FFF7 /* PollImagesCell.swift */; };
 		AB3AF3672834E05F00160F0C /* OrderedSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3AF3662834E05F00160F0C /* OrderedSet.swift */; };
 		AB3AF36A2834FAD900160F0C /* CurrentUserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3AF3692834FAD900160F0C /* CurrentUserProfileView.swift */; };
 		AB3AF36C2834FC5900160F0C /* CurrentUserProfileView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB3AF36B2834FC5900160F0C /* CurrentUserProfileView.xib */; };
@@ -655,6 +657,8 @@
 		AB3A47DE283F5CA700106407 /* RankingCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingCreationView.swift; sourceTree = "<group>"; };
 		AB3A47DF283F5CA700106407 /* RankingCreationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingCreationModel.swift; sourceTree = "<group>"; };
 		AB3A47E4283F5CF400106407 /* RankingCreationView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RankingCreationView.xib; sourceTree = "<group>"; };
+		AB3A6F89286F0F6B0073FFF7 /* PollDescriptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollDescriptionCell.swift; sourceTree = "<group>"; };
+		AB3A6F8B286F444F0073FFF7 /* PollImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollImagesCell.swift; sourceTree = "<group>"; };
 		AB3AF3662834E05F00160F0C /* OrderedSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderedSet.swift; sourceTree = "<group>"; };
 		AB3AF3692834FAD900160F0C /* CurrentUserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentUserProfileView.swift; sourceTree = "<group>"; };
 		AB3AF36B2834FC5900160F0C /* CurrentUserProfileView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CurrentUserProfileView.xib; sourceTree = "<group>"; };
@@ -2162,6 +2166,8 @@
 			isa = PBXGroup;
 			children = (
 				AB879051286E02CD00C069BA /* PollTitleCell.swift */,
+				AB3A6F89286F0F6B0073FFF7 /* PollDescriptionCell.swift */,
+				AB3A6F8B286F444F0073FFF7 /* PollImagesCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -3318,6 +3324,7 @@
 				AB60B5BD285CD6150023C99B /* CommentsSelection.swift in Sources */,
 				ABB46F3E2346373700AF212B /* TabBarController.swift in Sources */,
 				AB1C3BC62334F8D6003895F2 /* ProfileAuthViewController.swift in Sources */,
+				AB3A6F8A286F0F6B0073FFF7 /* PollDescriptionCell.swift in Sources */,
 				AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */,
 				AB98307027B54D43002C5132 /* ContentLoader.swift in Sources */,
 				ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */,
@@ -3518,6 +3525,7 @@
 				ABB9E887279EA6510018BB2E /* WelcomeView.swift in Sources */,
 				AB3C686B223FDEEA00B57580 /* _AuthViewController.swift in Sources */,
 				AB72961027DA2F0F00D45B54 /* HotModel.swift in Sources */,
+				AB3A6F8C286F444F0073FFF7 /* PollImagesCell.swift in Sources */,
 				ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */,
 				ABF01A6C25418E2C009E2BC4 /* BackRoundedButton.swift in Sources */,
 				AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */,

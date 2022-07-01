@@ -32,11 +32,17 @@ class PollView: UIView {
         contentView.frame = self.bounds
         contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(contentView)
+        guard !survey.isNil else { return }
         setupUI()
     }
     
     // MARK: - Properties
     weak var viewInput: PollViewInput?
+    
+    private lazy var collectionView: PollCollectionView = {
+        let instance = PollCollectionView(poll: survey!, callbackDelegate: self)
+        return instance
+    }()
     private var isLoadingData = false
     private var loadingIndicator: LoadingIndicator? {
         didSet {
@@ -51,11 +57,8 @@ class PollView: UIView {
 
 // MARK: - Controller Output
 extension PollView: PollControllerOutput {
-    var hasVoted: Bool {
-        return viewInput?.controllerOutput?.hasVoted ?? false
-    }
     
-    func onAddFavorite() {
+    func onAddFavoriteCallback() {
         
     }
     
@@ -75,18 +78,18 @@ extension PollView: PollControllerOutput {
         return viewInput?.showNext ?? false
     }
     
-    func onClaim(_: Result<Bool, Error>) {
+    func onClaimCallback(_: Result<Bool, Error>) {
 
     }
     
-    func onVote(_ result: Result<Bool, Error>) {
+    func onVoteCallback(_ result: Result<Bool, Error>) {
         
     }
     
-    func onLoad(_ result: Result<Bool, Error>) {
+    func onLoadCallback(_ result: Result<Bool, Error>) {
         switch result {
         case .success:
-            
+            collectionView.addEquallyTo(to: container)
             guard !loadingIndicator.isNil else { return }
                     UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, options: [.curveEaseIn], animations: {
                         self.loadingIndicator?.alpha = 0
@@ -103,7 +106,7 @@ extension PollView: PollControllerOutput {
         }
     }
     
-    func onCountUpdated() {
+    func onCountUpdatedCallback() {
         
     }
     
@@ -119,7 +122,7 @@ extension PollView: PollControllerOutput {
 // MARK: - UI Setup
 extension PollView {
     private func setupUI() {
-
+        
     }
     
     private func updateResults() {

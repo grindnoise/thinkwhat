@@ -122,6 +122,7 @@ extension ListController: ListModelOutput {
 extension ListController: DataObservable {
     func onDataLoaded() {
         navigationController?.setNavigationBarHidden(false, animated: true)
+        controllerOutput?.onDidLoad()
     }
 }
 

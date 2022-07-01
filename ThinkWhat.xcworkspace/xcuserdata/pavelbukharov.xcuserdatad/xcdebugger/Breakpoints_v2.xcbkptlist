@@ -1987,22 +1987,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "8A56061C-4251-45A3-BBB2-D756C1284A8A"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Models/Survey.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "401"
-            endingLineNumber = "401"
-            landmarkName = "newReferences"
-            landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "FFC71362-FB12-432E-B936-B6CC0A2FBC3D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -2205,12 +2189,12 @@
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "72EA3C11-5EB0-4A10-97ED-349A31810B90 - b62a9bc1a6fcb29d"
+                  uuid = "72EA3C11-5EB0-4A10-97ED-349A31810B90 - b6c9c0f507408d98"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "__C.NSLayoutConstraint.setMultiplierWithFade(_: CoreGraphics.CGFloat, duration: Swift.Double) -&gt; __C.NSLayoutConstraint"
-                  moduleName = "ThinkWhat (local)"
+                  moduleName = "ThinkWhat (alpha)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Helpers/Extensions/NSLayoutConstraint.swift"
                   startingColumnNumber = "9223372036854775807"
@@ -2220,12 +2204,12 @@
                   offsetFromSymbolStart = "92">
                </Location>
                <Location
-                  uuid = "72EA3C11-5EB0-4A10-97ED-349A31810B90 - b62a9bc1a6fcb29d"
+                  uuid = "72EA3C11-5EB0-4A10-97ED-349A31810B90 - b6c9c0f507408d98"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "__C.NSLayoutConstraint.setMultiplierWithFade(_: CoreGraphics.CGFloat, duration: Swift.Double) -&gt; __C.NSLayoutConstraint"
-                  moduleName = "ThinkWhat (local)"
+                  moduleName = "ThinkWhat (alpha)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Helpers/Extensions/NSLayoutConstraint.swift"
                   startingColumnNumber = "9223372036854775807"
@@ -2235,6 +2219,22 @@
                   offsetFromSymbolStart = "356">
                </Location>
             </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "47D3A24C-0193-4C75-B701-9EE340236E44"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/Cells/PollTitleCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "79"
+            endingLineNumber = "79"
+            landmarkName = "item"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -42,11 +42,11 @@ class ListView: UIView {
     weak var viewInput: ListViewInput?
     private var isSetupCompleted = false
     private var shadowPath: CGPath!
-    private var list: (UIView & SurveyDataSource)! {
-        didSet {
-            list.addEquallyTo(to: card)
-        }
-    }
+    private lazy var list: (UIView & SurveyDataSource) = {
+        let list = SurveysCollection(delegate: self, category: .New)
+        list.addEquallyTo(to: card)
+        return list
+    }()
     
     
     // MARK: - IB outlets
@@ -71,7 +71,7 @@ extension ListView: ListControllerOutput {
     }
     
     func onDidLoad() {
-        
+        list.reload()
     }
     
     func onWillAppear() {
@@ -116,11 +116,11 @@ extension ListView {
         card.layer.cornerRadius = card.frame.width * 0.05
         alpha = 0
 
-        if #available(iOS 14, *)  {
-            list = SurveysCollection(delegate: self, category: .New)//(frame: card.bounds)
-        } else {
-            list = SurveyTable(delegate: self, category: .New)
-        }
+//        if #available(iOS 14, *)  {
+//            list = SurveysCollection(delegate: self, category: .New)//(frame: card.bounds)
+//        } else {
+//            list = SurveyTable(delegate: self, category: .New)
+//        }
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

@@ -65,6 +65,8 @@
 "progress" = "Прогресс";
 "people_voted" = "человек";
 "delete" = "Удалить";
+"hide_details" = "Cкрыть подробности";
+"show_details" = "Показать подробности";
 
 
 //Welcome VC

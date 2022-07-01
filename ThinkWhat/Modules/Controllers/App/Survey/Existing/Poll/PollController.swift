@@ -112,6 +112,7 @@ class PollController: UIViewController {
     }
     
     private func setupUI() {
+        if !_survey.isNil { controllerOutput?.onLoadCallback(.success(true)) }
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
                     self.navigationController?.navigationBar.standardAppearance = appearance
@@ -224,7 +225,7 @@ class PollController: UIViewController {
             controllerInput?.addView()
             return
         }
-        controllerOutput?.startLoading()
+//        controllerOutput?.startLoading()
         controllerInput?.loadPoll(surveyReference, incrementViewCounter: true)
     }
 //
@@ -381,7 +382,7 @@ extension PollController: PollModelOutput {
     }
     
     func onClaimCallback(_ result: Result<Bool, Error>) {
-        controllerOutput?.onClaim(result)
+        controllerOutput?.onClaimCallback(result)
     }
     
     func onVoteCallback(_ result: Result<Bool, Error>) {
@@ -393,7 +394,7 @@ extension PollController: PollModelOutput {
             print("")
 #endif
         }
-        controllerOutput?.onVote(result)
+        controllerOutput?.onVoteCallback(result)
     }
     
     func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
@@ -401,7 +402,7 @@ extension PollController: PollModelOutput {
         switch result {
         case .success(let mark):
             guard mark else { return }
-            controllerOutput?.onAddFavorite()
+            controllerOutput?.onAddFavoriteCallback()
         case .failure:
 #if DEBUG
             print("")
@@ -410,13 +411,13 @@ extension PollController: PollModelOutput {
     }
     
     func onLoadCallback(_ result: Result<Bool, Error>) {
-        controllerOutput?.onLoad(result)
+        controllerOutput?.onLoadCallback(result)
     }
     
     func onCountUpdateCallback(_ result: Result<Bool, Error>) {
         switch result {
         case .success:
-            controllerOutput?.onCountUpdated()
+            controllerOutput?.onCountUpdatedCallback()
         case .failure(let error):
 #if DEBUG
             print(error.localizedDescription)
@@ -445,9 +446,9 @@ extension PollController: BannerObservable {
 // MARK: - UINavigationControllerDelegate
 extension PollController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        if let vc = viewController as? HotController, controllerOutput?.hasVoted == true {
-            vc.shouldSkipCurrentCard = true
-        }
+//        if let vc = viewController as? HotController, controllerOutput?.hasVoted == true {
+//            vc.shouldSkipCurrentCard = true
+//        }
     }
 }
 
