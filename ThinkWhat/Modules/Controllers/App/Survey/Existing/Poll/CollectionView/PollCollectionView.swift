@@ -8,14 +8,10 @@
 
 import UIKit
 
-//struct PollItem: Hashable {
-//
-//}
-
 class PollCollectionView: UICollectionView {
     
     enum Section: Int {
-        case title, description, image
+        case title, description, image, youtube, web
         
         var localized: String {
             switch self {
@@ -25,6 +21,10 @@ class PollCollectionView: UICollectionView {
                 return "description".localized
             case .image:
                 return "images".localized
+            case .youtube:
+                return "YouTube"
+            case .web:
+                return "web".localized
             }
         }
     }
@@ -32,7 +32,8 @@ class PollCollectionView: UICollectionView {
     // MARK: - Private properties
     private let poll: Survey
     private weak var callbackDelegate: CallbackObservable?
-    private var source: UICollectionViewDiffableDataSource<Section, AnyHashable>!
+    private var source: UICollectionViewDiffableDataSource<Section, Int>!
+    private var imageCellRegistration: UICollectionView.CellRegistration<ImageCell, AnyHashable>!
     
     // MARK: - Initialization
     init(poll: Survey, callbackDelegate: CallbackObservable) {
@@ -46,9 +47,14 @@ class PollCollectionView: UICollectionView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        print("\(String(describing: type(of: self))).\(#function)")
+    }
+    
     // MARK: - UI functions
     private func setupUI() {
         delegate = self
+//        allowsMultipleSelection = true
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
             layoutConfig.headerMode = .firstItemInSection
@@ -66,13 +72,26 @@ class PollCollectionView: UICollectionView {
         
         let descriptionCellRegistration = UICollectionView.CellRegistration<PollDescriptionCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.item.isNil else { return }
+//            cell.collectionView = self
             cell.item = self.poll
         }
         
-        let imageCellRegistration = UICollectionView.CellRegistration<PollImageCell, AnyHashable> { [weak self] cell, indexPath, item in
+        imageCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.item.isNil else { return }
             cell.item = self.poll
+            cell.callbackDelegate = self
         }
+        
+        let youtubeCellRegistration = UICollectionView.CellRegistration<YoutubeCell, AnyHashable> { [weak self] cell, indexPath, item in
+            guard let self = self, cell.url.isNil else { return }
+            cell.url = self.poll.url
+        }
+        
+        let webCellRegistration = UICollectionView.CellRegistration<WebViewCell, AnyHashable> { [weak self] cell, indexPath, item in
+            guard let self = self, cell.url.isNil else { return }
+            cell.url = self.poll.url
+        }
+
 
 //        let headerRegistration = UICollectionView.SupplementaryRegistration <UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) { headerView, elementKind, indexPath in
 //            
@@ -101,21 +120,29 @@ class PollCollectionView: UICollectionView {
 //            }]
 //        }
         
-        source = UICollectionViewDiffableDataSource<Section, AnyHashable>(collectionView: self) {
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: AnyHashable) -> UICollectionViewCell? in
-            guard let section = Section(rawValue: indexPath.section) else { return UICollectionViewCell() }
+        source = UICollectionViewDiffableDataSource<Section, Int>(collectionView: self) { [unowned self]
+            (collectionView: UICollectionView, indexPath: IndexPath, identifier: Int) -> UICollectionViewCell? in
+            guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
             if section == .title {
                 return collectionView.dequeueConfiguredReusableCell(using: titleCellRegistration,
-                                                                        for: indexPath,
-                                                                        item: identifier)
+                                                                    for: indexPath,
+                                                                    item: identifier)
             } else if section == .description {
                 return collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
-                                                                        for: indexPath,
-                                                                        item: identifier)
+                                                                    for: indexPath,
+                                                                    item: identifier)
             } else if section == .image {
-                return collectionView.dequeueConfiguredReusableCell(using: imageCellRegistration,
-                                                                        for: indexPath,
-                                                                        item: identifier)
+                return collectionView.dequeueConfiguredReusableCell(using: self.imageCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            } else if section == .youtube {
+                return collectionView.dequeueConfiguredReusableCell(using: youtubeCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            } else if section == .web {
+                return collectionView.dequeueConfiguredReusableCell(using: webCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
             }
             return UICollectionViewCell()
         }
@@ -125,29 +152,67 @@ class PollCollectionView: UICollectionView {
 //            return self.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
 //        }
         
-        var snapshot = NSDiffableDataSourceSnapshot<Section, AnyHashable>()
-        snapshot.appendSections([.title, .description, .image])
-        snapshot.appendItems([AnyHashable(0)], toSection: .title)
-        snapshot.appendItems([AnyHashable(1)], toSection: .description)
-        snapshot.appendItems([AnyHashable(2)], toSection: .image)
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
+        snapshot.appendSections([.title, .description,])
+        snapshot.appendItems([0], toSection: .title)
+        snapshot.appendItems([1], toSection: .description)
+        if poll.imagesCount != 0 {
+            snapshot.appendSections([.image])
+            snapshot.appendItems([2], toSection: .image)
+        }
+        if let url = poll.url {
+            if url.absoluteString.isYoutubeLink {
+                snapshot.appendSections([.youtube])
+                snapshot.appendItems([3], toSection: .youtube)
+            } else if url.absoluteString.isTikTokLink {
+                
+            } else {
+                snapshot.appendSections([.web])
+                snapshot.appendItems([4], toSection: .web)
+            }
+        }
         source.apply(snapshot, animatingDifferences: false)
+    }
+    
+//    public func refresh() {
+//        source.refresh()
+//    }
+    
+    public func onImageScroll(_ index: Int) {
+        guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
+        cell.scrollToImage(at: index)
     }
 }
 
 extension PollCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        guard let dataSource = source else { return false }
+//        // Allows for closing an already open cell
+//        if collectionView.indexPathsForSelectedItems?.contains(indexPath) ?? false {
+//            collectionView.deselectItem(at: indexPath, animated: true)
+//        } else {
+//            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+//        }
+//
+//        source.refresh()
+//
+//        return false // The selecting or deselecting is already performed above
         
-        // Allows for closing an already open cell
-        if collectionView.indexPathsForSelectedItems?.contains(indexPath) ?? false {
+        guard let cell = collectionView.cellForItem(at: indexPath), !cell.isSelected else {
             collectionView.deselectItem(at: indexPath, animated: true)
-        } else {
-            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+            source.refresh()
+            return false
         }
-        
-        dataSource.refresh()
-        
-        return false // The selecting or deselecting is already performed above
+        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+        source.refresh()
+        return true
+    }
+}
+
+extension PollCollectionView: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        if let mediafile = sender as? Mediafile {
+            callbackDelegate?.callbackReceived(mediafile)
+        }
     }
 }

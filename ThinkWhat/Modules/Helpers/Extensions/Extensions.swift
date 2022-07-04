@@ -722,7 +722,7 @@ extension UITabBarController {
             UIView.animate(withDuration: animated ? 0.2 : 0.0, animations: {
                 self.view.frame = self.movedFrameView!
                 self.view.setNeedsDisplay()
-                            self.view.layoutIfNeeded()
+                self.view.layoutIfNeeded()
             }) {
                 (_) in
                 self.tabBar.isHidden = true

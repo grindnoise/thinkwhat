@@ -2121,8 +2121,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "128"
             endingLineNumber = "128"
-            landmarkName = "color"
-            landmarkType = "24">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -2189,12 +2189,12 @@
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "72EA3C11-5EB0-4A10-97ED-349A31810B90 - b6c9c0f507408d98"
+                  uuid = "72EA3C11-5EB0-4A10-97ED-349A31810B90 - b62a9bc1a6fcb29d"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "__C.NSLayoutConstraint.setMultiplierWithFade(_: CoreGraphics.CGFloat, duration: Swift.Double) -&gt; __C.NSLayoutConstraint"
-                  moduleName = "ThinkWhat (alpha)"
+                  moduleName = "ThinkWhat (local)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Helpers/Extensions/NSLayoutConstraint.swift"
                   startingColumnNumber = "9223372036854775807"
@@ -2204,12 +2204,12 @@
                   offsetFromSymbolStart = "92">
                </Location>
                <Location
-                  uuid = "72EA3C11-5EB0-4A10-97ED-349A31810B90 - b6c9c0f507408d98"
+                  uuid = "72EA3C11-5EB0-4A10-97ED-349A31810B90 - b62a9bc1a6fcb29d"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "__C.NSLayoutConstraint.setMultiplierWithFade(_: CoreGraphics.CGFloat, duration: Swift.Double) -&gt; __C.NSLayoutConstraint"
-                  moduleName = "ThinkWhat (alpha)"
+                  moduleName = "ThinkWhat (local)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Helpers/Extensions/NSLayoutConstraint.swift"
                   startingColumnNumber = "9223372036854775807"
@@ -2235,6 +2235,102 @@
             endingLineNumber = "79"
             landmarkName = "item"
             landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "142615C1-634D-48EB-A80C-E418BB8451BE"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Models/Survey.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "512"
+            endingLineNumber = "512"
+            landmarkName = "load(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "A93CC3FD-E19B-4895-A29F-D0A9342FF681"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/PollCollectionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "143"
+            endingLineNumber = "143"
+            landmarkName = "setupUI()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7D328226-075B-42D7-9FAD-DC27E597893D"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/PollCollectionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "91"
+            endingLineNumber = "91"
+            landmarkName = "setupUI()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "7D328226-075B-42D7-9FAD-DC27E597893D - fc4b6c93c21ee9b1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #6 (ThinkWhat__local_.WebViewCell, Foundation.IndexPath, Swift.AnyHashable) -&gt; () in ThinkWhat__local_.PollCollectionView.setupUI() -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/PollCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "91"
+                  endingLineNumber = "91"
+                  offsetFromSymbolStart = "200">
+               </Location>
+               <Location
+                  uuid = "7D328226-075B-42D7-9FAD-DC27E597893D - fc4b6c93c21ee9b1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #6 (ThinkWhat__local_.WebViewCell, Foundation.IndexPath, Swift.AnyHashable) -&gt; () in ThinkWhat__local_.PollCollectionView.setupUI() -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/PollCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "91"
+                  endingLineNumber = "91"
+                  offsetFromSymbolStart = "252">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "657A3E96-9045-43FB-AF68-A17FDFA38917"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/PollCollectionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "127"
+            endingLineNumber = "127"
+            landmarkName = "setupUI()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

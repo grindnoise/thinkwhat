@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8A22AE464A3DA9E18DAF1148 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF39D3257CEBEE91B9088DE7 /* Pods_ThinkWhat.framework */; };
+		6CB194718B5283036590BDD8 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 506DF462B1B98573AB8A7CCD /* Pods_ThinkWhat.framework */; };
 		AB00FFD32583A4A50071C7DE /* TextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00FFD22583A4A50071C7DE /* TextViewController.swift */; };
 		AB00FFD52587A6320071C7DE /* BlurTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00FFD42587A6320071C7DE /* BlurTransition.swift */; };
 		AB016BFE26CA73BA005C5A87 /* ButtonWithImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB016BFD26CA73BA005C5A87 /* ButtonWithImage.swift */; };
@@ -126,7 +126,7 @@
 		AB3A47E3283F5CA700106407 /* RankingCreationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A47DF283F5CA700106407 /* RankingCreationModel.swift */; };
 		AB3A47E5283F5CF400106407 /* RankingCreationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB3A47E4283F5CF400106407 /* RankingCreationView.xib */; };
 		AB3A6F8A286F0F6B0073FFF7 /* PollDescriptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A6F89286F0F6B0073FFF7 /* PollDescriptionCell.swift */; };
-		AB3A6F8C286F444F0073FFF7 /* PollImagesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A6F8B286F444F0073FFF7 /* PollImagesCell.swift */; };
+		AB3A6F8C286F444F0073FFF7 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3A6F8B286F444F0073FFF7 /* ImageCell.swift */; };
 		AB3AF3672834E05F00160F0C /* OrderedSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3AF3662834E05F00160F0C /* OrderedSet.swift */; };
 		AB3AF36A2834FAD900160F0C /* CurrentUserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3AF3692834FAD900160F0C /* CurrentUserProfileView.swift */; };
 		AB3AF36C2834FC5900160F0C /* CurrentUserProfileView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB3AF36B2834FC5900160F0C /* CurrentUserProfileView.xib */; };
@@ -185,6 +185,7 @@
 		AB42E339284A45C600F4487B /* TopicSelectionModernCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB42E338284A45C600F4487B /* TopicSelectionModernCollectionView.swift */; };
 		AB42E33B284A4ED200F4487B /* TopicSelectionModernContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB42E33A284A4ED200F4487B /* TopicSelectionModernContent.swift */; };
 		AB42E33D284A682D00F4487B /* TopicSelectionModernContent.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB42E33C284A682D00F4487B /* TopicSelectionModernContent.xib */; };
+		AB4366192873059200A0CB1C /* ImageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4366182873059200A0CB1C /* ImageViewer.swift */; };
 		AB43A56025E63BB800BF8749 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */; };
 		AB4428B2282BCBD500D5628E /* SurveyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4428B0282BCBD500D5628E /* SurveyCell.swift */; };
 		AB4428B3282BCBD500D5628E /* SurveyCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB4428B1282BCBD500D5628E /* SurveyCell.xib */; };
@@ -409,8 +410,7 @@
 		ABADF57A27F1DB0E00A26474 /* ImagesCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF57827F1DB0E00A26474 /* ImagesCell.xib */; };
 		ABADF57E27F2082B00A26474 /* HyperlinkCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF57C27F2082B00A26474 /* HyperlinkCell.swift */; };
 		ABADF57F27F2082B00A26474 /* HyperlinkCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF57D27F2082B00A26474 /* HyperlinkCell.xib */; };
-		ABADF58327F2338800A26474 /* YoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF58127F2338800A26474 /* YoutubeCell.swift */; };
-		ABADF58427F2338800A26474 /* YoutubeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF58227F2338800A26474 /* YoutubeCell.xib */; };
+		ABADF58327F2338800A26474 /* _YoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF58127F2338800A26474 /* _YoutubeCell.swift */; };
 		ABADF58827F2E4F300A26474 /* WebCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF58627F2E4F300A26474 /* WebCell.swift */; };
 		ABADF58927F2E4F300A26474 /* WebCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF58727F2E4F300A26474 /* WebCell.xib */; };
 		ABADF59227F361AE00A26474 /* ChoiceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF59027F361AE00A26474 /* ChoiceCell.swift */; };
@@ -512,8 +512,10 @@
 		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
 		ABF73549270DC1F700F7C308 /* ClaimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF73548270DC1F700F7C308 /* ClaimView.swift */; };
 		ABF7354B270DC26E00F7C308 /* ClaimView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABF7354A270DC26E00F7C308 /* ClaimView.xib */; };
+		ABFB4222287320DE0066CFA0 /* YoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */; };
+		ABFB42242873443A0066CFA0 /* WebViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB42232873443A0066CFA0 /* WebViewCell.swift */; };
 		ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFD793D25F8CD99009A2824 /* RoundIcon.swift */; };
-		B3C1FE5ED6DFA4C52CD0493D /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DDA2CA12CE1F821C3DA81D2 /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
+		E45D8A36687F94E44167B4C1 /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1990D33405450AFC8B28EB7 /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -534,11 +536,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		191D60811ABD57A2EEBF83BD /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
-		4869026AC68AE423EAAC5F72 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; sourceTree = "<group>"; };
-		520F716438E0A418EA6F3A26 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig"; sourceTree = "<group>"; };
-		6B2AD8C737C5E0F520C362EC /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.local.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.local.xcconfig"; sourceTree = "<group>"; };
-		7DDA2CA12CE1F821C3DA81D2 /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		04DCB8C38F3E209D215312A4 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
+		37548674831584D32AC05BCA /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.local.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.local.xcconfig"; sourceTree = "<group>"; };
+		506DF462B1B98573AB8A7CCD /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		851B60B887C4C55FA151532F /* Pods-ThinkWhat.alpha.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.alpha.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.alpha.xcconfig"; sourceTree = "<group>"; };
+		9985BB77C868972C5F0E7A1F /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
+		A1990D33405450AFC8B28EB7 /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A84926AB9BF568B8C2533401 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig"; sourceTree = "<group>"; };
 		AB00FFD22583A4A50071C7DE /* TextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewController.swift; sourceTree = "<group>"; };
 		AB00FFD42587A6320071C7DE /* BlurTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurTransition.swift; sourceTree = "<group>"; };
 		AB016BFD26CA73BA005C5A87 /* ButtonWithImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonWithImage.swift; sourceTree = "<group>"; };
@@ -658,7 +662,7 @@
 		AB3A47DF283F5CA700106407 /* RankingCreationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingCreationModel.swift; sourceTree = "<group>"; };
 		AB3A47E4283F5CF400106407 /* RankingCreationView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RankingCreationView.xib; sourceTree = "<group>"; };
 		AB3A6F89286F0F6B0073FFF7 /* PollDescriptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollDescriptionCell.swift; sourceTree = "<group>"; };
-		AB3A6F8B286F444F0073FFF7 /* PollImagesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollImagesCell.swift; sourceTree = "<group>"; };
+		AB3A6F8B286F444F0073FFF7 /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
 		AB3AF3662834E05F00160F0C /* OrderedSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderedSet.swift; sourceTree = "<group>"; };
 		AB3AF3692834FAD900160F0C /* CurrentUserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentUserProfileView.swift; sourceTree = "<group>"; };
 		AB3AF36B2834FC5900160F0C /* CurrentUserProfileView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CurrentUserProfileView.xib; sourceTree = "<group>"; };
@@ -723,6 +727,7 @@
 		AB42E338284A45C600F4487B /* TopicSelectionModernCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelectionModernCollectionView.swift; sourceTree = "<group>"; };
 		AB42E33A284A4ED200F4487B /* TopicSelectionModernContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelectionModernContent.swift; sourceTree = "<group>"; };
 		AB42E33C284A682D00F4487B /* TopicSelectionModernContent.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TopicSelectionModernContent.xib; sourceTree = "<group>"; };
+		AB4366182873059200A0CB1C /* ImageViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewer.swift; sourceTree = "<group>"; };
 		AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
 		AB4428B0282BCBD500D5628E /* SurveyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCell.swift; sourceTree = "<group>"; };
 		AB4428B1282BCBD500D5628E /* SurveyCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyCell.xib; sourceTree = "<group>"; };
@@ -951,8 +956,7 @@
 		ABADF57827F1DB0E00A26474 /* ImagesCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImagesCell.xib; sourceTree = "<group>"; };
 		ABADF57C27F2082B00A26474 /* HyperlinkCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperlinkCell.swift; sourceTree = "<group>"; };
 		ABADF57D27F2082B00A26474 /* HyperlinkCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HyperlinkCell.xib; sourceTree = "<group>"; };
-		ABADF58127F2338800A26474 /* YoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeCell.swift; sourceTree = "<group>"; };
-		ABADF58227F2338800A26474 /* YoutubeCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = YoutubeCell.xib; sourceTree = "<group>"; };
+		ABADF58127F2338800A26474 /* _YoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _YoutubeCell.swift; sourceTree = "<group>"; };
 		ABADF58627F2E4F300A26474 /* WebCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCell.swift; sourceTree = "<group>"; };
 		ABADF58727F2E4F300A26474 /* WebCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WebCell.xib; sourceTree = "<group>"; };
 		ABADF59027F361AE00A26474 /* ChoiceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceCell.swift; sourceTree = "<group>"; };
@@ -1055,12 +1059,12 @@
 		ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysTableViewController.swift; sourceTree = "<group>"; };
 		ABF73548270DC1F700F7C308 /* ClaimView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimView.swift; sourceTree = "<group>"; };
 		ABF7354A270DC26E00F7C308 /* ClaimView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ClaimView.xib; sourceTree = "<group>"; };
+		ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeCell.swift; sourceTree = "<group>"; };
+		ABFB42232873443A0066CFA0 /* WebViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewCell.swift; sourceTree = "<group>"; };
 		ABFD793D25F8CD99009A2824 /* RoundIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundIcon.swift; sourceTree = "<group>"; };
-		AF39D3257CEBEE91B9088DE7 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BDF51F46589DDF15422A0A72 /* Pods-ThinkWhat.alpha.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.alpha.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.alpha.xcconfig"; sourceTree = "<group>"; };
-		D6CCA115D6708FB93518D66F /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
-		DF576775A809D6259D0A5995 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
-		E28B1AE8771195954BEB73AE /* Pods-ThinkWhat.local.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.local.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.local.xcconfig"; sourceTree = "<group>"; };
+		BA6B8BC88211772EDA702BF5 /* Pods-ThinkWhat.local.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.local.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.local.xcconfig"; sourceTree = "<group>"; };
+		CAD20809C362192426285D44 /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
+		FA32E18F64371983914D948A /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1068,7 +1072,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A22AE464A3DA9E18DAF1148 /* Pods_ThinkWhat.framework in Frameworks */,
+				6CB194718B5283036590BDD8 /* Pods_ThinkWhat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1076,7 +1080,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3C1FE5ED6DFA4C52CD0493D /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */,
+				E45D8A36687F94E44167B4C1 /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1095,8 +1099,8 @@
 			children = (
 				AB4B85DC27785ACE00884E65 /* libswiftCore.tbd */,
 				AB2BB282277856FB004606E3 /* libswift_Concurrency.tbd */,
-				AF39D3257CEBEE91B9088DE7 /* Pods_ThinkWhat.framework */,
-				7DDA2CA12CE1F821C3DA81D2 /* Pods_ThinkWhat_ThinkWhatTests.framework */,
+				506DF462B1B98573AB8A7CCD /* Pods_ThinkWhat.framework */,
+				A1990D33405450AFC8B28EB7 /* Pods_ThinkWhat_ThinkWhatTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2167,7 +2171,9 @@
 			children = (
 				AB879051286E02CD00C069BA /* PollTitleCell.swift */,
 				AB3A6F89286F0F6B0073FFF7 /* PollDescriptionCell.swift */,
-				AB3A6F8B286F444F0073FFF7 /* PollImagesCell.swift */,
+				AB3A6F8B286F444F0073FFF7 /* ImageCell.swift */,
+				ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */,
+				ABFB42232873443A0066CFA0 /* WebViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -2198,6 +2204,7 @@
 			children = (
 				AB883B3528047FE300DBE4EF /* ImageController.swift */,
 				AB883B3628047FE300DBE4EF /* ImageController.xib */,
+				AB4366182873059200A0CB1C /* ImageViewer.swift */,
 			);
 			path = Image;
 			sourceTree = "<group>";
@@ -2301,12 +2308,12 @@
 		AB913F8928097D8A00609D51 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				AB3C6835223FD3EE00B57580 /* Fonts */,
-				AB883B292800702500DBE4EF /* Popup & Banner */,
-				AB883B2727FDB33600DBE4EF /* ImageSigns.swift */,
-				AB38DD73281A76FE00FFEB3F /* Subclasses */,
 				AB913F8D28097DAA00609D51 /* Animated */,
+				AB3C6835223FD3EE00B57580 /* Fonts */,
+				AB883B2727FDB33600DBE4EF /* ImageSigns.swift */,
+				AB883B292800702500DBE4EF /* Popup & Banner */,
 				AB913F8C28097DA200609D51 /* Static */,
+				AB38DD73281A76FE00FFEB3F /* Subclasses */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -2538,8 +2545,7 @@
 		ABADF58027F2334C00A26474 /* Youtube */ = {
 			isa = PBXGroup;
 			children = (
-				ABADF58127F2338800A26474 /* YoutubeCell.swift */,
-				ABADF58227F2338800A26474 /* YoutubeCell.xib */,
+				ABADF58127F2338800A26474 /* _YoutubeCell.swift */,
 			);
 			path = Youtube;
 			sourceTree = "<group>";
@@ -2905,14 +2911,14 @@
 		E9FBECDA3D06FB129E6BE92E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				DF576775A809D6259D0A5995 /* Pods-ThinkWhat.debug.xcconfig */,
-				E28B1AE8771195954BEB73AE /* Pods-ThinkWhat.local.xcconfig */,
-				BDF51F46589DDF15422A0A72 /* Pods-ThinkWhat.alpha.xcconfig */,
-				191D60811ABD57A2EEBF83BD /* Pods-ThinkWhat.release.xcconfig */,
-				D6CCA115D6708FB93518D66F /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */,
-				6B2AD8C737C5E0F520C362EC /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */,
-				520F716438E0A418EA6F3A26 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */,
-				4869026AC68AE423EAAC5F72 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */,
+				CAD20809C362192426285D44 /* Pods-ThinkWhat.debug.xcconfig */,
+				BA6B8BC88211772EDA702BF5 /* Pods-ThinkWhat.local.xcconfig */,
+				851B60B887C4C55FA151532F /* Pods-ThinkWhat.alpha.xcconfig */,
+				9985BB77C868972C5F0E7A1F /* Pods-ThinkWhat.release.xcconfig */,
+				04DCB8C38F3E209D215312A4 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */,
+				37548674831584D32AC05BCA /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */,
+				A84926AB9BF568B8C2533401 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */,
+				FA32E18F64371983914D948A /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -2924,11 +2930,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB3C6806223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhat" */;
 			buildPhases = (
-				3DFC8B7CEDC53F92BD553115 /* [CP] Check Pods Manifest.lock */,
+				87634DBC27E00564EF9AEE88 /* [CP] Check Pods Manifest.lock */,
 				AB3C67D7223FBB6400B57580 /* Sources */,
 				AB3C67D8223FBB6400B57580 /* Frameworks */,
 				AB3C67D9223FBB6400B57580 /* Resources */,
-				333F72553BFCC6E6C4F0ACD4 /* [CP] Embed Pods Frameworks */,
+				DDC354AFF49150236CD59F76 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2943,11 +2949,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB3C6809223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhatTests" */;
 			buildPhases = (
-				3722EC4BD980BC8DC9D54274 /* [CP] Check Pods Manifest.lock */,
+				C8C6C49D5E43598D75EAFC4E /* [CP] Check Pods Manifest.lock */,
 				AB3C67EE223FBB6600B57580 /* Sources */,
 				AB3C67EF223FBB6600B57580 /* Frameworks */,
 				AB3C67F0223FBB6600B57580 /* Resources */,
-				2C79F347DAB27C80DE15E6E8 /* [CP] Embed Pods Frameworks */,
+				2E93E5A5D067A4648D42D6F0 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -3127,7 +3133,6 @@
 				ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */,
 				AB913F7E280715BB00609D51 /* PollResultCell.xib in Resources */,
 				AB54F47F285B189900C620B3 /* ChoiceEditingPopup.xib in Resources */,
-				ABADF58427F2338800A26474 /* YoutubeCell.xib in Resources */,
 				ABADF57027F1BC7500A26474 /* TitleCell.xib in Resources */,
 				ABADF58927F2E4F300A26474 /* WebCell.xib in Resources */,
 				AB98307527B687CB002C5132 /* LoginViewController.xib in Resources */,
@@ -3183,7 +3188,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2C79F347DAB27C80DE15E6E8 /* [CP] Embed Pods Frameworks */ = {
+		2E93E5A5D067A4648D42D6F0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3200,24 +3205,29 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		333F72553BFCC6E6C4F0ACD4 /* [CP] Embed Pods Frameworks */ = {
+		87634DBC27E00564EF9AEE88 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Embed Pods Frameworks";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ThinkWhat-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		3722EC4BD980BC8DC9D54274 /* [CP] Check Pods Manifest.lock */ = {
+		C8C6C49D5E43598D75EAFC4E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3239,26 +3249,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		3DFC8B7CEDC53F92BD553115 /* [CP] Check Pods Manifest.lock */ = {
+		DDC354AFF49150236CD59F76 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ThinkWhat-checkManifestLockResult.txt",
+				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -3395,6 +3400,7 @@
 				AB72964B27DB612000D45B54 /* SettingsView.swift in Sources */,
 				AB0980DC24CF04A100A02405 /* UserActivityCell.swift in Sources */,
 				AB04144F244EF3A600336857 /* SurveyStackViewController.swift in Sources */,
+				AB4366192873059200A0CB1C /* ImageViewer.swift in Sources */,
 				AB5CA11824F5418500F55DEC /* TransitionCoordinator.swift in Sources */,
 				AB0BFDF3252DC9E400BD5EFF /* MegaphoneIcon.swift in Sources */,
 				AB8F28B027C0DEEB008E4ED0 /* NSLayoutConstraint.swift in Sources */,
@@ -3487,6 +3493,7 @@
 				AB913F8B28097D9C00609D51 /* ProgressCircle.swift in Sources */,
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
 				AB72964327DB60C800D45B54 /* SettingsController.swift in Sources */,
+				ABFB42242873443A0066CFA0 /* WebViewCell.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */,
 				AB54F47D285B127400C620B3 /* ChoiceEditingPopup.swift in Sources */,
 				ABCE775D2848D378001E3413 /* InsetLabel.swift in Sources */,
@@ -3520,12 +3527,13 @@
 				ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */,
 				AB0BFDF1252DBCD500BD5EFF /* HeartIcon.swift in Sources */,
 				AB8DA33F27A182D300F92C18 /* SignupContract.swift in Sources */,
+				ABFB4222287320DE0066CFA0 /* YoutubeCell.swift in Sources */,
 				AB3C686D223FDF3D00B57580 /* AppLogo.swift in Sources */,
 				ABA448F327EE031D00F8E00D /* PollModel.swift in Sources */,
 				ABB9E887279EA6510018BB2E /* WelcomeView.swift in Sources */,
 				AB3C686B223FDEEA00B57580 /* _AuthViewController.swift in Sources */,
 				AB72961027DA2F0F00D45B54 /* HotModel.swift in Sources */,
-				AB3A6F8C286F444F0073FFF7 /* PollImagesCell.swift in Sources */,
+				AB3A6F8C286F444F0073FFF7 /* ImageCell.swift in Sources */,
 				ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */,
 				ABF01A6C25418E2C009E2BC4 /* BackRoundedButton.swift in Sources */,
 				AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */,
@@ -3632,7 +3640,7 @@
 				AB309C7927ADB4E1005BBCB4 /* UserDefaults.swift in Sources */,
 				AB7085E726CB9A1F006F020F /* SideApp.swift in Sources */,
 				AB913F8728086EF500609D51 /* CommentCell.swift in Sources */,
-				ABADF58327F2338800A26474 /* YoutubeCell.swift in Sources */,
+				ABADF58327F2338800A26474 /* _YoutubeCell.swift in Sources */,
 				ABA78295285898D600964FDE /* AddChoiceCollectionView.swift in Sources */,
 				ABADF57927F1DB0E00A26474 /* ImagesCell.swift in Sources */,
 				AB334FB9270C423400DD7332 /* ClockIndicator.swift in Sources */,
@@ -3837,7 +3845,7 @@
 		};
 		AB3C6807223FBB6600B57580 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DF576775A809D6259D0A5995 /* Pods-ThinkWhat.debug.xcconfig */;
+			baseConfigurationReference = CAD20809C362192426285D44 /* Pods-ThinkWhat.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -3868,7 +3876,7 @@
 		};
 		AB3C6808223FBB6600B57580 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 191D60811ABD57A2EEBF83BD /* Pods-ThinkWhat.release.xcconfig */;
+			baseConfigurationReference = 9985BB77C868972C5F0E7A1F /* Pods-ThinkWhat.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -3898,7 +3906,7 @@
 		};
 		AB3C680A223FBB6600B57580 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D6CCA115D6708FB93518D66F /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */;
+			baseConfigurationReference = 04DCB8C38F3E209D215312A4 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -3921,7 +3929,7 @@
 		};
 		AB3C680B223FBB6600B57580 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4869026AC68AE423EAAC5F72 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */;
+			baseConfigurationReference = FA32E18F64371983914D948A /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -4053,7 +4061,7 @@
 		};
 		AB864446286C40AF00C7A6F8 /* Alpha */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BDF51F46589DDF15422A0A72 /* Pods-ThinkWhat.alpha.xcconfig */;
+			baseConfigurationReference = 851B60B887C4C55FA151532F /* Pods-ThinkWhat.alpha.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -4084,7 +4092,7 @@
 		};
 		AB864447286C40AF00C7A6F8 /* Alpha */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 520F716438E0A418EA6F3A26 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */;
+			baseConfigurationReference = A84926AB9BF568B8C2533401 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -4196,7 +4204,7 @@
 		};
 		ABD5FD08286C4D2800BCC382 /* Local */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E28B1AE8771195954BEB73AE /* Pods-ThinkWhat.local.xcconfig */;
+			baseConfigurationReference = BA6B8BC88211772EDA702BF5 /* Pods-ThinkWhat.local.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -4228,7 +4236,7 @@
 		};
 		ABD5FD09286C4D2800BCC382 /* Local */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6B2AD8C737C5E0F520C362EC /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */;
+			baseConfigurationReference = 37548674831584D32AC05BCA /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";

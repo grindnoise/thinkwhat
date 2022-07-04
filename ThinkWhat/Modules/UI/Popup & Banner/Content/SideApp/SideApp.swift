@@ -47,15 +47,20 @@ class SideApp: UIView, BannerContent {
         }
     }
     @IBAction func playEmbedded(_ sender: Any) {
-            self.delegate?.callbackReceived(self)
-            if self.app == .Youtube {
-                UserDefaults.App.youtubePlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.youtubePlay
-            } else if self.app == .TikTok {
-                UserDefaults.App.tiktokPlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.tiktokPlay
+        if defaultSwitch.isOn {
+            switch app {
+            case .TikTok:
+                UserDefaults.App.tiktokPlay = .Embedded
+            case .Youtube:
+                UserDefaults.App.youtubePlay = .Embedded
+            case .Null:
+                print("")
             }
-        if localhost {
-        UserDefaults.App.youtubePlay = nil
         }
+        self.delegate?.callbackReceived(SideAppPreference.Embedded)
+//        if localhost {
+//        UserDefaults.App.youtubePlay = nil
+//        }
     }
     @IBOutlet weak var openButton: UIButton! {
         didSet {
@@ -63,15 +68,20 @@ class SideApp: UIView, BannerContent {
         }
     }
     @IBAction func openYoutubeApp(_ sender: Any) {
-            self.delegate?.callbackReceived(self)
-            if self.app == .Youtube {
-                UserDefaults.App.youtubePlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.youtubePlay
-            } else if self.app == .TikTok {
-                UserDefaults.App.tiktokPlay = self.defaultSwitch.isOn ? SideAppPreference.Embedded : UserDefaults.App.tiktokPlay
+        if defaultSwitch.isOn {
+            switch app {
+            case .TikTok:
+                UserDefaults.App.tiktokPlay = .App
+            case .Youtube:
+                UserDefaults.App.youtubePlay = .App
+            case .Null:
+                print("")
             }
-        if localhost {
-        UserDefaults.App.youtubePlay = nil
         }
+        self.delegate?.callbackReceived(SideAppPreference.App)
+//        if localhost {
+//        UserDefaults.App.youtubePlay = nil
+//        }
     }
     
     @IBAction func onChange(_ sender: UISwitch) {
@@ -87,9 +97,6 @@ class SideApp: UIView, BannerContent {
             label.text = "remember".localized
         }
     }
-    
-    
-    
 
     override init(frame: CGRect) {
         super.init(frame: frame)

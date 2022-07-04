@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Agrume
 
 class PollView: UIView {
     
@@ -37,7 +38,7 @@ class PollView: UIView {
     }
     
     // MARK: - Properties
-    weak var viewInput: PollViewInput?
+    weak var viewInput: (PollViewInput & UIViewController)?
     
     private lazy var collectionView: PollCollectionView = {
         let instance = PollCollectionView(poll: survey!, callbackDelegate: self)
@@ -138,8 +139,31 @@ extension PollView {
 
 extension PollView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
-        
+        guard let mediafile = sender as? Mediafile,
+              let images = survey!.media.sorted { $0.order < $1.order }.compactMap {$0.image} as? [UIImage] else { return }
+        let agrume = Agrume(images: images, startIndex: mediafile.order, background: .colored(.black))
+        let helper = makeHelper()
+        agrume.onLongPress = helper.makeSaveToLibraryLongPressGesture
+        agrume.show(from: viewInput!)
+        guard images.count > 1 else { return }
+        agrume.didScroll = { [weak self] index in
+            guard let self = self else { return }
+            self.collectionView.onImageScroll(index)
+        }
     }
+        
+    private func makeHelper() -> AgrumePhotoLibraryHelper {
+        let saveButtonTitle = "save_image".localized
+        let cancelButtonTitle = "cancel".localized
+       let helper = AgrumePhotoLibraryHelper(saveButtonTitle: saveButtonTitle, cancelButtonTitle: cancelButtonTitle) { error in
+         guard error == nil else {
+           print("Could not save your photo")
+           return
+         }
+         print("Photo has been saved to your library")
+       }
+       return helper
+     }
 }
 
 extension PollView: BannerObservable {

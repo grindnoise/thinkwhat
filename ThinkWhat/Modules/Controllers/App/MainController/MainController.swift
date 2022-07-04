@@ -177,14 +177,16 @@ class MainController: UITabBarController {//}, StorageProtocol {
                         self.loadingIndicator?.removeFromSuperview()
                         self.setTabBarVisible(visible: true, animated: true)
                         self.viewControllers?.forEach {
-                            guard let nav = $0 as? CustomNavigationController, let target = nav.viewControllers.first as? DataObservable else { return }
+                            guard let nav = $0 as? CustomNavigationController,
+                                  let target = nav.viewControllers.first as? DataObservable else { return }
                             target.onDataLoaded()
-                            Surveys.shared.newReferences
                             self.timers.forEach { $0.fire() }
                         }
                     }
                 } catch {
-                    print(error.localizedDescription)
+#if DEBUG
+                    error.printLocalized(class: type(of: self), functionName: #function)
+#endif
                 }
                 requestAttempt = 0
             }
@@ -192,7 +194,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
             throw error
         }
     }
-
+    
     
     // MARK: - Properties
     private var requestAttempt = 0

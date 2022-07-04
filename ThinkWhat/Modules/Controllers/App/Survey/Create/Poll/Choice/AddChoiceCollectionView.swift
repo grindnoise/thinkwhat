@@ -150,6 +150,8 @@ class AddChoiceCollectionView: UICollectionView {
         let layout = UICollectionViewCompositionalLayout(section: section)
         return layout
     }
+    
+    
 }
 
 @available(iOS 14.0, *)

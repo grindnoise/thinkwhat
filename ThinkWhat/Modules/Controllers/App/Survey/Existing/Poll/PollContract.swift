@@ -24,6 +24,7 @@ protocol PollViewInput: class {
     func onAddFavorite(_: Bool)
     func onVote(_: Answer)
     func onImageTapped(image: UIImage, title: String)
+    func onImageTapped(mediafile: Mediafile)
     func onURLTapped(_: URL)
     func onExitWithSkip()
     func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor)
@@ -60,8 +61,8 @@ protocol PollModelOutput: class {
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
-protocol PollControllerOutput: class {
-    var viewInput: PollViewInput? { get set }
+protocol PollControllerOutput: AnyObject {
+    var viewInput: (PollViewInput & UIViewController)? { get set }
     var survey: Survey? { get }
     var surveyReference: SurveyReference { get }
 //    var hasVoted: Bool { get }

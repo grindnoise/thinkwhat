@@ -312,6 +312,9 @@ class Survey: Decodable {
             if Surveys.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 Surveys.shared.all.append(self)
             }
+            if !SurveyReferences.shared.all.contains(where: {$0 == self.reference}) {
+                SurveyReferences.shared.all.append(self.reference)
+            }
         } catch {
 #if DEBUG
             print(error.localizedDescription)
@@ -500,11 +503,11 @@ class Surveys {
                     }
                 } else {
                     let instances = try decoder.decode([SurveyReference].self, from: value.rawData())
-                    guard !instances.isEmpty else {
-                        notifications.append(Notifications.Surveys.Empty)
-                        Notification.send(names: notifications.uniqued())
-                        return
-                    }
+//                    guard !instances.isEmpty else {
+//                        notifications.append(Notifications.Surveys.Empty)
+//                        Notification.send(names: notifications.uniqued())
+//                        return
+//                    }
                     for instance in instances {
                         if key == Category.Top.rawValue {//} && !value.isEmpty {
                             if topReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {

@@ -176,6 +176,7 @@ code_sign_if_enabled() {
 }
 
 if [[ "$CONFIGURATION" == "Alpha" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Agrume/Agrume.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework"
@@ -183,6 +184,7 @@ if [[ "$CONFIGURATION" == "Alpha" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/GoogleSignIn/GoogleSignIn.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/L10n-swift/L10n_swift.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ReCaptcha/ReCaptcha.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SwiftyGif/SwiftyGif.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyVK/SwiftyVK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework"
@@ -198,6 +200,7 @@ if [[ "$CONFIGURATION" == "Alpha" ]]; then
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit/FBSDKShareKit.framework"
 fi
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Agrume/Agrume.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework"
@@ -205,6 +208,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/GoogleSignIn/GoogleSignIn.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/L10n-swift/L10n_swift.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ReCaptcha/ReCaptcha.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SwiftyGif/SwiftyGif.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyVK/SwiftyVK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework"
@@ -220,6 +224,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit/FBSDKShareKit.framework"
 fi
 if [[ "$CONFIGURATION" == "Local" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Agrume/Agrume.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework"
@@ -227,6 +232,7 @@ if [[ "$CONFIGURATION" == "Local" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/GoogleSignIn/GoogleSignIn.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/L10n-swift/L10n_swift.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ReCaptcha/ReCaptcha.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SwiftyGif/SwiftyGif.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyVK/SwiftyVK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework"
@@ -242,6 +248,7 @@ if [[ "$CONFIGURATION" == "Local" ]]; then
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit/FBSDKShareKit.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Agrume/Agrume.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework"
@@ -249,6 +256,7 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/GoogleSignIn/GoogleSignIn.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/L10n-swift/L10n_swift.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ReCaptcha/ReCaptcha.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/SwiftyGif/SwiftyGif.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyVK/SwiftyVK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Swinject/Swinject.framework"

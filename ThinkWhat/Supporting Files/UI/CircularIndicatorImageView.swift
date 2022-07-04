@@ -21,7 +21,7 @@ class CircularIndicatorImageView: UIImageView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        layer.backgroundColor = UIColor.white.cgColor//UIColor(white: 1, alpha: 0.05).cgColor
+        layer.backgroundColor = UIColor.secondarySystemBackground.cgColor//UIColor(white: 1, alpha: 0.05).cgColor
         addSubview(progressIndicatorView)
         
         addConstraints(NSLayoutConstraint.constraints(

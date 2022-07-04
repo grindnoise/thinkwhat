@@ -39,7 +39,8 @@
 "Female" = "Female";
 "paste_link" = "Paste link";
 "continueButton" = "Continue";
-"save" = "Сохранить";
+"save" = "Save";
+"save_image" = "Save image";
 "camera" = "Camera";
 "photo_album" = "Photos";
 "api_unavailable" = "Server is currently unavailable, try again later";
@@ -67,7 +68,8 @@
 "delete" = "Delete";
 "hide_details" = "Hide details";
 "show_details" = "Show details";
-
+"hide_images" = "Hide images";
+"show_images" = "Show images";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";

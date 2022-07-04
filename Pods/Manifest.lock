@@ -1,4 +1,6 @@
 PODS:
+  - Agrume (5.8.0):
+    - SwiftyGif
   - Alamofire (5.5.0)
   - AppAuth (1.4.0):
     - AppAuth/Core (= 1.4.0)
@@ -37,6 +39,7 @@ PODS:
   - ReCaptcha (1.6.0):
     - ReCaptcha/Core (= 1.6.0)
   - ReCaptcha/Core (1.6.0)
+  - SwiftyGif (5.4.2)
   - SwiftyJSON (5.0.0)
   - SwiftyVK (3.4.2)
   - Swinject (2.7.1)
@@ -45,6 +48,7 @@ PODS:
   - YoutubePlayer-in-WKWebView (0.3.4)
 
 DEPENDENCIES:
+  - Agrume
   - Alamofire (~> 5.5)
   - FBSDKCoreKit
   - FBSDKLoginKit
@@ -63,6 +67,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
+    - Agrume
     - Alamofire
     - AppAuth
     - FBAEMKit
@@ -77,6 +82,7 @@ SPEC REPOS:
     - Nimble
     - Quick
     - ReCaptcha
+    - SwiftyGif
     - SwiftyJSON
     - SwiftyVK
     - Swinject
@@ -85,6 +91,7 @@ SPEC REPOS:
     - YoutubePlayer-in-WKWebView
 
 SPEC CHECKSUMS:
+  Agrume: 0b1a42b5bfbc3aa9f0801f2857d8df1138cf2951
   Alamofire: 1c4fb5369c3fe93d2857c780d8bbe09f06f97e7c
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
   FBAEMKit: 98e4afc9f867c6db3d1c0e7e3727d94a630b5f59
@@ -99,6 +106,7 @@ SPEC CHECKSUMS:
   Nimble: 5f8a2fb6fa343a7242dfdd9d42f7267419d464b2
   Quick: 6d9559f40647bc4d510103842ef2fdd882d753e2
   ReCaptcha: d493ed256054a7b6a7eabcaf0b47ec9a8f42a16e
+  SwiftyGif: dec758a9dd3d278e5a855dbf279bf062c923c387
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
   SwiftyVK: 5005dac6e85f7b0fd44e21ed2f021a397dff4cab
   Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
@@ -106,6 +114,6 @@ SPEC CHECKSUMS:
   VK-ios-sdk: 62a10b6571fbcda0657f455fedce7fedf55b4cd0
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: 960bbc38bf48f0d45dc82d95b25b0c5723ca0ac8
+PODFILE CHECKSUM: 93e823761840e5db41ce5b1bf5539c521da74ed0
 
 COCOAPODS: 1.11.2

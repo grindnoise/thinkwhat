@@ -322,6 +322,13 @@ class PollController: UIViewController {
 
 // MARK: - View Input
 extension PollController: PollViewInput {
+    func onImageTapped(mediafile: Mediafile) {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(ImageViewer(mediafile: mediafile), animated: true)
+    }
+    
     var showNext: Bool {
         return _showNext
     }

@@ -254,6 +254,9 @@ extension Banner: CallbackObservable {
         } else if sender is UIImage {
             callbackDelegate?.callbackReceived(sender)
             dismiss()
+        } else if sender is SideAppPreference {
+            callbackDelegate?.callbackReceived(sender)
+            dismiss()
         }
     }
 }

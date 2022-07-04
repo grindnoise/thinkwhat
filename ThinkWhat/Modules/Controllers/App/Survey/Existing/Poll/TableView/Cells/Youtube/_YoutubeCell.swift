@@ -9,7 +9,7 @@
 import UIKit
 import YoutubePlayer_in_WKWebView
 
-class YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackObservable {
+class _YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackObservable {
 
     private var tempAppPreference: SideAppPreference?
     private var sideAppPreference: SideAppPreference? {
@@ -125,7 +125,7 @@ class YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackObservable {
     }
 }
 
-extension YoutubeCell: BannerObservable {
+extension _YoutubeCell: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
 
     func onBannerWillDisappear(_ sender: Any) {}

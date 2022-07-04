@@ -55,6 +55,35 @@ class Mediafile: Decodable {
         file        = _file
     }
     
+    func downloadImage(downloadProgress: @escaping(Double)->(), completion: @escaping (Result<UIImage, Error>) -> ()) {
+        guard let url = imageURL else {
+            completion(.failure("Image URL is nil"))
+            return
+        }
+        API.shared.downloadImage(url: url) { downloadProgress($0) } completion: { [weak self] in
+            guard let self = self else { completion(.failure(APIError.unexpected(code: 500))); return }
+            switch $0 {
+            case.success(let image):
+                self.image = image
+                completion($0)
+            default:
+                completion($0)
+            }
+        }
+    }
+    
+    func downloadImageAsync() async throws -> UIImage {
+        do {
+            guard let url =  imageURL else { throw AppError.invalidURL }
+            image = try await API.shared.downloadImageAsync(from: url)
+            return image!
+        } catch {
+            throw error
+#if DEBUG
+            error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        }
+    }
 //    func downloadImage(progress: @escaping (CGFloat) -> ()) throws -> UIImage? {
 //        guard imageURL != nil else {
 //            throw NSError(domain:"", code: 500, userInfo:[ NSLocalizedDescriptionKey: "Invalid URL"]) as Error
