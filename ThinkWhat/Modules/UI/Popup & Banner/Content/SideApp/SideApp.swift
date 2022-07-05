@@ -64,7 +64,13 @@ class SideApp: UIView, BannerContent {
     }
     @IBOutlet weak var openButton: UIButton! {
         didSet {
-            openButton.setTitle("open_youtube".localized, for: .normal)
+            var title = ""
+            if app == .Youtube {
+                title = "open_youtube".localized
+            } else if app == .TikTok {
+                title = "open_tiktok".localized
+            }
+            openButton.setTitle(title, for: .normal)
         }
     }
     @IBAction func openYoutubeApp(_ sender: Any) {

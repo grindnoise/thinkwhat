@@ -45,7 +45,7 @@ class Slide: UIView {
     
     // MARK: - Private Properties
     public func showTitle() {
-        guard !mediafile.isNil, !imageView.isNil else { return }
+        guard !mediafile.isNil, !mediafile!.title.isEmpty, !imageView.isNil else { return }
         titleLabel = InsetLabel()
         setObservers()
         titleLabel?.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
@@ -59,8 +59,11 @@ class Slide: UIView {
             titleLabel!.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 16),
             titleLabel!.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -16),
             titleLabel!.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -16),
-            titleLabel!.heightAnchor.constraint(equalTo: titleLabel!.widthAnchor, multiplier: 1/8.0),
+//            titleLabel!.heightAnchor.constraint(equalTo: titleLabel!.widthAnchor, multiplier: 1/8.0),
         ])
+        let constraint = titleLabel!.heightAnchor.constraint(equalTo: titleLabel!.widthAnchor, multiplier: 1/8.0)
+        constraint.identifier = "height"
+        constraint.isActive = true
         titleLabel!.backgroundColor = .black.withAlphaComponent(0.8)
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
             guard let label = self.titleLabel else { return }

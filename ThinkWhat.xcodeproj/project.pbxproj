@@ -35,6 +35,7 @@
 		AB10031B27BFBBDE00338EE4 /* FillUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB10031727BFBBDE00338EE4 /* FillUserView.swift */; };
 		AB10031C27BFBBDE00338EE4 /* FillUserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB10031827BFBBDE00338EE4 /* FillUserModel.swift */; };
 		AB10031E27BFBC3600338EE4 /* FillUserView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB10031D27BFBC3600338EE4 /* FillUserView.xib */; };
+		AB142A922874802400F9E13D /* QuestionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB142A912874802400F9E13D /* QuestionCell.swift */; };
 		AB16401A281A9B86001F33F8 /* SurveyCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB164018281A9B86001F33F8 /* SurveyCollectionCell.swift */; };
 		AB16401E281A9C8D001F33F8 /* SurveyCellContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB16401D281A9C8D001F33F8 /* SurveyCellContentView.swift */; };
 		AB164020281A9C95001F33F8 /* SurveyCellContentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB16401F281A9C95001F33F8 /* SurveyCellContentView.xib */; };
@@ -570,6 +571,7 @@
 		AB10031727BFBBDE00338EE4 /* FillUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FillUserView.swift; sourceTree = "<group>"; };
 		AB10031827BFBBDE00338EE4 /* FillUserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FillUserModel.swift; sourceTree = "<group>"; };
 		AB10031D27BFBC3600338EE4 /* FillUserView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FillUserView.xib; sourceTree = "<group>"; };
+		AB142A912874802400F9E13D /* QuestionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionCell.swift; sourceTree = "<group>"; };
 		AB164018281A9B86001F33F8 /* SurveyCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCollectionCell.swift; sourceTree = "<group>"; };
 		AB16401D281A9C8D001F33F8 /* SurveyCellContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCellContentView.swift; sourceTree = "<group>"; };
 		AB16401F281A9C95001F33F8 /* SurveyCellContentView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SurveyCellContentView.xib; sourceTree = "<group>"; };
@@ -2174,6 +2176,7 @@
 				AB3A6F8B286F444F0073FFF7 /* ImageCell.swift */,
 				ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */,
 				ABFB42232873443A0066CFA0 /* WebViewCell.swift */,
+				AB142A912874802400F9E13D /* QuestionCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -3414,6 +3417,7 @@
 				AB72962D27DB5A6D00D45B54 /* ListView.swift in Sources */,
 				AB2AA1B8235D94DF0086D16C /* SurveyTableViewCell.swift in Sources */,
 				ABF27578280EB0B80023CD1F /* VotersController.swift in Sources */,
+				AB142A922874802400F9E13D /* QuestionCell.swift in Sources */,
 				AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */,
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
 				ABC18337284E502A005D1C31 /* ImageSelectionHeaderContent.swift in Sources */,

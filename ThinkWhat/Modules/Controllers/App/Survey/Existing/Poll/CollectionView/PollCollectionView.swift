@@ -11,7 +11,7 @@ import UIKit
 class PollCollectionView: UICollectionView {
     
     enum Section: Int {
-        case title, description, image, youtube, web
+        case title, description, image, youtube, web, question
         
         var localized: String {
             switch self {
@@ -25,6 +25,8 @@ class PollCollectionView: UICollectionView {
                 return "YouTube"
             case .web:
                 return "web".localized
+            case .question:
+                return "question".localized
             }
         }
     }
@@ -75,21 +77,23 @@ class PollCollectionView: UICollectionView {
 //            cell.collectionView = self
             cell.item = self.poll
         }
-        
         imageCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.item.isNil else { return }
             cell.item = self.poll
             cell.callbackDelegate = self
         }
-        
         let youtubeCellRegistration = UICollectionView.CellRegistration<YoutubeCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.url.isNil else { return }
             cell.url = self.poll.url
         }
-        
         let webCellRegistration = UICollectionView.CellRegistration<WebViewCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.url.isNil else { return }
             cell.url = self.poll.url
+            cell.callbackDelegate = self
+        }
+        let questionCellRegistration = UICollectionView.CellRegistration<QuestionCell, AnyHashable> { [weak self] cell, indexPath, item in
+            guard let self = self, cell.question.isNil else { return }
+            cell.question = self.poll.question
         }
 
 
@@ -143,6 +147,10 @@ class PollCollectionView: UICollectionView {
                 return collectionView.dequeueConfiguredReusableCell(using: webCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
+            } else if section == .question {
+                return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
             }
             return UICollectionViewCell()
         }
@@ -164,13 +172,13 @@ class PollCollectionView: UICollectionView {
             if url.absoluteString.isYoutubeLink {
                 snapshot.appendSections([.youtube])
                 snapshot.appendItems([3], toSection: .youtube)
-            } else if url.absoluteString.isTikTokLink {
-                
             } else {
                 snapshot.appendSections([.web])
                 snapshot.appendItems([4], toSection: .web)
             }
         }
+        snapshot.appendSections([.question])
+        snapshot.appendItems([5], toSection: .question)
         source.apply(snapshot, animatingDifferences: false)
     }
     
@@ -211,8 +219,9 @@ extension PollCollectionView: UICollectionViewDelegate {
 
 extension PollCollectionView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
-        if let mediafile = sender as? Mediafile {
-            callbackDelegate?.callbackReceived(mediafile)
-        }
+        ///Passthrouth
+//        if let mediafile = sender as? Mediafile {
+            callbackDelegate?.callbackReceived(sender)
+//        }
     }
 }

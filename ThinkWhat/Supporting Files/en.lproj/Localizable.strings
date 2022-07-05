@@ -47,7 +47,8 @@
 "retry" = "Retry";
 "more_info" = "More info";
 "play_youtube" = "Play here";
-"open_youtube" = "Open in Youtube app";
+"open_youtube" = "Open YouTube app";
+"open_tiktok" = "Open TikTok app";
 "remember" = "Remember";
 "bad_url" = "Incorrect url";
 "claim_sent" = "Сlaim has been sent";
@@ -70,6 +71,8 @@
 "show_details" = "Show details";
 "hide_images" = "Hide images";
 "show_images" = "Show images";
+"hide_webview" = "Hide web link";
+"show_webview" = "Show web link";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";
@@ -228,6 +231,7 @@
 "post_poll" = "Post";
 "optional" = "Optional";
 "open_safari" = "Open browser";
+"open_in_safari" = "Open in browser";
 "open_hyperlink" = "Open hyperlink";
 "limits_description" = "Limit for participants, upon reaching which the poll closes";
 "comments_on_description" = "Participants can post comments";
@@ -249,3 +253,5 @@
 "paste_url" = "Paste link";
 "add_image" = "Add image";
 "hot_restricted" = "Private polls cannot be get into the Hot";
+
+//PollView

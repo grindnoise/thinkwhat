@@ -35,7 +35,7 @@ class PollDescriptionCell: UICollectionViewCell {
     private let textView: UITextView = {
         let textView = UITextView()
         
-        textView.backgroundColor = .clear
+        textView.backgroundColor = .secondarySystemBackground
         textView.isEditable = false
         textView.isSelectable = false
         return textView
@@ -86,7 +86,7 @@ class PollDescriptionCell: UICollectionViewCell {
     private func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true
-        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        
         horizontalStack.heightAnchor.constraint(equalToConstant: 40).isActive = true
         disclosureLabel.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor).isActive = true
         contentView.addSubview(verticalStack)

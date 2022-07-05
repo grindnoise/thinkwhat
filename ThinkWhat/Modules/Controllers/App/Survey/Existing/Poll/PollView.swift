@@ -134,24 +134,27 @@ extension PollView {
 //        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
 //        banner.accessibilityIdentifier = accessibilityIdentifier
 //        banner.present(subview: PlainBannerContent(text: text, imageContent: imageContent, color: color), isModal: isModal, shouldDismissAfter: shouldDismissAfter)
-//    }
+    //    }
 }
 
 extension PollView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
-        guard let mediafile = sender as? Mediafile,
-              let images = survey!.media.sorted { $0.order < $1.order }.compactMap {$0.image} as? [UIImage] else { return }
-        let agrume = Agrume(images: images, startIndex: mediafile.order, background: .colored(.black))
-        let helper = makeHelper()
-        agrume.onLongPress = helper.makeSaveToLibraryLongPressGesture
-        agrume.show(from: viewInput!)
-        guard images.count > 1 else { return }
-        agrume.didScroll = { [weak self] index in
-            guard let self = self else { return }
-            self.collectionView.onImageScroll(index)
+        if let mediafile = sender as? Mediafile {
+            let images = survey!.media.sorted { $0.order < $1.order }.compactMap {$0.image}
+            let agrume = Agrume(images: images, startIndex: mediafile.order, background: .colored(.black))
+            let helper = makeHelper()
+            agrume.onLongPress = helper.makeSaveToLibraryLongPressGesture
+            agrume.show(from: viewInput!)
+            guard images.count > 1 else { return }
+            agrume.didScroll = { [weak self] index in
+                guard let self = self else { return }
+                self.collectionView.onImageScroll(index)
+            }
+        } else if let url = sender as? URL {
+            viewInput?.onURLTapped(url)
         }
     }
-        
+    
     private func makeHelper() -> AgrumePhotoLibraryHelper {
         let saveButtonTitle = "save_image".localized
         let cancelButtonTitle = "cancel".localized

@@ -5,7 +5,6 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -20,13 +19,6 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DQ0-1H-8Vm">
-                    <rect key="frame" x="0.0" y="44" width="414" height="0.0"/>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    <constraints>
-                        <constraint firstAttribute="height" id="eas-Up-JWH"/>
-                    </constraints>
-                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="e2e-D9-7gT">
                     <rect key="frame" x="0.0" y="44" width="414" height="818"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -35,20 +27,12 @@
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
-                <constraint firstItem="DQ0-1H-8Vm" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="2N4-W0-uCa"/>
-                <constraint firstItem="DQ0-1H-8Vm" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="2VG-E0-1vH"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="e2e-D9-7gT" secondAttribute="bottom" id="5Js-f1-sjg"/>
                 <constraint firstItem="e2e-D9-7gT" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="6M3-uu-VvA"/>
-                <constraint firstItem="e2e-D9-7gT" firstAttribute="top" secondItem="DQ0-1H-8Vm" secondAttribute="bottom" id="DJ8-tn-FYv"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="e2e-D9-7gT" secondAttribute="trailing" id="NUn-4U-fBG"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="DQ0-1H-8Vm" secondAttribute="trailing" id="fci-Di-AKz"/>
+                <constraint firstItem="e2e-D9-7gT" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="nY5-Lt-Zu0"/>
             </constraints>
             <point key="canvasLocation" x="137.68115942028987" y="82.366071428571431"/>
         </view>
     </objects>
-    <resources>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-    </resources>
 </document>

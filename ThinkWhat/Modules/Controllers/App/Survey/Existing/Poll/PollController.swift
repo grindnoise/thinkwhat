@@ -107,8 +107,19 @@ class PollController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
+        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
+        
+//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+//        icon.backgroundColor = .clear
+//        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor
+//        icon.isRounded = false
+//        icon.scaleMultiplicator = 1.4
+//        icon.category = Icon.Category(rawValue: _surveyReference.topic.id) ?? .Null
+//        navigationItem.titleView = icon
+//        navigationItem.titleView?.alpha = 0
+//
+//        navigationItem.titleView?.clipsToBounds = false
     }
     
     private func setupUI() {
@@ -119,38 +130,35 @@ class PollController: UIViewController {
                     self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         
-        guard deviceType != .iPhoneSE else {
-                    ///Set icon category in title
-                    let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-                    icon.backgroundColor = .clear
-                    icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor
-                    icon.isRounded = false
-                    icon.scaleMultiplicator = 1.4
-                    icon.category = Icon.Category(rawValue: _surveyReference.topic.id) ?? .Null
-                    navigationItem.titleView = icon
+//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+//        icon.backgroundColor = .clear
+//        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor
+//        icon.isRounded = false
+//        icon.scaleMultiplicator = 1.4
+//        icon.category = Icon.Category(rawValue: _surveyReference.topic.id) ?? .Null
+//        navigationItem.titleView = icon
+//
+//
+//        navigationItem.titleView?.clipsToBounds = false
+        navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
             
-                    navigationItem.titleView?.clipsToBounds = false
-                    navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-            
-                    let gesture = UITapGestureRecognizer(target: self, action: #selector(PollController.addFavorite))
-                    watchButton.addGestureRecognizer(gesture)
-            
-                    if isAddedToFavorite {
-                        watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
-                    } else {
-                        watchButton.tintColor = .systemGray
-                    }
-            
-                    if let nc = navigationController as? NavigationControllerPreloaded {
-                        nc.setNavigationBarHidden(false, animated: false)
-//                        nc.navigationBar.isTranslucent = false
-                    }
-                    navigationItem.largeTitleDisplayMode = .never
-                    watchButton.image = _surveyReference.isFavorite ? ImageSigns.binocularsFilled.image : ImageSigns.binoculars.image
-                    isAddedToFavorite = _surveyReference.isFavorite ? true : false
-                    navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
-            return
-        }
+//                    let gesture = UITapGestureRecognizer(target: self, action: #selector(PollController.addFavorite))
+//                    watchButton.addGestureRecognizer(gesture)
+//
+//                    if isAddedToFavorite {
+//                        watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+//                    } else {
+//                        watchButton.tintColor = .systemGray
+//                    }
+//
+//                    if let nc = navigationController as? NavigationControllerPreloaded {
+//                        nc.setNavigationBarHidden(false, animated: false)
+////                        nc.navigationBar.isTranslucent = false
+//                    }
+//                    navigationItem.largeTitleDisplayMode = .never
+//                    watchButton.image = _surveyReference.isFavorite ? ImageSigns.binocularsFilled.image : ImageSigns.binoculars.image
+//                    isAddedToFavorite = _surveyReference.isFavorite ? true : false
+//                    navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
         
         navigationBar.addSubview(avatar)
         avatar.translatesAutoresizingMaskIntoConstraints = false
@@ -158,7 +166,8 @@ class PollController: UIViewController {
         NSLayoutConstraint.activate([
             avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
             avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
-            avatar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState),
+            avatar.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.NavBarHeightLargeState - UINavigationController.Constants.ImageBottomMarginForLargeState*2),
+//            avatar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState),
             avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1.0/1.0)
             ])
         
@@ -208,7 +217,8 @@ class PollController: UIViewController {
 //        progressIndicator.layer.masksToBounds = false
 //        progressIndicator.lineWidth = progressIndicator.frame.width * 0.1
         
-
+//        navigationItem.titleView?.alpha = 0
+//        icon.alpha = 0
     }
     
     private func setObservers() {
@@ -218,6 +228,52 @@ class PollController: UIViewController {
                   let label = view.arrangedSubviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel else { return }
             label.font = UIFont(name: Fonts.Bold, size: newValue.width * 0.1)
         })
+        guard let navBar = navigationController?.navigationBar else { return }
+        observers.append(navBar.observe(\UINavigationBar.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
+            guard let self = self,
+                  let newValue = change.newValue else { return }
+//                  let titleView = self.navigationItem.titleView else { return }
+            
+            if self.navigationItem.titleView.isNil {
+                let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+                icon.backgroundColor = .clear
+                icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
+                icon.isRounded = false
+                icon.scaleMultiplicator = 1.4
+                icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
+                self.navigationItem.titleView = icon
+                self.navigationItem.titleView?.alpha = 0
+
+                self.navigationItem.titleView?.clipsToBounds = false
+            }
+
+            
+            var largeAlpha: CGFloat = CGFloat(1) - max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
+            let smallAlpha: CGFloat = max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
+            
+            largeAlpha = largeAlpha < 0.24 ? 0 : largeAlpha
+            self.navigationItem.titleView?.alpha = smallAlpha
+            self.avatar.alpha = largeAlpha
+            self.stackView.alpha = largeAlpha
+//            if oldValue.height > newValue.height {
+//                if largeAlpha != 0 {
+//                    self.avatar.alpha = 0
+//                    self.stackView.alpha = 0
+//                }
+//                if smallAlpha != 1 {
+//                    titleView.alpha = 1
+//                }
+//            } else if oldValue.height < newValue.height {
+//                if largeAlpha != 1 {
+//                    self.avatar.alpha = 1
+//                    self.stackView.alpha = 1
+//                }
+//                if smallAlpha != 0 {
+//                    titleView.alpha = 0
+//                }
+//            }
+        })
+
     }
     
     private func performChecks() {
