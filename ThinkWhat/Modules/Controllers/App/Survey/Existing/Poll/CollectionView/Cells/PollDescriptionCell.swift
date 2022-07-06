@@ -30,29 +30,45 @@ class PollDescriptionCell: UICollectionViewCell {
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+        instance.text = "details".localized.uppercased()
         return instance
     }()
     private let textView: UITextView = {
-        let textView = UITextView()
-        
-        textView.backgroundColor = .secondarySystemBackground
-        textView.isEditable = false
-        textView.isSelectable = false
-        return textView
+        let instance = UITextView()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+        instance.backgroundColor = .secondarySystemBackground
+        instance.isEditable = false
+        instance.isSelectable = false
+        return instance
         }()
     private var observers: [NSKeyValueObservation] = []
+    private let icon: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        let imageView = UIImageView(image: UIImage(systemName: "magnifyingglass"))
+        imageView.tintColor = .secondaryLabel
+        imageView.contentMode = .center
+        imageView.addEquallyTo(to: instance)
+        return instance
+    }()
     private let disclosureIndicator: UIImageView = {
         let disclosureIndicator = UIImageView()
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
         disclosureIndicator.tintColor = .secondaryLabel
-        disclosureIndicator.contentMode = .scaleAspectFit
+        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
+        disclosureIndicator.contentMode = .center
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
     }()
     
     // Stacks
     private lazy var horizontalStack: UIStackView = {
-        let rootStack = UIStackView(arrangedSubviews: [disclosureLabel, disclosureIndicator])
+        let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
+        let constraint = rootStack.heightAnchor.constraint(equalToConstant: 40)
+        constraint.identifier = "height"
+        constraint.isActive = true
         rootStack.alignment = .center
         rootStack.distribution = .fillProportionally
         return rootStack
@@ -87,7 +103,6 @@ class PollDescriptionCell: UICollectionViewCell {
         backgroundColor = .clear
         clipsToBounds = true
         
-        horizontalStack.heightAnchor.constraint(equalToConstant: 40).isActive = true
         disclosureLabel.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor).isActive = true
         contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -110,8 +125,8 @@ class PollDescriptionCell: UICollectionViewCell {
         openConstraint =
             textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         openConstraint?.priority = .defaultLow
-        //Наоборот, тк изначально ячейка не выбрана, а надо развернуто показать
-        disclosureLabel.text = !isSelected ? "hide_details".localized.uppercased() : "show_details".localized.uppercased()
+        
+//        disclosureLabel.text = !isSelected ? "hide_details".localized.uppercased() : "show_details".localized.uppercased()
         updateAppearance()
     }
     
@@ -120,10 +135,10 @@ class PollDescriptionCell: UICollectionViewCell {
         closedConstraint?.isActive = isSelected
         openConstraint?.isActive = !isSelected
         
-        UIView.transition(with: disclosureLabel, duration: 0.1, options: .transitionCrossDissolve) { [unowned self] in
+//        UIView.transition(with: disclosureLabel, duration: 0.1, options: .transitionCrossDissolve) { [unowned self] in
             //Наоборот, тк изначально ячейка не выбрана, а надо развернуто показать
-            disclosureLabel.text = !isSelected ? "hide_details".localized.uppercased() : "show_details".localized.uppercased()
-        } completion: { _ in }
+//            disclosureLabel.text = !isSelected ? "hide_details".localized.uppercased() : "show_details".localized.uppercased()
+//        } completion: { _ in }
 
         UIView.animate(withDuration: 0.3) {
             let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
@@ -143,16 +158,29 @@ class PollDescriptionCell: UICollectionViewCell {
         observers.append(textView.observe(\UITextView.bounds, options: .new, changeHandler: { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             guard let self = self, let value = change.newValue else { return }
             self.textView.cornerRadius = value.width * 0.05
-            self.textView.font = UIFont(name: Fonts.Regular,
-                                        size: self.textView.frame.width * 0.05)
         }))
-        observers.append(disclosureLabel.observe(\UILabel.bounds, options: .new, changeHandler: { view, change in
-            guard let newValue = change.newValue else { return }
-            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.3)
-        }))
+//        observers.append(disclosureLabel.observe(\InsetLabel.bounds, options: .new) { [weak self] view, _ in
+//            guard let self = self else { return }
+//            view.insets = UIEdgeInsets(top: view.insets.top, left: self.textView.cornerRadius, bottom: view.insets.bottom, right: view.insets.right)
+//        })
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                          forTextStyle: .body)
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                 forTextStyle: .footnote)
+        guard let constraint_1 = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
+              let constraint_2 = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        setNeedsLayout()
+        constraint_1.constant = textView.contentSize.height
+        constraint_2.constant = max(String(describing: item.rating).height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        layoutIfNeeded()
     }
 }
+

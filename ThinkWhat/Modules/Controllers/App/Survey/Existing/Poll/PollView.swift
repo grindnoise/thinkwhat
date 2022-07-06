@@ -42,6 +42,8 @@ class PollView: UIView {
     
     private lazy var collectionView: PollCollectionView = {
         let instance = PollCollectionView(poll: survey!, callbackDelegate: self)
+        instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
+        //////            UIApplication.shared.windows[0].safeAreaInsets.bottom, right: 0.0)
         return instance
     }()
     private var isLoadingData = false

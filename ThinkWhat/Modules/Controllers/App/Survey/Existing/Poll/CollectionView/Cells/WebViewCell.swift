@@ -52,7 +52,12 @@ class WebViewCell: UICollectionViewCell {
     }()
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
+        instance.text = "web_link".localized.uppercased()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
         instance.textColor = .secondaryLabel
+//                let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+//                constraint.identifier = "height"
+//                constraint.isActive = true
         return instance
     }()
     private lazy var browserButton: UIButton = {
@@ -73,12 +78,25 @@ class WebViewCell: UICollectionViewCell {
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
     }()
-    
+    private let icon: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        let imageView = UIImageView(image: UIImage(systemName: "link"))
+        imageView.tintColor = .secondaryLabel
+        imageView.contentMode = .center
+        imageView.addEquallyTo(to: instance)
+        return instance
+    }()
+
     // Stacks
     private lazy var horizontalStack: UIStackView = {
-        let rootStack = UIStackView(arrangedSubviews: [disclosureLabel, disclosureIndicator])
+        let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         rootStack.alignment = .center
         rootStack.distribution = .fillProportionally
+        let constraint = rootStack.heightAnchor.constraint(equalToConstant: 40)
+        constraint.identifier = "height"
+        constraint.isActive = true
         return rootStack
     }()
     private lazy var verticalStack: UIStackView = {
@@ -94,6 +112,7 @@ class WebViewCell: UICollectionViewCell {
     private lazy var webView: WKWebView = {
         let instance = WKWebView()
         instance.backgroundColor = .secondarySystemBackground
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         instance.addEquallyTo(to: background)
 //        instance.uiDelegate = self
         instance.alpha = 0
@@ -142,7 +161,6 @@ class WebViewCell: UICollectionViewCell {
             verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),
             verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
-            background.heightAnchor.constraint(equalTo: background.widthAnchor, multiplier: 1/1),
             browserButton.heightAnchor.constraint(equalToConstant: 40)
         ])
         closedConstraint =
@@ -153,7 +171,7 @@ class WebViewCell: UICollectionViewCell {
             browserButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         openConstraint?.priority = .defaultLow
         //Наоборот, тк изначально ячейка не выбрана, а надо развернуто показать
-        disclosureLabel.text = !isSelected ? "hide_webview".localized.uppercased() : "show_webview".localized.uppercased()
+//        disclosureLabel.text = !isSelected ? "hide_webview".localized.uppercased() : "show_webview".localized.uppercased()
         updateAppearance()
     }
     
@@ -161,10 +179,10 @@ class WebViewCell: UICollectionViewCell {
         closedConstraint?.isActive = isSelected
         openConstraint?.isActive = !isSelected
         
-        UIView.transition(with: disclosureLabel, duration: 0.1, options: .transitionCrossDissolve) { [unowned self] in
-            //Наоборот, тк изначально ячейка не выбрана, а надо развернуто показать
-            disclosureLabel.text = !isSelected ? "hide_webview".localized.uppercased() : "show_webview".localized.uppercased()
-        } completion: { _ in }
+//        UIView.transition(with: disclosureLabel, duration: 0.1, options: .transitionCrossDissolve) { [unowned self] in
+//            //Наоборот, тк изначально ячейка не выбрана, а надо развернуто показать
+//            disclosureLabel.text = !isSelected ? "hide_webview".localized.uppercased() : "show_webview".localized.uppercased()
+//        } completion: { _ in }
 
         UIView.animate(withDuration: 0.3) {
             let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
@@ -177,15 +195,25 @@ class WebViewCell: UICollectionViewCell {
             guard let value = change.newValue else { return }
             view.cornerRadius = max(value.height, value.width) * 0.05
         })
-        observers.append(disclosureLabel.observe(\UILabel.bounds, options: .new, changeHandler: { view, change in
-            guard let newValue = change.newValue else { return }
-            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.3)
-        }))
+//        observers.append(disclosureLabel.observe(\InsetLabel.bounds, options: .new) { [weak self] view, change in
+//            guard let self = self, let newValue = change.newValue else { return }
+//            view.insets = UIEdgeInsets(top: view.insets.top, left: self.background.cornerRadius, bottom: view.insets.bottom, right: view.insets.right)
+//        })
     }
     
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                 forTextStyle: .footnote)
+        guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        setNeedsLayout()
+        constraint.constant = max(disclosureLabel.text!.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        layoutIfNeeded()
+    }
     
     @objc
     private func openURL() {

@@ -20,9 +20,43 @@ class YoutubeCell: UICollectionViewCell {
     }
     
     // MARK: - Private Properties
+    private let disclosureLabel: UILabel = {
+        let instance = UILabel()
+        instance.textColor = .secondaryLabel
+        instance.text = "media".localized.uppercased()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+        return instance
+    }()
+    private let icon: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        let imageView = UIImageView(image: UIImage(systemName: "video.fill"))
+        imageView.tintColor = .secondaryLabel
+        imageView.contentMode = .center
+        imageView.addEquallyTo(to: instance)
+        return instance
+    }()
+    private lazy var horizontalStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel])
+        instance.alignment = .center
+        instance.axis = .horizontal
+        instance.distribution = .fillProportionally
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+        constraint.identifier = "height"
+        constraint.isActive = true
+        return instance
+    }()
+    private lazy var verticalStack: UIStackView = {
+        let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, playerView])
+        verticalStack.axis = .vertical
+        verticalStack.spacing = padding
+        return verticalStack
+    }()
     private lazy var playerView: WKYTPlayerView = {
         let instance = WKYTPlayerView()
         instance.backgroundColor = .secondarySystemBackground
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
         instance.delegate = self
         return instance
     }()
@@ -61,19 +95,19 @@ class YoutubeCell: UICollectionViewCell {
     private func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true
-        contentView.addSubview(playerView)
+        contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
-        playerView.translatesAutoresizingMaskIntoConstraints = false
+        verticalStack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            playerView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            playerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            playerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
-            playerView.heightAnchor.constraint(equalTo: playerView.widthAnchor, multiplier: 9/16),
+            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),
+            verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
+//            playerView.heightAnchor.constraint(equalTo: playerView.widthAnchor, multiplier: 9/16),
         ])
         let constraint = playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint.priority = .defaultLow
@@ -88,11 +122,26 @@ class YoutubeCell: UICollectionViewCell {
             guard let value = change.newValue else { return }
             view.cornerRadius = max(value.height, value.width) * 0.05
         })
+//        observers.append(disclosureLabel.observe(\InsetLabel.bounds, options: .new) { [weak self] view, change in
+//            guard let self = self, let newValue = change.newValue else { return }
+//            view.insets = UIEdgeInsets(top: view.insets.top, left: self.playerView.cornerRadius, bottom: view.insets.bottom, right: view.insets.right)
+////            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.3)
+//        })
     }
     
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                 forTextStyle: .footnote)
+        guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        setNeedsLayout()
+        constraint.constant = max(disclosureLabel.text!.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        layoutIfNeeded()
+    }
     
     private func openYotubeApp() {
         guard let id = url?.absoluteString.youtubeID else { return }

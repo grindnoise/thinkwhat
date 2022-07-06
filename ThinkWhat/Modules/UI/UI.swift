@@ -10,15 +10,7 @@ import UIKit
 
 //MARK: - String & fonts
 
-struct Fonts {
-    static let Semibold         = "OpenSans-Semibold"
-    static let SemiboldItalic   = "OpenSans-SemiboldItalic"
-    static let Bold             = "OpenSans-Bold"
-    static let Regular          = "OpenSans"
-    static let Light            = "OpenSans-Light"
-    static let Italic           = "OpenSans-Italic"
-    static let Extrabold        = "OpenSans-ExtraBold"
-}
+
 
 struct StringAttributes {
     enum FontStyle: String {

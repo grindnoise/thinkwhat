@@ -459,6 +459,8 @@
 		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
 		ABCAC572235EE99B00E6A118 /* TagLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCAC571235EE99B00E6A118 /* TagLabel.swift */; };
+		ABCBDA0E28759EE300888F23 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCBDA0D28759EE300888F23 /* Fonts.swift */; };
+		ABCBDA1028759F2500888F23 /* UIFont+.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCBDA0F28759F2500888F23 /* UIFont+.swift */; };
 		ABCDE35F260C7D3300ACF5A6 /* VerticalTextLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDE35E260C7D3300ACF5A6 /* VerticalTextLayer.swift */; };
 		ABCE775928488C8E001E3413 /* ImageSelectionPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCE775828488C8E001E3413 /* ImageSelectionPopup.swift */; };
 		ABCE775B28489342001E3413 /* ImageSelectionPopup.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */; };
@@ -1006,6 +1008,8 @@
 		ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSign.swift; sourceTree = "<group>"; };
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABCAC571235EE99B00E6A118 /* TagLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagLabel.swift; sourceTree = "<group>"; };
+		ABCBDA0D28759EE300888F23 /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
+		ABCBDA0F28759F2500888F23 /* UIFont+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+.swift"; sourceTree = "<group>"; };
 		ABCDE35E260C7D3300ACF5A6 /* VerticalTextLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalTextLayer.swift; sourceTree = "<group>"; };
 		ABCE775828488C8E001E3413 /* ImageSelectionPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionPopup.swift; sourceTree = "<group>"; };
 		ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageSelectionPopup.xib; sourceTree = "<group>"; };
@@ -1137,7 +1141,6 @@
 			isa = PBXGroup;
 			children = (
 				AB3C6811223FC71600B57580 /* Constants.swift */,
-				AB10030B27BF760400338EE4 /* Extensions */,
 				AB309C7827ADB4E1005BBCB4 /* UserDefaults.swift */,
 				AB3C6819223FD04500B57580 /* KeychainService.swift */,
 				AB0AB63427B4E37C006FD33F /* TimeoutTask.swift */,
@@ -1193,6 +1196,7 @@
 				ABF2756B280D62710023CD1F /* UITableView.swift */,
 				ABA448D327E331B000F8E00D /* UIView.swift */,
 				AB913F782806FADF00609D51 /* UIViewController.swift */,
+				ABCBDA0F28759F2500888F23 /* UIFont+.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1642,7 +1646,6 @@
 				AB3C6818223FD04500B57580 /* SMSResponse.swift */,
 				AB3EF63D22F4213C004BA878 /* EmailResponse.swift */,
 				AB3FDD3C23100D7800056C20 /* TemporaryUserCredentials.swift */,
-				AB4727A8268C6444002A9563 /* UI.swift */,
 				AB9DBF7726A197D600EFA66D /* Segues.swift */,
 			);
 			path = Algorithms;
@@ -2311,6 +2314,8 @@
 		AB913F8928097D8A00609D51 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				ABCBDA0D28759EE300888F23 /* Fonts.swift */,
+				AB4727A8268C6444002A9563 /* UI.swift */,
 				AB913F8D28097DAA00609D51 /* Animated */,
 				AB3C6835223FD3EE00B57580 /* Fonts */,
 				AB883B2727FDB33600DBE4EF /* ImageSigns.swift */,
@@ -2654,6 +2659,7 @@
 		ABB9E86B279E9E420018BB2E /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				AB10030B27BF760400338EE4 /* Extensions */,
 				AB38DD692819410700FFEB3F /* Constants */,
 				AB913F8928097D8A00609D51 /* UI */,
 				ABB9E88B279FD55D0018BB2E /* Controllers */,
@@ -3343,6 +3349,7 @@
 				AB38DD702819535C00FFEB3F /* Confirm.swift in Sources */,
 				AB3A47E2283F5CA700106407 /* RankingCreationView.swift in Sources */,
 				ABBA1988242B430100F11E0D /* AnswerHeaderCell.swift in Sources */,
+				ABCBDA0E28759EE300888F23 /* Fonts.swift in Sources */,
 				AB463FB527C3FDB3007D7240 /* UnderlinedSearchTextField.swift in Sources */,
 				AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */,
 				AB39899B28637E4F004C958E /* CostCollectionView.swift in Sources */,
@@ -3411,6 +3418,7 @@
 				AB37B9B22774BF3A00C7DEBC /* API.swift in Sources */,
 				AB87904D286DF03500C069BA /* ChoiceResultCell.swift in Sources */,
 				ABCDE35F260C7D3300ACF5A6 /* VerticalTextLayer.swift in Sources */,
+				ABCBDA1028759F2500888F23 /* UIFont+.swift in Sources */,
 				AB38DD662817F18900FFEB3F /* SubscribersModel.swift in Sources */,
 				AB463FBB27C7E65A007D7240 /* Avatar.swift in Sources */,
 				AB883B3728047FE300DBE4EF /* ImageController.swift in Sources */,

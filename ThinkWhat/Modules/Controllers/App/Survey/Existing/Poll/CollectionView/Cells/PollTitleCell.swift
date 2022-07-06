@@ -14,6 +14,7 @@ class PollTitleCell: UICollectionViewCell {
     private lazy var titleLabel: UILabel = {
         let instance = UILabel()
         instance.textAlignment = .center
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .largeTitle)
         instance.numberOfLines = 0
         instance.textColor = .label
         return instance
@@ -28,6 +29,7 @@ class PollTitleCell: UICollectionViewCell {
     }()
     private let ratingLabel: UILabel = {
         let instance = UILabel()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.textColor = .secondaryLabel
         return instance
@@ -42,12 +44,16 @@ class PollTitleCell: UICollectionViewCell {
     }()
     private let viewsLabel: UILabel = {
         let instance = UILabel()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.textColor = .secondaryLabel
         return instance
     }()
     private let bottomView: UIView = {
         let instance = UIView()
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 15)
+        constraint.identifier = "height"
+        constraint.isActive = true
         instance.backgroundColor = .clear
         return instance
     }()
@@ -55,7 +61,6 @@ class PollTitleCell: UICollectionViewCell {
     private lazy var horizontalStack: UIStackView = {
         let horizontalStack = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
         horizontalStack.alignment = .center
-//        horizontalStack.distribution = .fillProportionally
         horizontalStack.spacing = 4
         return horizontalStack
     }()
@@ -116,8 +121,6 @@ class PollTitleCell: UICollectionViewCell {
                     horizontalStack.centerXAnchor.constraint(equalTo: bottomView.centerXAnchor),
                     horizontalStack.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor),
                 ])
-        
-        bottomView.heightAnchor.constraint(equalToConstant: 15).isActive = true
         contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         verticalStack.translatesAutoresizingMaskIntoConstraints = false
@@ -138,24 +141,49 @@ class PollTitleCell: UICollectionViewCell {
     }
     
     private func setObservers() {
-        observers.append(titleLabel.observe(\UILabel.bounds, options: [.new]) { [weak self] view, change in
-            guard let self = self, let newValue = change.newValue else { return }
-            view.font = UIFont(name: Fonts.Bold, size: newValue.width * 0.1)
-            guard let item = self.item,
+        observers.append(titleLabel.observe(\UILabel.bounds, options: [.new]) { [weak self] view, _ in
+            guard let self = self,
+                  let text = view.text,
                   let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first,
-                  let height = item.title.height(withConstrainedWidth: view.bounds.width, font: view.font) as? CGFloat,
+                  let height = text.height(withConstrainedWidth: view.bounds.width, font: view.font) as? CGFloat,
                   height != constraint.constant else { return }
             self.setNeedsLayout()
             constraint.constant = height
             self.layoutIfNeeded()
         })
-        observers.append(viewsLabel.observe(\UILabel.bounds, options: [.new]) { view, change in
-            guard let newValue = change.newValue else { return }
-            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.8)
-        })
-        observers.append(ratingLabel.observe(\UILabel.bounds, options: [.new]) { view, change in
-            guard let newValue = change.newValue else { return }
-            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.8)
+        observers.append(ratingLabel.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
+            guard let self = self,
+                  let text = view.text else { return }
+            //            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.8)
+            guard let constraint = self.bottomView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+            self.setNeedsLayout()
+            constraint.constant = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
+            self.layoutIfNeeded()
         })
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                            forTextStyle: .largeTitle)
+        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .caption2)
+        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .caption2)
+        guard let constraint_1 = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
+              let constraint_2 = bottomView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        setNeedsLayout()
+        constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
+                                                  font: titleLabel.font)
+        constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
+                                                                       font: ratingLabel.font)
+        layoutIfNeeded()
+        
+    }
+    
 }

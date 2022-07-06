@@ -45,6 +45,64 @@ class ImageCell: UICollectionViewCell {
     }
     
     // MARK: - Private Properties
+    private lazy var disclosureLabel: UILabel = {
+        let instance = UILabel()
+        instance.textColor = .secondaryLabel
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+//        instance.addEquallyTo(to: horizontalStack)
+//        instance.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            instance.topAnchor.constraint(equalTo: emptyView.topAnchor),
+//            instance.bottomAnchor.constraint(equalTo: emptyView.bottomAnchor),
+//            instance.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor),
+//            instance.widthAnchor.constraint(equalTo: emptyView.widthAnchor, multiplier: 0.95),
+//        ])
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+//        constraint.identifier = "height"
+//        constraint.isActive = true
+        instance.text = "images".localized.uppercased()
+        return instance
+    }()
+    private lazy var emptyView: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+        constraint.identifier = "height"
+        constraint.isActive = true
+        instance.addSubview(horizontalStack)
+        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
+            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            horizontalStack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+            horizontalStack.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.95),
+        ])
+        
+        return instance
+    }()
+    private let icon: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        let imageView = UIImageView(image: UIImage(systemName: "photo.fill"))
+        imageView.tintColor = .secondaryLabel
+        imageView.contentMode = .center
+        imageView.addEquallyTo(to: instance)
+        return instance
+    }()
+    private lazy var horizontalStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel])
+        instance.alignment = .center
+        instance.axis = .horizontal
+        instance.distribution = .fillProportionally
+        return instance
+    }()
+    private lazy var verticalStack: UIStackView = {
+        let verticalStack = UIStackView(arrangedSubviews: [emptyView, imageContainer])
+        verticalStack.axis = .vertical
+        verticalStack.spacing = padding
+        return verticalStack
+    }()
     private let imageContainer: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
@@ -83,6 +141,7 @@ class ImageCell: UICollectionViewCell {
         let instance = UILabel()
         instance.alpha = 0
         imageContainer.addSubview(instance)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .callout)
         instance.backgroundColor = .black.withAlphaComponent(0.8)
         instance.textColor = .white
         instance.textAlignment = .center
@@ -118,18 +177,19 @@ class ImageCell: UICollectionViewCell {
     private func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true
-        contentView.addSubview(imageContainer)
+        contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
-        imageContainer.translatesAutoresizingMaskIntoConstraints = false
+        verticalStack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            imageContainer.topAnchor.constraint(equalTo: contentView.topAnchor),//, constant: padding),
-            imageContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-            imageContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),//, constant: padding),
+            verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+            verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+//            disclosureLabel.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95)
         ])
         let constraint = imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint.priority = .defaultLow
@@ -218,13 +278,28 @@ class ImageCell: UICollectionViewCell {
         observers.append(pages.observe(\UILabel.bounds, options: .new) { view, change in
             guard let newValue = change.newValue else { return }
             view.cornerRadius = newValue.height * 0.25
-            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.5)
+//            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.5)
         })
+//        observers.append(disclosureLabel.observe(\InsetLabel.bounds, options: .new) { [weak self] view, change in
+//            guard let self = self else { return }
+//            view.insets = UIEdgeInsets(top: view.insets.top, left: self.imageContainer.cornerRadius, bottom: view.insets.bottom, right: view.insets.right)
+////            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.3)
+//        })
     }
     
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                 forTextStyle: .footnote)
+        guard let constraint = emptyView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        setNeedsLayout()
+        constraint.constant = max(disclosureLabel.text!.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        layoutIfNeeded()
+    }
     
     // MARK: - Public methods
     func scrollToImage(at position: Int) {
