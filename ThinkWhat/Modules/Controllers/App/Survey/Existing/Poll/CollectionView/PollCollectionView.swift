@@ -11,7 +11,7 @@ import UIKit
 class PollCollectionView: UICollectionView {
     
     enum Section: Int {
-        case title, description, image, youtube, web, question
+        case title, description, image, youtube, web, question, choices
         
         var localized: String {
             switch self {
@@ -27,6 +27,8 @@ class PollCollectionView: UICollectionView {
                 return "web".localized
             case .question:
                 return "question".localized
+            case .choices:
+                return "poll_choices".localized
             }
         }
     }
@@ -56,7 +58,7 @@ class PollCollectionView: UICollectionView {
     // MARK: - UI functions
     private func setupUI() {
         delegate = self
-//        allowsMultipleSelection = true
+        allowsMultipleSelection = true
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
             layoutConfig.headerMode = .firstItemInSection
@@ -83,18 +85,25 @@ class PollCollectionView: UICollectionView {
             cell.callbackDelegate = self
         }
         let youtubeCellRegistration = UICollectionView.CellRegistration<YoutubeCell, AnyHashable> { [weak self] cell, indexPath, item in
-            guard let self = self, cell.url.isNil else { return }
-            cell.url = self.poll.url
+            guard let self = self, cell.item.isNil else { return }
+            cell.item = self.poll
         }
         let webCellRegistration = UICollectionView.CellRegistration<WebViewCell, AnyHashable> { [weak self] cell, indexPath, item in
-            guard let self = self, cell.url.isNil else { return }
-            cell.url = self.poll.url
+            guard let self = self, cell.item.isNil else { return }
+            cell.item = self.poll
             cell.callbackDelegate = self
         }
         let questionCellRegistration = UICollectionView.CellRegistration<QuestionCell, AnyHashable> { [weak self] cell, indexPath, item in
-            guard let self = self, cell.question.isNil else { return }
-            cell.question = self.poll.question
+            guard let self = self, cell.item.isNil else { return }
+            cell.item = self.poll
         }
+        
+        let choicesCellRegistration = UICollectionView.CellRegistration<ChoiceSectionCell, AnyHashable> { [weak self] cell, indexPath, item in
+            cell.owner = self
+            guard let self = self, cell.item.isNil else { return }
+            cell.item = self.poll
+        }
+
 
 
 //        let headerRegistration = UICollectionView.SupplementaryRegistration <UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) { headerView, elementKind, indexPath in
@@ -151,7 +160,12 @@ class PollCollectionView: UICollectionView {
                 return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
+            } else if section == .choices {
+                return collectionView.dequeueConfiguredReusableCell(using: choicesCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
             }
+
             return UICollectionViewCell()
         }
         
@@ -179,6 +193,9 @@ class PollCollectionView: UICollectionView {
         }
         snapshot.appendSections([.question])
         snapshot.appendItems([5], toSection: .question)
+        snapshot.appendSections([.choices])
+        snapshot.appendItems([6], toSection: .choices)
+
         source.apply(snapshot, animatingDifferences: false)
     }
     
@@ -189,6 +206,10 @@ class PollCollectionView: UICollectionView {
     public func onImageScroll(_ index: Int) {
         guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
         cell.scrollToImage(at: index)
+    }
+    
+    public func onQuestionsHeightChange(){
+        source.refresh()
     }
 }
 
@@ -206,14 +227,20 @@ extension PollCollectionView: UICollectionViewDelegate {
 //
 //        return false // The selecting or deselecting is already performed above
         
-        guard let cell = collectionView.cellForItem(at: indexPath), !cell.isSelected else {
-            collectionView.deselectItem(at: indexPath, animated: true)
-            source.refresh()
-            return false
-        }
+//        guard let cell = collectionView.cellForItem(at: indexPath), !cell.isSelected else {
+//            collectionView.deselectItem(at: indexPath, animated: true)
+//            source.refresh()
+//            return false
+//        }
         collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
         source.refresh()
         return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        source.refresh()
+        return false
     }
 }
 

@@ -258,3 +258,5 @@
 "details" = "Details";
 "media" = "Media";
 "web_link" = "Web link";
+"vote_verb" = "Vote";
+"vote_noun" = "Vote";

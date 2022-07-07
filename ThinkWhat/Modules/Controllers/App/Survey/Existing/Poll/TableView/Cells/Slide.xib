@@ -16,10 +16,11 @@
             <subviews>
                 <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9ba-FQ-uKV" customClass="CircularIndicatorImageView" customModule="ThinkWhat" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="0.0" width="160" height="90"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </imageView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="9ba-FQ-uKV" secondAttribute="bottom" id="Mgs-lx-Coi"/>
                 <constraint firstItem="9ba-FQ-uKV" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="TuB-Xo-ysI"/>

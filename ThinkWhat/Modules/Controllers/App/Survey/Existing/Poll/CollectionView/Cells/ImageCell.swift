@@ -11,9 +11,11 @@ import UIKit
 class ImageCell: UICollectionViewCell {
     
     // MARK: - Public Properties
+    override var isSelected: Bool { didSet { updateAppearance() } }
     var item: Survey! {
         didSet {
             guard !item.isNil else { return }
+            color = item.topic.tagColor
             createSlides(mediafiles: item.media)// item.imagesCount)
             slides.forEach { [weak self] slide in
                 guard let self = self, let mediafile = slide.mediafile else { return }
@@ -63,6 +65,15 @@ class ImageCell: UICollectionViewCell {
         instance.text = "images".localized.uppercased()
         return instance
     }()
+    private let disclosureIndicator: UIImageView = {
+        let disclosureIndicator = UIImageView()
+        disclosureIndicator.image = UIImage(systemName: "chevron.down")
+        disclosureIndicator.tintColor = .secondaryLabel
+        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
+        disclosureIndicator.contentMode = .center
+        disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
+        return disclosureIndicator
+    }()
     private lazy var emptyView: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
@@ -91,8 +102,11 @@ class ImageCell: UICollectionViewCell {
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel])
+        let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         instance.alignment = .center
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+        constraint.identifier = "height"
+        constraint.isActive = true
         instance.axis = .horizontal
         instance.distribution = .fillProportionally
         return instance
@@ -107,7 +121,7 @@ class ImageCell: UICollectionViewCell {
         let instance = UIView()
         instance.backgroundColor = .clear
 //        instance.translatesAutoresizingMaskIntoConstraints = false
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1.0/1.0).isActive = true
         return instance
     }()
     private lazy var scrollView: UIScrollView = {
@@ -158,6 +172,17 @@ class ImageCell: UICollectionViewCell {
     private var observers: [NSKeyValueObservation] = []
     private var pageIndex: Int = 0
     private let padding: CGFloat = 0
+    // Constraints
+    private var closedConstraint: NSLayoutConstraint!
+    private var openConstraint: NSLayoutConstraint!
+    private var color: UIColor = .secondaryLabel {
+        didSet {
+            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            guard let imageView = icon.get(all: UIImageView.self).first else { return }
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        }
+    }
     
     // MARK: - Public Properties
     public weak var callbackDelegate: CallbackObservable?
@@ -191,12 +216,37 @@ class ImageCell: UICollectionViewCell {
             verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
 //            disclosureLabel.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95)
         ])
-        let constraint = imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        constraint.priority = .defaultLow
-        constraint.isActive = true
         
-        setNeedsLayout()
-        layoutIfNeeded()
+                setNeedsLayout()
+                layoutIfNeeded()
+        
+        closedConstraint =
+            emptyView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        closedConstraint.priority = .defaultLow // use low priority so stack stays pinned to top of cell
+        
+        openConstraint =
+            imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        openConstraint.priority = .defaultLow
+        
+//        disclosureLabel.text = !isSelected ? "hide_details".localized.uppercased() : "show_details".localized.uppercased()
+        updateAppearance()
+        
+//        let constraint = imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+//        constraint.priority = .defaultLow
+//        constraint.isActive = true
+//
+//        setNeedsLayout()
+//        layoutIfNeeded()
+    }
+    
+    private func updateAppearance() {
+        closedConstraint?.isActive = isSelected
+        openConstraint?.isActive = !isSelected
+        
+        UIView.animate(withDuration: 0.3) {
+            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
+            self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
+        }
     }
     
     private func showPageControl(animated: Bool = true) {
@@ -228,36 +278,18 @@ class ImageCell: UICollectionViewCell {
             slide.addGestureRecognizer(recognizer)
             slide.imageView.cornerRadius = imageContainer.cornerRadius
             slide.cornerRadius = imageContainer.cornerRadius
-            slide.backgroundColor = .secondarySystemBackground
+            slide.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
             slide.layer.masksToBounds = true
             slides.append(slide)
             slide.translatesAutoresizingMaskIntoConstraints = false
-            slide.widthAnchor.constraint(equalTo: slide.heightAnchor, multiplier: 1.0/1.0).isActive = true
+//            slide.widthAnchor.constraint(equalTo: slide.heightAnchor, multiplier: 1.0/1.0).isActive = true
             slide.addEquallyTo(to: opaqueView, multiplier: 0.95)
+            slide.widthAnchor.constraint(equalTo: slide.heightAnchor, multiplier: 1.0/1.0).isActive = true
         }
         guard let constraint = imagesStack.getAllConstraints().filter({ $0.identifier == "width"}).first else { return }
         constraint.constant = imageContainer.frame.width * CGFloat(mediafiles.count)// + CGFloat(mediafiles.count) * imagesStack.spacing
     }
-//    private func createSlides(count: Int) {
-//        for _ in 0..<count {
-//            guard let slide  = Bundle.main.loadNibNamed("Slide", owner: self, options: nil)?.first as? Slide else { return }
-//            slide.mediafile =
-//            slide.color = item.topic.tagColor
-//            slide.frame = .zero
-////            slide.imageView.backgroundColor = .secondarySystemBackground
-//            let recognizer = UITapGestureRecognizer(target: self, action: #selector(self.imageTapped(recognizer:)))
-//            slide.imageView.addGestureRecognizer(recognizer)
-//            slide.imageView.cornerRadius = imageContainer.cornerRadius
-//            slide.cornerRadius = imageContainer.cornerRadius
-//            slide.backgroundColor = .secondarySystemBackground
-//            slide.layer.masksToBounds = true
-//            slides.append(slide)
-//            imagesStack.addArrangedSubview(slide)
-//        }
-//        guard let constraint = imagesStack.getAllConstraints().filter({ $0.identifier == "width"}).first else { return }
-//        constraint.constant = imageContainer.frame.width * CGFloat(count)
-//    }
-    
+
     @objc
     private func imageTapped(recognizer: UITapGestureRecognizer) {
         guard let slide = recognizer.view as? Slide,
@@ -289,6 +321,12 @@ class ImageCell: UICollectionViewCell {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+        
+        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        if let imageView = icon.get(all: UIImageView.self).first {
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        }
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }

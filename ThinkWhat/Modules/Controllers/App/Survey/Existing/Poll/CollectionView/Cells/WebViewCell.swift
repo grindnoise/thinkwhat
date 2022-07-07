@@ -14,10 +14,11 @@ class WebViewCell: UICollectionViewCell {
     // MARK: - Public Properties
     ///Внимание, вызывается из collectionView.didSelect!
     override var isSelected: Bool { didSet { updateAppearance() } }
-    var url: URL? {
+    var item: Survey! {
         didSet {
-            guard !url.isNil else { return }
-            if url!.absoluteString.isTikTokLink, isTiTokInstalled {
+            guard !item.isNil, let url = item.url else { return }
+            color = item.topic.tagColor
+            if url.absoluteString.isTikTokLink, isTiTokInstalled {
                 app = .TikTok
                 opaqueView = UIView(frame: .zero)
                 opaqueView!.backgroundColor = .clear
@@ -26,7 +27,7 @@ class WebViewCell: UICollectionViewCell {
                 opaqueView!.addGestureRecognizer(recognizer)
             }
             do {
-                try webView.load(URLRequest(url: url!, method: .get))
+                try webView.load(URLRequest(url: url, method: .get))
             } catch {
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)
@@ -74,7 +75,8 @@ class WebViewCell: UICollectionViewCell {
         let disclosureIndicator = UIImageView()
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
         disclosureIndicator.tintColor = .secondaryLabel
-        disclosureIndicator.contentMode = .scaleAspectFit
+        disclosureIndicator.contentMode = .center
+        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
     }()
@@ -128,6 +130,15 @@ class WebViewCell: UICollectionViewCell {
             return UserDefaults.App.tiktokPlay
         }
     }
+    private var color: UIColor = .secondaryLabel {
+        didSet {
+            background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            guard let imageView = icon.get(all: UIImageView.self).first else { return }
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        }
+    }
     
     // MARK: - Public Properties
     public weak var callbackDelegate: CallbackObservable?
@@ -179,11 +190,6 @@ class WebViewCell: UICollectionViewCell {
         closedConstraint?.isActive = isSelected
         openConstraint?.isActive = !isSelected
         
-//        UIView.transition(with: disclosureLabel, duration: 0.1, options: .transitionCrossDissolve) { [unowned self] in
-//            //Наоборот, тк изначально ячейка не выбрана, а надо развернуто показать
-//            disclosureLabel.text = !isSelected ? "hide_webview".localized.uppercased() : "show_webview".localized.uppercased()
-//        } completion: { _ in }
-
         UIView.animate(withDuration: 0.3) {
             let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
             self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
@@ -195,16 +201,18 @@ class WebViewCell: UICollectionViewCell {
             guard let value = change.newValue else { return }
             view.cornerRadius = max(value.height, value.width) * 0.05
         })
-//        observers.append(disclosureLabel.observe(\InsetLabel.bounds, options: .new) { [weak self] view, change in
-//            guard let self = self, let newValue = change.newValue else { return }
-//            view.insets = UIEdgeInsets(top: view.insets.top, left: self.background.cornerRadius, bottom: view.insets.bottom, right: view.insets.right)
-//        })
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        //Set dynamic font size
+            background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            if let imageView = icon.get(all: UIImageView.self).first {
+                imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            }
+            //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
@@ -217,6 +225,7 @@ class WebViewCell: UICollectionViewCell {
     
     @objc
     private func openURL() {
+        guard let url = item.url else { return }
         callbackDelegate?.callbackReceived(url as Any)
     }
     
@@ -225,8 +234,8 @@ class WebViewCell: UICollectionViewCell {
             switch app {
             case .TikTok:
                 if sideAppPreference == .App || tempAppPreference == .App {
-                    if isTiTokInstalled {
-                        UIApplication.shared.open(url!, options: [:], completionHandler: {_ in})
+                    if isTiTokInstalled, let url = item.url {
+                        UIApplication.shared.open(url, options: [:], completionHandler: {_ in})
                     }
                 } else if sideAppPreference == nil, tempAppPreference == nil, isTiTokInstalled {
                     let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self)
@@ -247,7 +256,8 @@ extension WebViewCell: CallbackObservable {
             opaqueView?.removeFromSuperview()
             if preference == .App {
                 tempAppPreference = .App
-                UIApplication.shared.open(url!, options: [:], completionHandler: {_ in})
+                guard let url = item.url else { return }
+                UIApplication.shared.open(url, options: [:], completionHandler: {_ in})
             } else {
                 tempAppPreference = .Embedded
             }

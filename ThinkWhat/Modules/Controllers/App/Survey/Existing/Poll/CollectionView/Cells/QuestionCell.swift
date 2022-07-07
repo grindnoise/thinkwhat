@@ -10,6 +10,20 @@ import UIKit
 
 class QuestionCell: UICollectionViewCell {
     
+    // MARK: - Public properties
+    public var item: Survey! {
+        didSet {
+            guard !item.isNil else { return }
+            color = item.topic.tagColor
+            textView.text = item.question
+            let constraint = textView.heightAnchor.constraint(equalToConstant: textView.contentSize.height)
+            constraint.identifier = "height"
+            constraint.isActive = true
+            setNeedsLayout()
+            layoutIfNeeded()
+        }
+    }
+    
     // MARK: - Private properties
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
@@ -21,7 +35,7 @@ class QuestionCell: UICollectionViewCell {
     private lazy var textView: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = .secondarySystemBackground
-        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Italic.rawValue, forTextStyle: .headline)
         textView.isEditable = false
         textView.isSelectable = false
         return textView
@@ -54,18 +68,12 @@ class QuestionCell: UICollectionViewCell {
     }()
     private var observers: [NSKeyValueObservation] = []
     private let padding: CGFloat = 0
-    
-    
-    // MARK: - Public properties
-    public var question: String! {
+    private var color: UIColor = .secondaryLabel {
         didSet {
-            guard let question = question else { return }
-            textView.text = question
-            let constraint = textView.heightAnchor.constraint(equalToConstant: textView.contentSize.height)
-            constraint.identifier = "height"
-            constraint.isActive = true
-            setNeedsLayout()
-            layoutIfNeeded()
+            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            guard let imageView = icon.get(all: UIImageView.self).first else { return }
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
         }
     }
     
@@ -133,18 +141,24 @@ class QuestionCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
+        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        if let imageView = icon.get(all: UIImageView.self).first {
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        }
+        
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                          forTextStyle: .body)
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Italic.rawValue,
+                                          forTextStyle: .headline)
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                                  forTextStyle: .footnote)
         guard let constraint_1 = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
               let constraint_2 = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
         constraint_1.constant = textView.contentSize.height
-        constraint_2.constant = max(question.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        constraint_2.constant = max(item.question.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
         layoutIfNeeded()
     }
 }

@@ -1,5 +1,5 @@
 //
-//  ChoiceCell.swift
+//  delChoiceCell.swift
 //  ThinkWhat
 //
 //  Created by Pavel Bukharov on 29.03.2022.
@@ -8,10 +8,10 @@
 
 import UIKit
 
-class ChoiceCell: UITableViewCell {
+class delChoiceCell: UITableViewCell {
 
     deinit {
-        print("ChoiceCell deinit")
+        print("delChoiceCell deinit")
     }
     
     @IBOutlet weak var checkBox: CheckBox!

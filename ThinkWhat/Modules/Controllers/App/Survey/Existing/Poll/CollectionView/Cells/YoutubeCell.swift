@@ -12,12 +12,15 @@ import YoutubePlayer_in_WKWebView
 class YoutubeCell: UICollectionViewCell {
     
     // MARK: - Public Properties
-    var url: URL? {
+    var item: Survey! {
         didSet {
-            guard !url.isNil, let id = url?.absoluteString.youtubeID else { return }
+            guard !item.isNil, let url = item.url, let id = url.absoluteString.youtubeID else { return }
+            color = item.topic.tagColor
             playerView.load(withVideoId: id)
         }
     }
+    public weak var callbackDelegate: CallbackObservable?
+    override var isSelected: Bool { didSet { updateAppearance() } }
     
     // MARK: - Private Properties
     private let disclosureLabel: UILabel = {
@@ -26,6 +29,15 @@ class YoutubeCell: UICollectionViewCell {
         instance.text = "media".localized.uppercased()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
         return instance
+    }()
+    private let disclosureIndicator: UIImageView = {
+        let disclosureIndicator = UIImageView()
+        disclosureIndicator.image = UIImage(systemName: "chevron.down")
+        disclosureIndicator.tintColor = .secondaryLabel
+        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
+        disclosureIndicator.contentMode = .center
+        disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
+        return disclosureIndicator
     }()
     private let icon: UIView = {
         let instance = UIView()
@@ -38,7 +50,7 @@ class YoutubeCell: UICollectionViewCell {
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel])
+        let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         instance.alignment = .center
         instance.axis = .horizontal
         instance.distribution = .fillProportionally
@@ -76,9 +88,18 @@ class YoutubeCell: UICollectionViewCell {
         let appUrl = URL(string: appScheme)
         return UIApplication.shared.canOpenURL(appUrl! as URL)
     }
-    
-    // MARK: - Public Properties
-    public weak var callbackDelegate: CallbackObservable?
+    // Constraints
+    private var closedConstraint: NSLayoutConstraint!
+    private var openConstraint: NSLayoutConstraint!
+    private var color: UIColor = .secondaryLabel {
+        didSet {
+            playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            guard let imageView = icon.get(all: UIImageView.self).first else { return }
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        }
+    }
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -109,12 +130,30 @@ class YoutubeCell: UICollectionViewCell {
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
 //            playerView.heightAnchor.constraint(equalTo: playerView.widthAnchor, multiplier: 9/16),
         ])
-        let constraint = playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        constraint.priority = .defaultLow
-        constraint.isActive = true
-        
+//        let constraint = playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+//        constraint.priority = .defaultLow
+//        constraint.isActive = true
+//
         setNeedsLayout()
         layoutIfNeeded()
+        
+        closedConstraint =
+            horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        closedConstraint?.priority = .defaultLow // use low priority so stack stays pinned to top of cell
+        openConstraint =
+        playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        openConstraint?.priority = .defaultLow
+        updateAppearance()
+    }
+    
+    private func updateAppearance() {
+        closedConstraint?.isActive = isSelected
+        openConstraint?.isActive = !isSelected
+
+        UIView.animate(withDuration: 0.3) {
+            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
+            self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
+        }
     }
     
     private func setObservers() {
@@ -132,6 +171,13 @@ class YoutubeCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
+        playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        if let imageView = icon.get(all: UIImageView.self).first {
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        }
+        
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
@@ -144,7 +190,7 @@ class YoutubeCell: UICollectionViewCell {
     }
     
     private func openYotubeApp() {
-        guard let id = url?.absoluteString.youtubeID else { return }
+        guard let url = item.url, let id = url.absoluteString.youtubeID else { return }
         let appScheme = "youtube://watch?v=\(id)"
         if let appUrl = URL(string: appScheme) {
             UIApplication.shared.open(appUrl)

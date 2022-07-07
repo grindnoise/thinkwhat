@@ -16,6 +16,7 @@ class PollDescriptionCell: UICollectionViewCell {
     var item: Survey! {
         didSet {
             guard !item.isNil else { return }
+            color = item.topic.tagColor
             textView.text = item.description
             let constraint = textView.heightAnchor.constraint(equalToConstant: textView.contentSize.height)
             constraint.identifier = "height"
@@ -26,7 +27,6 @@ class PollDescriptionCell: UICollectionViewCell {
     }
     
     // MARK: - Private Properties
-    // Views
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
@@ -79,6 +79,15 @@ class PollDescriptionCell: UICollectionViewCell {
         verticalStack.spacing = padding
         return verticalStack
     }()
+    private var color: UIColor = .secondaryLabel {
+        didSet {
+            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            guard let imageView = icon.get(all: UIImageView.self).first else { return }
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        }
+    }
     
     // Constraints
     private var closedConstraint: NSLayoutConstraint?
@@ -105,8 +114,10 @@ class PollDescriptionCell: UICollectionViewCell {
         
         disclosureLabel.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor).isActive = true
         contentView.addSubview(verticalStack)
+//        contentView.addSubview(opaqueView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         verticalStack.translatesAutoresizingMaskIntoConstraints = false
+//        opaqueView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
@@ -116,6 +127,10 @@ class PollDescriptionCell: UICollectionViewCell {
             verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),
             verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
+//            opaqueView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+//            opaqueView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+//            opaqueView.topAnchor.constraint(equalTo: contentView.topAnchor),
+//            opaqueView.bottomAnchor.constraint(equalTo: horizontalStack.bottomAnchor),
         ])
 
         closedConstraint =
@@ -167,6 +182,13 @@ class PollDescriptionCell: UICollectionViewCell {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+        
+        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        if let imageView = icon.get(all: UIImageView.self).first {
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        }
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }

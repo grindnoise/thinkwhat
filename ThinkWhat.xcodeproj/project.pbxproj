@@ -14,6 +14,9 @@
 		AB04144D244EF2F600336857 /* Controllers.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB04144C244EF2F600336857 /* Controllers.storyboard */; };
 		AB04144F244EF3A600336857 /* SurveyStackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB04144E244EF3A600336857 /* SurveyStackViewController.swift */; };
 		AB041451244EFD0300336857 /* CategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB041450244EFD0300336857 /* CategoriesViewController.swift */; };
+		AB090D802876EEAF00FAFAB0 /* ChoiceSectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB090D7F2876EEAF00FAFAB0 /* ChoiceSectionCell.swift */; };
+		AB090D832876F06D00FAFAB0 /* ChoiceCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB090D822876F06D00FAFAB0 /* ChoiceCollectionView.swift */; };
+		AB090D85287727FA00FAFAB0 /* ChoiceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB090D84287727FA00FAFAB0 /* ChoiceCell.swift */; };
 		AB0980DC24CF04A100A02405 /* UserActivityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0980DB24CF04A100A02405 /* UserActivityCell.swift */; };
 		AB0AB63227B3DF2B006FD33F /* GoogleWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63127B3DF2B006FD33F /* GoogleWorker.swift */; };
 		AB0AB63527B4E37C006FD33F /* TimeoutTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0AB63427B4E37C006FD33F /* TimeoutTask.swift */; };
@@ -414,8 +417,8 @@
 		ABADF58327F2338800A26474 /* _YoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF58127F2338800A26474 /* _YoutubeCell.swift */; };
 		ABADF58827F2E4F300A26474 /* WebCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF58627F2E4F300A26474 /* WebCell.swift */; };
 		ABADF58927F2E4F300A26474 /* WebCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF58727F2E4F300A26474 /* WebCell.xib */; };
-		ABADF59227F361AE00A26474 /* ChoiceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF59027F361AE00A26474 /* ChoiceCell.swift */; };
-		ABADF59327F361AE00A26474 /* ChoiceCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF59127F361AE00A26474 /* ChoiceCell.xib */; };
+		ABADF59227F361AE00A26474 /* delChoiceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF59027F361AE00A26474 /* delChoiceCell.swift */; };
+		ABADF59327F361AE00A26474 /* delChoiceCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF59127F361AE00A26474 /* delChoiceCell.xib */; };
 		ABADF59727F4A8D500A26474 /* VoteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF59527F4A8D400A26474 /* VoteCell.swift */; };
 		ABADF59827F4A8D500A26474 /* VoteCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF59627F4A8D400A26474 /* VoteCell.xib */; };
 		ABADF59C27F7066300A26474 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABADF59B27F7066300A26474 /* Banner.swift */; };
@@ -552,6 +555,9 @@
 		AB04144C244EF2F600336857 /* Controllers.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Controllers.storyboard; sourceTree = "<group>"; };
 		AB04144E244EF3A600336857 /* SurveyStackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyStackViewController.swift; sourceTree = "<group>"; };
 		AB041450244EFD0300336857 /* CategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewController.swift; sourceTree = "<group>"; };
+		AB090D7F2876EEAF00FAFAB0 /* ChoiceSectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceSectionCell.swift; sourceTree = "<group>"; };
+		AB090D822876F06D00FAFAB0 /* ChoiceCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceCollectionView.swift; sourceTree = "<group>"; };
+		AB090D84287727FA00FAFAB0 /* ChoiceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceCell.swift; sourceTree = "<group>"; };
 		AB0980DB24CF04A100A02405 /* UserActivityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserActivityCell.swift; sourceTree = "<group>"; };
 		AB0AB63127B3DF2B006FD33F /* GoogleWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleWorker.swift; sourceTree = "<group>"; };
 		AB0AB63427B4E37C006FD33F /* TimeoutTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeoutTask.swift; sourceTree = "<group>"; };
@@ -963,8 +969,8 @@
 		ABADF58127F2338800A26474 /* _YoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _YoutubeCell.swift; sourceTree = "<group>"; };
 		ABADF58627F2E4F300A26474 /* WebCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCell.swift; sourceTree = "<group>"; };
 		ABADF58727F2E4F300A26474 /* WebCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WebCell.xib; sourceTree = "<group>"; };
-		ABADF59027F361AE00A26474 /* ChoiceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceCell.swift; sourceTree = "<group>"; };
-		ABADF59127F361AE00A26474 /* ChoiceCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChoiceCell.xib; sourceTree = "<group>"; };
+		ABADF59027F361AE00A26474 /* delChoiceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delChoiceCell.swift; sourceTree = "<group>"; };
+		ABADF59127F361AE00A26474 /* delChoiceCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = delChoiceCell.xib; sourceTree = "<group>"; };
 		ABADF59527F4A8D400A26474 /* VoteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteCell.swift; sourceTree = "<group>"; };
 		ABADF59627F4A8D400A26474 /* VoteCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VoteCell.xib; sourceTree = "<group>"; };
 		ABADF59B27F7066300A26474 /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
@@ -1127,6 +1133,15 @@
 				AB041450244EFD0300336857 /* CategoriesViewController.swift */,
 			);
 			path = CategoriesViewController;
+			sourceTree = "<group>";
+		};
+		AB090D812876F04A00FAFAB0 /* ChoiceCollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				AB090D822876F06D00FAFAB0 /* ChoiceCollectionView.swift */,
+				AB090D84287727FA00FAFAB0 /* ChoiceCell.swift */,
+			);
+			path = ChoiceCollectionView;
 			sourceTree = "<group>";
 		};
 		AB0AB63027B3DF1B006FD33F /* Google */ = {
@@ -2117,7 +2132,6 @@
 			isa = PBXGroup;
 			children = (
 				AB879047286D9F7600C069BA /* Navbar content */,
-				ABB19149286CAADE00C89142 /* Poll v2 */,
 				ABA448E727EE02E600F8E00D /* Poll */,
 				AB8C99552486760B00BC517B /* Claim */,
 				AB8C99512485321F00BC517B /* ClaimBarButton.swift */,
@@ -2174,12 +2188,14 @@
 		AB879050286E02B700C069BA /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				AB090D812876F04A00FAFAB0 /* ChoiceCollectionView */,
 				AB879051286E02CD00C069BA /* PollTitleCell.swift */,
 				AB3A6F89286F0F6B0073FFF7 /* PollDescriptionCell.swift */,
 				AB3A6F8B286F444F0073FFF7 /* ImageCell.swift */,
 				ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */,
 				ABFB42232873443A0066CFA0 /* WebViewCell.swift */,
 				AB142A912874802400F9E13D /* QuestionCell.swift */,
+				AB090D7F2876EEAF00FAFAB0 /* ChoiceSectionCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -2570,8 +2586,8 @@
 		ABADF58F27F3619500A26474 /* Choice */ = {
 			isa = PBXGroup;
 			children = (
-				ABADF59027F361AE00A26474 /* ChoiceCell.swift */,
-				ABADF59127F361AE00A26474 /* ChoiceCell.xib */,
+				ABADF59027F361AE00A26474 /* delChoiceCell.swift */,
+				ABADF59127F361AE00A26474 /* delChoiceCell.xib */,
 			);
 			path = Choice;
 			sourceTree = "<group>";
@@ -2624,13 +2640,6 @@
 				ABAEEE5B27A5D7ED00E4EF29 /* VKWorker.swift */,
 			);
 			path = VK;
-			sourceTree = "<group>";
-		};
-		ABB19149286CAADE00C89142 /* Poll v2 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "Poll v2";
 			sourceTree = "<group>";
 		};
 		ABB46F3C2345DDA000AF212B /* Managers */ = {
@@ -3170,7 +3179,7 @@
 				ABF3DF1D283BB13300309AA9 /* LargeCard.xib in Resources */,
 				AB3C6850223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf in Resources */,
 				ABF27572280D76720023CD1F /* NextCell.xib in Resources */,
-				ABADF59327F361AE00A26474 /* ChoiceCell.xib in Resources */,
+				ABADF59327F361AE00A26474 /* delChoiceCell.xib in Resources */,
 				ABADF57A27F1DB0E00A26474 /* ImagesCell.xib in Resources */,
 				AB21970926C1163A005A7BA8 /* TotalCost.xib in Resources */,
 				ABA448FA27EF235300F8E00D /* AuthorCell.xib in Resources */,
@@ -3368,6 +3377,7 @@
 				AB883B312804391200DBE4EF /* VoteMessage.swift in Sources */,
 				AB8238F927A914100061F7C6 /* URLs.swift in Sources */,
 				AB72963D27DB5F0B00D45B54 /* TopicsModel.swift in Sources */,
+				AB090D802876EEAF00FAFAB0 /* ChoiceSectionCell.swift in Sources */,
 				ABB46F412347406F00AF212B /* ProfileViewController.swift in Sources */,
 				AB87904F286DF99B00C069BA /* PollCollectionView.swift in Sources */,
 				AB98308B27B9385B002C5132 /* RecoverView.swift in Sources */,
@@ -3376,6 +3386,7 @@
 				AB9998BE28058FA5009D0E4F /* Double.swift in Sources */,
 				AB00FFD52587A6320071C7DE /* BlurTransition.swift in Sources */,
 				ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */,
+				AB090D832876F06D00FAFAB0 /* ChoiceCollectionView.swift in Sources */,
 				ABB46F372344B1F900AF212B /* CallbackObservable.swift in Sources */,
 				ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */,
 				AB1D7BA4248F606200845F1C /* FadeTransition.swift in Sources */,
@@ -3576,6 +3587,7 @@
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				AB4727A9268C6444002A9563 /* UI.swift in Sources */,
 				AB3A47D1283F59D200106407 /* PollCreationContract.swift in Sources */,
+				AB090D85287727FA00FAFAB0 /* ChoiceCell.swift in Sources */,
 				ABDA424F23B0D60500BAC3A5 /* NewAnswerIcons.swift in Sources */,
 				AB8DA33527A17F0E00F92C18 /* GetStartedViewController.swift in Sources */,
 				AB48B90624348CDC00A27B0D /* SurveyTotalCell.swift in Sources */,
@@ -3612,7 +3624,7 @@
 				ABF27581280EB2D40023CD1F /* VotersModel.swift in Sources */,
 				AB25AC33282BBFE700050907 /* SurveyTable.swift in Sources */,
 				AB3C6824223FD1E900B57580 /* CustomAlertSign.swift in Sources */,
-				ABADF59227F361AE00A26474 /* ChoiceCell.swift in Sources */,
+				ABADF59227F361AE00A26474 /* delChoiceCell.swift in Sources */,
 				ABB8B1912423D11600E8DFF3 /* Slide.swift in Sources */,
 				AB6083BB2240F761002C0D7E /* MailAuthViewController.swift in Sources */,
 				ABA448D927E46F3B00F8E00D /* CardView.swift in Sources */,

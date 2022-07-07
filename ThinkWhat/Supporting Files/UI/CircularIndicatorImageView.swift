@@ -13,15 +13,16 @@ class CircularIndicatorImageView: UIImageView {
     public var color: UIColor = K_COLOR_RED {
         didSet {
             progressIndicatorView.color = color
+            layer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : color.withAlphaComponent(0.1).cgColor
         }
     }
     
-    let progressIndicatorView = CameraLoadingIndicator(frame: .zero)
+    public var progressIndicatorView: CameraLoadingIndicator!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
-        layer.backgroundColor = UIColor.secondarySystemBackground.cgColor//UIColor(white: 1, alpha: 0.05).cgColor
+        progressIndicatorView = CameraLoadingIndicator(color: color)
+        layer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : color.withAlphaComponent(0.1).cgColor
         addSubview(progressIndicatorView)
         
         addConstraints(NSLayoutConstraint.constraints(
