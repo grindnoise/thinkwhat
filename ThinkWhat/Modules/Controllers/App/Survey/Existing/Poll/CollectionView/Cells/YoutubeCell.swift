@@ -25,7 +25,7 @@ class YoutubeCell: UICollectionViewCell {
     // MARK: - Private Properties
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
-        instance.textColor = .secondaryLabel
+        instance.textColor = .systemBlue
         instance.text = "media".localized.uppercased()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
         return instance
@@ -33,7 +33,7 @@ class YoutubeCell: UICollectionViewCell {
     private let disclosureIndicator: UIImageView = {
         let disclosureIndicator = UIImageView()
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
-        disclosureIndicator.tintColor = .secondaryLabel
+        disclosureIndicator.tintColor = .systemBlue
         disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.contentMode = .center
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
@@ -44,7 +44,7 @@ class YoutubeCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         let imageView = UIImageView(image: UIImage(systemName: "video.fill"))
-        imageView.tintColor = .secondaryLabel
+        imageView.tintColor = .systemBlue
         imageView.contentMode = .center
         imageView.addEquallyTo(to: instance)
         return instance
@@ -60,20 +60,34 @@ class YoutubeCell: UICollectionViewCell {
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, playerView])
+        let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, shadowView])
+        verticalStack.clipsToBounds = false
         verticalStack.axis = .vertical
         verticalStack.spacing = padding
         return verticalStack
     }()
+    private lazy var shadowView: UIView = {
+        let instance = UIView()
+        instance.layer.masksToBounds = false
+        instance.clipsToBounds = false
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "shadow"
+        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+        instance.layer.shadowRadius = 5
+        instance.layer.shadowOffset = .zero
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
+        return instance
+    }()
     private lazy var playerView: WKYTPlayerView = {
         let instance = WKYTPlayerView()
         instance.backgroundColor = .secondarySystemBackground
-        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
+        instance.addEquallyTo(to: shadowView)
         instance.delegate = self
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
-    private let padding: CGFloat = 0
+    private let padding: CGFloat = 10
     private var tempAppPreference: SideAppPreference?
     private var sideAppPreference: SideAppPreference? {
         if UserDefaults.App.youtubePlay == nil {
@@ -91,13 +105,13 @@ class YoutubeCell: UICollectionViewCell {
     // Constraints
     private var closedConstraint: NSLayoutConstraint!
     private var openConstraint: NSLayoutConstraint!
-    private var color: UIColor = .secondaryLabel {
+    private var color: UIColor = .systemBlue {
         didSet {
-            playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
-            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
-            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+//            playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             guard let imageView = icon.get(all: UIImageView.self).first else { return }
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
     
@@ -137,11 +151,9 @@ class YoutubeCell: UICollectionViewCell {
         setNeedsLayout()
         layoutIfNeeded()
         
-        closedConstraint =
-            horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        closedConstraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         closedConstraint?.priority = .defaultLow // use low priority so stack stays pinned to top of cell
-        openConstraint =
-        playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        openConstraint = playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         openConstraint?.priority = .defaultLow
         updateAppearance()
     }
@@ -150,9 +162,10 @@ class YoutubeCell: UICollectionViewCell {
         closedConstraint?.isActive = isSelected
         openConstraint?.isActive = !isSelected
 
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
             let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
             self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
+            self.shadowView.alpha = self.isSelected ? 0 : 1
         }
     }
     
@@ -160,6 +173,10 @@ class YoutubeCell: UICollectionViewCell {
         observers.append(playerView.observe(\WKYTPlayerView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = max(value.height, value.width) * 0.05
+        })
+        observers.append(shadowView.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { view, change in
+            guard let value = change.newValue else { return }
+            view.layer.shadowPath = UIBezierPath(roundedRect: value, cornerRadius: value.height*0.05).cgPath
         })
 //        observers.append(disclosureLabel.observe(\InsetLabel.bounds, options: .new) { [weak self] view, change in
 //            guard let self = self, let newValue = change.newValue else { return }
@@ -171,11 +188,15 @@ class YoutubeCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
-        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
-        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        verticalStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
+            $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        }
+        
+        playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         if let imageView = icon.get(all: UIImageView.self).first {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
         
         //Set dynamic font size

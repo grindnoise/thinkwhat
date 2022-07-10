@@ -15,16 +15,33 @@ class QuestionCell: UICollectionViewCell {
         didSet {
             guard !item.isNil else { return }
             color = item.topic.tagColor
+            collectionView.dataItems = item.answers
             textView.text = item.question
-            let constraint = textView.heightAnchor.constraint(equalToConstant: textView.contentSize.height)
-            constraint.identifier = "height"
-            constraint.isActive = true
+            let constraint_1 = textView.heightAnchor.constraint(equalToConstant: max(item.question.height(withConstrainedWidth: textView.bounds.width, font: textView.font!), 40))
+            constraint_1.identifier = "height"
+            constraint_1.isActive = true
+            let constraint_2 = collectionView.heightAnchor.constraint(equalToConstant: 1)
+            constraint_2.priority = .defaultHigh
+            constraint_2.identifier = "height"
+            constraint_2.isActive = true
             setNeedsLayout()
             layoutIfNeeded()
         }
     }
+    var boundsListener: BoundsListener?
+    var answerListener: AnswerListener? {
+        didSet {
+            collectionView.answerListener = answerListener
+        }
+    }
+    
     
     // MARK: - Private properties
+    private lazy var collectionView: ChoiceCollectionView = {
+        let instance = ChoiceCollectionView(answerListener: answerListener, callbackDelegate: self)
+        return instance
+        }()
+
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
@@ -34,8 +51,8 @@ class QuestionCell: UICollectionViewCell {
     }()
     private lazy var textView: UITextView = {
         let textView = UITextView()
-        textView.backgroundColor = .secondarySystemBackground
-        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Italic.rawValue, forTextStyle: .headline)
+        textView.backgroundColor = .clear
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.SemiboldItalic.rawValue, forTextStyle: .headline)
         textView.isEditable = false
         textView.isSelectable = false
         return textView
@@ -61,19 +78,20 @@ class QuestionCell: UICollectionViewCell {
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, textView])
-        verticalStack.axis = .vertical
-        verticalStack.spacing = padding
-        return verticalStack
+        let instance = UIStackView(arrangedSubviews: [horizontalStack, textView, collectionView])
+        instance.axis = .vertical
+        instance.clipsToBounds = false
+        instance.spacing = padding
+        return instance
     }()
     private var observers: [NSKeyValueObservation] = []
     private let padding: CGFloat = 0
     private var color: UIColor = .secondaryLabel {
         didSet {
-            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
-            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+//            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             guard let imageView = icon.get(all: UIImageView.self).first else { return }
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
     
@@ -96,23 +114,24 @@ class QuestionCell: UICollectionViewCell {
     private func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true
-        disclosureLabel.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        disclosureLabel.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor).isActive = true
         contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         verticalStack.translatesAutoresizingMaskIntoConstraints = false
-        textView.translatesAutoresizingMaskIntoConstraints = false
-
+        
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),
+            verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
-            verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
         ])
         
-        let constraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        let constraint =
+            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint.priority = .defaultLow
         constraint.isActive = true
     }
@@ -129,22 +148,26 @@ class QuestionCell: UICollectionViewCell {
         observers.append(textView.observe(\UITextView.bounds, options: .new) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             guard let self = self, let value = change.newValue else { return }
             self.textView.cornerRadius = value.width * 0.05
-//            self.textView.font = UIFont(name: Fonts.Semibold,
-//                                        size: self.textView.frame.width * 0.05)
         })
-//        observers.append(disclosureLabel.observe(\InsetLabel.bounds, options: .new) { [weak self] view, _ in
-//            guard let self = self else { return }
-//            view.insets = UIEdgeInsets(top: view.insets.top, left: self.textView.cornerRadius, bottom: view.insets.bottom, right: view.insets.right)
-//        })
+        observers.append(collectionView.observe(\ChoiceCollectionView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
+            guard let self = self,
+                  let constraint = self.collectionView.getAllConstraints().filter({ $0.identifier == "height" }).first,
+                  let value = change.newValue,
+                      value.height != constraint.constant else { return }
+            self.setNeedsLayout()
+            constraint.constant = value.height
+            self.layoutIfNeeded()
+            self.boundsListener?.onBoundsChanged(view.frame)
+        })
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
-        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+//        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         if let imageView = icon.get(all: UIImageView.self).first {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
         
         //Set dynamic font size
@@ -163,3 +186,8 @@ class QuestionCell: UICollectionViewCell {
     }
 }
 
+extension QuestionCell: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        
+    }
+}

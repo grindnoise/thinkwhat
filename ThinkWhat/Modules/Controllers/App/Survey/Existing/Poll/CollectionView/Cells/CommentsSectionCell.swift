@@ -1,23 +1,25 @@
 //
-//  ChoiceSectionCell.swift
+//  CommentsSectionCell.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 07.07.2022.
+//  Created by Pavel Bukharov on 08.07.2022.
 //  Copyright © 2022 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 
-class ChoiceSectionCell: UICollectionViewCell {
+class CommentsSectionCell: UICollectionViewCell {
     
     // MARK: - Public Properties
     ///Внимание, вызывается из collectionView.didSelect!
+    override var isSelected: Bool { didSet { updateAppearance() } }
     var boundsListener: BoundsListener?
     var item: Survey! {
         didSet {
             guard !item.isNil else { return }
             color = item.topic.tagColor
             collectionView.dataItems = item.answers
+            disclosureLabel.text = item.isCommentingAllowed ? "comments".localized.uppercased() + " (\(0))": "comments_disabled".localized.uppercased()
             let constraint = collectionView.heightAnchor.constraint(equalToConstant: 1)
             constraint.priority = .defaultHigh
             constraint.identifier = "height"
@@ -26,18 +28,26 @@ class ChoiceSectionCell: UICollectionViewCell {
             layoutIfNeeded()
         }
     }
-    var answerListener: AnswerListener?
     
     // MARK: - Private Properties
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
-        instance.text = "vote_noun".localized.uppercased()
+        instance.text = "comments".localized.uppercased()
         return instance
     }()
-    private lazy var collectionView: ChoiceCollectionView = {
-        let instance = ChoiceCollectionView(answerListener: answerListener, callbackDelegate: self)
+    private lazy var disclosureIndicator: UIImageView = {
+        let disclosureIndicator = UIImageView()
+        disclosureIndicator.image = UIImage(systemName: "chevron.down")
+        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        disclosureIndicator.contentMode = .center
+        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
+        disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
+        return disclosureIndicator
+    }()
+    private lazy var collectionView: CommentsCollectionView = {
+        let instance = CommentsCollectionView(callbackDelegate: self)
         return instance
         }()
     private var observers: [NSKeyValueObservation] = []
@@ -45,7 +55,7 @@ class ChoiceSectionCell: UICollectionViewCell {
         let instance = UIView()
         instance.backgroundColor = .clear
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        let imageView = UIImageView(image: UIImage(systemName: "list.bullet"))
+        let imageView = UIImageView(image: UIImage(systemName: "bubble.left.and.bubble.right.fill"))
         imageView.tintColor = .secondaryLabel
         imageView.contentMode = .center
         imageView.addEquallyTo(to: instance)
@@ -71,7 +81,7 @@ class ChoiceSectionCell: UICollectionViewCell {
     
     // Stacks
     private lazy var horizontalStack: UIStackView = {
-        let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel])
+        let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         let constraint = rootStack.heightAnchor.constraint(equalToConstant: 40)
         constraint.identifier = "height"
         constraint.isActive = true
@@ -80,7 +90,7 @@ class ChoiceSectionCell: UICollectionViewCell {
         return rootStack
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [collectionView])//horizontalStack
+        let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, collectionView])
         verticalStack.axis = .vertical
         verticalStack.spacing = padding
         return verticalStack
@@ -89,11 +99,16 @@ class ChoiceSectionCell: UICollectionViewCell {
     private let padding: CGFloat = 0
     private var color: UIColor = .secondaryLabel {
         didSet {
+            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
             guard let imageView = icon.get(all: UIImageView.self).first else { return }
             imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
         }
     }
+    
+    // Constraints
+    private var closedConstraint: NSLayoutConstraint!
+    private var openConstraint: NSLayoutConstraint!
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -126,14 +141,32 @@ class ChoiceSectionCell: UICollectionViewCell {
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
         ])
         
-        let constraint =
-            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        constraint.priority = .defaultLow
-        constraint.isActive = true
+//        let constraint =
+//            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+//        constraint.priority = .defaultLow
+        closedConstraint =
+            disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        closedConstraint?.priority = .defaultLow // use low priority so stack stays pinned to top of cell
+        
+        openConstraint =
+        collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        openConstraint?.priority = .defaultLow
+        
+        updateAppearance()
+    }
+    
+    private func updateAppearance() {
+        closedConstraint.isActive = isSelected
+        openConstraint.isActive = !isSelected
+
+        UIView.animate(withDuration: 0.3) {
+            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
+            self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
+        }
     }
     
     private func setObservers() {
-        observers.append(collectionView.observe(\ChoiceCollectionView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
+        observers.append(collectionView.observe(\CommentsCollectionView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
             guard let self = self,
                   let constraint = self.collectionView.getAllConstraints().filter({ $0.identifier == "height" }).first,
                   let value = change.newValue,
@@ -143,7 +176,7 @@ class ChoiceSectionCell: UICollectionViewCell {
             self.layoutIfNeeded()
             self.boundsListener?.onBoundsChanged(view.frame)
         })
-        observers.append(collectionView.observe(\ChoiceCollectionView.bounds, options: .new) { view, change in
+        observers.append(collectionView.observe(\CommentsCollectionView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
         })
@@ -163,7 +196,8 @@ class ChoiceSectionCell: UICollectionViewCell {
     }
 }
 
-extension ChoiceSectionCell: CallbackObservable {
+// MARK: - CallbackObservable
+extension CommentsSectionCell: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         
     }

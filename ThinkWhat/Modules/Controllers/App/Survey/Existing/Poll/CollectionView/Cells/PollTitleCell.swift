@@ -57,6 +57,52 @@ class PollTitleCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         return instance
     }()
+    private let bottomView_2: UIView = {
+        let instance = UIView()
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+        constraint.identifier = "height"
+        constraint.isActive = true
+        instance.backgroundColor = .clear
+        return instance
+    }()
+    private lazy var shareButton: UIImageView = {
+        let instance = UIImageView()
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+        instance.image = UIImage(systemName: "square.and.arrow.up")
+//        instance.contentMode = .bottom
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        return instance
+    }()
+    private lazy var claimButton: UIImageView = {
+        let instance = UIImageView()
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+        instance.image = UIImage(systemName: "square.and.arrow.up.trianglebadge.exclamationmark")
+//        instance.contentMode = .bottom
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        return instance
+    }()
+//    private lazy var shareButton: UIButton = {
+//        let instance = UIButton()
+//        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+//        instance.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
+//        instance.imageView?.contentMode = .bottom
+//        instance.imageView?.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        return instance
+//    }()
+//    private lazy var claimButton: UIButton = {
+//        let instance = UIButton()
+//        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+//        instance.setImage(UIImage(systemName: "exclamationmark.triangle"), for: .normal)
+//        instance.imageView?.contentMode = .bottom
+//        instance.imageView?.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        return instance
+//    }()
     // Stacks
     private lazy var horizontalStack: UIStackView = {
         let horizontalStack = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
@@ -64,8 +110,15 @@ class PollTitleCell: UICollectionViewCell {
         horizontalStack.spacing = 4
         return horizontalStack
     }()
+    private lazy var horizontalStack_2: UIStackView = {
+        let horizontalStack = UIStackView(arrangedSubviews: [shareButton, claimButton])
+//        horizontalStack.alignment = .bottom
+        horizontalStack.distribution = .fillEqually
+        horizontalStack.spacing = 4
+        return horizontalStack
+    }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [titleLabel, bottomView])
+        let verticalStack = UIStackView(arrangedSubviews: [titleLabel, bottomView])//, bottomView_2])
         verticalStack.axis = .vertical
         verticalStack.spacing = 4
         return verticalStack
@@ -109,17 +162,22 @@ class PollTitleCell: UICollectionViewCell {
         setupUI()
     }
 
-    // MARK: - UI methods
+    // MARK: - Private methods
     private func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true
         
         bottomView.addSubview(horizontalStack)
+//        bottomView_2.addSubview(horizontalStack_2)
         horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+//        horizontalStack_2.translatesAutoresizingMaskIntoConstraints = false
                 NSLayoutConstraint.activate([
                     horizontalStack.heightAnchor.constraint(equalTo: bottomView.heightAnchor),
                     horizontalStack.centerXAnchor.constraint(equalTo: bottomView.centerXAnchor),
                     horizontalStack.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor),
+//                    horizontalStack_2.heightAnchor.constraint(equalTo: bottomView_2.heightAnchor),
+//                    horizontalStack_2.centerXAnchor.constraint(equalTo: bottomView_2.centerXAnchor),
+//                    horizontalStack_2.centerYAnchor.constraint(equalTo: bottomView_2.centerYAnchor),
                 ])
         contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -135,6 +193,7 @@ class PollTitleCell: UICollectionViewCell {
             verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
         ])
         
+//        constraint = bottomView_2.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint.priority = .defaultLow
         constraint.isActive = true
@@ -160,6 +219,11 @@ class PollTitleCell: UICollectionViewCell {
             constraint.constant = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
             self.layoutIfNeeded()
         })
+    }
+    
+    @objc
+    private func handleTap(_ button: UIButton) {
+        print(button)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

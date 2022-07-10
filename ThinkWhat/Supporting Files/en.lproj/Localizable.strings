@@ -192,6 +192,7 @@
 "images" = "Images";
 "poll_choices" = "Choices";
 "comments" = "Comments";
+"comments_disabled" = "Comments disabled";
 "voters_limit" = "Limits";
 "voters_limit_description" = "Voters limit";
 "hot_option" = "Hot start";
@@ -260,3 +261,6 @@
 "web_link" = "Web link";
 "vote_verb" = "Vote";
 "vote_noun" = "Vote";
+"make_claim" = "Claim";
+"share" = "Share";
+"watch" = "Watch";

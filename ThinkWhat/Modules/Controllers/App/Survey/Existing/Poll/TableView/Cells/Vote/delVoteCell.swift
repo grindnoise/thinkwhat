@@ -8,7 +8,7 @@
 
 import UIKit
 
-class VoteCell: UITableViewCell {
+class delVoteCell: UITableViewCell {
     
     @IBOutlet weak var claimButton: UIButton! {
         didSet {

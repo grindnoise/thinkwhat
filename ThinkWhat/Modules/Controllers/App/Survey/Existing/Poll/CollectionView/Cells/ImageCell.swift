@@ -49,7 +49,7 @@ class ImageCell: UICollectionViewCell {
     // MARK: - Private Properties
     private lazy var disclosureLabel: UILabel = {
         let instance = UILabel()
-        instance.textColor = .secondaryLabel
+        instance.textColor = .systemBlue
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
 //        instance.addEquallyTo(to: horizontalStack)
 //        instance.translatesAutoresizingMaskIntoConstraints = false
@@ -68,7 +68,7 @@ class ImageCell: UICollectionViewCell {
     private let disclosureIndicator: UIImageView = {
         let disclosureIndicator = UIImageView()
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
-        disclosureIndicator.tintColor = .secondaryLabel
+        disclosureIndicator.tintColor = .systemBlue
         disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.contentMode = .center
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
@@ -96,7 +96,7 @@ class ImageCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         let imageView = UIImageView(image: UIImage(systemName: "photo.fill"))
-        imageView.tintColor = .secondaryLabel
+        imageView.tintColor = .systemBlue
         imageView.contentMode = .center
         imageView.addEquallyTo(to: instance)
         return instance
@@ -130,6 +130,7 @@ class ImageCell: UICollectionViewCell {
         instance.isScrollEnabled = true
         instance.isPagingEnabled = true
         instance.showsHorizontalScrollIndicator = false
+        instance.layer.masksToBounds = false
         instance.addEquallyTo(to: imageContainer)
         return instance
     }()
@@ -175,12 +176,12 @@ class ImageCell: UICollectionViewCell {
     // Constraints
     private var closedConstraint: NSLayoutConstraint!
     private var openConstraint: NSLayoutConstraint!
-    private var color: UIColor = .secondaryLabel {
+    private var color: UIColor = .systemBlue {
         didSet {
-            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
-            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             guard let imageView = icon.get(all: UIImageView.self).first else { return }
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
     
@@ -243,9 +244,10 @@ class ImageCell: UICollectionViewCell {
         closedConstraint?.isActive = isSelected
         openConstraint?.isActive = !isSelected
         
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
             let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
             self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
+            self.imageContainer.alpha = self.isSelected ? 0 : 1
         }
     }
     
@@ -265,10 +267,32 @@ class ImageCell: UICollectionViewCell {
     
     private func createSlides(mediafiles: [Mediafile]) {
         mediafiles.sorted { $0.order < $1.order}.forEach {
+                
+            
             guard let slide  = Bundle.main.loadNibNamed("Slide", owner: self, options: nil)?.first as? Slide else { return }
             let opaqueView = UIView()
             opaqueView.backgroundColor = .clear
-            imagesStack.addArrangedSubview(opaqueView)
+            opaqueView.layer.masksToBounds = false
+            
+            let shadowView = UIView()
+           
+            shadowView.layer.masksToBounds = false
+            shadowView.clipsToBounds = false
+            shadowView.backgroundColor = .clear
+            shadowView.accessibilityIdentifier = "shadow"
+            shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            shadowView.layer.shadowRadius = 6
+            shadowView.layer.shadowOffset = .zero
+            shadowView.widthAnchor.constraint(equalTo: shadowView.heightAnchor, multiplier: 1.0/1.0).isActive = true
+            
+                shadowView.addEquallyTo(to: opaqueView, multiplier: 0.95)
+            
+            let bg = UIView()
+            bg.accessibilityIdentifier = "bg"
+            bg.backgroundColor = .systemBackground
+            bg.addEquallyTo(to: shadowView)
+            
             slide.mediafile = $0
             slide.color = item.topic.tagColor
             slide.frame = .zero
@@ -282,9 +306,24 @@ class ImageCell: UICollectionViewCell {
             slide.layer.masksToBounds = true
             slides.append(slide)
             slide.translatesAutoresizingMaskIntoConstraints = false
-//            slide.widthAnchor.constraint(equalTo: slide.heightAnchor, multiplier: 1.0/1.0).isActive = true
-            slide.addEquallyTo(to: opaqueView, multiplier: 0.95)
-            slide.widthAnchor.constraint(equalTo: slide.heightAnchor, multiplier: 1.0/1.0).isActive = true
+//            slide.addEquallyTo(to: opaqueView, multiplier: 0.95)
+//            slide.addEquallyTo(to: shadowView, multiplier: 0.95)
+                        slide.addEquallyTo(to: bg)
+            //            slide.widthAnchor.constraint(equalTo: slide.heightAnchor, multiplier: 1.0/1.0).isActive = true
+            imagesStack.addArrangedSubview(opaqueView)
+        }
+        imagesStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow"}).forEach {
+            self.observers.append($0.observe(\UIView.bounds, options: .new) { view, change in
+                guard let newValue = change.newValue else { return }
+                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.height*0.05).cgPath
+                //                view.layer.shadowColor = UIColor.red.withAlphaComponent(0.6).cgColor
+            })
+        }
+        imagesStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "bg"}).forEach {
+            self.observers.append($0.observe(\UIView.bounds, options: .new) { view, change in
+                guard let newValue = change.newValue else { return }
+                view.cornerRadius = newValue.height*0.05
+            })
         }
         guard let constraint = imagesStack.getAllConstraints().filter({ $0.identifier == "width"}).first else { return }
         constraint.constant = imageContainer.frame.width * CGFloat(mediafiles.count)// + CGFloat(mediafiles.count) * imagesStack.spacing
@@ -312,6 +351,12 @@ class ImageCell: UICollectionViewCell {
             view.cornerRadius = newValue.height * 0.25
 //            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.5)
         })
+//        scrollView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach { [weak self] in
+//            guard let self = self else { return }
+//            self.observers.append($0.observe(\UIView.bounds, options: .new) { view, change in
+//                view.layer.shadowPath = UIBezierPath(roundedRect: view.bounds, cornerRadius: view.cornerRadius).cgPath
+//            })
+//        }
 //        observers.append(disclosureLabel.observe(\InsetLabel.bounds, options: .new) { [weak self] view, change in
 //            guard let self = self else { return }
 //            view.insets = UIEdgeInsets(top: view.insets.top, left: self.imageContainer.cornerRadius, bottom: view.insets.bottom, right: view.insets.right)
@@ -322,10 +367,13 @@ class ImageCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
-        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         if let imageView = icon.get(all: UIImageView.self).first {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        }
+        scrollView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
+            $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
         }
         
         //Set dynamic font size

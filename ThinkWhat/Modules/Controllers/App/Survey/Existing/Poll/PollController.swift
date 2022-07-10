@@ -109,17 +109,6 @@ class PollController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
-        
-//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-//        icon.backgroundColor = .clear
-//        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor
-//        icon.isRounded = false
-//        icon.scaleMultiplicator = 1.4
-//        icon.category = Icon.Category(rawValue: _surveyReference.topic.id) ?? .Null
-//        navigationItem.titleView = icon
-//        navigationItem.titleView?.alpha = 0
-//
-//        navigationItem.titleView?.clipsToBounds = false
     }
     
     private func setupUI() {
@@ -129,56 +118,56 @@ class PollController: UIViewController {
                     self.navigationController?.navigationBar.standardAppearance = appearance
                     self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         guard let navigationBar = self.navigationController?.navigationBar else { return }
-        
-//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-//        icon.backgroundColor = .clear
-//        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor
-//        icon.isRounded = false
-//        icon.scaleMultiplicator = 1.4
-//        icon.category = Icon.Category(rawValue: _surveyReference.topic.id) ?? .Null
-//        navigationItem.titleView = icon
-//
-//
-//        navigationItem.titleView?.clipsToBounds = false
+
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-            
-//                    let gesture = UITapGestureRecognizer(target: self, action: #selector(PollController.addFavorite))
-//                    watchButton.addGestureRecognizer(gesture)
-//
-//                    if isAddedToFavorite {
-//                        watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
-//                    } else {
-//                        watchButton.tintColor = .systemGray
-//                    }
-//
-//                    if let nc = navigationController as? NavigationControllerPreloaded {
-//                        nc.setNavigationBarHidden(false, animated: false)
-////                        nc.navigationBar.isTranslucent = false
-//                    }
-//                    navigationItem.largeTitleDisplayMode = .never
-//                    watchButton.image = _surveyReference.isFavorite ? ImageSigns.binocularsFilled.image : ImageSigns.binoculars.image
-//                    isAddedToFavorite = _surveyReference.isFavorite ? true : false
-//                    navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: watchButton)]
         
+        let watchAction : UIAction = .init(title: "watch".localized, image: UIImage(systemName: "binoculars"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { (action) in
+            //                    self.addButtonActionPressed(action: .simple)
+        })
+        
+        let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { (action) in
+            //                    self.addButtonActionPressed(action: .advanced)
+        })
+        let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { (action) in
+            //                    self.addButtonActionPressed(action: .advanced)
+        })
+        
+        let actions = [watchAction, shareAction, claimAction]
+        
+        let menu = UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+        
+        let actionButton = UIBarButtonItem(title: "", image: UIImage(systemName: "ellipsis"), primaryAction: nil, menu: menu)
+        navigationItem.rightBarButtonItem = actionButton
         navigationBar.addSubview(avatar)
         avatar.translatesAutoresizingMaskIntoConstraints = false
 
+//        NSLayoutConstraint.activate([
+//            avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+//            avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+//            avatar.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.NavBarHeightLargeState - UINavigationController.Constants.ImageBottomMarginForLargeState*2),
+//            avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1.0/1.0)
+//            ])
         NSLayoutConstraint.activate([
-            avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
-            avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
-            avatar.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.NavBarHeightLargeState - UINavigationController.Constants.ImageBottomMarginForLargeState*2),
-//            avatar.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState),
-            avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1.0/1.0)
+            avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
+            avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
+            avatar.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
+            avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor)
             ])
         
         stackView.axis = .horizontal
         navigationBar.addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
 
+//        NSLayoutConstraint.activate([
+//            stackView.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState),
+//            stackView.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
+//            stackView.heightAnchor.constraint(equalToConstant: 52 - UINavigationController.Constants.ImageBottomMarginForLargeState),
+//            stackView.trailingAnchor.constraint(equalTo: avatar.leadingAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForSmallState)
+//        ])
         NSLayoutConstraint.activate([
-            stackView.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState),
-            stackView.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
-            stackView.heightAnchor.constraint(equalToConstant: 52 - UINavigationController.Constants.ImageBottomMarginForLargeState),
+            stackView.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageRightMargin),
+            stackView.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
+            stackView.heightAnchor.constraint(equalTo: avatar.heightAnchor),
             stackView.trailingAnchor.constraint(equalTo: avatar.leadingAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForSmallState)
         ])
         
@@ -202,23 +191,6 @@ class PollController: UIViewController {
         
         indicator.translatesAutoresizingMaskIntoConstraints = false
         indicator.widthAnchor.constraint(equalTo: indicator.heightAnchor, multiplier: 1.0/1.0).isActive = true
-        
-//        navigationBar.set
-
-//        navigationBar.addSubview(progressIndicator)
-//        progressIndicator.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            progressIndicator.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState*2),
-//            progressIndicator.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 0),// -UINavigationController.Constants.ImageBottomMarginForSmallState),
-//            progressIndicator.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState*3.5),
-//            progressIndicator.widthAnchor.constraint(equalTo: progressIndicator.heightAnchor, multiplier: 1.0/1.0)
-//            ])
-//        progressIndicator.layer.masksToBounds = false
-//        progressIndicator.lineWidth = progressIndicator.frame.width * 0.1
-        
-//        navigationItem.titleView?.alpha = 0
-//        icon.alpha = 0
     }
     
     private func setObservers() {

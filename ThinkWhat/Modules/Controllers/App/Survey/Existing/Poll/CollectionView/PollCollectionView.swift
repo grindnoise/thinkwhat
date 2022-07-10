@@ -11,7 +11,7 @@ import UIKit
 class PollCollectionView: UICollectionView {
     
     enum Section: Int {
-        case title, description, image, youtube, web, question, choices
+        case title, description, image, youtube, web, question, choices, vote, comments
         
         var localized: String {
             switch self {
@@ -29,6 +29,10 @@ class PollCollectionView: UICollectionView {
                 return "question".localized
             case .choices:
                 return "poll_choices".localized
+            case .vote:
+                return "vote".localized
+            case .comments:
+                return "comments".localized
             }
         }
     }
@@ -38,6 +42,19 @@ class PollCollectionView: UICollectionView {
     private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<Section, Int>!
     private var imageCellRegistration: UICollectionView.CellRegistration<ImageCell, AnyHashable>!
+    private var answer: Answer? {
+        didSet {
+            guard oldValue.isNil else { return }
+            var snapshot = source.snapshot()
+            snapshot.appendSections([.vote])
+            snapshot.appendItems([7], toSection: .vote)
+            source.apply(snapshot, animatingDifferences: true) {
+                self.scrollToItem(at: IndexPath(item: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
+            }
+            guard let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-1)) as? VoteCell else { return }
+            cell.answer = answer!
+        }
+    }
     
     // MARK: - Initialization
     init(poll: Survey, callbackDelegate: CallbackObservable) {
@@ -75,6 +92,7 @@ class PollCollectionView: UICollectionView {
         }
         
         let descriptionCellRegistration = UICollectionView.CellRegistration<PollDescriptionCell, AnyHashable> { [weak self] cell, indexPath, item in
+            cell.layer.masksToBounds = false
             guard let self = self, cell.item.isNil else { return }
 //            cell.collectionView = self
             cell.item = self.poll
@@ -95,16 +113,28 @@ class PollCollectionView: UICollectionView {
         }
         let questionCellRegistration = UICollectionView.CellRegistration<QuestionCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.item.isNil else { return }
+            cell.boundsListener = self
+            cell.answerListener = self
             cell.item = self.poll
         }
         
         let choicesCellRegistration = UICollectionView.CellRegistration<ChoiceSectionCell, AnyHashable> { [weak self] cell, indexPath, item in
-            cell.owner = self
+            cell.boundsListener = self
             guard let self = self, cell.item.isNil else { return }
             cell.item = self.poll
         }
 
-
+        let voteCellRegistration = UICollectionView.CellRegistration<VoteCell, AnyHashable> { [weak self] cell, indexPath, item in
+            guard let self = self, cell.color.isNil else { return }
+            cell.callbackDelegate = self
+            cell.color = self.poll.topic.tagColor
+        }
+        
+        let commentsCellRegistration = UICollectionView.CellRegistration<CommentsSectionCell, AnyHashable> { [weak self] cell, indexPath, item in
+            cell.boundsListener = self
+            guard let self = self, cell.item.isNil else { return }
+            cell.item = self.poll
+        }
 
 //        let headerRegistration = UICollectionView.SupplementaryRegistration <UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) { headerView, elementKind, indexPath in
 //            
@@ -141,9 +171,11 @@ class PollCollectionView: UICollectionView {
                                                                     for: indexPath,
                                                                     item: identifier)
             } else if section == .description {
-                return collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
+                let cell = collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
+                                                                        for: indexPath,
+                                                                        item: identifier)
+                cell.layer.masksToBounds = false
+                return cell
             } else if section == .image {
                 return collectionView.dequeueConfiguredReusableCell(using: self.imageCellRegistration,
                                                                     for: indexPath,
@@ -162,6 +194,14 @@ class PollCollectionView: UICollectionView {
                                                                     item: identifier)
             } else if section == .choices {
                 return collectionView.dequeueConfiguredReusableCell(using: choicesCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            } else if section == .vote {
+                return collectionView.dequeueConfiguredReusableCell(using: voteCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            }  else if section == .comments {
+                return collectionView.dequeueConfiguredReusableCell(using: commentsCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
             }
@@ -193,8 +233,8 @@ class PollCollectionView: UICollectionView {
         }
         snapshot.appendSections([.question])
         snapshot.appendItems([5], toSection: .question)
-        snapshot.appendSections([.choices])
-        snapshot.appendItems([6], toSection: .choices)
+//        snapshot.appendSections([.choices])
+//        snapshot.appendItems([6], toSection: .choices)
 
         source.apply(snapshot, animatingDifferences: false)
     }
@@ -203,12 +243,28 @@ class PollCollectionView: UICollectionView {
 //        source.refresh()
 //    }
     
+    // MARK: - Public methods
     public func onImageScroll(_ index: Int) {
         guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
         cell.scrollToImage(at: index)
     }
     
-    public func onQuestionsHeightChange(){
+    public func onVoteCallback(){
+        guard let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-1)) as? VoteCell else { return }
+        var snapshot = source.snapshot()
+        snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .vote))
+        snapshot.deleteSections([.vote])
+        snapshot.appendSections([.comments])
+        snapshot.appendItems([8], toSection: .comments)
+        source.apply(snapshot, animatingDifferences: true)
+        scrollToItem(at: IndexPath(item: 0, section: numberOfSections-1), at: .bottom, animated: true)
+        
+    }
+}
+
+// MARK: - BoundsListener
+extension PollCollectionView: BoundsListener {
+    func onBoundsChanged(_ rect: CGRect) {
         source.refresh()
     }
 }
@@ -244,11 +300,19 @@ extension PollCollectionView: UICollectionViewDelegate {
     }
 }
 
+// MARK: - CallbackObservable
 extension PollCollectionView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         ///Passthrouth
 //        if let mediafile = sender as? Mediafile {
             callbackDelegate?.callbackReceived(sender)
 //        }
+    }
+}
+
+// MARK: - AnswerListener
+extension PollCollectionView: AnswerListener {
+    func onChoiceMade(_ answer: Answer) {
+        self.answer = answer
     }
 }

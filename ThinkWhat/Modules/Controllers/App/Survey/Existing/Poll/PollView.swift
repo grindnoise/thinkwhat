@@ -44,6 +44,7 @@ class PollView: UIView {
         let instance = PollCollectionView(poll: survey!, callbackDelegate: self)
         instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
         //////            UIApplication.shared.windows[0].safeAreaInsets.bottom, right: 0.0)
+        instance.layer.masksToBounds = false
         return instance
     }()
     private var isLoadingData = false
@@ -82,11 +83,12 @@ extension PollView: PollControllerOutput {
     }
     
     func onClaimCallback(_: Result<Bool, Error>) {
-
+ 
     }
     
     func onVoteCallback(_ result: Result<Bool, Error>) {
-        
+        //Hide vote button & show comments section
+        collectionView.onVoteCallback()
     }
     
     func onLoadCallback(_ result: Result<Bool, Error>) {
@@ -154,6 +156,11 @@ extension PollView: CallbackObservable {
             }
         } else if let url = sender as? URL {
             viewInput?.onURLTapped(url)
+        } else if let answer = sender as? Answer {
+//            viewInput?.onVote(answer)
+            delayAsync(delay: 3) {
+                self.collectionView.onVoteCallback()
+            }
         }
     }
     

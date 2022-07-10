@@ -20,15 +20,16 @@ class ChoiceCollectionView: UICollectionView {
             reload()
         }
     }
+    weak var answerListener: AnswerListener?
     
     // MARK: - Private properties
     private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<Section, Answer>!
-    private let listener: ChoiceSectionCell
+//    private let listener: ChoiceSectionCell
     
     // MARK: - Initialization
-    init(dataItems: [Answer] = [], listener: ChoiceSectionCell, callbackDelegate: CallbackObservable) {
-        self.listener = listener
+    init(dataItems: [Answer] = [], answerListener: AnswerListener?, callbackDelegate: CallbackObservable) {
+//        self.listener = listener
         self.dataItems = dataItems
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.callbackDelegate = callbackDelegate
@@ -46,18 +47,25 @@ class ChoiceCollectionView: UICollectionView {
     // MARK: - UI functions
     private func setupUI() {
         delegate = self
+//        contentInsetAdjustmentBehavior = .never
+//        contentInset = UIEdgeInsets.zero
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
-            layoutConfig.headerMode = .firstItemInSection
-            layoutConfig.backgroundColor = .clear
-            layoutConfig.showsSeparators = false
+            var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
+            configuration.headerMode = .firstItemInSection
+            configuration.backgroundColor = .clear
+            configuration.showsSeparators = false
+//            configuration.contentInsetsReference = .none
             
-            return NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+            return NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
         }
         
         let cellRegistration = UICollectionView.CellRegistration<ChoiceCell, Answer> { cell, indexPath, item in
             guard cell.item.isNil else { return }
+            var configuration = UIBackgroundConfiguration.listPlainCell()
+            configuration.backgroundColor = .clear
+            cell.backgroundConfiguration = configuration
             cell.item = item
+            cell.automaticallyUpdatesBackgroundConfiguration = false
         }
         
         source = UICollectionViewDiffableDataSource<Section, Answer>(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
@@ -73,12 +81,16 @@ class ChoiceCollectionView: UICollectionView {
         snapshot.appendSections([.main,])
         snapshot.appendItems(dataItems, toSection: .main)
         source.apply(snapshot, animatingDifferences: false)
-        source.refresh() {
-            self.listener.onImagesHeightChange(self.contentSize.height)
-        }
+//        source.refresh() {
+//            self.listener.onImagesHeightChange(self.contentSize.height)
+//        }
     }
 }
 
+// MARK: - UICollectionViewDelegate
 extension ChoiceCollectionView: UICollectionViewDelegate {
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? ChoiceCell else { return }
+        answerListener?.onChoiceMade(cell.item)
+    }
 }
