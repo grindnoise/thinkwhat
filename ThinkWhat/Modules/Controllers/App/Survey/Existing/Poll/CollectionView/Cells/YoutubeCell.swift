@@ -49,6 +49,20 @@ class YoutubeCell: UICollectionViewCell {
         imageView.addEquallyTo(to: instance)
         return instance
     }()
+    private lazy var loadingIndicator: LoadingIndicator = {
+        let instance = LoadingIndicator(frame: .zero)
+        playerView.addSubview(instance)
+        instance.translatesAutoresizingMaskIntoConstraints = false
+        instance.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        NSLayoutConstraint.activate([
+            instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1),
+            instance.topAnchor.constraint(equalTo: playerView.topAnchor),
+            instance.bottomAnchor.constraint(equalTo: playerView.bottomAnchor),
+            instance.centerXAnchor.constraint(equalTo: playerView.centerXAnchor),
+        ])
+        instance.addEnableAnimation()
+        return instance
+    }()
     private lazy var horizontalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         instance.alignment = .center
@@ -66,6 +80,17 @@ class YoutubeCell: UICollectionViewCell {
         verticalStack.spacing = padding
         return verticalStack
     }()
+    private lazy var background: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "bg"
+        instance.layer.masksToBounds = false
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        instance.addEquallyTo(to: shadowView)
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+//        constraint.identifier = "height"
+//        constraint.isActive = true
+        return instance
+    }()
     private lazy var shadowView: UIView = {
         let instance = UIView()
         instance.layer.masksToBounds = false
@@ -81,8 +106,8 @@ class YoutubeCell: UICollectionViewCell {
     }()
     private lazy var playerView: WKYTPlayerView = {
         let instance = WKYTPlayerView()
-        instance.backgroundColor = .secondarySystemBackground
-        instance.addEquallyTo(to: shadowView)
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
+        instance.addEquallyTo(to: background)
         instance.delegate = self
         return instance
     }()
@@ -107,7 +132,7 @@ class YoutubeCell: UICollectionViewCell {
     private var openConstraint: NSLayoutConstraint!
     private var color: UIColor = .systemBlue {
         didSet {
-//            playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+            playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
             disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             guard let imageView = icon.get(all: UIImageView.self).first else { return }
@@ -170,9 +195,10 @@ class YoutubeCell: UICollectionViewCell {
     }
     
     private func setObservers() {
-        observers.append(playerView.observe(\WKYTPlayerView.bounds, options: .new) { view, change in
-            guard let value = change.newValue else { return }
+        observers.append(playerView.observe(\WKYTPlayerView.bounds, options: .new) { [weak self] view, change in
+            guard let self = self, let value = change.newValue else { return }
             view.cornerRadius = max(value.height, value.width) * 0.05
+            self.background.cornerRadius = view.cornerRadius
         })
         observers.append(shadowView.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { view, change in
             guard let value = change.newValue else { return }
@@ -191,8 +217,8 @@ class YoutubeCell: UICollectionViewCell {
         verticalStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
             $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
         }
-        
-        playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
         disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         if let imageView = icon.get(all: UIImageView.self).first {
@@ -235,17 +261,16 @@ extension YoutubeCell: CallbackObservable {
 }
 
 extension YoutubeCell: WKYTPlayerViewDelegate {
-//    func playerViewDidBecomeReady(_ playerView: WKYTPlayerView) {
-//        print("ready")
-//        UIView.animate(withDuration: 0.3, animations: {
-//            self.loadingIndicator.alpha = 0
-//        }) {
-//            _ in
-//            UIView.animate(withDuration: 1, delay: 0, options: .curveEaseInOut, animations: {
-//                self.playerView.alpha = 1
-//            })
-//        }
-//    }
+    func playerViewDidBecomeReady(_ playerView: WKYTPlayerView) {
+        print("ready")
+        UIView.animate(withDuration: 0.2, animations: {
+            self.loadingIndicator.alpha = 0
+        }) {
+            _ in
+            self.loadingIndicator.removeAllAnimations()
+            self.loadingIndicator.removeFromSuperview()
+        }
+    }
     
     func playerView(_ playerView: WKYTPlayerView, didChangeTo state: WKYTPlayerState) {
         guard state == .buffering else { return }

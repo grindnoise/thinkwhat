@@ -47,9 +47,10 @@ class WebViewCell: UICollectionViewCell {
     private var opaqueView: UIView?
     private lazy var background: UIView = {
         let instance = UIView()
-        instance.layer.masksToBounds = true
+        instance.accessibilityIdentifier = "bg"
+        instance.layer.masksToBounds = false
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
         instance.addEquallyTo(to: shadowView)
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
         return instance
     }()
     private lazy var disclosureLabel: UILabel = {
@@ -128,11 +129,9 @@ class WebViewCell: UICollectionViewCell {
     }()
     private lazy var webView: WKWebView = {
         let instance = WKWebView()
-        instance.backgroundColor = .secondarySystemBackground
-//        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         instance.addEquallyTo(to: background)
 //        instance.uiDelegate = self
-        instance.alpha = 0
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
         instance.navigationDelegate = self
         return instance
     }()
@@ -147,7 +146,7 @@ class WebViewCell: UICollectionViewCell {
     }
     private var color: UIColor = .secondaryLabel {
         didSet {
-//            background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+            webView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
             disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             guard let imageView = icon.get(all: UIImageView.self).first else { return }

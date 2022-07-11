@@ -192,7 +192,7 @@
 "images" = "Изображения";
 "poll_choices" = "Варианты";
 "comments" = "Комментарии";
-"comments_disabled" = "Comments disabled";
+"comments_disabled" = "Комментарии отключены";
 "voters_limit" = "Лимит";
 "voters_limit_description" = "Лимит участников";
 "hot_option" = "Горячий старт";
@@ -264,3 +264,4 @@
 "make_claim" = "Пожаловаться";
 "share" = "Поделиться";
 "watch" = "Отслеживать";
+"vote_to_view_comments" = "Чтобы увидеть комментарии и комментрировать необходимо сначала проголосовать";

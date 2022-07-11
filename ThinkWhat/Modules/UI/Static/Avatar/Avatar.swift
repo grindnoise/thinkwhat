@@ -16,17 +16,18 @@ class Avatar: UIView {
             guard let image = image, !container.isNil else {
                 return
             }
-            let imageView = UIImageView(image: image)
-            imageView.contentMode = .scaleAspectFill
-            imageView.alpha  = 0
-            imageView.isUserInteractionEnabled = true
-            imageView.backgroundColor = .tertiarySystemBackground
-            imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//            let imageView = UIImageView(image: image)
+//            imageView.contentMode = .scaleAspectFill
+//            imageView.alpha  = 0
+//            imageView.isUserInteractionEnabled = true
+//            imageView.backgroundColor = .tertiarySystemBackground
+//            imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             imageView.addEquallyTo(to: container)
             let icon = self.container.get(all: Icon.self).first
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) { [weak self] in guard !self.isNil else { return }
-                imageView.alpha = 1
-                imageView.transform = .identity
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) { [weak self] in
+                guard let self = self else { return }
+                self.imageView.alpha = 1
+                self.imageView.transform = .identity
                 icon?.alpha = 0
             } completion: { _ in
                 guard !icon.isNil else { return }
@@ -34,6 +35,26 @@ class Avatar: UIView {
             }
         }
     }
+    
+    public lazy var imageView: UIImageView = {
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .scaleAspectFill
+        imageView.alpha  = 0
+        imageView.isUserInteractionEnabled = true
+        imageView.backgroundColor = .tertiarySystemBackground
+        imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//        imageView.addEquallyTo(to: container)
+//        let icon = self.container.get(all: Icon.self).first
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) { [weak self] in guard !self.isNil else { return }
+//            imageView.alpha = 1
+//            imageView.transform = .identity
+//            icon?.alpha = 0
+//        } completion: { _ in
+//            guard !icon.isNil else { return }
+//            icon!.removeFromSuperview()
+//        }
+        return imageView
+    }()
 
     public var lightColor = K_COLOR_RED {
         didSet {
@@ -77,6 +98,7 @@ class Avatar: UIView {
     
     init(gender: Gender, image: UIImage? = nil, borderColor: UIColor = .clear) {
         super.init(frame: .zero)
+        self.gender = gender
         self.image = image
         self.isBordered = borderColor != .clear
         self.lightColor = borderColor

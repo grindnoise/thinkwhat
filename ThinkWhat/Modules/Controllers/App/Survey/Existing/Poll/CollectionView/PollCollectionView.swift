@@ -38,28 +38,40 @@ class PollCollectionView: UICollectionView {
     }
     
     // MARK: - Private properties
+    private weak var host: PollView!
     private let poll: Survey
     private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<Section, Int>!
     private var imageCellRegistration: UICollectionView.CellRegistration<ImageCell, AnyHashable>!
     private var answer: Answer? {
         didSet {
-            guard oldValue.isNil else { return }
+            guard oldValue.isNil else {
+                if let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-1)) as? VoteCell {
+                    cell.answer = answer!
+                }
+                return
+            }
             var snapshot = source.snapshot()
+            snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .comments))
+            snapshot.deleteSections([.comments])
             snapshot.appendSections([.vote])
             snapshot.appendItems([7], toSection: .vote)
-            source.apply(snapshot, animatingDifferences: true) {
-                self.scrollToItem(at: IndexPath(item: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
+            snapshot.appendSections([.comments])
+            snapshot.appendItems([8], toSection: .comments)
+            source.apply(snapshot, animatingDifferences: true) //{
+//                self.scrollToItem(at: IndexPath(item: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
+//            }
+            if let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-2)) as? VoteCell {
+                cell.answer = answer!
             }
-            guard let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-1)) as? VoteCell else { return }
-            cell.answer = answer!
         }
     }
     
     // MARK: - Initialization
-    init(poll: Survey, callbackDelegate: CallbackObservable) {
+    init(host: PollView?, poll: Survey, callbackDelegate: CallbackObservable) {
         self.poll = poll
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
+        self.host = host
         self.callbackDelegate = callbackDelegate
         setupUI()
     }
@@ -112,7 +124,9 @@ class PollCollectionView: UICollectionView {
             cell.callbackDelegate = self
         }
         let questionCellRegistration = UICollectionView.CellRegistration<QuestionCell, AnyHashable> { [weak self] cell, indexPath, item in
-            guard let self = self, cell.item.isNil else { return }
+            guard let self = self else { return }
+            cell.mode = self.host.mode
+            guard cell.item.isNil else { return }
             cell.boundsListener = self
             cell.answerListener = self
             cell.item = self.poll
@@ -235,6 +249,8 @@ class PollCollectionView: UICollectionView {
         snapshot.appendItems([5], toSection: .question)
 //        snapshot.appendSections([.choices])
 //        snapshot.appendItems([6], toSection: .choices)
+        snapshot.appendSections([.comments])
+        snapshot.appendItems([8], toSection: .comments)
 
         source.apply(snapshot, animatingDifferences: false)
     }
@@ -249,16 +265,27 @@ class PollCollectionView: UICollectionView {
         cell.scrollToImage(at: index)
     }
     
-    public func onVoteCallback(){
-        guard let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-1)) as? VoteCell else { return }
-        var snapshot = source.snapshot()
-        snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .vote))
-        snapshot.deleteSections([.vote])
-        snapshot.appendSections([.comments])
-        snapshot.appendItems([8], toSection: .comments)
-        source.apply(snapshot, animatingDifferences: true)
-        scrollToItem(at: IndexPath(item: 0, section: numberOfSections-1), at: .bottom, animated: true)
-        
+    public func onVoteCallback(_ result: Result<Bool, Error>){
+        switch result {
+        case .success:
+            //Remove .vote section
+//            guard let _ = visibleCells.filter({ $0.isKind(of: VoteCell.self) }).first as? VoteCell else { return }
+            var snapshot = source.snapshot()
+            snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .vote))
+            snapshot.deleteSections([.vote])
+            source.apply(snapshot, animatingDifferences: true)
+//            scrollToItem(at: IndexPath(item: 0, section: numberOfSections-1), at: .bottom, animated: true)
+            //Chmod visible .choices cells & reorder desc
+            guard let cell = visibleCells.filter({ $0.isKind(of: QuestionCell.self) }).first as? QuestionCell,
+                  let mode = host?.mode else { return }
+            cell.mode = mode
+            
+        case .failure(let error):
+#if DEBUG
+            error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            showBanner(callbackDelegate: host, bannerDelegate: host!, text: "backend_error".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+        }
     }
 }
 
@@ -272,6 +299,13 @@ extension PollCollectionView: BoundsListener {
 extension PollCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        if let _ = cellForItem(at: indexPath) as? CommentsSectionCell {
+            guard host?.mode == .ReadOnly else {
+                showBanner(callbackDelegate: host, bannerDelegate: host!, text: "vote_to_view_comments".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+                return false
+            }
+            return true
+        }
 //        // Allows for closing an already open cell
 //        if collectionView.indexPathsForSelectedItems?.contains(indexPath) ?? false {
 //            collectionView.deselectItem(at: indexPath, animated: true)

@@ -23,6 +23,14 @@ class ChoiceCollectionView: UICollectionView {
     weak var answerListener: AnswerListener?
     
     // MARK: - Private properties
+    public var mode: PollController.Mode = .Write {
+        didSet {
+            visibleCells.forEach {
+                guard let cell = $0 as? ChoiceCell else { return }
+                cell.mode = mode
+            }
+        }
+    }
     private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<Section, Answer>!
 //    private let listener: ChoiceSectionCell
@@ -43,6 +51,11 @@ class ChoiceCollectionView: UICollectionView {
     deinit {
         print("\(String(describing: type(of: self))).\(#function)")
     }
+    
+    // MARK: - Public methods
+    public func refresh() {
+        source.refresh()
+    }
 
     // MARK: - UI functions
     private func setupUI() {
@@ -54,12 +67,14 @@ class ChoiceCollectionView: UICollectionView {
             configuration.headerMode = .firstItemInSection
             configuration.backgroundColor = .clear
             configuration.showsSeparators = false
-//            configuration.contentInsetsReference = .none
+            //            configuration.contentInsetsReference = .none
             
             return NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
         }
         
-        let cellRegistration = UICollectionView.CellRegistration<ChoiceCell, Answer> { cell, indexPath, item in
+        let cellRegistration = UICollectionView.CellRegistration<ChoiceCell, Answer> { [weak self] cell, indexPath, item in
+            guard let self = self else { return }
+            cell.mode = self.mode
             guard cell.item.isNil else { return }
             var configuration = UIBackgroundConfiguration.listPlainCell()
             configuration.backgroundColor = .clear

@@ -28,6 +28,12 @@ class QuestionCell: UICollectionViewCell {
             layoutIfNeeded()
         }
     }
+    public var mode: PollController.Mode = .Write {
+        didSet {
+            guard collectionView.mode != mode else { return }
+            collectionView.mode = mode
+        }
+    }
     var boundsListener: BoundsListener?
     var answerListener: AnswerListener? {
         didSet {

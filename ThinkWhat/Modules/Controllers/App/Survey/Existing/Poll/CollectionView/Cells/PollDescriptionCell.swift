@@ -34,6 +34,17 @@ class PollDescriptionCell: UICollectionViewCell {
         instance.text = "details".localized.uppercased()
         return instance
     }()
+    private lazy var background: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "bg"
+        instance.layer.masksToBounds = false
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        instance.addEquallyTo(to: shadowView)
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+//        constraint.identifier = "height"
+//        constraint.isActive = true
+        return instance
+    }()
     private lazy var shadowView: UIView = {
         let instance = UIView()
         instance.layer.masksToBounds = false
@@ -53,10 +64,10 @@ class PollDescriptionCell: UICollectionViewCell {
         let instance = UITextView()
         instance.layer.masksToBounds = false
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white//.secondarySystemBackground
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)//.secondarySystemBackground
         instance.isEditable = false
         instance.isSelectable = false
-        instance.addEquallyTo(to: shadowView)
+        instance.addEquallyTo(to: background)
         return instance
         }()
     private var observers: [NSKeyValueObservation] = []
@@ -99,7 +110,7 @@ class PollDescriptionCell: UICollectionViewCell {
     }()
     private var color: UIColor = .systemBlue {
         didSet {
-//            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
+            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
             disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             guard let imageView = icon.get(all: UIImageView.self).first else { return }
@@ -204,7 +215,7 @@ class PollDescriptionCell: UICollectionViewCell {
         observers.append(textView.observe(\UITextView.bounds, options: .new, changeHandler: { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
             guard let self = self, let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
-//            self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: view.bounds, cornerRadius: view.cornerRadius).cgPath
+            self.background.cornerRadius = view.cornerRadius
         }))
 //        observers.append(shadowView.observe(\UIView.bounds, options: .new) { [weak self] view, change in
 //            guard let self = self, let newValue = change.newValue else { return }
@@ -215,7 +226,7 @@ class PollDescriptionCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
         verticalStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
             $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
         }

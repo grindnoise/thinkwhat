@@ -19,6 +19,7 @@ class CommentsSectionCell: UICollectionViewCell {
             guard !item.isNil else { return }
             color = item.topic.tagColor
             collectionView.dataItems = item.answers
+            disclosureIndicator.alpha = item.isCommentingAllowed ? 1 : 0
             disclosureLabel.text = item.isCommentingAllowed ? "comments".localized.uppercased() + " (\(0))": "comments_disabled".localized.uppercased()
             let constraint = collectionView.heightAnchor.constraint(equalToConstant: 1)
             constraint.priority = .defaultHigh
@@ -156,12 +157,12 @@ class CommentsSectionCell: UICollectionViewCell {
     }
     
     private func updateAppearance() {
-        closedConstraint.isActive = isSelected
-        openConstraint.isActive = !isSelected
+        closedConstraint.isActive = !isSelected
+        openConstraint.isActive = isSelected
 
         UIView.animate(withDuration: 0.3) {
             let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
-            self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
+            self.disclosureIndicator.transform = self.isSelected ? upsideDown :.identity
         }
     }
     

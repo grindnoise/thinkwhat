@@ -41,7 +41,7 @@ class PollView: UIView {
     weak var viewInput: (PollViewInput & UIViewController)?
     
     private lazy var collectionView: PollCollectionView = {
-        let instance = PollCollectionView(poll: survey!, callbackDelegate: self)
+        let instance = PollCollectionView(host: self, poll: survey!, callbackDelegate: self)
         instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
         //////            UIApplication.shared.windows[0].safeAreaInsets.bottom, right: 0.0)
         instance.layer.masksToBounds = false
@@ -87,8 +87,9 @@ extension PollView: PollControllerOutput {
     }
     
     func onVoteCallback(_ result: Result<Bool, Error>) {
+        isUserInteractionEnabled = true
         //Hide vote button & show comments section
-        collectionView.onVoteCallback()
+        collectionView.onVoteCallback(result)
     }
     
     func onLoadCallback(_ result: Result<Bool, Error>) {
@@ -157,10 +158,16 @@ extension PollView: CallbackObservable {
         } else if let url = sender as? URL {
             viewInput?.onURLTapped(url)
         } else if let answer = sender as? Answer {
-//            viewInput?.onVote(answer)
-            delayAsync(delay: 3) {
-                self.collectionView.onVoteCallback()
-            }
+            viewInput?.onVote(answer)
+            isUserInteractionEnabled = true
+//            delayAsync(delay: 3) {
+//                self.collectionView.onVoteCallback()
+//                self.isUserInteractionEnabled = true
+//            }
+        } else if let string = sender as? String {
+//            if string == "vote_to_view_comments" {
+//                showBanner(callbackDelegate: self, bannerDelegate: self, text: string.localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+//            }
         }
     }
     

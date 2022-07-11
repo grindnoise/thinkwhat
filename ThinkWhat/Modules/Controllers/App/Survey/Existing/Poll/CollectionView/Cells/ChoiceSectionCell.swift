@@ -12,8 +12,13 @@ class ChoiceSectionCell: UICollectionViewCell {
     
     // MARK: - Public Properties
     ///Внимание, вызывается из collectionView.didSelect!
-    var boundsListener: BoundsListener?
-    var item: Survey! {
+    public var mode: PollController.Mode = .Write {
+        didSet {
+            collectionView.mode = mode
+        }
+    }
+    public var boundsListener: BoundsListener?
+    public var item: Survey! {
         didSet {
             guard !item.isNil else { return }
             color = item.topic.tagColor
@@ -26,7 +31,7 @@ class ChoiceSectionCell: UICollectionViewCell {
             layoutIfNeeded()
         }
     }
-    var answerListener: AnswerListener?
+    public var answerListener: AnswerListener?
     
     // MARK: - Private Properties
     private let disclosureLabel: UILabel = {

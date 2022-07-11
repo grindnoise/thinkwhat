@@ -13,7 +13,7 @@ class CircularIndicatorImageView: UIImageView {
     public var color: UIColor = K_COLOR_RED {
         didSet {
             progressIndicatorView.color = color
-            layer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : color.withAlphaComponent(0.1).cgColor
+            layer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : color.withAlphaComponent(0.2).cgColor
         }
     }
     

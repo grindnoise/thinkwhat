@@ -378,7 +378,11 @@ extension PollController: PollViewInput {
     }
     
     func onVote(_ choice: Answer) {
-        controllerInput?.vote(choice)
+//        controllerInput?.vote(choice)
+        delayAsync(delay: 2) {
+            self._mode = .ReadOnly
+            self.controllerOutput?.onVoteCallback(.success(true))
+        }
     }
     
     func onClaim(_ claim: Claim) {

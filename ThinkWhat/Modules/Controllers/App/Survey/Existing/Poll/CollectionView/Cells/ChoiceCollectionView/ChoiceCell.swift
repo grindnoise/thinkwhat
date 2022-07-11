@@ -27,6 +27,28 @@ class ChoiceCell: UICollectionViewCell {
             color = _color
         }
     }
+    public var mode: PollController.Mode = .Write {
+        didSet {
+            guard oldValue != mode, mode == .ReadOnly, !leadingConstraint.isNil, !trailingConstraint.isNil else { return }
+            guard let constraint = votersView.getAllConstraints().filter({ $0.identifier == "width" }).first else { return }
+//            setupVotersView()
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) {
+                self.setNeedsLayout()
+                constraint.constant = self.contentView.bounds.width/4
+                self.shadowView.layer.shadowOpacity = 0
+                self.leadingConstraint.constant = 0
+                self.trailingConstraint.constant = 0
+                self.layoutIfNeeded()
+            } completion: { _ in
+                self.setupVotersView()
+                delayAsync(delay: 0.2) {
+                    self.shadowView.layer.shadowOpacity = 1
+                }
+            }
+        }
+    }
+    public weak var host: ChoiceCollectionView?
+    public var isChosen = false
     
     // MARK: - Private properties
     private lazy var background: UIView = {
@@ -69,12 +91,12 @@ class ChoiceCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "shadow"
         instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.3).cgColor
-        instance.layer.shadowRadius = 5
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.2).cgColor
+        instance.layer.shadowRadius = 4
         instance.layer.shadowOffset = .zero
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
-        constraint.identifier = "height"
-        constraint.isActive = true
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+//        constraint.identifier = "height"
+//        constraint.isActive = true
 //        instance.addEquallyTo(to: background)
         return instance
     }()
@@ -88,25 +110,79 @@ class ChoiceCell: UICollectionViewCell {
         instance.addEquallyTo(to: background)
         return instance
     }()
+    private lazy var votersView: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "voters"
+        instance.translatesAutoresizingMaskIntoConstraints = false
+        instance.clipsToBounds = true
+        let constraint = instance.widthAnchor.constraint(equalToConstant: 0)
+        constraint.identifier = "width"
+        constraint.isActive = true
+        
+        instance.addSubview(avatarsStackView)
+        avatarsStackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            avatarsStackView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.9),
+            avatarsStackView.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+            avatarsStackView.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+            avatarsStackView.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)!)*1.5)
+        ])
+        return instance
+    }()
+    private lazy var avatarsStackView: UIStackView = {
+        let imageView = UIImageView(image: UIImage(systemName: "chevron.right"))
+        imageView.accessibilityIdentifier = "chevron"
+        imageView.clipsToBounds = true
+        imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        imageView.contentMode = .center
+        let instance = UIStackView(arrangedSubviews: [avatarsView, imageView])
+        instance.spacing = 0
+        return instance
+    }()
+    private lazy var avatarsView: UIView = {
+       let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.clipsToBounds = true
+        return instance
+    }()
+    
     private let padding: CGFloat = 10
     private var observers: [NSKeyValueObservation] = []
     private var color: UIColor = .secondarySystemBackground {
         didSet {
-            selectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.4)
+            selectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.5)
             background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.1)
+            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
+            avatarsStackView.get(all: UIImageView.self).filter({ $0.accessibilityIdentifier == "chevron" }).forEach({ $0.tintColor = color })
         }
     }
     private lazy var horizontalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [shadowView])
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
-        constraint.identifier = "height"
-        constraint.isActive = true
+        let instance = UIStackView(arrangedSubviews: [shadowView, votersView])
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+//        constraint.identifier = "height"
+//        constraint.isActive = true
         instance.alignment = .center
         instance.clipsToBounds = false
-        instance.distribution = .fillProportionally
+//        instance.distribution = .fillProportionally
         return instance
     }()
+    private var leadingConstraint: NSLayoutConstraint! {
+        didSet {
+            leadingConstraint.isActive = true
+        }
+    }
+    private var trailingConstraint: NSLayoutConstraint! {
+        didSet {
+            trailingConstraint.isActive = true
+        }
+    }
+    private var topConstraint: NSLayoutConstraint! {
+        didSet {
+            topConstraint.isActive = true
+        }
+    }
+    private var avatars: [Avatar] = []
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -127,16 +203,18 @@ class ChoiceCell: UICollectionViewCell {
         contentView.addSubview(horizontalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+        leadingConstraint = horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: mode == .ReadOnly ? 0 : padding*2)
+        trailingConstraint = horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: mode == .ReadOnly ? 0 : -padding)
+        topConstraint = horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding)
         
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-            horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding*2),
-            horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+//            horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
 //            textView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
+            votersView.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor)
         ])
         
         let constraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
@@ -147,12 +225,36 @@ class ChoiceCell: UICollectionViewCell {
     private func setObservers() {
         observers.append(textView.observe(\UITextView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
             guard let self = self,
-                  let constraint = self.shadowView.getAllConstraints().filter({ $0.identifier == "height" }).first,
-                  let value = change.newValue else { return }
-            self.setNeedsLayout()
-            constraint.constant = value.height
-            self.layoutIfNeeded()
-            self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: view.bounds, cornerRadius: view.cornerRadius).cgPath
+                  let constraint = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
+                  let value = change.newValue,
+                  value.height >= self.textView.frame.height else { return }
+            
+            UIView.animate(withDuration: 0.15, delay: 0, animations: {
+                self.contentView.setNeedsLayout()
+                constraint.constant = value.height
+                self.contentView.layoutIfNeeded()
+            }) { _ in
+//                self.host?.refresh()
+                print(self.topConstraint.constant)
+                self.updateConstraints()
+            }
+            
+            let destinationPath = UIBezierPath(roundedRect: view.bounds,
+                                               cornerRadius: self.shadowView.bounds.width * 0.05).cgPath
+            let anim = Animations.get(property: .ShadowPath,
+                                      fromValue: self.shadowView.layer.shadowPath as Any,
+                                      toValue: destinationPath,
+                                      duration: 0.2,
+                                      delay: 0,
+                                      repeatCount: 0,
+                                      autoreverses: false,
+                                      timingFunction: .linear,
+                                      delegate: nil,
+                                      isRemovedOnCompletion: true,
+                                      completionBlocks: nil)
+            self.shadowView.layer.add(anim, forKey: nil)
+            self.shadowView.layer.shadowPath = destinationPath
+//            self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: view.bounds, cornerRadius: view.cornerRadius).cgPath
         })
         observers.append(textView.observe(\UITextView.bounds, options: .new) { [weak self] view, change in
             guard let self = self,
@@ -167,6 +269,49 @@ class ChoiceCell: UICollectionViewCell {
 //        })
     }
     
+    private func setupVotersView() {
+#if DEBUG
+        let inset: CGFloat = (avatarsView.bounds.height*3 - avatarsView.bounds.width)/4
+        
+        for i in 0...2 {
+            let avatar = Avatar(gender: .Male, borderColor: traitCollection.userInterfaceStyle == .dark ? .black : .white)
+            avatar.layer.zPosition = 10 - CGFloat(i)
+            avatars.append(avatar)
+            avatarsView.addSubview(avatar)
+            avatar.layer.masksToBounds = false
+            avatar.translatesAutoresizingMaskIntoConstraints = false
+            let centerY = avatar.centerYAnchor.constraint(equalTo: avatarsView.centerYAnchor)
+            centerY.identifier = "centerY"
+            centerY.isActive = true
+            avatar.heightAnchor.constraint(equalTo: avatarsView.heightAnchor).isActive = true
+            avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor).isActive = true
+            
+            if i == 0 {
+                avatar.image = UIImage(systemName: "checkmark.seal.fill")
+                avatar.leadingAnchor.constraint(equalTo: avatarsView.leadingAnchor, constant: 0).isActive = true
+                avatar.imageView.tintColor = color
+                avatar.imageView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+            } else {
+                avatar.leadingAnchor.constraint(equalTo: avatars[i-1].leadingAnchor, constant: inset).isActive = true
+            }
+        }
+#else
+        guard item.totalVotes != 0 else {
+            let instance = UILabel()
+            instance.textAlignment = .center
+            instance.numberOfLines = 0
+            instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                              forTextStyle: .caption2)
+            instance.text = "no_votes".localized
+            instance.addEquallyTo(to: avatarsView)
+            guard let chevron = avatarsStackView.get(all: UIImageView.self).filter({ $0.accessibilityIdentifier == "chevron" }).first else { return }
+            avatarsStackView.removeArrangedSubview(chevron)
+            chevron.removeFromSuperview()
+            return
+        }
+#endif
+    }
+    
     // MARK: - UI methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -175,8 +320,8 @@ class ChoiceCell: UICollectionViewCell {
             $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
         }
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-        selectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.4)
-        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.1)
+        selectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.5)
+        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
@@ -189,6 +334,7 @@ class ChoiceCell: UICollectionViewCell {
     }
     
     private func updateAppearance() {
+        guard mode == .Write else { return }
         guard let constraint = selectionView.getAllConstraints().filter({ $0.identifier == "width"}).first else { return }
         
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
@@ -196,7 +342,7 @@ class ChoiceCell: UICollectionViewCell {
             self.horizontalStack.setNeedsLayout()
             constraint.constant = self.isSelected ? self.background.frame.width : 0
             self.horizontalStack.layoutIfNeeded()
-//            self.textView.backgroundColor = self.isSelected ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.4) : self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : self.color.withAlphaComponent(0.1)
+//            self.textView.backgroundColor = self.isSelected ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.5) : self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : self.color.withAlphaComponent(0.2)
         } completion: { _ in}
     }
     
