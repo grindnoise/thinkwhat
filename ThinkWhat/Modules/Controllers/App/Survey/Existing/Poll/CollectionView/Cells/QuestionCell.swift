@@ -16,6 +16,9 @@ class QuestionCell: UICollectionViewCell {
             guard !item.isNil else { return }
             color = item.topic.tagColor
             collectionView.dataItems = item.answers
+            if mode == .ReadOnly {
+                collectionView.reloadUsingSorting()
+            }
             textView.text = item.question
             let constraint_1 = textView.heightAnchor.constraint(equalToConstant: max(item.question.height(withConstrainedWidth: textView.bounds.width, font: textView.font!), 40))
             constraint_1.identifier = "height"
@@ -40,6 +43,7 @@ class QuestionCell: UICollectionViewCell {
             collectionView.answerListener = answerListener
         }
     }
+    weak var callbackDelegate: CallbackObservable?
     
     
     // MARK: - Private properties
@@ -194,6 +198,6 @@ class QuestionCell: UICollectionViewCell {
 
 extension QuestionCell: CallbackObservable {
     func callbackReceived(_ sender: Any) {
-        
+        callbackDelegate?.callbackReceived(sender)
     }
 }

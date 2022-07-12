@@ -11,12 +11,12 @@ import UIKit
 /// *View* sends user actions to the *Controller*.
 ///
 /// **Controller** conforms to this protocol
-protocol VotersViewInput: class {
+protocol VotersViewInput: AnyObject {
     
     var controllerOutput: VotersControllerOutput? { get set }
     var controllerInput: VotersControllerInput? { get set }
     var answer: Answer { get }
-    var indexPath: IndexPath { get }
+//    var indexPath: IndexPath { get }
     var color: UIColor { get }
     
     func setFilterEnabled(_: Bool)
@@ -25,7 +25,7 @@ protocol VotersViewInput: class {
 /// *Controller* tells the *Model* what to do based on the input
 ///
 /// **Model** conforms to this protocol
-protocol VotersControllerInput: class {
+protocol VotersControllerInput: AnyObject {
     var modelOutput: VotersModelOutput? { get set }
     
     func loadData()
@@ -34,7 +34,7 @@ protocol VotersControllerInput: class {
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
-protocol VotersModelOutput: class {
+protocol VotersModelOutput: AnyObject {
     var answer: Answer { get }
     
     func onDataLoaded(_: Result<[Userprofile], Error>)
@@ -43,10 +43,10 @@ protocol VotersModelOutput: class {
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
-protocol VotersControllerOutput: class {
+protocol VotersControllerOutput: AnyObject {
     var viewInput: VotersViewInput? { get set }
     var answer: Answer { get }
-    var indexPath: IndexPath { get }
+//    var indexPath: IndexPath { get }
     
     func onFilterTapped()
     func onDataLoaded(_: Result<[Userprofile], Error>)

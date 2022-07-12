@@ -22,6 +22,7 @@ class Avatar: UIView {
 //            imageView.isUserInteractionEnabled = true
 //            imageView.backgroundColor = .tertiarySystemBackground
 //            imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            imageView.image = image
             imageView.addEquallyTo(to: container)
             let icon = self.container.get(all: Icon.self).first
             UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) { [weak self] in
@@ -81,7 +82,15 @@ class Avatar: UIView {
         }
     }
     weak var delegate: CallbackObservable?
-    private var isBordered: Bool = false
+    public lazy var isBordered: Bool = false {
+        didSet {
+            guard isBordered, let constraint = container.getAllConstraints().filter({ $0.identifier == "ratio" }).first else { return }
+            container.superview!.removeConstraint(constraint)
+            let new = container.heightAnchor.constraint(equalTo: border.heightAnchor, multiplier: 0.9)
+            new.identifier = "ratio"
+            new.isActive = true
+        }
+    }
     private var observers: [NSKeyValueObservation] = []
     
     //MARK: - IB outlets
@@ -100,7 +109,7 @@ class Avatar: UIView {
         super.init(frame: .zero)
         self.gender = gender
         self.image = image
-        self.isBordered = borderColor != .clear
+//        self.isBordered = borderColor != .clear
         self.lightColor = borderColor
         commonInit()
     }

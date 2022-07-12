@@ -42,16 +42,23 @@ extension PollModel: PollControllerInput {
 
             do {
                 let json = try await API.shared.vote(answer: answer)
+                let resultDetails = SurveyResult(choice: answer)
                 for i in json {
                     if i.0 == "survey_result" {
                         for entity in i.1 {
                             guard let answerId = entity.1["answer"].int,
                                   let timeString = entity.1["timestamp"].string,
                                   let timestamp = Date(dateTimeString: timeString) else { break }
-                            survey!.result = [answerId: timestamp]
-                            Surveys.shared.hot.remove(object: self.survey!)
-                            Userprofiles.shared.current!.balance += 1
+                            await MainActor.run {
+                                survey!.result = [answerId: timestamp]
+                                Surveys.shared.hot.remove(object: self.survey!)
+                                Userprofiles.shared.current!.balance += 1
+                            }
                         }
+                    } else if i.0 == "popular_vote", let isPopular = i.1.rawValue as? Bool {
+                        resultDetails.isPopular = isPopular
+                    } else if i.0 == "points", let points = i.1.int {
+                        resultDetails.points = points
                     } else if i.0 == "hot" && !i.1.isEmpty {
                         await MainActor.run {
                             Surveys.shared.load(i.1)
@@ -89,6 +96,7 @@ extension PollModel: PollControllerInput {
                         }
                     }
                 }
+                survey?.resultDetails = resultDetails
                 await MainActor.run {
                     modelOutput?.onVoteCallback(.success(true))
                 }

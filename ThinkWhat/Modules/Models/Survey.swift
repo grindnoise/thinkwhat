@@ -180,6 +180,7 @@ class Survey: Decodable {
             }
         }
     }
+    var resultDetails:          SurveyResult?
     var owner:                  Userprofile
     var likes:                  Int = 0 {
         didSet {
@@ -487,13 +488,20 @@ class Surveys {
                                                    DateFormatter.dateFormatter ]
 //        decoder.keyDecodingStrategy                 = .convertFromSnakeCase
         do {
+//            if let dict = json.dictionary {
+//                if dict.isEmpty {
+//                    notifications.append(Notifications.Surveys.Empty)
+//                    Notification.send(names: notifications.uniqued())
+//                    return
+//                }
+//            }
             for (key, value) in json {
                 if key == Category.Hot.rawValue {
                     let instances = try decoder.decode([Survey].self, from: value.rawData())
-                    guard !instances.isEmpty else {
+                    if instances.isEmpty {
                         notifications.append(Notifications.Surveys.Empty)
                         Notification.send(names: notifications.uniqued())
-                        return
+//                        return
                     }
                     for instance in instances {
                         if hot.filter({ $0.hashValue == instance.hashValue }).isEmpty {
@@ -503,11 +511,23 @@ class Surveys {
                     }
                 } else {
                     let instances = try decoder.decode([SurveyReference].self, from: value.rawData())
-//                    guard !instances.isEmpty else {
-//                        notifications.append(Notifications.Surveys.Empty)
+                    if instances.isEmpty {
+//                        var notification: Notification.Name!
+//                        if key == Category.Top.rawValue {
+//                            notification = Notifications.Surveys.ZeroTop
+//                        } else if key == Category.New.rawValue {
+//                            notification = Notifications.Surveys.ZeroNew
+//                        } else if key == Category.Own.rawValue {
+//                            notification = Notifications.Surveys.ZeroOwn
+//                        } else if key == Category.Subscriptions.rawValue {
+//                            notification = Notifications.Surveys.ZeroSubscriptions
+//                        } else if key == Category.Favorite.rawValue {
+//                            notification = Notifications.Surveys.ZeroFavorites
+//                        }
+//                        notifications.append(notification)
 //                        Notification.send(names: notifications.uniqued())
-//                        return
-//                    }
+                        notifications.append(Notifications.Surveys.Empty)
+                    }
                     for instance in instances {
                         if key == Category.Top.rawValue {//} && !value.isEmpty {
                             if topReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {

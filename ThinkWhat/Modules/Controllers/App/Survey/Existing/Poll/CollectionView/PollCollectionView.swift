@@ -45,6 +45,7 @@ class PollCollectionView: UICollectionView {
     private var imageCellRegistration: UICollectionView.CellRegistration<ImageCell, AnyHashable>!
     private var answer: Answer? {
         didSet {
+            guard host.mode == .Write else { return }
             guard oldValue.isNil else {
                 if let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-1)) as? VoteCell {
                     cell.answer = answer!
@@ -127,6 +128,7 @@ class PollCollectionView: UICollectionView {
             guard let self = self else { return }
             cell.mode = self.host.mode
             guard cell.item.isNil else { return }
+            cell.callbackDelegate = self
             cell.boundsListener = self
             cell.answerListener = self
             cell.item = self.poll
@@ -279,7 +281,18 @@ class PollCollectionView: UICollectionView {
             guard let cell = visibleCells.filter({ $0.isKind(of: QuestionCell.self) }).first as? QuestionCell,
                   let mode = host?.mode else { return }
             cell.mode = mode
-            
+            guard let details = poll.resultDetails else { return }
+            if details.isPopular {
+                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: host, heightScaleFactor: 0.5)
+                banner.accessibilityIdentifier = "vote"
+                let imageView = ImageSigns.flameFilled
+                imageView.contentMode = .scaleAspectFit
+                delayAsync(delay: 1.5) { [self] in
+                    banner.present(content: VoteMessage(imageContent: imageView, points: self.poll.resultDetails?.points ?? 0, color: self.poll.topic.tagColor, callbackDelegate: banner))
+                }
+            } else {
+                
+            }
         case .failure(let error):
 #if DEBUG
             error.printLocalized(class: type(of: self), functionName: #function)

@@ -14,10 +14,11 @@ class VoteMessage: UIView {
         print("VoteMessage deinit")
     }
     
-    init(imageContent _imageContent: UIView, color _color: UIColor, callbackDelegate _callbackDelegate: CallbackObservable) {
-        self.callbackDelegate = _callbackDelegate
-        self.imageContent = _imageContent
-        self.color = _color
+    init(imageContent: UIView, points: Int, color: UIColor, callbackDelegate: CallbackObservable) {
+        self.callbackDelegate = callbackDelegate
+        self.imageContent = imageContent
+        self.color = color
+        self.points = points
         super.init(frame: CGRect.zero)
         commonInit()
     }
@@ -57,8 +58,8 @@ class VoteMessage: UIView {
         attributedText.append(NSAttributedString(string: "most_popular_choice".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: frame.width * 0.06), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         attributedText.append(NSAttributedString(string: "\n\n", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         attributedText.append(NSAttributedString(string: "extra_points".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.06), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        attributedText.append(NSAttributedString(string: "2", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.07), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .systemBlue : color, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        attributedText.append(NSAttributedString(string: "points".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.06), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\(String(describing: points))", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.07), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .systemBlue : color, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: " points".localized.lowercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.06), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         label.attributedText = attributedText
     }
     
@@ -99,4 +100,5 @@ class VoteMessage: UIView {
     private let imageContent: UIView
     private weak var callbackDelegate: CallbackObservable?
     private let color: UIColor
+    private let points: Int
 }

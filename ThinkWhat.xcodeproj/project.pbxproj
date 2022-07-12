@@ -208,6 +208,8 @@
 		AB463FBE27C7E6C8007D7240 /* Avatar.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB463FBD27C7E6C8007D7240 /* Avatar.xib */; };
 		AB4727A9268C6444002A9563 /* UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4727A8268C6444002A9563 /* UI.swift */; };
 		AB48B90624348CDC00A27B0D /* SurveyTotalCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB48B90524348CDC00A27B0D /* SurveyTotalCell.swift */; };
+		AB48E2B6287DA68B0020F81B /* SurveyResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB48E2B5287DA68B0020F81B /* SurveyResult.swift */; };
+		AB48E2B8287DD7D60020F81B /* UICollectionView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB48E2B7287DD7D60020F81B /* UICollectionView+.swift */; };
 		AB4BD892244DE52100D9A3F0 /* TopIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4BD891244DE52100D9A3F0 /* TopIcon.swift */; };
 		AB51605C24EFEC79006A07B7 /* CategoryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51605B24EFEC79006A07B7 /* CategoryCollectionViewController.swift */; };
 		AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51605D24EFF610006A07B7 /* CategoryCollectionViewCell.swift */; };
@@ -761,6 +763,8 @@
 		AB463FBD27C7E6C8007D7240 /* Avatar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Avatar.xib; sourceTree = "<group>"; };
 		AB4727A8268C6444002A9563 /* UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI.swift; sourceTree = "<group>"; };
 		AB48B90524348CDC00A27B0D /* SurveyTotalCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTotalCell.swift; sourceTree = "<group>"; };
+		AB48E2B5287DA68B0020F81B /* SurveyResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyResult.swift; sourceTree = "<group>"; };
+		AB48E2B7287DD7D60020F81B /* UICollectionView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+.swift"; sourceTree = "<group>"; };
 		AB4B85DC27785ACE00884E65 /* libswiftCore.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftCore.tbd; path = usr/lib/swift/libswiftCore.tbd; sourceTree = SDKROOT; };
 		AB4BD891244DE52100D9A3F0 /* TopIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopIcon.swift; sourceTree = "<group>"; };
 		AB51605B24EFEC79006A07B7 /* CategoryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewController.swift; sourceTree = "<group>"; };
@@ -1224,6 +1228,7 @@
 				ABA448D327E331B000F8E00D /* UIView.swift */,
 				AB913F782806FADF00609D51 /* UIViewController.swift */,
 				ABCBDA0F28759F2500888F23 /* UIFont+.swift */,
+				AB48E2B7287DD7D60020F81B /* UICollectionView+.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2449,6 +2454,7 @@
 				AB30A4FA272AAE5500A7DCC0 /* SurveyReference.swift */,
 				AB1D845124EA91D200B75929 /* Topic.swift */,
 				ABEDC4E22450168D00FA9128 /* User.swift */,
+				AB48E2B5287DA68B0020F81B /* SurveyResult.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -3494,6 +3500,7 @@
 				AB52B734240E5D4B006DBDA8 /* ReadySign.swift in Sources */,
 				AB016BFE26CA73BA005C5A87 /* ButtonWithImage.swift in Sources */,
 				AB6083BF2240FF15002C0D7E /* UnderlinedSignTextField.swift in Sources */,
+				AB48E2B8287DD7D60020F81B /* UICollectionView+.swift in Sources */,
 				AB39F41428478B5C00DEE0ED /* ImageSelectionCellContent.swift in Sources */,
 				AB38DD5C2817F15400FFEB3F /* SubscribersController.swift in Sources */,
 				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
@@ -3660,6 +3667,7 @@
 				ABF27580280EB2D40023CD1F /* VotersView.swift in Sources */,
 				AB9DBF7826A197D600EFA66D /* Segues.swift in Sources */,
 				AB9CADC125F755CE002AFD19 /* CircleButton.swift in Sources */,
+				AB48E2B6287DA68B0020F81B /* SurveyResult.swift in Sources */,
 				ABF3DF1F283BC2DA00309AA9 /* HotCard.swift in Sources */,
 				ABB4AAAA2666335600D4738D /* NewSurveyTitle.swift in Sources */,
 				AB7C6FB42865AE3000000429 /* Error.swift in Sources */,

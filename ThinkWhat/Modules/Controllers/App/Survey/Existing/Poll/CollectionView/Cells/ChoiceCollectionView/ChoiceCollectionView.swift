@@ -25,6 +25,9 @@ class ChoiceCollectionView: UICollectionView {
     // MARK: - Private properties
     public var mode: PollController.Mode = .Write {
         didSet {
+            if oldValue != mode, mode == .ReadOnly {
+                reloadUsingSorting()
+            }
             visibleCells.forEach {
                 guard let cell = $0 as? ChoiceCell else { return }
                 cell.mode = mode
@@ -33,6 +36,7 @@ class ChoiceCollectionView: UICollectionView {
     }
     private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<Section, Answer>!
+    private var shouldChangeColor = false
 //    private let listener: ChoiceSectionCell
     
     // MARK: - Initialization
@@ -74,13 +78,17 @@ class ChoiceCollectionView: UICollectionView {
         
         let cellRegistration = UICollectionView.CellRegistration<ChoiceCell, Answer> { [weak self] cell, indexPath, item in
             guard let self = self else { return }
+            cell.callbackDelegate = self
+            if cell.item.isNil {
+                var configuration = UIBackgroundConfiguration.listPlainCell()
+                configuration.backgroundColor = .clear
+                cell.backgroundConfiguration = configuration
+                cell.item = item
+                cell.automaticallyUpdatesBackgroundConfiguration = false
+            }
             cell.mode = self.mode
-            guard cell.item.isNil else { return }
-            var configuration = UIBackgroundConfiguration.listPlainCell()
-            configuration.backgroundColor = .clear
-            cell.backgroundConfiguration = configuration
-            cell.item = item
-            cell.automaticallyUpdatesBackgroundConfiguration = false
+            guard self.shouldChangeColor else { return }
+            cell.color = Colors.tags()[indexPath.row]
         }
         
         source = UICollectionViewDiffableDataSource<Section, Answer>(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
@@ -100,6 +108,25 @@ class ChoiceCollectionView: UICollectionView {
 //            self.listener.onImagesHeightChange(self.contentSize.height)
 //        }
     }
+    
+    public func reloadUsingSorting() {
+        shouldChangeColor = true
+        self.visibleCells.enumerated().forEach {
+            guard let cell = $1 as? ChoiceCell else { return }
+            cell.color = Colors.tags()[$0]
+        }
+//        var snapshot = source.snapshot()
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Answer>()
+        
+        snapshot.appendSections([.main,])
+        snapshot.appendItems(dataItems.sorted{ $0.totalVotes > $1.totalVotes }, toSection: .main)
+        source.apply(snapshot, animatingDifferences: true) {
+//            self.visibleCells.enumerated().forEach {
+//                guard let cell = $1 as? ChoiceCell else { return }
+//                cell.color = Colors.tags()[$0]
+//            }
+        }
+    }
 }
 
 // MARK: - UICollectionViewDelegate
@@ -107,5 +134,17 @@ extension ChoiceCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.cellForItem(at: indexPath) as? ChoiceCell else { return }
         answerListener?.onChoiceMade(cell.item)
+    }
+    
+//    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+//        guard mode == .Write else { return false }
+//        return true
+//    }
+}
+
+// MARK: - CallbackObservable
+extension ChoiceCollectionView: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        callbackDelegate?.callbackReceived(sender)
     }
 }

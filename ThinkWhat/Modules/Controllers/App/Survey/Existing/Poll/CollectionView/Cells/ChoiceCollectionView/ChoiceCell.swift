@@ -27,30 +27,65 @@ class ChoiceCell: UICollectionViewCell {
             color = _color
         }
     }
-    public var mode: PollController.Mode = .Write {
+    public weak var host: ChoiceCollectionView?
+    public weak var callbackDelegate: CallbackObservable?
+    public var mode: PollController.Mode = .ReadOnly {
         didSet {
-            guard oldValue != mode, mode == .ReadOnly, !leadingConstraint.isNil, !trailingConstraint.isNil else { return }
-            guard let constraint = votersView.getAllConstraints().filter({ $0.identifier == "width" }).first else { return }
-//            setupVotersView()
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) {
-                self.setNeedsLayout()
-                constraint.constant = self.contentView.bounds.width/4
-                self.shadowView.layer.shadowOpacity = 0
-                self.leadingConstraint.constant = 0
-                self.trailingConstraint.constant = 0
-                self.layoutIfNeeded()
-            } completion: { _ in
-                self.setupVotersView()
-                delayAsync(delay: 0.2) {
-                    self.shadowView.layer.shadowOpacity = 1
+            if mode == .Write {
+                leadingConstraint.constant =  padding*2
+                trailingConstraint.constant = -padding
+            } else if mode == .ReadOnly,
+//                      oldValue == .Write,
+                      !leadingConstraint.isNil,
+                      !trailingConstraint.isNil,
+                      let constraint = votersView.getAllConstraints().filter({ $0.identifier == "width" }).first {
+                
+                
+                //Decide if user has voted to show animations
+                let animated = oldValue == .Write
+                if item.totalVotes <= 1, let imageView = avatarsStackView.get(all: UIImageView.self).filter({ $0.accessibilityIdentifier == "chevron"}).first, isChosen {
+                    avatarsStackView.removeArrangedSubview(imageView)
+                    imageView.removeFromSuperview()
+                }
+                
+                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: animated ? 0.2 : 0, delay: 0, options: .curveEaseInOut) {
+                    self.setNeedsLayout()
+                    constraint.constant = self.contentView.bounds.width/4
+                    self.shadowView.layer.shadowOpacity = 0
+                    self.leadingConstraint.constant = 0
+                    self.trailingConstraint.constant = 0
+                    self.layoutIfNeeded()
+                } completion: { _ in
+                    self.setupVotersView()
+                    self.setPercentage()
+                    guard animated else {
+                        self.shadowView.layer.shadowOpacity = 1
+                        return
+                    }
+                    delayAsync(delay: 0.2) {
+                        self.shadowView.layer.shadowOpacity = 1
+                    }
+                    
                 }
             }
         }
     }
-    public weak var host: ChoiceCollectionView?
-    public var isChosen = false
+    public var color: UIColor = .secondarySystemBackground {
+        didSet {
+            UIView.animate(withDuration: 0.5) { [weak self] in
+                guard let self = self else { return }
+                self.selectionView.backgroundColor = self.color.withAlphaComponent(0.5)//self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.5)
+                self.background.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+                self.textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .clear : self.color.withAlphaComponent(0.2)
+                self.avatarsStackView.get(all: UIImageView.self).filter({ $0.accessibilityIdentifier == "chevron" }).forEach({ $0.tintColor = self.color })
+            }
+        }
+    }
     
     // MARK: - Private properties
+    private var isChosen: Bool {
+        return item.survey?.result?.keys.first == item.id
+    }
     private lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
@@ -128,6 +163,8 @@ class ChoiceCell: UICollectionViewCell {
             avatarsStackView.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
             avatarsStackView.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)!)*1.5)
         ])
+        instance.isUserInteractionEnabled = true
+        instance.addGestureRecognizer(UIGestureRecognizer(target: self, action: #selector(self.handleTap)))
         return instance
     }()
     private lazy var avatarsStackView: UIStackView = {
@@ -136,27 +173,31 @@ class ChoiceCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         imageView.contentMode = .center
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(UIGestureRecognizer(target: self, action: #selector(self.handleTap)))
         let instance = UIStackView(arrangedSubviews: [avatarsView, imageView])
         instance.spacing = 0
+//        instance.isUserInteractionEnabled = true
         return instance
     }()
     private lazy var avatarsView: UIView = {
        let instance = UIView()
         instance.backgroundColor = .clear
         instance.clipsToBounds = true
+        instance.addGestureRecognizer(UIGestureRecognizer(target: self, action: #selector(self.handleTap)))
+        return instance
+    }()
+    private lazy var opaqueView: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.clipsToBounds = true
+        instance.layer.zPosition = 11
+        instance.addGestureRecognizer(UIGestureRecognizer(target: self, action: #selector(self.handleTap)))
         return instance
     }()
     
     private let padding: CGFloat = 10
     private var observers: [NSKeyValueObservation] = []
-    private var color: UIColor = .secondarySystemBackground {
-        didSet {
-            selectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.5)
-            background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
-            avatarsStackView.get(all: UIImageView.self).filter({ $0.accessibilityIdentifier == "chevron" }).forEach({ $0.tintColor = color })
-        }
-    }
     private lazy var horizontalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [shadowView, votersView])
 //        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
@@ -269,33 +310,23 @@ class ChoiceCell: UICollectionViewCell {
 //        })
     }
     
+    @objc
+    private func handleTap() {
+        callbackDelegate?.callbackReceived(self as Any)
+    }
+    
+    private func setPercentage() {
+        guard let constraint = selectionView.getAllConstraints().filter({ $0.identifier == "width" }).first else { return }
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) { [weak self] in
+            guard let self = self else { return }
+            self.setNeedsLayout()
+            self.selectionView.alpha = 1
+            constraint.constant = self.textView.frame.width * self.item.percent
+            self.layoutIfNeeded()
+        } completion: { _ in }
+    }
+    
     private func setupVotersView() {
-#if DEBUG
-        let inset: CGFloat = (avatarsView.bounds.height*3 - avatarsView.bounds.width)/4
-        
-        for i in 0...2 {
-            let avatar = Avatar(gender: .Male, borderColor: traitCollection.userInterfaceStyle == .dark ? .black : .white)
-            avatar.layer.zPosition = 10 - CGFloat(i)
-            avatars.append(avatar)
-            avatarsView.addSubview(avatar)
-            avatar.layer.masksToBounds = false
-            avatar.translatesAutoresizingMaskIntoConstraints = false
-            let centerY = avatar.centerYAnchor.constraint(equalTo: avatarsView.centerYAnchor)
-            centerY.identifier = "centerY"
-            centerY.isActive = true
-            avatar.heightAnchor.constraint(equalTo: avatarsView.heightAnchor).isActive = true
-            avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor).isActive = true
-            
-            if i == 0 {
-                avatar.image = UIImage(systemName: "checkmark.seal.fill")
-                avatar.leadingAnchor.constraint(equalTo: avatarsView.leadingAnchor, constant: 0).isActive = true
-                avatar.imageView.tintColor = color
-                avatar.imageView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
-            } else {
-                avatar.leadingAnchor.constraint(equalTo: avatars[i-1].leadingAnchor, constant: inset).isActive = true
-            }
-        }
-#else
         guard item.totalVotes != 0 else {
             let instance = UILabel()
             instance.textAlignment = .center
@@ -309,18 +340,171 @@ class ChoiceCell: UICollectionViewCell {
             chevron.removeFromSuperview()
             return
         }
-#endif
+        
+        let count = min(item.voters.count, 3)
+        let inset: CGFloat = (avatarsView.bounds.width - avatarsView.bounds.height)/CGFloat(max(min(count-1, 1), count-1))
+        
+        for i in 0..<Int(count) {
+            let avatar = Avatar(gender: .Male, borderColor: traitCollection.userInterfaceStyle == .dark ? .black : .white)
+            avatar.layer.zPosition = 10 - CGFloat(i)
+            avatars.append(avatar)
+            avatar.alpha = 0
+            avatar.isBordered = true
+            avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            avatarsView.addSubview(avatar)
+            avatar.layer.masksToBounds = false
+            avatar.translatesAutoresizingMaskIntoConstraints = false
+            let centerY = avatar.centerYAnchor.constraint(equalTo: avatarsView.centerYAnchor)
+            centerY.identifier = "centerY"
+            centerY.isActive = true
+            avatar.heightAnchor.constraint(equalTo: avatarsView.heightAnchor).isActive = true
+            avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor).isActive = true
+            
+            var voters = item.voters
+            voters.remove(object: Userprofiles.shared.current!)
+            
+            if isChosen {
+                if i == 0 {
+                    if count == 1 {
+                        avatar.centerXAnchor.constraint(equalTo: avatarsView.centerXAnchor).isActive = true
+                    } else {
+                        avatar.leadingAnchor.constraint(equalTo: avatarsView.leadingAnchor).isActive = true
+                    }
+                    
+                    avatar.image = UIImage(systemName: "checkmark.seal.fill")
+                    avatar.imageView.tintColor = color
+                    avatar.imageView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+                    avatar.borderBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+                } else {
+                    avatar.leadingAnchor.constraint(equalTo: avatars[i-1].leadingAnchor, constant: inset).isActive = true
+                    guard let user = voters[i-1] as? Userprofile else { return }
+                    if let image = user.image {
+                        avatar.image = image
+                    } else {
+                        Task {
+                            let image = try await user.downloadImageAsync()
+                            await MainActor.run{
+                                avatar.image = image
+                            }
+                        }
+                    }
+                }
+            } else {
+                if i == 0 {
+                    if count == 1 {
+                        avatar.centerXAnchor.constraint(equalTo: avatarsView.centerXAnchor).isActive = true
+                    } else {
+                        avatar.leadingAnchor.constraint(equalTo: avatarsView.leadingAnchor).isActive = true
+                    }
+                } else {
+                    avatar.leadingAnchor.constraint(equalTo: avatars[i].leadingAnchor, constant: inset).isActive = true
+                }
+                guard let user = voters[i] as? Userprofile else { return }
+                if let image = user.image {
+                    avatar.imageView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+                    avatar.borderBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+                    avatar.image = image
+                } else {
+                    Task {
+                        let image = try await user.downloadImageAsync()
+                        await MainActor.run {
+                            avatar.imageView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+                            avatar.borderBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+                            avatar.image = image
+                        }
+                    }
+                }
+            }
+            
+            
+            
+            
+            
+//            if i == 0 {
+//                if isChosen {
+//                    avatar.image = UIImage(systemName: "checkmark.seal.fill")
+//                    avatar.imageView.tintColor = color
+//                    avatar.imageView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+//                } else {
+//
+//                }
+//                if count == 1 {
+//                    avatar.centerXAnchor.constraint(equalTo: avatarsView.centerXAnchor).isActive = true
+//                } else {
+//                    avatar.leadingAnchor.constraint(equalTo: avatarsView.leadingAnchor).isActive = true
+//                }
+//            } else {
+//                avatar.leadingAnchor.constraint(equalTo: avatars[i-1].leadingAnchor, constant: inset).isActive = true
+//                guard let user = item.voters[i-1] as? Userprofile else { return }
+//                if let image = user.image {
+//                    avatar.image = image
+//                } else {
+//                    Task {
+//                        let image = try await user.downloadImageAsync()
+//                        await MainActor.run{
+//                            Animations.onImageLoaded(imageView: avatar.imageView, image: image)
+//                        }
+//                    }
+//                }
+//            }
+            avatar.lightColor = .white
+            avatar.darkColor = .black
+            UIView.animate(
+                withDuration: 0.3,
+                delay: 0.075 * Double(i),
+                usingSpringWithDamping: 0.5,
+                initialSpringVelocity: 0.1,
+                options: [.curveEaseInOut],
+                animations: {
+                    avatar.alpha = 1
+                    avatar.transform = .identity
+                }) { _ in }
+        }
+        opaqueView.addEquallyTo(to: avatarsView)
+    }
+    
+    // MARK: - Public methods
+    public func setMode(mode _mode: PollController.Mode, animated: Bool) {
+        guard mode != _mode, mode == .ReadOnly,
+              !leadingConstraint.isNil,
+              !trailingConstraint.isNil,
+              let constraint = votersView.getAllConstraints().filter({ $0.identifier == "width" }).first else { return
+        }
+        mode = _mode
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: animated ? 0.2 : 0, delay: 0, options: .curveEaseOut) {
+            self.setNeedsLayout()
+            constraint.constant = self.contentView.bounds.width/4
+            self.shadowView.layer.shadowOpacity = 0
+            self.leadingConstraint.constant = 0
+            self.trailingConstraint.constant = 0
+            self.layoutIfNeeded()
+        } completion: { _ in
+            self.setupVotersView()
+            guard animated else {
+                self.shadowView.layer.shadowOpacity = 1
+                return
+            }
+            delayAsync(delay: 0.2) {
+                self.shadowView.layer.shadowOpacity = 1
+            }
+        }
     }
     
     // MARK: - UI methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
+        avatars.forEach {
+            $0.imageView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+            $0.borderBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+        }
+        
         horizontalStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
             $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
         }
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-        selectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.5)
+//        selectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.5)
         textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
         
         //Set dynamic font size
@@ -334,7 +518,12 @@ class ChoiceCell: UICollectionViewCell {
     }
     
     private func updateAppearance() {
-        guard mode == .Write else { return }
+        guard mode == .Write else {
+            if isSelected, !item.voters.isEmpty {
+                callbackDelegate?.callbackReceived(self)
+            }
+            return
+        }
         guard let constraint = selectionView.getAllConstraints().filter({ $0.identifier == "width"}).first else { return }
         
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {

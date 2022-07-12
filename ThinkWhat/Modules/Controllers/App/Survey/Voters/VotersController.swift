@@ -10,9 +10,15 @@ import UIKit
 
 class VotersController: UIViewController {
 
-    init(answer _answer: Answer, indexPath: IndexPath, color: UIColor) {
+//    init(answer _answer: Answer, indexPath: IndexPath, color: UIColor) {
+//        self._answer = _answer
+//        self._indexPath = indexPath
+//        self._color = color
+//        super.init(nibName: nil, bundle: nil)
+//    }
+    
+    init(answer _answer: Answer, color: UIColor) {
         self._answer = _answer
-        self._indexPath = indexPath
         self._color = color
         super.init(nibName: nil, bundle: nil)
     }
@@ -88,7 +94,7 @@ class VotersController: UIViewController {
     var controllerOutput: VotersControllerOutput?
     var controllerInput: VotersControllerInput?
     private let _answer: Answer
-    private let _indexPath: IndexPath
+//    private let _indexPath: IndexPath
     private let _color: UIColor
     private let filterButton = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
     private var isFilterEnabled = false
@@ -107,9 +113,9 @@ extension VotersController: VotersViewInput {
         }
     }
     
-    var indexPath: IndexPath {
-        return _indexPath
-    }
+//    var indexPath: IndexPath {
+//        return _indexPath
+//    }
     
     var answer: Answer {
         return _answer

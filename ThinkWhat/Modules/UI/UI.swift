@@ -136,7 +136,9 @@ struct Colors {
     }
     static func tags() -> [UIColor] {
         return [
+            Tags.GreenPantone,
             Tags.EnglishVermillion,
+            Tags.HoneyYellow,
             Tags.RoyalPurple,
             Tags.Saffron,
             Tags.CoyoteBrown,
@@ -151,8 +153,8 @@ struct Colors {
             Tags.SandyBrown,
             Tags.CafeNoir,
             Tags.Cardinal,
-            Tags.GreenPantone,
-            Tags.HoneyYellow,
+
+            
             Tags.VioletBlueCrayola,
             Tags.Avocado
         ]

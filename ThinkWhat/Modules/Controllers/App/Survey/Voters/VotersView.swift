@@ -83,9 +83,9 @@ extension VotersView: VotersControllerOutput {
         }
     }
     
-    var indexPath: IndexPath {
-        return viewInput!.indexPath
-    }
+//    var indexPath: IndexPath {
+//        return viewInput!.indexPath
+//    }
     
     var answer: Answer {
         return viewInput!.answer

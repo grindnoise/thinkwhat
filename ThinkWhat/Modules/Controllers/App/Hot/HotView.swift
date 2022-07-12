@@ -53,7 +53,8 @@ class HotView: UIView {
     @objc
     private func onRemove(_ notification: Notification) {
         guard let instance = notification.object as? SurveyReference,
-              let survey = instance.survey else { return }
+              let survey = instance.survey,
+              !currentCard.isNil else { return }
         if currentCard.survey == survey {
             skipCard()
         }

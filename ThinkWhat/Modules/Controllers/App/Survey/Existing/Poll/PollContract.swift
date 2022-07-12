@@ -11,7 +11,7 @@ import UIKit
 /// *View* sends user actions to the *Controller*.
 ///
 /// **Controller** conforms to this protocol
-protocol PollViewInput: class {
+protocol PollViewInput: AnyObject {
     
     var controllerOutput: PollControllerOutput? { get set }
     var controllerInput: PollControllerInput? { get set }
@@ -27,13 +27,14 @@ protocol PollViewInput: class {
     func onImageTapped(mediafile: Mediafile)
     func onURLTapped(_: URL)
     func onExitWithSkip()
-    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor)
+//    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor)
+    func onVotersTapped(answer: Answer, color: UIColor)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
 ///
 /// **Model** conforms to this protocol
-protocol PollControllerInput: class {
+protocol PollControllerInput: AnyObject {
     
     var modelOutput: PollModelOutput? { get set }
     var survey: Survey? { get }
@@ -48,7 +49,7 @@ protocol PollControllerInput: class {
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
-protocol PollModelOutput: class {
+protocol PollModelOutput: AnyObject {
     var survey: Survey? { get }
     
     func onLoadCallback(_: Result<Bool, Error>)

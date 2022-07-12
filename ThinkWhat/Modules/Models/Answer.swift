@@ -28,6 +28,13 @@ class Answer: Decodable {
     var image: UIImage?
     var fileURL: URL?
     var file: Data?
+    var percent: Double {
+        guard let survey = survey else { return 0 }
+        print(totalVotes)
+        print(survey.votesTotal)
+        print(Double(totalVotes)/Double(survey.votesTotal))
+        return Double(totalVotes)/Double(survey.votesTotal)
+    }
     private let tempId = 999999
     
     required init(from decoder: Decoder) throws {

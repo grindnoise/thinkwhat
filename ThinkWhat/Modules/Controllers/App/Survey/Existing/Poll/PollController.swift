@@ -22,6 +22,7 @@ class PollController: UIViewController {
     var mode: Mode {
         return _mode
     }
+    private var userHasVoted = false
     private var _survey: Survey!
     private var _surveyReference: SurveyReference!
     private var _showNext: Bool = false
@@ -79,7 +80,7 @@ class PollController: UIViewController {
         self._surveyReference = surveyReference
         self._survey = surveyReference.survey
         self._showNext = __showNext
-        self._mode = surveyReference.isComplete ? .ReadOnly : .Write
+        self._mode = (surveyReference.isComplete || surveyReference.isOwn) ? .ReadOnly : .Write
     }
     
     required init?(coder: NSCoder) {
@@ -101,7 +102,7 @@ class PollController: UIViewController {
         setupUI()
         setObservers()
         performChecks()
-//        navigationController?.delegate = self
+        navigationController?.delegate = self
         setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
     }
     
@@ -350,6 +351,11 @@ class PollController: UIViewController {
 
 // MARK: - View Input
 extension PollController: PollViewInput {
+    func onVotersTapped(answer: Answer, color: UIColor) {
+        navigationController?.pushViewController(VotersController(answer: answer, color: color), animated: true)
+//        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
+    }
+    
     func onImageTapped(mediafile: Mediafile) {
         let backItem = UIBarButtonItem()
         backItem.title = ""
@@ -361,9 +367,9 @@ extension PollController: PollViewInput {
         return _showNext
     }
     
-    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor) {
-        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
-    }
+//    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor) {
+//        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
+//    }
     
     func onURLTapped(_ url: URL) {
         var vc: SFSafariViewController!
@@ -378,11 +384,11 @@ extension PollController: PollViewInput {
     }
     
     func onVote(_ choice: Answer) {
-//        controllerInput?.vote(choice)
-        delayAsync(delay: 2) {
-            self._mode = .ReadOnly
-            self.controllerOutput?.onVoteCallback(.success(true))
-        }
+        controllerInput?.vote(choice)
+//        delayAsync(delay: 0.5) {
+//            self._mode = .ReadOnly
+//            self.controllerOutput?.onVoteCallback(.success(true))
+//        }
     }
     
     func onClaim(_ claim: Claim) {
@@ -428,6 +434,7 @@ extension PollController: PollModelOutput {
         switch result {
         case .success:
             _mode = .ReadOnly
+            userHasVoted = true
         default:
 #if DEBUG
             print("")
@@ -485,9 +492,9 @@ extension PollController: BannerObservable {
 // MARK: - UINavigationControllerDelegate
 extension PollController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-//        if let vc = viewController as? HotController, controllerOutput?.hasVoted == true {
-//            vc.shouldSkipCurrentCard = true
-//        }
+        if let vc = viewController as? HotController, userHasVoted {
+            vc.shouldSkipCurrentCard = true
+        }
     }
 }
 

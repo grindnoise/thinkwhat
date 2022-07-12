@@ -86,6 +86,11 @@ class SurveysCollection: UIView, SurveyDataSource {
 //                           Notifications.Surveys.Completed,
                            Notifications.Surveys.Rejected]
         let zeroEmitted = [Notifications.Surveys.Empty]
+//        let zeroEmitted = [Notifications.Surveys.ZeroOwn,
+//                           Notifications.Surveys.ZeroNew,
+//                           Notifications.Surveys.ZeroTop,
+//                           Notifications.Surveys.ZeroFavorites,
+//                           Notifications.Surveys.ZeroSubscriptions]
         
         pagination.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onPagination), name: $0, object: nil) }
         zeroEmitted.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.endRefreshing), name: $0, object: nil) }
@@ -195,7 +200,7 @@ extension SurveysCollection: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.cellForItem(at: indexPath) as? SurveyCollectionCell else { return }
-        callbackDelegate?.callbackReceived(cell.item)
+        callbackDelegate?.callbackReceived(cell.item as Any)
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -216,6 +221,18 @@ extension SurveysCollection: UICollectionViewDelegate {
     
     @objc
     private func endRefreshing() {
+//        switch category {
+//        case .New:
+//
+//        case .Top:
+//
+//        case .Own:
+//
+//        case.Favorite:
+//
+//        default:
+//            print("")
+//        }
         refreshControl.endRefreshing()
     }
     
@@ -250,7 +267,7 @@ extension SurveysCollection: UICollectionViewDelegate {
         snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
         snapshot.appendSections([.main])
         snapshot.appendItems(dataItems, toSection: .main)
-
+        
         // Display data in the collection view by applying the snapshot to data source
         dataSource.apply(snapshot, animatingDifferences: true)
     }
