@@ -40,11 +40,16 @@ class PollDescriptionCell: UICollectionViewCell {
         instance.layer.masksToBounds = false
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
         instance.addEquallyTo(to: shadowView)
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let value = change.newValue else { return }
+            view.cornerRadius = value.width * 0.05
+        })
 //        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
 //        constraint.identifier = "height"
 //        constraint.isActive = true
         return instance
     }()
+
     private lazy var shadowView: UIView = {
         let instance = UIView()
         instance.layer.masksToBounds = false
@@ -52,24 +57,43 @@ class PollDescriptionCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "shadow"
         instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-        instance.layer.shadowRadius = 5
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.2).cgColor
+        instance.layer.shadowRadius = 4
         instance.layer.shadowOffset = .zero
         let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
         constraint.identifier = "height"
         constraint.isActive = true
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let newValue = change.newValue else { return }
+            view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
+        })
         return instance
     }()
     private lazy var textView: UITextView = {
         let instance = UITextView()
-        instance.layer.masksToBounds = false
+        instance.isUserInteractionEnabled = false
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)//.secondarySystemBackground
+        instance.backgroundColor = .clear
         instance.isEditable = false
         instance.isSelectable = false
-        instance.addEquallyTo(to: background)
+        background.addSubview(instance)
+        instance.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            instance.topAnchor.constraint(equalTo: background.topAnchor, constant: padding),
+            instance.bottomAnchor.constraint(equalTo: background.bottomAnchor, constant: -padding),
+            instance.leadingAnchor.constraint(equalTo: background.leadingAnchor, constant: padding),
+            instance.trailingAnchor.constraint(equalTo: background.trailingAnchor, constant: -padding),
+        ])
+        observers.append(instance.observe(\UITextView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
+            guard let self = self,
+                  let constraint = self.shadowView.getAllConstraints().filter({ $0.identifier == "height" }).first,
+                  let value = change.newValue else { return }
+            self.setNeedsLayout()
+            constraint.constant = value.height + self.padding*2
+            self.layoutIfNeeded()
+        })
         return instance
-        }()
+    }()
     private var observers: [NSKeyValueObservation] = []
     private let icon: UIView = {
         let instance = UIView()
@@ -110,7 +134,7 @@ class PollDescriptionCell: UICollectionViewCell {
     }()
     private var color: UIColor = .systemBlue {
         didSet {
-            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
+            background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.2)
             disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             guard let imageView = icon.get(all: UIImageView.self).first else { return }
@@ -123,7 +147,7 @@ class PollDescriptionCell: UICollectionViewCell {
     private var openConstraint: NSLayoutConstraint?
     
     // Layout
-    private let padding: CGFloat = 10
+    private let padding: CGFloat = 8
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -147,10 +171,8 @@ class PollDescriptionCell: UICollectionViewCell {
         
         disclosureLabel.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor).isActive = true
         contentView.addSubview(verticalStack)
-//        contentView.addSubview(opaqueView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         verticalStack.translatesAutoresizingMaskIntoConstraints = false
-//        opaqueView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
@@ -169,17 +191,6 @@ class PollDescriptionCell: UICollectionViewCell {
         openConstraint =
             shadowView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         openConstraint?.priority = .defaultLow
-        
-//        shadowView.addEquallyTo(to: textView)
-//        textView.insertSubview(shadowView, at: 0)
-//        shadowView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            shadowView.widthAnchor.constraint(equalTo: textView.widthAnchor),
-//            shadowView.heightAnchor.constraint(equalTo: textView.heightAnchor),
-//            shadowView.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
-//            shadowView.centerXAnchor.constraint(equalTo: textView.centerXAnchor),
-//        ])
-        
         updateAppearance()
     }
     
@@ -187,46 +198,22 @@ class PollDescriptionCell: UICollectionViewCell {
     private func updateAppearance() {
         closedConstraint?.isActive = isSelected
         openConstraint?.isActive = !isSelected
-        
-//        UIView.transition(with: disclosureLabel, duration: 0.1, options: .transitionCrossDissolve) { [unowned self] in
-            //Наоборот, тк изначально ячейка не выбрана, а надо развернуто показать
-//            disclosureLabel.text = !isSelected ? "hide_details".localized.uppercased() : "show_details".localized.uppercased()
-//        } completion: { _ in }
 
         UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
             let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
             self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
-            self.shadowView.alpha = self.isSelected ? 0 : 1
+            self.shadowView.alpha = self.isSelected ? 0.5 : 1
         }
     }
     
     private func setObservers() {
-        observers.append(textView.observe(\UITextView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
-            guard let self = self,
-//                  let constraint = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
-                  let constraint = self.shadowView.getAllConstraints().filter({ $0.identifier == "height" }).first,
-                  let value = change.newValue else { return }
-            self.setNeedsLayout()
-            constraint.constant = value.height
-//            constraint2.constant = value.height
-            self.layoutIfNeeded()
-            self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: view.bounds, cornerRadius: view.cornerRadius).cgPath
-        })
-        observers.append(textView.observe(\UITextView.bounds, options: .new, changeHandler: { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGRect>) in
-            guard let self = self, let value = change.newValue else { return }
-            view.cornerRadius = value.width * 0.05
-            self.background.cornerRadius = view.cornerRadius
-        }))
-//        observers.append(shadowView.observe(\UIView.bounds, options: .new) { [weak self] view, change in
-//            guard let self = self, let newValue = change.newValue else { return }
-//            view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: 10).cgPath
-//        })
+        
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.2)
         verticalStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
             $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
         }
@@ -243,10 +230,10 @@ class PollDescriptionCell: UICollectionViewCell {
                                           forTextStyle: .body)
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                                  forTextStyle: .footnote)
-        guard let constraint_1 = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
+        guard let constraint_1 = self.shadowView.getAllConstraints().filter({ $0.identifier == "height" }).first,
               let constraint_2 = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
-        constraint_1.constant = textView.contentSize.height
+        constraint_1.constant = textView.contentSize.height + padding*2
         constraint_2.constant = max(String(describing: item.rating).height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
         layoutIfNeeded()
     }

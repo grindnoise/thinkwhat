@@ -30,9 +30,9 @@ class Answer: Decodable {
     var file: Data?
     var percent: Double {
         guard let survey = survey else { return 0 }
-        print(totalVotes)
-        print(survey.votesTotal)
-        print(Double(totalVotes)/Double(survey.votesTotal))
+        if survey.votesTotal == 0 || totalVotes == 0 {
+            return 0
+        }
         return Double(totalVotes)/Double(survey.votesTotal)
     }
     private let tempId = 999999

@@ -219,11 +219,17 @@ class PollTitleCell: UICollectionViewCell {
             constraint.constant = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
             self.layoutIfNeeded()
         })
+        NotificationCenter.default.addObserver(self, selector: #selector(self.updateViewsCount), name: Notifications.Surveys.Views, object: nil)
     }
     
     @objc
-    private func handleTap(_ button: UIButton) {
-        print(button)
+    private func updateViewsCount(_ button: UIButton) {
+        viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
+    }
+    
+    @objc
+    private func updateRating(_ button: UIButton) {
+        ratingLabel.text = String(describing: item.rating)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

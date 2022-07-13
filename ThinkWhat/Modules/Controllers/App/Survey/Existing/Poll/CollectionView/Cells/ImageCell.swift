@@ -42,6 +42,7 @@ class ImageCell: UICollectionViewCell {
                 slide.imageView.image = image
                 slide.imageView.progressIndicatorView.alpha = 0
                 slide.showTitle()
+                self.showPageControl()
             }
         }
     }
@@ -247,7 +248,7 @@ class ImageCell: UICollectionViewCell {
         UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
             let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
             self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
-            self.imageContainer.alpha = self.isSelected ? 0 : 1
+            self.imageContainer.alpha = self.isSelected ? 0.5 : 1
         }
     }
     
@@ -281,8 +282,8 @@ class ImageCell: UICollectionViewCell {
             shadowView.backgroundColor = .clear
             shadowView.accessibilityIdentifier = "shadow"
             shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-            shadowView.layer.shadowRadius = 6
+            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.2).cgColor
+            shadowView.layer.shadowRadius = 4
             shadowView.layer.shadowOffset = .zero
             shadowView.widthAnchor.constraint(equalTo: shadowView.heightAnchor, multiplier: 1.0/1.0).isActive = true
             

@@ -2242,32 +2242,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "982A7742-7149-44BB-A72F-D46C0C13641B"
+            uuid = "E775B113-19D9-4B1B-A80C-42F41A205634"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/Cells/ChoiceCollectionView/ChoiceCell.swift"
+            filePath = "ThinkWhat/Modules/Models/Answer.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "367"
-            endingLineNumber = "367"
-            landmarkName = "setupVotersView()"
-            landmarkType = "7">
+            startingLineNumber = "36"
+            endingLineNumber = "36"
+            landmarkName = "percent"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "FF99B099-2B88-4D10-A093-D45C313D679E"
-            shouldBeEnabled = "No"
+            uuid = "EAE9CA93-4178-4725-ABF6-19AFAC262D69"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/Cells/ChoiceCollectionView/ChoiceCollectionView.swift"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/Cells/PollTitleCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "91"
-            endingLineNumber = "91"
-            landmarkName = "setupUI()"
+            startingLineNumber = "227"
+            endingLineNumber = "227"
+            landmarkName = "updateViewsCount(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

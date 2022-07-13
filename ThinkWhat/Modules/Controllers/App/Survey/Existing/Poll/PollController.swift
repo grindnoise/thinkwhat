@@ -224,27 +224,10 @@ class PollController: UIViewController {
             var largeAlpha: CGFloat = CGFloat(1) - max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             let smallAlpha: CGFloat = max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             
-            largeAlpha = largeAlpha < 0.24 ? 0 : largeAlpha
+            largeAlpha = largeAlpha < 0.28 ? 0 : largeAlpha
             self.navigationItem.titleView?.alpha = smallAlpha
             self.avatar.alpha = largeAlpha
             self.stackView.alpha = largeAlpha
-//            if oldValue.height > newValue.height {
-//                if largeAlpha != 0 {
-//                    self.avatar.alpha = 0
-//                    self.stackView.alpha = 0
-//                }
-//                if smallAlpha != 1 {
-//                    titleView.alpha = 1
-//                }
-//            } else if oldValue.height < newValue.height {
-//                if largeAlpha != 1 {
-//                    self.avatar.alpha = 1
-//                    self.stackView.alpha = 1
-//                }
-//                if smallAlpha != 0 {
-//                    titleView.alpha = 0
-//                }
-//            }
         })
 
     }
@@ -458,17 +441,6 @@ extension PollController: PollModelOutput {
     
     func onLoadCallback(_ result: Result<Bool, Error>) {
         controllerOutput?.onLoadCallback(result)
-    }
-    
-    func onCountUpdateCallback(_ result: Result<Bool, Error>) {
-        switch result {
-        case .success:
-            controllerOutput?.onCountUpdatedCallback()
-        case .failure(let error):
-#if DEBUG
-            print(error.localizedDescription)
-#endif
-        }
     }
 }
 

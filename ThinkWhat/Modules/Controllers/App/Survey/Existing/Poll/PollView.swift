@@ -113,7 +113,7 @@ extension PollView: PollControllerOutput {
     }
     
     func onCountUpdatedCallback() {
-        
+//        collectionView.updateViewsCount()
     }
     
     var survey: Survey? {

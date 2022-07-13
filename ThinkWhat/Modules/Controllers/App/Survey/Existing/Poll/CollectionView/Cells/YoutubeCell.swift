@@ -98,8 +98,8 @@ class YoutubeCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "shadow"
         instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-        instance.layer.shadowRadius = 5
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.2).cgColor
+        instance.layer.shadowRadius = 4
         instance.layer.shadowOffset = .zero
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
         return instance
@@ -190,7 +190,7 @@ class YoutubeCell: UICollectionViewCell {
         UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
             let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
             self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
-            self.shadowView.alpha = self.isSelected ? 0 : 1
+            self.shadowView.alpha = self.isSelected ? 0.5 : 1
         }
     }
     

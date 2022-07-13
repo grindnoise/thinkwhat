@@ -22,13 +22,10 @@ extension PollModel: PollControllerInput {
         Task {
             do {
                 try await API.shared.incrementViewCounterAsync(surveyReference: survey!.reference)
-                await MainActor.run {
-                    modelOutput?.onCountUpdateCallback(.success(true))
-                }
             } catch {
-                await MainActor.run {
-                    modelOutput?.onCountUpdateCallback(.failure(error))
-                }
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
             }
         }
     }
