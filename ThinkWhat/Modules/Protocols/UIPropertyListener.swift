@@ -8,6 +8,6 @@
 
 import UIKit
 
-protocol BoundsListener {
+protocol BoundsListener: AnyObject {
     func onBoundsChanged(_: CGRect)
 }

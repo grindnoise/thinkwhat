@@ -2258,15 +2258,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "EAE9CA93-4178-4725-ABF6-19AFAC262D69"
-            shouldBeEnabled = "Yes"
+            uuid = "D30C8D9B-8E29-4774-ABCB-D52DA6380849"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/Cells/PollTitleCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "227"
-            endingLineNumber = "227"
+            startingLineNumber = "241"
+            endingLineNumber = "241"
             landmarkName = "updateViewsCount(_:)"
             landmarkType = "7">
          </BreakpointContent>

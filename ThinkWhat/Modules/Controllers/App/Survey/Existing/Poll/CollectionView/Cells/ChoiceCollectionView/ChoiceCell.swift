@@ -11,7 +11,7 @@ import UIKit
 
 class ChoiceCell: UICollectionViewCell {
     
-    // MARK: - Override
+    // MARK: - Overriden properties
     override var isSelected: Bool { didSet { updateAppearance() }}
     
     // MARK: - Public properties
@@ -19,21 +19,13 @@ class ChoiceCell: UICollectionViewCell {
         didSet {
             guard !item.isNil else { return }
             textView.text = item.description
-//            let constraint = textView.heightAnchor.constraint(equalToConstant: textView.contentSize.height)
-//            constraint.identifier = "height"
-//            constraint.isActive = true
-//            setNeedsLayout()
-//            layoutIfNeeded()
             guard let _color = item.survey?.topic.tagColor else { return }
             color = _color
         }
     }
     public var mode: PollController.Mode = .ReadOnly {
         didSet {
-            if mode == .Write {
-//                leadingConstraint.constant =  padding*2
-//                trailingConstraint.constant = -padding
-            } else if mode == .ReadOnly,
+            if mode == .ReadOnly,
 //                      oldValue == .Write,
                       !leadingConstraint.isNil,
                       !trailingConstraint.isNil,
@@ -70,7 +62,6 @@ class ChoiceCell: UICollectionViewCell {
                     self.setNeedsLayout()
                     constraint_1.constant = self.contentView.bounds.width/4
                     constraint_2.constant = 0
-//                    self.leadingConstraint.constant = 4
                     self.trailingConstraint.constant = 0
                     self.layoutIfNeeded()
                     self.setupVotersView()
@@ -196,8 +187,6 @@ class ChoiceCell: UICollectionViewCell {
                   let constraint_2 = self.horizontalStack.getAllConstraints().filter({ $0.identifier == "height" }).first,
                   let value = change.newValue,
                   value.height >= self.textView.frame.height else { return }
-            print(value.height)
-            
             UIView.animate(withDuration: 0.15, delay: 0, animations: {
                 self.contentView.setNeedsLayout()
 //                constraint.constant = value.height + self.padding*2
@@ -311,6 +300,13 @@ class ChoiceCell: UICollectionViewCell {
         return instance
     }()
     
+    // MARK: - Destructor
+    deinit {
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -394,8 +390,25 @@ class ChoiceCell: UICollectionViewCell {
 //            view.cornerRadius = value.width * 0.05
 //        })
     }
-    
-   
+
+    private func updateAppearance() {
+        guard mode == .Write else {
+            if isSelected, !item.voters.isEmpty {
+                callbackDelegate?.callbackReceived(self)
+            }
+            return
+        }
+        guard let constraint_1 = selectionView.getAllConstraints().filter({ $0.identifier == "width"}).first,
+              let constraint_2 = checkmark.getAllConstraints().filter({ $0.identifier == "width"}).first else { return }
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+            self.selectionView.alpha =  self.isSelected ? 1 : 0
+            self.horizontalStack.setNeedsLayout()
+            constraint_2.constant =  self.isSelected ? "test".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)!)*1.5 + 10 : 0
+            constraint_1.constant = self.isSelected ? self.background.frame.width : 0
+            self.horizontalStack.layoutIfNeeded()
+        } completion: { _ in}
+    }
     
     private func setPercentage() {
         guard let constraint = selectionView.getAllConstraints().filter({ $0.identifier == "width" }).first else { return }
@@ -511,10 +524,7 @@ class ChoiceCell: UICollectionViewCell {
         
     }
     
-    // MARK: - Public methods
-
-    
-    // MARK: - UI methods
+    // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
@@ -543,24 +553,4 @@ class ChoiceCell: UICollectionViewCell {
         constraint.constant = textView.contentSize.height + padding*2
         layoutIfNeeded()
     }
-    
-    private func updateAppearance() {
-        guard mode == .Write else {
-            if isSelected, !item.voters.isEmpty {
-                callbackDelegate?.callbackReceived(self)
-            }
-            return
-        }
-        guard let constraint_1 = selectionView.getAllConstraints().filter({ $0.identifier == "width"}).first,
-              let constraint_2 = checkmark.getAllConstraints().filter({ $0.identifier == "width"}).first else { return }
-        
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
-            self.selectionView.alpha =  self.isSelected ? 1 : 0
-            self.horizontalStack.setNeedsLayout()
-            constraint_2.constant =  self.isSelected ? "test".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)!)*1.5 + 10 : 0
-            constraint_1.constant = self.isSelected ? self.background.frame.width : 0
-            self.horizontalStack.layoutIfNeeded()
-        } completion: { _ in}
-    }
-    
 }

@@ -11,8 +11,11 @@ import YoutubePlayer_in_WKWebView
 
 class YoutubeCell: UICollectionViewCell {
     
+    // MARK: - Overriden properties
+    override var isSelected: Bool { didSet { updateAppearance() } }
+    
     // MARK: - Public Properties
-    var item: Survey! {
+    public var item: Survey! {
         didSet {
             guard !item.isNil, let url = item.url, let id = url.absoluteString.youtubeID else { return }
             color = item.topic.tagColor
@@ -20,7 +23,6 @@ class YoutubeCell: UICollectionViewCell {
         }
     }
     public weak var callbackDelegate: CallbackObservable?
-    override var isSelected: Bool { didSet { updateAppearance() } }
     
     // MARK: - Private Properties
     private let disclosureLabel: UILabel = {
@@ -140,6 +142,13 @@ class YoutubeCell: UICollectionViewCell {
         }
     }
     
+    // MARK: - Destructor
+    deinit {
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -211,6 +220,15 @@ class YoutubeCell: UICollectionViewCell {
 //        })
     }
     
+    private func openYotubeApp() {
+        guard let url = item.url, let id = url.absoluteString.youtubeID else { return }
+        let appScheme = "youtube://watch?v=\(id)"
+        if let appUrl = URL(string: appScheme) {
+            UIApplication.shared.open(appUrl)
+        }
+    }
+    
+    // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
@@ -234,14 +252,6 @@ class YoutubeCell: UICollectionViewCell {
         setNeedsLayout()
         constraint.constant = max(disclosureLabel.text!.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
         layoutIfNeeded()
-    }
-    
-    private func openYotubeApp() {
-        guard let url = item.url, let id = url.absoluteString.youtubeID else { return }
-        let appScheme = "youtube://watch?v=\(id)"
-        if let appUrl = URL(string: appScheme) {
-            UIApplication.shared.open(appUrl)
-        }
     }
 }
 

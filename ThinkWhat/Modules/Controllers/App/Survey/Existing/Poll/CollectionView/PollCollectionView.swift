@@ -134,11 +134,11 @@ class PollCollectionView: UICollectionView {
             cell.item = self.poll
         }
         
-        let choicesCellRegistration = UICollectionView.CellRegistration<ChoiceSectionCell, AnyHashable> { [weak self] cell, indexPath, item in
-            cell.boundsListener = self
-            guard let self = self, cell.item.isNil else { return }
-            cell.item = self.poll
-        }
+//        let choicesCellRegistration = UICollectionView.CellRegistration<ChoiceSectionCell, AnyHashable> { [weak self] cell, indexPath, item in
+//            cell.boundsListener = self
+//            guard let self = self, cell.item.isNil else { return }
+//            cell.item = self.poll
+//        }
 
         let voteCellRegistration = UICollectionView.CellRegistration<VoteCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.color.isNil else { return }
@@ -208,10 +208,10 @@ class PollCollectionView: UICollectionView {
                 return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
-            } else if section == .choices {
-                return collectionView.dequeueConfiguredReusableCell(using: choicesCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
+//            } else if section == .choices {
+//                return collectionView.dequeueConfiguredReusableCell(using: choicesCellRegistration,
+//                                                                    for: indexPath,
+//                                                                    item: identifier)
             } else if section == .vote {
                 return collectionView.dequeueConfiguredReusableCell(using: voteCellRegistration,
                                                                     for: indexPath,
@@ -249,8 +249,8 @@ class PollCollectionView: UICollectionView {
         }
         snapshot.appendSections([.question])
         snapshot.appendItems([5], toSection: .question)
-//        snapshot.appendSections([.choices])
-//        snapshot.appendItems([6], toSection: .choices)
+////        snapshot.appendSections([.choices])
+////        snapshot.appendItems([6], toSection: .choices)
         snapshot.appendSections([.comments])
         snapshot.appendItems([8], toSection: .comments)
 

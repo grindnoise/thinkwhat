@@ -15,13 +15,15 @@ class PollController: UIViewController {
         case ReadOnly, Write
     }
     
-    // MARK: - Properties
+    // MARK: - Public properties
     var controllerOutput: PollControllerOutput?
     var controllerInput: PollControllerInput?
-    private var _mode: Mode = .Write
     var mode: Mode {
         return _mode
     }
+    
+    // MARK: - Private properties
+    private var _mode: Mode = .Write
     private var userHasVoted = false
     private var _survey: Survey!
     private var _surveyReference: SurveyReference!
@@ -46,11 +48,9 @@ class PollController: UIViewController {
         v.spacing = 8
         return v
     }()
-    
     private lazy var avatar: Avatar = {
         return Avatar(gender: surveyReference.owner.gender, image: surveyReference.owner.image)
     }()
-    
     private lazy var progressIndicator: CircleButton = {
         let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: true)
         customTitle.color = .clear
@@ -69,12 +69,18 @@ class PollController: UIViewController {
         return customTitle
     }()
     private var observers: [NSKeyValueObservation] = []
+    private var notifications: [Task<Void, Never>?] = []
     
-    // MARK: - Initialization
+    // MARK: - Destructor
     deinit {
-        print("PollController deinit")
+        notifications.forEach { $0?.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
     }
     
+    // MARK: - Initialization
     init(surveyReference: SurveyReference, showNext __showNext: Bool = false) {
         super.init(nibName: nil, bundle: nil)
         self._surveyReference = surveyReference
@@ -86,32 +92,9 @@ class PollController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
 
-        let model = PollModel()
-               
-        self.controllerOutput = view as? PollView
-        self.controllerOutput?
-            .viewInput = self
-        self.controllerInput = model
-        self.controllerInput?
-            .modelOutput = self
-        
-        setupUI()
-        setObservers()
-        performChecks()
-        navigationController?.delegate = self
-        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
-    }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
-    }
-    
+    // MARK: - Private methods
     private func setupUI() {
         if !_survey.isNil { controllerOutput?.onLoadCallback(.success(true)) }
         let appearance = UINavigationBarAppearance()
@@ -126,8 +109,46 @@ class PollController: UIViewController {
             //                    self.addButtonActionPressed(action: .simple)
         })
         
-        let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { (action) in
-            //                    self.addButtonActionPressed(action: .advanced)
+        let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+            guard let self = self else { return }
+            // Setting description
+            let firstActivityItem = self._surveyReference.title
+
+                // Setting url
+                let secondActivityItem: URL = URL(string: "http://your-url.com/")!
+                
+                // If you want to use an image
+                let image : UIImage = UIImage(named: "anon")!
+                let activityViewController : UIActivityViewController = UIActivityViewController(
+                    activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
+                
+                // This lines is for the popover you need to show in iPad
+                activityViewController.popoverPresentationController?.sourceView = self.view
+                
+                // This line remove the arrow of the popover to show in iPad
+                activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
+                activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
+                
+                // Pre-configuring activity items
+                activityViewController.activityItemsConfiguration = [
+                UIActivity.ActivityType.message
+                ] as? UIActivityItemsConfigurationReading
+                
+                // Anything you want to exclude
+                activityViewController.excludedActivityTypes = [
+                    UIActivity.ActivityType.postToWeibo,
+                    UIActivity.ActivityType.print,
+                    UIActivity.ActivityType.assignToContact,
+                    UIActivity.ActivityType.saveToCameraRoll,
+                    UIActivity.ActivityType.addToReadingList,
+                    UIActivity.ActivityType.postToFlickr,
+                    UIActivity.ActivityType.postToVimeo,
+                    UIActivity.ActivityType.postToTencentWeibo,
+                    UIActivity.ActivityType.postToFacebook
+                ]
+                
+                activityViewController.isModalInPresentation = true
+                self.present(activityViewController, animated: true, completion: nil)
         })
         let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { (action) in
             //                    self.addButtonActionPressed(action: .advanced)
@@ -240,10 +261,6 @@ class PollController: UIViewController {
 //        controllerOutput?.startLoading()
         controllerInput?.loadPoll(surveyReference, incrementViewCounter: true)
     }
-//
-//    @objc private func updateViewsCount(notification: Notification) {
-//        controllerOutput?.onCountUpdated()
-//    }
 
     @objc private func addFavorite() {
         guard !isLoading, !survey.isNil else { return }
@@ -276,6 +293,15 @@ class PollController: UIViewController {
 //        NotificationCenter.default.post(name: Notifications.Surveys.UpdateFavorite, object: nil)
         controllerInput?.addFavorite(mark)
     }
+    
+    @objc
+    private func handleTap(_ recognizer: UITapGestureRecognizer) {
+        guard let sender = recognizer.view else { return }
+        if sender.isKind(of: CircleButton.self) {
+            let popup = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.5)
+            popup.present(content: UIView(), dismissAfter: 1)
+        }
+    }
 
 //    override func viewWillAppear(_ animated: Bool) {
 //        super.viewWillAppear(animated)
@@ -285,6 +311,31 @@ class PollController: UIViewController {
 //    }
     
  
+    // MARK: - Overriden methods
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let model = PollModel()
+               
+        self.controllerOutput = view as? PollView
+        self.controllerOutput?
+            .viewInput = self
+        self.controllerInput = model
+        self.controllerInput?
+            .modelOutput = self
+        
+        setupUI()
+        setObservers()
+        performChecks()
+        navigationController?.delegate = self
+        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
+    }
     
     override func willMove(toParent parent: UIViewController?) {
         super.willMove(toParent: parent)
@@ -319,15 +370,6 @@ class PollController: UIViewController {
             watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
         } else {
             watchButton.tintColor = .systemGray
-        }
-    }
-    
-    @objc
-    private func handleTap(_ recognizer: UITapGestureRecognizer) {
-        guard let sender = recognizer.view else { return }
-        if sender.isKind(of: CircleButton.self) {
-            let popup = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.5)
-            popup.present(content: UIView(), dismissAfter: 1)
         }
     }
 }

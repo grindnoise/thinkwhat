@@ -37,13 +37,13 @@ class QuestionCell: UICollectionViewCell {
             collectionView.mode = mode
         }
     }
-    var boundsListener: BoundsListener?
-    var answerListener: AnswerListener? {
+    public weak var boundsListener: BoundsListener?
+    public weak var answerListener: AnswerListener? {
         didSet {
             collectionView.answerListener = answerListener
         }
     }
-    weak var callbackDelegate: CallbackObservable?
+    public weak var callbackDelegate: CallbackObservable?
     
     
     // MARK: - Private properties
@@ -51,7 +51,6 @@ class QuestionCell: UICollectionViewCell {
         let instance = ChoiceCollectionView(answerListener: answerListener, callbackDelegate: self)
         return instance
         }()
-
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
@@ -89,6 +88,7 @@ class QuestionCell: UICollectionViewCell {
     }()
     private lazy var verticalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [horizontalStack, textView, collectionView])
+//        let instance = UIStackView(arrangedSubviews: [horizontalStack, textView])
         instance.axis = .vertical
         instance.clipsToBounds = false
         instance.spacing = padding
@@ -105,31 +105,38 @@ class QuestionCell: UICollectionViewCell {
         }
     }
     
+    // MARK: - Destructor
+    deinit {
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func commonInit() {
         setObservers()
         setupUI()
     }
 
-    // MARK: - UI methods
+    // MARK: - Private methods
     private func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true
-        
+
         disclosureLabel.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor).isActive = true
         contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         verticalStack.translatesAutoresizingMaskIntoConstraints = false
-        
+
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -139,13 +146,13 @@ class QuestionCell: UICollectionViewCell {
             verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
         ])
-        
+
         let constraint =
             collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint.priority = .defaultLow
         constraint.isActive = true
     }
-    
+
     private func setObservers() {
         observers.append(textView.observe(\UITextView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
             guard let self = self,
@@ -170,19 +177,20 @@ class QuestionCell: UICollectionViewCell {
             self.boundsListener?.onBoundsChanged(view.frame)
         })
     }
-    
+
+    // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
+
 //        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
         disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         if let imageView = icon.get(all: UIImageView.self).first {
             imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
-        
+
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        
+
         textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Italic.rawValue,
                                           forTextStyle: .headline)
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
@@ -196,8 +204,10 @@ class QuestionCell: UICollectionViewCell {
     }
 }
 
+// MARK: - CallbackObservable
 extension QuestionCell: CallbackObservable {
     func callbackReceived(_ sender: Any) {
+        //Passthrough
         callbackDelegate?.callbackReceived(sender)
     }
 }

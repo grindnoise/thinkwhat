@@ -13,7 +13,7 @@ class CommentsSectionCell: UICollectionViewCell {
     // MARK: - Public Properties
     ///Внимание, вызывается из collectionView.didSelect!
     override var isSelected: Bool { didSet { updateAppearance() } }
-    var boundsListener: BoundsListener?
+    public weak var boundsListener: BoundsListener?
     var item: Survey! {
         didSet {
             guard !item.isNil else { return }

@@ -10,6 +10,7 @@ import UIKit
 
 class ChoiceCollectionView: UICollectionView {
 
+    // MARK: - Enums
     enum Section: Int {
         case main
     }
@@ -20,7 +21,7 @@ class ChoiceCollectionView: UICollectionView {
             reload()
         }
     }
-    weak var answerListener: AnswerListener?
+    public weak var answerListener: AnswerListener?
     
     // MARK: - Private properties
     public var mode: PollController.Mode = .Write {
@@ -37,11 +38,17 @@ class ChoiceCollectionView: UICollectionView {
     private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<Section, Answer>!
     private var shouldChangeColor = false
-//    private let listener: ChoiceSectionCell
+
+    
+    // MARK: - Destructor
+    deinit {
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
     
     // MARK: - Initialization
     init(dataItems: [Answer] = [], answerListener: AnswerListener?, callbackDelegate: CallbackObservable) {
-//        self.listener = listener
         self.dataItems = dataItems
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.callbackDelegate = callbackDelegate
@@ -51,27 +58,15 @@ class ChoiceCollectionView: UICollectionView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    deinit {
-        print("\(String(describing: type(of: self))).\(#function)")
-    }
-    
-    // MARK: - Public methods
-    public func refresh() {
-        source.refresh()
-    }
 
-    // MARK: - UI functions
+    // MARK: - Private methods
     private func setupUI() {
         delegate = self
-//        contentInsetAdjustmentBehavior = .never
-//        contentInset = UIEdgeInsets.zero
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
             configuration.headerMode = .firstItemInSection
             configuration.backgroundColor = .clear
             configuration.showsSeparators = false
-            //            configuration.contentInsetsReference = .none
             
             return NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
         }
@@ -104,9 +99,11 @@ class ChoiceCollectionView: UICollectionView {
         snapshot.appendSections([.main,])
         snapshot.appendItems(dataItems, toSection: .main)
         source.apply(snapshot, animatingDifferences: false)
-//        source.refresh() {
-//            self.listener.onImagesHeightChange(self.contentSize.height)
-//        }
+    }
+    
+    // MARK: - Public methods
+    public func refresh() {
+        source.refresh()
     }
     
     public func reloadUsingSorting() {
@@ -115,9 +112,7 @@ class ChoiceCollectionView: UICollectionView {
             guard let cell = $1 as? ChoiceCell else { return }
             cell.color = Colors.tags()[$0]
         }
-//        var snapshot = source.snapshot()
         var snapshot = NSDiffableDataSourceSnapshot<Section, Answer>()
-        
         snapshot.appendSections([.main,])
         snapshot.appendItems(dataItems.sorted{ $0.totalVotes > $1.totalVotes }, toSection: .main)
         source.apply(snapshot, animatingDifferences: true) {

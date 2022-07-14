@@ -10,19 +10,15 @@ import UIKit
 
 class PollDescriptionCell: UICollectionViewCell {
     
-    // MARK: - Public Properties
-    ///Внимание, вызывается из collectionView.didSelect!
+    // MARK: - Overriden properties
     override var isSelected: Bool { didSet { updateAppearance() } }
-    var item: Survey! {
+    
+    // MARK: - Public Properties
+    public var item: Survey! {
         didSet {
             guard !item.isNil else { return }
             color = item.topic.tagColor
             textView.text = item.description
-//            let constraint = textView.heightAnchor.constraint(equalToConstant: textView.contentSize.height)
-//            constraint.identifier = "height"
-//            constraint.isActive = true
-//            setNeedsLayout()
-//            layoutIfNeeded()
         }
     }
     
@@ -44,9 +40,6 @@ class PollDescriptionCell: UICollectionViewCell {
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
         })
-//        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
-//        constraint.identifier = "height"
-//        constraint.isActive = true
         return instance
     }()
 
@@ -114,7 +107,6 @@ class PollDescriptionCell: UICollectionViewCell {
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
     }()
-    
     // Stacks
     private lazy var horizontalStack: UIStackView = {
         let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
@@ -141,13 +133,19 @@ class PollDescriptionCell: UICollectionViewCell {
             imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
-    
     // Constraints
     private var closedConstraint: NSLayoutConstraint?
     private var openConstraint: NSLayoutConstraint?
-    
     // Layout
     private let padding: CGFloat = 8
+    
+    // MARK: - Destructor
+    deinit {
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -210,6 +208,7 @@ class PollDescriptionCell: UICollectionViewCell {
         
     }
     
+    // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         

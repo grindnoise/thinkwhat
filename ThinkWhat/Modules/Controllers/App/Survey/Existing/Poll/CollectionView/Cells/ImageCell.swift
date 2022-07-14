@@ -10,7 +10,7 @@ import UIKit
 
 class ImageCell: UICollectionViewCell {
     
-    // MARK: - Public Properties
+    // MARK: - Overriden Properties
     override var isSelected: Bool { didSet { updateAppearance() } }
     var item: Survey! {
         didSet {
@@ -46,6 +46,9 @@ class ImageCell: UICollectionViewCell {
             }
         }
     }
+    
+    // MARK: - Public Properties
+    public weak var callbackDelegate: CallbackObservable?
     
     // MARK: - Private Properties
     private lazy var disclosureLabel: UILabel = {
@@ -118,11 +121,15 @@ class ImageCell: UICollectionViewCell {
         verticalStack.spacing = padding
         return verticalStack
     }()
-    private let imageContainer: UIView = {
+    private lazy var imageContainer: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
 //        instance.translatesAutoresizingMaskIntoConstraints = false
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1.0/1.0).isActive = true
+        observers.append(instance.observe(\UITextView.bounds, options: .new, changeHandler: { view, change in
+            guard let value = change.newValue else { return }
+            view.cornerRadius = value.width * 0.05
+        }))
         return instance
     }()
     private lazy var scrollView: UIScrollView = {
@@ -186,8 +193,12 @@ class ImageCell: UICollectionViewCell {
         }
     }
     
-    // MARK: - Public Properties
-    public weak var callbackDelegate: CallbackObservable?
+    // MARK: - Destructor
+    deinit {
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -339,10 +350,7 @@ class ImageCell: UICollectionViewCell {
     }
     
     private func setObservers() {
-        observers.append(imageContainer.observe(\UITextView.bounds, options: .new, changeHandler: { view, change in
-            guard let value = change.newValue else { return }
-            view.cornerRadius = value.width * 0.05
-        }))
+        
         observers.append(imagesStack.observe(\UIStackView.bounds, options: .new) { [weak self] view, change in
             guard let self = self, let value = change.newValue, !self.item.isNil else { return }
             self.scrollView.contentSize.width = value.width// + CGFloat(self.item.imagesCount) * view.spacing
@@ -365,6 +373,7 @@ class ImageCell: UICollectionViewCell {
 //        })
     }
     
+    // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
@@ -389,7 +398,7 @@ class ImageCell: UICollectionViewCell {
     }
     
     // MARK: - Public methods
-    func scrollToImage(at position: Int) {
+    public func scrollToImage(at position: Int) {
         guard let destinationView = imagesStack.get(all: Slide.self).filter({ $0.mediafile?.order == position }).first?.superview else { return  }
         scrollView.scrollRectToVisible(destinationView.frame, animated: false)
     }

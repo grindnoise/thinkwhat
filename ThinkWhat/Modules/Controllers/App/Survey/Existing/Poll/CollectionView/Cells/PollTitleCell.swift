@@ -17,6 +17,16 @@ class PollTitleCell: UICollectionViewCell {
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .largeTitle)
         instance.numberOfLines = 0
         instance.textColor = .label
+        observers.append(instance.observe(\UILabel.bounds, options: [.new]) { [weak self] view, _ in
+            guard let self = self,
+                  let text = view.text,
+                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first,
+                  let height = text.height(withConstrainedWidth: view.bounds.width, font: view.font) as? CGFloat,
+                  height != constraint.constant else { return }
+            self.setNeedsLayout()
+            constraint.constant = height
+            self.layoutIfNeeded()
+        })
         return instance
     }()
     private let ratingView: UIImageView = {
@@ -27,11 +37,20 @@ class PollTitleCell: UICollectionViewCell {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
         return instance
     }()
-    private let ratingLabel: UILabel = {
+    private lazy var ratingLabel: UILabel = {
         let instance = UILabel()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.textColor = .secondaryLabel
+        observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
+            guard let self = self,
+                  let text = view.text else { return }
+            //            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.8)
+            guard let constraint = self.bottomView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+            self.setNeedsLayout()
+            constraint.constant = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
+            self.layoutIfNeeded()
+        })
         return instance
     }()
     private let viewsView: UIImageView = {
@@ -42,7 +61,7 @@ class PollTitleCell: UICollectionViewCell {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
         return instance
     }()
-    private let viewsLabel: UILabel = {
+    @MainActor private let viewsLabel: UILabel = {
         let instance = UILabel()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
@@ -83,27 +102,6 @@ class PollTitleCell: UICollectionViewCell {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()
-//    private lazy var shareButton: UIButton = {
-//        let instance = UIButton()
-//        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
-//        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
-//        instance.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
-//        instance.imageView?.contentMode = .bottom
-//        instance.imageView?.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-//        return instance
-//    }()
-//    private lazy var claimButton: UIButton = {
-//        let instance = UIButton()
-//        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
-//        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
-//        instance.setImage(UIImage(systemName: "exclamationmark.triangle"), for: .normal)
-//        instance.imageView?.contentMode = .bottom
-//        instance.imageView?.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-//        return instance
-//    }()
-    // Stacks
     private lazy var horizontalStack: UIStackView = {
         let horizontalStack = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
         horizontalStack.alignment = .center
@@ -126,9 +124,11 @@ class PollTitleCell: UICollectionViewCell {
     private var observers: [NSKeyValueObservation] = []
     private let padding: CGFloat = 40
     private var constraint: NSLayoutConstraint!
+    ///Store tasks from NotificationCenter's AsyncStream
+    private var notifications: [Task<Void, Never>?] = []
     
     // MARK: - Private properties
-    public var item: Survey! {
+    public weak var item: Survey! {
         didSet {
             titleLabel.text = item.title
             ratingLabel.text = String(describing: item.rating)
@@ -141,13 +141,17 @@ class PollTitleCell: UICollectionViewCell {
         }
     }
     
-    // MARK: - Initialization
-    init(_ item: Survey) {
-        self.item = item
-        super.init(frame: .zero)
-        commonInit()
+    // MARK: - Destructor
+    deinit {
+        ///Destruct notifications
+        notifications.forEach { $0?.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
     }
     
+    // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()
@@ -197,41 +201,53 @@ class PollTitleCell: UICollectionViewCell {
         constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint.priority = .defaultLow
         constraint.isActive = true
+        
     }
     
     private func setObservers() {
-        observers.append(titleLabel.observe(\UILabel.bounds, options: [.new]) { [weak self] view, _ in
-            guard let self = self,
-                  let text = view.text,
-                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first,
-                  let height = text.height(withConstrainedWidth: view.bounds.width, font: view.font) as? CGFloat,
-                  height != constraint.constant else { return }
-            self.setNeedsLayout()
-            constraint.constant = height
-            self.layoutIfNeeded()
-        })
-        observers.append(ratingLabel.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
-            guard let self = self,
-                  let text = view.text else { return }
-            //            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.8)
-            guard let constraint = self.bottomView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
-            self.setNeedsLayout()
-            constraint.constant = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
-            self.layoutIfNeeded()
-        })
-        NotificationCenter.default.addObserver(self, selector: #selector(self.updateViewsCount), name: Notifications.Surveys.Views, object: nil)
+        if #available(iOS 15, *) {
+            notifications.append(Task { [weak self] in
+                guard !self.isNil else { return }
+                for await _ in await NotificationCenter.default.notifications(for: UIApplication.willResignActiveNotification) {
+                    print("UIApplication.willResignActiveNotification")
+                }
+            })
+            notifications.append(Task { [weak self] in
+                guard !self.isNil else { return }
+                for await _ in await NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+                    print("UIApplication.didBecomeActiveNotification")
+                }
+            })
+            notifications.append(Task { [weak self] in
+                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
+                    await MainActor.run {
+                        guard let self = self,
+                              let item = self.item else { return }
+                        self.viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
+                    }
+                }
+            })
+        } else {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.updateViewsCount),
+                                                   name: Notifications.Surveys.Views,
+                                                   object: nil)
+        }
     }
     
     @objc
     private func updateViewsCount(_ button: UIButton) {
+        guard let item = item else { return }
         viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
     }
     
     @objc
     private func updateRating(_ button: UIButton) {
+        guard let item = item else { return }
         ratingLabel.text = String(describing: item.rating)
     }
     
+    // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
@@ -246,7 +262,8 @@ class PollTitleCell: UICollectionViewCell {
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .caption2)
         guard let constraint_1 = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
-              let constraint_2 = bottomView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+              let constraint_2 = bottomView.getAllConstraints().filter({$0.identifier == "height"}).first,
+              let item = item else { return }
         setNeedsLayout()
         constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
                                                   font: titleLabel.font)
