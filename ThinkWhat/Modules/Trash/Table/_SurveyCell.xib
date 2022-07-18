@@ -178,6 +178,9 @@
         </tableViewCell>
     </objects>
     <designables>
+        <designable name="Aus-Lg-nvc">
+            <size key="intrinsicContentSize" width="31" height="14.5"/>
+        </designable>
         <designable name="enh-D8-9ut">
             <size key="intrinsicContentSize" width="31" height="14.5"/>
         </designable>

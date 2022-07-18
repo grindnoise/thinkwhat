@@ -29,7 +29,7 @@ class YoutubeCell: UICollectionViewCell {
         let instance = UILabel()
         instance.textColor = .systemBlue
         instance.text = "media".localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
         return instance
     }()
     private let disclosureIndicator: UIImageView = {
@@ -246,7 +246,7 @@ class YoutubeCell: UICollectionViewCell {
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                                  forTextStyle: .footnote)
         guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()

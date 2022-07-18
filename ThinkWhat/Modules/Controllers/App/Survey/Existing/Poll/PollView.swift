@@ -63,7 +63,8 @@ class PollView: UIView {
 extension PollView: PollControllerOutput {
     
     func onAddFavoriteCallback() {
-        
+        guard surveyReference.isFavorite else { return }
+        showBanner(bannerDelegate: self, text: "added_to_watch_list".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
     }
     
     var mode: PollController.Mode {
@@ -92,23 +93,18 @@ extension PollView: PollControllerOutput {
         collectionView.onVoteCallback(result)
     }
     
-    func onLoadCallback(_ result: Result<Bool, Error>) {
-        switch result {
-        case .success:
-            collectionView.addEquallyTo(to: container)
-            guard !loadingIndicator.isNil else { return }
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, options: [.curveEaseIn], animations: {
-                        self.loadingIndicator?.alpha = 0
-                        self.loadingIndicator?.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
-                    }) {
-                        _ in
-                        self.loadingIndicator?.removeFromSuperview()
-                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
-                            self.container.alpha = 1
-                        }) {_ in }
-                    }
-        case .failure:
-            showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark)
+    func onLoadCallback() {
+        collectionView.addEquallyTo(to: container)
+        guard !loadingIndicator.isNil else { return }
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, options: [.curveEaseIn], animations: {
+            self.loadingIndicator?.alpha = 0
+            self.loadingIndicator?.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
+        }) {
+            _ in
+            self.loadingIndicator?.removeFromSuperview()
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
+                self.container.alpha = 1
+            }) {_ in }
         }
     }
     

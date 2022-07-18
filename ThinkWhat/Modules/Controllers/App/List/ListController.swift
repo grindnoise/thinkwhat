@@ -33,7 +33,6 @@ class ListController: UIViewController {
         super.viewWillAppear(animated)
         listSwitch.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
-        controllerOutput?.onWillAppear()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -47,8 +46,8 @@ class ListController: UIViewController {
     }
     
     private func setObservers() {
-        let names = [Notifications.System.UpdateStats]
-        names.forEach { NotificationCenter.default.addObserver(view, selector: #selector(ListView.updateStats), name: $0, object: nil) }
+//        let names = [Notifications.System.UpdateStats]
+//        names.forEach { NotificationCenter.default.addObserver(view, selector: #selector(ListView.updateStats), name: $0, object: nil) }
     }
 
     private func setupUI() {

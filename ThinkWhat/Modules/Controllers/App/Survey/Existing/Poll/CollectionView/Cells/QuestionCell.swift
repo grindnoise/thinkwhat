@@ -55,7 +55,7 @@ class QuestionCell: UICollectionViewCell {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
         instance.text = "poll_question".localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
         return instance
     }()
     private lazy var textView: UITextView = {
@@ -193,7 +193,7 @@ class QuestionCell: UICollectionViewCell {
 
         textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Italic.rawValue,
                                           forTextStyle: .headline)
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                                  forTextStyle: .footnote)
         guard let constraint_1 = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
               let constraint_2 = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }

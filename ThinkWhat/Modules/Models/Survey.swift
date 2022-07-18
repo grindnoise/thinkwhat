@@ -123,7 +123,8 @@ class Survey: Decodable {
              isCommentingAllowed = "is_commenting_allowed",
              totalVotes = "votes_total",
              owner = "userprofile",
-             isHot = "is_hot"
+             isHot = "is_hot",
+             share_link
     }
     
     var active:                 Bool
@@ -157,7 +158,8 @@ class Survey: Decodable {
     var answersSortedByOrder:   [Answer] {
         return answers.sorted { $0.order < $1.order }
     }
-
+    var shareHash:              String = ""
+    var shareEncryptedString:   String = ""
     var url:                    URL? = nil///hlink
     var votesLimit:             Int {
         didSet {
@@ -303,8 +305,9 @@ class Survey: Decodable {
             isCommentingAllowed     = try container.decode(Bool.self, forKey: .isCommentingAllowed)
             isFavorite              = try container.decode(Bool.self, forKey: .isFavorite)
             isHot                   = try container.decode(Bool.self, forKey: .isHot)
-            
-            
+            let shareData           = try container.decode([String].self, forKey: .share_link)
+            shareHash               = shareData.first ?? ""
+            shareEncryptedString    = shareData.last ?? ""
             
             if let dict = try container.decodeIfPresent([String: Date].self, forKey: .result), !dict.isEmpty {
                 result = [Int(dict.keys.first!)!: dict.values.first!]
@@ -351,7 +354,7 @@ class Survey: Decodable {
     }
     
     private func createReference() -> SurveyReference {
-        return SurveyReference(id: id, title: title, startDate: startDate, topic: topic, type: type, likes: likes, views: views, isOwn: isOwn, isComplete: isComplete, isFavorite: isFavorite, isHot: isHot, survey: self, owner: owner, isAnonymous: isAnonymous)
+        return SurveyReference(id: id, title: title, description: description, startDate: startDate, topic: topic, type: type, likes: likes, views: views, isOwn: isOwn, isComplete: isComplete, isFavorite: isFavorite, isHot: isHot, survey: self, owner: owner, isAnonymous: isAnonymous)
     }
     
     func getAnswerVotePercentage(_ answerVotesCount: Int) -> Int {

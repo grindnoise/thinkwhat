@@ -36,16 +36,16 @@ class TopicsController: UIViewController {
         super.viewWillAppear(animated)
         barButton.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
-        controllerOutput?.onWillAppear()
+//        controllerOutput?.onWillAppear()
         if mode == .Search {
             searchField.alpha = 1
         }
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        controllerOutput?.onDidLayout()
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        controllerOutput?.onDidLayout()
+//    }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -57,8 +57,8 @@ class TopicsController: UIViewController {
     }
 
     private func setObservers() {
-        let names = [Notifications.System.UpdateStats]
-        names.forEach { NotificationCenter.default.addObserver(view, selector: #selector(TopicsView.updateStats), name: $0, object: nil) }
+//        let names = [Notifications.System.UpdateStats]
+//        names.forEach { NotificationCenter.default.addObserver(view, selector: #selector(TopicsView.updateStats), name: $0, object: nil) }
     }
     
     private func setupUI() {
@@ -116,49 +116,49 @@ class TopicsController: UIViewController {
     var controllerInput: TopicsControllerInput?
     var mode: Mode = .Parent {
         didSet {
-            guard oldValue != mode else { return }
-            switch mode {
-            case .Parent:
-                navigationItem.title = "topics".localized
-                if oldValue == .Search {
-                    controllerOutput?.onSearchToParentMode()
-                    searchField.resignFirstResponder()
-                    UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
-                        self.searchField.alpha = 0
-                        self.barButton.image = ImageSigns.magnifyingGlassFilled.image
-                    } completion: { _ in }
-                } else {
-                    onParentMode()
-                    controllerOutput?.onParentMode()
-                }
-            case .Child:
-                navigationItem.title = "topics".localized
-                if oldValue == .List {
-                    controllerOutput?.onListToChildMode()
-                } else {
-                    onChildMode()
-                    controllerOutput?.onChildMode()
-                }
-            case .List:
-                if let topic = controllerOutput?.topic {
-                    navigationItem.title = topic.title
-                } else {
-                    navigationItem.title = "topics".localized
-                }
-                controllerOutput?.onListMode()
-            case .Search:
-                controllerOutput?.onSearchMode()
-                let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
-                view.addGestureRecognizer(touch)
-                setupTextField(textField: searchField)
-                searchField.text = ""
-                searchField.becomeFirstResponder()
-                navigationItem.title = ""
-                UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
-                    self.searchField.alpha = 1
-                    self.barButton.image = ImageSigns.arrowLeft.image
-                } completion: { _ in }
-            }
+//            guard oldValue != mode else { return }
+//            switch mode {
+//            case .Parent:
+//                navigationItem.title = "topics".localized
+//                if oldValue == .Search {
+//                    controllerOutput?.onSearchToParentMode()
+//                    searchField.resignFirstResponder()
+//                    UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
+//                        self.searchField.alpha = 0
+//                        self.barButton.image = ImageSigns.magnifyingGlassFilled.image
+//                    } completion: { _ in }
+//                } else {
+//                    onParentMode()
+//                    controllerOutput?.onParentMode()
+//                }
+//            case .Child:
+//                navigationItem.title = "topics".localized
+//                if oldValue == .List {
+//                    controllerOutput?.onListToChildMode()
+//                } else {
+//                    onChildMode()
+//                    controllerOutput?.onChildMode()
+//                }
+//            case .List:
+//                if let topic = controllerOutput?.topic {
+//                    navigationItem.title = topic.title
+//                } else {
+//                    navigationItem.title = "topics".localized
+//                }
+//                controllerOutput?.onListMode()
+//            case .Search:
+//                controllerOutput?.onSearchMode()
+//                let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
+//                view.addGestureRecognizer(touch)
+//                setupTextField(textField: searchField)
+//                searchField.text = ""
+//                searchField.becomeFirstResponder()
+//                navigationItem.title = ""
+//                UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
+//                    self.searchField.alpha = 1
+//                    self.barButton.image = ImageSigns.arrowLeft.image
+//                } completion: { _ in }
+//            }
         }
     }
     
@@ -220,20 +220,17 @@ extension TopicsController: TopicsModelOutput {
     func onSearchCompleted(_ instances: [SurveyReference]) {
         controllerOutput?.onSearchCompleted(instances)
         isSearching = false
-#if DEBUG
-        print(instances.map{ $0.title })
-#endif
     }
     
-    func onError(_: Error) {
-        func onError(_ error: Error) {
-            isSearching = false
-    #if DEBUG
-            print(error.localizedDescription)
-    #endif
-            controllerOutput?.onError()
-        }
-    }
+//    func onError(_: Error) {
+//        func onError(_ error: Error) {
+//            isSearching = false
+//    #if DEBUG
+//            print(error.localizedDescription)
+//    #endif
+//            controllerOutput?.onError()
+//        }
+//    }
 }
 
 extension TopicsController: DataObservable {

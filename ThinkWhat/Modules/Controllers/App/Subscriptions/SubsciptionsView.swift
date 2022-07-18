@@ -10,38 +10,54 @@ import UIKit
 
 class SubsciptionsView: UIView {
     
-    // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        commonInit()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        commonInit()
-    }
-    
-    private func commonInit() {
-        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-        addSubview(contentView)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-        ])
-        setupUI()
-    }
-        
-    // MARK: - Properties
     weak var viewInput: SubsciptionsViewInput?
-    private var isSetupCompleted = false
+    
+    // MARK: - Private properties
     private var isCollectionViewSetupCompleted = false
-    private var shadowPath: CGPath!
     private let reuseIdentifier = "voter"
     private var needsAnimation = true
     private var isRevealed = false
+    private lazy var collectionView: SurveysCollectionView = {
+        let instance = SurveysCollectionView(delegate: self, category: .Subscriptions)
+        return instance
+    }()
+    private lazy var featheredLayer: CAGradientLayer = {
+        let instance = CAGradientLayer()
+        let outerColor = UIColor.clear.cgColor
+        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.cgColor
+//        instance.startPoint = CGPoint(x: 0, y: 0.5);
+//        instance.endPoint = CGPoint(x: 1.0, y: 0.5);
+        // without specifying startPoint and endPoint, we get a vertical gradient
+        instance.colors = [outerColor, innerColor, innerColor, outerColor]
+        instance.locations = [0.0, 0.025, 0.975, 1.0]
+        instance.frame = frame
+        return instance
+    }()
+    private lazy var background: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "bg"
+        instance.layer.masksToBounds = true
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        instance.addEquallyTo(to: shadowView)
+//        collectionView.addEquallyTo(to: instance)
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let value = change.newValue else { return }
+            view.cornerRadius = value.width * 0.05
+        })
+        return instance
+    }()
+    private lazy var featheredView: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "feathered"
+        instance.layer.masksToBounds = true
+        instance.backgroundColor = .clear
+        instance.addEquallyTo(to: background)
+        collectionView.addEquallyTo(to: instance)
+        return instance
+    }()
+    private var observers: [NSKeyValueObservation] = []
+    private var notifications: [Task<Void, Never>?] = []
+    private var shadowObserver: NSKeyValueObservation!
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -51,16 +67,24 @@ class SubsciptionsView: UIView {
 //            upperContainer.alpha = 0
         }
     }
-//    @IBOutlet weak var usersView: UIView!
-//    @IBOutlet weak var usersWidthConstraint: NSLayoutConstraint!
-    @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var bottomContainer: UIView!
-    @IBOutlet weak var card: UIView! {
+    @IBOutlet weak var subscriptionsCollectionView: UICollectionView!
+    @IBOutlet weak var shadowView: UIView! {
         didSet {
-            card.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+            shadowView.layer.masksToBounds = false
+            shadowView.clipsToBounds = false
+            shadowView.backgroundColor = .clear
+            shadowView.accessibilityIdentifier = "shadow"
+            shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+            shadowView.layer.shadowRadius = 5
+            shadowView.layer.shadowOffset = .zero
+            shadowObserver = shadowView.observe(\UIView.bounds, options: .new) { view, change in
+                guard let newValue = change.newValue else { return }
+                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
+            }
+            background.addEquallyTo(to: shadowView)
         }
     }
-    @IBOutlet weak var cardShadow: UIView!
     @IBOutlet weak var upperContainerHeightConstraint: NSLayoutConstraint! {
         didSet {
             upperContainerHeightConstraint.constant = 0
@@ -82,142 +106,40 @@ class SubsciptionsView: UIView {
     @IBAction func moreTapped(_ sender: UIButton) {
         viewInput?.onSubscpitionsTapped()
     }
-}
-
-// MARK: - Controller Output
-extension SubsciptionsView: SubsciptionsControllerOutput {
-    func onWillAppear() {
-        if #available(iOS 14, *) {
-            guard let v = card.subviews.filter({ $0.isKind(of: SurveysCollection.self) }).first as? SurveysCollection else { return }
-            v.deselect()
-        } else {
-            guard let v = card.subviews.filter({ $0.isKind(of: SurveyTable.self) }).first as? SurveyTable else { return }
-            v.deselect()
-        }
+    
+    // MARK: - Initialization
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
     }
     
-    
-    func onError() {
-        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark, dismissAfter: 1)
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        commonInit()
     }
     
-    
-//    func onSubscriptionsUpdated() {
-//        if #available(iOS 14, *) {
-//            viewInput
-//        } else {
-//            // Fallback on earlier versions
-//        }
-//    }
-    
-    func onSubscribedForUpdated() {
-        collectionView.reloadData()
+    // MARK: - Private properties
+    private func commonInit() {
+        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
+        setupUI()
     }
-    
-    func onDidLoad() {}
-    
-    
-    func onDidLayout() {
-        guard !isSetupCompleted else { return }
-        isSetupCompleted = true
-        ///Add shadow
-        transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-        alpha = 0
-        cardShadow.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-        shadowPath = UIBezierPath(roundedRect: cardShadow.bounds, cornerRadius: cardShadow.frame.width * 0.05).cgPath
-        cardShadow.layer.shadowPath = shadowPath
-        cardShadow.layer.shadowRadius = 7
-        cardShadow.layer.shadowOffset = .zero
-        cardShadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
-            self.alpha = 1
-            self.transform = .identity
-        } completion: { _ in }
-    }
-    
-    func onUpperContainerShown(_ reveal: Bool) {
-        isRevealed = reveal
-        let cardBlur: UIView = {
-            guard let v = self.card.subviews.filter({ $0.accessibilityIdentifier == "cardBlur" }).first else {
-                let v = UIView(frame: card.bounds)
-                v.backgroundColor = .black.withAlphaComponent(0.5)
-                v.alpha = 0
-                card.addSubview(v)
-                v.accessibilityIdentifier = "cardBlur"
-                v.isUserInteractionEnabled = true
-                v.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.hideMenu)))
-                return v
-            }
-            return v
-        }()
-        let menuBlur: UIVisualEffectView =  {
-            guard let v = self.upperContainer.subviews.filter({ $0.accessibilityIdentifier == "menuBlur" }).first as? UIVisualEffectView else {
-                let blur = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
-                blur.frame = upperContainer.bounds
-//                upperContainer.addSubview(blur)
-                blur.addEquallyTo(to: upperContainer)
-                blur.setNeedsLayout()
-                blur.layoutIfNeeded()
-                blur.accessibilityIdentifier = "menuBlur"
-                blur.isUserInteractionEnabled = false
-                return blur
-            }
-            return v
-        }()
-
-        cardBlur.alpha = reveal ? 0 : 1
-        menuBlur.effect = !reveal ? nil : UIBlurEffect(style: .prominent)
-        if !reveal {
-            menuBlur.setNeedsLayout()
-            menuBlur.layoutIfNeeded()
-        }
         
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.17, delay: 0,
-                                                       options: [.curveLinear],
-                                                       animations: {
-            cardBlur.alpha = !reveal ? 0 : 1
-            menuBlur.effect = reveal ? nil : UIBlurEffect(style: .prominent)
-            self.setNeedsLayout()
-            self.upperContainerHeightConstraint.constant += reveal ? self.frame.height * 0.2 : -self.upperContainerHeightConstraint.constant
-            self.layoutIfNeeded()
-            self.upperContainer.subviews.forEach {
-                $0.alpha = reveal ? 1 : 0
-            }
-//            self.upperContainer.alpha = reveal ? 1 : 0
-        })
-        {
-            [weak self] _ in
-            guard !self.isNil else { return }
-            self!.setFlowLayout()
-            guard !reveal else { return }
-        }
-    }
-}
-
-// MARK: - UI Setup
-extension SubsciptionsView {
     private func setupUI() {
-        collectionView.register(UINib(nibName: "VoterCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
-        card.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        card.layer.masksToBounds = true
-        card.layer.cornerRadius = card.frame.width * 0.05
-        alpha = 0
+        subscriptionsCollectionView.register(UINib(nibName: "VoterCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
         setText()
-        if #available(iOS 14, *)  {
-            let list = SurveysCollection(delegate: self, category: .Subscriptions)//(frame: card.bounds)
-            list.addEquallyTo(to: card)
-        } else {
-            let list = SurveyTable(delegate: self, category: .Subscriptions)
-            list.addEquallyTo(to: card)
-        }
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        cardShadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        card.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        setText()
-//        guard let v = self.card.subviews.filter({ $0.accessibilityIdentifier == "cardBlur" }).first as? UIVisualEffectView, isRevealed else { return }
-//                v.effect = UIBlurEffect(style: self.traitCollection.userInterfaceStyle == .dark ? .dark : .light)
+        observers.append(featheredView.observe(\UIView.bounds, options: .new) { [weak self] view, change in
+            guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
+            self.featheredLayer.frame = newValue
+        })
+        featheredView.layer.mask = featheredLayer
     }
     
     private func setText() {
@@ -240,21 +162,149 @@ extension SubsciptionsView {
         guard !isCollectionViewSetupCompleted else { return }
         isCollectionViewSetupCompleted = true
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.itemSize = CGSize(width: collectionView.bounds.height, height: collectionView.bounds.height)
+        flowLayout.itemSize = CGSize(width: subscriptionsCollectionView.bounds.height, height: subscriptionsCollectionView.bounds.height)
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         flowLayout.scrollDirection = .horizontal
         flowLayout.minimumInteritemSpacing = 0.0
-        collectionView.collectionViewLayout = flowLayout
-        collectionView.delegate = self
-        collectionView.dataSource = self
+        subscriptionsCollectionView.collectionViewLayout = flowLayout
+        subscriptionsCollectionView.delegate = self
+        subscriptionsCollectionView.dataSource = self
     }
     
     @objc
     private func hideMenu() {
         viewInput?.toggleBarButton()
     }
+    
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        let outerColor = UIColor.clear.cgColor
+        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.cgColor
+        featheredLayer.colors = [outerColor, innerColor,innerColor,outerColor]
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        
+        setText()
+//        guard let v = self.card.subviews.filter({ $0.accessibilityIdentifier == "cardBlur" }).first as? UIVisualEffectView, isRevealed else { return }
+//                v.effect = UIBlurEffect(style: self.traitCollection.userInterfaceStyle == .dark ? .dark : .light)
+    }
 }
 
+// MARK: - Controller Output
+extension SubsciptionsView: SubsciptionsControllerOutput {
+    func onError() {
+//        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark, dismissAfter: 1)
+    }
+    
+    func onSubscribedForUpdated() {
+        subscriptionsCollectionView.reloadData()
+    }
+    
+    func onUpperContainerShown(_ reveal: Bool) {
+        isRevealed = reveal
+//        let cardBlur: UIView = {
+//            guard let v = self.card.subviews.filter({ $0.accessibilityIdentifier == "cardBlur" }).first else {
+//                let v = UIView(frame: card.bounds)
+//                v.backgroundColor = .black.withAlphaComponent(0.5)
+//                v.alpha = 0
+//                card.addSubview(v)
+//                v.accessibilityIdentifier = "cardBlur"
+//                v.isUserInteractionEnabled = true
+//                v.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.hideMenu)))
+//                return v
+//            }
+//            return v
+//        }()
+//        let menuBlur: UIVisualEffectView =  {
+//            guard let v = self.upperContainer.subviews.filter({ $0.accessibilityIdentifier == "menuBlur" }).first as? UIVisualEffectView else {
+//                let blur = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
+//                blur.frame = upperContainer.bounds
+////                upperContainer.addSubview(blur)
+//                blur.addEquallyTo(to: upperContainer)
+//                blur.setNeedsLayout()
+//                blur.layoutIfNeeded()
+//                blur.accessibilityIdentifier = "menuBlur"
+//                blur.isUserInteractionEnabled = false
+//                return blur
+//            }
+//            return v
+//        }()
+//
+//        cardBlur.alpha = reveal ? 0 : 1
+//        menuBlur.effect = !reveal ? nil : UIBlurEffect(style: .prominent)
+//        if !reveal {
+//            menuBlur.setNeedsLayout()
+//            menuBlur.layoutIfNeeded()
+//        }
+        //        observers.forEach({ $0.invalidate()})
+//        if !reveal {
+            shadowObserver.invalidate()
+        let initialPath = UIBezierPath(roundedRect: CGRect(origin: .zero, size: CGSize(width: shadowView.bounds.width, height: reveal ? background.bounds.height  : background.bounds.height - self.frame.height * 0.2)),
+                                               cornerRadius: self.shadowView.bounds.width * 0.05).cgPath
+        
+        let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero, size: CGSize(width: shadowView.bounds.width, height: shadowView.bounds.height + (reveal ? -self.frame.height * 0.2 : self.frame.height * 0.2))),
+                                               cornerRadius: self.shadowView.bounds.width * 0.05).cgPath
+            let anim = Animations.get(property: .ShadowPath,
+                                      fromValue: initialPath,
+                                      toValue: destinationPath,
+                                      duration: 0.25,
+                                      delay: 0,
+                                      repeatCount: 0,
+                                      autoreverses: false,
+                                      timingFunction: .easeInEaseOut,
+                                      delegate: nil,
+                                      isRemovedOnCompletion: true,
+                                      completionBlocks: nil)
+            self.shadowView.layer.add(anim, forKey: nil)
+            self.shadowView.layer.shadowPath = destinationPath
+//            shadowObserver = shadowView.observe(\UIView.bounds, options: .new) { view, change in
+//                guard let newValue = change.newValue else { return }
+//                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
+//            }
+//        }
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0,
+                                                       options: [.curveEaseInOut],
+                                                       animations: {
+//            cardBlur.alpha = !reveal ? 0 : 1
+//            menuBlur.effect = reveal ? nil : UIBlurEffect(style: .prominent)
+            self.setNeedsLayout()
+            self.upperContainerHeightConstraint.constant += reveal ? self.frame.height * 0.2 : -self.upperContainerHeightConstraint.constant
+            self.layoutIfNeeded()
+            self.upperContainer.subviews.forEach {
+                $0.alpha = reveal ? 1 : 0
+            }
+//            self.shadowView.layer.shadowOpacity = 0
+//            self.upperContainer.alpha = reveal ? 1 : 0
+        })
+        {
+            [weak self] _ in
+//            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.1, delay: 0) {
+//                self?.shadowView.layer.shadowOpacity = 1
+//            }
+            guard !self.isNil else { return }
+            self!.setFlowLayout()
+            guard !reveal else { return }
+        }
+        
+//        let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero, size: CGSize(width: shadowView.bounds.width, height: shadowView.bounds.height)),
+//                                                       cornerRadius: self.shadowView.bounds.width * 0.05).cgPath
+//                    let anim = Animations.get(property: .ShadowPath,
+//                                              fromValue: self.shadowView.layer.shadowPath as Any,
+//                                              toValue: destinationPath,
+//                                              duration: 0.1,
+//                                              delay: 0,
+//                                              repeatCount: 0,
+//                                              autoreverses: false,
+//                                              timingFunction: .linear,
+//                                              delegate: nil,
+//                                              isRemovedOnCompletion: true,
+//                                              completionBlocks: nil)
+//                    self.shadowView.layer.add(anim, forKey: nil)
+//                    self.shadowView.layer.shadowPath = destinationPath
+    }
+}
+
+// MARK: - UI Setup
 extension SubsciptionsView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewInput?.userprofiles.count ?? 0
@@ -285,14 +335,8 @@ extension SubsciptionsView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let instance = sender as? SurveyReference {
             viewInput?.onSurveyTapped(instance)
-        } else if #available(iOS 14, *) {
-            if sender is SurveysCollection || sender is SurveyTable {
-                viewInput?.onDataSourceRequest()
-            }
-        } else {
-            if sender is SurveyTable {
-                viewInput?.onDataSourceRequest()
-            }
+        } else if sender is SurveysCollectionView {
+            viewInput?.onDataSourceRequest()
         }
     }
 }

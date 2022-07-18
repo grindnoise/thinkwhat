@@ -10,18 +10,77 @@ import UIKit
 
 class ListView: UIView {
     
+    weak var viewInput: ListViewInput?
+    
+    // MARK: - Private properties
+    private lazy var collectionView: (SurveysCollection & SurveyDataSource) = {
+        let instance = SurveysCollection(delegate: self, category: .New)
+        return instance
+    }()
+    private var observers: [NSKeyValueObservation] = []
+    private var notifications: [Task<Void, Never>?] = []
+//    private var hMaskLayer: CAGradientLayer!
+    private lazy var background: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "bg"
+        instance.layer.masksToBounds = false
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        instance.addEquallyTo(to: shadowView)
+        collectionView.addEquallyTo(to: instance)
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let value = change.newValue else { return }
+            view.cornerRadius = value.width * 0.05
+        })
+        return instance
+    }()
+
+    
+    // MARK: - IB outlets
+    @IBOutlet var contentView: UIView!
+    @IBOutlet weak var shadowView: UIView! {
+        didSet {
+            shadowView.layer.masksToBounds = false
+            shadowView.clipsToBounds = false
+            shadowView.backgroundColor = .clear
+            shadowView.accessibilityIdentifier = "shadow"
+            shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+            shadowView.layer.shadowRadius = 5
+            shadowView.layer.shadowOffset = .zero
+            observers.append(shadowView.observe(\UIView.bounds, options: .new) { view, change in
+                guard let newValue = change.newValue else { return }
+                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
+            })
+            background.addEquallyTo(to: shadowView)
+        }
+    }
+    
+    // MARK: - Destructor
+    deinit {
+        ///Destruct notifications
+        notifications.forEach { $0?.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
+        setupUI()
     }
+    
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        commonInit()
+        setupUI()
     }
     
-    private func commonInit() {
+    private func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -31,101 +90,32 @@ class ListView: UIView {
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
-        setupUI()
     }
-    
-    override func layoutSubviews() {
-        
-    }
-    
-    // MARK: - Properties
-    weak var viewInput: ListViewInput?
-    private var isSetupCompleted = false
-    private var shadowPath: CGPath!
-    private lazy var list: (UIView & SurveyDataSource) = {
-        let list = SurveysCollection(delegate: self, category: .New)
-        list.addEquallyTo(to: card)
-        return list
-    }()
-    
-    
-    // MARK: - IB outlets
-    @IBOutlet var contentView: UIView!
-    @IBOutlet weak var card: UIView! {
-        didSet {
-            card.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        }
-    }
-    @IBOutlet weak var cardShadow: UIView!
 }
 
 // MARK: - Controller Output
-extension ListView: ListControllerOutput {
+extension ListView: ListControllerOutput {    
     func onError() {
         showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark, dismissAfter: 1)
     }
     
     func onDataSourceChanged() {
         guard let category = viewInput?.surveyCategory else { return }
-        list.category = category
+        collectionView.category = category
     }
     
     func onDidLoad() {
-        list.reload()
+        collectionView.reload()
     }
     
-    func onWillAppear() {
-        if #available(iOS 14, *) {
-            guard let v = card.subviews.filter({ $0.isKind(of: SurveysCollection.self) }).first as? SurveysCollection else { return }
-            v.deselect()
-        } else {
-            guard let v = card.subviews.filter({ $0.isKind(of: SurveyTable.self) }).first as? SurveyTable else { return }
-            v.deselect()
-        }
-    }
-    
-    func onDidLayout() {
-        guard !isSetupCompleted else { return }
-        isSetupCompleted = true
-        ///Add shadow
-        transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-        alpha = 0
-        cardShadow.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-        shadowPath = UIBezierPath(roundedRect: cardShadow.bounds, cornerRadius: cardShadow.frame.width * 0.05).cgPath
-        cardShadow.layer.shadowPath = shadowPath
-        cardShadow.layer.shadowRadius = 7
-        cardShadow.layer.shadowOffset = .zero
-        cardShadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
-            self.alpha = 1
-            self.transform = .identity
-        } completion: { _ in }
-    }
-    
-    @objc
-    func updateStats() {
-//        print("forceUpdate")
-    }
+    func onDidLayout() {}
 }
 
 // MARK: - UI Setup
 extension ListView {
-    private func setupUI() {
-        card.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        card.layer.masksToBounds = true
-        card.layer.cornerRadius = card.frame.width * 0.05
-        alpha = 0
-
-//        if #available(iOS 14, *)  {
-//            list = SurveysCollection(delegate: self, category: .New)//(frame: card.bounds)
-//        } else {
-//            list = SurveyTable(delegate: self, category: .New)
-//        }
-    }
-    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        cardShadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        card.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
     }
 }
 
@@ -133,14 +123,8 @@ extension ListView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let instance = sender as? SurveyReference {
             viewInput?.onSurveyTapped(instance)
-        } else if #available(iOS 14, *) {
-            if sender is SurveysCollection || sender is SurveyTable {
-                viewInput?.onDataSourceRequest()
-            }
-        } else {
-            if sender is SurveyTable {
-                viewInput?.onDataSourceRequest()
-            }
+        } else if sender is SurveysCollection {
+            viewInput?.onDataSourceRequest()
         }
     }
 }

@@ -23,9 +23,9 @@ extension TopicsModel: TopicsControllerInput {
                     modelOutput?.onSearchCompleted(instances)
                 }
             } catch {
-                await MainActor.run {
-                    modelOutput?.onError(error)
-                }
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
             }
         }
     }
@@ -35,9 +35,9 @@ extension TopicsModel: TopicsControllerInput {
             do {
                 try await API.shared.surveys.loadSurveyReferences(.Topic, topic)
             } catch {
-                await MainActor.run {
-                    modelOutput?.onError(error)
-                }
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
             }
         }
     }

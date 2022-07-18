@@ -48,9 +48,7 @@ protocol ListControllerOutput: class {
     var viewInput: ListViewInput? { get set }
     
     func onDidLayout()
-    func onWillAppear()
     func onDidLoad()
     func onDataSourceChanged()
     func onError()
-    func updateStats()
 }

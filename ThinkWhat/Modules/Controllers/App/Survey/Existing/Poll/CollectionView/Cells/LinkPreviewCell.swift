@@ -1,15 +1,15 @@
 //
-//  WebViewCell.swift
+//  LinkPreviewCell.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 04.07.2022.
+//  Created by Pavel Bukharov on 15.07.2022.
 //  Copyright © 2022 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
-import WebKit
+import LinkPresentation
 
-class WebViewCell: UICollectionViewCell {
+class LinkPreviewCell: UICollectionViewCell {
     
     // MARK: - Overriden properties
     override var isSelected: Bool { didSet { updateAppearance() } }
@@ -17,36 +17,20 @@ class WebViewCell: UICollectionViewCell {
     // MARK: - Public Properties
     var item: Survey! {
         didSet {
-            guard !item.isNil, let url = item.url else { return }
+            guard !item.isNil, !item.url.isNil else { return }
             color = item.topic.tagColor
-            if url.absoluteString.isTikTokLink, isTiTokInstalled {
-                app = .TikTok
-                opaqueView = UIView(frame: .zero)
-                opaqueView!.backgroundColor = .clear
-                opaqueView!.addEquallyTo(to: contentView)
-                let recognizer = UITapGestureRecognizer(target: self, action: #selector(WebViewCell.viewTapped(recognizer: )))
-                opaqueView!.addGestureRecognizer(recognizer)
-            }
-            do {
-                try webView.load(URLRequest(url: url, method: .get))
-            } catch {
-#if DEBUG
-                error.printLocalized(class: type(of: self), functionName: #function)
-#endif
+            guard let url = item.url else { return }
+            LPMetadataProvider().startFetchingMetadata(for: url) { [weak self] data, error in
+                guard let self = self, let data = data, error.isNil else { return }
+                Task {
+                    self.linkPreview.metadata = data
+                }
             }
         }
     }
     public weak var callbackDelegate: CallbackObservable?
     
     // MARK: - Private Properties
-    private var isTiTokInstalled: Bool {
-        let appName = "tiktok"
-        let appScheme = "\(appName)://app"
-        let appUrl = URL(string: appScheme)
-        return UIApplication.shared.canOpenURL(appUrl! as URL)
-    }
-    private var app: ThirdPartyApp  = .Null
-    private var opaqueView: UIView?
     private lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
@@ -68,25 +52,6 @@ class WebViewCell: UICollectionViewCell {
 //                let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
 //                constraint.identifier = "height"
 //                constraint.isActive = true
-        return instance
-    }()
-    private lazy var browserButton: UIButton = {
-        let instance = UIButton()
-        instance.setImage(UIImage(systemName: "safari.fill"), for: .normal)
-        instance.tintColor = .systemBlue
-        instance.addTarget(self, action: #selector(WebViewCell.openURL), for: .touchUpInside)
-        instance.translatesAutoresizingMaskIntoConstraints = false
-        webView.addSubview(instance)
-        NSLayoutConstraint.activate([
-            instance.widthAnchor.constraint(equalToConstant: 40),
-            instance.heightAnchor.constraint(equalToConstant: 40),
-            instance.bottomAnchor.constraint(equalTo: webView.bottomAnchor, constant: -20),
-            instance.trailingAnchor.constraint(equalTo: webView.trailingAnchor, constant: -20),
-        ])
-        instance.contentVerticalAlignment = .fill
-        instance.contentHorizontalAlignment = .fill
-        instance.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
@@ -138,33 +103,31 @@ class WebViewCell: UICollectionViewCell {
         instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.2).cgColor
         instance.layer.shadowRadius = 4
         instance.layer.shadowOffset = .zero
-        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1.5/1).isActive = true
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
         observers.append(instance.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { view, change in
             guard let value = change.newValue else { return }
             view.layer.shadowPath = UIBezierPath(roundedRect: value, cornerRadius: value.height*0.05).cgPath
         })
         return instance
     }()
-    private lazy var webView: WKWebView = {
-        let instance = WKWebView()
+    @MainActor private lazy var linkPreview: LPLinkView = {
+        let instance = LPLinkView()
         instance.addEquallyTo(to: background)
-//        instance.uiDelegate = self
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
-        instance.navigationDelegate = self
+        opaqueView.addEquallyTo(to: background)
+        return instance
+    }()
+    private lazy var opaqueView: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.layer.zPosition = 10
+        instance.accessibilityIdentifier = "opaqueView"
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(self.openURL))
+        instance.addGestureRecognizer(recognizer)
         return instance
     }()
     private let padding: CGFloat = 10
-    private var tempAppPreference: SideAppPreference?
-    private var sideAppPreference: SideAppPreference? {
-        if UserDefaults.App.tiktokPlay == nil {
-            return nil
-        } else {
-            return UserDefaults.App.tiktokPlay
-        }
-    }
     private var color: UIColor = .secondaryLabel {
         didSet {
-            webView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
             disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
             guard let imageView = icon.get(all: UIImageView.self).first else { return }
@@ -208,17 +171,16 @@ class WebViewCell: UICollectionViewCell {
             verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),
             verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
-            browserButton.heightAnchor.constraint(equalToConstant: 40)
         ])
+        
         closedConstraint =
             disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         closedConstraint?.priority = .defaultLow // use low priority so stack stays pinned to top of cell
         
         openConstraint =
-            webView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+            linkPreview.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         openConstraint?.priority = .defaultLow
-        //Наоборот, тк изначально ячейка не выбрана, а надо развернуто показать
-//        disclosureLabel.text = !isSelected ? "hide_webview".localized.uppercased() : "show_webview".localized.uppercased()
+
         updateAppearance()
     }
     
@@ -239,25 +201,6 @@ class WebViewCell: UICollectionViewCell {
     private func openURL() {
         guard let url = item.url else { return }
         callbackDelegate?.callbackReceived(url as Any)
-    }
-    
-    @objc private func viewTapped(recognizer: UITapGestureRecognizer) {
-        if recognizer.state == .ended {
-            switch app {
-            case .TikTok:
-                if sideAppPreference == .App || tempAppPreference == .App {
-                    if isTiTokInstalled, let url = item.url {
-                        UIApplication.shared.open(url, options: [:], completionHandler: {_ in})
-                    }
-                } else if sideAppPreference == nil, tempAppPreference == nil, isTiTokInstalled {
-                    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self)
-                    let content = SideApp(app: .TikTok, callbackDelegate: banner)
-                    banner.present(content: content, isModal: true)
-                }
-            default:
-                print("")
-            }
-        }
     }
     
     // MARK: - Overriden methods
@@ -283,52 +226,5 @@ class WebViewCell: UICollectionViewCell {
         setNeedsLayout()
         constraint.constant = max(disclosureLabel.text!.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
         layoutIfNeeded()
-    }
-}
-
-// MARK: - CallbackObservable
-extension WebViewCell: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-        if let preference = sender as? SideAppPreference {
-            opaqueView?.removeFromSuperview()
-            if preference == .App {
-                tempAppPreference = .App
-                guard let url = item.url else { return }
-                UIApplication.shared.open(url, options: [:], completionHandler: {_ in})
-            } else {
-                tempAppPreference = .Embedded
-            }
-        }
-    }
-}
-
-
-// MARK: - BannerObservable
-extension WebViewCell: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-
-    func onBannerWillDisappear(_ sender: Any) {}
-
-    func onBannerDidAppear(_ sender: Any) {}
-
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let popup = sender as? Popup {
-            popup.removeFromSuperview()
-        }
-    }
-}
-
-// MARK: - WKUIDelegate
-extension WebViewCell: WKNavigationDelegate {
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        UIView.animate(withDuration: 0.2, delay: 1, options: [.curveEaseInOut], animations: {
-            self.webView.alpha = 1
-        })
-//        webView.evaluateJavaScript("document.documentElement.outerHTML.toString()",
-//                                   completionHandler: { (html: Any?, error: Error?) in
-//            print(html as Any)
-//        })
     }
 }

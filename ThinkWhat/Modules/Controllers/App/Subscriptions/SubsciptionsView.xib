@@ -16,13 +16,11 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SubsciptionsView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
-                <outlet property="bottomContainer" destination="Vpm-D9-cyN" id="t9q-wg-oYh"/>
-                <outlet property="card" destination="X4d-cI-Foa" id="JGT-AC-cza"/>
-                <outlet property="cardShadow" destination="WXd-xw-6Wt" id="m0J-2h-vpY"/>
-                <outlet property="collectionView" destination="6XV-Rm-OmZ" id="3EJ-a8-fgx"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Pgm-6r-hSr"/>
                 <outlet property="more" destination="17S-zV-iGm" id="De9-Q8-hVP"/>
+                <outlet property="shadowView" destination="WXd-xw-6Wt" id="m0J-2h-vpY"/>
                 <outlet property="subscribers" destination="62S-hj-7FF" id="b32-1h-6Sd"/>
+                <outlet property="subscriptionsCollectionView" destination="6XV-Rm-OmZ" id="3EJ-a8-fgx"/>
                 <outlet property="upperContainer" destination="OwL-Ha-6XN" id="cZn-lg-cDY"/>
                 <outlet property="upperContainerHeightConstraint" destination="NDq-Y8-pXZ" id="PM2-PK-6Vz"/>
             </connections>
@@ -32,32 +30,6 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vpm-D9-cyN">
-                    <rect key="frame" x="0.0" y="214" width="414" height="648"/>
-                    <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WXd-xw-6Wt">
-                            <rect key="frame" x="10" y="-160" width="394" height="798"/>
-                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="boolean" keyPath="shadow" value="YES"/>
-                            </userDefinedRuntimeAttributes>
-                        </view>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="X4d-cI-Foa">
-                            <rect key="frame" x="10" y="-160" width="394" height="798"/>
-                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        </view>
-                    </subviews>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    <constraints>
-                        <constraint firstItem="WXd-xw-6Wt" firstAttribute="height" secondItem="X4d-cI-Foa" secondAttribute="height" id="75O-R7-aZo"/>
-                        <constraint firstAttribute="bottom" secondItem="X4d-cI-Foa" secondAttribute="bottom" constant="10" id="83n-mA-1vE"/>
-                        <constraint firstItem="WXd-xw-6Wt" firstAttribute="width" secondItem="X4d-cI-Foa" secondAttribute="width" id="BnG-tt-Qw9"/>
-                        <constraint firstAttribute="trailing" secondItem="X4d-cI-Foa" secondAttribute="trailing" constant="10" id="PrD-xJ-cx8"/>
-                        <constraint firstItem="X4d-cI-Foa" firstAttribute="leading" secondItem="Vpm-D9-cyN" secondAttribute="leading" constant="10" id="anM-3R-KIo"/>
-                        <constraint firstItem="WXd-xw-6Wt" firstAttribute="centerX" secondItem="X4d-cI-Foa" secondAttribute="centerX" id="ndB-YX-XDb"/>
-                        <constraint firstItem="WXd-xw-6Wt" firstAttribute="centerY" secondItem="X4d-cI-Foa" secondAttribute="centerY" id="vex-xQ-0eE"/>
-                    </constraints>
-                </view>
                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OwL-Ha-6XN">
                     <rect key="frame" x="0.0" y="44" width="414" height="170"/>
                     <subviews>
@@ -107,18 +79,24 @@
                         <constraint firstItem="6XV-Rm-OmZ" firstAttribute="height" secondItem="OwL-Ha-6XN" secondAttribute="height" multiplier="0.717647" id="zXh-hG-R5S"/>
                     </constraints>
                 </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WXd-xw-6Wt">
+                    <rect key="frame" x="10" y="224" width="394" height="628"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="shadow" value="YES"/>
+                    </userDefinedRuntimeAttributes>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
                 <constraint firstItem="OwL-Ha-6XN" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="9Db-rX-6wy"/>
-                <constraint firstItem="Vpm-D9-cyN" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="FZQ-k1-Rw8"/>
-                <constraint firstItem="Vpm-D9-cyN" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="Uh5-ds-Aan"/>
-                <constraint firstItem="Vpm-D9-cyN" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="cls-aG-JXF"/>
-                <constraint firstItem="X4d-cI-Foa" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="10" id="ht7-Se-DvG"/>
+                <constraint firstItem="WXd-xw-6Wt" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="cAq-r6-QBi"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="WXd-xw-6Wt" secondAttribute="trailing" constant="10" id="eEp-Jp-MwN"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="WXd-xw-6Wt" secondAttribute="bottom" constant="10" id="l8Q-xK-jnq"/>
                 <constraint firstItem="OwL-Ha-6XN" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="ngT-dr-8px"/>
                 <constraint firstItem="OwL-Ha-6XN" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="nzZ-Zk-AIp"/>
-                <constraint firstItem="Vpm-D9-cyN" firstAttribute="top" secondItem="OwL-Ha-6XN" secondAttribute="bottom" id="pAp-oX-ZTw"/>
+                <constraint firstItem="WXd-xw-6Wt" firstAttribute="top" secondItem="OwL-Ha-6XN" secondAttribute="bottom" constant="10" id="wqo-rn-hrH"/>
             </constraints>
             <point key="canvasLocation" x="137.68115942028987" y="81.696428571428569"/>
         </view>

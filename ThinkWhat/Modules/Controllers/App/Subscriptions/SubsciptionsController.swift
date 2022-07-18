@@ -25,19 +25,12 @@ class SubsciptionsController: UIViewController {
         title = "subscriptions".localized
         setupUI()
         setObservers()
-        controllerOutput?.onDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         barButton.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
-        controllerOutput?.onWillAppear()
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        controllerOutput?.onDidLayout()
     }
     
     override func viewWillDisappear(_ animated: Bool) {

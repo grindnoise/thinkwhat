@@ -54,7 +54,7 @@ class ImageCell: UICollectionViewCell {
     private lazy var disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .systemBlue
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
 //        instance.addEquallyTo(to: horizontalStack)
 //        instance.translatesAutoresizingMaskIntoConstraints = false
 //        NSLayoutConstraint.activate([
@@ -389,7 +389,7 @@ class ImageCell: UICollectionViewCell {
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                                  forTextStyle: .footnote)
         guard let constraint = emptyView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()

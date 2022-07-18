@@ -119,7 +119,12 @@ class PollCollectionView: UICollectionView {
             guard let self = self, cell.item.isNil else { return }
             cell.item = self.poll
         }
-        let webCellRegistration = UICollectionView.CellRegistration<WebViewCell, AnyHashable> { [weak self] cell, indexPath, item in
+//        let webCellRegistration = UICollectionView.CellRegistration<WebViewCell, AnyHashable> { [weak self] cell, indexPath, item in
+//            guard let self = self, cell.item.isNil else { return }
+//            cell.item = self.poll
+//            cell.callbackDelegate = self
+//        }
+        let linkPreviewRegistration = UICollectionView.CellRegistration<LinkPreviewCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.item.isNil else { return }
             cell.item = self.poll
             cell.callbackDelegate = self
@@ -201,7 +206,7 @@ class PollCollectionView: UICollectionView {
                                                                     for: indexPath,
                                                                     item: identifier)
             } else if section == .web {
-                return collectionView.dequeueConfiguredReusableCell(using: webCellRegistration,
+                return collectionView.dequeueConfiguredReusableCell(using: linkPreviewRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
             } else if section == .question {

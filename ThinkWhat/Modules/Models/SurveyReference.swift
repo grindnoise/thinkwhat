@@ -12,7 +12,7 @@ import SwiftyJSON
 class SurveyReference: Decodable {
 
     private enum CodingKeys: String, CodingKey {
-        case id, type, title, category, likes, views, progress,
+        case id, type, title, category, likes, views, progress, rating, description,
              startDate = "start_date",
              isComplete = "is_complete",
              isOwn = "is_own",
@@ -27,7 +27,9 @@ class SurveyReference: Decodable {
     var title: String
     var startDate: Date
     var topic: Topic
+    var truncatedDescription: String
     //    var completionPercentage: Int
+    var rating: Double
     var likes: Int
     var views: Int {
         didSet {
@@ -82,6 +84,7 @@ class SurveyReference: Decodable {
             }
             id      = try container.decode(Int.self, forKey: .id)
             title   = try container.decode(String.self, forKey: .title)
+            truncatedDescription = try container.decode(String.self, forKey: .description)
             topic   = _topic
             type    = _type
 //            let _owner  = try container.decode(Userprofile.self, forKey: .owner)
@@ -96,6 +99,7 @@ class SurveyReference: Decodable {
             isFavorite  = try container.decode(Bool.self, forKey: .isFavorite)
             isHot       = try container.decode(Bool.self, forKey: .isHot)
             progress    = try container.decode(Int.self, forKey: .progress)
+            rating      = Double(try container.decode(String.self, forKey: .rating)) ?? 0
             ///Check for existing instance by hashValue
             if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 SurveyReferences.shared.all.append(self)
@@ -105,7 +109,7 @@ class SurveyReference: Decodable {
         }
     }
     
-    init(id _id: Int, title _title: String, startDate _startDate: Date, topic _topic: Topic, type _type: Survey.SurveyType, likes _likes: Int = 0, views _views: Int = 0, isOwn _isOwn: Bool, isComplete _isComplete: Bool, isFavorite _isFavorite: Bool, isHot _isHot: Bool, survey _survey: Survey, owner _owner: Userprofile, votesTotal _votesTotal: Int = 0, votesLimit _votesLimit: Int = 0, isAnonymous _isAnonymous: Bool) {
+    init(id _id: Int, title _title: String, description: String, startDate _startDate: Date, topic _topic: Topic, type _type: Survey.SurveyType, likes _likes: Int = 0, views _views: Int = 0, isOwn _isOwn: Bool, isComplete _isComplete: Bool, isFavorite _isFavorite: Bool, isHot _isHot: Bool, survey _survey: Survey, owner _owner: Userprofile, votesTotal _votesTotal: Int = 0, votesLimit _votesLimit: Int = 0, isAnonymous _isAnonymous: Bool) {
         id                      = _id
         title                   = _title
         topic                   = _topic
@@ -122,7 +126,9 @@ class SurveyReference: Decodable {
 //        survey                  = _survey
         owner                   = _owner
         isAnonymous             = _isAnonymous
+        truncatedDescription    = description
         progress                = 0
+        rating                  = 0
         if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
             SurveyReferences.shared.all.append(self)
         }

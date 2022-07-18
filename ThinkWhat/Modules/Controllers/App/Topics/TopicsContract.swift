@@ -25,7 +25,7 @@ protocol TopicsViewInput: class {
 /// *Controller* tells the *Model* what to do based on the input
 ///
 /// **Model** conforms to this protocol
-protocol TopicsControllerInput: class {
+protocol TopicsControllerInput: AnyObject {
     
     var modelOutput: TopicsModelOutput? { get set }
     
@@ -36,26 +36,28 @@ protocol TopicsControllerInput: class {
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
-protocol TopicsModelOutput: class {
-    func onError(_: Error)
+protocol TopicsModelOutput: AnyObject {
+//    func onError(_: Error)
     func onSearchCompleted(_: [SurveyReference])
 }
 
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
-protocol TopicsControllerOutput: class {
+protocol TopicsControllerOutput: AnyObject {
     var viewInput: TopicsViewInput? { get set }
-    var topic: Topic? { get }
     
-    func onDidLayout()
-    func onWillAppear()
-    func onParentMode()
-    func onChildMode()
-    func onListMode()
-    func onListToChildMode()
-    func onSearchToParentMode()
+    func onDefaultMode()
     func onSearchMode()
     func onSearchCompleted(_: [SurveyReference])
-    func onError()
+//    var topic: Topic? { get }
+    
+//    func onDidLayout()
+//    func onWillAppear()
+//    func onParentMode()
+//    func onChildMode()
+    
+//    func onListToChildMode()
+//    func onSearchToParentMode()
+//    func onError()
 }

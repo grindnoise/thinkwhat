@@ -26,7 +26,7 @@ class PollDescriptionCell: UICollectionViewCell {
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .systemBlue
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
         instance.text = "details".localized.uppercased()
         return instance
     }()
@@ -227,7 +227,7 @@ class PollDescriptionCell: UICollectionViewCell {
         
         textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                           forTextStyle: .body)
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                                  forTextStyle: .footnote)
         guard let constraint_1 = self.shadowView.getAllConstraints().filter({ $0.identifier == "height" }).first,
               let constraint_2 = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }

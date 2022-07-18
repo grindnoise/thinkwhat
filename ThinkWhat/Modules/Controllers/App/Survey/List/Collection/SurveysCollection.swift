@@ -98,6 +98,7 @@ class SurveysCollection: UIView, SurveyDataSource {
     }
     
     private func setupUI() {
+        
         // Create cell registration that defines how data should be shown in a cell
         let cellRegistration = UICollectionView.CellRegistration<SurveyCollectionCell, SurveyReference> { (cell, indexPath, item) in
             cell.item = item
@@ -143,7 +144,8 @@ class SurveysCollection: UIView, SurveyDataSource {
         didSet {
             // Create list layout
             layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
-            layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+            layoutConfig.backgroundColor = .clear
+//            layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
             
             let listLayout = UICollectionViewCompositionalLayout.list(using: layoutConfig)
             // Create collection view with list layout

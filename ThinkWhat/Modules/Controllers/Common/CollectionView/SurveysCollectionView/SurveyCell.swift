@@ -1,17 +1,17 @@
 //
-//  PollTitleCell.swift
+//  SurveyCell.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 30.06.2022.
+//  Created by Pavel Bukharov on 17.07.2022.
 //  Copyright © 2022 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 
-class PollTitleCell: UICollectionViewCell {
+class SurveyCell: UICollectionViewCell {
     
     // MARK: - Public properties
-    public weak var item: Survey! {
+    public weak var item: SurveyReference! {
         didSet {
             titleLabel.text = item.title
             ratingLabel.text = String(describing: item.rating)
@@ -140,7 +140,6 @@ class PollTitleCell: UICollectionViewCell {
     private var constraint: NSLayoutConstraint!
     ///Store tasks from NotificationCenter's AsyncStream
     private var notifications: [Task<Void, Never>?] = []
-    
     
     // MARK: - Destructor
     deinit {
@@ -275,3 +274,5 @@ class PollTitleCell: UICollectionViewCell {
     }
     
 }
+
+

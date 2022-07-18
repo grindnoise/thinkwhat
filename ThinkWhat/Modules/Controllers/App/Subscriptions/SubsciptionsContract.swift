@@ -48,9 +48,6 @@ protocol SubsciptionsModelOutput: class {
 protocol SubsciptionsControllerOutput: class {
     var viewInput: SubsciptionsViewInput? { get set }
     
-    func onWillAppear()
-    func onDidLayout()
-    func onDidLoad()
     func onUpperContainerShown(_: Bool)
     func onSubscribedForUpdated()
     func onError()

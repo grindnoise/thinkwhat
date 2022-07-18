@@ -70,7 +70,7 @@ protocol PollControllerOutput: AnyObject {
     var mode: PollController.Mode { get }
     
 //    func onSurveyLoaded()
-    func onLoadCallback(_: Result<Bool, Error>)
+    func onLoadCallback()
     func onVoteCallback(_: Result<Bool,Error>)
     func onClaimCallback(_: Result<Bool,Error>)
 //    func startLoading()

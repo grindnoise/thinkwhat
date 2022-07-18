@@ -25,10 +25,15 @@ class PollController: UIViewController {
     // MARK: - Private properties
     private var _mode: Mode = .Write
     private var userHasVoted = false
-    private var _survey: Survey!
+    private var _survey: Survey! {
+        didSet {
+            navigationItem.rightBarButtonItem?.isEnabled = !_survey.isNil
+            guard !_survey.isNil else { return }
+            setBarButtonItem()
+        }
+    }
     private var _surveyReference: SurveyReference!
     private var _showNext: Bool = false
-    private var isLoading = false
     private let watchButton: UIImageView = {
         let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
         v.contentMode = .center
@@ -46,6 +51,12 @@ class PollController: UIViewController {
     private lazy var stackView: UIStackView = {
         let v = UIStackView()
         v.spacing = 8
+        observers.append(v.observe(\UIStackView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
+            guard !self.isNil,
+                  let newValue = change.newValue,
+                  let label = view.arrangedSubviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel else { return }
+            label.font = UIFont(name: Fonts.Bold, size: newValue.width * 0.1)
+        })
         return v
     }()
     private lazy var avatar: Avatar = {
@@ -87,6 +98,7 @@ class PollController: UIViewController {
         self._survey = surveyReference.survey
         self._showNext = __showNext
         self._mode = (surveyReference.isComplete || surveyReference.isOwn) ? .ReadOnly : .Write
+        if !_survey.isNil { self.setBarButtonItem() }
     }
     
     required init?(coder: NSCoder) {
@@ -96,79 +108,19 @@ class PollController: UIViewController {
     
     // MARK: - Private methods
     private func setupUI() {
-        if !_survey.isNil { controllerOutput?.onLoadCallback(.success(true)) }
+        if !_survey.isNil { controllerOutput?.onLoadCallback() }
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-                    self.navigationController?.navigationBar.standardAppearance = appearance
-                    self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        self.navigationController?.navigationBar.standardAppearance = appearance
+        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         guard let navigationBar = self.navigationController?.navigationBar else { return }
-
+        
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-        
-        let watchAction : UIAction = .init(title: "watch".localized, image: UIImage(systemName: "binoculars"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { (action) in
-            //                    self.addButtonActionPressed(action: .simple)
-        })
-        
-        let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
-            guard let self = self else { return }
-            // Setting description
-            let firstActivityItem = self._surveyReference.title
-
-                // Setting url
-                let secondActivityItem: URL = URL(string: "http://your-url.com/")!
-                
-                // If you want to use an image
-                let image : UIImage = UIImage(named: "anon")!
-                let activityViewController : UIActivityViewController = UIActivityViewController(
-                    activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
-                
-                // This lines is for the popover you need to show in iPad
-                activityViewController.popoverPresentationController?.sourceView = self.view
-                
-                // This line remove the arrow of the popover to show in iPad
-                activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
-                activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
-                
-                // Pre-configuring activity items
-                activityViewController.activityItemsConfiguration = [
-                UIActivity.ActivityType.message
-                ] as? UIActivityItemsConfigurationReading
-                
-                // Anything you want to exclude
-                activityViewController.excludedActivityTypes = [
-                    UIActivity.ActivityType.postToWeibo,
-                    UIActivity.ActivityType.print,
-                    UIActivity.ActivityType.assignToContact,
-                    UIActivity.ActivityType.saveToCameraRoll,
-                    UIActivity.ActivityType.addToReadingList,
-                    UIActivity.ActivityType.postToFlickr,
-                    UIActivity.ActivityType.postToVimeo,
-                    UIActivity.ActivityType.postToTencentWeibo,
-                    UIActivity.ActivityType.postToFacebook
-                ]
-                
-                activityViewController.isModalInPresentation = true
-                self.present(activityViewController, animated: true, completion: nil)
-        })
-        let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { (action) in
-            //                    self.addButtonActionPressed(action: .advanced)
-        })
-        
-        let actions = [watchAction, shareAction, claimAction]
-        
-        let menu = UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
-        
-        let actionButton = UIBarButtonItem(title: "", image: UIImage(systemName: "ellipsis"), primaryAction: nil, menu: menu)
-        navigationItem.rightBarButtonItem = actionButton
+            
         navigationBar.addSubview(avatar)
         avatar.translatesAutoresizingMaskIntoConstraints = false
+        navigationItem.rightBarButtonItem?.isEnabled = !_survey.isNil
 
-//        NSLayoutConstraint.activate([
-//            avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
-//            avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
-//            avatar.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.NavBarHeightLargeState - UINavigationController.Constants.ImageBottomMarginForLargeState*2),
-//            avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1.0/1.0)
-//            ])
         NSLayoutConstraint.activate([
             avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
@@ -180,12 +132,6 @@ class PollController: UIViewController {
         navigationBar.addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
 
-//        NSLayoutConstraint.activate([
-//            stackView.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState),
-//            stackView.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState),
-//            stackView.heightAnchor.constraint(equalToConstant: 52 - UINavigationController.Constants.ImageBottomMarginForLargeState),
-//            stackView.trailingAnchor.constraint(equalTo: avatar.leadingAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForSmallState)
-//        ])
         NSLayoutConstraint.activate([
             stackView.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageRightMargin),
             stackView.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
@@ -216,12 +162,7 @@ class PollController: UIViewController {
     }
     
     private func setObservers() {
-        observers.append(stackView.observe(\UIStackView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
-            guard !self.isNil,
-                  let newValue = change.newValue,
-                  let label = view.arrangedSubviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel else { return }
-            label.font = UIFont(name: Fonts.Bold, size: newValue.width * 0.1)
-        })
+        
         guard let navBar = navigationController?.navigationBar else { return }
         observers.append(navBar.observe(\UINavigationBar.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
             guard let self = self,
@@ -245,7 +186,7 @@ class PollController: UIViewController {
             var largeAlpha: CGFloat = CGFloat(1) - max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             let smallAlpha: CGFloat = max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             
-            largeAlpha = largeAlpha < 0.28 ? 0 : largeAlpha
+            largeAlpha = largeAlpha < 0.3 ? 0 : largeAlpha
             self.navigationItem.titleView?.alpha = smallAlpha
             self.avatar.alpha = largeAlpha
             self.stackView.alpha = largeAlpha
@@ -261,38 +202,6 @@ class PollController: UIViewController {
 //        controllerOutput?.startLoading()
         controllerInput?.loadPoll(surveyReference, incrementViewCounter: true)
     }
-
-    @objc private func addFavorite() {
-        guard !isLoading, !survey.isNil else { return }
-        guard survey!.isComplete else {
-            showBanner(bannerDelegate: self, text: "finish_poll".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
-            return
-        }
-//        isLoading = true
-        var mark = true
-        if !isAddedToFavorite {
-            UIView.transition(with: watchButton, duration: 0.3, options: [.transitionCrossDissolve]) {
-                self.watchButton.image = ImageSigns.binocularsFilled.image
-            } completion: { _ in}
-            mark = true
-            if Surveys.shared.favoriteReferences.filter({ $0.id == _surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences.append(_surveyReference)
-            }
-//            if Array(Surveys.shared.favoriteReferences.keys).filter( {$0.id == _surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences[self._surveyReference] = Date() }
-        } else {
-            UIView.transition(with: watchButton, duration: 0.2, options: [.transitionCrossDissolve]) {
-                self.watchButton.image = ImageSigns.binoculars.image
-            } completion: { _ in}
-            mark = false
-            if Surveys.shared.favoriteReferences.filter({ $0.id == _surveyReference.id }).isEmpty { Surveys.shared.favoriteReferences.remove(object: _surveyReference)
-            }
-//            if let key = Surveys.shared.favoriteReferences.keys.filter({ $0.id == _surveyReference.id }).first {
-//                Surveys.shared.favoriteReferences.removeValue(forKey: key)
-//            }
-        }
-        isAddedToFavorite = !isAddedToFavorite
-//        NotificationCenter.default.post(name: Notifications.Surveys.UpdateFavorite, object: nil)
-        controllerInput?.addFavorite(mark)
-    }
     
     @objc
     private func handleTap(_ recognizer: UITapGestureRecognizer) {
@@ -303,6 +212,82 @@ class PollController: UIViewController {
         }
     }
 
+    private func setBarButtonItem() {
+        var actionButton: UIBarButtonItem!
+        let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+            guard let self = self, !self._survey.isNil else { return }
+            // Setting description
+            let firstActivityItem = self._surveyReference.title
+            
+            // Setting url
+            let queryItems = [URLQueryItem(name: "hash", value: self._survey.shareHash), URLQueryItem(name: "enc", value: self._survey.shareEncryptedString)]
+            var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
+            urlComps.queryItems = queryItems
+            
+            let secondActivityItem: URL = urlComps.url!
+            
+            // If you want to use an image
+            let image : UIImage = UIImage(named: "anon")!
+            let activityViewController : UIActivityViewController = UIActivityViewController(
+                activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
+            
+            // This lines is for the popover you need to show in iPad
+            activityViewController.popoverPresentationController?.sourceView = self.view
+            
+            // This line remove the arrow of the popover to show in iPad
+            activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
+            activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
+            
+            // Pre-configuring activity items
+            activityViewController.activityItemsConfiguration = [
+                UIActivity.ActivityType.message
+            ] as? UIActivityItemsConfigurationReading
+            
+            // Anything you want to exclude
+            activityViewController.excludedActivityTypes = [
+                UIActivity.ActivityType.postToWeibo,
+                UIActivity.ActivityType.print,
+                UIActivity.ActivityType.assignToContact,
+                UIActivity.ActivityType.saveToCameraRoll,
+                UIActivity.ActivityType.addToReadingList,
+                UIActivity.ActivityType.postToFlickr,
+                UIActivity.ActivityType.postToVimeo,
+                UIActivity.ActivityType.postToTencentWeibo,
+                UIActivity.ActivityType.postToFacebook
+            ]
+            
+            activityViewController.isModalInPresentation = true
+            self.present(activityViewController,
+                         animated: true,
+                         completion: nil)
+        })
+        
+        if _survey.isOwn {
+            actionButton = UIBarButtonItem(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up"), primaryAction: shareAction, menu: nil)
+            navigationItem.rightBarButtonItem = actionButton
+        } else {
+            let watchAction : UIAction = .init(title: _survey.isFavorite ? "don't_watch".localized : "watch".localized, image: UIImage(systemName: "binoculars"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+                guard let self = self else { return }
+                guard let instance = self._survey,
+                      instance.isComplete else {
+                    showBanner(bannerDelegate: self.controllerOutput as! BannerObservable, text: "finish_poll".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+                    return }
+                self.controllerInput?.addFavorite(!instance.isFavorite)
+            })
+            watchAction.accessibilityIdentifier = "watch"
+            
+            let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { (action) in
+                //                    self.addButtonActionPressed(action: .advanced)
+            })
+            
+            let actions = [watchAction, shareAction, claimAction]
+            
+            let menu = UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+            
+            actionButton = UIBarButtonItem(title: "", image: UIImage(systemName: "ellipsis"), primaryAction: nil, menu: menu)
+        }
+        navigationItem.rightBarButtonItem = actionButton
+    }
 //    override func viewWillAppear(_ animated: Bool) {
 //        super.viewWillAppear(animated)
 ////                navigationController?.navigationBar.prefersLargeTitles = false
@@ -469,11 +454,11 @@ extension PollController: PollModelOutput {
     }
     
     func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
-        isLoading = false
         switch result {
         case .success(let mark):
             guard mark else { return }
             controllerOutput?.onAddFavoriteCallback()
+            setBarButtonItem()
         case .failure:
 #if DEBUG
             print("")
@@ -482,7 +467,13 @@ extension PollController: PollModelOutput {
     }
     
     func onLoadCallback(_ result: Result<Bool, Error>) {
-        controllerOutput?.onLoadCallback(result)
+        switch result {
+        case .success:
+            _survey = _surveyReference.survey
+            controllerOutput?.onLoadCallback()
+        case .failure:
+            showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark)
+        }
     }
 }
 

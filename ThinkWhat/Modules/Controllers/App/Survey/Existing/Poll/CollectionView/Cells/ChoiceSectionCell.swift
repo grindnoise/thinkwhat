@@ -37,7 +37,7 @@ class ChoiceSectionCell: UICollectionViewCell {
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
         instance.text = "vote_noun".localized.uppercased()
         return instance
     }()
@@ -159,7 +159,7 @@ class ChoiceSectionCell: UICollectionViewCell {
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                                  forTextStyle: .footnote)
         guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
