@@ -189,7 +189,7 @@ extension HotController: DataObservable {
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(HotController.populateStack),
-                                               name: Notifications.Surveys.UpdateHotSurveys,
+                                               name: Notifications.Surveys.SwitchHot,
                                                object: nil)
     }
 }

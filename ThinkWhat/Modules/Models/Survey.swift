@@ -204,25 +204,25 @@ class Survey: Decodable {
         didSet {
             guard oldValue != isHot else { return }
             reference.isHot = isHot
-            Notification.send(names: [Notifications.Surveys.UpdateHotSurveys])
         }
 //        return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
     }
 
     var isComplete: Bool {
-        if let _result = result, !_result.isEmpty {
-            return true
+        guard let result = result else {
+            return false
         }
-        return false
+        reference.isComplete = !result.isEmpty
+        return !result.isEmpty
     }
     var isOwn: Bool {
+//        assert(UserDefaults.Profile.id.isNil)
         return owner.id == UserDefaults.Profile.id
     }
     var isFavorite: Bool {
         didSet {
             guard oldValue != isFavorite else { return }
             reference.isFavorite = isFavorite
-            NotificationCenter.default.post(name: isFavorite ? Notifications.Surveys.SetFavorite : Notifications.Surveys.UnsetFavorite, object: self.reference)
 //            Notification.send(names: [Notifications.Surveys.UpdateFavorite])
         }
 //        return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
@@ -509,7 +509,7 @@ class Surveys {
                     for instance in instances {
                         if hot.filter({ $0.hashValue == instance.hashValue }).isEmpty {
                             hot.append(Surveys.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                            notifications.append(Notifications.Surveys.UpdateHotSurveys)
+                            notifications.append(Notifications.Surveys.SwitchHot)
                         }
                     }
                 } else {

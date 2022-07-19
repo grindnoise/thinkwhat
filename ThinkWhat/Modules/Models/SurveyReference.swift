@@ -41,14 +41,25 @@ class SurveyReference: Decodable {
     var isComplete: Bool {
         didSet {
             guard oldValue != isComplete else { return }
-            NotificationCenter.default.post(name: Notifications.Surveys.Completed, object: self)
-//            Notification.send(names: [Notifications.Surveys.Completed])
+//            NotificationCenter.default.post(name: Notifications.Surveys.Completed, object: self)
+            Notification.send(names: [Notifications.Surveys.Completed])
         }
     }
     var isOwn: Bool
     var isAnonymous: Bool
-    var isHot: Bool
-    var isFavorite: Bool
+    var isHot: Bool {
+        didSet {
+            guard oldValue != isHot else { return }
+            Notification.send(names: [Notifications.Surveys.SwitchHot])
+        }
+    }
+    var isFavorite: Bool {
+        didSet {
+            guard oldValue != isFavorite else { return }
+//            NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: nil)
+            Notification.send(names: [Notifications.Surveys.SwitchFavorite])
+        }
+    }
 //    var isFavorite: Bool {
 //        didSet {
 //            guard oldValue != isFavorite else { return }

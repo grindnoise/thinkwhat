@@ -188,8 +188,12 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? SurveyCollectionCell else { return }
-        callbackDelegate?.callbackReceived(cell.item as Any)
+        if let cell = collectionView.cellForItem(at: indexPath) as? SurveyCollectionCell {
+            callbackDelegate?.callbackReceived(cell.item as Any)
+        } else if let cell = collectionView.cellForItem(at: indexPath) as? SubscriptionCell {
+            callbackDelegate?.callbackReceived(cell.item as Any)
+        }
+        deselect()
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {

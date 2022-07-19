@@ -18,11 +18,18 @@ class SubscriptionCell: UICollectionViewCell {
             descriptionLabel.text = item.truncatedDescription
             ratingLabel.text = String(describing: item.rating)
             viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-            dateLabel.text = item.startDate.toDateString()
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd.MM.yyyy"
+            dateLabel.text = formatter.string(from: item.startDate)
+//            dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? .systemGreen : .systemGray
+//            dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? item.topic.tagColor : .systemGray
             topicLabel.text = item.topic.title.uppercased()
-            usernameLabel.text = item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n" + item.owner.lastNameSingleWord)
+            firstnameLabel.text = item.owner.firstNameSingleWord
+            lastnameLabel.text = item.owner.lastNameSingleWord
+            
+//            usernameLabel.text = item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n" + item.owner.lastNameSingleWord)
             topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-            if !item.owner.lastNameSingleWord.isEmpty { usernameLabel.numberOfLines = 2 }
+//            if !item.owner.lastNameSingleWord.isEmpty { usernameLabel.numberOfLines = 2 }
             if let image = item.owner.image {
                 avatar.image = image
             } else {
@@ -33,13 +40,78 @@ class SubscriptionCell: UICollectionViewCell {
                     }
                 }
             }
+            
+            if item.isFavorite || item.isComplete || item.isHot {
+                let stackView = UIStackView()
+                stackView.spacing = 0
+                stackView.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+                stackView.accessibilityIdentifier = "marksStackView"
+                observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
+                    guard let newValue = change.newValue else { return }
+                    view.cornerRadius = newValue.height/2.25
+                })
+                if item.isComplete {
+                    let container = UIView()
+                    container.backgroundColor = .clear
+                    container.accessibilityIdentifier = "isComplete"
+                    container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                    
+                    let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
+//                    instance.accessibilityIdentifier = "isComplete"
+//                    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.15/1).isActive = true
+//                    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemGreen
+                    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : item.topic.tagColor
+                    instance.contentMode = .scaleAspectFit
+                    instance.addEquallyTo(to: container)
+                    stackView.addArrangedSubview(container)
+                }
+                if item.isFavorite {
+                    let container = UIView()
+                    container.backgroundColor = .clear
+                    container.accessibilityIdentifier = "isFavorite"
+                    container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                    
+                    let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
+//                    instance.accessibilityIdentifier = "isFavorite"
+//                    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.15/1).isActive = true
+                    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                    instance.contentMode = .scaleAspectFit
+                    instance.addEquallyTo(to: container)
+                    stackView.addArrangedSubview(container)
+                }
+                if item.isHot {
+                    let container = UIView()
+                    container.backgroundColor = .clear
+                    container.accessibilityIdentifier = "isHot"
+                    container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                    
+                    let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+//                    instance.accessibilityIdentifier = "isComplete"
+//                    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.15/1).isActive = true
+                    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed//.white
+                    instance.contentMode = .scaleAspectFit
+                    instance.addEquallyTo(to: container)
+                    stackView.addArrangedSubview(container)
+                }
+                topicStackView.addArrangedSubview(stackView)
+            }
+            
+//            if item.isHot {
+//                let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+//                instance.accessibilityIdentifier = "isHot"
+//                instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed
+//                instance.contentMode = .scaleAspectFit
+//                topicStackView.addArrangedSubview(instance)
+//            }
+            
             let constraint = titleLabel.heightAnchor.constraint(equalToConstant: 300)
             constraint.identifier = "height"
             constraint.isActive = true
             let constraint_2 = descriptionLabel.heightAnchor.constraint(equalToConstant: 15)
             constraint_2.identifier = "height"
             constraint_2.isActive = true
-            let constraint_3 = topicView.heightAnchor.constraint(equalToConstant: 15)
+            let constraint_3 = topicView.heightAnchor.constraint(equalToConstant: 25)
             constraint_3.identifier = "height"
             constraint_3.isActive = true
 //                    let constraint_4 = topicLabel.widthAnchor.constraint(equalToConstant: 30)
@@ -56,14 +128,16 @@ class SubscriptionCell: UICollectionViewCell {
         let instance = UILabel()
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
-        instance.numberOfLines = 1
+        instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
         instance.textColor = .label
         observers.append(instance.observe(\UILabel.bounds, options: [.new]) { [weak self] view, _ in
             guard let self = self,
-                  let constraint = self.titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
-                  let height = "text".height(withConstrainedWidth: view.bounds.width, font: view.font) as? CGFloat,
-                  height != constraint.constant else { return }
+                  let item = self.item,
+                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first else{ return }
+            
+            let height = item.title.height(withConstrainedWidth: view.bounds.width, font: view.font)
+            guard height != constraint.constant else { return }
             self.setNeedsLayout()
             constraint.constant = height
             self.layoutIfNeeded()
@@ -72,17 +146,19 @@ class SubscriptionCell: UICollectionViewCell {
     }()
     private lazy var descriptionLabel: InsetLabel = {
         let instance = InsetLabel()
-        instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0)
+        instance.insets = UIEdgeInsets(top: instance.insets.top, left: 0, bottom: 20, right: 0)
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline)
-        instance.numberOfLines = 1
+        instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
         instance.textColor = .label
         observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, _ in
             guard let self = self,
-                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first,
-                  let height = "text".height(withConstrainedWidth: view.bounds.width, font: view.font) as? CGFloat,
-                  height != constraint.constant else { return }
+                  let item = self.item,
+                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first else{ return }
+            
+            let height = item.truncatedDescription.height(withConstrainedWidth: view.bounds.width, font: view.font)
+            guard height != constraint.constant else { return }
             self.setNeedsLayout()
             constraint.constant = height + view.insets.top + view.insets.bottom
             self.layoutIfNeeded()
@@ -127,11 +203,34 @@ class SubscriptionCell: UICollectionViewCell {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()
-    private lazy var dateLabel: UILabel = {
-        let instance = UILabel()
+    private lazy var dateLabel: InsetLabel = {
+        let instance = InsetLabel()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
-        instance.textColor = .secondaryLabel
+        instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
+        instance.textColor = .secondaryLabel//.white
+//        instance.backgroundColor = .systemGray
+        observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
+            guard let self = self,
+                  let newValue = change.newValue else { return }
+            
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd.MM.yyyy"
+            let text = formatter.string(from: self.item.startDate)
+            let height = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
+            let width = text.width(withConstrainedHeight: height, font: view.font)
+            
+            self.setNeedsLayout()
+            if let constraint = view.getAllConstraints().filter({ $0.identifier == "width"}).first {
+                constraint.constant = width + 8
+            } else {
+                let constraint = view.widthAnchor.constraint(equalToConstant: width + 8)
+                constraint.identifier = "width"
+                constraint.isActive = true
+            }
+            self.layoutIfNeeded()
+            view.cornerRadius = newValue.height/2.25
+        })
         return instance
     }()
     private lazy var usernameLabel: UILabel = {
@@ -143,9 +242,9 @@ class SubscriptionCell: UICollectionViewCell {
     }()
     private lazy var topicLabel: InsetLabel = {
         let instance = InsetLabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
         instance.textAlignment = .center
-        instance.insets = UIEdgeInsets(top: 2, left: 4, bottom: 2, right: 4)
+        instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
         instance.textColor = .white
         observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
             guard let self = self,
@@ -163,10 +262,16 @@ class SubscriptionCell: UICollectionViewCell {
                 constraint_2.isActive = true
             }
 //            constraint_2.constant = newValue.width + 8
-            constraint.constant = height + 4
+            constraint.constant = height// + 4
             self.layoutIfNeeded()
             view.cornerRadius = newValue.height/2.25
         })
+        return instance
+    }()
+    private lazy var topicStackView: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [topicLabel])//, dateLabel])
+        instance.alignment = .center
+        instance.spacing = 4
         return instance
     }()
     @MainActor private let viewsLabel: UILabel = {
@@ -195,11 +300,11 @@ class SubscriptionCell: UICollectionViewCell {
     private lazy var statsStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
         instance.alignment = .center
-        instance.spacing = 4
+        instance.spacing = 2
         return instance
     }()
     private lazy var avatarStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [dateLabel, avatar, usernameLabel])
+        let instance = UIStackView(arrangedSubviews: [avatar, usernameLabel])//, dateLabel])
         instance.axis = .vertical
         instance.spacing = 4
         return instance
@@ -211,18 +316,70 @@ class SubscriptionCell: UICollectionViewCell {
 //        constraint.identifier = "height"
 //        constraint.isActive = true
         instance.backgroundColor = .clear
-        instance.addSubview(topicLabel)
-        topicLabel.translatesAutoresizingMaskIntoConstraints = false
+        instance.addSubview(topicStackView)
+        topicStackView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            topicLabel.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-            topicLabel.topAnchor.constraint(equalTo: instance.topAnchor),
-            topicLabel.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            topicStackView.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+            topicStackView.topAnchor.constraint(equalTo: instance.topAnchor),
+            topicStackView.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
 //            topicLabel.widthAnchor.constraint(equalToConstant: 30),
         ])
 //        let constraint = topicLabel.widthAnchor.constraint(equalToConstant: 30)
 //        constraint.identifier = "width"
 //        constraint.isActive = true
 //        constraint.priority = .defaultLow
+        return instance
+    }()
+    private lazy var userView: UIView = {
+        let instance = UIView()
+        instance.clipsToBounds = false
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "userView"
+        instance.addSubview(dateLabel)
+        instance.addSubview(firstnameLabel)
+        instance.addSubview(lastnameLabel)
+        instance.addSubview(avatar)
+//        instance.addSubview(dateLabel)
+        firstnameLabel.translatesAutoresizingMaskIntoConstraints = false
+        lastnameLabel.translatesAutoresizingMaskIntoConstraints = false
+        avatar.translatesAutoresizingMaskIntoConstraints = false
+        dateLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            firstnameLabel.centerYAnchor.constraint(equalTo: lastnameLabel.centerYAnchor),
+            firstnameLabel.centerXAnchor.constraint(equalTo: lastnameLabel.centerXAnchor),
+            firstnameLabel.widthAnchor.constraint(equalTo: lastnameLabel.widthAnchor),
+//            lastnameLabel.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
+            lastnameLabel.centerXAnchor.constraint(equalTo: avatar.centerXAnchor),
+            lastnameLabel.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
+            lastnameLabel.widthAnchor.constraint(equalTo: avatar.widthAnchor, multiplier: 1.7),
+            avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 0),
+            avatar.centerXAnchor.constraint(equalTo: dateLabel.centerXAnchor),
+            avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.8),
+            dateLabel.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            dateLabel.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+        ])
+        return instance
+    }()
+    private lazy var firstnameLabel: ArcLabel = {
+        let instance = ArcLabel()
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+        instance.textAlignment = .center
+        instance.text = "test"
+        instance.textColor = .secondaryLabel
+        instance.accessibilityIdentifier = "firstnameLabel"
+        return instance
+    }()
+    private lazy var lastnameLabel: ArcLabel = {
+        let instance = ArcLabel()
+        instance.angle = 4.7
+        instance.clockwise = false
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+        instance.textAlignment = .center
+        instance.text = "test"
+        instance.textColor = .secondaryLabel
+        instance.accessibilityIdentifier = "lastnameLabel"
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
@@ -232,7 +389,7 @@ class SubscriptionCell: UICollectionViewCell {
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [verticalStack, avatarStack])
+        let instance = UIStackView(arrangedSubviews: [verticalStack, userView])
         instance.axis = .horizontal
         instance.spacing = 4
         return instance
@@ -245,7 +402,6 @@ class SubscriptionCell: UICollectionViewCell {
     
     // MARK: - Destructor
     deinit {
-        ///Destruct notifications
         notifications.forEach { $0?.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
@@ -288,7 +444,7 @@ class SubscriptionCell: UICollectionViewCell {
             
             horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 //            horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding/2),
-            avatarStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.2)
+            userView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.2)
         ])
         
         constraint = statsView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding/2)
@@ -320,6 +476,136 @@ class SubscriptionCell: UICollectionViewCell {
                     }
                 }
             })
+            notifications.append(Task { [weak self] in
+                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
+                    await MainActor.run {
+                        guard let self = self,
+                              let item = self.item
+                        else { return }
+                        switch item.isFavorite {
+                        case true:
+                            var stackView: UIStackView!
+                            if let _stackView = topicStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
+                                stackView = _stackView
+                            } else {
+                                stackView = UIStackView()
+                                stackView.spacing = 0
+                                stackView.backgroundColor = .clear
+                                stackView.accessibilityIdentifier = "marksStackView"
+                                observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
+                                    guard let newValue = change.newValue else { return }
+                                    view.cornerRadius = newValue.height/2.25
+                                })
+                                topicStackView.addArrangedSubview(stackView)
+                            }
+                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isFavorite"}).isEmpty else { return }
+                            let container = UIView()
+                            container.backgroundColor = .clear
+                            container.accessibilityIdentifier = "isFavorite"
+                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                            
+                            let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
+                            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                            instance.contentMode = .scaleAspectFit
+                            instance.addEquallyTo(to: container)
+                            stackView.insertArrangedSubview(container,
+                                                            at: stackView.arrangedSubviews.isEmpty ? 0 : stackView.arrangedSubviews.count > 1 ? stackView.arrangedSubviews.count-1 : stackView.arrangedSubviews.count)
+                        case false:
+                            guard let stackView = topicStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
+                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isFavorite" }).first else { return }
+                            stackView.removeArrangedSubview(mark)
+                            mark.removeFromSuperview()
+                        }
+                    }
+                }
+            })
+            notifications.append(Task { [weak self] in
+                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
+                    await MainActor.run {
+                        guard let self = self,
+                              let item = self.item
+                        else { return }
+//                        self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? .systemGreen : .systemGray
+//                        self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? self.item.topic.tagColor : .systemGray
+                        switch item.isComplete {
+                        case true:
+//                            self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemGray : item.isComplete ? .systemGreen : .systemGray
+                            var stackView: UIStackView!
+                            if let _stackView = self.topicStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
+                                stackView = _stackView
+                            } else {
+                                stackView = UIStackView()
+                                stackView.spacing = 0
+                                stackView.backgroundColor = .clear
+                                stackView.accessibilityIdentifier = "marksStackView"
+                                self.observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
+                                    guard let newValue = change.newValue else { return }
+                                    view.cornerRadius = newValue.height/2.25
+                                })
+                                self.topicStackView.addArrangedSubview(stackView)
+                            }
+                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty else { return }
+                            let container = UIView()
+                            container.backgroundColor = .clear
+                            container.accessibilityIdentifier = "isComplete"
+                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                            
+                            let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
+                            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemGreen
+                            instance.contentMode = .scaleAspectFit
+                            instance.addEquallyTo(to: container)
+                            stackView.insertArrangedSubview(container, at: 0)
+                        case false:
+                            guard let stackView = self.topicStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
+                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isComplete" }).first else { return }
+                            stackView.removeArrangedSubview(mark)
+                            mark.removeFromSuperview()
+                        }
+                    }
+                }
+            })
+            notifications.append(Task { [weak self] in
+                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
+                    await MainActor.run {
+                        guard let self = self,
+                              let item = self.item
+                        else { return }
+                        switch item.isHot {
+                        case true:
+                            var stackView: UIStackView!
+                            if let _stackView = self.topicStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
+                                stackView = _stackView
+                            } else {
+                                stackView = UIStackView()
+                                stackView.spacing = 0
+                                stackView.backgroundColor = .clear
+                                stackView.accessibilityIdentifier = "marksStackView"
+                                self.observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
+                                    guard let newValue = change.newValue else { return }
+                                    view.cornerRadius = newValue.height/2.25
+                                })
+                                self.topicStackView.addArrangedSubview(stackView)
+                            }
+                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isHot"}).isEmpty else { return }
+                            let container = UIView()
+                            container.backgroundColor = .clear
+                            container.accessibilityIdentifier = "isHot"
+                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                            
+                            let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+                            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed
+                            instance.contentMode = .scaleAspectFit
+                            instance.addEquallyTo(to: container)
+                            stackView.insertArrangedSubview(container, at: stackView.arrangedSubviews.count == 0 ? 0 : stackView.arrangedSubviews.count)
+                        case false:
+                            guard let stackView = self.topicStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
+                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isHot" }).first else { return }
+                            stackView.removeArrangedSubview(mark)
+                            mark.removeFromSuperview()
+                        }
+                    }
+                }
+            })
         } else {
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.updateViewsCount),
@@ -344,12 +630,28 @@ class SubscriptionCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+//        dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? .systemGreen : .systemGray
+//        dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? item.topic.tagColor : .systemGray
+        if let stackView = topicStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
+            stackView.arrangedSubviews.forEach { [weak self] in
+                guard let self = self,
+                      let identifier = $0.accessibilityIdentifier else { return }
+                if identifier == "isHot" {
+                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed
+                } else if identifier == "isComplete" {
+//                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
+                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
+                } else if identifier == "isFavorite" {
+                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                }
+            }
+        }
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
         titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                            forTextStyle: .title1)
+                                            forTextStyle: .title2)
         ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .caption2)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,

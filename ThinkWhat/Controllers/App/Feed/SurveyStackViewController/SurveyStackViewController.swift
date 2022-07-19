@@ -29,7 +29,7 @@ class SurveyStackViewController: UIViewController {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(SurveyStackViewController.generatePreviews),
-                                               name: Notifications.Surveys.UpdateHotSurveys,
+                                               name: Notifications.Surveys.SwitchHot,
                                                object: nil)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(SurveyStackViewController.didBecomeActive),

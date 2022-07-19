@@ -332,9 +332,9 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    func toDateStringLiteral_dMMM() -> String {
+    func toDateStringLiteral_dMMM(localeIdentifier: String = "ru_RU") -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.locale = Locale(identifier: localeIdentifier)
         formatter.dateFormat = "d MMM"
         return formatter.string(from: self)
     }

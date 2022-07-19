@@ -41,10 +41,11 @@ struct Notifications {
     struct Surveys {
         static let UnsetFavorite                    = Notification.Name("NotificationFavoriteSurveyUnset")
         static let SetFavorite                      = Notification.Name("NotificationFavoriteSurveySet")
+        static let SwitchFavorite                   = Notification.Name("NotificationSwitchFavorite")
         static let UpdateFavorite                   = Notification.Name("NotificationFavoriteSurveysUpdated")
         static let UpdateTopSurveys                 = Notification.Name("NotificationTopSurveysUpdated")
         static let UpdateNewSurveys                 = Notification.Name("NotificationNewSurveysUpdated")
-        static let UpdateHotSurveys                 = Notification.Name("NotificationSurveysStackReceived")
+        static let SwitchHot                        = Notification.Name("NotificationSwitchHot")
         static let UpdateSubscriptions              = Notification.Name("NotificationSubscriptionsReceived")
         static let UpdateOwn                        = Notification.Name("NotificationOwnSurveysUpdated")
         static let UpdateAll                        = Notification.Name("NotificationAllSurveysUpdated")

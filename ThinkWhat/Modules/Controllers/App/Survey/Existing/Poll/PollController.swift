@@ -159,6 +159,8 @@ class PollController: UIViewController {
         
         indicator.translatesAutoresizingMaskIntoConstraints = false
         indicator.widthAnchor.constraint(equalTo: indicator.heightAnchor, multiplier: 1.0/1.0).isActive = true
+//        navigationBar.setNeedsLayout()
+//        navigationBar.layoutIfNeeded()
     }
     
     private func setObservers() {
@@ -191,7 +193,14 @@ class PollController: UIViewController {
             self.avatar.alpha = largeAlpha
             self.stackView.alpha = largeAlpha
         })
-
+        notifications.append(Task { [weak self] in
+            for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
+                await MainActor.run {
+                    guard let self = self else { return }
+                    self.setBarButtonItem()
+                }
+            }
+        })
     }
     
     private func performChecks() {
@@ -458,7 +467,7 @@ extension PollController: PollModelOutput {
         case .success(let mark):
             guard mark else { return }
             controllerOutput?.onAddFavoriteCallback()
-            setBarButtonItem()
+//            setBarButtonItem()
         case .failure:
 #if DEBUG
             print("")
