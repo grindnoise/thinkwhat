@@ -61,8 +61,12 @@ struct Notifications {
         static let Rejected                         = Notification.Name("NotificationReject")
         static let Claimed                          = Notification.Name("NotificationClaim")
         static let Completed                        = Notification.Name("NotificationSurveyCompleted")
+        static let Progress                         = Notification.Name("NotificationSurveyProgress")
         static let Views                            = Notification.Name("NotificationSurveyViews")
+        static let Rating                           = Notification.Name("NotificationSurveyRating")
         static let Watchers                         = Notification.Name("NotificationSurveyWatchers")
+        static let Likes                            = Notification.Name("NotificationSurveyLikes")
+        
         
         static let SurveysStackUpdated              = Notification.Name("NotificationSurveysStackUpdated")
         static let OwnSurveysUpdated                = Notification.Name("NotificationOwnSurveysUpdated")

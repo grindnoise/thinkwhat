@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SurveyCell: UICollectionViewCell {
+class _delSurveyCell: UICollectionViewCell {
     
     // MARK: - Public properties
     public weak var item: SurveyReference! {
@@ -34,9 +34,11 @@ class SurveyCell: UICollectionViewCell {
         observers.append(instance.observe(\UILabel.bounds, options: [.new]) { [weak self] view, _ in
             guard let self = self,
                   let text = view.text,
-                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first,
-                  let height = text.height(withConstrainedWidth: view.bounds.width, font: view.font) as? CGFloat,
-                  height != constraint.constant else { return }
+                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+            
+            let height = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
+            guard height != constraint.constant else { return }
+            
             self.setNeedsLayout()
             constraint.constant = height
             self.layoutIfNeeded()
@@ -208,18 +210,18 @@ class SurveyCell: UICollectionViewCell {
         if #available(iOS 15, *) {
             notifications.append(Task { [weak self] in
                 guard !self.isNil else { return }
-                for await _ in await NotificationCenter.default.notifications(for: UIApplication.willResignActiveNotification) {
+                for await _ in NotificationCenter.default.notifications(for: UIApplication.willResignActiveNotification) {
                     print("UIApplication.willResignActiveNotification")
                 }
             })
             notifications.append(Task { [weak self] in
                 guard !self.isNil else { return }
-                for await _ in await NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+                for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
                     print("UIApplication.didBecomeActiveNotification")
                 }
             })
             notifications.append(Task { [weak self] in
-                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
+                for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
                     await MainActor.run {
                         guard let self = self,
                               let item = self.item else { return }

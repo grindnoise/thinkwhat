@@ -275,6 +275,10 @@ extension UIView {
                 constraint.secondItem as? UIView == self
         }
     }
+    
+    func getConstraint(identifier: String) -> NSLayoutConstraint? {
+        return self.getAllConstraints().filter({ $0.identifier == identifier }).first
+    }
 }
 
 

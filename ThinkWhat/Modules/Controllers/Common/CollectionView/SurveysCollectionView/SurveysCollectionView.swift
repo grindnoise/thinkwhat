@@ -96,33 +96,27 @@ class SurveysCollectionView: UICollectionView {
         allowsMultipleSelection = true
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
-            layoutConfig.headerMode = .firstItemInSection
+//            layoutConfig.headerMode = .firstItemInSection
             layoutConfig.backgroundColor = .clear
             layoutConfig.showsSeparators = true
             
             return NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
         }
         
-        let subscriptionCellRegistration = UICollectionView.CellRegistration<SubscriptionCell, SurveyReference> { cell, indexPath, item in
+        let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { cell, indexPath, item in
             guard cell.item.isNil else { return }
             cell.item = item
         }
         
-        let surveyCellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { cell, indexPath, item in
-            cell.layer.masksToBounds = false
-            guard cell.item.isNil else { return }
-            cell.item = item
-        }
-        
-        source = UICollectionViewDiffableDataSource<Section, SurveyReference>(collectionView: self) { [weak self]
+        source = UICollectionViewDiffableDataSource<Section, SurveyReference>(collectionView: self) {
             collectionView, indexPath, identifier -> UICollectionViewCell? in
-            guard let self = self else { return UICollectionViewCell() }
-            guard self.category == .Subscriptions else {
-                return collectionView.dequeueConfiguredReusableCell(using: surveyCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
-            }
-            return collectionView.dequeueConfiguredReusableCell(using: subscriptionCellRegistration,
+//            guard let self = self else { return UICollectionViewCell() }
+//            guard self.category == .Subscriptions else {
+//                return collectionView.dequeueConfiguredReusableCell(using: surveyCellRegistration,
+//                                                                    for: indexPath,
+//                                                                    item: identifier)
+//            }
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
                                                                 for: indexPath,
                                                                 item: identifier)
         }
@@ -150,18 +144,15 @@ class SurveysCollectionView: UICollectionView {
     }
     
     private func setObservers() {
-//        observers.append(observe(\SurveysCollectionView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
-//            guard let self = self, !self.hMaskLayer.isNil, let newValue = change.newValue, newValue.size != self.hMaskLayer.bounds.size else { return }
-//            self.hMaskLayer.frame = newValue
-//        })
+
         
         if #available(iOS 15, *) {
+            let events = EventEmitter().emit(every: 5)
             notifications.append(Task { [weak self] in
-                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
-                    await MainActor.run {
-                        guard let self = self else { return }
-                        
-                    }
+                for await _ in events {
+                    guard let self = self,
+                          let cells = visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell] else { return }
+                    self.callbackDelegate?.callbackReceived(cells.compactMap({ $0.item }))
                 }
             })
         } else {
@@ -190,7 +181,7 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let cell = collectionView.cellForItem(at: indexPath) as? SurveyCollectionCell {
             callbackDelegate?.callbackReceived(cell.item as Any)
-        } else if let cell = collectionView.cellForItem(at: indexPath) as? SubscriptionCell {
+        } else if let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell {
             callbackDelegate?.callbackReceived(cell.item as Any)
         }
         deselect()

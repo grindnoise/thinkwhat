@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SubscriptionCell: UICollectionViewCell {
+class SurveyCell: UICollectionViewCell {
     
     // MARK: - Public properties
     public weak var item: SurveyReference! {
@@ -26,6 +26,13 @@ class SubscriptionCell: UICollectionViewCell {
             topicLabel.text = item.topic.title.uppercased()
             firstnameLabel.text = item.owner.firstNameSingleWord
             lastnameLabel.text = item.owner.lastNameSingleWord
+            
+            if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
+                label.text = String(describing: item.progress) + "%"
+            }
+            if let progress = progressView.getSubview(type: UIView.self, identifier: "progress") {
+                progress.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+            }
             
 //            usernameLabel.text = item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n" + item.owner.lastNameSingleWord)
             topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
@@ -124,14 +131,15 @@ class SubscriptionCell: UICollectionViewCell {
     }
     
     // MARK: - Private properties
-    private lazy var titleLabel: UILabel = {
-        let instance = UILabel()
+    private lazy var titleLabel: InsetLabel = {
+        let instance = InsetLabel()
+        instance.insets = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
         instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
         instance.textColor = .label
-        observers.append(instance.observe(\UILabel.bounds, options: [.new]) { [weak self] view, _ in
+        observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, _ in
             guard let self = self,
                   let item = self.item,
                   let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first else{ return }
@@ -139,14 +147,14 @@ class SubscriptionCell: UICollectionViewCell {
             let height = item.title.height(withConstrainedWidth: view.bounds.width, font: view.font)
             guard height != constraint.constant else { return }
             self.setNeedsLayout()
-            constraint.constant = height
+            constraint.constant = height + view.insets.top + view.insets.bottom
             self.layoutIfNeeded()
         })
         return instance
     }()
     private lazy var descriptionLabel: InsetLabel = {
         let instance = InsetLabel()
-        instance.insets = UIEdgeInsets(top: instance.insets.top, left: 0, bottom: 20, right: 0)
+        instance.insets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline)
         instance.numberOfLines = 0
@@ -167,7 +175,7 @@ class SubscriptionCell: UICollectionViewCell {
     }()
     private let ratingView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "star.fill"))
-        instance.tintColor = .secondaryLabel
+        instance.tintColor = Colors.Tags.HoneyYellow
         instance.contentMode = .scaleAspectFit
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
@@ -191,7 +199,7 @@ class SubscriptionCell: UICollectionViewCell {
     }()
     private let viewsView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "eye.fill"))
-        instance.tintColor = .secondaryLabel
+        instance.tintColor = .darkGray
         instance.contentMode = .scaleAspectFit
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
@@ -249,10 +257,11 @@ class SubscriptionCell: UICollectionViewCell {
         observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
             guard let self = self,
                   let newValue = change.newValue,
-                  let constraint = self.topicView.getAllConstraints().filter({$0.identifier == "height"}).first,
-                  //                  let constraint_2 = view.getAllConstraints().filter({$0.identifier == "width"}).first,
-                  let height = self.item.topic.title.height(withConstrainedWidth: view.bounds.width, font: view.font) as? CGFloat,
-                  let width = self.item.topic.title.width(withConstrainedHeight: height, font: view.font) as? CGFloat else { return }
+                  let constraint = self.topicView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+            
+            let height = self.item.topic.title.height(withConstrainedWidth: view.bounds.width, font: view.font)
+            let width = self.item.topic.title.width(withConstrainedHeight: height, font: view.font)
+            
             self.setNeedsLayout()
             if let constraint_2 = view.getAllConstraints().filter({ $0.identifier == "width"}).first {
                 constraint_2.constant = width + 16
@@ -268,8 +277,58 @@ class SubscriptionCell: UICollectionViewCell {
         })
         return instance
     }()
+    private lazy var progressView: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .quaternaryLabel
+        instance.accessibilityIdentifier = "progressView"
+        let constraint = instance.widthAnchor.constraint(equalToConstant: 30)
+        constraint.identifier = "width"
+        constraint.isActive = true
+        observers.append(instance.observe(\UIView.bounds, options: [.new]) { view, change in
+            guard let newValue = change.newValue else { return }
+            view.cornerRadius = newValue.height/2.25
+        })
+        let subview = UIView()
+        instance.addSubview(subview)
+        subview.accessibilityIdentifier = "progress"
+        subview.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            subview.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+            subview.topAnchor.constraint(equalTo: instance.topAnchor),
+            subview.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+        ])
+        let constraint_2 = subview.widthAnchor.constraint(equalToConstant: 30)
+        constraint_2.identifier = "width"
+        constraint_2.isActive = true
+        
+        let label = InsetLabel()
+        label.accessibilityIdentifier = "progressLabel"
+        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
+        label.textAlignment = .center
+        label.textColor = .white
+        label.insets = UIEdgeInsets(top: 0, left: 6, bottom: 0, right: 6)
+        observers.append(label.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
+            guard let self = self,
+                  let item = self.item,
+                  let newValue = change.newValue,
+                  let constraint = self.progressView.getAllConstraints().filter({ $0.identifier == "width" }).first,
+                  let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
+                  let constraint_2 = progressIndicator.getConstraint(identifier: "width") else { return }
+            
+//            guard view.bounds.size != newValue.size else { return }
+            
+            self.setNeedsLayout()
+            constraint.constant = "100%".width(withConstrainedHeight: newValue.height, font: view.font) + view.insets.left + view.insets.right
+            constraint_2.constant = constraint.constant * CGFloat(item.progress)/100
+            self.layoutIfNeeded()
+            
+            view.cornerRadius = newValue.height/2.25
+        })
+        label.addEquallyTo(to: instance)
+        return instance
+    }()
     private lazy var topicStackView: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [topicLabel])//, dateLabel])
+        let instance = UIStackView(arrangedSubviews: [topicLabel, progressView])//, dateLabel])
         instance.alignment = .center
         instance.spacing = 4
         return instance
@@ -289,11 +348,16 @@ class SubscriptionCell: UICollectionViewCell {
         constraint.isActive = true
         instance.backgroundColor = .clear
         instance.addSubview(statsStack)
+        instance.addSubview(dateLabel)
         statsStack.translatesAutoresizingMaskIntoConstraints = false
+        dateLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             statsStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
             statsStack.topAnchor.constraint(equalTo: instance.topAnchor),
             statsStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            dateLabel.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+            dateLabel.topAnchor.constraint(equalTo: instance.topAnchor),
+            dateLabel.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
         return instance
     }()
@@ -301,12 +365,6 @@ class SubscriptionCell: UICollectionViewCell {
         let instance = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
         instance.alignment = .center
         instance.spacing = 2
-        return instance
-    }()
-    private lazy var avatarStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [avatar, usernameLabel])//, dateLabel])
-        instance.axis = .vertical
-        instance.spacing = 4
         return instance
     }()
     private lazy var topicView: UIView = {
@@ -335,7 +393,7 @@ class SubscriptionCell: UICollectionViewCell {
         instance.clipsToBounds = false
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "userView"
-        instance.addSubview(dateLabel)
+//        instance.addSubview(dateLabel)
         instance.addSubview(firstnameLabel)
         instance.addSubview(lastnameLabel)
         instance.addSubview(avatar)
@@ -352,18 +410,18 @@ class SubscriptionCell: UICollectionViewCell {
             lastnameLabel.centerXAnchor.constraint(equalTo: avatar.centerXAnchor),
             lastnameLabel.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
             lastnameLabel.widthAnchor.constraint(equalTo: avatar.widthAnchor, multiplier: 1.7),
-            avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 0),
-            avatar.centerXAnchor.constraint(equalTo: dateLabel.centerXAnchor),
+            avatar.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+            avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
             avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.8),
-            dateLabel.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-            dateLabel.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+//            dateLabel.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+//            dateLabel.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
         ])
         return instance
     }()
     private lazy var firstnameLabel: ArcLabel = {
         let instance = ArcLabel()
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.text = "test"
         instance.textColor = .secondaryLabel
@@ -375,7 +433,7 @@ class SubscriptionCell: UICollectionViewCell {
         instance.angle = 4.7
         instance.clockwise = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.text = "test"
         instance.textColor = .secondaryLabel
@@ -383,19 +441,31 @@ class SubscriptionCell: UICollectionViewCell {
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [topicView, titleLabel, descriptionLabel, statsView])
+        let instance = UIStackView(arrangedSubviews: [subHorizontalStack, descriptionLabel, statsView])
+        instance.axis = .vertical
+        instance.spacing = 4
+        return instance
+    }()
+    private lazy var topVerticalStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [topicView, titleLabel])
         instance.axis = .vertical
         instance.spacing = 4
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [verticalStack, userView])
+        let instance = UIStackView(arrangedSubviews: [verticalStack])//, userView])
         instance.axis = .horizontal
         instance.spacing = 4
         return instance
     }()
+    private lazy var subHorizontalStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [topVerticalStack, userView])
+        instance.axis = .horizontal
+        instance.spacing = 0
+        return instance
+    }()
     private var observers: [NSKeyValueObservation] = []
-    private let padding: CGFloat = 25
+    private let padding: CGFloat = 20
     private var constraint: NSLayoutConstraint!
     ///Store tasks from NotificationCenter's AsyncStream
     private var notifications: [Task<Void, Never>?] = []
@@ -440,14 +510,12 @@ class SubscriptionCell: UICollectionViewCell {
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
             horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
             horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-//            avatarStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.25),
-            
             horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 //            horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding/2),
-            userView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.2)
+            userView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.175)
         ])
         
-        constraint = statsView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding/2)
+        constraint = statsView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint.priority = .defaultLow
         constraint.isActive = true
         
@@ -455,32 +523,49 @@ class SubscriptionCell: UICollectionViewCell {
     
     private func setObservers() {
         if #available(iOS 15, *) {
+//            notifications.append(Task { [weak self] in
+//                guard !self.isNil else { return }
+//                for await _ in NotificationCenter.default.notifications(for: UIApplication.willResignActiveNotification) {
+//                    print("UIApplication.willResignActiveNotification")
+//                }
+//            })
+//            notifications.append(Task { [weak self] in
+//                guard !self.isNil else { return }
+//                for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+//                    print("UIApplication.didBecomeActiveNotification")
+//                }
+//            })
             notifications.append(Task { [weak self] in
-                guard !self.isNil else { return }
-                for await _ in await NotificationCenter.default.notifications(for: UIApplication.willResignActiveNotification) {
-                    print("UIApplication.willResignActiveNotification")
-                }
-            })
-            notifications.append(Task { [weak self] in
-                guard !self.isNil else { return }
-                for await _ in await NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-                    print("UIApplication.didBecomeActiveNotification")
-                }
-            })
-            notifications.append(Task { [weak self] in
-                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
                     await MainActor.run {
                         guard let self = self,
-                              let item = self.item else { return }
+                              let item = self.item,
+                              let object = notification.object as? SurveyReference,
+                              item === object
+                        else { return }
                         self.viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
                     }
                 }
             })
             notifications.append(Task { [weak self] in
-                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Rating) {
                     await MainActor.run {
                         guard let self = self,
-                              let item = self.item
+                              let item = self.item,
+                              let object = notification.object as? SurveyReference,
+                              item === object
+                        else { return }
+                        self.ratingLabel.text = String(describing: String(describing: item.rating))
+                    }
+                }
+            })
+            notifications.append(Task { [weak self] in
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
+                    await MainActor.run {
+                        guard let self = self,
+                              let item = self.item,
+                              let object = notification.object as? SurveyReference,
+                              item === object
                         else { return }
                         switch item.isFavorite {
                         case true:
@@ -520,10 +605,12 @@ class SubscriptionCell: UICollectionViewCell {
                 }
             })
             notifications.append(Task { [weak self] in
-                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
                     await MainActor.run {
                         guard let self = self,
-                              let item = self.item
+                              let item = self.item,
+                              let object = notification.object as? SurveyReference,
+                              item === object
                         else { return }
 //                        self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? .systemGreen : .systemGray
 //                        self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? self.item.topic.tagColor : .systemGray
@@ -565,10 +652,12 @@ class SubscriptionCell: UICollectionViewCell {
                 }
             })
             notifications.append(Task { [weak self] in
-                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
                     await MainActor.run {
                         guard let self = self,
-                              let item = self.item
+                              let item = self.item,
+                              let object = notification.object as? SurveyReference,
+                              item === object
                         else { return }
                         switch item.isHot {
                         case true:
@@ -602,6 +691,26 @@ class SubscriptionCell: UICollectionViewCell {
                                   let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isHot" }).first else { return }
                             stackView.removeArrangedSubview(mark)
                             mark.removeFromSuperview()
+                        }
+                    }
+                }
+            })
+            notifications.append(Task { [weak self] in
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
+                    await MainActor.run {
+                        guard let self = self,
+                              let item = self.item,
+                              let object = notification.object as? SurveyReference,
+                              item === object,
+                              let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
+                              let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
+                              let constraint = progressIndicator.getConstraint(identifier: "width") else { return }
+                        
+                        progressLabel.text = String(describing: item.progress) + "%"
+                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
+                            self.progressView.setNeedsLayout()
+                            constraint.constant = constraint.constant * CGFloat(item.progress)/100
+                            self.progressView.layoutIfNeeded()
                         }
                     }
                 }
@@ -651,7 +760,7 @@ class SubscriptionCell: UICollectionViewCell {
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
         titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                            forTextStyle: .title2)
+                                            forTextStyle: .title1)
         ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .caption2)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
@@ -665,8 +774,6 @@ class SubscriptionCell: UICollectionViewCell {
         constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
                                                                        font: ratingLabel.font)
         layoutIfNeeded()
-        
     }
-    
 }
 

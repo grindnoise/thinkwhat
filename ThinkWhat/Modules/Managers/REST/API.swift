@@ -1236,6 +1236,23 @@ class API {
             }
         }
         
+        
+        public func updateSurveyStats(_ instances: [SurveyReference]) async throws {
+            guard let url = API_URLS.Surveys.updateStats else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["ids": instances.compactMap { $0.id }]
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let json = try JSON(data: data, options: .mutableContainers)
+                await MainActor.run {
+                    Surveys.shared.updateSurveyStats(json)
+                }
+            } catch let error {
+                throw error
+            }
+        }
+        
         func markFavoriteAsync(mark: Bool, surveyReference: SurveyReference) async throws -> Data {
             guard let url = mark ? API_URLS.Surveys.addFavorite : API_URLS.Surveys.removeFavorite else { throw APIError.invalidURL }
             

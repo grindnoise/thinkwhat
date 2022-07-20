@@ -114,6 +114,7 @@ class Survey: Decodable {
              answers,
              result,
              rating,
+             progress,
              startDate = "start_date",
              url = "hlink",
              voteCapacity = "vote_capacity",
@@ -231,8 +232,9 @@ class Survey: Decodable {
         return SurveyReferences.shared.all.filter({ $0.hashValue == hashValue}).first ?? createReference()
     }
     var progress: Int {
-        get {
-            return votesTotal * 100 / votesLimit
+        didSet {
+            guard oldValue != progress else { return }
+            reference.progress = progress
         }
     }
     ///Convert to dict to create new survey
@@ -287,6 +289,7 @@ class Survey: Decodable {
             topic                   = _topic
             active                  = try container.decode(Bool.self, forKey: .active)
             id                      = try container.decode(Int.self, forKey: .id)
+            progress                = try container.decode(Int.self, forKey: .progress)
             title                   = try container.decode(String.self, forKey: .title)
             description             = try container.decode(String.self, forKey: .description)
             startDate               = try container.decode(Date.self, forKey: .startDate)
@@ -345,6 +348,7 @@ class Survey: Decodable {
         isCommentingAllowed = _isCommentingAllowed
         isFavorite          = _isFavorite
         isHot               = _isHot
+        progress            = 0
         media = _media.map({ number, dict in
             return Mediafile(title: dict.first?.value ?? "", order: number, survey: self, image: dict.first?.key)
         })
@@ -481,6 +485,45 @@ class Surveys {
             NotificationCenter.default.post(name: Notifications.Surveys.Rejected, object: instance.reference)
 //            Notification.send(names: [Notifications.Surveys.Rejected])
         }
+    }
+
+    //Updates rating, progress and views count
+    func updateSurveyStats(_ json: JSON) {
+        for i in json {
+            let instance: SurveyReference? = SurveyReferences.shared.all.filter({ $0.id == Int(i.0) }).first ?? Surveys.shared.all.filter({ $0.reference.id == Int(i.0)}).first?.reference
+            guard let instance = instance,
+                  let progress = i.1["progress"].int,
+            let rating = i.1["rating"].double,
+                let views = i.1["views"].int else { return }
+            instance.progress = progress
+            instance.rating = rating
+            instance.views = views
+        }
+        
+        
+        
+        //        if !json.isEmpty {
+////            for cat in all {
+////                cat.total = 0
+////                cat.active = 0
+////            }
+//            for cat in json {
+//                if let category = self[Int(cat.0)!] as? Topic,
+//                    let total = cat.1["total"].int,
+//                    let active = cat.1["active"].int,
+//                    let activeAndFavorite = cat.1["active_favorite"].int {
+//                    category.total = total
+//                    category.active = active
+//                    category.activeAndFavorite = activeAndFavorite
+////                    category.parent?.total += total
+////                    category.parent?.active += active
+//                    if let favorite = cat.1["favorite"].int {
+//                        category.favorite = favorite
+////                        category.parent?.favorite += favorite
+//                    }
+//                }
+//            }
+//        }
     }
     
     func load(_ json: JSON) {

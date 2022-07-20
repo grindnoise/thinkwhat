@@ -98,6 +98,27 @@ class SurveysCollection: UIView, SurveyDataSource {
     }
     
     private func setupUI() {
+        let pagination = [Notifications.Surveys.UpdateSubscriptions,
+                          Notifications.Surveys.UpdateTopSurveys,
+                          Notifications.Surveys.UpdateOwn,
+//                          Notifications.Surveys.UpdateFavorite,
+                          Notifications.Surveys.SetFavorite,
+                          Notifications.Surveys.UpdateAll,
+                          Notifications.Surveys.UpdateNewSurveys,]
+        let remove      = [Notifications.Surveys.Claimed,
+                           Notifications.Surveys.UnsetFavorite,
+//                           Notifications.Surveys.Completed,
+                           Notifications.Surveys.Rejected]
+        let zeroEmitted = [Notifications.Surveys.Empty]
+//        let zeroEmitted = [Notifications.Surveys.ZeroOwn,
+//                           Notifications.Surveys.ZeroNew,
+//                           Notifications.Surveys.ZeroTop,
+//                           Notifications.Surveys.ZeroFavorites,
+//                           Notifications.Surveys.ZeroSubscriptions]
+        
+        pagination.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onPagination), name: $0, object: nil) }
+        zeroEmitted.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.endRefreshing), name: $0, object: nil) }
+        remove.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onRemove), name: $0, object: nil) }
         
         // Create cell registration that defines how data should be shown in a cell
         let cellRegistration = UICollectionView.CellRegistration<SurveyCollectionCell, SurveyReference> { (cell, indexPath, item) in

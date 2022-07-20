@@ -29,20 +29,39 @@ class SurveyReference: Decodable {
     var topic: Topic
     var truncatedDescription: String
     //    var completionPercentage: Int
-    var rating: Double
-    var likes: Int
+    var rating: Double {
+        didSet {
+            guard oldValue != rating else { return }
+//            Notification.send(names: [Notifications.Surveys.Rating])
+            NotificationCenter.default.post(name: Notifications.Surveys.Rating, object: self)
+            guard let survey = survey else { return }
+            survey.rating = rating
+        }
+    }
+    var likes: Int {
+        didSet {
+            guard oldValue != likes else { return }
+//            Notification.send(names: [Notifications.Surveys.Likes])
+            NotificationCenter.default.post(name: Notifications.Surveys.Likes, object: self)
+            guard let survey = survey else { return }
+            survey.likes = likes
+        }
+    }
     var views: Int {
         didSet {
-            guard survey != nil else { return }
-            survey!.views = views
+            guard oldValue != views else { return }
+//            Notification.send(names: [Notifications.Surveys.Views])
+            NotificationCenter.default.post(name: Notifications.Surveys.Views, object: self)
+            guard let survey = survey else { return }
+            survey.views = views
         }
     }
     var type: Survey.SurveyType
     var isComplete: Bool {
         didSet {
             guard oldValue != isComplete else { return }
-//            NotificationCenter.default.post(name: Notifications.Surveys.Completed, object: self)
-            Notification.send(names: [Notifications.Surveys.Completed])
+            NotificationCenter.default.post(name: Notifications.Surveys.Completed, object: self)
+//            Notification.send(names: [Notifications.Surveys.Completed])
         }
     }
     var isOwn: Bool
@@ -50,14 +69,15 @@ class SurveyReference: Decodable {
     var isHot: Bool {
         didSet {
             guard oldValue != isHot else { return }
-            Notification.send(names: [Notifications.Surveys.SwitchHot])
+            NotificationCenter.default.post(name: Notifications.Surveys.SwitchHot, object: self)
+//            Notification.send(names: [Notifications.Surveys.SwitchHot])
         }
     }
     var isFavorite: Bool {
         didSet {
             guard oldValue != isFavorite else { return }
-//            NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: nil)
-            Notification.send(names: [Notifications.Surveys.SwitchFavorite])
+            NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: self)
+//            Notification.send(names: [Notifications.Surveys.SwitchFavorite])
         }
     }
 //    var isFavorite: Bool {
@@ -76,7 +96,15 @@ class SurveyReference: Decodable {
     var survey: Survey? {
         return Surveys.shared.all.filter{ $0.hashValue == hashValue }.first
     }
-    var progress: Int
+    var progress: Int {
+        didSet {
+            guard oldValue != progress else { return }
+            NotificationCenter.default.post(name: Notifications.Surveys.Progress, object: self)
+//            Notification.send(names: [Notifications.Surveys.Progress])
+            guard let survey = survey else { return }
+            survey.progress = progress
+        }
+    }
     required init(from decoder: Decoder) throws {
         do {
             let container = try decoder.container(keyedBy: CodingKeys.self)

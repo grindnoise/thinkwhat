@@ -13,8 +13,8 @@ class ListView: UIView {
     weak var viewInput: ListViewInput?
     
     // MARK: - Private properties
-    private lazy var collectionView: (SurveysCollection & SurveyDataSource) = {
-        let instance = SurveysCollection(delegate: self, category: .New)
+    private lazy var collectionView: SurveysCollectionView = {
+        let instance = SurveysCollectionView(delegate: self, category: .New)
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
@@ -105,7 +105,7 @@ extension ListView: ListControllerOutput {
     }
     
     func onDidLoad() {
-        collectionView.reload()
+//        collectionView.reload()
     }
     
     func onDidLayout() {}
@@ -123,7 +123,7 @@ extension ListView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let instance = sender as? SurveyReference {
             viewInput?.onSurveyTapped(instance)
-        } else if sender is SurveysCollection {
+        } else if sender is SurveysCollectionView {
             viewInput?.onDataSourceRequest()
         }
     }

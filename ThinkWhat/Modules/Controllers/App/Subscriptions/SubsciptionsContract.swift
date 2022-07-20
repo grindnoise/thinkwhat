@@ -22,6 +22,7 @@ protocol SubsciptionsViewInput: class {
     func onDataSourceRequest()
     func toggleBarButton()
     func onSurveyTapped(_: SurveyReference)
+    func updateSurveyStats(_: [SurveyReference])
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -33,6 +34,7 @@ protocol SubsciptionsControllerInput: class {
     var userprofiles: [Userprofile] { get }
     
     func loadSubscriptions()
+    func updateSurveyStats(_: [SurveyReference])
 }
 
 /// *Model* returns the result to the *Controller*
@@ -51,4 +53,5 @@ protocol SubsciptionsControllerOutput: class {
     func onUpperContainerShown(_: Bool)
     func onSubscribedForUpdated()
     func onError()
+    func onWillAppear()
 }

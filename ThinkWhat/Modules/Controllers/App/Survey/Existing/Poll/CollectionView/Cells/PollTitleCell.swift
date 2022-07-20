@@ -141,6 +141,20 @@ class PollTitleCell: UICollectionViewCell {
     ///Store tasks from NotificationCenter's AsyncStream
     private var notifications: [Task<Void, Never>?] = []
     
+//    private var steps: AsyncStream<Int>!
+//    private lazy var requestUpdater = AsyncStream<Bool> { [weak self] continuation in
+//        Timer.scheduledTimer(
+//            withTimeInterval: 5.0,
+//            repeats: true
+//        ) { [weak self] timer in
+//            guard !self.isNil else {
+//                timer.invalidate()
+//                continuation.finish()
+//                return
+//            }
+//            continuation.yield(true)
+//        }
+//    }
     
     // MARK: - Destructor
     deinit {
@@ -219,6 +233,7 @@ class PollTitleCell: UICollectionViewCell {
                     print("UIApplication.didBecomeActiveNotification")
                 }
             })
+            
             notifications.append(Task { [weak self] in
                 for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
                     await MainActor.run {
@@ -228,6 +243,9 @@ class PollTitleCell: UICollectionViewCell {
                     }
                 }
             })
+            
+            
+            
         } else {
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.updateViewsCount),

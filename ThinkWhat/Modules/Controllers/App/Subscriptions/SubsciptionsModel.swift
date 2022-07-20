@@ -15,6 +15,18 @@ class SubsciptionsModel {
 
 // MARK: - Controller Input
 extension SubsciptionsModel: SubsciptionsControllerInput {
+    func updateSurveyStats(_ instances: [SurveyReference]) {
+        Task {
+            do {
+                try await API.shared.surveys.updateSurveyStats(instances)
+            } catch {
+                await MainActor.run {
+                    modelOutput?.onError(error)
+                }
+            }
+        }
+    }
+    
     func loadSubscriptions() {
         Task {
             do {

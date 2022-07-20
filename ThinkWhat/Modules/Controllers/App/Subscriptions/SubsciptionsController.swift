@@ -31,6 +31,7 @@ class SubsciptionsController: UIViewController {
         super.viewWillAppear(animated)
         barButton.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
+        controllerOutput?.onWillAppear()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -103,6 +104,10 @@ class SubsciptionsController: UIViewController {
 
 // MARK: - View Input
 extension SubsciptionsController: SubsciptionsViewInput {
+    func updateSurveyStats(_ instances: [SurveyReference]) {
+        controllerInput?.updateSurveyStats(instances)
+    }
+    
     func onSurveyTapped(_ surveyReference: SurveyReference) {
         if let nav = navigationController as? CustomNavigationController {
             nav.transitionStyle = .Default

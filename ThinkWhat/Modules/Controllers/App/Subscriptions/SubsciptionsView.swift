@@ -24,7 +24,7 @@ class SubsciptionsView: UIView {
     private lazy var featheredLayer: CAGradientLayer = {
         let instance = CAGradientLayer()
         let outerColor = UIColor.clear.cgColor
-        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.cgColor
+        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
 //        instance.startPoint = CGPoint(x: 0, y: 0.5);
 //        instance.endPoint = CGPoint(x: 1.0, y: 0.5);
         // without specifying startPoint and endPoint, we get a vertical gradient
@@ -37,7 +37,7 @@ class SubsciptionsView: UIView {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = true
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         instance.addEquallyTo(to: shadowView)
 //        collectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
@@ -179,10 +179,10 @@ class SubsciptionsView: UIView {
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         let outerColor = UIColor.clear.cgColor
-        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.cgColor
+        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
         featheredLayer.colors = [outerColor, innerColor,innerColor,outerColor]
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         
         setText()
 //        guard let v = self.card.subviews.filter({ $0.accessibilityIdentifier == "cardBlur" }).first as? UIVisualEffectView, isRevealed else { return }
@@ -192,6 +192,10 @@ class SubsciptionsView: UIView {
 
 // MARK: - Controller Output
 extension SubsciptionsView: SubsciptionsControllerOutput {
+    func onWillAppear() {
+        collectionView.deselect()
+    }
+    
     func onError() {
 //        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark, dismissAfter: 1)
     }
@@ -337,6 +341,8 @@ extension SubsciptionsView: CallbackObservable {
             viewInput?.onSurveyTapped(instance)
         } else if sender is SurveysCollectionView {
             viewInput?.onDataSourceRequest()
+        } else if let instances = sender as? [SurveyReference] {
+            viewInput?.updateSurveyStats(instances)
         }
     }
 }
