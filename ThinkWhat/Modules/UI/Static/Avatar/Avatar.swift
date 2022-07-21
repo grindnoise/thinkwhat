@@ -8,7 +8,7 @@
 
 import UIKit
 
-class delAvatar: UIView {
+class Avatar: UIView {
     
     private var gender: Gender = .Male
     @MainActor public var image: UIImage? {
@@ -177,9 +177,26 @@ class delAvatar: UIView {
     }
 }
 
-class Avatar: UIView {
+class NewAvatar: UIView {
     
     // MARK: - Public properties
+    public var userprofile: Userprofile! {
+        didSet {
+            guard let userprofile = userprofile else { return }
+            guard let image = userprofile.image else {
+                Task {
+                    let image = try await userprofile.downloadImageAsync()
+                    await MainActor.run {
+                        imageView.contentMode = .scaleAspectFit
+                    }
+                    Animations.changeImageCrossDissolve(imageView: imageView, image: image)
+                }
+                return
+            }
+            imageView.contentMode = .scaleAspectFit
+            Animations.changeImageCrossDissolve(imageView: imageView, image: image)
+        }
+    }
     public var isShadowed: Bool {
         didSet {
             shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
@@ -187,7 +204,6 @@ class Avatar: UIView {
     }
     
     // MARK: - Private properties
-    private let userpofile: Userprofile
     private var notifications: [Task<Void, Never>?] = []
     private var observers: [NSKeyValueObservation] = []
     private lazy var shadowView: UIView = {
@@ -195,19 +211,45 @@ class Avatar: UIView {
         instance.layer.masksToBounds = false
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "shadowView"
-        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-        instance.layer.shadowRadius = 5
+        instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+        instance.layer.shadowRadius = 3
         instance.layer.shadowOffset = .zero
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let newValue = change.newValue else { return }
             view.layer.shadowPath = UIBezierPath(ovalIn: newValue).cgPath
         })
+        imageView.addEquallyTo(to: instance)
         return instance
     }()
-    
-    
+    private lazy var imageView: UIImageView = {
+        let instance = UIImageView()
+        instance.contentMode = .scaleAspectFit
+        instance.accessibilityIdentifier = "imageView"
+        instance.layer.masksToBounds = true
+        instance.backgroundColor = .systemGray2
+        if let userprofile = userprofile, let image = userprofile.image {
+            instance.image = image
+        } else {
+            let largeConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .bold, scale: .medium)
+            instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
+            instance.tintColor = .white
+            instance.contentMode = .center
+        }
+        observers.append(instance.observe(\UIImageView.bounds, options: .new) { [weak self] view, change in
+            guard let self = self,
+                  let newValue = change.newValue
+            else { return }
+            view.cornerRadius = newValue.height/2
+            guard let _ = self.userprofile.image else {
+                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.5, weight: .regular, scale: .medium)
+                instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
+                return
+            }
+        })
+        return instance
+    }()
     
     // MARK: - Destructor
     deinit {
@@ -219,8 +261,8 @@ class Avatar: UIView {
     }
 
     // MARK: - Initialization
-    init(userprofile: Userprofile, isShadowed: Bool = false) {
-        self.userpofile = userprofile
+    init(userprofile: Userprofile? = nil, isShadowed: Bool = false) {
+        self.userprofile = userprofile
         self.isShadowed = isShadowed
         super.init(frame: .zero)
         
@@ -238,31 +280,27 @@ class Avatar: UIView {
         backgroundColor = .clear
         clipsToBounds = false
 
-//        contentView.addSubview(horizontalStack)
+        addSubview(shadowView)
 //        contentView.translatesAutoresizingMaskIntoConstraints = false
-//        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            contentView.topAnchor.constraint(equalTo: topAnchor),
-//            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-//            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-//            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-//            horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-//            horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-//            horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-////            horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding/2),
-//            userView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.175)
-//        ])
+        shadowView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            shadowView.topAnchor.constraint(equalTo: topAnchor),
+            shadowView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            shadowView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            shadowView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
     }
     
     private func setObservers() {
         notifications.append(Task { [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
-                await MainActor.run {
-                    guard let self = self else { return }
-
-                    
-                }
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.ImageDownloaded) {
+                guard let self = self,
+                      let object = notification.object as? Userprofile,
+                      object === userprofile,
+                      let image = self.userprofile.image
+                else { return }
+                Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
             }
         })
     }

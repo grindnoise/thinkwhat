@@ -208,7 +208,18 @@ class Survey: Decodable {
         }
 //        return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
     }
-
+    var isBanned: Bool = false {
+        didSet {
+            guard isBanned else { return }
+            reference.isBanned = isBanned
+        }
+    }
+    var isClaimed: Bool = false {
+        didSet {
+            guard isClaimed else { return }
+            reference.isClaimed = isClaimed
+        }
+    }
     var isComplete: Bool {
         guard let result = result else {
             return false
@@ -224,9 +235,7 @@ class Survey: Decodable {
         didSet {
             guard oldValue != isFavorite else { return }
             reference.isFavorite = isFavorite
-//            Notification.send(names: [Notifications.Surveys.UpdateFavorite])
         }
-//        return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
     }
     var reference: SurveyReference {
         return SurveyReferences.shared.all.filter({ $0.hashValue == hashValue}).first ?? createReference()
@@ -357,8 +366,9 @@ class Survey: Decodable {
         })
     }
     
+    //Creates SurveyReference
     private func createReference() -> SurveyReference {
-        return SurveyReference(id: id, title: title, description: description, startDate: startDate, topic: topic, type: type, likes: likes, views: views, isOwn: isOwn, isComplete: isComplete, isFavorite: isFavorite, isHot: isHot, survey: self, owner: owner, isAnonymous: isAnonymous)
+        return SurveyReference(id: id, title: title, description: description, startDate: startDate, topic: topic, type: type, likes: likes, views: views, isOwn: isOwn, isComplete: isComplete, isFavorite: isFavorite, isHot: isHot, survey: self, owner: owner, isAnonymous: isAnonymous, progress: progress, rating: rating)
     }
     
     func getAnswerVotePercentage(_ answerVotesCount: Int) -> Int {
@@ -461,7 +471,7 @@ class Surveys {
             } else if let existing = newReferences.filter({ $0 == instance.reference }).first {
                 newReferences.remove(object: existing)
             }
-            NotificationCenter.default.post(name: Notifications.Surveys.Claimed, object: instance.reference)
+            NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: instance.reference)
 //            Notification.send(names: [Notifications.Surveys.Claimed])
         }
     }
@@ -575,30 +585,32 @@ class Surveys {
                         notifications.append(Notifications.Surveys.Empty)
                     }
                     for instance in instances {
-                        if key == Category.Top.rawValue {//} && !value.isEmpty {
-                            if topReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                topReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                                //                                    notifications.append(Notifications.Surveys.UpdateTopSurveys)
+                        let survey = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance
+                        
+                        if key == Category.Top.rawValue {
+                            if topReferences.filter({ $0.hashValue == survey.hashValue }).isEmpty {
+                                NotificationCenter.default.post(name: Notifications.Surveys.TopAppend, object: survey)
+                                topReferences.append(survey)
                             }
                         } else if key == Category.New.rawValue {
-                            if newReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                newReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                                //                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
+                            if newReferences.filter({ $0.hashValue == survey.hashValue }).isEmpty {
+                                NotificationCenter.default.post(name: Notifications.Surveys.NewAppend, object: survey)
+                                newReferences.append(survey)
                             }
                         } else if key == Category.Own.rawValue {
-                            if ownReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                ownReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                                //                                    notifications.append(Notifications.Surveys.UpdateNewSurveys)
+                            if ownReferences.filter({ $0.hashValue == survey.hashValue }).isEmpty {
+                                NotificationCenter.default.post(name: Notifications.Surveys.OwnAppend, object: survey)
+                                ownReferences.append(survey)
                             }
                         } else if key == Category.Subscriptions.rawValue {
-                            if subscriptions.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                subscriptions.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                                //                                    notifications.append(Notifications.Surveys.UpdateSubscriptions)
+                            if subscriptions.filter({ $0.hashValue == survey.hashValue }).isEmpty {
+                                NotificationCenter.default.post(name: Notifications.Surveys.SubscriptionAppend, object: survey)
+                                subscriptions.append(survey)
                             }
                         } else if key == Category.Favorite.rawValue {
-                            if favoriteReferences.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                                favoriteReferences.append(SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-                                //                                    notifications.append(Notifications.Surveys.UpdateFavorite)
+                            if favoriteReferences.filter({ $0.hashValue == survey.hashValue }).isEmpty {
+                                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteAppend, object: survey)
+                                favoriteReferences.append(survey)
                             }
                         }
                     }
@@ -606,10 +618,9 @@ class Surveys {
             }
             Notification.send(names: notifications.uniqued())
         } catch {
-            #if DEBUG
-            print(error.localizedDescription)
-            #endif
+#if DEBUG
             fatalError("Survey init() threw error: \(error)")
+#endif
         }
     }
     

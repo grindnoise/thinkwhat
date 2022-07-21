@@ -87,11 +87,11 @@ struct Animations {
         return rotationAnimation
     }
     
-    static func onImageLoaded(imageView: UIImageView, image: UIImage) {
+    static func changeImageCrossDissolve(imageView: UIImageView, image: UIImage, duration: TimeInterval = 0.5) {
         Task {
             await MainActor.run {
                 UIView.transition(with: imageView,
-                                  duration: 0.5,
+                                  duration: duration,
                                   options: .transitionCrossDissolve,
                                   animations: {
                     imageView.image = image

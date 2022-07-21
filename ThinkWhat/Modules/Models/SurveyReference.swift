@@ -80,6 +80,19 @@ class SurveyReference: Decodable {
 //            Notification.send(names: [Notifications.Surveys.SwitchFavorite])
         }
     }
+    
+    var isBanned: Bool = false {
+        didSet {
+            guard isBanned else { return }
+            NotificationCenter.default.post(name: Notifications.Surveys.Ban, object: self)
+        }
+    }
+    var isClaimed: Bool = false {
+        didSet {
+            guard isClaimed else { return }
+            NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: self)
+        }
+    }
 //    var isFavorite: Bool {
 //        didSet {
 //            guard oldValue != isFavorite else { return }
@@ -144,30 +157,52 @@ class SurveyReference: Decodable {
                 SurveyReferences.shared.all.append(self)
             }
         } catch {
+#if DEBUG
+            print(error.localizedDescription)
+#endif
             throw error
         }
     }
     
-    init(id _id: Int, title _title: String, description: String, startDate _startDate: Date, topic _topic: Topic, type _type: Survey.SurveyType, likes _likes: Int = 0, views _views: Int = 0, isOwn _isOwn: Bool, isComplete _isComplete: Bool, isFavorite _isFavorite: Bool, isHot _isHot: Bool, survey _survey: Survey, owner _owner: Userprofile, votesTotal _votesTotal: Int = 0, votesLimit _votesLimit: Int = 0, isAnonymous _isAnonymous: Bool) {
-        id                      = _id
-        title                   = _title
-        topic                   = _topic
-        startDate               = _startDate
-        likes                   = _likes
-        views                   = _views
-        type                    = _type
-        isOwn                   = _isOwn
-        isHot                   = _isHot
-        isComplete              = _isComplete
-        isFavorite              = _isFavorite
-        votesTotal              = _votesTotal
-        votesLimit              = _votesLimit
+    init(id: Int,
+         title: String,
+         description: String,
+         startDate: Date,
+         topic: Topic,
+         type: Survey.SurveyType,
+         likes: Int = 0,
+         views: Int = 0,
+         isOwn: Bool,
+         isComplete: Bool,
+         isFavorite: Bool,
+         isHot: Bool,
+         survey: Survey,
+         owner: Userprofile,
+         votesTotal: Int = 0,
+         votesLimit: Int = 0,
+         isAnonymous: Bool,
+         progress: Int = 0,
+         rating: Double = 0) {
+        
+        self.id                      = id
+        self.title                   = title
+        self.topic                   = topic
+        self.startDate               = startDate
+        self.likes                   = likes
+        self.views                   = views
+        self.type                    = type
+        self.isOwn                   = isOwn
+        self.isHot                   = isHot
+        self.isComplete              = isComplete
+        self.isFavorite              = isFavorite
+        self.votesTotal              = votesTotal
+        self.votesLimit              = votesLimit
 //        survey                  = _survey
-        owner                   = _owner
-        isAnonymous             = _isAnonymous
-        truncatedDescription    = description
-        progress                = 0
-        rating                  = 0
+        self.owner                   = owner
+        self.isAnonymous             = isAnonymous
+        self.truncatedDescription    = description
+        self.progress                = progress
+        self.rating                  = rating
         if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
             SurveyReferences.shared.all.append(self)
         }

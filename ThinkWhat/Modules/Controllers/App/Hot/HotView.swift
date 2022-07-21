@@ -44,7 +44,7 @@ class HotView: UIView {
     }
     
     private func setObservers() {
-        let remove = [Notifications.Surveys.Claimed,
+        let remove = [Notifications.Surveys.Claim,
                            Notifications.Surveys.Completed,
                            Notifications.Surveys.Rejected]
         remove.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onRemove), name: $0, object: nil) }

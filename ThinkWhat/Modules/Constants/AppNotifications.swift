@@ -32,6 +32,7 @@ struct Notifications {
     struct Userprofiles {
         static let SubscribedForUpdated             = Notification.Name("NotificationUpdateSubscribedFor")
         static let SubscribersUpdated               = Notification.Name("NotificationSubscribersUpdated")
+        static let ImageDownloaded                  = Notification.Name("ImageDownloaded")
     }
     
     struct System {
@@ -39,6 +40,15 @@ struct Notifications {
     }
     
     struct Surveys {
+        static let SubscriptionAppend               = Notification.Name("SurveysSubscriptionAppend")
+        static let NewAppend                        = Notification.Name("SurveysNewAppend")
+        static let TopAppend                        = Notification.Name("SurveysTopAppend")
+        static let OwnAppend                        = Notification.Name("SurveysOwnAppend")
+        static let FavoriteAppend                   = Notification.Name("SurveysFavoriteAppend")
+        static let Claim                            = Notification.Name("SurveyClaim")
+        static let Ban                              = Notification.Name("SurveyBan")
+        
+        
         static let UnsetFavorite                    = Notification.Name("NotificationFavoriteSurveyUnset")
         static let SetFavorite                      = Notification.Name("NotificationFavoriteSurveySet")
         static let SwitchFavorite                   = Notification.Name("NotificationSwitchFavorite")
@@ -59,7 +69,7 @@ struct Notifications {
         static let ZeroNew                          = Notification.Name("NotificationZeroNewReceived")
         
         static let Rejected                         = Notification.Name("NotificationReject")
-        static let Claimed                          = Notification.Name("NotificationClaim")
+        
         static let Completed                        = Notification.Name("NotificationSurveyCompleted")
         static let Progress                         = Notification.Name("NotificationSurveyProgress")
         static let Views                            = Notification.Name("NotificationSurveyViews")
@@ -76,6 +86,7 @@ struct Notifications {
         static let UserSurveysUpdated               = Notification.Name("NotificationUserSurveysUpdated")
         static let UserFavoriteSurveysUpdated       = Notification.Name("NotificationUserFavoriteSurveysUpdated")
         static let NewSurveyPostError               = Notification.Name("NotificationNewSurveyPostError")
+        
     }
     
     struct UI {

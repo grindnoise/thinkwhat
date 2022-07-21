@@ -81,7 +81,7 @@ class SurveysCollection: UIView, SurveyDataSource {
                           Notifications.Surveys.SetFavorite,
                           Notifications.Surveys.UpdateAll,
                           Notifications.Surveys.UpdateNewSurveys,]
-        let remove      = [Notifications.Surveys.Claimed,
+        let remove      = [Notifications.Surveys.Claim,
                            Notifications.Surveys.UnsetFavorite,
 //                           Notifications.Surveys.Completed,
                            Notifications.Surveys.Rejected]
@@ -105,7 +105,7 @@ class SurveysCollection: UIView, SurveyDataSource {
                           Notifications.Surveys.SetFavorite,
                           Notifications.Surveys.UpdateAll,
                           Notifications.Surveys.UpdateNewSurveys,]
-        let remove      = [Notifications.Surveys.Claimed,
+        let remove      = [Notifications.Surveys.Claim,
                            Notifications.Surveys.UnsetFavorite,
 //                           Notifications.Surveys.Completed,
                            Notifications.Surveys.Rejected]

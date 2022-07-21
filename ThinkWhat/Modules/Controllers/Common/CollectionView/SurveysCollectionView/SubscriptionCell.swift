@@ -14,6 +14,9 @@ class SurveyCell: UICollectionViewCell {
     public weak var item: SurveyReference! {
         didSet {
             guard let item = item else { return }
+            defer {
+                setProgress()
+            }
             titleLabel.text = item.title
             descriptionLabel.text = item.truncatedDescription
             ratingLabel.text = String(describing: item.rating)
@@ -21,11 +24,10 @@ class SurveyCell: UICollectionViewCell {
             let formatter = DateFormatter()
             formatter.dateFormat = "dd.MM.yyyy"
             dateLabel.text = formatter.string(from: item.startDate)
-//            dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? .systemGreen : .systemGray
-//            dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? item.topic.tagColor : .systemGray
             topicLabel.text = item.topic.title.uppercased()
             firstnameLabel.text = item.owner.firstNameSingleWord
             lastnameLabel.text = item.owner.lastNameSingleWord
+            avatar.userprofile = item.owner
             
             if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
                 label.text = String(describing: item.progress) + "%"
@@ -34,99 +36,72 @@ class SurveyCell: UICollectionViewCell {
                 progress.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
             }
             
-//            usernameLabel.text = item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n" + item.owner.lastNameSingleWord)
             topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-//            if !item.owner.lastNameSingleWord.isEmpty { usernameLabel.numberOfLines = 2 }
-            if let image = item.owner.image {
-                avatar.image = image
-            } else {
-                Task {
-                    let image = try await item.owner.downloadImageAsync()
-                    await MainActor.run {
-                        avatar.image = image
+
+            if topicStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).isEmpty {
+                if item.isFavorite || item.isComplete || item.isHot {
+                    let stackView = UIStackView()
+                    stackView.spacing = 0
+                    stackView.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+                    stackView.accessibilityIdentifier = "marksStackView"
+                    observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
+                        guard let newValue = change.newValue else { return }
+                        view.cornerRadius = newValue.height/2.25
+                    })
+                    if item.isComplete {
+                        let container = UIView()
+                        container.backgroundColor = .clear
+                        container.accessibilityIdentifier = "isComplete"
+                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                        
+                        let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
+                        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : item.topic.tagColor
+                        instance.contentMode = .scaleAspectFit
+                        instance.addEquallyTo(to: container)
+                        stackView.addArrangedSubview(container)
                     }
+                    if item.isFavorite {
+                        let container = UIView()
+                        container.backgroundColor = .clear
+                        container.accessibilityIdentifier = "isFavorite"
+                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                        
+                        let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
+                        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                        instance.contentMode = .scaleAspectFit
+                        instance.addEquallyTo(to: container)
+                        stackView.addArrangedSubview(container)
+                    }
+                    if item.isHot {
+                        let container = UIView()
+                        container.backgroundColor = .clear
+                        container.accessibilityIdentifier = "isHot"
+                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                        
+                        let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+                        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed//.white
+                        instance.contentMode = .scaleAspectFit
+                        instance.addEquallyTo(to: container)
+                        stackView.addArrangedSubview(container)
+                    }
+                    topicStackView.addArrangedSubview(stackView)
                 }
             }
             
-            if item.isFavorite || item.isComplete || item.isHot {
-                let stackView = UIStackView()
-                stackView.spacing = 0
-                stackView.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-                stackView.accessibilityIdentifier = "marksStackView"
-                observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
-                    guard let newValue = change.newValue else { return }
-                    view.cornerRadius = newValue.height/2.25
-                })
-                if item.isComplete {
-                    let container = UIView()
-                    container.backgroundColor = .clear
-                    container.accessibilityIdentifier = "isComplete"
-                    container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                    
-                    let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
-//                    instance.accessibilityIdentifier = "isComplete"
-//                    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.15/1).isActive = true
-//                    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemGreen
-                    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : item.topic.tagColor
-                    instance.contentMode = .scaleAspectFit
-                    instance.addEquallyTo(to: container)
-                    stackView.addArrangedSubview(container)
-                }
-                if item.isFavorite {
-                    let container = UIView()
-                    container.backgroundColor = .clear
-                    container.accessibilityIdentifier = "isFavorite"
-                    container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                    
-                    let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-//                    instance.accessibilityIdentifier = "isFavorite"
-//                    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.15/1).isActive = true
-                    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-                    instance.contentMode = .scaleAspectFit
-                    instance.addEquallyTo(to: container)
-                    stackView.addArrangedSubview(container)
-                }
-                if item.isHot {
-                    let container = UIView()
-                    container.backgroundColor = .clear
-                    container.accessibilityIdentifier = "isHot"
-                    container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                    
-                    let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-//                    instance.accessibilityIdentifier = "isComplete"
-//                    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.15/1).isActive = true
-                    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed//.white
-                    instance.contentMode = .scaleAspectFit
-                    instance.addEquallyTo(to: container)
-                    stackView.addArrangedSubview(container)
-                }
-                topicStackView.addArrangedSubview(stackView)
+            if titleLabel.getConstraint(identifier: "height").isNil, descriptionLabel.getConstraint(identifier: "height").isNil, topicView.getConstraint(identifier: "height").isNil {
+                let constraint = titleLabel.heightAnchor.constraint(equalToConstant: 300)
+                constraint.identifier = "height"
+                constraint.isActive = true
+                let constraint_2 = descriptionLabel.heightAnchor.constraint(equalToConstant: 15)
+                constraint_2.identifier = "height"
+                constraint_2.isActive = true
+                let constraint_3 = topicView.heightAnchor.constraint(equalToConstant: 25)
+                constraint_3.identifier = "height"
+                constraint_3.isActive = true
+                
+                setNeedsLayout()
+                layoutIfNeeded()
             }
-            
-//            if item.isHot {
-//                let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-//                instance.accessibilityIdentifier = "isHot"
-//                instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-//                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed
-//                instance.contentMode = .scaleAspectFit
-//                topicStackView.addArrangedSubview(instance)
-//            }
-            
-            let constraint = titleLabel.heightAnchor.constraint(equalToConstant: 300)
-            constraint.identifier = "height"
-            constraint.isActive = true
-            let constraint_2 = descriptionLabel.heightAnchor.constraint(equalToConstant: 15)
-            constraint_2.identifier = "height"
-            constraint_2.isActive = true
-            let constraint_3 = topicView.heightAnchor.constraint(equalToConstant: 25)
-            constraint_3.identifier = "height"
-            constraint_3.isActive = true
-//                    let constraint_4 = topicLabel.widthAnchor.constraint(equalToConstant: 30)
-//            constraint_4.identifier = "width"
-//            constraint_4.isActive = true
-            
-            setNeedsLayout()
-            layoutIfNeeded()
         }
     }
     
@@ -205,9 +180,8 @@ class SurveyCell: UICollectionViewCell {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
         return instance
     }()
-    private lazy var avatar: Avatar = {
-        let instance = Avatar(gender: .Male)
-        instance.isBordered = false
+    private lazy var avatar: NewAvatar = {
+        let instance = NewAvatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()
@@ -279,7 +253,7 @@ class SurveyCell: UICollectionViewCell {
     }()
     private lazy var progressView: UIView = {
         let instance = UIView()
-        instance.backgroundColor = .quaternaryLabel
+        instance.backgroundColor = .systemGray3
         instance.accessibilityIdentifier = "progressView"
         let constraint = instance.widthAnchor.constraint(equalToConstant: 30)
         constraint.identifier = "width"
@@ -465,7 +439,7 @@ class SurveyCell: UICollectionViewCell {
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
-    private let padding: CGFloat = 20
+    private let padding: CGFloat = 10
     private var constraint: NSLayoutConstraint!
     ///Store tasks from NotificationCenter's AsyncStream
     private var notifications: [Task<Void, Never>?] = []
@@ -508,7 +482,7 @@ class SurveyCell: UICollectionViewCell {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+            horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
             horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 //            horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding/2),
@@ -721,6 +695,17 @@ class SurveyCell: UICollectionViewCell {
                                                    name: Notifications.Surveys.Views,
                                                    object: nil)
         }
+    }
+    
+    private func setProgress() {
+        guard let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
+              let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
+              let constraint = progressIndicator.getConstraint(identifier: "width") else { return }
+        
+        progressLabel.text = String(describing: item.progress) + "%"
+        self.progressView.setNeedsLayout()
+        constraint.constant = constraint.constant * CGFloat(item.progress)/100
+        self.progressView.layoutIfNeeded()
     }
     
     @objc

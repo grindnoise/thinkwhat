@@ -80,7 +80,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     }
 
     private func setObservers() {
-        let names = [Notifications.Surveys.Claimed,
+        let names = [Notifications.Surveys.Claim,
 //                     Notifications.Surveys.Completed,
                      Notifications.System.UpdateStats,
                      Notifications.Surveys.Rejected]
