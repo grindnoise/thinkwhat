@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Avatar: UIView {
+class delAvatar: UIView {
     
     private var gender: Gender = .Male
     @MainActor public var image: UIImage? {
@@ -16,12 +16,6 @@ class Avatar: UIView {
             guard let image = image, !container.isNil else {
                 return
             }
-//            let imageView = UIImageView(image: image)
-//            imageView.contentMode = .scaleAspectFill
-//            imageView.alpha  = 0
-//            imageView.isUserInteractionEnabled = true
-//            imageView.backgroundColor = .tertiarySystemBackground
-//            imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             imageView.image = image
             imageView.addEquallyTo(to: container)
             let icon = self.container.get(all: Icon.self).first
@@ -180,5 +174,104 @@ class Avatar: UIView {
     @objc
     private func handleTap() {
         delegate?.callbackReceived(self)
+    }
+}
+
+class Avatar: UIView {
+    
+    // MARK: - Public properties
+    public var isShadowed: Bool {
+        didSet {
+            shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+        }
+    }
+    
+    // MARK: - Private properties
+    private let userpofile: Userprofile
+    private var notifications: [Task<Void, Never>?] = []
+    private var observers: [NSKeyValueObservation] = []
+    private lazy var shadowView: UIView = {
+        let instance = UIView()
+        instance.layer.masksToBounds = false
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "shadowView"
+        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+        instance.layer.shadowRadius = 5
+        instance.layer.shadowOffset = .zero
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let newValue = change.newValue else { return }
+            view.layer.shadowPath = UIBezierPath(ovalIn: newValue).cgPath
+        })
+        return instance
+    }()
+    
+    
+    
+    // MARK: - Destructor
+    deinit {
+        notifications.forEach { $0?.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+
+    // MARK: - Initialization
+    init(userprofile: Userprofile, isShadowed: Bool = false) {
+        self.userpofile = userprofile
+        self.isShadowed = isShadowed
+        super.init(frame: .zero)
+        
+        setObservers()
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    // MARK: - Private methods
+    private func setupUI() {
+        backgroundColor = .clear
+        clipsToBounds = false
+
+//        contentView.addSubview(horizontalStack)
+//        contentView.translatesAutoresizingMaskIntoConstraints = false
+//        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            contentView.topAnchor.constraint(equalTo: topAnchor),
+//            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+//            horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+//            horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+//            horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+////            horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding/2),
+//            userView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.175)
+//        ])
+    }
+    
+    private func setObservers() {
+        notifications.append(Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
+                await MainActor.run {
+                    guard let self = self else { return }
+
+                    
+                }
+            }
+        })
+    }
+    
+    // MARK: - Public methods
+    
+    
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
     }
 }

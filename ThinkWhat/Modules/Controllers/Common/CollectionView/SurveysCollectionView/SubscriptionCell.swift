@@ -738,9 +738,11 @@ class SurveyCell: UICollectionViewCell {
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+        
+        progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        
         topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-//        dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? .systemGreen : .systemGray
-//        dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? item.topic.tagColor : .systemGray
+
         if let stackView = topicStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
             stackView.arrangedSubviews.forEach { [weak self] in
                 guard let self = self,

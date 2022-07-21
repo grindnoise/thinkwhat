@@ -1985,22 +1985,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "47E6ACA1-47A0-410A-82CB-09EA1F56F5E6"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/UI/Static/Avatar/Avatar.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "45"
-            endingLineNumber = "45"
-            landmarkName = "imageView"
-            landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "AB347EF0-0EAD-448E-9065-E0313DF0793B"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -2075,22 +2059,6 @@
             startingLineNumber = "574"
             endingLineNumber = "574"
             landmarkName = "load(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "E5783336-9720-4E55-B28E-046A1BF7D4A6"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/List/ListController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "107"
-            endingLineNumber = "107"
-            landmarkName = "onDataSourceRequest()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2234,8 +2202,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "322"
             endingLineNumber = "322"
-            landmarkName = "SurveyCell"
-            landmarkType = "3">
+            landmarkName = "progressView"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -2257,17 +2225,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "AB39ED54-2F45-4920-9725-8C73C4718EBD"
+            uuid = "6AE6D0CD-7331-4195-9BB1-609B684F7326"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Survey/List/Collection/SurveysCollection.swift"
+            filePath = "ThinkWhat/Modules/UI/Static/Avatar/Avatar.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "276"
-            endingLineNumber = "276"
-            landmarkName = "onPagination()"
-            landmarkType = "7">
+            startingLineNumber = "215"
+            endingLineNumber = "215"
+            landmarkName = "Avatar"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
