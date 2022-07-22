@@ -45,7 +45,7 @@ class PollTitleCell: UICollectionViewCell {
     }()
     private let ratingView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "star.fill"))
-        instance.tintColor = .secondaryLabel
+        instance.tintColor = Colors.Tags.HoneyYellow
         instance.contentMode = .scaleAspectFit
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
@@ -67,9 +67,9 @@ class PollTitleCell: UICollectionViewCell {
         })
         return instance
     }()
-    private let viewsView: UIImageView = {
+    private lazy var viewsView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "eye.fill"))
-        instance.tintColor = .secondaryLabel
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.contentMode = .scaleAspectFit
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
@@ -269,7 +269,7 @@ class PollTitleCell: UICollectionViewCell {
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
+        viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }

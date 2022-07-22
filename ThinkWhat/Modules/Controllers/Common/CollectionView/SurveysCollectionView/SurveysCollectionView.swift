@@ -274,6 +274,14 @@ class SurveysCollectionView: UICollectionView {
                                                    selector: #selector(self.appendItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.SubscriptionAppend,
                                                    object: self)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.appendItemIdentifier(notification:)),
+                                                   name: Notifications.Surveys.Claim,
+                                                   object: self)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.appendItemIdentifier(notification:)),
+                                                   name: Notifications.Surveys.Ban,
+                                                   object: self)
         }
     }
     
@@ -300,6 +308,16 @@ class SurveysCollectionView: UICollectionView {
             snap.appendItems([instance], toSection: .main)
             source.apply(snap, animatingDifferences: true)
         }
+    }
+    
+    @objc func removeItemIdentifier(notification: Notification) {
+        guard let instance = notification.object as? SurveyReference,
+              source.snapshot().itemIdentifiers.contains(instance)
+        else { return }
+
+        var snap = self.source.snapshot()
+        snap.deleteItems([instance])
+        source.apply(snap, animatingDifferences: true)
     }
     
     // MARK: - Overriden methods
@@ -366,8 +384,6 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         var snapshot = source.snapshot()
         guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
         snapshot.deleteItems([instance!])
-
-        // Display data in the collection view by applying the snapshot to data source
         source.apply(snapshot, animatingDifferences: true)
     }
     
@@ -381,8 +397,6 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         var snapshot = source.snapshot()
         guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }
         snapshot.appendItems([newInstance], toSection: .main)
-
-        // Display data in the collection view by applying the snapshot to data source
         source.apply(snapshot, animatingDifferences: true)
     }
     
@@ -390,8 +404,6 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
         snapshot.appendSections([.main])
         snapshot.appendItems(dataItems, toSection: .main)
-        
-        // Display data in the collection view by applying the snapshot to data source
         source.apply(snapshot, animatingDifferences: true)
     }
 }

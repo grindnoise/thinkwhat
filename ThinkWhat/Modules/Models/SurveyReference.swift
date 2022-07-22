@@ -9,7 +9,7 @@
 import Foundation
 import SwiftyJSON
 
-class SurveyReference: Decodable {
+class SurveyReference: Decodable {// NSObject,
 
     private enum CodingKeys: String, CodingKey {
         case id, type, title, category, likes, views, progress, rating, description,
@@ -23,9 +23,22 @@ class SurveyReference: Decodable {
              isHot = "is_hot",
              isAnonymous = "is_anonymous"
     }
+    
+//    //NS
+//    override var hash: Int {
+//        var hasher = Hasher()
+//        hasher.combine(title)
+//        hasher.combine(id)
+//        hasher.combine(topic)
+//        return hasher.finalize()
+//    }
+    
     var id: Int
     var title: String
+//    @objc dynamic var title: String
+//    public let titleKeyPath = \SurveyReference.title
     var startDate: Date
+    
     var topic: Topic
     var truncatedDescription: String
     //    var completionPercentage: Int
@@ -152,13 +165,19 @@ class SurveyReference: Decodable {
             isHot       = try container.decode(Bool.self, forKey: .isHot)
             progress    = try container.decode(Int.self, forKey: .progress)
             rating      = Double(try container.decode(String.self, forKey: .rating)) ?? 0
-            ///Check for existing instance by hashValue
+            //Check for existing instance by hashValue
             if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 SurveyReferences.shared.all.append(self)
-            }
+                        }
+            //NS
+//            super.init()
+//            if SurveyReferences.shared.all.filter({ $0.isEqual(self) }).isEmpty {
+//                SurveyReferences.shared.all.append(self)
+//            }
         } catch {
 #if DEBUG
             print(error.localizedDescription)
+            fatalError()
 #endif
             throw error
         }
@@ -203,9 +222,16 @@ class SurveyReference: Decodable {
         self.truncatedDescription    = description
         self.progress                = progress
         self.rating                  = rating
+        
+        //Swift
         if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
             SurveyReferences.shared.all.append(self)
         }
+//        //NSObject
+//        super.init()
+//        if SurveyReferences.shared.all.filter({ $0.isEqual(self) }).isEmpty {
+//            SurveyReferences.shared.all.append(self)
+//        }
     }
 //    //    var survey
 //    //    var hashValue: Int {
@@ -245,17 +271,32 @@ class SurveyReference: Decodable {
 //    }
 }
 
+//extension SurveyReference {
+////    static func == (lhs: SurveyReference, rhs: SurveyReference) -> Bool {
+//    //        return lhs.hashValue == rhs.hashValue
+//    //    }
+//
+//    override func isEqual(_ object: Any?) -> Bool {
+//        guard let other = object as? SurveyReference else {
+//            return false
+//        }
+//        return title == other.title && id == other.id && topic == other.topic
+//    }
+//
+//
+//}
 extension SurveyReference: Hashable {
     static func == (lhs: SurveyReference, rhs: SurveyReference) -> Bool {
         return lhs.hashValue == rhs.hashValue
     }
-    
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(title)
         hasher.combine(id)
         hasher.combine(topic)
     }
 }
+
 
 class SurveyReferences {
     static let shared = SurveyReferences()
@@ -271,3 +312,29 @@ class SurveyReferences {
         all.removeAll()
     }
 }
+
+
+//class Identity: NSObject {
+//
+//    let name: String
+//    let email: String
+//
+//    init(name: String, email: String) {
+//        self.name = name
+//        self.email = email
+//    }
+//
+//    override var hash: Int {
+//        var hasher = Hasher()
+//        hasher.combine(name)
+//        hasher.combine(email)
+//        return hasher.finalize()
+//    }
+//
+//    override func isEqual(_ object: Any?) -> Bool {
+//        guard let other = object as? Identity else {
+//            return false
+//        }
+//        return name == other.name && email == other.email
+//    }
+//}

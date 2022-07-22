@@ -17,6 +17,28 @@ class ListView: UIView {
         let instance = SurveysCollectionView(delegate: self, category: .New)
         return instance
     }()
+    private lazy var featheredView: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "feathered"
+        instance.layer.masksToBounds = true
+        instance.backgroundColor = .clear
+        instance.addEquallyTo(to: background)
+        observers.append(instance.observe(\UIView.bounds, options: .new) { [weak self] view, change in
+            guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
+            self.featheredLayer.frame = newValue
+        })
+        collectionView.addEquallyTo(to: instance)
+        return instance
+    }()
+    private lazy var featheredLayer: CAGradientLayer = {
+        let instance = CAGradientLayer()
+        let outerColor = UIColor.clear.cgColor
+        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
+        instance.colors = [outerColor, innerColor, innerColor, outerColor]
+        instance.locations = [0.0, 0.025, 0.975, 1.0]
+        instance.frame = frame
+        return instance
+    }()
     private var observers: [NSKeyValueObservation] = []
     private var notifications: [Task<Void, Never>?] = []
 //    private var hMaskLayer: CAGradientLayer!
@@ -90,6 +112,7 @@ class ListView: UIView {
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
+        featheredView.layer.mask = featheredLayer
     }
 }
 

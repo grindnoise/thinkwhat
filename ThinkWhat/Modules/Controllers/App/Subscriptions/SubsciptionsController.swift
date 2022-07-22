@@ -10,6 +10,45 @@ import UIKit
 
 class SubsciptionsController: UIViewController {
 
+    // MARK: - Properties
+    var controllerOutput: SubsciptionsControllerOutput?
+    var controllerInput: SubsciptionsControllerInput?
+    private var observers: [NSKeyValueObservation] = []
+    private lazy var barButton: UIView = {
+        let instance = UIView()
+        instance.layer.masksToBounds = false
+        instance.clipsToBounds = false
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "shadow"
+        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+        instance.layer.shadowRadius = 7
+        instance.layer.shadowOffset = .zero
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let newValue = change.newValue else { return }
+            view.layer.shadowPath = UIBezierPath(ovalIn: newValue).cgPath
+        })
+        
+        let button = UIButton()
+        observers.append(button.observe(\UIButton.bounds, options: .new) { view, change in
+            guard let newValue = change.newValue else { return }
+            view.cornerRadius = newValue.size.height/2
+            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 0.65, weight: .semibold, scale: .medium)
+            let image = UIImage(systemName: "chevron.down", withConfiguration: largeConfig)
+            view.setImage(image, for: .normal)
+        })
+        button.addTarget(self, action: #selector(self.toggleBarButton), for: .touchUpInside)
+        button.accessibilityIdentifier = "button"
+        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        button.imageView?.contentMode = .center
+        button.imageView?.tintColor = .white
+        button.addEquallyTo(to: instance)
+
+        return instance
+    }()
+    private var isBarButtonOn = true
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -48,13 +87,8 @@ class SubsciptionsController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(barButton)
-        barButton.layer.cornerRadius = UINavigationController.Constants.ImageSizeForLargeState / 2
-        barButton.clipsToBounds = true
-        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         barButton.translatesAutoresizingMaskIntoConstraints = false
-        let gesture = UITapGestureRecognizer(target: self,
-                                             action: #selector(SubsciptionsController.toggleBarButton))
-        barButton.addGestureRecognizer(gesture)
+
         NSLayoutConstraint.activate([
             barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
@@ -80,26 +114,15 @@ class SubsciptionsController: UIViewController {
     @objc
     func toggleBarButton() {
         controllerOutput?.onUpperContainerShown(isBarButtonOn)
-        UIView.animate(withDuration: 0.2,
+        UIView.animate(withDuration: 0.3,
                        delay: 0,
                        options: .curveEaseOut) {
-            self.barButton.transform = self.isBarButtonOn ? CGAffineTransform(rotationAngle: Double.pi) : .identity
+            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
+            self.barButton.transform = self.isBarButtonOn ? upsideDown :.identity
         } completion: { _ in
             self.isBarButtonOn = !self.isBarButtonOn
         }
     }
-    
-    // MARK: - Properties
-    var controllerOutput: SubsciptionsControllerOutput?
-    var controllerInput: SubsciptionsControllerInput?
-    private let barButton: UIImageView = {
-        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
-        v.contentMode = .scaleAspectFill
-        v.image = ImageSigns.chevronDownFilled.image
-        v.isUserInteractionEnabled = true
-        return v
-    }()
-    private var isBarButtonOn = true
 }
 
 // MARK: - View Input

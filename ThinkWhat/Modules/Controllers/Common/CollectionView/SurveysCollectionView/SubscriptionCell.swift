@@ -16,6 +16,8 @@ class SurveyCell: UICollectionViewCell {
             guard let item = item else { return }
             defer {
                 setProgress()
+                refreshConstraints()
+                setColors()
             }
             titleLabel.text = item.title
             descriptionLabel.text = item.truncatedDescription
@@ -28,6 +30,23 @@ class SurveyCell: UICollectionViewCell {
             firstnameLabel.text = item.owner.firstNameSingleWord
             lastnameLabel.text = item.owner.lastNameSingleWord
             avatar.userprofile = item.owner
+            
+            //NSObject observation
+//            observers.append(item.observe(\SurveyReference.title, options: .new) { [weak self] _, change in
+//                guard let self = self,
+//                      let title = change.newValue,
+//                      let label = self.titleLabel as? InsetLabel,
+//                      let constraint = label.getAllConstraints().filter({$0.identifier == "height"}).first else{ return }
+//
+//                let height = title.height(withConstrainedWidth: label.bounds.width, font: label.font)
+//                guard height != constraint.constant else { return }
+//                self.setNeedsLayout()
+//                constraint.constant = height + label.insets.top + label.insets.bottom
+//                self.layoutIfNeeded()
+//            })
+            
+//            avatar.shadowColor = item.topic.tagColor
+            descriptionLabel.backgroundColor = item.topic.tagColor.withAlphaComponent(0.075)
             
             if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
                 label.text = String(describing: item.progress) + "%"
@@ -125,19 +144,21 @@ class SurveyCell: UICollectionViewCell {
             constraint.constant = height + view.insets.top + view.insets.bottom
             self.layoutIfNeeded()
         })
+        
         return instance
     }()
     private lazy var descriptionLabel: InsetLabel = {
         let instance = InsetLabel()
-        instance.insets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        instance.insets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline)
         instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
-        instance.textColor = .label
-        observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, _ in
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
             guard let self = self,
                   let item = self.item,
+                  let newValue = change.newValue,
                   let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first else{ return }
             
             let height = item.truncatedDescription.height(withConstrainedWidth: view.bounds.width, font: view.font)
@@ -145,6 +166,7 @@ class SurveyCell: UICollectionViewCell {
             self.setNeedsLayout()
             constraint.constant = height + view.insets.top + view.insets.bottom
             self.layoutIfNeeded()
+            view.cornerRadius = newValue.width * 0.05
         })
         return instance
     }()
@@ -172,9 +194,9 @@ class SurveyCell: UICollectionViewCell {
         })
         return instance
     }()
-    private let viewsView: UIImageView = {
+    private lazy var viewsView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "eye.fill"))
-        instance.tintColor = .darkGray
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.contentMode = .scaleAspectFit
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
@@ -215,13 +237,6 @@ class SurveyCell: UICollectionViewCell {
         })
         return instance
     }()
-    private lazy var usernameLabel: UILabel = {
-        let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
-        instance.textAlignment = .center
-        instance.textColor = .secondaryLabel
-        return instance
-    }()
     private lazy var topicLabel: InsetLabel = {
         let instance = InsetLabel()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
@@ -238,9 +253,9 @@ class SurveyCell: UICollectionViewCell {
             
             self.setNeedsLayout()
             if let constraint_2 = view.getAllConstraints().filter({ $0.identifier == "width"}).first {
-                constraint_2.constant = width + 16
+                constraint_2.constant = width + view.insets.right*2.5 + view.insets.left*2.5
             } else {
-                let constraint_2 = view.widthAnchor.constraint(equalToConstant: width + 16)
+                let constraint_2 = view.widthAnchor.constraint(equalToConstant: width + view.insets.right*2.5 + view.insets.left*2.5)
                 constraint_2.identifier = "width"
                 constraint_2.isActive = true
             }
@@ -383,8 +398,9 @@ class SurveyCell: UICollectionViewCell {
 //            lastnameLabel.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
             lastnameLabel.centerXAnchor.constraint(equalTo: avatar.centerXAnchor),
             lastnameLabel.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
-            lastnameLabel.widthAnchor.constraint(equalTo: avatar.widthAnchor, multiplier: 1.7),
-            avatar.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+            lastnameLabel.widthAnchor.constraint(equalTo: avatar.widthAnchor, multiplier: 1.6),
+//            avatar.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+            avatar.topAnchor.constraint(equalTo: instance.topAnchor),
             avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
             avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.8),
 //            dateLabel.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
@@ -395,10 +411,10 @@ class SurveyCell: UICollectionViewCell {
     private lazy var firstnameLabel: ArcLabel = {
         let instance = ArcLabel()
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.text = "test"
-        instance.textColor = .secondaryLabel
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.accessibilityIdentifier = "firstnameLabel"
         return instance
     }()
@@ -407,10 +423,10 @@ class SurveyCell: UICollectionViewCell {
         instance.angle = 4.7
         instance.clockwise = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.text = "test"
-        instance.textColor = .secondaryLabel
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.accessibilityIdentifier = "lastnameLabel"
         return instance
     }()
@@ -439,7 +455,7 @@ class SurveyCell: UICollectionViewCell {
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
-    private let padding: CGFloat = 10
+    private let padding: CGFloat = 15
     private var constraint: NSLayoutConstraint!
     ///Store tasks from NotificationCenter's AsyncStream
     private var notifications: [Task<Void, Never>?] = []
@@ -708,6 +724,42 @@ class SurveyCell: UICollectionViewCell {
         self.progressView.layoutIfNeeded()
     }
     
+    private func setColors() {
+        guard let stackView = topicStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView else { return }
+        stackView.arrangedSubviews.forEach { [weak self] in
+            guard let self = self,
+                  let identifier = $0.accessibilityIdentifier else { return }
+            if identifier == "isHot" {
+                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed
+            } else if identifier == "isComplete" {
+                //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
+                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
+            } else if identifier == "isFavorite" {
+                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+            }
+        }
+    }
+    
+    private func refreshConstraints() {
+        guard let constraint = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
+              let constraint_2 = descriptionLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
+              let constraint_3 = topicLabel.getAllConstraints().filter({ $0.identifier == "width"}).first
+        else { return }
+        
+        let height = item.title.height(withConstrainedWidth: titleLabel.bounds.width, font: titleLabel.font)
+        let height_2 = item.truncatedDescription.height(withConstrainedWidth: descriptionLabel.bounds.width, font: descriptionLabel.font)
+        let width = item.topic.title.width(withConstrainedHeight: topicLabel.bounds.height, font: topicLabel.font)
+//        guard height != constraint.constant else { return }
+        setNeedsLayout()
+        constraint.constant = height + titleLabel.insets.top + titleLabel.insets.bottom
+        constraint_2.constant = height_2 + descriptionLabel.insets.top + descriptionLabel.insets.bottom
+        constraint_3.constant = width + topicLabel.insets.right*2.5 + topicLabel.insets.left*2.5
+        layoutIfNeeded()
+        topicStackView.updateConstraints()
+        topicLabel.frame.origin = .zero
+//        avatar.imageView.image = UIImage(systemName: "face.smiling.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: avatar.bounds.size.height*0.5, weight: .regular, scale: .medium))
+    }
+    
     @objc
     private func updateViewsCount(_ button: UIButton) {
         guard let item = item else { return }
@@ -725,9 +777,10 @@ class SurveyCell: UICollectionViewCell {
         super.traitCollectionDidChange(previousTraitCollection)
         
         progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-        
+        viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-
+        descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        
         if let stackView = topicStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
             stackView.arrangedSubviews.forEach { [weak self] in
                 guard let self = self,
@@ -752,13 +805,24 @@ class SurveyCell: UICollectionViewCell {
                                             forTextStyle: .caption2)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .caption2)
+        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .subheadline)
+        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
+        
         guard let constraint_1 = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
               let constraint_2 = statsView.getAllConstraints().filter({$0.identifier == "height"}).first,
+              let constraint_3 = descriptionLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
+              let constraint_4 = topicView.getAllConstraints().filter({$0.identifier == "height"}).first,
               let item = item else { return }
+        
         setNeedsLayout()
         constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
                                                   font: titleLabel.font)
         constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
+                                                                       font: ratingLabel.font)
+        constraint_3.constant = item.truncatedDescription.height(withConstrainedWidth: ratingLabel.bounds.width,
+                                                                       font: ratingLabel.font)
+        constraint_4.constant = item.topic.title.height(withConstrainedWidth: ratingLabel.bounds.width,
                                                                        font: ratingLabel.font)
         layoutIfNeeded()
     }

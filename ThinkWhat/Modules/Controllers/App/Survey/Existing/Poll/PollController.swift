@@ -188,15 +188,17 @@ class PollController: UIViewController {
             var largeAlpha: CGFloat = CGFloat(1) - max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             let smallAlpha: CGFloat = max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             
-            largeAlpha = largeAlpha < 0.3 ? 0 : largeAlpha
+            largeAlpha = largeAlpha < 0.35 ? 0 : largeAlpha
             self.navigationItem.titleView?.alpha = smallAlpha
             self.avatar.alpha = largeAlpha
             self.stackView.alpha = largeAlpha
         })
         notifications.append(Task { [weak self] in
-            for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
+                guard let self = self,
+                      let instance = notification.object as? SurveyReference,
+                      self._surveyReference == instance else { return }
                 await MainActor.run {
-                    guard let self = self else { return }
                     self.setBarButtonItem()
                 }
             }

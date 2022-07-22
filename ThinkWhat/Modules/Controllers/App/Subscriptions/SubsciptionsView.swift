@@ -52,6 +52,10 @@ class SubsciptionsView: UIView {
         instance.layer.masksToBounds = true
         instance.backgroundColor = .clear
         instance.addEquallyTo(to: background)
+        observers.append(instance.observe(\UIView.bounds, options: .new) { [weak self] view, change in
+            guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
+            self.featheredLayer.frame = newValue
+        })
         collectionView.addEquallyTo(to: instance)
         return instance
     }()
@@ -135,10 +139,6 @@ class SubsciptionsView: UIView {
     private func setupUI() {
         subscriptionsCollectionView.register(UINib(nibName: "VoterCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
         setText()
-        observers.append(featheredView.observe(\UIView.bounds, options: .new) { [weak self] view, change in
-            guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
-            self.featheredLayer.frame = newValue
-        })
         featheredView.layer.mask = featheredLayer
     }
     

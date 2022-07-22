@@ -193,13 +193,20 @@ class NewAvatar: UIView {
                 }
                 return
             }
-            imageView.contentMode = .scaleAspectFit
-            Animations.changeImageCrossDissolve(imageView: imageView, image: image)
+//            imageView.contentMode = .scaleAspectFit
+            Task { @MainActor in imageView.image = image }
+            
+//            Animations.changeImageCrossDissolve(imageView: imageView, image: image)
         }
     }
     public var isShadowed: Bool {
         didSet {
             shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+        }
+    }
+    public var shadowColor: UIColor = .clear {
+        didSet {
+            shadowView.layer.shadowColor = shadowColor.withAlphaComponent(0.4).cgColor
         }
     }
     
@@ -212,8 +219,8 @@ class NewAvatar: UIView {
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "shadowView"
         instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-        instance.layer.shadowRadius = 3
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
+        instance.layer.shadowRadius = 4
         instance.layer.shadowOffset = .zero
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
@@ -232,7 +239,7 @@ class NewAvatar: UIView {
         if let userprofile = userprofile, let image = userprofile.image {
             instance.image = image
         } else {
-            let largeConfig = UIImage.SymbolConfiguration(pointSize: 30, weight: .bold, scale: .medium)
+            let largeConfig = UIImage.SymbolConfiguration(pointSize: instance.bounds.height*0.65, weight: .regular, scale: .medium)
             instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
             instance.tintColor = .white
             instance.contentMode = .center
@@ -243,10 +250,12 @@ class NewAvatar: UIView {
             else { return }
             view.cornerRadius = newValue.height/2
             guard let _ = self.userprofile.image else {
-                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.5, weight: .regular, scale: .medium)
+                view.contentMode = .center
+                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.65, weight: .regular, scale: .medium)
                 instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
                 return
             }
+            view.contentMode = .scaleAspectFit
         })
         return instance
     }()

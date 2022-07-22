@@ -10,6 +10,51 @@ import UIKit
 
 class HotController: UIViewController {
 
+    
+    // MARK: - Properties
+    var controllerOutput: HotControllerOutput?
+    var controllerInput: HotControllerInput?
+    var shouldSkipCurrentCard = false
+    
+    private var observers: [NSKeyValueObservation] = []
+    private var isViewLayedOut = false
+    private lazy var barButton: UIView = {
+        let instance = UIView()
+        instance.layer.masksToBounds = false
+        instance.clipsToBounds = false
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "shadow"
+        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+        instance.layer.shadowRadius = 7
+        instance.layer.shadowOffset = .zero
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let newValue = change.newValue else { return }
+            view.layer.shadowPath = UIBezierPath(ovalIn: newValue).cgPath
+        })
+        
+        let button = UIButton()
+        observers.append(button.observe(\UIButton.bounds, options: .new) { view, change in
+            guard let newValue = change.newValue else { return }
+            view.cornerRadius = newValue.size.height/2
+            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 0.65, weight: .semibold, scale: .medium)
+            let image = UIImage(systemName: "plus", withConfiguration: largeConfig)
+            view.setImage(image, for: .normal)
+        })
+        button.addTarget(self, action: #selector(self.onCreate), for: .touchUpInside)
+        button.accessibilityIdentifier = "button"
+        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        button.imageView?.contentMode = .center
+        button.imageView?.tintColor = .white
+        button.addEquallyTo(to: instance)
+
+        return instance
+    }()
+    private var isNetworking = false
+    private var timer: Timer?
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -68,18 +113,14 @@ class HotController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(barButton)
-        barButton.layer.cornerRadius = UINavigationController.Constants.ImageSizeForLargeState / 2
-        barButton.clipsToBounds = true
         barButton.translatesAutoresizingMaskIntoConstraints = false
-        barButton.image = ImageSigns.plusFilled.image
-        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        barButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onCreate)))
         NSLayoutConstraint.activate([
             barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
             barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
             barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
             ])
+        barButton.frame = .zero
     }
     
     @objc
@@ -112,25 +153,23 @@ class HotController: UIViewController {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
+        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        button.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
     }
     
     
     
-    // MARK: - Properties
-    var controllerOutput: HotControllerOutput?
-    var controllerInput: HotControllerInput?
-    var shouldSkipCurrentCard = false
-    private var isViewLayedOut = false
-    private let barButton: UIImageView = {
-        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
-        v.contentMode = .scaleAspectFill
-        v.isUserInteractionEnabled = true
-        return v
-    }()
+    
+//    private let barButton: UIImageView = {
+//        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
+//        v.contentMode = .scaleAspectFill
+//        v.isUserInteractionEnabled = true
+//        return v
+//    }()
     ///Indicates that request is in progress, so another one shouldn't be fired
-    private var isNetworking = false
-    private var timer: Timer?
+    
 }
 
 // MARK: - View Input
