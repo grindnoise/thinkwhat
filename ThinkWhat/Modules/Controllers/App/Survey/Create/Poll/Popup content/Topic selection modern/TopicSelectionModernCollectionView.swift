@@ -8,6 +8,30 @@
 
 import UIKit
 
+struct TopicHeaderItem: Hashable {
+    let title: String
+    let topic: Topic
+    let topics: [TopicItem]
+    
+    init(topic: Topic) {
+        self.topic = topic
+        self.title = topic.title
+        self.topics = topic.children.map {
+            return TopicItem(topic: $0)
+        }
+    }
+}
+
+struct TopicItem: Hashable {
+    let title: String
+    let topic: Topic
+    
+    init(topic: Topic) {
+        self.topic = topic
+        self.title = topic.title
+    }
+}
+
 class TopicSelectionModernCollectionView: UICollectionView {
     
     enum Section {
@@ -277,29 +301,7 @@ enum TopicListItem: Hashable {
     case topic(TopicItem)
 }
 
-struct TopicHeaderItem: Hashable {
-    let title: String
-    let topic: Topic
-    let topics: [TopicItem]
-    
-    init(topic: Topic) {
-        self.topic = topic
-        self.title = topic.title
-        self.topics = topic.children.map {
-            return TopicItem(topic: $0)
-        }
-    }
-}
 
-struct TopicItem: Hashable {
-    let title: String
-    let topic: Topic
-    
-    init(topic: Topic) {
-        self.topic = topic
-        self.title = topic.title
-    }
-}
 
 extension UICollectionReusableView {
     static var reuseIdentifier: String {

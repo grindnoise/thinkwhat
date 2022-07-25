@@ -46,8 +46,7 @@ class ListView: UIView {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = false
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-        instance.addEquallyTo(to: shadowView)
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         collectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
@@ -138,7 +137,7 @@ extension ListView: ListControllerOutput {
 extension ListView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     }
 }
 

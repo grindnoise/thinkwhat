@@ -19,7 +19,7 @@ protocol TopicsViewInput: class {
     
     func onSurveyTapped(_: SurveyReference)
     func onDataSourceRequest(_: Topic)
-    
+    func onTopicSelected(_: Topic)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -50,6 +50,7 @@ protocol TopicsControllerOutput: AnyObject {
     func onDefaultMode()
     func onSearchMode()
     func onSearchCompleted(_: [SurveyReference])
+    func onTopicMode(_: Topic)
 //    var topic: Topic? { get }
     
 //    func onDidLayout()

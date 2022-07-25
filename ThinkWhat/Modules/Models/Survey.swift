@@ -43,7 +43,7 @@ class Survey: Decodable {
 //                    all.remove(object: $0)
 //                }
 //                return all
-                return SurveyReferences.shared.all.filter({ $0.topic == topic! })
+                return SurveyReferences.shared.all.filter({ $0.topic == topic! }).uniqued()
             case .Search:
                 fatalError()
             }

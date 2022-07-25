@@ -34,7 +34,7 @@ class SubsciptionsController: UIViewController {
         observers.append(button.observe(\UIButton.bounds, options: .new) { view, change in
             guard let newValue = change.newValue else { return }
             view.cornerRadius = newValue.size.height/2
-            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 0.65, weight: .semibold, scale: .medium)
+            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 0.55, weight: .semibold, scale: .medium)
             let image = UIImage(systemName: "chevron.down", withConfiguration: largeConfig)
             view.setImage(image, for: .normal)
         })
@@ -98,7 +98,9 @@ class SubsciptionsController: UIViewController {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
+        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
     @objc

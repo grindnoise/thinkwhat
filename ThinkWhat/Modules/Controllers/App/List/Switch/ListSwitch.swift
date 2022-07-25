@@ -14,71 +14,39 @@ class ListSwitch: UIView {
         case Top, New, Watching, Own
     }
     
-    // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable) {
-        self.callbackDelegate = callbackDelegate
-        super.init(frame: .zero)
-        commonInit()
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        commonInit()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        commonInit()
-    }
-    
-    private func commonInit() {
-        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-        addSubview(contentView)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-        ])
-        setupUI()
-    }
-    
-    private func setupUI() {
-        new.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-        new.tintColor = .white
-        bg.insertSubview(mark, at: 0)
-        bg.clipsToBounds = false
-        mark.clipsToBounds = false
-        mark.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        top.tintColor = state == .Top ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        new.tintColor = state == .New ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        watching.tintColor = state == .Watching ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        own.tintColor = state == .Own ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        mark.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-    }
-    
-    @objc
-    private func handleTap(recognizer: UITapGestureRecognizer) {
-        guard let v = recognizer.view else { return }
-        if v === top {
-            state = .Top
-        } else if v === new {
-            state = .New
-        } else if v === watching {
-            state = .Watching
-        } else {
-            state = .Own
+    private var observers: [NSKeyValueObservation] = []
+    @IBOutlet weak var backgroundView: UIView! {
+        didSet {
+            backgroundView.accessibilityIdentifier = "backgroundView"
+            backgroundView.layer.masksToBounds = false
+            backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+            observers.append(backgroundView.observe(\UIView.bounds, options: .new) { view, change in
+                guard let value = change.newValue else { return }
+                view.cornerRadius = value.height/2
+            })
         }
     }
     
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var bg: UIView!
+    @IBOutlet weak var shadowView: UIView! {
+        didSet {
+            shadowView.clipsToBounds = false
+            shadowView.backgroundColor = .clear
+            shadowView.accessibilityIdentifier = "shadow"
+            shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+            shadowView.layer.shadowRadius = 5
+            shadowView.layer.shadowOffset = .zero
+            observers.append(shadowView.observe(\UIView.bounds, options: .new) { view, change in
+                guard let newValue = change.newValue else { return }
+                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.height/2).cgPath
+            })
+        }
+    }
+    @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var top: UIImageView! {
         didSet {
+            top.layer.zPosition = 10
             top.isUserInteractionEnabled = true
             top.contentMode = .center
             top.image = ImageSigns.capslockFilled.image
@@ -119,6 +87,7 @@ class ListSwitch: UIView {
             guard state != oldValue else { return }
             callbackDelegate?.callbackReceived(state)
             var oldView: UIView!
+            var imageName: String!
             switch oldValue {
             case .Top:
                 oldView = top
@@ -132,33 +101,121 @@ class ListSwitch: UIView {
             var newView: UIView!
             switch state {
             case .Top:
+                imageName = "capslock.fill"
                 newView = top
             case .New:
                 newView = new
+                imageName = "tag.fill"
             case .Watching:
+                imageName = "binoculars.fill"
                 newView = watching
             case .Own:
+                imageName = "figure.wave"
                 newView = own
             }
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: [.curveEaseInOut]) {
+            
+            let image = UIImage(systemName: imageName,
+                                withConfiguration: UIImage.SymbolConfiguration(pointSize: mark.bounds.size.height * 0.45, weight: .semibold, scale: .medium))
+            
+            guard let imageView = mark.getSubview(type: UIImageView.self, identifier: "innerView") else { return }
+            UIView.transition(with: imageView, duration: 0.175, options: .transitionCrossDissolve) { [weak self] in
+                guard let self = self else { return }
                 self.mark.center.x  = newView.center.x
-                oldView.tintColor = .secondaryLabel//self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-                oldView.transform = .identity
-                newView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-                newView.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .white
+                imageView.image = image
             } completion: { _ in }
         }
     }
     
-    private let mark = UIView(frame: .zero)
+    private lazy var mark: UIView = {
+        let instance = UIView()
+        instance.clipsToBounds = false
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "mark"
+        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+        instance.layer.shadowRadius = 7
+        instance.layer.shadowOffset = .zero
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+//            guard let newValue = change.newValue else { return }
+//            view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.height/2).cgPath
+//        })
+        let innerView = UIImageView()
+        innerView.accessibilityIdentifier = "innerView"
+        innerView.contentMode = .center
+        innerView.addEquallyTo(to: instance)
+        innerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        innerView.tintColor = .white
+        observers.append(innerView.observe(\UIImageView.bounds, options: .new) { view, change in
+            guard let newValue = change.newValue else { return }
+            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 0.45, weight: .semibold, scale: .medium)
+            let image = UIImage(systemName: "tag.fill", withConfiguration: largeConfig)
+            view.image = image
+            view.cornerRadius = view.bounds.height/2
+        })
+
+        return instance
+    }()
     private weak var callbackDelegate: CallbackObservable?
     
-    override var bounds: CGRect {
-        didSet {
-            guard oldValue != bounds, !bg.isNil else { return }
-            bg.cornerRadius = bounds.height / 2
-            mark.frame = CGRect(origin: .zero, size: CGSize(width: bounds.height, height: bounds.height))
-            mark.cornerRadius = bounds.height / 2
+    // MARK: - Initialization
+    init(callbackDelegate: CallbackObservable) {
+        self.callbackDelegate = callbackDelegate
+        super.init(frame: .zero)
+        commonInit()
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        commonInit()
+    }
+    
+    private func commonInit() {
+        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        addSubview(contentView)
+        shadowView.addSubview(mark)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        mark.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            mark.heightAnchor.constraint(equalTo: contentView.heightAnchor),
+            mark.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+        ])
+        let constraint = mark.leadingAnchor.constraint(equalTo: shadowView.leadingAnchor, constant: 0)
+        constraint.identifier = "leading"
+        constraint.isActive = true
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        mark.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+//        top.tintColor = state == .Top ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        new.tintColor = state == .New ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        watching.tintColor = state == .Watching ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        own.tintColor = state == .Own ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        mark.getSubview(type: UIView.self, identifier: "innerView")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    }
+    
+    @objc
+    private func handleTap(recognizer: UITapGestureRecognizer) {
+        guard let v = recognizer.view else { return }
+        if v === top {
+            state = .Top
+        } else if v === new {
+            state = .New
+        } else if v === watching {
+            state = .Watching
+        } else {
+            state = .Own
         }
     }
 }

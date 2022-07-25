@@ -14,7 +14,13 @@ class SurveysCollectionView: UICollectionView {
     private enum Section { case main }
     
     // MARK: - Public properties
-    public var topic: Topic?
+    public var topic: Topic? {
+        didSet {
+            guard !topic.isNil else { return }
+            category = .Topic
+//            setDataSource()
+        }
+    }
     public var category: Survey.SurveyCategory {
         didSet {
             guard oldValue != category else { return }
@@ -46,7 +52,6 @@ class SurveysCollectionView: UICollectionView {
     
     // MARK: - Destructor
     deinit {
-        ///Destruct notifications
         notifications.forEach { $0?.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
@@ -103,8 +108,6 @@ class SurveysCollectionView: UICollectionView {
         }
         
         let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { cell, indexPath, item in
-            print("row: \(indexPath.row) item: \(item.title)")
-//            guard cell.item.isNil else { return }
             cell.item = item
         }
         

@@ -10,7 +10,7 @@ import UIKit
 
 class InsetTextField: UITextField {
 
-    var insets: UIEdgeInsets = UIEdgeInsets(top: 0, left: 18, bottom: 0, right: 20) {
+    var insets: UIEdgeInsets = UIEdgeInsets.zero {// UIEdgeInsets(top: 0, left: 18, bottom: 0, right: 20) {
         didSet {
             setNeedsLayout()
             layoutIfNeeded()

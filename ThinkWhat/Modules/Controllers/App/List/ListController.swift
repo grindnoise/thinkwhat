@@ -59,8 +59,8 @@ class ListController: UIViewController {
         NSLayoutConstraint.activate([
             listSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             listSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-            listSwitch.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState * 0.97),
-            listSwitch.widthAnchor.constraint(equalTo: listSwitch.heightAnchor, multiplier: 4.2)
+            listSwitch.heightAnchor.constraint(equalToConstant: 40),
+            listSwitch.widthAnchor.constraint(equalTo: listSwitch.heightAnchor, multiplier: 4)
             ])
     }
     

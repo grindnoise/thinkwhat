@@ -14,7 +14,9 @@ class ChoiceCell: UICollectionViewCell {
     // MARK: - Overriden properties
     override var isSelected: Bool {
         didSet {
-            guard isSelected != oldValue else { return }
+            if mode == .Write, isSelected == oldValue {
+                return
+            }
             updateAppearance()
         }
     }

@@ -91,6 +91,9 @@
 		AB30A4FD272AAEAD00A7DCC0 /* Answer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB30A4FC272AAEAD00A7DCC0 /* Answer.swift */; };
 		AB30A5002731470000A7DCC0 /* ResultIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB30A4FF273146FF00A7DCC0 /* ResultIndicator.swift */; };
 		AB30A5022731472800A7DCC0 /* ResultIndicator.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB30A5012731472800A7DCC0 /* ResultIndicator.xib */; };
+		AB3211AA288E7D0800C736DE /* TopicsCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3211A9288E7D0800C736DE /* TopicsCollectionView.swift */; };
+		AB3211AC288E80EB00C736DE /* TopicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3211AB288E80EB00C736DE /* TopicCell.swift */; };
+		AB3211AE288E810A00C736DE /* TopicHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3211AD288E810A00C736DE /* TopicHeaderCell.swift */; };
 		AB32DA3D25D56138007AFF05 /* TextInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB32DA3C25D56138007AFF05 /* TextInputViewController.swift */; };
 		AB334FB9270C423400DD7332 /* ClockIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB334FB8270C423400DD7332 /* ClockIndicator.swift */; };
 		AB334FC1270C6EDC00DD7332 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB334FC0270C6EDC00DD7332 /* AlertController.swift */; };
@@ -477,8 +480,8 @@
 		ABCE775B28489342001E3413 /* ImageSelectionPopup.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */; };
 		ABCE775D2848D378001E3413 /* InsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCE775C2848D378001E3413 /* InsetLabel.swift */; };
 		ABD2A2B32883DE1E00591568 /* SurveysCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2A2B22883DE1E00591568 /* SurveysCollectionView.swift */; };
-		ABD2A2B628841B1100591568 /* SubscriptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2A2B528841B1100591568 /* SubscriptionCell.swift */; };
-		ABD2A2B828841B1E00591568 /* SurveyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2A2B728841B1E00591568 /* SurveyCell.swift */; };
+		ABD2A2B628841B1100591568 /* SurveyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2A2B528841B1100591568 /* SurveyCell.swift */; };
+		ABD2A2B828841B1E00591568 /* delSurveyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2A2B728841B1E00591568 /* delSurveyCell.swift */; };
 		ABD639A427A5B0C50020958F /* ReCAPTCHAViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD639A127A5B0C40020958F /* ReCAPTCHAViewModel.swift */; };
 		ABD639A527A5B0C50020958F /* ReCAPTCHAViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD639A227A5B0C50020958F /* ReCAPTCHAViewController.swift */; };
 		ABD639A627A5B0C50020958F /* recaptcha.html in Resources */ = {isa = PBXBuildFile; fileRef = ABD639A327A5B0C50020958F /* recaptcha.html */; };
@@ -644,6 +647,9 @@
 		AB30A4FC272AAEAD00A7DCC0 /* Answer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Answer.swift; sourceTree = "<group>"; };
 		AB30A4FF273146FF00A7DCC0 /* ResultIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultIndicator.swift; sourceTree = "<group>"; };
 		AB30A5012731472800A7DCC0 /* ResultIndicator.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResultIndicator.xib; sourceTree = "<group>"; };
+		AB3211A9288E7D0800C736DE /* TopicsCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicsCollectionView.swift; sourceTree = "<group>"; };
+		AB3211AB288E80EB00C736DE /* TopicCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCell.swift; sourceTree = "<group>"; };
+		AB3211AD288E810A00C736DE /* TopicHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicHeaderCell.swift; sourceTree = "<group>"; };
 		AB32DA3C25D56138007AFF05 /* TextInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputViewController.swift; sourceTree = "<group>"; };
 		AB334FB8270C423400DD7332 /* ClockIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockIndicator.swift; sourceTree = "<group>"; };
 		AB334FC0270C6EDC00DD7332 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertController.swift; sourceTree = "<group>"; };
@@ -1041,8 +1047,8 @@
 		ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageSelectionPopup.xib; sourceTree = "<group>"; };
 		ABCE775C2848D378001E3413 /* InsetLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetLabel.swift; sourceTree = "<group>"; };
 		ABD2A2B22883DE1E00591568 /* SurveysCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveysCollectionView.swift; sourceTree = "<group>"; };
-		ABD2A2B528841B1100591568 /* SubscriptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionCell.swift; sourceTree = "<group>"; };
-		ABD2A2B728841B1E00591568 /* SurveyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCell.swift; sourceTree = "<group>"; };
+		ABD2A2B528841B1100591568 /* SurveyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCell.swift; sourceTree = "<group>"; };
+		ABD2A2B728841B1E00591568 /* delSurveyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delSurveyCell.swift; sourceTree = "<group>"; };
 		ABD639A127A5B0C40020958F /* ReCAPTCHAViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReCAPTCHAViewModel.swift; sourceTree = "<group>"; };
 		ABD639A227A5B0C50020958F /* ReCAPTCHAViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReCAPTCHAViewController.swift; sourceTree = "<group>"; };
 		ABD639A327A5B0C50020958F /* recaptcha.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = recaptcha.html; sourceTree = "<group>"; };
@@ -1447,6 +1453,16 @@
 				AB30A5012731472800A7DCC0 /* ResultIndicator.xib */,
 			);
 			path = ResultIndicator;
+			sourceTree = "<group>";
+		};
+		AB3211A8288E7CF100C736DE /* CollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				AB3211A9288E7D0800C736DE /* TopicsCollectionView.swift */,
+				AB3211AB288E80EB00C736DE /* TopicCell.swift */,
+				AB3211AD288E810A00C736DE /* TopicHeaderCell.swift */,
+			);
+			path = CollectionView;
 			sourceTree = "<group>";
 		};
 		AB334FBF270C6E9F00DD7332 /* Alert */ = {
@@ -2047,6 +2063,7 @@
 		AB72963127DB5ED800D45B54 /* Topics */ = {
 			isa = PBXGroup;
 			children = (
+				AB3211A8288E7CF100C736DE /* CollectionView */,
 				AB1E201B2832594A00C4E43D /* Cells */,
 				AB72963227DB5EFB00D45B54 /* TopicsController.swift */,
 				AB72963327DB5EFB00D45B54 /* TopicsController.xib */,
@@ -2776,8 +2793,8 @@
 			isa = PBXGroup;
 			children = (
 				ABD2A2B22883DE1E00591568 /* SurveysCollectionView.swift */,
-				ABD2A2B528841B1100591568 /* SubscriptionCell.swift */,
-				ABD2A2B728841B1E00591568 /* SurveyCell.swift */,
+				ABD2A2B528841B1100591568 /* SurveyCell.swift */,
+				ABD2A2B728841B1E00591568 /* delSurveyCell.swift */,
 			);
 			path = SurveysCollectionView;
 			sourceTree = "<group>";
@@ -3392,6 +3409,7 @@
 				AB00FFD32583A4A50071C7DE /* TextViewController.swift in Sources */,
 				ABE065072844B57100877D92 /* OptionSelection.swift in Sources */,
 				AB791D7D243B1BF00085E00E /* VoteAnimationView.swift in Sources */,
+				AB3211AC288E80EB00C736DE /* TopicCell.swift in Sources */,
 				AB3A47DA283F5C1E00106407 /* RankingCreationController.swift in Sources */,
 				AB463FB727C403A7007D7240 /* GeoNames.swift in Sources */,
 				AB798C252248DB730042BC7C /* PasswordRecoveryViewController.swift in Sources */,
@@ -3469,9 +3487,10 @@
 				ABBA73F82383F74E00540ECF /* HeartButton.swift in Sources */,
 				AB72964C27DB612000D45B54 /* SettingsModel.swift in Sources */,
 				AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */,
+				AB3211AA288E7D0800C736DE /* TopicsCollectionView.swift in Sources */,
 				ABF27574280E8D230023CD1F /* AppErrors.swift in Sources */,
 				ABD639A527A5B0C50020958F /* ReCAPTCHAViewController.swift in Sources */,
-				ABD2A2B828841B1E00591568 /* SurveyCell.swift in Sources */,
+				ABD2A2B828841B1E00591568 /* delSurveyCell.swift in Sources */,
 				AB3CCB3428376EDA0024372B /* Device.swift in Sources */,
 				AB6083C122410131002C0D7E /* ValidSign.swift in Sources */,
 				ABF2758B28102AE40023CD1F /* VotersFilter.swift in Sources */,
@@ -3489,6 +3508,7 @@
 				AB8F28B027C0DEEB008E4ED0 /* NSLayoutConstraint.swift in Sources */,
 				AB30A4FD272AAEAD00A7DCC0 /* Answer.swift in Sources */,
 				AB4054FA28783E81000F7768 /* VoteCell.swift in Sources */,
+				AB3211AE288E810A00C736DE /* TopicHeaderCell.swift in Sources */,
 				AB37B9B22774BF3A00C7DEBC /* API.swift in Sources */,
 				AB87904D286DF03500C069BA /* ChoiceResultCell.swift in Sources */,
 				ABCDE35F260C7D3300ACF5A6 /* VerticalTextLayer.swift in Sources */,
@@ -3738,7 +3758,7 @@
 				ABADF57927F1DB0E00A26474 /* ImagesCell.swift in Sources */,
 				AB334FB9270C423400DD7332 /* ClockIndicator.swift in Sources */,
 				ABADF59C27F7066300A26474 /* Banner.swift in Sources */,
-				ABD2A2B628841B1100591568 /* SubscriptionCell.swift in Sources */,
+				ABD2A2B628841B1100591568 /* SurveyCell.swift in Sources */,
 				AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */,
 				AB39F41B2847C02A00DEE0ED /* ImageSelectionProvider.swift in Sources */,
 				AB463FB327C3FADD007D7240 /* SearchTextField.swift in Sources */,
