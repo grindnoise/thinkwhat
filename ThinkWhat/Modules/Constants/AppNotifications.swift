@@ -45,6 +45,7 @@ struct Notifications {
         static let TopAppend                        = Notification.Name("SurveysTopAppend")
         static let OwnAppend                        = Notification.Name("SurveysOwnAppend")
         static let FavoriteAppend                   = Notification.Name("SurveysFavoriteAppend")
+        static let TopicAppend                      = Notification.Name("SurveysTopicAppend")
         static let Claim                            = Notification.Name("SurveyClaim")
         static let Ban                              = Notification.Name("SurveyBan")
         

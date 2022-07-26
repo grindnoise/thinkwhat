@@ -23,7 +23,7 @@ class SurveysCollectionView: UICollectionView {
     }
     public var category: Survey.SurveyCategory {
         didSet {
-            guard oldValue != category else { return }
+//            guard oldValue != category else { return }
             setDataSource()
             guard !dataItems.isEmpty else { return }
             scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
@@ -49,6 +49,13 @@ class SurveysCollectionView: UICollectionView {
     private weak var callbackDelegate: CallbackObservable?
 //    private var hMaskLayer: CAGradientLayer!
     private var observers: [NSKeyValueObservation] = []
+    private lazy var searchSpinner: UIActivityIndicatorView = {
+        let instance = UIActivityIndicatorView(style: .large)
+        instance.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instance.alpha = 0
+        instance.layoutCentered(in: self)
+        return instance
+    }()
     
     // MARK: - Destructor
     deinit {
@@ -98,13 +105,29 @@ class SurveysCollectionView: UICollectionView {
     // MARK: - Private methods
     private func setupUI() {
         delegate = self
+        
+        refreshControl = UIRefreshControl()
+        refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
+        refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
+        
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
 //            layoutConfig.headerMode = .firstItemInSection
             layoutConfig.backgroundColor = .clear
             layoutConfig.showsSeparators = true
+//            layoutConfig.itemSeparatorHandler = {
+                
+//            }
+//            if #available(iOS 14.5, *) {
+//                var separatorConfig = UIListSeparatorConfiguration(listAppearance: UICollectionLayoutListConfiguration.Appearance.grouped)
+//                separatorConfig.bottomSeparatorInsets = NSDirectionalEdgeInsets(top: <#T##CGFloat#>, leading: <#T##CGFloat#>, bottom: <#T##CGFloat#>, trailing: .greatestFiniteMagnitude)
+//                layoutConfig.separatorConfiguration = separatorConfig
+//            }
             
-            return NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 0, trailing: sectionLayout.contentInsets.trailing)
+            
+            return sectionLayout
         }
         
         let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { cell, indexPath, item in
@@ -271,6 +294,22 @@ class SurveysCollectionView: UICollectionView {
                     await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
+            
+            //Topic added
+            notifications.append(Task { [weak self] in
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
+                    guard let self = self,
+                          self.category == .Topic,
+                          let instance = notification.object as? SurveyReference,
+                          !self.source.snapshot().itemIdentifiers.contains(instance)
+                    else { return }
+
+                    var snap = self.source.snapshot()
+                    snap.appendItems([instance], toSection: .main)
+                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                }
+            })
+
 
         } else {
             NotificationCenter.default.addObserver(self,
@@ -279,13 +318,54 @@ class SurveysCollectionView: UICollectionView {
                                                    object: self)
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.appendItemIdentifier(notification:)),
-                                                   name: Notifications.Surveys.Claim,
+                                                   name: Notifications.Surveys.TopicAppend,
                                                    object: self)
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.appendItemIdentifier(notification:)),
+                                                   name: Notifications.Surveys.FavoriteAppend,
+                                                   object: self)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.appendItemIdentifier(notification:)),
+                                                   name: Notifications.Surveys.OwnAppend,
+                                                   object: self)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.appendItemIdentifier(notification:)),
+                                                   name: Notifications.Surveys.TopAppend,
+                                                   object: self)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.appendItemIdentifier(notification:)),
+                                                   name: Notifications.Surveys.NewAppend,
+                                                   object: self)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.removeItemIdentifier(notification:)),
+                                                   name: Notifications.Surveys.Claim,
+                                                   object: self)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.removeItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.Ban,
                                                    object: self)
         }
+    }
+    
+    // MARK: - Public methods
+    @MainActor @objc
+    public func endRefreshing() {
+        refreshControl?.endRefreshing()
+    }
+    
+    @MainActor @objc
+    public func beginSearchRefreshing() {
+        searchSpinner.startAnimating()
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0) {
+            self.searchSpinner.alpha = 1
+        }
+    }
+    
+    @MainActor @objc
+    public func endSearchRefreshing() {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
+            self.searchSpinner.alpha = 1
+        } completion: { _ in self.searchSpinner.stopAnimating() }
     }
     
     //Old-fashioned observation
@@ -326,6 +406,7 @@ class SurveysCollectionView: UICollectionView {
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
+        searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //        collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
 //        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     }
@@ -364,23 +445,6 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     }
     
     @objc
-    private func endRefreshing() {
-//        switch category {
-//        case .New:
-//
-//        case .Top:
-//
-//        case .Own:
-//
-//        case.Favorite:
-//
-//        default:
-//            print("")
-//        }
-        refreshControl?.endRefreshing()
-    }
-    
-    @objc
     private func onRemove(_ notification: Notification) {
 //        setDataSource()
         let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
@@ -390,13 +454,13 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         source.apply(snapshot, animatingDifferences: true)
     }
     
-    @objc
-    private func onPagination() {
-        endRefreshing()
-        appendToDataSource()
-    }
+//    @objc
+//    private func onPagination() {
+//        endRefreshing()
+//        appendToDataSource()
+//    }
     
-    func appendToDataSource() {
+    private func appendToDataSource() {
         var snapshot = source.snapshot()
         guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }
         snapshot.appendItems([newInstance], toSection: .main)

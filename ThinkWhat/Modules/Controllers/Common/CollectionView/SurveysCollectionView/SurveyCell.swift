@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SurveyCell: UICollectionViewCell {
+class SurveyCell: UICollectionViewListCell {
     
     // MARK: - Public properties
     public weak var item: SurveyReference! {
@@ -31,6 +31,13 @@ class SurveyCell: UICollectionViewCell {
             lastnameLabel.text = item.owner.lastNameSingleWord
             avatar.userprofile = item.owner
             
+            if item.isComplete {
+                titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+                descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+            } else {
+                titleLabel.textColor = .label
+                descriptionLabel.textColor = .label
+            }
             //NSObject observation
 //            observers.append(item.observe(\SurveyReference.title, options: .new) { [weak self] _, change in
 //                guard let self = self,
@@ -57,64 +64,72 @@ class SurveyCell: UICollectionViewCell {
             
             topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
 
-            if topicStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).isEmpty {
-                if item.isFavorite || item.isComplete || item.isHot {
-                    let stackView = UIStackView()
-                    stackView.clipsToBounds = false
-                    stackView.spacing = 2
-                    stackView.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-                    stackView.accessibilityIdentifier = "marksStackView"
-                    observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
-                        guard let newValue = change.newValue else { return }
-                        view.cornerRadius = newValue.height/2.25
-                    })
-                    if item.isComplete {
-                        let container = UIView()
-                        container.backgroundColor = .clear
-                        container.accessibilityIdentifier = "isComplete"
-                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                        
-                        let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill",
-                                                                  withConfiguration: UIImage.SymbolConfiguration(pointSize: stackView.frame.height, weight: .semibold, scale: .medium)))
-                        instance.contentMode = .center
-                        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : item.topic.tagColor
-                        instance.contentMode = .scaleAspectFit
-                        instance.addEquallyTo(to: container)
-                        stackView.addArrangedSubview(container)
-//                        observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
-//                            guard let newValue = change.newValue else { return }
-//                            view.cornerRadius = newValue.size.height/2
-//                            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
-//                            let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
-//                            view.image = image
-//                        })
-                    }
-                    if item.isFavorite {
-                        let container = UIView()
-                        container.backgroundColor = .clear
-                        container.accessibilityIdentifier = "isFavorite"
-                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                        
-                        let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-                        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-                        instance.contentMode = .scaleAspectFit
-                        instance.addEquallyTo(to: container)
-                        stackView.addArrangedSubview(container)
-                    }
-                    if item.isHot {
-                        let container = UIView()
-                        container.backgroundColor = .clear
-                        container.accessibilityIdentifier = "isHot"
-                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                        
-                        let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-                        instance.tintColor = .systemRed
-                        instance.contentMode = .scaleAspectFit
-                        instance.addEquallyTo(to: container)
-                        stackView.addArrangedSubview(container)
-                    }
-                    topicStackView.addArrangedSubview(stackView)
-                }
+            var marksStackView: UIStackView!
+            if let instance = topicStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
+                marksStackView = instance
+            } else {
+                let stackView = UIStackView()
+                stackView.clipsToBounds = false
+                stackView.spacing = 2
+                stackView.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+                stackView.accessibilityIdentifier = "marksStackView"
+                observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
+                    guard let newValue = change.newValue else { return }
+                    view.cornerRadius = newValue.height/2.25
+                })
+                topicStackView.addArrangedSubview(stackView)
+                marksStackView = stackView
+            }
+            marksStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+            
+            if item.isOwn {
+                let container = UIView()
+                container.backgroundColor = .clear
+                container.accessibilityIdentifier = "isOwn"
+                container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                
+                let instance = UIImageView(image: UIImage(systemName: "figure.wave"))
+                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+                instance.contentMode = .scaleAspectFit
+                instance.addEquallyTo(to: container)
+                marksStackView.addArrangedSubview(container)
+            } else if item.isComplete {
+                let container = UIView()
+                container.backgroundColor = .clear
+                container.accessibilityIdentifier = "isComplete"
+                container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                
+                let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill",
+                                                          withConfiguration: UIImage.SymbolConfiguration(pointSize: marksStackView.frame.height, weight: .semibold, scale: .medium)))
+                instance.contentMode = .center
+                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : item.topic.tagColor
+                instance.contentMode = .scaleAspectFit
+                instance.addEquallyTo(to: container)
+                marksStackView.addArrangedSubview(container)
+            }
+            if item.isFavorite {
+                let container = UIView()
+                container.backgroundColor = .clear
+                container.accessibilityIdentifier = "isFavorite"
+                container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                
+                let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
+                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                instance.contentMode = .scaleAspectFit
+                instance.addEquallyTo(to: container)
+                marksStackView.addArrangedSubview(container)
+            }
+            if item.isHot {
+                let container = UIView()
+                container.backgroundColor = .clear
+                container.accessibilityIdentifier = "isHot"
+                container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                
+                let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+                instance.tintColor = .systemRed
+                instance.contentMode = .scaleAspectFit
+                instance.addEquallyTo(to: container)
+                marksStackView.addArrangedSubview(container)
             }
             
             if titleLabel.getConstraint(identifier: "height").isNil, descriptionLabel.getConstraint(identifier: "height").isNil, topicView.getConstraint(identifier: "height").isNil {
@@ -133,11 +148,14 @@ class SurveyCell: UICollectionViewCell {
             }
         }
     }
+//    override var separatorLayoutGuide: UILayoutGuide = {
+//        return UILayoutGuide()
+//    }()
     
     // MARK: - Private properties
     private lazy var titleLabel: InsetLabel = {
         let instance = InsetLabel()
-        instance.insets = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
+        instance.insets = UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0)
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
         instance.numberOfLines = 0
@@ -159,12 +177,12 @@ class SurveyCell: UICollectionViewCell {
     }()
     private lazy var descriptionLabel: InsetLabel = {
         let instance = InsetLabel()
-        instance.insets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        instance.insets = UIEdgeInsets(top: 5, left: 0, bottom: 10, right: 0)
         instance.textAlignment = .left
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
         instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        instance.textColor = .label
         observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
             guard let self = self,
                   let item = self.item,
@@ -190,9 +208,9 @@ class SurveyCell: UICollectionViewCell {
     }()
     private lazy var ratingLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
         instance.textAlignment = .center
-        instance.textColor = .secondaryLabel
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
             guard let self = self,
                   let text = view.text else { return }
@@ -219,10 +237,10 @@ class SurveyCell: UICollectionViewCell {
     }()
     private lazy var dateLabel: InsetLabel = {
         let instance = InsetLabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
-        instance.textColor = .secondaryLabel//.white
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 //        instance.backgroundColor = .systemGray
         observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
             guard let self = self,
@@ -278,7 +296,7 @@ class SurveyCell: UICollectionViewCell {
     }()
     private lazy var progressView: UIView = {
         let instance = UIView()
-        instance.backgroundColor = .systemGray3
+        instance.backgroundColor = .systemGray4
         instance.accessibilityIdentifier = "progressView"
         let constraint = instance.widthAnchor.constraint(equalToConstant: 30)
         constraint.identifier = "width"
@@ -333,11 +351,11 @@ class SurveyCell: UICollectionViewCell {
         instance.spacing = 4
         return instance
     }()
-    @MainActor private let viewsLabel: UILabel = {
+    @MainActor private lazy var viewsLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
         instance.textAlignment = .center
-        instance.textColor = .secondaryLabel
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         return instance
     }()
     private lazy var statsView: UIView = {
@@ -363,7 +381,7 @@ class SurveyCell: UICollectionViewCell {
     }()
     private lazy var statsStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
-        instance.alignment = .center
+//        instance.alignment = .center
         instance.spacing = 2
         return instance
     }()
@@ -444,13 +462,13 @@ class SurveyCell: UICollectionViewCell {
     private lazy var verticalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [subHorizontalStack, descriptionLabel, statsView])
         instance.axis = .vertical
-        instance.spacing = 10
+        instance.spacing = 0
         return instance
     }()
     private lazy var topVerticalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [topicView, titleLabel])
         instance.axis = .vertical
-        instance.spacing = 4
+        instance.spacing = 0
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
@@ -466,7 +484,7 @@ class SurveyCell: UICollectionViewCell {
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
-    private let padding: CGFloat = 15
+    private let padding: CGFloat = 10
     private var constraint: NSLayoutConstraint!
     ///Store tasks from NotificationCenter's AsyncStream
     private var notifications: [Task<Void, Never>?] = []
@@ -619,7 +637,7 @@ class SurveyCell: UICollectionViewCell {
                         case true:
 //                            self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemGray : item.isComplete ? .systemGreen : .systemGray
                             var stackView: UIStackView!
-                            if let _stackView = self.topicStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
+                            if let _stackView = self.topicStackView.getSubview(type: UIStackView.self, identifier: "marksStackView") {
                                 stackView = _stackView
                             } else {
                                 stackView = UIStackView()
@@ -757,6 +775,9 @@ class SurveyCell: UICollectionViewCell {
                 $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
             } else if identifier == "isFavorite" {
                 $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+            } else if identifier == "isOwn" {
+                //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
+                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
             }
         }
     }
@@ -794,14 +815,32 @@ class SurveyCell: UICollectionViewCell {
     }
     
     // MARK: - Overriden methods
+    override func updateConstraints() {
+        super.updateConstraints()
+        
+        separatorLayoutGuide.leadingAnchor.constraint(equalTo: ratingView.trailingAnchor, constant: 10).isActive = true
+        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor, constant: .greatestFiniteMagnitude).isActive = true
+    }
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
         progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-        descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 //        descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
+        
+        if !item.isNil {
+            if item.isComplete {
+                titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+                descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+            } else {
+                titleLabel.textColor = .label
+                descriptionLabel.textColor = .label
+            }
+        }
         
         if let stackView = topicStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
             stackView.arrangedSubviews.forEach { [weak self] in
@@ -814,6 +853,9 @@ class SurveyCell: UICollectionViewCell {
                     $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
                 } else if identifier == "isFavorite" {
                     $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                } else if identifier == "isOwn" {
+                    //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
+                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
                 }
             }
         }
@@ -824,12 +866,19 @@ class SurveyCell: UICollectionViewCell {
         titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                             forTextStyle: .title1)
         ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption2)
+                                            forTextStyle: .caption1)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption2)
-        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .caption1)
+        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                             forTextStyle: .subheadline)
-        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
+        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                            forTextStyle: .footnote)
+        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+                                                forTextStyle: .caption2)
+        lastnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+                                               forTextStyle: .caption2)
+        dateLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+                                               forTextStyle: .caption2)
         
         guard let constraint_1 = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
               let constraint_2 = statsView.getAllConstraints().filter({$0.identifier == "height"}).first,

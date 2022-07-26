@@ -47,7 +47,7 @@ class ListView: UIView {
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = false
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        collectionView.addEquallyTo(to: instance)
+        //        collectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
@@ -117,8 +117,8 @@ class ListView: UIView {
 
 // MARK: - Controller Output
 extension ListView: ListControllerOutput {    
-    func onError() {
-        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark, dismissAfter: 1)
+    func onRequestCompleted(_ result: Result<Bool, Error>) {
+        collectionView.endRefreshing()
     }
     
     func onDataSourceChanged() {
@@ -141,6 +141,7 @@ extension ListView {
     }
 }
 
+// MARK: - CallbackObservable
 extension ListView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let instance = sender as? SurveyReference {
@@ -151,6 +152,7 @@ extension ListView: CallbackObservable {
     }
 }
 
+// MARK: - BannerObservable
 extension ListView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     

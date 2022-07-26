@@ -57,6 +57,13 @@ class TopicCellHeader: UICollectionViewListCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.isNil ? .systemGray : item.topic.tagColor
     }
+    
+//    override func updateConstraints() {
+//        super.updateConstraints()
+//
+//        separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 100).isActive = true
+//        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor, constant: .greatestFiniteMagnitude).isActive = true
+//    }
 }
 
 class TopicCellHeaderContent: UIView, UIContentView {
@@ -93,7 +100,7 @@ class TopicCellHeaderContent: UIView, UIContentView {
         let instance = UIStackView(arrangedSubviews: [titleView, statsView])
         instance.axis = .vertical
 //        instance.distribution = .fillEqually
-        instance.spacing = 4
+        instance.spacing = 8
         return instance
     }()
     private lazy var iconContainer: UIView = {
@@ -182,9 +189,9 @@ class TopicCellHeaderContent: UIView, UIContentView {
     }()
     private lazy var hotCountLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
         instance.textAlignment = .center
-        instance.textColor = .secondaryLabel
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 //        observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
 //            guard let self = self,
 //                  let text = view.text else { return }
@@ -206,16 +213,16 @@ class TopicCellHeaderContent: UIView, UIContentView {
     }()
     private lazy var viewsCountLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
         instance.textAlignment = .center
-        instance.textColor = .secondaryLabel
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 
         return instance
     }()
     private lazy var statsStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [viewsCountView, viewsCountLabel, hotCountView, hotCountLabel,])
         instance.alignment = .center
-        instance.spacing = 4
+        instance.spacing = 2
         return instance
     }()
     private lazy var statsView: UIView = {
@@ -230,7 +237,7 @@ class TopicCellHeaderContent: UIView, UIContentView {
         instance.addSubview(statsStack)
         statsStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            statsStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+            statsStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
             statsStack.topAnchor.constraint(equalTo: instance.topAnchor),
             statsStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
@@ -274,6 +281,18 @@ class TopicCellHeaderContent: UIView, UIContentView {
         titleLabel.text = currentConfiguration.topicItem.title.uppercased()
         viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.active.roundedWithAbbreviations)
         
+        if currentConfiguration.topicItem.topic.hotTotal == 0 {
+            statsStack.removeArrangedSubview(hotCountView)
+            statsStack.removeArrangedSubview(hotCountLabel)
+            hotCountView.removeFromSuperview()
+            hotCountLabel.removeFromSuperview()
+        } else {
+            if !statsStack.arrangedSubviews.contains(hotCountView) { statsStack.addArrangedSubview(hotCountView) }
+            if !statsStack.arrangedSubviews.contains(hotCountLabel) { statsStack.addArrangedSubview(hotCountLabel) }
+        }
+        viewsCountLabel.text = String(describing: currentConfiguration.topicItem.topic.viewsTotal.roundedWithAbbreviations)
+        hotCountLabel.text = String(describing: currentConfiguration.topicItem.topic.hotTotal.roundedWithAbbreviations)
+        
         guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
         
         let height = "test".height(withConstrainedWidth: 100, font: titleLabel.font)
@@ -282,8 +301,6 @@ class TopicCellHeaderContent: UIView, UIContentView {
         titleLabel.cornerRadius = titleLabel.bounds.height/2.25
         
         refreshConstraints()
-        viewsCountLabel.text = String(describing: 500023.roundedWithAbbreviations)
-        hotCountLabel.text = String(describing: 1223.roundedWithAbbreviations)
     }
 
     private func setupUI() {
@@ -361,6 +378,9 @@ class TopicCellHeaderContent: UIView, UIContentView {
         guard let item = currentConfiguration.topicItem else { return }
         
         titleLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        viewsCountLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        hotCountLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        
         (icon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : item.topic.tagColor.cgColor
         
         //Set dynamic font size
@@ -370,10 +390,10 @@ class TopicCellHeaderContent: UIView, UIContentView {
                                             forTextStyle: .headline)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .callout)
-        viewsCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .footnote)
-        hotCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .footnote)
+        viewsCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+                                            forTextStyle: .caption1)
+        hotCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+                                            forTextStyle: .caption1)
         
         refreshConstraints()
     }

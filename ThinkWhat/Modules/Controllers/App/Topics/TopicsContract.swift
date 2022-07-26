@@ -18,7 +18,7 @@ protocol TopicsViewInput: class {
     var mode: TopicsController.Mode { get set }
     
     func onSurveyTapped(_: SurveyReference)
-    func onDataSourceRequest(_: Topic)
+    func onDataSourceRequest()
     func onTopicSelected(_: Topic)
 }
 
@@ -39,6 +39,7 @@ protocol TopicsControllerInput: AnyObject {
 protocol TopicsModelOutput: AnyObject {
 //    func onError(_: Error)
     func onSearchCompleted(_: [SurveyReference])
+    func onRequestCompleted(_: Result<Bool, Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -50,7 +51,9 @@ protocol TopicsControllerOutput: AnyObject {
     func onDefaultMode()
     func onSearchMode()
     func onSearchCompleted(_: [SurveyReference])
+    func onRequestCompleted(_: Result<Bool, Error>)
     func onTopicMode(_: Topic)
+    func beginSearchRefreshing()
 //    var topic: Topic? { get }
     
 //    func onDidLayout()

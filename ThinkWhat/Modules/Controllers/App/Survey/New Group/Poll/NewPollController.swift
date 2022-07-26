@@ -2320,20 +2320,21 @@ extension NewPollController: UITableViewDelegate, UITableViewDataSource {
     }
     
     private func postSurvey() {
-        survey = Survey(type: Survey.SurveyType.Poll,
-                        title: pollTitle,
-                        topic: topic!,
-                        description: pollDescription,
-                        question: question,
-                        answers: answers,
-                        media: images,
-                        url: hyperlink,
-                        voteCapacity: votesCapacity,
-                        isPrivate: isPrivate,
-                        isAnonymous: isAnonymous,
-                        isCommentingAllowed: isCommentingAllowed,
-                        isHot: isHot,
-                        isFavorite: false)
+//        survey = Survey(type: Survey.SurveyType.Poll,
+//                        title: pollTitle,
+//                        topic: topic!,
+//                        description: pollDescription,
+//                        question: question,
+//                        answers: answers,
+//                        media: images,
+//                        url: hyperlink,
+//                        voteCapacity: votesCapacity,
+//                        isPrivate: isPrivate,
+//                        isAnonymous: isAnonymous,
+//                        isCommentingAllowed: isCommentingAllowed,
+//                        isHot: isHot,
+//                        isFavorite: false,
+//                        isOwn: true)
         
         performSegue(withIdentifier: Segues.NewSurvey.Results, sender: nil)
         
@@ -2374,7 +2375,7 @@ extension NewPollController: UITableViewDelegate, UITableViewDataSource {
             return dict
         }
         
-        survey = Survey(type: .Poll, title: pollTitle, topic: topic!, description: pollDescription, question: question, answers: answers, media: images, url: hyperlink, voteCapacity: votesCapacity, isPrivate: isPrivate, isAnonymous: isAnonymous, isCommentingAllowed: isCommentingAllowed, isHot: isHot, isFavorite: false)
+//        survey = Survey(type: .Poll, title: pollTitle, topic: topic!, description: pollDescription, question: question, answers: answers, media: images, url: hyperlink, voteCapacity: votesCapacity, isPrivate: isPrivate, isAnonymous: isAnonymous, isCommentingAllowed: isCommentingAllowed, isHot: isHot, isFavorite: false, isOwn: true)
         performSegue(withIdentifier: Segues.NewSurvey.Results, sender: nil)
         
         

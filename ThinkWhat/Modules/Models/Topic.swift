@@ -106,6 +106,8 @@ class Topic: Decodable {
         case active             = "active_count"
         case favorite           = "favorite_count"
         case activeAndFavorite  = "active_favorite_count"
+        case viewsTotal         = "views_total"
+        case hotTotal           = "hot_total"
     }
     
     let id: Int
@@ -120,6 +122,8 @@ class Topic: Decodable {
     var active: Int = 0
     var favorite: Int = 0
     var activeAndFavorite: Int = 0
+    var viewsTotal: Int = 0
+    var hotTotal: Int = 0
     var visibleCount: Int {
         if isParentNode {
             return children.reduce(into: 0) { $0 += $1.activeAndFavorite }
@@ -141,7 +145,9 @@ class Topic: Decodable {
             total           = try container.decode(Int.self, forKey: .total)
             active          = try container.decode(Int.self, forKey: .active)
             favorite        = try container.decode(Int.self, forKey: .favorite)
-            activeAndFavorite        = try container.decode(Int.self, forKey: .activeAndFavorite)
+            active          = try container.decode(Int.self, forKey: .active)
+            viewsTotal      = try container.decodeIfPresent(Int.self, forKey: .viewsTotal) ?? 0
+            hotTotal        = try container.decode(Int.self, forKey: .hotTotal)
             if Topics.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 Topics.shared.all.append(self)
             }

@@ -44,11 +44,16 @@ class TopicsCollectionView: UICollectionView {
     // MARK: - Private methods
     private func setupUI() {
         delegate = self
+        
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
             layoutConfig.headerMode = .firstItemInSection
             layoutConfig.backgroundColor = .clear
-            layoutConfig.showsSeparators = false
+            if #available(iOS 14.5, *) {
+                layoutConfig.separatorConfiguration.color = .tertiarySystemFill
+            }
+//            layoutConfig.showsSeparators = true
+//            layoutConfig.footerMode = .supplementary
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
 //            sectionLayout.interGroupSpacing = 20
@@ -60,7 +65,7 @@ class TopicsCollectionView: UICollectionView {
             guard let self = self else { return }
             cell.item = item
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-            backgroundConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.1)
+            backgroundConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
             cell.backgroundConfiguration = backgroundConfig
             
             let accessoryConfig = UICellAccessory.CustomViewConfiguration(customView: UIImageView(image: UIImage(systemName: "chevron.right")), placement: .trailing(displayed: .always, at: {
@@ -69,10 +74,24 @@ class TopicsCollectionView: UICollectionView {
             cell.accessories = [UICellAccessory.customView(configuration: accessoryConfig)]
 //            cell.accessories = [.outlineDisclosure(displayed: .always, options: .init(style: .cell, isHidden: false, reservedLayoutWidth: nil, tintColor: item.topic.tagColor), actionHandler: nil)]//[.outlineDisclosure(options:headerDisclosureOption)
             
-            cell.callback = {
-                self.callbackDelegate?.callbackReceived(cell.item.topic as Any)
-            }
+//            cell.callback = {
+//                self.callbackDelegate?.callbackReceived(cell.item.topic as Any)
+//            }
         }
+        
+//        let footerRegistration = UICollectionView.SupplementaryRegistration
+//        <SeparatorCell>(elementKind: UICollectionView.elementKindSectionFooter) {
+//            [unowned self] (footerView, elementKind, indexPath) in
+//            
+////            let headerItem = self.source.snapshot().sectionIdentifiers[indexPath.section]
+////            let symbolCount = headerItem.topics.count
+////
+////            // Configure footer view content
+////            var configuration = footerView.defaultContentConfiguration()
+////            configuration.text = "Topics count: \(symbolCount)"
+////            footerView.contentConfiguration = configuration
+////            footerView
+//        }
 
         let headerCellRegistration = UICollectionView.CellRegistration<TopicCellHeader, TopicHeaderItem> {
             (cell, indexPath, headerItem) in
@@ -85,7 +104,7 @@ class TopicsCollectionView: UICollectionView {
             cell.accessories = [.outlineDisclosure(options:headerDisclosureOption) {
                 var currentSectionSnapshot = self.source.snapshot(for: headerItem)
                 if currentSectionSnapshot.items.filter({ currentSectionSnapshot.isExpanded($0) }).isEmpty {
-                    self.scrollToItem(at: indexPath, at: .top, animated: true)
+//                    self.scrollToItem(at: indexPath, at: .top, animated: true)
                     currentSectionSnapshot.expand(currentSectionSnapshot.items)
                 } else {
                     currentSectionSnapshot.collapse(currentSectionSnapshot.items)
@@ -112,6 +131,15 @@ class TopicsCollectionView: UICollectionView {
                 return cell
             }
         }
+        
+//        source.supplementaryViewProvider = { [unowned self]
+//            (collectionView, elementKind, indexPath) -> UICollectionReusableView? in
+//
+//            if elementKind == UICollectionView.elementKindSectionFooter {
+//                return dequeueConfiguredReusableSupplementary(using: footerRegistration, for: indexPath)
+//            }
+//            return nil
+//        }
         
         for headerItem in modelObjects {
             var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<TopicListItem>()

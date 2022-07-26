@@ -120,7 +120,7 @@ class SurveyReference: Decodable {// NSObject,
     var votesTotal: Int
     var votesLimit: Int
     var survey: Survey? {
-        return Surveys.shared.all.filter{ $0.hashValue == hashValue }.first
+        return Surveys.shared.all.filter{ $0.reference == self }.first
     }
     var progress: Int {
         didSet {
@@ -166,11 +166,11 @@ class SurveyReference: Decodable {// NSObject,
             progress    = try container.decode(Int.self, forKey: .progress)
             rating      = Double(try container.decode(String.self, forKey: .rating)) ?? 0
             //Check for existing instance by hashValue
-            if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
+            if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {
                 SurveyReferences.shared.all.append(self)
-                        }
+            }
             //NS
-//            super.init()
+            //            super.init()
 //            if SurveyReferences.shared.all.filter({ $0.isEqual(self) }).isEmpty {
 //                SurveyReferences.shared.all.append(self)
 //            }
@@ -224,7 +224,7 @@ class SurveyReference: Decodable {// NSObject,
         self.rating                  = rating
         
         //Swift
-        if SurveyReferences.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
+        if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {
             SurveyReferences.shared.all.append(self)
         }
 //        //NSObject
@@ -303,7 +303,13 @@ class SurveyReferences {
     private init() {}
     var all: [SurveyReference] = [] {
         didSet {
-            guard oldValue.count != all.count else { return }
+//            Check for duplicates
+            guard let lastInstance = all.last else { return }
+            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
+                all.remove(object: lastInstance)
+            }
+            
+//            guard oldValue.count != all.count else { return }
             Notification.send(names: [Notifications.Surveys.UpdateAll])
         }
     }

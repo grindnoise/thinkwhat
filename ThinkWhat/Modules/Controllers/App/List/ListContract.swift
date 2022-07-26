@@ -38,7 +38,7 @@ protocol ListModelOutput: class {
     // Model output methods here
     var surveyCategory: Survey.SurveyCategory { get }
     
-    func onError(_: Error)
+    func onRequestCompleted(_: Result<Bool, Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -50,5 +50,5 @@ protocol ListControllerOutput: class {
     func onDidLayout()
     func onDidLoad()
     func onDataSourceChanged()
-    func onError()
+    func onRequestCompleted(_: Result<Bool, Error>)
 }

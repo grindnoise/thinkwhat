@@ -1223,6 +1223,7 @@ class API {
             } else {
                 parameters  = ["ids": category.dataItems().map { $0.id }]
             }
+            
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
                 try await MainActor.run {

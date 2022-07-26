@@ -110,11 +110,15 @@ extension ListController: ListViewInput {
 
 // MARK: - Model Output
 extension ListController: ListModelOutput {
-    func onError(_ error: Error) {
+    func onRequestCompleted(_ result: Result<Bool, Error>) {
+        switch result {
+        case .success:
+            controllerOutput?.onRequestCompleted(result)
+        case .failure(let error):
 #if DEBUG
-        print(error.localizedDescription)
+            error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-        controllerOutput?.onError()
+        }
     }
 }
 

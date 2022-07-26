@@ -21,9 +21,12 @@ extension ListModel: ListControllerInput {
         Task {
             do {
                 try await API.shared.surveys.loadSurveyReferences(source)
+                await MainActor.run {
+                    modelOutput?.onRequestCompleted(.success(true))
+                }
             } catch {
                 await MainActor.run {
-                    modelOutput?.onError(error)
+                    modelOutput?.onRequestCompleted(.failure(error))
                 }
             }
         }

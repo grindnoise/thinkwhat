@@ -30,11 +30,19 @@ class TopicsController: UIViewController {
                 searchField.text = ""
                 searchField.becomeFirstResponder()
                 controllerOutput?.onSearchMode()
+                //Clear previous fetch request
+                controllerOutput?.onSearchCompleted([])
                 imageName = "arrow.backward"
             case .Topic:
                 guard let topic = topic else { return }
                 controllerOutput?.onTopicMode(topic)
+                imageName = "arrow.backward"
+                guard let title = self.topic?.title else { return }
+                navigationItem.title = title
             default:
+                if let recognizer = view.gestureRecognizers?.first {
+                    view.removeGestureRecognizer(recognizer)
+                }
                 navigationItem.title = "topics".localized
                 searchField.text = ""
                 searchField.resignFirstResponder()
@@ -56,51 +64,6 @@ class TopicsController: UIViewController {
             mode = .Topic
         }
     }
-    
-                
-//            case .Parent:
-//                navigationItem.title = "topics".localized
-//                if oldValue == .Search {
-//                    controllerOutput?.onSearchToParentMode()
-//                    searchField.resignFirstResponder()
-//                    UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
-//                        self.searchField.alpha = 0
-//                        self.barButton.image = ImageSigns.magnifyingGlassFilled.image
-//                    } completion: { _ in }
-//                } else {
-//                    onParentMode()
-//                    controllerOutput?.onParentMode()
-//                }
-//            case .Child:
-//                navigationItem.title = "topics".localized
-//                if oldValue == .List {
-//                    controllerOutput?.onListToChildMode()
-//                } else {
-//                    onChildMode()
-//                    controllerOutput?.onChildMode()
-//                }
-//            case .List:
-//                if let topic = controllerOutput?.topic {
-//                    navigationItem.title = topic.title
-//                } else {
-//                    navigationItem.title = "topics".localized
-//                }
-//                controllerOutput?.onListMode()
-//            case .Search:
-//                controllerOutput?.onSearchMode()
-//                let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
-//                view.addGestureRecognizer(touch)
-//                setupTextField(textField: searchField)
-//                searchField.text = ""
-//                searchField.becomeFirstResponder()
-//                navigationItem.title = ""
-//                UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
-//                    self.searchField.alpha = 1
-//                    self.barButton.image = ImageSigns.arrowLeft.image
-//                } completion: { _ in }
-//            }
-//        }
-//    }
     private var observers: [NSKeyValueObservation] = []
     private lazy var barButton: UIView = {
         let instance = UIView()
@@ -150,8 +113,11 @@ class TopicsController: UIViewController {
         let instance = InsetTextField()
         instance.placeholder = "search".localized
         instance.alpha = 0
+        instance.delegate = self
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
+        instance.addTarget(self, action: #selector(TopicsController.textFieldDidChange(_:)), for: .editingChanged)
+        instance.returnKeyType = .done
         observers.append(instance.observe(\InsetTextField.bounds, options: .new) { view, change in
             guard let newValue = change.newValue else { return }
             
@@ -235,11 +201,21 @@ class TopicsController: UIViewController {
     
     
     @objc private func handleTap() {
-        guard mode == .Search else {
+        switch mode {
+        case .Topic:
+            mode = .Default
+        case .Search:
+            mode = .Default
+        case .Default:
             mode = .Search
-            return
         }
-        mode = .Default
+        
+        
+//        guard mode == .Search else {
+//            mode = .Search
+//            return
+//        }
+//        mode = .Default
 //        if mode == .Child {
 //            mode = .Parent
 //        } else if mode == .List {
@@ -265,6 +241,11 @@ class TopicsController: UIViewController {
 
 // MARK: - View Input
 extension TopicsController: TopicsViewInput {
+    func onDataSourceRequest() {
+        guard let topic = topic else { return }
+        controllerInput?.onDataSourceRequest(topic)
+    }
+    
     func onTopicSelected(_ instance: Topic) {
         topic = instance
     }
@@ -307,6 +288,17 @@ extension TopicsController: TopicsViewInput {
 
 // MARK: - Model Output
 extension TopicsController: TopicsModelOutput {
+    func onRequestCompleted(_ result: Result<Bool, Error>) {
+        switch result {
+        case .success:
+            controllerOutput?.onRequestCompleted(result)
+        case .failure(let error):
+#if DEBUG
+            error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        }
+    }
+    
     func onSearchCompleted(_ instances: [SurveyReference]) {
         controllerOutput?.onSearchCompleted(instances)
         isSearching = false
@@ -328,16 +320,23 @@ extension TopicsController: UITextFieldDelegate {
         return !isSearching
     }
     
-    
     @objc
     func textFieldDidChange(_ textField: UITextField) {
-        guard let textField = textField as? UnderlinedSignTextField else { return }
-        if textField.text!.count > 3 {
-            isSearching = true
-            controllerInput?.search(substring: searchField.text!, excludedIds: [])
-        } else {
+        guard !isSearching, let text = textField.text, text.count > 3 else {
             isSearching = false
+            return
         }
+        controllerOutput?.beginSearchRefreshing()
+        isSearching = true
+        controllerInput?.search(substring: text, excludedIds: [])
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if let recognizer = view.gestureRecognizers?.first {
+            view.removeGestureRecognizer(recognizer)
+        }
+        textField.resignFirstResponder()
+        return true
     }
     
     @objc private func hideKeyboard() {

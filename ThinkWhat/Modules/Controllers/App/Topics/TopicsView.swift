@@ -40,7 +40,7 @@ class TopicsView: UIView {
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = true
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        instance.addEquallyTo(to: shadowView)
+//        instance.addEquallyTo(to: shadowView)
 //        collectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
@@ -126,20 +126,44 @@ class TopicsView: UIView {
 
 // MARK: - Controller Output
 extension TopicsView: TopicsControllerOutput {
+    func beginSearchRefreshing() {
+        surveysCollectionView.beginSearchRefreshing()
+    }
+    
+    func onRequestCompleted(_ result: Result<Bool, Error>) {
+        surveysCollectionView.endRefreshing()
+    }
+    
     func onTopicMode(_ instance: Topic) {
         surveysCollectionView.topic = instance
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0.15) { [weak self] in
+            guard let self = self else { return }
+            self.topicsCollectionView.alpha = 0
+            self.surveysCollectionView.alpha = 1
+        }
     }
     
     func onDefaultMode() {
-        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+            guard let self = self else { return }
+            self.topicsCollectionView.alpha = 1
+            self.surveysCollectionView.alpha = 0
+        }
     }
     
     func onSearchMode() {
-        
+        surveysCollectionView.category = .Search
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+            guard let self = self else { return }
+            self.topicsCollectionView.alpha = 0
+            self.surveysCollectionView.alpha = 1
+        }
+
     }
     
-    func onSearchCompleted(_: [SurveyReference]) {
-        
+    func onSearchCompleted(_ instances: [SurveyReference]) {
+        surveysCollectionView.endSearchRefreshing()
+        surveysCollectionView.fetchResult = instances
     }
 }
 
@@ -148,12 +172,12 @@ extension TopicsView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let instance = sender as? Topic {
             viewInput?.onTopicSelected(instance)
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-                guard let self = self else { return }
-                self.topicsCollectionView.alpha = 0
-                self.surveysCollectionView.alpha = 1
-            }
+        } else if sender is SurveysCollectionView {
+            viewInput?.onDataSourceRequest()
+        } else if let instance = sender as? SurveyReference {
+            viewInput?.onSurveyTapped(instance)
         }
+
     }
 }
 

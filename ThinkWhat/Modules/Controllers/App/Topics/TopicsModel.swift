@@ -34,10 +34,13 @@ extension TopicsModel: TopicsControllerInput {
         Task {
             do {
                 try await API.shared.surveys.loadSurveyReferences(.Topic, topic)
+                await MainActor.run {
+                    modelOutput?.onRequestCompleted(.success(true))
+                }
             } catch {
-#if DEBUG
-                error.printLocalized(class: type(of: self), functionName: #function)
-#endif
+                await MainActor.run {
+                    modelOutput?.onRequestCompleted(.failure(error))
+                }
             }
         }
     }

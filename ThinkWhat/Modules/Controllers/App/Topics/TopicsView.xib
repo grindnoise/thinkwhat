@@ -20,6 +20,14 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0yW-tL-slk">
+                    <rect key="frame" x="0.0" y="44" width="414" height="0.0"/>
+                    <viewLayoutGuide key="safeArea" id="rcn-0A-xVp"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="height" id="qGS-vd-76h"/>
+                    </constraints>
+                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TK8-CT-KHK">
                     <rect key="frame" x="10" y="54" width="394" height="798"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -28,9 +36,12 @@
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="TK8-CT-KHK" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="10" id="Az0-p3-rwh"/>
+                <constraint firstItem="0yW-tL-slk" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="G4i-iu-b7z"/>
+                <constraint firstItem="0yW-tL-slk" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="KOt-HK-KPc"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="TK8-CT-KHK" secondAttribute="trailing" constant="10" id="RKe-sd-wg5"/>
+                <constraint firstItem="TK8-CT-KHK" firstAttribute="top" secondItem="0yW-tL-slk" secondAttribute="bottom" constant="10" id="a67-BF-1gS"/>
                 <constraint firstItem="TK8-CT-KHK" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="qHM-OE-Edi"/>
+                <constraint firstItem="0yW-tL-slk" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="xl6-4q-F3G"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="TK8-CT-KHK" secondAttribute="bottom" constant="10" id="z8A-67-c30"/>
             </constraints>
             <point key="canvasLocation" x="137.68115942028987" y="66.964285714285708"/>

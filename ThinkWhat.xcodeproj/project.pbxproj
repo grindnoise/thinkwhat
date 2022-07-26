@@ -386,6 +386,7 @@
 		AB99A95424C6CCE800814F96 /* UserLogoHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99A95324C6CCE800814F96 /* UserLogoHeader.swift */; };
 		AB99A95624C6D1C700814F96 /* HeartExpandingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99A95524C6D1C700814F96 /* HeartExpandingView.swift */; };
 		AB99A95924C8154A00814F96 /* UserLogoHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB99A95824C8154A00814F96 /* UserLogoHeader.xib */; };
+		AB9A901228900C7C00E8197C /* SeparatorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9A901128900C7C00E8197C /* SeparatorCell.swift */; };
 		AB9CADBF25F755B3002AFD19 /* CircleButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB9CADBE25F755B3002AFD19 /* CircleButton.xib */; };
 		AB9CADC125F755CE002AFD19 /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9CADC025F755CE002AFD19 /* CircleButton.swift */; };
 		AB9DBF7826A197D600EFA66D /* Segues.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9DBF7726A197D600EFA66D /* Segues.swift */; };
@@ -953,6 +954,7 @@
 		AB99A95324C6CCE800814F96 /* UserLogoHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLogoHeader.swift; sourceTree = "<group>"; };
 		AB99A95524C6D1C700814F96 /* HeartExpandingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartExpandingView.swift; sourceTree = "<group>"; };
 		AB99A95824C8154A00814F96 /* UserLogoHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UserLogoHeader.xib; sourceTree = "<group>"; };
+		AB9A901128900C7C00E8197C /* SeparatorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeparatorCell.swift; sourceTree = "<group>"; };
 		AB9CADBE25F755B3002AFD19 /* CircleButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CircleButton.xib; sourceTree = "<group>"; };
 		AB9CADC025F755CE002AFD19 /* CircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButton.swift; sourceTree = "<group>"; };
 		AB9DBF7726A197D600EFA66D /* Segues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segues.swift; sourceTree = "<group>"; };
@@ -1460,6 +1462,7 @@
 			children = (
 				AB3211A9288E7D0800C736DE /* TopicsCollectionView.swift */,
 				AB3211AB288E80EB00C736DE /* TopicCell.swift */,
+				AB9A901128900C7C00E8197C /* SeparatorCell.swift */,
 				AB3211AD288E810A00C736DE /* TopicHeaderCell.swift */,
 			);
 			path = CollectionView;
@@ -3736,6 +3739,7 @@
 				AB7C6FB42865AE3000000429 /* Error.swift in Sources */,
 				ABF20FBA24CAE8610092B223 /* UserSubscriptionCell.swift in Sources */,
 				ABF27587280EDC810023CD1F /* VoterCell.swift in Sources */,
+				AB9A901228900C7C00E8197C /* SeparatorCell.swift in Sources */,
 				AB98308327B935DA002C5132 /* RecoverAccontViewController.swift in Sources */,
 				AB913F7D280715BB00609D51 /* PollResultCell.swift in Sources */,
 				AB913F752806C3C200609D51 /* DataCleanOnTerminateObservable.swift in Sources */,

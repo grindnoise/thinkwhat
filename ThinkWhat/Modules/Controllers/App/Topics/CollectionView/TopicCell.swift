@@ -57,7 +57,7 @@ class TopicCell: UICollectionViewListCell {
         super.traitCollectionDidChange(previousTraitCollection)
         
         var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-        backgroundConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.1)
+        backgroundConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
         backgroundConfiguration = backgroundConfig
 
         tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
@@ -87,15 +87,30 @@ class TopicCellContent: UIView, UIContentView {
     private var currentConfiguration: TopicCellConfiguration!
     private var observers: [NSKeyValueObservation] = []
     private lazy var horizontalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [icon, titleLabel, viewsLabel])
+        let instance = UIStackView(arrangedSubviews: [iconContainer, titleLabel, viewsLabel])
         instance.axis = .horizontal
-        instance.spacing = 8
+        instance.spacing = 4
+        return instance
+    }()
+    private lazy var iconContainer: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.addSubview(icon)
+        icon.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            icon.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+            icon.topAnchor.constraint(equalTo: instance.topAnchor),
+            icon.heightAnchor.constraint(equalTo: instance.heightAnchor),
+//            icon.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+            icon.widthAnchor.constraint(equalTo: icon.heightAnchor, multiplier: 1/1)
+        ])
+        
         return instance
     }()
     private lazy var icon: Icon = {
         let instance = Icon()
         instance.isRounded = false
-        instance.scaleMultiplicator = 1.1
+        instance.scaleMultiplicator = 1.2
 //        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.isNil ? .systemGray : currentConfiguration.topicItem.topic.tagColor
         return instance
@@ -160,25 +175,26 @@ class TopicCellContent: UIView, UIContentView {
         titleLabel.text = currentConfiguration.topicItem.title
         viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.active.roundedWithAbbreviations)
         
-        guard let constraint = titleLabel.getConstraint(identifier: "height"),
-              let text = titleLabel.text
-        else { return }
+        guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
         
         self.setNeedsLayout()
-        constraint.constant = text.height(withConstrainedWidth: titleLabel.bounds.width, font: titleLabel.font)
+        //One line needed
+        constraint.constant = "string".height(withConstrainedWidth: titleLabel.bounds.width, font: titleLabel.font)
         self.layoutIfNeeded()
     }
 
     private func setupUI() {
         addSubview(horizontalStack)
         horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+        iconContainer.translatesAutoresizingMaskIntoConstraints = false
 //        icon.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             horizontalStack.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: padding/2),
             horizontalStack.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor, constant: padding),
+            iconContainer.widthAnchor.constraint(equalTo: horizontalStack.widthAnchor, multiplier: 0.15)
 //            horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
-            icon.widthAnchor.constraint(equalTo: icon.heightAnchor, multiplier: 1/1),
+//            icon.widthAnchor.constraint(equalTo: icon.heightAnchor, multiplier: 1/1),
 //            icon.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor),
 //            horizontalStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding)
 //            horizontalStack.widthAnchor.constraint(equalTo: widthAnchor),
