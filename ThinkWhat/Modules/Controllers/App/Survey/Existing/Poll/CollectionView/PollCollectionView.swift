@@ -94,9 +94,11 @@ class PollCollectionView: UICollectionView {
             layoutConfig.headerMode = .firstItemInSection
             layoutConfig.backgroundColor = .clear
             layoutConfig.showsSeparators = false
-//            layoutConfig.headerMode = .supplementary
             
-            return NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+//            sectionLayout.interGroupSpacing = 20
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 30, trailing: sectionLayout.contentInsets.trailing)
+            return sectionLayout
         }
         
         let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [weak self] cell, indexPath, item in
@@ -109,6 +111,7 @@ class PollCollectionView: UICollectionView {
             guard let self = self, cell.item.isNil else { return }
 //            cell.collectionView = self
             cell.item = self.poll
+            cell.isFoldable = cell.item.isComplete
         }
         imageCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.item.isNil else { return }

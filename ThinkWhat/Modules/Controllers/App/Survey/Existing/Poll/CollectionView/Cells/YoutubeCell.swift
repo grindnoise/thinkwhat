@@ -25,30 +25,53 @@ class YoutubeCell: UICollectionViewCell {
     public weak var callbackDelegate: CallbackObservable?
     
     // MARK: - Private Properties
+    private var observers: [NSKeyValueObservation] = []
+    private lazy var headerContainer: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.addSubview(horizontalStack)
+        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
+            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
+            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
+            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
+        ])
+        
+        return instance
+    }()
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
-        instance.textColor = .systemBlue
+        instance.textColor = .secondaryLabel
         instance.text = "media".localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         return instance
     }()
     private let disclosureIndicator: UIImageView = {
         let disclosureIndicator = UIImageView()
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
-        disclosureIndicator.tintColor = .systemBlue
+        disclosureIndicator.tintColor = .secondaryLabel
         disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.contentMode = .center
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
     }()
-    private let icon: UIView = {
+    private lazy var icon: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         let imageView = UIImageView(image: UIImage(systemName: "video.fill"))
-        imageView.tintColor = .systemBlue
+        imageView.tintColor = .secondaryLabel
         imageView.contentMode = .center
         imageView.addEquallyTo(to: instance)
+        
+        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
+            guard let newValue = change.newValue else { return }
+            
+            view.image = UIImage(systemName: "video.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
+        }))
+        
         return instance
     }()
     private lazy var loadingIndicator: LoadingIndicator = {
@@ -70,13 +93,14 @@ class YoutubeCell: UICollectionViewCell {
         instance.alignment = .center
         instance.axis = .horizontal
         instance.distribution = .fillProportionally
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+        instance.spacing = 4
+        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
         constraint.identifier = "height"
         constraint.isActive = true
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, shadowView])
+        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, shadowView])
         verticalStack.clipsToBounds = false
         verticalStack.axis = .vertical
         verticalStack.spacing = padding
@@ -86,7 +110,7 @@ class YoutubeCell: UICollectionViewCell {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = false
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         instance.addEquallyTo(to: shadowView)
 //        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
 //        constraint.identifier = "height"
@@ -113,8 +137,7 @@ class YoutubeCell: UICollectionViewCell {
         instance.delegate = self
         return instance
     }()
-    private var observers: [NSKeyValueObservation] = []
-    private let padding: CGFloat = 10
+    private let padding: CGFloat = 0
     private var tempAppPreference: SideAppPreference?
     private var sideAppPreference: SideAppPreference? {
         if UserDefaults.App.youtubePlay == nil {
@@ -135,10 +158,10 @@ class YoutubeCell: UICollectionViewCell {
     private var color: UIColor = .systemBlue {
         didSet {
             playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
-            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            guard let imageView = icon.get(all: UIImageView.self).first else { return }
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//            guard let imageView = icon.get(all: UIImageView.self).first else { return }
+//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
     
@@ -189,17 +212,22 @@ class YoutubeCell: UICollectionViewCell {
         closedConstraint?.priority = .defaultLow // use low priority so stack stays pinned to top of cell
         openConstraint = playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         openConstraint?.priority = .defaultLow
-        updateAppearance()
+        updateAppearance(animated: false)
     }
     
-    private func updateAppearance() {
+    /// Updates the views to reflect changes in selection
+    private func updateAppearance(animated: Bool = true) {
         closedConstraint?.isActive = isSelected
         openConstraint?.isActive = !isSelected
 
+        guard animated else {
+            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
+            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+            return
+        }
         UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
-            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
-            self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
-            self.shadowView.alpha = self.isSelected ? 0.5 : 1
+            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
+            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
         }
     }
     
@@ -235,22 +263,22 @@ class YoutubeCell: UICollectionViewCell {
         verticalStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
             $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
         }
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+//        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
         playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
-        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        if let imageView = icon.get(all: UIImageView.self).first {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        }
+//        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        if let imageView = icon.get(all: UIImageView.self).first {
+//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        }
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                                 forTextStyle: .footnote)
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                 forTextStyle: .caption2)
         guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
-        constraint.constant = max(disclosureLabel.text!.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
         layoutIfNeeded()
     }
 }

@@ -17,7 +17,6 @@ class CommentsSectionCell: UICollectionViewCell {
     var item: Survey! {
         didSet {
             guard !item.isNil else { return }
-            color = item.topic.tagColor
             collectionView.dataItems = item.answers
             disclosureIndicator.alpha = item.isCommentingAllowed ? 1 : 0
             disclosureLabel.text = item.isCommentingAllowed ? "comments".localized.uppercased() + " (\(0))": "comments_disabled".localized.uppercased()
@@ -31,17 +30,32 @@ class CommentsSectionCell: UICollectionViewCell {
     }
     
     // MARK: - Private Properties
+    private lazy var headerContainer: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.addSubview(horizontalStack)
+        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
+            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
+            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
+            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
+        ])
+        
+        return instance
+    }()
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         instance.text = "comments".localized.uppercased()
         return instance
     }()
     private lazy var disclosureIndicator: UIImageView = {
         let disclosureIndicator = UIImageView()
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
-        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        disclosureIndicator.tintColor = .secondaryLabel
         disclosureIndicator.contentMode = .center
         disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
@@ -52,14 +66,21 @@ class CommentsSectionCell: UICollectionViewCell {
         return instance
         }()
     private var observers: [NSKeyValueObservation] = []
-    private let icon: UIView = {
+    private lazy var icon: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        let imageView = UIImageView(image: UIImage(systemName: "bubble.left.and.bubble.right.fill"))
+        let imageView = UIImageView(image: UIImage(systemName: "bubble.right.fill"))
         imageView.tintColor = .secondaryLabel
         imageView.contentMode = .center
         imageView.addEquallyTo(to: instance)
+        
+        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
+            guard let newValue = change.newValue else { return }
+            
+            view.image = UIImage(systemName: "bubble.right.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
+        }))
+        
         return instance
     }()
 //    private lazy var emptyView: UIView = {
@@ -83,29 +104,22 @@ class CommentsSectionCell: UICollectionViewCell {
     // Stacks
     private lazy var horizontalStack: UIStackView = {
         let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
-        let constraint = rootStack.heightAnchor.constraint(equalToConstant: 40)
+        let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
         constraint.identifier = "height"
         constraint.isActive = true
         rootStack.alignment = .center
+        rootStack.spacing = 4
         rootStack.distribution = .fillProportionally
         return rootStack
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, collectionView])
+        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, collectionView])
         verticalStack.axis = .vertical
         verticalStack.spacing = padding
         return verticalStack
     }()
     // Layout
     private let padding: CGFloat = 0
-    private var color: UIColor = .secondaryLabel {
-        didSet {
-            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
-            guard let imageView = icon.get(all: UIImageView.self).first else { return }
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : color
-        }
-    }
     
     // Constraints
     private var closedConstraint: NSLayoutConstraint!
@@ -127,7 +141,6 @@ class CommentsSectionCell: UICollectionViewCell {
         backgroundColor = .clear
         clipsToBounds = true
         
-        disclosureLabel.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor).isActive = true
         contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         verticalStack.translatesAutoresizingMaskIntoConstraints = false
@@ -153,16 +166,22 @@ class CommentsSectionCell: UICollectionViewCell {
         collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         openConstraint?.priority = .defaultLow
         
-        updateAppearance()
+        updateAppearance(animated: false)
     }
     
-    private func updateAppearance() {
-        closedConstraint.isActive = !isSelected
-        openConstraint.isActive = isSelected
+    /// Updates the views to reflect changes in selection
+    private func updateAppearance(animated: Bool = true) {
+        closedConstraint?.isActive = isSelected
+        openConstraint?.isActive = !isSelected
 
-        UIView.animate(withDuration: 0.3) {
-            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
-            self.disclosureIndicator.transform = self.isSelected ? upsideDown :.identity
+        guard animated else {
+            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
+            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+            return
+        }
+        UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
+            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
+            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
         }
     }
     
@@ -188,11 +207,11 @@ class CommentsSectionCell: UICollectionViewCell {
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                                 forTextStyle: .footnote)
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                 forTextStyle: .caption2)
         guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
-        constraint.constant = max(String(describing: item.rating).height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
         layoutIfNeeded()
     }
 }

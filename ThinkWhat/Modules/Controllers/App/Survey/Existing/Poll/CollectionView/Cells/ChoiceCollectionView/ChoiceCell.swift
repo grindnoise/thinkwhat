@@ -622,7 +622,7 @@ class ChoiceCell: UICollectionViewCell {
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                           forTextStyle: .body)
-        guard let constraint = shadowView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
         constraint.constant = textView.contentSize.height + padding*2
         layoutIfNeeded()

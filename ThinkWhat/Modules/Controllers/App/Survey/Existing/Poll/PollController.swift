@@ -105,7 +105,6 @@ class PollController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    
     // MARK: - Private methods
     private func setupUI() {
         if !_survey.isNil { controllerOutput?.onLoadCallback() }
@@ -152,10 +151,112 @@ class PollController: UIViewController {
         indicator.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
         stackView.addArrangedSubview(indicator)
         
-        let label = UILabel()
-        label.textColor = traitCollection.userInterfaceStyle == .dark ? .label : surveyReference.topic.tagColor
-        label.text = surveyReference.topic.title
-        stackView.addArrangedSubview(label)
+       
+        
+        let titleContainer = UIView()
+        titleContainer.backgroundColor = .clear
+        stackView.addArrangedSubview(titleContainer)
+        
+        let label = InsetLabel()
+        label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .label : surveyReference.topic.tagColor
+        label.textColor = .white
+        label.text = surveyReference.topic.title.uppercased()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .center
+        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .headline)
+        label.numberOfLines = 1
+        label.accessibilityIdentifier = "label"
+        
+        let width = surveyReference.topic.title.width(withConstrainedHeight: 100, font: label.font)
+        let height = surveyReference.topic.title.height(withConstrainedWidth: width, font: label.font)
+        
+        label.insets = UIEdgeInsets(top: 0, left: height/3, bottom: 0, right: height/3)
+        
+        let widthConstraint = label.widthAnchor.constraint(equalToConstant: width + height/2.25*3)
+        widthConstraint.identifier = "width"
+        widthConstraint.isActive = true
+        
+//        let heightConstraint = label.heightAnchor.constraint(equalToConstant: height)
+//        heightConstraint.identifier = "height"
+//        heightConstraint.isActive = true
+        label.cornerRadius = height/2.25
+        
+        let titleStackView = UIStackView()
+        titleStackView.spacing = 4
+        titleContainer.addSubview(titleStackView)
+        titleStackView.accessibilityIdentifier = "titleStackView"
+        
+        let heightConstraint = titleStackView.heightAnchor.constraint(equalToConstant: height)
+        heightConstraint.identifier = "height"
+        heightConstraint.isActive = true
+        
+        let marksStackView = UIStackView()
+        marksStackView.spacing = 4
+        marksStackView.accessibilityIdentifier = "marksStackView"
+        
+        titleStackView.addArrangedSubview(label)
+        titleStackView.addArrangedSubview(marksStackView)
+        
+        if surveyReference.isOwn {
+            let container = UIView()
+            container.backgroundColor = .clear
+            container.accessibilityIdentifier = "isOwn"
+            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+            
+            let instance = UIImageView(image: UIImage(systemName: "figure.wave"))
+            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+            instance.contentMode = .scaleAspectFit
+            instance.addEquallyTo(to: container)
+            marksStackView.addArrangedSubview(container)
+        } else if surveyReference.isComplete {
+            let container = UIView()
+            container.backgroundColor = .clear
+            container.accessibilityIdentifier = "isComplete"
+            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+            
+            let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill",
+                                                      withConfiguration: UIImage.SymbolConfiguration(pointSize: marksStackView.frame.height, weight: .semibold, scale: .medium)))
+            instance.contentMode = .center
+            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : surveyReference.topic.tagColor
+            instance.contentMode = .scaleAspectFit
+            instance.addEquallyTo(to: container)
+            marksStackView.addArrangedSubview(container)
+        }
+        if surveyReference.isFavorite {
+            let container = UIView()
+            container.backgroundColor = .clear
+            container.accessibilityIdentifier = "isFavorite"
+            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+            
+            let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
+            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+            instance.contentMode = .scaleAspectFit
+            instance.addEquallyTo(to: container)
+            marksStackView.addArrangedSubview(container)
+        }
+        if surveyReference.isHot {
+            let container = UIView()
+            container.backgroundColor = .clear
+            container.accessibilityIdentifier = "isHot"
+            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+            
+            let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+            instance.tintColor = .systemRed
+            instance.contentMode = .scaleAspectFit
+            instance.addEquallyTo(to: container)
+            marksStackView.addArrangedSubview(container)
+        }
+        
+        observers.append(label.observe(\InsetLabel.bounds, options: [.new]) { view, change in//[weak self] view, change in
+            guard let newValue = change.newValue else { return }
+            view.cornerRadius = newValue.height/2.25
+        })
+        
+        titleStackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            titleStackView.leadingAnchor.constraint(equalTo: titleContainer.leadingAnchor),
+            titleStackView.centerYAnchor.constraint(equalTo: titleContainer.centerYAnchor)
+        ])
         
         indicator.translatesAutoresizingMaskIntoConstraints = false
         indicator.widthAnchor.constraint(equalTo: indicator.heightAnchor, multiplier: 1.0/1.0).isActive = true
@@ -169,7 +270,7 @@ class PollController: UIViewController {
         observers.append(navBar.observe(\UINavigationBar.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
             guard let self = self,
                   let newValue = change.newValue else { return }
-//                  let titleView = self.navigationItem.titleView else { return }
+            //                  let titleView = self.navigationItem.titleView else { return }
             
             if self.navigationItem.titleView.isNil {
                 let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
@@ -180,10 +281,10 @@ class PollController: UIViewController {
                 icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
                 self.navigationItem.titleView = icon
                 self.navigationItem.titleView?.alpha = 0
-
+                
                 self.navigationItem.titleView?.clipsToBounds = false
             }
-
+            
             
             var largeAlpha: CGFloat = CGFloat(1) - max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             let smallAlpha: CGFloat = max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
@@ -197,9 +298,123 @@ class PollController: UIViewController {
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
                 guard let self = self,
                       let instance = notification.object as? SurveyReference,
-                      self._surveyReference == instance else { return }
+                      self._surveyReference == instance
+                else { return }
+                
                 await MainActor.run {
                     self.setBarButtonItem()
+                    
+                    switch instance.isFavorite {
+                    case true:
+                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isFavorite"}).isEmpty
+                        else { return }
+                        
+                        let container = UIView()
+                        container.backgroundColor = .clear
+                        container.accessibilityIdentifier = "isFavorite"
+                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                        
+                        let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
+                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                        instance.contentMode = .scaleAspectFit
+                        instance.addEquallyTo(to: container)
+                        marksStackView.insertArrangedSubview(container,
+                                                             at: marksStackView.arrangedSubviews.isEmpty ? 0 : marksStackView.arrangedSubviews.count > 1 ? marksStackView.arrangedSubviews.count-1 : marksStackView.arrangedSubviews.count)
+                    case false:
+                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isFavorite") else { return }
+                        marksStackView.removeArrangedSubview(mark)
+                        mark.removeFromSuperview()
+                    }
+                }
+            }
+        })
+        
+        notifications.append(Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
+                await MainActor.run {
+                    guard let self = self,
+                          let instance = notification.object as? SurveyReference,
+                          self._surveyReference == instance
+                    else { return }
+                    
+                    switch instance.isComplete {
+                    case true:
+                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty
+                        else { return }
+                        
+                        let container = UIView()
+                        container.backgroundColor = .clear
+                        container.accessibilityIdentifier = "isComplete"
+                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                        
+                        let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
+                        instance.contentMode = .center
+                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .white : self._surveyReference.topic.tagColor
+                        instance.contentMode = .scaleAspectFit
+                        instance.addEquallyTo(to: container)
+                        
+                        marksStackView.insertArrangedSubview(container, at: 0)
+                        
+                        self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
+                            guard let newValue = change.newValue else { return }
+                            view.cornerRadius = newValue.size.height/2
+                            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
+                            let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
+                            view.image = image
+                        })
+                    case false:
+                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isComplete") else { return }
+                        marksStackView.removeArrangedSubview(mark)
+                        mark.removeFromSuperview()
+                    }
+                }
+            }
+        })
+        
+        notifications.append(Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
+                await MainActor.run {
+                    guard let self = self,
+                          let instance = notification.object as? SurveyReference,
+                          self._surveyReference == instance
+                    else { return }
+                    
+                    switch instance.isHot {
+                    case true:
+                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isHot"}).isEmpty
+                        else { return }
+                        
+                        let container = UIView()
+                        container.backgroundColor = .clear
+                        container.accessibilityIdentifier = "isHot"
+                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+                        
+                        let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+                        instance.contentMode = .center
+                        instance.tintColor = .systemRed
+                        instance.contentMode = .scaleAspectFit
+                        instance.addEquallyTo(to: container)
+                        
+                        marksStackView.insertArrangedSubview(container, at: marksStackView.arrangedSubviews.count == 0 ? 0 : marksStackView.arrangedSubviews.count)
+                        
+                        self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
+                            guard let newValue = change.newValue else { return }
+                            view.cornerRadius = newValue.size.height/2
+                            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
+                            let image = UIImage(systemName: "flame.fill", withConfiguration: largeConfig)
+                            view.image = image
+                        })
+                    case false:
+                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isHot") else { return }
+                        marksStackView.removeArrangedSubview(mark)
+                        mark.removeFromSuperview()
+                    }
                 }
             }
         })
@@ -210,7 +425,7 @@ class PollController: UIViewController {
             controllerInput?.addView()
             return
         }
-//        controllerOutput?.startLoading()
+        //        controllerOutput?.startLoading()
         controllerInput?.loadPoll(surveyReference, incrementViewCounter: true)
     }
     
@@ -222,7 +437,7 @@ class PollController: UIViewController {
             popup.present(content: UIView(), dismissAfter: 1)
         }
     }
-
+    
     private func setBarButtonItem() {
         var actionButton: UIBarButtonItem!
         let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
@@ -299,20 +514,20 @@ class PollController: UIViewController {
         }
         navigationItem.rightBarButtonItem = actionButton
     }
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-////                navigationController?.navigationBar.prefersLargeTitles = false
-//        navigationItem.largeTitleDisplayMode = .never
-//
-//    }
+    //    override func viewWillAppear(_ animated: Bool) {
+    //        super.viewWillAppear(animated)
+    ////                navigationController?.navigationBar.prefersLargeTitles = false
+    //        navigationItem.largeTitleDisplayMode = .never
+    //
+    //    }
     
- 
+    
     // MARK: - Overriden methods
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         let model = PollModel()
-               
+        
         self.controllerOutput = view as? PollView
         self.controllerOutput?
             .viewInput = self
@@ -324,7 +539,7 @@ class PollController: UIViewController {
         setObservers()
         performChecks()
         navigationController?.delegate = self
-        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+        setNavigationBarTintColor(.label)//traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -350,23 +565,42 @@ class PollController: UIViewController {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
-        if let label = stackView.get(all: UILabel.self).first {
-            label.textColor = traitCollection.userInterfaceStyle == .dark ? .label : surveyReference.topic.tagColor
-        }
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        //        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
         
         if let indicator = stackView.get(all: CircleButton.self).first {
             indicator.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
         }
         
+        if let label = stackView.getSubview(type: InsetLabel.self, identifier: "label") {
+            label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        }
+        
         if let icon = navigationItem.titleView as? Icon {
-            icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : _surveyReference.topic.tagColor)
+            icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
         }
         if isAddedToFavorite {
             watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
         } else {
             watchButton.tintColor = .systemGray
         }
+        
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory,
+              let label = stackView.getSubview(type: InsetLabel.self, identifier: "label"),
+              let titleStackView = stackView.getSubview(type: UIStackView.self, identifier: "titleStackView"),
+              let widthConstraint = label.getConstraint(identifier: "width"),
+              let heightConstraint = titleStackView.getConstraint(identifier: "height")
+        else { return }
+        
+        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                       forTextStyle: .headline)
+        
+        let width = surveyReference.topic.title.width(withConstrainedHeight: 100, font: label.font)
+        let height = surveyReference.topic.title.height(withConstrainedWidth: width, font: label.font)
+        label.insets = UIEdgeInsets(top: 0, left: height/3, bottom: 0, right: height/3)
+        widthConstraint.constant =  width + height/2.25*3
+        heightConstraint.constant = height
     }
 }
 
@@ -374,7 +608,7 @@ class PollController: UIViewController {
 extension PollController: PollViewInput {
     func onVotersTapped(answer: Answer, color: UIColor) {
         navigationController?.pushViewController(VotersController(answer: answer, color: color), animated: true)
-//        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
+        //        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
     }
     
     func onImageTapped(mediafile: Mediafile) {
@@ -388,9 +622,9 @@ extension PollController: PollViewInput {
         return _showNext
     }
     
-//    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor) {
-//        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
-//    }
+    //    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor) {
+    //        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
+    //    }
     
     func onURLTapped(_ url: URL) {
         var vc: SFSafariViewController!

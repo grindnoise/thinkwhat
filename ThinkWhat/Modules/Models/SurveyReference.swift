@@ -74,7 +74,6 @@ class SurveyReference: Decodable {// NSObject,
         didSet {
             guard oldValue != isComplete else { return }
             NotificationCenter.default.post(name: Notifications.Surveys.Completed, object: self)
-//            Notification.send(names: [Notifications.Surveys.Completed])
         }
     }
     var isOwn: Bool

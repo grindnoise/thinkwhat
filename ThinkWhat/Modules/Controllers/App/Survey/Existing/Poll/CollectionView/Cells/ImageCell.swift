@@ -53,70 +53,76 @@ class ImageCell: UICollectionViewCell {
     // MARK: - Private Properties
     private lazy var disclosureLabel: UILabel = {
         let instance = UILabel()
-        instance.textColor = .systemBlue
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
-//        instance.addEquallyTo(to: horizontalStack)
-//        instance.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            instance.topAnchor.constraint(equalTo: emptyView.topAnchor),
-//            instance.bottomAnchor.constraint(equalTo: emptyView.bottomAnchor),
-//            instance.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor),
-//            instance.widthAnchor.constraint(equalTo: emptyView.widthAnchor, multiplier: 0.95),
-//        ])
-//        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
-//        constraint.identifier = "height"
-//        constraint.isActive = true
+        instance.textColor = .secondaryLabel
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         instance.text = "images".localized.uppercased()
         return instance
     }()
-    private let disclosureIndicator: UIImageView = {
-        let disclosureIndicator = UIImageView()
-        disclosureIndicator.image = UIImage(systemName: "chevron.down")
-        disclosureIndicator.tintColor = .systemBlue
-        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
-        disclosureIndicator.contentMode = .center
-        disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
-        return disclosureIndicator
+    private lazy var disclosureIndicator: UIImageView = {
+        let instance = UIImageView()
+        instance.image = UIImage(systemName: "chevron.down")
+        instance.tintColor = .secondaryLabel
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.contentMode = .center
+        instance.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
+        
+        return instance
     }()
-    private lazy var emptyView: UIView = {
+    private lazy var headerContainer: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
-        constraint.identifier = "height"
-        constraint.isActive = true
-        instance.addSubview(horizontalStack)
+        
+        let innerView = UIView()
+        innerView.backgroundColor = .clear
+        
+        instance.addSubview(innerView)
+        innerView.addSubview(horizontalStack)
+        
+        innerView.translatesAutoresizingMaskIntoConstraints = false
         horizontalStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
-            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-            horizontalStack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-            horizontalStack.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.95),
+            innerView.topAnchor.constraint(equalTo: instance.topAnchor),
+            innerView.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            innerView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.95),
+            innerView.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+            horizontalStack.topAnchor.constraint(equalTo: innerView.topAnchor),
+            horizontalStack.bottomAnchor.constraint(equalTo: innerView.bottomAnchor, constant: -10),
+            horizontalStack.leadingAnchor.constraint(equalTo: innerView.leadingAnchor, constant: 10),
+            horizontalStack.trailingAnchor.constraint(equalTo: innerView.trailingAnchor, constant: -10),
         ])
         
         return instance
     }()
-    private let icon: UIView = {
+    private lazy var icon: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         let imageView = UIImageView(image: UIImage(systemName: "photo.fill"))
-        imageView.tintColor = .systemBlue
+        imageView.tintColor = .secondaryLabel
         imageView.contentMode = .center
         imageView.addEquallyTo(to: instance)
+        
+        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
+            guard let newValue = change.newValue else { return }
+            
+            view.image = UIImage(systemName: "photo.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
+        }))
+        
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         instance.alignment = .center
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
         constraint.identifier = "height"
         constraint.isActive = true
+        instance.spacing = 4
         instance.axis = .horizontal
         instance.distribution = .fillProportionally
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [emptyView, imageContainer])
+        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, imageContainer])
         verticalStack.axis = .vertical
         verticalStack.spacing = padding
         return verticalStack
@@ -186,10 +192,10 @@ class ImageCell: UICollectionViewCell {
     private var openConstraint: NSLayoutConstraint!
     private var color: UIColor = .systemBlue {
         didSet {
-            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            guard let imageView = icon.get(all: UIImageView.self).first else { return }
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//            guard let imageView = icon.get(all: UIImageView.self).first else { return }
+//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
         }
     }
     
@@ -227,39 +233,35 @@ class ImageCell: UICollectionViewCell {
             verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),//, constant: padding),
             verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
             verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-//            disclosureLabel.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95)
         ])
         
-                setNeedsLayout()
-                layoutIfNeeded()
+        setNeedsLayout()
+        layoutIfNeeded()
         
         closedConstraint =
-            emptyView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        closedConstraint.priority = .defaultLow // use low priority so stack stays pinned to top of cell
+        horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
+        closedConstraint.priority = .defaultLow
         
         openConstraint =
-            imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+            imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         openConstraint.priority = .defaultLow
         
-//        disclosureLabel.text = !isSelected ? "hide_details".localized.uppercased() : "show_details".localized.uppercased()
-        updateAppearance()
-        
-//        let constraint = imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-//        constraint.priority = .defaultLow
-//        constraint.isActive = true
-//
-//        setNeedsLayout()
-//        layoutIfNeeded()
+        updateAppearance(animated: false)
     }
     
-    private func updateAppearance() {
+    /// Updates the views to reflect changes in selection
+    private func updateAppearance(animated: Bool = true) {
         closedConstraint?.isActive = isSelected
         openConstraint?.isActive = !isSelected
-        
+
+        guard animated else {
+            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
+            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+            return
+        }
         UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
-            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
-            self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
-            self.imageContainer.alpha = self.isSelected ? 0.5 : 1
+            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
+            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
         }
     }
     
@@ -296,9 +298,22 @@ class ImageCell: UICollectionViewCell {
             shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.2).cgColor
             shadowView.layer.shadowRadius = 4
             shadowView.layer.shadowOffset = .zero
-            shadowView.widthAnchor.constraint(equalTo: shadowView.heightAnchor, multiplier: 1.0/1.0).isActive = true
+//            shadowView.widthAnchor.constraint(equalTo: shadowView.heightAnchor, multiplier: 1.0/1.0).isActive = true
             
-                shadowView.addEquallyTo(to: opaqueView, multiplier: 0.95)
+//            shadowView.addEquallyTo(to: opaqueView, multiplier: 0.95)
+            opaqueView.addSubview(shadowView)
+            shadowView.translatesAutoresizingMaskIntoConstraints = false
+            
+            NSLayoutConstraint.activate([
+                shadowView.topAnchor.constraint(equalTo: opaqueView.topAnchor),
+                shadowView.widthAnchor.constraint(equalTo: opaqueView.widthAnchor, multiplier: 0.95),
+                shadowView.centerXAnchor.constraint(equalTo: opaqueView.centerXAnchor),
+                shadowView.bottomAnchor.constraint(equalTo: opaqueView.bottomAnchor)
+            ])
+            
+//            let constraint = shadowView.bottomAnchor.constraint(equalTo: opaqueView.bottomAnchor)
+//            constraint.priority = .defaultLow
+//            constraint.isActive = true
             
             let bg = UIView()
             bg.accessibilityIdentifier = "bg"
@@ -377,11 +392,11 @@ class ImageCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        if let imageView = icon.get(all: UIImageView.self).first {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        }
+//        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        if let imageView = icon.get(all: UIImageView.self).first {
+//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        }
         scrollView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
             $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
         }
@@ -389,11 +404,11 @@ class ImageCell: UICollectionViewCell {
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                                  forTextStyle: .footnote)
-        guard let constraint = emptyView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        guard let constraint = horizontalStack.getConstraint(identifier: "height") else { return }
         setNeedsLayout()
-        constraint.constant = max(disclosureLabel.text!.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
         layoutIfNeeded()
     }
     

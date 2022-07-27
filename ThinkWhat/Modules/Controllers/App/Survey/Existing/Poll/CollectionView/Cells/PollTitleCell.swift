@@ -53,9 +53,9 @@ class PollTitleCell: UICollectionViewCell {
     }()
     private lazy var ratingLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
         instance.textAlignment = .center
-        instance.textColor = .secondaryLabel
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
             guard let self = self,
                   let text = view.text else { return }
@@ -67,7 +67,7 @@ class PollTitleCell: UICollectionViewCell {
         })
         return instance
     }()
-    private lazy var viewsView: UIImageView = {
+    @MainActor private lazy var viewsView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "eye.fill"))
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.contentMode = .scaleAspectFit
@@ -75,14 +75,14 @@ class PollTitleCell: UICollectionViewCell {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
         return instance
     }()
-    @MainActor private let viewsLabel: UILabel = {
+    @MainActor private lazy var viewsLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
         instance.textAlignment = .center
-        instance.textColor = .secondaryLabel
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         return instance
     }()
-    private let bottomView: UIView = {
+    @MainActor private let bottomView: UIView = {
         let instance = UIView()
         let constraint = instance.heightAnchor.constraint(equalToConstant: 15)
         constraint.identifier = "height"
@@ -90,7 +90,7 @@ class PollTitleCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         return instance
     }()
-    private let bottomView_2: UIView = {
+    @MainActor private let bottomView_2: UIView = {
         let instance = UIView()
         let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
         constraint.identifier = "height"
@@ -98,7 +98,7 @@ class PollTitleCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         return instance
     }()
-    private lazy var shareButton: UIImageView = {
+    @MainActor private lazy var shareButton: UIImageView = {
         let instance = UIImageView()
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
 //        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
@@ -107,7 +107,7 @@ class PollTitleCell: UICollectionViewCell {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()
-    private lazy var claimButton: UIImageView = {
+    @MainActor private lazy var claimButton: UIImageView = {
         let instance = UIImageView()
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
 //        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
@@ -116,13 +116,13 @@ class PollTitleCell: UICollectionViewCell {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()
-    private lazy var horizontalStack: UIStackView = {
+    @MainActor private lazy var horizontalStack: UIStackView = {
         let horizontalStack = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
         horizontalStack.alignment = .center
         horizontalStack.spacing = 4
         return horizontalStack
     }()
-    private lazy var horizontalStack_2: UIStackView = {
+    @MainActor private lazy var horizontalStack_2: UIStackView = {
         let horizontalStack = UIStackView(arrangedSubviews: [shareButton, claimButton])
 //        horizontalStack.alignment = .bottom
         horizontalStack.distribution = .fillEqually
@@ -229,46 +229,71 @@ class PollTitleCell: UICollectionViewCell {
             })
             notifications.append(Task { [weak self] in
                 guard !self.isNil else { return }
-                for await _ in await NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+                for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
                     print("UIApplication.didBecomeActiveNotification")
                 }
             })
             
             notifications.append(Task { [weak self] in
-                for await _ in await NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
                     await MainActor.run {
                         guard let self = self,
-                              let item = self.item else { return }
+                              let item = self.item,
+                              let object = notification.object as? SurveyReference,
+                              item === object
+                        else { return }
                         self.viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
                     }
                 }
             })
-            
-            
-            
+            notifications.append(Task { [weak self] in
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Rating) {
+                    await MainActor.run {
+                        guard let self = self,
+                              let item = self.item,
+                              let object = notification.object as? SurveyReference,
+                              item === object
+                        else { return }
+                        self.ratingLabel.text = String(describing: item.rating)
+                    }
+                }
+            })
         } else {
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.updateViewsCount),
                                                    name: Notifications.Surveys.Views,
                                                    object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.updateViewsCount),
+                                                   name: Notifications.Surveys.Rating,
+                                                   object: nil)
         }
     }
     
     @objc
-    private func updateViewsCount(_ button: UIButton) {
-        guard let item = item else { return }
+    private func updateViewsCount(notification: Notification) {
+        guard let item = self.item,
+              let object = notification.object as? SurveyReference,
+              item === object
+        else { return }
         viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
     }
     
     @objc
-    private func updateRating(_ button: UIButton) {
-        guard let item = item else { return }
+    private func updateRating(notification: Notification) {
+        guard let item = self.item,
+              let object = notification.object as? SurveyReference,
+              item === object
+        else { return }
         ratingLabel.text = String(describing: item.rating)
     }
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+        
+        viewsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        ratingLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         
         //Set dynamic font size
@@ -277,9 +302,9 @@ class PollTitleCell: UICollectionViewCell {
         titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
                                             forTextStyle: .largeTitle)
         ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption2)
+                                            forTextStyle: .caption1)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption2)
+                                            forTextStyle: .caption1)
         guard let constraint_1 = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
               let constraint_2 = bottomView.getAllConstraints().filter({$0.identifier == "height"}).first,
               let item = item else { return }

@@ -609,7 +609,7 @@ class SurveyCell: UICollectionViewListCell {
                             container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
                             
                             let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-                            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
                             instance.contentMode = .scaleAspectFit
                             instance.addEquallyTo(to: container)
                             stackView.insertArrangedSubview(container,
@@ -660,7 +660,7 @@ class SurveyCell: UICollectionViewListCell {
                             
                             let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
                             instance.contentMode = .center
-                            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemGreen
+                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .white : self.item.topic.tagColor
                             instance.contentMode = .scaleAspectFit
                             instance.addEquallyTo(to: container)
                             stackView.insertArrangedSubview(container, at: 0)
@@ -749,6 +749,18 @@ class SurveyCell: UICollectionViewListCell {
                                                    selector: #selector(self.updateViewsCount),
                                                    name: Notifications.Surveys.Views,
                                                    object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.switchFavorite),
+                                                   name: Notifications.Surveys.SwitchFavorite,
+                                                   object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.setCompleted),
+                                                   name: Notifications.Surveys.Completed,
+                                                   object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.switchHot),
+                                                   name: Notifications.Surveys.SwitchHot,
+                                                   object: nil)
         }
     }
     
@@ -803,13 +815,25 @@ class SurveyCell: UICollectionViewListCell {
     }
     
     @objc
-    private func updateViewsCount(_ button: UIButton) {
+    private func updateViewsCount(notification: Notification) {
         guard let item = item else { return }
         viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
     }
     
     @objc
-    private func updateRating(_ button: UIButton) {
+    private func switchFavorite(notification: Notification) {
+        guard let item = item else { return }
+        ratingLabel.text = String(describing: item.rating)
+    }
+    
+    @objc
+    private func setCompleted(notification: Notification) {
+        guard let item = item else { return }
+        ratingLabel.text = String(describing: item.rating)
+    }
+    
+    @objc
+    private func switchHot(notification: Notification) {
         guard let item = item else { return }
         ratingLabel.text = String(describing: item.rating)
     }

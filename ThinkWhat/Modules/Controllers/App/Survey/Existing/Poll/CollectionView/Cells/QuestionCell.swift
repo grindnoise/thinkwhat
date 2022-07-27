@@ -14,7 +14,6 @@ class QuestionCell: UICollectionViewCell {
     public var item: Survey! {
         didSet {
             guard !item.isNil else { return }
-            color = item.topic.tagColor
             collectionView.dataItems = item.answers
             if mode == .ReadOnly {
                 collectionView.reloadUsingSorting()
@@ -47,6 +46,21 @@ class QuestionCell: UICollectionViewCell {
     
     
     // MARK: - Private properties
+    private lazy var headerContainer: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.addSubview(horizontalStack)
+        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
+            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
+            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
+            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
+        ])
+        
+        return instance
+    }()
     private lazy var collectionView: ChoiceCollectionView = {
         let instance = ChoiceCollectionView(answerListener: answerListener, callbackDelegate: self)
         return instance
@@ -55,18 +69,18 @@ class QuestionCell: UICollectionViewCell {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
         instance.text = "poll_question".localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
         return instance
     }()
     private lazy var textView: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = .clear
-        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.SemiboldItalic.rawValue, forTextStyle: .headline)
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
         textView.isEditable = false
         textView.isSelectable = false
         return textView
     }()
-    private let icon: UIView = {
+    private lazy var icon: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
@@ -74,20 +88,30 @@ class QuestionCell: UICollectionViewCell {
         imageView.tintColor = .secondaryLabel
         imageView.contentMode = .center
         imageView.addEquallyTo(to: instance)
+        
+        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
+            guard let newValue = change.newValue else { return }
+            
+            view.image = UIImage(systemName: "questionmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
+        }))
+        
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel])
         instance.alignment = .center
         instance.axis = .horizontal
+        instance.spacing = 4
         instance.distribution = .fillProportionally
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+        
+        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
         constraint.identifier = "height"
         constraint.isActive = true
+        
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [horizontalStack, textView, collectionView])
+        let instance = UIStackView(arrangedSubviews: [headerContainer, textView, collectionView])
 //        let instance = UIStackView(arrangedSubviews: [horizontalStack, textView])
         instance.axis = .vertical
         instance.clipsToBounds = false
@@ -96,14 +120,6 @@ class QuestionCell: UICollectionViewCell {
     }()
     private var observers: [NSKeyValueObservation] = []
     private let padding: CGFloat = 0
-    private var color: UIColor = .secondaryLabel {
-        didSet {
-//            textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
-            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            guard let imageView = icon.get(all: UIImageView.self).first else { return }
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        }
-    }
     
     // MARK: - Destructor
     deinit {
@@ -147,8 +163,7 @@ class QuestionCell: UICollectionViewCell {
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
         ])
 
-        let constraint =
-            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        let constraint = collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         constraint.priority = .defaultLow
         constraint.isActive = true
     }
@@ -182,24 +197,18 @@ class QuestionCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
-//        textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)
-        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        if let imageView = icon.get(all: UIImageView.self).first {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        }
-
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
 
-        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Italic.rawValue,
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                           forTextStyle: .headline)
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                                 forTextStyle: .footnote)
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                 forTextStyle: .caption2)
         guard let constraint_1 = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
               let constraint_2 = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
         constraint_1.constant = textView.contentSize.height
-        constraint_2.constant = max(item.question.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        constraint_2.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
         layoutIfNeeded()
     }
 }

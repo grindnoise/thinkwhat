@@ -18,7 +18,6 @@ class LinkPreviewCell: UICollectionViewCell {
     var item: Survey! {
         didSet {
             guard !item.isNil, !item.url.isNil else { return }
-            color = item.topic.tagColor
             guard let url = item.url else { return }
             LPMetadataProvider().startFetchingMetadata(for: url) { [weak self] data, error in
                 guard let self = self, let data = data, error.isNil else { return }
@@ -31,6 +30,21 @@ class LinkPreviewCell: UICollectionViewCell {
     public weak var callbackDelegate: CallbackObservable?
     
     // MARK: - Private Properties
+    private lazy var headerContainer: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.addSubview(horizontalStack)
+        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
+            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
+            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
+            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
+        ])
+        
+        return instance
+    }()
     private lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
@@ -46,8 +60,8 @@ class LinkPreviewCell: UICollectionViewCell {
     private lazy var disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.text = "web_link".localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.textColor = .secondaryLabel
         instance.addEquallyTo(to: shadowView)
 //                let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
 //                constraint.identifier = "height"
@@ -58,7 +72,7 @@ class LinkPreviewCell: UICollectionViewCell {
     private lazy var disclosureIndicator: UIImageView = {
         let disclosureIndicator = UIImageView()
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
-        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        disclosureIndicator.tintColor = .secondaryLabel
         disclosureIndicator.contentMode = .center
         disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
@@ -69,9 +83,16 @@ class LinkPreviewCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         let imageView = UIImageView(image: UIImage(systemName: "link"))
-        imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        imageView.tintColor = .secondaryLabel
         imageView.contentMode = .center
         imageView.addEquallyTo(to: instance)
+        
+        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
+            guard let newValue = change.newValue else { return }
+            
+            view.image = UIImage(systemName: "link", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
+        }))
+        
         return instance
     }()
     // Stacks
@@ -79,15 +100,18 @@ class LinkPreviewCell: UICollectionViewCell {
         let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         rootStack.alignment = .center
         rootStack.distribution = .fillProportionally
-        let constraint = rootStack.heightAnchor.constraint(equalToConstant: 40)
+        rootStack.spacing = 4
+        
+        let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
         constraint.identifier = "height"
         constraint.isActive = true
+       
         return rootStack
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, shadowView])//, browserButton])
+        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, shadowView])//, browserButton])
         verticalStack.axis = .vertical
-        verticalStack.spacing = padding
+        verticalStack.spacing = 0
         return verticalStack
     }()
     // Constraints
@@ -126,14 +150,6 @@ class LinkPreviewCell: UICollectionViewCell {
         return instance
     }()
     private let padding: CGFloat = 10
-    private var color: UIColor = .secondaryLabel {
-        didSet {
-            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            guard let imageView = icon.get(all: UIImageView.self).first else { return }
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        }
-    }
     
     // MARK: - Destructor
     deinit {
@@ -157,7 +173,7 @@ class LinkPreviewCell: UICollectionViewCell {
     private func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true
-        horizontalStack.heightAnchor.constraint(equalToConstant: 40).isActive = true
+//        horizontalStack.heightAnchor.constraint(equalToConstant: 40).isActive = true
         disclosureLabel.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor).isActive = true
         contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -173,25 +189,28 @@ class LinkPreviewCell: UICollectionViewCell {
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
         ])
         
-        closedConstraint =
-            disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        closedConstraint = disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         closedConstraint?.priority = .defaultLow // use low priority so stack stays pinned to top of cell
         
-        openConstraint =
-            linkPreview.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        openConstraint = linkPreview.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         openConstraint?.priority = .defaultLow
 
-        updateAppearance()
+        updateAppearance(animated: false)
     }
     
-    private func updateAppearance() {
+    /// Updates the views to reflect changes in selection
+    private func updateAppearance(animated: Bool = true) {
         closedConstraint?.isActive = isSelected
         openConstraint?.isActive = !isSelected
-        
+
+        guard animated else {
+            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2)
+            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+            return
+        }
         UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
-            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
-            self.disclosureIndicator.transform = !self.isSelected ? upsideDown :.identity
-            self.shadowView.alpha = self.isSelected ? 0.5 : 1
+            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2)
+            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
         }
     }
     
@@ -212,19 +231,20 @@ class LinkPreviewCell: UICollectionViewCell {
         }
         
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
-        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        if let imageView = icon.get(all: UIImageView.self).first {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        }
+//        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        if let imageView = icon.get(all: UIImageView.self).first {
+//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        }
+        
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                                 forTextStyle: .footnote)
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                 forTextStyle: .caption2)
         guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
-        constraint.constant = max(disclosureLabel.text!.height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
         layoutIfNeeded()
     }
 }

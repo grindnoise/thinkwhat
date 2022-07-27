@@ -156,29 +156,6 @@ class SurveysCollectionView: UICollectionView {
     }
     
     private func setObservers() {
-
-//        let pagination = [Notifications.Surveys.UpdateSubscriptions,
-//                          Notifications.Surveys.UpdateTopSurveys,
-//                          Notifications.Surveys.UpdateOwn,
-////                          Notifications.Surveys.UpdateFavorite,
-//                          Notifications.Surveys.SetFavorite,
-//                          Notifications.Surveys.UpdateAll,
-//                          Notifications.Surveys.UpdateNewSurveys,]
-//        let remove      = [Notifications.Surveys.Claimed,
-//                           Notifications.Surveys.UnsetFavorite,
-////                           Notifications.Surveys.Completed,
-//                           Notifications.Surveys.Rejected]
-//        let zeroEmitted = [Notifications.Surveys.Empty]
-////        let zeroEmitted = [Notifications.Surveys.ZeroOwn,
-////                           Notifications.Surveys.ZeroNew,
-////                           Notifications.Surveys.ZeroTop,
-////                           Notifications.Surveys.ZeroFavorites,
-////                           Notifications.Surveys.ZeroSubscriptions]
-//
-//        pagination.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onPagination), name: $0, object: nil) }
-//        zeroEmitted.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.endRefreshing), name: $0, object: nil) }
-//        remove.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onRemove), name: $0, object: nil) }
-        
         if #available(iOS 15, *) {
             
             //Update survey stats every n seconds
@@ -204,7 +181,7 @@ class SurveysCollectionView: UICollectionView {
                     await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
-            
+
             //Survey banned on server
             notifications.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Ban) {
@@ -219,7 +196,7 @@ class SurveysCollectionView: UICollectionView {
                 }
             })
 
-            
+
             //Subscriptions added
             notifications.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SubscriptionAppend) {
@@ -234,7 +211,7 @@ class SurveysCollectionView: UICollectionView {
                     await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
-            
+
             //New added
             notifications.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.NewAppend) {
@@ -249,7 +226,7 @@ class SurveysCollectionView: UICollectionView {
                     await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
-            
+
             //Top added
             notifications.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopAppend) {
@@ -264,7 +241,7 @@ class SurveysCollectionView: UICollectionView {
                     await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
-            
+
             //Own added
             notifications.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.OwnAppend) {
@@ -279,7 +256,7 @@ class SurveysCollectionView: UICollectionView {
                     await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
-            
+
             //Favorite added
             notifications.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
@@ -294,7 +271,7 @@ class SurveysCollectionView: UICollectionView {
                     await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
-            
+
             //Topic added
             notifications.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
@@ -315,35 +292,35 @@ class SurveysCollectionView: UICollectionView {
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.appendItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.SubscriptionAppend,
-                                                   object: self)
+                                                   object: nil)
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.appendItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.TopicAppend,
-                                                   object: self)
+                                                   object: nil)
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.appendItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.FavoriteAppend,
-                                                   object: self)
+                                                   object: nil)
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.appendItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.OwnAppend,
-                                                   object: self)
+                                                   object: nil)
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.appendItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.TopAppend,
-                                                   object: self)
+                                                   object: nil)
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.appendItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.NewAppend,
-                                                   object: self)
+                                                   object: nil)
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.removeItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.Claim,
-                                                   object: self)
+                                                   object: nil)
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(self.removeItemIdentifier(notification:)),
                                                    name: Notifications.Surveys.Ban,
-                                                   object: self)
+                                                   object: nil)
         }
     }
     
