@@ -139,6 +139,7 @@ class PollController: UIViewController {
         ])
         
         let indicator = CircleButton(frame: .zero)
+        indicator.accessibilityIdentifier = "progress"
         indicator.color = surveyReference.topic.tagColor
         indicator.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
         indicator.oval.lineCap = .round
@@ -152,7 +153,6 @@ class PollController: UIViewController {
         stackView.addArrangedSubview(indicator)
         
        
-        
         let titleContainer = UIView()
         titleContainer.backgroundColor = .clear
         stackView.addArrangedSubview(titleContainer)
@@ -416,6 +416,29 @@ class PollController: UIViewController {
                         mark.removeFromSuperview()
                     }
                 }
+            }
+        })
+        
+        //Observe progress
+        notifications.append(Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
+                guard let self = self,
+                      let instance = notification.object as? SurveyReference,
+                      self._surveyReference == instance,
+                      let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress")
+                else { return }
+
+                indicator.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
+            }
+        })
+
+        //Set timer to request stats updates
+        //Update survey stats every n seconds
+        let events = EventEmitter().emit(every: 5)
+        notifications.append(Task { [weak self] in
+            for await _ in events {
+                guard let self = self  else { return }
+                self.controllerInput?.updateSurveyStats([self._surveyReference])
             }
         })
     }

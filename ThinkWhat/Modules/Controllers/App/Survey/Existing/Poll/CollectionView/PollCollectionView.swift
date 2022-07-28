@@ -313,7 +313,8 @@ class PollCollectionView: UICollectionView {
 // MARK: - BoundsListener
 extension PollCollectionView: BoundsListener {
     func onBoundsChanged(_ rect: CGRect) {
-        source.refresh()
+        print(rect.size)
+        source.refresh(animatingDifferences: false)
     }
 }
 

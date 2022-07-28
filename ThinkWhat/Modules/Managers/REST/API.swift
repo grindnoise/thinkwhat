@@ -851,10 +851,10 @@ class API {
         }
     }
     
-    func getSurveyStats(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_UPDATE_STATS) else { completion(.failure(APIError.invalidURL)); return }
-        self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { completion($0) }
-    }
+//    func getSurveyStats(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
+//        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_UPDATE_STATS) else { completion(.failure(APIError.invalidURL)); return }
+//        self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { completion($0) }
+//    }
     
     func postPoll(survey: Survey, uploadProgress: @escaping(Double)->()?, completion: @escaping(Result<JSON, Error>)->()) {
         //TODO: - postSurvey replace dict()
@@ -1204,11 +1204,11 @@ class API {
             }
         }
         
-        public func updateStats() async throws -> Data {
-            guard let url = API_URLS.System.updateStats else { throw APIError.invalidURL }
-            
-            return try await parent.requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: parent.headers())
-        }
+//        public func updateStats() async throws -> Data {
+//            guard let url = API_URLS.System.updateStats else { throw APIError.invalidURL }
+//            
+//            return try await parent.requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: parent.headers())
+//        }
         
         public func loadSurveys(type: SurveyType, parameters: Parameters? = nil) async throws -> Data{
             return try await parent.requestAsync(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
@@ -1248,6 +1248,22 @@ class API {
                 let json = try JSON(data: data, options: .mutableContainers)
                 await MainActor.run {
                     Surveys.shared.updateSurveyStats(json)
+                }
+            } catch let error {
+                throw error
+            }
+        }
+        
+        public func updateResultsStats(_ instance: Survey) async throws {
+            guard let url = API_URLS.Surveys.updateResults else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["id": instance.id]
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let json = try JSON(data: data, options: .mutableContainers)
+                await MainActor.run {
+                    Surveys.shared.updateResultsStats(json)
                 }
             } catch let error {
                 throw error

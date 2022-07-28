@@ -15,19 +15,19 @@ class QuestionCell: UICollectionViewCell {
         didSet {
             guard !item.isNil else { return }
             collectionView.dataItems = item.answers
-            if mode == .ReadOnly {
-                collectionView.reloadUsingSorting()
-            }
+//            if mode == .ReadOnly {
+//                collectionView.reload(sorted: true, animatingDifferences: false, shouldChangeColor: true)
+//            }
             textView.text = item.question
-            let constraint_1 = textView.heightAnchor.constraint(equalToConstant: max(item.question.height(withConstrainedWidth: textView.bounds.width, font: textView.font!), 40))
+            let constraint_1 = textView.heightAnchor.constraint(equalToConstant: max(item.question.height(withConstrainedWidth: textView.bounds.width, font: textView.font!), 400))
             constraint_1.identifier = "height"
             constraint_1.isActive = true
             let constraint_2 = collectionView.heightAnchor.constraint(equalToConstant: 1)
             constraint_2.priority = .defaultHigh
             constraint_2.identifier = "height"
             constraint_2.isActive = true
-            setNeedsLayout()
-            layoutIfNeeded()
+//            setNeedsLayout()
+//            layoutIfNeeded()
         }
     }
     public var mode: PollController.Mode = .Write {
@@ -171,7 +171,7 @@ class QuestionCell: UICollectionViewCell {
     private func setObservers() {
         observers.append(textView.observe(\UITextView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
             guard let self = self,
-                  let constraint = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
+                  let constraint = self.textView.getConstraint(identifier: "height"),
                   let value = change.newValue else { return }
             self.setNeedsLayout()
             constraint.constant = value.height
@@ -181,11 +181,12 @@ class QuestionCell: UICollectionViewCell {
             guard let self = self, let value = change.newValue else { return }
             self.textView.cornerRadius = value.width * 0.05
         })
-        observers.append(collectionView.observe(\ChoiceCollectionView.contentSize, options: [NSKeyValueObservingOptions.new]) { [weak self] (view: UIView, change: NSKeyValueObservedChange<CGSize>) in
+        observers.append(collectionView.observe(\ChoiceCollectionView.contentSize, options: .new) { [weak self] view, change in
             guard let self = self,
-                  let constraint = self.collectionView.getAllConstraints().filter({ $0.identifier == "height" }).first,
-                  let value = change.newValue,
-                      value.height != constraint.constant else { return }
+                  let constraint = self.collectionView.getConstraint(identifier: "height"),
+                  let value = change.newValue,// else { return }//,
+                  value.height > view.frame.height else { return }
+//            self.boundsListener?.onBoundsChanged(view.frame)
             self.setNeedsLayout()
             constraint.constant = value.height
             self.layoutIfNeeded()

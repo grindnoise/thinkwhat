@@ -148,6 +148,8 @@ extension ListView: CallbackObservable {
             viewInput?.onSurveyTapped(instance)
         } else if sender is SurveysCollectionView {
             viewInput?.onDataSourceRequest()
+        } else if let instances = sender as? [SurveyReference] {
+            viewInput?.updateSurveyStats(instances)
         }
     }
 }

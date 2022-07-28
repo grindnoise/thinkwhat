@@ -18,7 +18,8 @@ class ChoiceCollectionView: UICollectionView {
     // MARK: - Public properties
     public var dataItems: [Answer] {
         didSet {
-            reload()
+            reload(sorted: mode == .ReadOnly, animatingDifferences: false, shouldChangeColor: mode == .ReadOnly)
+//            reload(sorted: mode == .ReadOnly, animatingDifferences: true, shouldChangeColor: mode == .ReadOnly)
         }
     }
     public weak var answerListener: AnswerListener?
@@ -27,7 +28,7 @@ class ChoiceCollectionView: UICollectionView {
     public var mode: PollController.Mode = .Write {
         didSet {
             if oldValue != mode, mode == .ReadOnly {
-                reloadUsingSorting()
+                reload(animatingDifferences: false, shouldChangeColor: true)
             }
             visibleCells.forEach {
                 guard let cell = $0 as? ChoiceCell else { return }
@@ -64,11 +65,13 @@ class ChoiceCollectionView: UICollectionView {
         delegate = self
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
-            configuration.headerMode = .firstItemInSection
+//            configuration.headerMode = .firstItemInSection
             configuration.backgroundColor = .clear
             configuration.showsSeparators = false
             
-            return NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
+            let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 0, trailing: sectionLayout.contentInsets.trailing)
+            return sectionLayout
         }
         
         let cellRegistration = UICollectionView.CellRegistration<ChoiceCell, Answer> { [weak self] cell, indexPath, item in
@@ -91,36 +94,35 @@ class ChoiceCollectionView: UICollectionView {
                                                                     for: indexPath,
                                                                     item: identifier)
         }
-        reload()
+        
+        reload(animatingDifferences: false)
     }
     
-    private func reload() {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Answer>()
-        snapshot.appendSections([.main,])
-        snapshot.appendItems(dataItems, toSection: .main)
-        source.apply(snapshot, animatingDifferences: false)
-    }
+//    private func reload() {
+//        var snapshot = NSDiffableDataSourceSnapshot<Section, Answer>()
+//        snapshot.appendSections([.main,])
+//        snapshot.appendItems(dataItems, toSection: .main)
+//        source.apply(snapshot, animatingDifferences: false)
+//    }
     
     // MARK: - Public methods
     public func refresh() {
         source.refresh()
     }
     
-    public func reloadUsingSorting() {
-        shouldChangeColor = true
-        self.visibleCells.enumerated().forEach {
+    public func reload(sorted: Bool = false, animatingDifferences: Bool = true, shouldChangeColor: Bool = false) {
+        guard !dataItems.isEmpty else { return }
+        self.shouldChangeColor = shouldChangeColor
+        
+        visibleCells.enumerated().forEach {
             guard let cell = $1 as? ChoiceCell else { return }
             cell.color = Colors.tags()[$0]
         }
+        
         var snapshot = NSDiffableDataSourceSnapshot<Section, Answer>()
         snapshot.appendSections([.main,])
-        snapshot.appendItems(dataItems.sorted{ $0.totalVotes > $1.totalVotes }, toSection: .main)
-        source.apply(snapshot, animatingDifferences: true) {
-//            self.visibleCells.enumerated().forEach {
-//                guard let cell = $1 as? ChoiceCell else { return }
-//                cell.color = Colors.tags()[$0]
-//            }
-        }
+        snapshot.appendItems(sorted ? dataItems.sorted{ $0.totalVotes > $1.totalVotes } : dataItems, toSection: .main)
+        source.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 }
 

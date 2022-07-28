@@ -128,23 +128,23 @@ class MainController: UITabBarController {//}, StorageProtocol {
         requestAttempt = 0
     }
     
-    @objc private func updateStats() {
-        Task {
-            do {
-                let data = try await API.shared.surveys.updateStats()
-                let json = try JSON(data: data, options: .mutableContainers)
-                await MainActor.run {
-                    Topics.shared.updateCount(json["count_by_categories"])
-                    Userprofiles.shared.current?.updateStats(json["userprofile"])
-                    Notification.send(names: [Notifications.System.UpdateStats])
-                }
-            } catch {
-#if DEBUG
-                error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-            }
-        }
-    }
+//    @objc private func updateStats() {
+//        Task {
+//            do {
+//                let data = try await API.shared.surveys.updateStats()
+//                let json = try JSON(data: data, options: .mutableContainers)
+//                await MainActor.run {
+//                    Topics.shared.updateCount(json["count_by_categories"])
+//                    Userprofiles.shared.current?.updateStats(json["userprofile"])
+//                    Notification.send(names: [Notifications.System.UpdateStats])
+//                }
+//            } catch {
+//#if DEBUG
+//                error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//            }
+//        }
+//    }
     
     func appLaunch() async throws {
         
@@ -180,7 +180,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
                             guard let nav = $0 as? CustomNavigationController,
                                   let target = nav.viewControllers.first as? DataObservable else { return }
                             target.onDataLoaded()
-                            self.timers.forEach { $0.fire() }
+//                            self.timers.forEach { $0.fire() }
                         }
                     }
                 } catch {
@@ -200,12 +200,12 @@ class MainController: UITabBarController {//}, StorageProtocol {
     private var requestAttempt = 0
     private var loadingIndicator: LoadingIndicator?
     private var apiUnavailableView: APIUnavailableView?
-    private lazy var timers: [Timer] = {
-        var array: [Timer] = []
-        let t = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(MainController.updateStats), userInfo: nil, repeats: true)
-        array.append(t)
-        return array
-    }()
+//    private lazy var timers: [Timer] = {
+//        var array: [Timer] = []
+//        let t = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(MainController.updateStats), userInfo: nil, repeats: true)
+//        array.append(t)
+//        return array
+//    }()
 }
 
 //MARK: -  UITabBarControllerDelegate

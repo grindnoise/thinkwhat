@@ -20,3 +20,12 @@ extension UICollectionView {
         }
     }
 }
+
+extension UICollectionViewDiffableDataSource {
+    /// Reapplies the current snapshot to the data source, animating the differences.
+    /// - Parameters:
+    ///   - completion: A closure to be called on completion of reapplying the snapshot.
+    func refresh(animatingDifferences: Bool = true, completion: (() -> Void)? = nil) {
+        self.apply(self.snapshot(), animatingDifferences: animatingDifferences, completion: completion)
+    }
+}

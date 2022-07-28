@@ -555,6 +555,19 @@ class Surveys {
         }
     }
     
+    func updateResultsStats(_ json: JSON) {
+        for i in json {
+            let instance: SurveyReference? = SurveyReferences.shared.all.filter({ $0.id == Int(i.0) }).first ?? Surveys.shared.all.filter({ $0.reference.id == Int(i.0)}).first?.reference
+            guard let instance = instance,
+                  let progress = i.1["progress"].int,
+            let rating = i.1["rating"].double,
+                let views = i.1["views"].int else { return }
+            instance.progress = progress
+            instance.rating = rating
+            instance.views = views
+        }
+    }
+    
     func load(_ json: JSON) {
         let decoder                                 = JSONDecoder()
         var notifications: [NSNotification.Name]    = []

@@ -20,6 +20,7 @@ struct Animations {
         case StrokeStart     = "strokeStart"
         case StrokeColor     = "strokeColor"
         case LineWidth       = "lineWidth"
+        case Opacity         = "opacity"
     }
     static func group(animations: [CAAnimation], repeatCount: Float = 0, autoreverses: Bool = false, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CAAnimationGroup {
         

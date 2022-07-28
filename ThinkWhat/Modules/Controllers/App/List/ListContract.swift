@@ -19,6 +19,7 @@ protocol ListViewInput: class {
     
     func onSurveyTapped(_: SurveyReference)
     func onDataSourceRequest()
+    func updateSurveyStats(_: [SurveyReference])
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -29,6 +30,7 @@ protocol ListControllerInput: class {
     var modelOutput: ListModelOutput? { get set }
     
     func onDataSourceRequest()
+    func updateSurveyStats(_: [SurveyReference])
 }
 
 /// *Model* returns the result to the *Controller*

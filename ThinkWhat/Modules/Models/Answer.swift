@@ -28,6 +28,7 @@ class Answer: Decodable {
     var image: UIImage?
     var fileURL: URL?
     var file: Data?
+    //0..1 max
     var percent: Double {
         guard let survey = survey else { return 0 }
         if survey.votesTotal == 0 || totalVotes == 0 {

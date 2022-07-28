@@ -165,7 +165,18 @@ extension PollModel: PollControllerInput {
                     modelOutput?.onAddFavoriteCallback(.failure(error))
                 }
             }
-            
+        }
+    }
+    
+    func updateSurveyStats(_ instances: [SurveyReference]) {
+        Task {
+            do {
+                try await API.shared.surveys.updateSurveyStats(instances)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
         }
     }
 }

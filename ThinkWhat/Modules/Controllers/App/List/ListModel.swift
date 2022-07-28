@@ -15,6 +15,18 @@ class ListModel {
 
 // MARK: - Controller Input
 extension ListModel: ListControllerInput {
+    func updateSurveyStats(_ instances: [SurveyReference]) {
+        Task {
+            do {
+                try await API.shared.surveys.updateSurveyStats(instances)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
+    
     func onDataSourceRequest() {
         guard let source = modelOutput?.surveyCategory else { return }
         

@@ -436,7 +436,7 @@ extension SurveysCollectionView: UICollectionViewDelegate {
 //        endRefreshing()
 //        appendToDataSource()
 //    }
-    
+
     private func appendToDataSource() {
         var snapshot = source.snapshot()
         guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }

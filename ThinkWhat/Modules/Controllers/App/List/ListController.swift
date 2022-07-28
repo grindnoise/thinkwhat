@@ -86,6 +86,10 @@ class ListController: UIViewController {
 
 // MARK: - View Input
 extension ListController: ListViewInput {
+    func updateSurveyStats(_ instances: [SurveyReference]) {
+        controllerInput?.updateSurveyStats(instances)
+    }
+    
     var surveyCategory: Survey.SurveyCategory {
         return category
     }
