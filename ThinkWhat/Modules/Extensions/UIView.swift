@@ -80,7 +80,7 @@ extension UIView {
     func getAllSubviews<T: UIView>() -> [T] { return UIView.getAllSubviews(from: self) as [T] }
     func get<T: UIView>(all type: T.Type) -> [T] { return UIView.getAllSubviews(from: self) as [T] }
     func get(all types: [UIView.Type]) -> [UIView] { return UIView.getAllSubviews(from: self, types: types) }
-    func getSubview<T: UIView>(type: T.Type, identifier: String) -> T? {
+    func getSubview<T: UIView>(type: T.Type, identifier: String?) -> T? {
         return self.get(all: type).filter({ $0.accessibilityIdentifier == identifier }).first
     }
 }

@@ -91,13 +91,13 @@ class PollCollectionView: UICollectionView {
         allowsMultipleSelection = true
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
-            layoutConfig.headerMode = .firstItemInSection
+//            layoutConfig.headerMode = .firstItemInSection
             layoutConfig.backgroundColor = .clear
             layoutConfig.showsSeparators = false
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
 //            sectionLayout.interGroupSpacing = 20
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 30, trailing: sectionLayout.contentInsets.trailing)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 40, trailing: 8)
             return sectionLayout
         }
         

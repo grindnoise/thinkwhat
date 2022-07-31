@@ -77,7 +77,7 @@ extension PollModel: PollControllerInput {
                                                                            DateFormatter.dateFormatter ]
                                 let instances = try decoder.decode([Userprofile].self, from: data)
                                 instances.forEach { instance in
-                                    answer.addVoter(Userprofiles.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+                                    answer.voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
                                 }
 //                                print(answer.voters)
                             }
@@ -168,10 +168,10 @@ extension PollModel: PollControllerInput {
         }
     }
     
-    func updateSurveyStats(_ instances: [SurveyReference]) {
+    func updateResultsStats(_ instance: SurveyReference) {
         Task {
             do {
-                try await API.shared.surveys.updateSurveyStats(instances)
+                try await API.shared.surveys.updateResultStats(instance)
             } catch {
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)

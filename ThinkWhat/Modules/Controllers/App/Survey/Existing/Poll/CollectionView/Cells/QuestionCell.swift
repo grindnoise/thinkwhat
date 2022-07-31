@@ -69,13 +69,13 @@ class QuestionCell: UICollectionViewCell {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
         instance.text = "poll_question".localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         return instance
     }()
     private lazy var textView: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = .clear
-        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
         textView.isEditable = false
         textView.isSelectable = false
         return textView
@@ -104,7 +104,7 @@ class QuestionCell: UICollectionViewCell {
         instance.spacing = 4
         instance.distribution = .fillProportionally
         
-        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
+        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
         constraint.identifier = "height"
         constraint.isActive = true
         
@@ -201,10 +201,10 @@ class QuestionCell: UICollectionViewCell {
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
 
-        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                          forTextStyle: .headline)
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                          forTextStyle: .body)
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                                 forTextStyle: .caption2)
+                                                 forTextStyle: .caption1)
         guard let constraint_1 = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
               let constraint_2 = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()

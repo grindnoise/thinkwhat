@@ -58,8 +58,9 @@ class TopicsView: UIView {
             guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
             self.featheredLayer.frame = newValue
         })
-        surveysCollectionView.addEquallyTo(to: instance)
         topicsCollectionView.addEquallyTo(to: instance)
+        surveysCollectionView.addEquallyTo(to: instance)
+//        topicsCollectionView.addEquallyTo(to: instance)
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
@@ -114,8 +115,90 @@ class TopicsView: UIView {
         featheredView.layer.mask = featheredLayer
     }
     
+    private func reveal(unfold: Bool = true, view animatedView: UIView, duration: TimeInterval, completionBlocks: [Closure] = []) {
+        
+        let circlePathLayer = CAShapeLayer()
+        var _completionBlocks = completionBlocks
+        var circleFrameTopCenter: CGRect {
+            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+            let circlePathBounds = circlePathLayer.bounds
+            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+            circleFrame.origin.y = circlePathBounds.minY - circleFrame.minY
+            return circleFrame
+        }
+        
+        var circleFrameTop: CGRect {
+            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+            let circlePathBounds = circlePathLayer.bounds
+            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+            return circleFrame
+        }
+        
+        var circleFrameTopLeft: CGRect {
+            return CGRect.zero
+        }
+        
+        var circleFrameCenter: CGRect {
+            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+            let circlePathBounds = circlePathLayer.bounds
+            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+            return circleFrame
+        }
+        
+        func circlePath(_ rect: CGRect) -> UIBezierPath {
+            return UIBezierPath(ovalIn: rect)
+        }
+        
+        circlePathLayer.frame = animatedView.bounds
+        circlePathLayer.path = circlePath(circleFrameCenter).cgPath
+        animatedView.layer.mask = circlePathLayer
+
+        let center = (x: animatedView.bounds.midX, y: animatedView.bounds.midY)
+        
+        let finalRadius = sqrt((center.x*center.x) + (center.y*center.y))
+        
+        let radiusInset = finalRadius
+        
+        let outerRect = circleFrameCenter.insetBy(dx: -radiusInset, dy: -radiusInset)
+        
+        let toPath = UIBezierPath(ovalIn: outerRect).cgPath
+        
+        let fromPath = circlePathLayer.path
+        
+        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
+        
+        maskLayerAnimation.fromValue = unfold ? fromPath : toPath
+        maskLayerAnimation.toValue = !unfold ? fromPath : toPath
+        maskLayerAnimation.duration = duration
+        maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+        maskLayerAnimation.isRemovedOnCompletion = true
+        _completionBlocks.append(
+            {
+//                guard unfold else {
+//                    circlePathLayer.path = circlePathLayer.path
+//                    return
+//                }
+                animatedView.layer.mask = nil
+                if !unfold {
+                    animatedView.layer.opacity = 0
+                }
+            }
+        )
+        maskLayerAnimation.delegate = self
+        maskLayerAnimation.setValue(_completionBlocks, forKey: "maskCompletionBlocks")
+        circlePathLayer.add(maskLayerAnimation, forKey: "path")
+        if unfold {
+            circlePathLayer.path = toPath
+        } else {
+            circlePathLayer.path = fromPath
+        }
+    }
+    
     // MARK: - Overrriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        topicsCollectionView.backgroundColor = .clear
         let outerColor = UIColor.clear.cgColor
         let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
         featheredLayer.colors = [outerColor, innerColor,innerColor,outerColor]
@@ -136,29 +219,26 @@ extension TopicsView: TopicsControllerOutput {
     
     func onTopicMode(_ instance: Topic) {
         surveysCollectionView.topic = instance
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0.15) { [weak self] in
-            guard let self = self else { return }
-            self.topicsCollectionView.alpha = 0
-            self.surveysCollectionView.alpha = 1
-        }
+        surveysCollectionView.alpha = 1
+        surveysCollectionView.backgroundColor = background.backgroundColor
+        reveal(view: surveysCollectionView, duration: 0.3)
     }
     
     func onDefaultMode() {
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-            guard let self = self else { return }
-            self.topicsCollectionView.alpha = 1
-            self.surveysCollectionView.alpha = 0
-        }
+        surveysCollectionView.alpha = 1
+        topicsCollectionView.backgroundColor = background.backgroundColor
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0) {
+//            self.surveysCollectionView.alpha = 0
+//        }
+        reveal(unfold: false, view: surveysCollectionView, duration: 0.3)
     }
     
     func onSearchMode() {
         surveysCollectionView.category = .Search
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-            guard let self = self else { return }
-            self.topicsCollectionView.alpha = 0
-            self.surveysCollectionView.alpha = 1
-        }
-
+        surveysCollectionView.alpha = 1
+//        surveysCollectionView.layer.mask = nil
+        surveysCollectionView.backgroundColor = background.backgroundColor
+        reveal(view: surveysCollectionView, duration: 0.3)
     }
     
     func onSearchCompleted(_ instances: [SurveyReference]) {
@@ -177,11 +257,23 @@ extension TopicsView: CallbackObservable {
         } else if let instance = sender as? SurveyReference {
             viewInput?.onSurveyTapped(instance)
         }
-
     }
 }
 
-
+extension TopicsView: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
+            completionBlocks.forEach{ $0() }
+        } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
+            completionBlocks.forEach{ $0() }
+        } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
+            initialLayer.path = path as! CGPath
+            if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
+                completionBlock()
+            }
+        }
+    }
+}
 
 
 
@@ -429,7 +521,7 @@ extension TopicsView: CallbackObservable {
 //        }
 //
 //        list.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
 //            self.collectionView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
 //            self.collectionView.alpha = 0
 //            self.icon.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
@@ -445,7 +537,7 @@ extension TopicsView: CallbackObservable {
 //
 //    func onListToChildMode() {
 //        setChildText()
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
 //            self.collectionView.alpha = 1
 //            self.collectionView.transform = .identity
 //            self.icon.alpha = 1
@@ -462,7 +554,7 @@ extension TopicsView: CallbackObservable {
 //
 //    func onSearchToParentMode() {
 //        guard !list.isNil else { return }
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
 //            self.collectionView.alpha = 1
 //            self.collectionView.transform = .identity
 //            self.label.alpha = 1
@@ -485,7 +577,7 @@ extension TopicsView: CallbackObservable {
 //        }
 //
 //        list.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) {
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
 //            self.collectionView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
 //            self.collectionView.alpha = 0
 //            self.icon.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)

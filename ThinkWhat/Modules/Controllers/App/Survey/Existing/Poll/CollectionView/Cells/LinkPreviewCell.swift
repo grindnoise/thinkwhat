@@ -60,7 +60,7 @@ class LinkPreviewCell: UICollectionViewCell {
     private lazy var disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.text = "web_link".localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         instance.textColor = .secondaryLabel
         instance.addEquallyTo(to: shadowView)
 //                let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
@@ -102,7 +102,7 @@ class LinkPreviewCell: UICollectionViewCell {
         rootStack.distribution = .fillProportionally
         rootStack.spacing = 4
         
-        let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
+        let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
         constraint.identifier = "height"
         constraint.isActive = true
        
@@ -130,7 +130,7 @@ class LinkPreviewCell: UICollectionViewCell {
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
         observers.append(instance.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { view, change in
             guard let value = change.newValue else { return }
-            view.layer.shadowPath = UIBezierPath(roundedRect: value, cornerRadius: value.height*0.05).cgPath
+            view.layer.shadowPath = UIBezierPath(roundedRect: value, cornerRadius: value.width*0.05).cgPath
         })
         return instance
     }()
@@ -241,7 +241,7 @@ class LinkPreviewCell: UICollectionViewCell {
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                                 forTextStyle: .caption2)
+                                                 forTextStyle: .caption1)
         guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
         constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)

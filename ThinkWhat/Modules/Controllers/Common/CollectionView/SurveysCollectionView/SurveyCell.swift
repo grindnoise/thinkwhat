@@ -114,7 +114,7 @@ class SurveyCell: UICollectionViewListCell {
                 container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
                 
                 let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
                 instance.contentMode = .scaleAspectFit
                 instance.addEquallyTo(to: container)
                 marksStackView.addArrangedSubview(container)
@@ -179,7 +179,7 @@ class SurveyCell: UICollectionViewListCell {
         let instance = InsetLabel()
         instance.insets = UIEdgeInsets(top: 5, left: 0, bottom: 10, right: 0)
         instance.textAlignment = .left
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
         instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
         instance.textColor = .label
@@ -208,7 +208,7 @@ class SurveyCell: UICollectionViewListCell {
     }()
     private lazy var ratingLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
@@ -353,7 +353,7 @@ class SurveyCell: UICollectionViewListCell {
     }()
     @MainActor private lazy var viewsLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         return instance
@@ -484,7 +484,7 @@ class SurveyCell: UICollectionViewListCell {
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
-    private let padding: CGFloat = 10
+    private let padding: CGFloat = 20
     private var constraint: NSLayoutConstraint!
     ///Store tasks from NotificationCenter's AsyncStream
     private var notifications: [Task<Void, Never>?] = []
@@ -527,7 +527,7 @@ class SurveyCell: UICollectionViewListCell {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
+            horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
             horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 //            horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding/2),
@@ -609,7 +609,7 @@ class SurveyCell: UICollectionViewListCell {
                             container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
                             
                             let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
                             instance.contentMode = .scaleAspectFit
                             instance.addEquallyTo(to: container)
                             stackView.insertArrangedSubview(container,
@@ -786,7 +786,7 @@ class SurveyCell: UICollectionViewListCell {
                 //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
                 $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
             } else if identifier == "isFavorite" {
-                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
             } else if identifier == "isOwn" {
                 //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
                 $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
@@ -876,7 +876,7 @@ class SurveyCell: UICollectionViewListCell {
 //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
                     $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
                 } else if identifier == "isFavorite" {
-                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
                 } else if identifier == "isOwn" {
                     //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
                     $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
@@ -890,17 +890,17 @@ class SurveyCell: UICollectionViewListCell {
         titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                             forTextStyle: .title1)
         ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption1)
+                                            forTextStyle: .caption2)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption1)
-        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                            forTextStyle: .subheadline)
+                                            forTextStyle: .caption2)
+        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .body)
         topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
                                             forTextStyle: .footnote)
-        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                                forTextStyle: .caption2)
-        lastnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                               forTextStyle: .caption2)
+//        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+//                                                forTextStyle: .caption2)
+//        lastnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+//                                               forTextStyle: .caption2)
         dateLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                                forTextStyle: .caption2)
         
@@ -920,6 +920,7 @@ class SurveyCell: UICollectionViewListCell {
         constraint_4.constant = item.topic.title.height(withConstrainedWidth: ratingLabel.bounds.width,
                                                                        font: ratingLabel.font)
         layoutIfNeeded()
+        topicLabel.frame.origin = .zero
     }
 }
 

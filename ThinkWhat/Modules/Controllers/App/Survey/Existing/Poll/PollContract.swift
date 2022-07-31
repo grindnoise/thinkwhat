@@ -44,7 +44,7 @@ protocol PollControllerInput: AnyObject {
     func claim(_: Claim)
     func vote(_: Answer)
     func addView()
-    func updateSurveyStats(_: [SurveyReference])
+    func updateResultsStats(_: SurveyReference)
 }
 
 /// *Model* returns the result to the *Controller*

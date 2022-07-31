@@ -54,7 +54,7 @@ class ImageCell: UICollectionViewCell {
     private lazy var disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         instance.text = "images".localized.uppercased()
         return instance
     }()
@@ -113,7 +113,7 @@ class ImageCell: UICollectionViewCell {
     private lazy var horizontalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         instance.alignment = .center
-        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
+        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
         constraint.identifier = "height"
         constraint.isActive = true
         instance.spacing = 4

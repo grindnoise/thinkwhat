@@ -53,7 +53,7 @@ class PollTitleCell: UICollectionViewCell {
     }()
     private lazy var ratingLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
@@ -77,7 +77,7 @@ class PollTitleCell: UICollectionViewCell {
     }()
     @MainActor private lazy var viewsLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         return instance
@@ -302,9 +302,9 @@ class PollTitleCell: UICollectionViewCell {
         titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
                                             forTextStyle: .largeTitle)
         ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption1)
+                                            forTextStyle: .caption2)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption1)
+                                            forTextStyle: .caption2)
         guard let constraint_1 = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
               let constraint_2 = bottomView.getAllConstraints().filter({$0.identifier == "height"}).first,
               let item = item else { return }

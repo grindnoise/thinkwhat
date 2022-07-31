@@ -182,21 +182,8 @@ class NewAvatar: UIView {
     // MARK: - Public properties
     public var userprofile: Userprofile! {
         didSet {
-            guard let userprofile = userprofile else { return }
-            guard let image = userprofile.image else {
-                Task {
-                    let image = try await userprofile.downloadImageAsync()
-                    await MainActor.run {
-                        imageView.contentMode = .scaleAspectFit
-                    }
-                    Animations.changeImageCrossDissolve(imageView: imageView, image: image)
-                }
-                return
-            }
-//            imageView.contentMode = .scaleAspectFit
-            Task { @MainActor in imageView.image = image }
-            
-//            Animations.changeImageCrossDissolve(imageView: imageView, image: image)
+            guard !userprofile.isNil else { return }
+            setImage()
         }
     }
     public var isShadowed: Bool {
@@ -271,12 +258,14 @@ class NewAvatar: UIView {
 
     // MARK: - Initialization
     init(userprofile: Userprofile? = nil, isShadowed: Bool = false) {
-        self.userprofile = userprofile
         self.isShadowed = isShadowed
         super.init(frame: .zero)
+        self.userprofile = userprofile
         
         setObservers()
         setupUI()
+        guard !userprofile.isNil else { return }
+        setImage()
     }
     
     required init?(coder: NSCoder) {
@@ -312,6 +301,20 @@ class NewAvatar: UIView {
                 Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
             }
         })
+    }
+    
+    private func setImage() {
+        guard let image = userprofile.image else {
+            Task {
+                let image = try await userprofile.downloadImageAsync()
+                await MainActor.run {
+                    imageView.contentMode = .scaleAspectFit
+                }
+                Animations.changeImageCrossDissolve(imageView: imageView, image: image)
+            }
+            return
+        }
+        Task { @MainActor in imageView.image = image }
     }
     
     // MARK: - Public methods

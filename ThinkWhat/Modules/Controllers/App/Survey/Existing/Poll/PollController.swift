@@ -158,7 +158,7 @@ class PollController: UIViewController {
         stackView.addArrangedSubview(titleContainer)
         
         let label = InsetLabel()
-        label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .label : surveyReference.topic.tagColor
+        label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
         label.textColor = .white
         label.text = surveyReference.topic.title.uppercased()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -217,7 +217,7 @@ class PollController: UIViewController {
             let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill",
                                                       withConfiguration: UIImage.SymbolConfiguration(pointSize: marksStackView.frame.height, weight: .semibold, scale: .medium)))
             instance.contentMode = .center
-            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : surveyReference.topic.tagColor
+            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
             instance.contentMode = .scaleAspectFit
             instance.addEquallyTo(to: container)
             marksStackView.addArrangedSubview(container)
@@ -229,7 +229,7 @@ class PollController: UIViewController {
             container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
             
             let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
             instance.contentMode = .scaleAspectFit
             instance.addEquallyTo(to: container)
             marksStackView.addArrangedSubview(container)
@@ -265,6 +265,19 @@ class PollController: UIViewController {
     }
     
     private func setObservers() {
+        
+        func setUpdater() {
+            //Set timer to request stats updates
+            //Update survey stats every n seconds
+            let events = EventEmitter().emit(every: 5)
+            notifications.append(Task { [weak self] in
+                for await _ in events {
+                    guard let self = self else { return }
+
+                    self.controllerInput?.updateResultsStats(self._surveyReference)
+                }
+            })
+        }
         
         guard let navBar = navigationController?.navigationBar else { return }
         observers.append(navBar.observe(\UINavigationBar.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
@@ -316,7 +329,7 @@ class PollController: UIViewController {
                         container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
                         
                         let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
                         instance.contentMode = .scaleAspectFit
                         instance.addEquallyTo(to: container)
                         marksStackView.insertArrangedSubview(container,
@@ -341,6 +354,8 @@ class PollController: UIViewController {
                     
                     switch instance.isComplete {
                     case true:
+                        setUpdater()
+                        
                         guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
                               marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty
                         else { return }
@@ -352,7 +367,7 @@ class PollController: UIViewController {
                         
                         let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
                         instance.contentMode = .center
-                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .white : self._surveyReference.topic.tagColor
+                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
                         instance.contentMode = .scaleAspectFit
                         instance.addEquallyTo(to: container)
                         
@@ -432,15 +447,8 @@ class PollController: UIViewController {
             }
         })
 
-        //Set timer to request stats updates
-        //Update survey stats every n seconds
-        let events = EventEmitter().emit(every: 5)
-        notifications.append(Task { [weak self] in
-            for await _ in events {
-                guard let self = self  else { return }
-                self.controllerInput?.updateSurveyStats([self._surveyReference])
-            }
-        })
+        guard surveyReference.isComplete else { return }
+        setUpdater()
     }
     
     private func performChecks() {
@@ -599,6 +607,19 @@ class PollController: UIViewController {
         if let label = stackView.getSubview(type: InsetLabel.self, identifier: "label") {
             label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
         }
+        
+        if let isComplete = stackView.getSubview(type: UIView.self, identifier: "isComplete"), let imageView = isComplete.getSubview(type: UIImageView.self, identifier: nil) {
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        }
+        
+        if let isOwn = stackView.getSubview(type: UIView.self, identifier: "isOwn"), let imageView = isOwn.getSubview(type: UIImageView.self, identifier: nil) {
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        }
+        
+        if let isFavorite = stackView.getSubview(type: UIView.self, identifier: "isFavorite"), let imageView = isFavorite.getSubview(type: UIImageView.self, identifier: nil) {
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        }
+
         
         if let icon = navigationItem.titleView as? Icon {
             icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)

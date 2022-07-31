@@ -70,7 +70,7 @@ extension VotersView: VotersControllerOutput {
         case .success(let instances):
             instances.enumerated().forEach { (index, instance) in
                 ///Add voter for an answer
-                self.answer.addVoter(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
+                self.answer.voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
                 self.collectionView.insertItems(at: [IndexPath(row: self.answer.voters.count - 1, section: 0)])
             }
         case .failure:

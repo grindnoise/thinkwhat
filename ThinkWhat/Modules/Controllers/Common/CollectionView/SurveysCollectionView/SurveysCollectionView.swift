@@ -24,7 +24,7 @@ class SurveysCollectionView: UICollectionView {
     public var category: Survey.SurveyCategory {
         didSet {
 //            guard oldValue != category else { return }
-            setDataSource()
+            setDataSource(animatingDifferences: (category == .Topic || category == .Search) ? false : true)
             guard !dataItems.isEmpty else { return }
             scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         }
@@ -125,7 +125,7 @@ class SurveysCollectionView: UICollectionView {
 //            }
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 0, trailing: sectionLayout.contentInsets.trailing)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
             
             return sectionLayout
         }
@@ -444,10 +444,10 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         source.apply(snapshot, animatingDifferences: true)
     }
     
-    private func setDataSource() {
+    private func setDataSource(animatingDifferences: Bool = true) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
         snapshot.appendSections([.main])
         snapshot.appendItems(dataItems, toSection: .main)
-        source.apply(snapshot, animatingDifferences: true)
+        source.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 }

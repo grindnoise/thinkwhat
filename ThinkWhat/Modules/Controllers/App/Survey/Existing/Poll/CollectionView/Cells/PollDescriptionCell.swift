@@ -53,18 +53,18 @@ class PollDescriptionCell: UICollectionViewCell {
     private lazy var disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         instance.text = "details".localized.uppercased()
         return instance
     }()
     private lazy var textView: UITextView = {
         let instance = UITextView()
         instance.contentInset = UIEdgeInsets(top: 0,
-                                             left: instance.contentInset.left,
+                                             left: 0,//,instance.contentInset.left,
                                              bottom: 0,
-                                             right: instance.contentInset.right)
+                                             right: 0)//instance.contentInset.right)
         instance.isUserInteractionEnabled = false
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
         instance.backgroundColor = .clear
         instance.isEditable = false
         instance.isSelectable = false
@@ -113,7 +113,7 @@ class PollDescriptionCell: UICollectionViewCell {
     // Stacks
     private lazy var horizontalStack: UIStackView = {
         let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
-        let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
+        let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
         constraint.identifier = "height"
         constraint.isActive = true
         rootStack.alignment = .center
@@ -256,10 +256,10 @@ class PollDescriptionCell: UICollectionViewCell {
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                           forTextStyle: .body)
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                                 forTextStyle: .caption2)
+                                                 forTextStyle: .caption1)
         guard let constraint_1 = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
               let constraint_2 = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()

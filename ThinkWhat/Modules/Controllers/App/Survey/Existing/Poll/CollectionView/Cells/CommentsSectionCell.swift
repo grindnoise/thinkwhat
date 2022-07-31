@@ -48,7 +48,7 @@ class CommentsSectionCell: UICollectionViewCell {
     private let disclosureLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         instance.text = "comments".localized.uppercased()
         return instance
     }()
@@ -104,7 +104,7 @@ class CommentsSectionCell: UICollectionViewCell {
     // Stacks
     private lazy var horizontalStack: UIStackView = {
         let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
-        let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)!))
+        let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
         constraint.identifier = "height"
         constraint.isActive = true
         rootStack.alignment = .center
@@ -208,7 +208,7 @@ class CommentsSectionCell: UICollectionViewCell {
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                                 forTextStyle: .caption2)
+                                                 forTextStyle: .caption1)
         guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
         setNeedsLayout()
         constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)

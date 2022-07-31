@@ -15,10 +15,25 @@ class Answer: Decodable {
     }
     var id: Int
     var description: String
-    var totalVotes: Int = 0
+    var totalVotes: Int = 0 {
+        didSet {
+            guard oldValue != totalVotes else { return }
+            NotificationCenter.default.post(name: Notifications.SurveyAnswers.TotalVotes, object: self)
+        }
+    }
     var title: String
     var order: Int
-    var voters: [Userprofile] = []
+    var voters: [Userprofile] = [] {
+        didSet {
+            //Check for duplicates
+            guard let lastInstance = voters.last else { return }
+            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
+                voters.remove(object: lastInstance)
+            } else {
+                NotificationCenter.default.post(name: Notifications.SurveyAnswers.VotersAppend, object: self)
+            }
+        }
+    }
     var surveyID : Int
     var survey: Survey? {
         return Surveys.shared.all.filter({ $0.id == surveyID }).first
@@ -49,9 +64,9 @@ class Answer: Decodable {
             order       = try container.decode(Int.self, forKey: .order)
             let instances = try container.decode([Userprofile].self, forKey: .voters)
             instances.forEach { instance in
-                if voters.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+//                if voters.filter({ $0 == instance }).isEmpty {
                     voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
-                }
+//                }
             }
             url         = URL(string:try container.decode(String.self, forKey: .title))
             imageURL    = URL(string: try container.decodeIfPresent(String.self, forKey: .image) ?? "")
@@ -89,12 +104,6 @@ class Answer: Decodable {
             fileURL     = URL(string: json[CodingKeys.file.rawValue].stringValue) ?? fileURL
         } catch {
             fatalError(error.localizedDescription)
-        }
-    }
-    
-    func addVoter(_ userprofile: Userprofile) {
-        if voters.filter({ $0.hashValue == userprofile.hashValue }).isEmpty {
-            voters.append(userprofile)
         }
     }
 }

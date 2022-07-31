@@ -556,15 +556,46 @@ class Surveys {
     }
     
     func updateResultsStats(_ json: JSON) {
-        for i in json {
-            let instance: SurveyReference? = SurveyReferences.shared.all.filter({ $0.id == Int(i.0) }).first ?? Surveys.shared.all.filter({ $0.reference.id == Int(i.0)}).first?.reference
-            guard let instance = instance,
-                  let progress = i.1["progress"].int,
-            let rating = i.1["rating"].double,
-                let views = i.1["views"].int else { return }
-            instance.progress = progress
-            instance.rating = rating
-            instance.views = views
+        guard let id = json["id"].int,
+              let survey = Surveys.shared.all.filter({ $0.id == id }).first,
+              let progress = json["progress"].int,
+              let votesTotal = json["votes_total"].int,
+              let rating = json["rating"].double,
+              let answers = json["answers"].array
+        else { return }
+        
+        survey.rating = rating
+        survey.progress = progress
+        survey.votesTotal = votesTotal
+        
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategyFormatters = [
+            DateFormatter.ddMMyyyy,
+            DateFormatter.dateTimeFormatter,
+            DateFormatter.dateFormatter
+        ]
+        
+        for answer in answers {
+            guard let id = answer["id"].int,
+                  let instance = survey.answers.filter({ $0.id == id }).first,
+                  let totalVotes = answer["votes_total"].int
+            else { return }
+            
+                do {
+                    let data = try answer["last_voters"].rawData()
+                    let userprofiles = try decoder.decode([Userprofile].self, from: data)
+                    userprofiles.forEach { userprofile in
+#if DEBUG
+                        print(userprofile)
+#endif
+                        instance.voters.append(Userprofiles.shared.all.filter({ $0 == userprofile }).first ?? userprofile)
+                    }
+                } catch {
+#if DEBUG
+                    error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                }
+            instance.totalVotes = totalVotes
         }
     }
     

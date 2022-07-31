@@ -16,7 +16,15 @@ class Userprofiles {
     private init() {
         shouldImportUserDefaults = true
     }
-    var all: [Userprofile] = []
+    var all: [Userprofile] = [] {
+        didSet {
+            //Check for duplicates
+            guard let lastInstance = all.last else { return }
+            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
+                all.remove(object: lastInstance)
+            }
+        }
+    }
     var subscribedFor: [Userprofile] = [] {
         didSet {
             Notification.send(names: [Notifications.Userprofiles.SubscribedForUpdated])
@@ -299,7 +307,8 @@ class Userprofile: Decodable {
             }
         } catch {
 #if DEBUG
-            print(error.localizedDescription)
+            error.printLocalized(class: type(of: self), functionName: #function)
+            fatalError()
 #endif
             throw error
         }

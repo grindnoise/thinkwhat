@@ -1254,7 +1254,7 @@ class API {
             }
         }
         
-        public func updateResultsStats(_ instance: Survey) async throws {
+        public func updateResultStats(_ instance: SurveyReference) async throws {
             guard let url = API_URLS.Surveys.updateResults else { throw APIError.invalidURL }
             
             let parameters: Parameters = ["id": instance.id]
