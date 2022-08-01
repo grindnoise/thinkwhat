@@ -136,7 +136,7 @@ class PollTitleCell: UICollectionViewCell {
         return verticalStack
     }()
     private var observers: [NSKeyValueObservation] = []
-    private let padding: CGFloat = 40
+    private let padding: CGFloat = 20
     private var constraint: NSLayoutConstraint!
     ///Store tasks from NotificationCenter's AsyncStream
     private var notifications: [Task<Void, Never>?] = []
@@ -213,7 +213,7 @@ class PollTitleCell: UICollectionViewCell {
         ])
         
 //        constraint = bottomView_2.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         constraint.priority = .defaultLow
         constraint.isActive = true
         

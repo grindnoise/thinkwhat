@@ -71,6 +71,7 @@ class ChoiceCollectionView: UICollectionView {
             
             let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
             sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 0, trailing: sectionLayout.contentInsets.trailing)
+            sectionLayout.interGroupSpacing = 10
             return sectionLayout
         }
         

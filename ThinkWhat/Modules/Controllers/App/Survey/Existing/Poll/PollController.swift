@@ -617,7 +617,7 @@ class PollController: UIViewController {
         }
         
         if let isFavorite = stackView.getSubview(type: UIView.self, identifier: "isFavorite"), let imageView = isFavorite.getSubview(type: UIImageView.self, identifier: nil) {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
         }
 
         

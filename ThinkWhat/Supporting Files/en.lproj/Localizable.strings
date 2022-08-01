@@ -267,3 +267,5 @@
 "don't_watch" = "Don't watch";
 "vote_to_view_comments" = "To see comments and comment first vote";
 "added_to_watch_list" = "Poll was added to watch list";
+"votes_total" = "Votes";
+"voters" = "Voters";

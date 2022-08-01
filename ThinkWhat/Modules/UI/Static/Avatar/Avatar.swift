@@ -191,6 +191,12 @@ class NewAvatar: UIView {
             shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
         }
     }
+    public var isBordered: Bool
+    public var borderColor: UIColor {
+        didSet {
+            coloredBackground.backgroundColor = borderColor
+        }
+    }
     public var shadowColor: UIColor = .clear {
         didSet {
             shadowView.layer.shadowColor = shadowColor.withAlphaComponent(0.4).cgColor
@@ -214,7 +220,49 @@ class NewAvatar: UIView {
             guard let newValue = change.newValue else { return }
             view.layer.shadowPath = UIBezierPath(ovalIn: newValue).cgPath
         })
-        imageView.addEquallyTo(to: instance)
+        background.addEquallyTo(to: instance)
+        return instance
+    }()
+    public lazy var background: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "bg"
+        instance.clipsToBounds = true
+        instance.backgroundColor = .systemBackground
+        
+        coloredBackground.addEquallyTo(to: instance)
+        
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let value = change.newValue else { return }
+            view.cornerRadius = value.width/2
+        })
+        
+        return instance
+    }()
+    public lazy var coloredBackground: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "bg"
+        instance.clipsToBounds = true
+        instance.backgroundColor = borderColor
+        
+        if isBordered {
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            instance.addSubview(imageView)
+            
+            NSLayoutConstraint.activate([
+                imageView.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+                imageView.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+                imageView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.85),
+                imageView.heightAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.85),
+            ])
+        } else {
+            imageView.addEquallyTo(to: instance)
+        }
+        
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let value = change.newValue else { return }
+            view.cornerRadius = value.width/2
+        })
+        
         return instance
     }()
     private lazy var imageView: UIImageView = {
@@ -231,6 +279,7 @@ class NewAvatar: UIView {
             instance.tintColor = .white
             instance.contentMode = .center
         }
+        
         observers.append(instance.observe(\UIImageView.bounds, options: .new) { [weak self] view, change in
             guard let self = self,
                   let newValue = change.newValue
@@ -257,11 +306,14 @@ class NewAvatar: UIView {
     }
 
     // MARK: - Initialization
-    init(userprofile: Userprofile? = nil, isShadowed: Bool = false) {
+    init(userprofile: Userprofile? = nil, isShadowed: Bool = false, isBordered: Bool = false, borderColor: UIColor = .clear) {
         self.isShadowed = isShadowed
-        super.init(frame: .zero)
+        self.isBordered = isBordered
+        self.borderColor = borderColor
         self.userprofile = userprofile
         
+        super.init(frame: .zero)
+
         setObservers()
         setupUI()
         guard !userprofile.isNil else { return }
