@@ -180,6 +180,7 @@ class Survey: Decodable {
     var watchers:               Int = 0
     var result:                 [Int: Date]? {
         didSet {
+            print("")
 //            if let _result = result, let _oldValue = oldValue, _oldValue.isEmpty, !_result.isEmpty, let surveyRef = SurveyReferences.shared.all.filter({ $0.hashValue == self.hashValue }).first {
 //                surveyRef.isComplete = true
 //            }

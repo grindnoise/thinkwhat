@@ -264,20 +264,22 @@ class PollController: UIViewController {
 //        navigationBar.layoutIfNeeded()
     }
     
+    private func setUpdater() {
+        //Set timer to request stats updates
+        //Update survey stats every n seconds
+        let events = EventEmitter().emit(every: 5)
+        notifications.append(Task { [weak self] in
+            for await _ in events {
+                guard let self = self else { return }
+
+                self.controllerInput?.updateResultsStats(self._surveyReference)
+            }
+        })
+    }
+    
     private func setObservers() {
         
-        func setUpdater() {
-            //Set timer to request stats updates
-            //Update survey stats every n seconds
-            let events = EventEmitter().emit(every: 5)
-            notifications.append(Task { [weak self] in
-                for await _ in events {
-                    guard let self = self else { return }
-
-                    self.controllerInput?.updateResultsStats(self._surveyReference)
-                }
-            })
-        }
+        
         
         guard let navBar = navigationController?.navigationBar else { return }
         observers.append(navBar.observe(\UINavigationBar.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
@@ -313,21 +315,21 @@ class PollController: UIViewController {
                       let instance = notification.object as? SurveyReference,
                       self._surveyReference == instance
                 else { return }
-                
+
                 await MainActor.run {
                     self.setBarButtonItem()
-                    
+
                     switch instance.isFavorite {
                     case true:
                         guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
                               marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isFavorite"}).isEmpty
                         else { return }
-                        
+
                         let container = UIView()
                         container.backgroundColor = .clear
                         container.accessibilityIdentifier = "isFavorite"
                         container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                        
+
                         let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
                         instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
                         instance.contentMode = .scaleAspectFit
@@ -343,7 +345,7 @@ class PollController: UIViewController {
                 }
             }
         })
-        
+
         notifications.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
                 await MainActor.run {
@@ -351,28 +353,28 @@ class PollController: UIViewController {
                           let instance = notification.object as? SurveyReference,
                           self._surveyReference == instance
                     else { return }
-                    
+
                     switch instance.isComplete {
                     case true:
-                        setUpdater()
-                        
+                        self.setUpdater()
+
                         guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
                               marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty
                         else { return }
-                        
+
                         let container = UIView()
                         container.backgroundColor = .clear
                         container.accessibilityIdentifier = "isComplete"
                         container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                        
+
                         let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
                         instance.contentMode = .center
                         instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
                         instance.contentMode = .scaleAspectFit
                         instance.addEquallyTo(to: container)
-                        
+
                         marksStackView.insertArrangedSubview(container, at: 0)
-                        
+
                         self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
                             guard let newValue = change.newValue else { return }
                             view.cornerRadius = newValue.size.height/2
@@ -389,7 +391,7 @@ class PollController: UIViewController {
                 }
             }
         })
-        
+
         notifications.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
                 await MainActor.run {
@@ -397,26 +399,26 @@ class PollController: UIViewController {
                           let instance = notification.object as? SurveyReference,
                           self._surveyReference == instance
                     else { return }
-                    
+
                     switch instance.isHot {
                     case true:
                         guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
                               marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isHot"}).isEmpty
                         else { return }
-                        
+
                         let container = UIView()
                         container.backgroundColor = .clear
                         container.accessibilityIdentifier = "isHot"
                         container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                        
+
                         let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
                         instance.contentMode = .center
                         instance.tintColor = .systemRed
                         instance.contentMode = .scaleAspectFit
                         instance.addEquallyTo(to: container)
-                        
+
                         marksStackView.insertArrangedSubview(container, at: marksStackView.arrangedSubviews.count == 0 ? 0 : marksStackView.arrangedSubviews.count)
-                        
+
                         self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
                             guard let newValue = change.newValue else { return }
                             view.cornerRadius = newValue.size.height/2
@@ -433,7 +435,7 @@ class PollController: UIViewController {
                 }
             }
         })
-        
+
         //Observe progress
         notifications.append(Task { @MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {

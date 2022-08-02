@@ -2027,8 +2027,8 @@
             filePath = "ThinkWhat/Modules/Models/Survey.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "347"
-            endingLineNumber = "347"
+            startingLineNumber = "348"
+            endingLineNumber = "348"
             landmarkName = "init(from:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2059,8 +2059,8 @@
             filePath = "ThinkWhat/Modules/Models/Survey.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "234"
-            endingLineNumber = "234"
+            startingLineNumber = "235"
+            endingLineNumber = "235"
             landmarkName = "isComplete"
             landmarkType = "24">
          </BreakpointContent>
@@ -2075,8 +2075,8 @@
             filePath = "ThinkWhat/Modules/Models/Survey.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "252"
-            endingLineNumber = "252"
+            startingLineNumber = "253"
+            endingLineNumber = "253"
             landmarkName = "reference"
             landmarkType = "24">
          </BreakpointContent>
@@ -2091,8 +2091,8 @@
             filePath = "ThinkWhat/Modules/Models/Survey.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "372"
-            endingLineNumber = "372"
+            startingLineNumber = "373"
+            endingLineNumber = "373"
             landmarkName = "Survey"
             landmarkType = "3">
          </BreakpointContent>
@@ -2142,6 +2142,38 @@
             startingLineNumber = "149"
             endingLineNumber = "149"
             landmarkName = "setObservers()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F4ECF2BD-2D1D-41B0-983C-B9B363C0059F"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/Cells/ChoiceCollectionView/ChoiceCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "905"
+            endingLineNumber = "905"
+            landmarkName = "traitCollectionDidChange(_:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6FB1E1E7-4FE1-4568-847B-F88CE3C68739"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Survey/Existing/Poll/CollectionView/PollCollectionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "325"
+            endingLineNumber = "325"
+            landmarkName = "collectionView(_:shouldSelectItemAt:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

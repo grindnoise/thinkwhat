@@ -46,22 +46,18 @@ class PollCollectionView: UICollectionView {
     private var answer: Answer? {
         didSet {
             guard host.mode == .Write else { return }
-            guard oldValue.isNil else {
-                if let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-1)) as? VoteCell {
-                    cell.answer = answer!
-                }
-                return
+            if oldValue.isNil {
+                var snapshot = source.snapshot()
+                snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .comments))
+                snapshot.deleteSections([.comments])
+                snapshot.appendSections([.vote])
+                snapshot.appendItems([7], toSection: .vote)
+                snapshot.appendSections([.comments])
+                snapshot.appendItems([8], toSection: .comments)
+                source.apply(snapshot, animatingDifferences: true) //{
+                //                self.scrollToItem(at: IndexPath(item: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
+                //            }
             }
-            var snapshot = source.snapshot()
-            snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .comments))
-            snapshot.deleteSections([.comments])
-            snapshot.appendSections([.vote])
-            snapshot.appendItems([7], toSection: .vote)
-            snapshot.appendSections([.comments])
-            snapshot.appendItems([8], toSection: .comments)
-            source.apply(snapshot, animatingDifferences: true) //{
-//                self.scrollToItem(at: IndexPath(item: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
-//            }
             if let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-2)) as? VoteCell {
                 cell.answer = answer!
             }
@@ -278,26 +274,31 @@ class PollCollectionView: UICollectionView {
     public func onVoteCallback(_ result: Result<Bool, Error>){
         switch result {
         case .success:
+            guard let cell = visibleCells.filter({ $0.isKind(of: QuestionCell.self) }).first as? QuestionCell,
+                  let mode = host?.mode else { return }
+            cell.mode = mode
             //Remove .vote section
 //            guard let _ = visibleCells.filter({ $0.isKind(of: VoteCell.self) }).first as? VoteCell else { return }
             var snapshot = source.snapshot()
             snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .vote))
             snapshot.deleteSections([.vote])
             source.apply(snapshot, animatingDifferences: true)
+//            guard let cell = visibleCells.filter({ $0.isKind(of: QuestionCell.self) }).first as? QuestionCell,
+//                  let mode = host?.mode else { return }
+//            cell.mode = mode
+            source.refresh()
 //            scrollToItem(at: IndexPath(item: 0, section: numberOfSections-1), at: .bottom, animated: true)
             //Chmod visible .choices cells & reorder desc
-            guard let cell = visibleCells.filter({ $0.isKind(of: QuestionCell.self) }).first as? QuestionCell,
-                  let mode = host?.mode else { return }
-            cell.mode = mode
+           
             guard let details = poll.resultDetails else { return }
             if details.isPopular {
-                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: host, heightScaleFactor: 0.5)
-                banner.accessibilityIdentifier = "vote"
-                let imageView = ImageSigns.flameFilled
-                imageView.contentMode = .scaleAspectFit
-                delayAsync(delay: 1.5) { [self] in
-                    banner.present(content: VoteMessage(imageContent: imageView, points: self.poll.resultDetails?.points ?? 0, color: self.poll.topic.tagColor, callbackDelegate: banner))
-                }
+//                let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: host, heightScaleFactor: 0.5)
+//                banner.accessibilityIdentifier = "vote"
+//                let imageView = ImageSigns.flameFilled
+//                imageView.contentMode = .scaleAspectFit
+//                delayAsync(delay: 1.5) { [self] in
+//                    banner.present(content: VoteMessage(imageContent: imageView, points: self.poll.resultDetails?.points ?? 0, color: self.poll.topic.tagColor, callbackDelegate: banner))
+//                }
             } else {
                 
             }

@@ -31,6 +31,7 @@ extension PollModel: PollControllerInput {
     }
     
     func vote(_ answer: Answer) {
+        print(answer.description)
         guard !survey.isNil else { modelOutput?.onVoteCallback(.failure(APIError.badData)); return }
         Task {
             struct Failure {
@@ -94,6 +95,7 @@ extension PollModel: PollControllerInput {
                     }
                 }
                 survey?.resultDetails = resultDetails
+                survey?.isComplete = true
                 await MainActor.run {
                     modelOutput?.onVoteCallback(.success(true))
                 }

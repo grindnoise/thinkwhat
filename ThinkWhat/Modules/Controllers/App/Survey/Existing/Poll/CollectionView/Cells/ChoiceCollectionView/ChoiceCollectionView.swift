@@ -18,7 +18,7 @@ class ChoiceCollectionView: UICollectionView {
     // MARK: - Public properties
     public var dataItems: [Answer] {
         didSet {
-            reload(sorted: mode == .ReadOnly, animatingDifferences: false, shouldChangeColor: mode == .ReadOnly)
+            reload(sorted: false, animatingDifferences: false, shouldChangeColor: mode == .ReadOnly)
 //            reload(sorted: mode == .ReadOnly, animatingDifferences: true, shouldChangeColor: mode == .ReadOnly)
         }
     }
@@ -27,12 +27,25 @@ class ChoiceCollectionView: UICollectionView {
     // MARK: - Private properties
     public var mode: PollController.Mode = .Write {
         didSet {
+                            visibleCells.enumerated().forEach {
+                                guard let cell = $1 as? ChoiceCell else { return }
+                                cell.color = Colors.tags()[$0]
+                                cell.mode = mode
+                            }
             if oldValue != mode, mode == .ReadOnly {
-                reload(animatingDifferences: false, shouldChangeColor: true)
-            }
-            visibleCells.forEach {
-                guard let cell = $0 as? ChoiceCell else { return }
-                cell.mode = mode
+//                reload(animatingDifferences: true, shouldChangeColor: true)
+//                visibleCells.enumerated().forEach {
+//                    guard let cell = $1 as? ChoiceCell else { return }
+//                    cell.color = Colors.tags()[$0]
+//                    cell.mode = mode
+//                }
+//                var snapshot = NSDiffableDataSourceSnapshot<Section, Answer>()
+//                snapshot.appendSections([.main,])
+//                snapshot.appendItems(dataItems, toSection: .main)
+//                source.apply(snapshot, animatingDifferences: true)
+//                var snap = source.snapshot()
+//                snap.reloadSections([.main])
+                source.refresh()
             }
         }
     }
@@ -63,6 +76,7 @@ class ChoiceCollectionView: UICollectionView {
     // MARK: - Private methods
     private func setupUI() {
         delegate = self
+        allowsMultipleSelection = true
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
 //            configuration.headerMode = .firstItemInSection
@@ -78,13 +92,13 @@ class ChoiceCollectionView: UICollectionView {
         let cellRegistration = UICollectionView.CellRegistration<ChoiceCell, Answer> { [weak self] cell, indexPath, item in
             guard let self = self else { return }
             cell.callbackDelegate = self
-            if cell.item.isNil {
+//            if cell.item.isNil {
                 var configuration = UIBackgroundConfiguration.listPlainCell()
                 configuration.backgroundColor = .clear
                 cell.backgroundConfiguration = configuration
                 cell.item = item
                 cell.automaticallyUpdatesBackgroundConfiguration = false
-            }
+//            }
             cell.mode = self.mode
             guard self.shouldChangeColor else { return }
             cell.color = Colors.tags()[indexPath.row]
@@ -124,6 +138,7 @@ class ChoiceCollectionView: UICollectionView {
         snapshot.appendSections([.main,])
         snapshot.appendItems(sorted ? dataItems.sorted{ $0.totalVotes > $1.totalVotes } : dataItems, toSection: .main)
         source.apply(snapshot, animatingDifferences: animatingDifferences)
+//        if animatingDifferences { source.refresh() }
     }
 }
 
@@ -131,13 +146,31 @@ class ChoiceCollectionView: UICollectionView {
 extension ChoiceCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.cellForItem(at: indexPath) as? ChoiceCell else { return }
+        
         answerListener?.onChoiceMade(cell.item)
     }
     
-//    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-//        guard mode == .Write else { return false }
-//        return true
-//    }
+    func collectionView(_ collectionView: UICollectionView,
+                        shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        if let _ = cellForItem(at: indexPath) as? ChoiceCell {
+            if mode == .ReadOnly {
+                selectItem(at: indexPath, animated: true, scrollPosition: [])
+                source.refresh()
+            }
+        }
+        return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        source.refresh()
+        return false
+    }
+    
+    //    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+    //        guard mode == .Write else { return false }
+    //        return true
+    //    }
 }
 
 // MARK: - CallbackObservable

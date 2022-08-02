@@ -56,7 +56,7 @@ class City: Decodable {
                 Cities.shared.all.append(self)
             }
         } catch {
-            print(error)
+//            print(error)
             throw error
         }
     }
