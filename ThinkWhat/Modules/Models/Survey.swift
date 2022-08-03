@@ -180,7 +180,7 @@ class Survey: Decodable {
     var watchers:               Int = 0
     var result:                 [Int: Date]? {
         didSet {
-            print("")
+//            print("")
 //            if let _result = result, let _oldValue = oldValue, _oldValue.isEmpty, !_result.isEmpty, let surveyRef = SurveyReferences.shared.all.filter({ $0.hashValue == self.hashValue }).first {
 //                surveyRef.isComplete = true
 //            }
@@ -586,9 +586,6 @@ class Surveys {
                     let data = try answer["last_voters"].rawData()
                     let userprofiles = try decoder.decode([Userprofile].self, from: data)
                     userprofiles.forEach { userprofile in
-#if DEBUG
-                        print(userprofile)
-#endif
                         instance.voters.append(Userprofiles.shared.all.filter({ $0 == userprofile }).first ?? userprofile)
                     }
                 } catch {

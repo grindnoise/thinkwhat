@@ -635,6 +635,9 @@ class SurveyCell: UICollectionViewListCell {
 //                        self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? self.item.topic.tagColor : .systemGray
                         switch item.isComplete {
                         case true:
+                            self.titleLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+                            self.descriptionLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+
 //                            self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemGray : item.isComplete ? .systemGreen : .systemGray
                             var stackView: UIStackView!
                             if let _stackView = self.topicStackView.getSubview(type: UIStackView.self, identifier: "marksStackView") {

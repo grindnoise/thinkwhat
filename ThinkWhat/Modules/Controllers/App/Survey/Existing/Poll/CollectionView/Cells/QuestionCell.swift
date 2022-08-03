@@ -22,8 +22,8 @@ class QuestionCell: UICollectionViewCell {
             let constraint_1 = textView.heightAnchor.constraint(equalToConstant: max(item.question.height(withConstrainedWidth: textView.bounds.width, font: textView.font!), 400))
             constraint_1.identifier = "height"
             constraint_1.isActive = true
-            let constraint_2 = collectionView.heightAnchor.constraint(equalToConstant: 1)
-            constraint_2.priority = .defaultHigh
+            let constraint_2 = collectionView.heightAnchor.constraint(equalToConstant: 100)
+//            constraint_2.priority = .defaultHigh
             constraint_2.identifier = "height"
             constraint_2.isActive = true
 //            setNeedsLayout()
@@ -36,7 +36,11 @@ class QuestionCell: UICollectionViewCell {
             collectionView.mode = mode
         }
     }
-    public weak var boundsListener: BoundsListener?
+    public weak var boundsListener: BoundsListener? {
+        didSet {
+            collectionView.boundsListener = boundsListener
+        }
+    }
     public weak var answerListener: AnswerListener? {
         didSet {
             collectionView.answerListener = answerListener
@@ -56,7 +60,7 @@ class QuestionCell: UICollectionViewCell {
             horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
             horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
             horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
-            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
+            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
         
         return instance
@@ -104,14 +108,49 @@ class QuestionCell: UICollectionViewCell {
         instance.spacing = 4
         instance.distribution = .fillProportionally
         
+        
         let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
         constraint.identifier = "height"
         constraint.isActive = true
         
+        instance.heightAnchor.constraint(equalTo: disclosureLabel.heightAnchor).isActive = true
+        
         return instance
     }()
+    private lazy var containerView: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: 200)
+//        constraint.identifier = "height"
+//        constraint.isActive = true
+        
+//        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
+//            guard let newValue = change.newValue else { return }
+//
+//            view.image = UIImage(systemName: "questionmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
+//        }))
+        
+//        collectionView.addEquallyTo(to: instance)
+        instance.addSubview(collectionView)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: instance.topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+        ])
+
+        let constraint = instance.bottomAnchor.constraint(equalTo: collectionView.bottomAnchor)
+        constraint.identifier = "bottom"
+//        constraint.priority = .defaultLow
+        constraint.isActive = true
+        
+        return instance
+    }()
+    
     private lazy var verticalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [headerContainer, textView, collectionView])
+        let instance = UIStackView(arrangedSubviews: [headerContainer, textView, containerView/*collectionView*/])
 //        let instance = UIStackView(arrangedSubviews: [horizontalStack, textView])
         instance.axis = .vertical
         instance.clipsToBounds = false
@@ -158,9 +197,10 @@ class QuestionCell: UICollectionViewCell {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),
+            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 50),
             verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
+//            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
 
         let constraint = collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
@@ -184,13 +224,24 @@ class QuestionCell: UICollectionViewCell {
         observers.append(collectionView.observe(\ChoiceCollectionView.contentSize, options: .new) { [weak self] view, change in
             guard let self = self,
                   let constraint = self.collectionView.getConstraint(identifier: "height"),
-                  let value = change.newValue,// else { return }//,
-                  value.height > view.frame.height else { return }
+                  let value = change.newValue else { return }//,
+//                  value.height > view.frame.height else { return }
+            guard value.height != 0, constraint.constant != value.height else { return }
+            
+            if value.height < constraint.constant {
+                delayAsync(delay: 0.3) {
+                    self.setNeedsLayout()
+                    constraint.constant = value.height + 50
+                    self.layoutIfNeeded()
+                    self.boundsListener?.onBoundsChanged(view.frame)
+                }
+            } else {
+                self.setNeedsLayout()
+                constraint.constant = value.height + 50
+                self.layoutIfNeeded()
+//                self.boundsListener?.onBoundsChanged(view.frame)
+            }
 //            self.boundsListener?.onBoundsChanged(view.frame)
-            self.setNeedsLayout()
-            constraint.constant = value.height
-            self.layoutIfNeeded()
-            self.boundsListener?.onBoundsChanged(view.frame)
         })
     }
 
@@ -221,3 +272,9 @@ extension QuestionCell: CallbackObservable {
         callbackDelegate?.callbackReceived(sender)
     }
 }
+
+//extension QuestionCell: BoundsListener {
+//    func onBoundsChanged(_ rect: CGRect) {
+//        source.refresh()//animatingDifferences: true)
+//    }
+//}

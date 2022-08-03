@@ -23,10 +23,12 @@ class ChoiceCollectionView: UICollectionView {
         }
     }
     public weak var answerListener: AnswerListener?
+    public weak var boundsListener: BoundsListener?
     
     // MARK: - Private properties
     public var mode: PollController.Mode = .Write {
         didSet {
+            allowsMultipleSelection = mode == .ReadOnly ? true : false
                             visibleCells.enumerated().forEach {
                                 guard let cell = $1 as? ChoiceCell else { return }
                                 cell.color = Colors.tags()[$0]
@@ -76,7 +78,8 @@ class ChoiceCollectionView: UICollectionView {
     // MARK: - Private methods
     private func setupUI() {
         delegate = self
-        allowsMultipleSelection = true
+        allowsMultipleSelection = mode == .ReadOnly ? true : false
+
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
 //            configuration.headerMode = .firstItemInSection
@@ -155,7 +158,10 @@ extension ChoiceCollectionView: UICollectionViewDelegate {
         if let _ = cellForItem(at: indexPath) as? ChoiceCell {
             if mode == .ReadOnly {
                 selectItem(at: indexPath, animated: true, scrollPosition: [])
-                source.refresh()
+                source.refresh {
+                    self.boundsListener?.onBoundsChanged(self.frame)
+//                    self.boundsListener?.onBoundsChanged(CGRect(origin: .zero, size: self.contentSize))
+                }
             }
         }
         return true
@@ -163,7 +169,12 @@ extension ChoiceCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
         collectionView.deselectItem(at: indexPath, animated: true)
-        source.refresh()
+        if mode == .ReadOnly {
+            source.refresh {
+//                self.boundsListener?.onBoundsChanged(CGRect(origin: .zero, size: self.contentSize))
+                //                    self.boundsListener?.onBoundsChanged(CGRect(origin: .zero, size: self.contentSize))
+            }
+        }
         return false
     }
     

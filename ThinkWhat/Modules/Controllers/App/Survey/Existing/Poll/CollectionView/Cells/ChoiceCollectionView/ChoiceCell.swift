@@ -14,9 +14,10 @@ class ChoiceCell: UICollectionViewCell {
     // MARK: - Overriden properties
     override var isSelected: Bool {
         didSet {
-            if mode == .Write, isSelected == oldValue {
+            if mode == .Write {//}, isSelected == oldValue {
                 setSelection()
             } else {
+                guard !item.isNil, item.totalVotes != 0 else { return }
                 updateAppearance()
             }
         }
@@ -30,12 +31,12 @@ class ChoiceCell: UICollectionViewCell {
             votersCountLabel.text = String(describing: item.totalVotes.roundedWithAbbreviations)
 //            votersLabel.text = "votes_total".localized.uppercased() + ": \(item.totalVotes.roundedWithAbbreviations)"
             
-            setNeedsDisplay()
-            if let survey = item.survey, survey.isComplete {
-                closedConstraint.isActive = false
-                openConstraint.isActive = true
-            }
-            layoutIfNeeded()
+//            setNeedsDisplay()
+//            if let survey = item.survey, survey.isComplete {
+//                closedConstraint.isActive = false
+//                openConstraint.isActive = true
+//            }
+//            layoutIfNeeded()
             
             guard let color = item.survey?.topic.tagColor else { return }
             self.color = color
@@ -44,7 +45,7 @@ class ChoiceCell: UICollectionViewCell {
     public var mode: PollController.Mode = .ReadOnly {
         didSet {
             if mode == .ReadOnly {
-                
+                disclosureIndicator.alpha = item.totalVotes == 0 ? 0 : 1
 //                if oldValue == .Write {
 //                    closedConstraint.isActive = false
 //                    openConstraint.isActive = true
@@ -59,9 +60,9 @@ class ChoiceCell: UICollectionViewCell {
 ////                    layoutIfNeeded()
 //                }
                 
-                setupVotersView()
-                setPercentage(animated: oldValue == .Write)
-                
+                setVoters()
+                setProgress(animated: oldValue == .Write)
+                setObservers()
                 
                 
 //                guard animated else {
@@ -76,7 +77,7 @@ class ChoiceCell: UICollectionViewCell {
 
             UIView.animate(withDuration: 0.2, delay: 0) {
                 if self.mode == .ReadOnly {
-                    self.selectionView.backgroundColor = self.color.withAlphaComponent(self.isChosen ? 1 : 0.35)
+                    self.selectionView.backgroundColor = self.color.withAlphaComponent(self.isChosen ? 1 : 0.25)
                 } else {
                     self.selectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.65)
                 }
@@ -106,7 +107,7 @@ class ChoiceCell: UICollectionViewCell {
             
 //            UIView.animate(withDuration: 0.2, delay: 0) {
                 if self.mode == .ReadOnly {
-                    self.selectionView.backgroundColor = self.color.withAlphaComponent(self.isChosen ? 1 : 0.35)
+                    self.selectionView.backgroundColor = self.color.withAlphaComponent(self.isChosen ? 1 : 0.25)
                 } else {
                     self.selectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.65)
                 }
@@ -257,14 +258,24 @@ class ChoiceCell: UICollectionViewCell {
     }()
     private lazy var disclosureIndicator: UIImageView = {
         let disclosureIndicator = UIImageView()
-        disclosureIndicator.image = UIImage(systemName: "chevron.down")
+        disclosureIndicator.image = UIImage(systemName: "chevron.right")
         disclosureIndicator.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
-        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
+//        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.contentMode = .center
+        disclosureIndicator.alpha = 0
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
     }()
-
+    private lazy var doubleDisclosureIndicator: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "chevron.right.2"))
+        imageView.accessibilityIdentifier = "chevron"
+        imageView.clipsToBounds = true
+        imageView.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
+        imageView.contentMode = .center
+        imageView.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .small)
+        
+        return imageView
+    }()
     private lazy var progressStack: UIStackView = {
 //        let imageView = UIImageView(image: UIImage(systemName: "chevron.right"))
 //        imageView.accessibilityIdentifier = "chevron"
@@ -303,25 +314,19 @@ class ChoiceCell: UICollectionViewCell {
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
-        let imageView = UIImageView(image: UIImage(systemName: "chevron.right.2"))
-        imageView.accessibilityIdentifier = "chevron"
-        imageView.clipsToBounds = true
-        imageView.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
-        imageView.contentMode = .center
-        
-        let instance = UIStackView(arrangedSubviews: [votersLabel, votersView, votersCountLabel, imageView])
+        let instance = UIStackView(arrangedSubviews: [votersLabel, votersView, votersCountLabel, doubleDisclosureIndicator])
         instance.axis = .horizontal
         instance.clipsToBounds = false
         instance.spacing = 4
         
         votersLabel.translatesAutoresizingMaskIntoConstraints = false
         votersView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        doubleDisclosureIndicator.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             votersLabel.heightAnchor.constraint(equalTo: instance.heightAnchor),
             votersView.heightAnchor.constraint(equalTo: instance.heightAnchor),
-            imageView.heightAnchor.constraint(equalTo: instance.heightAnchor),
+            doubleDisclosureIndicator.heightAnchor.constraint(equalTo: instance.heightAnchor),
 //            votersLabel.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.6)
         ])
 
@@ -336,7 +341,7 @@ class ChoiceCell: UICollectionViewCell {
 
         NSLayoutConstraint.activate([
             horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
-            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
+            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -16),
             horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
             horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
@@ -364,6 +369,8 @@ class ChoiceCell: UICollectionViewCell {
     // Constraints
     private var closedConstraint: NSLayoutConstraint!
     private var openConstraint: NSLayoutConstraint!
+    //Last touch point
+    private var lastPoint: CGPoint = .zero
     
     // MARK: - Destructor
     deinit {
@@ -377,7 +384,7 @@ class ChoiceCell: UICollectionViewCell {
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setObservers()
+//        setObservers()
         setupUI()
     }
     
@@ -393,7 +400,7 @@ class ChoiceCell: UICollectionViewCell {
         contentView.addSubview(verticalStack)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         verticalStack.translatesAutoresizingMaskIntoConstraints = false
-        topConstraint = verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding)
+        topConstraint = verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor)//, constant: padding)
         
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
@@ -410,7 +417,7 @@ class ChoiceCell: UICollectionViewCell {
         closedConstraint.priority = .defaultLow
         closedConstraint.isActive = true
         
-        openConstraint = verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        openConstraint = verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         openConstraint.priority = .defaultLow
         
         
@@ -421,19 +428,8 @@ class ChoiceCell: UICollectionViewCell {
     }
     
     private func setObservers() {
-        //Observe votes count only when is complete
-//        notifications.append(Task { @MainActor [weak self] in
-//            for await notification in NotificationCenter.default.notifications(for: Notifications.SurveyAnswers.TotalVotes) {
-//                guard let self = self,
-//                      let instance = notification.object as? Answer,
-//                      let survey = self.item.survey,
-//                      self.item.survey == instance.survey,
-//                      survey.isComplete
-//                else { return }
-//
-//                self.setPercentage()
-//            }
-//        })
+        //Only when is complete
+        guard !item.isNil , let survey = item.survey, survey.isComplete else { return }
         
         //Observe last voters
         notifications.append(Task {@MainActor [weak self] in
@@ -453,7 +449,19 @@ class ChoiceCell: UICollectionViewCell {
                 
                 guard let lastVoter = users.first else { return }
                 
-                self.updateVotersView(userprofile: lastVoter)
+                self.updateVoters(userprofile: lastVoter)
+            }
+        })
+        
+        //Observe votes count
+        notifications.append(Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.SurveyAnswers.TotalVotes) {
+                guard let self = self,
+                      let instance = notification.object as? Answer,
+                      self.item.survey == instance.survey
+                else { return }
+                
+                self.updateProgress()
             }
         })
     }
@@ -473,26 +481,26 @@ class ChoiceCell: UICollectionViewCell {
             } completion: { _ in }
             return
         }
-        reveal(view: selectionView, duration: 0.25, completionBlocks: [])
+        reveal(view: selectionView, duration: 0.275, animateOpacity: true, completionBlocks: [])
     }
     
     /// Updates the views to reflect changes in selection
     private func updateAppearance(animated: Bool = true) {
-        closedConstraint.isActive = isSelected
-        openConstraint.isActive = !isSelected
+        closedConstraint.isActive = !isSelected
+        openConstraint.isActive = isSelected
 
         guard animated else {
-            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
-            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+            let upsideDown = CGAffineTransform(rotationAngle: .pi/2 )
+            self.disclosureIndicator.transform = !self.isSelected ? upsideDown : .identity
             return
         }
         UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
-            let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
+            let upsideDown = CGAffineTransform(rotationAngle: .pi/2 )
             self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
         }
     }
     
-    private func setPercentage(animated: Bool = true) {
+    private func setProgress(animated: Bool = true) {
         
         if item.totalVotes != 0 {
             votersCountLabel.text = String(describing: item.totalVotes.roundedWithAbbreviations)
@@ -530,7 +538,27 @@ class ChoiceCell: UICollectionViewCell {
         }
     }
     
-    private func setupVotersView() {
+    private func updateProgress() {
+        
+        if item.totalVotes != 0 {
+            votersCountLabel.text = String(describing: item.totalVotes.roundedWithAbbreviations)
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
+                self.disclosureIndicator.alpha = 1
+            }
+        }
+        
+        guard let constraint = selectionView.getConstraint(identifier: "width") else { return }
+        let width = textView.frame.width * item.percent
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.35, delay: 0, options: .curveEaseInOut) { [weak self] in
+            guard let self = self else { return }
+            self.setNeedsLayout()
+            constraint.constant = width
+            self.layoutIfNeeded()
+        } completion: { _ in }
+    }
+    
+    private func setVoters() {
         guard item.totalVotes != 0 else {
             votersView.alpha = 0
             votersLabel.alpha = 0
@@ -628,7 +656,7 @@ class ChoiceCell: UICollectionViewCell {
     }
     
     //Live voters updates
-    private func updateVotersView(userprofile: Userprofile) {
+    private func updateVoters(userprofile: Userprofile) {
         let avatar = NewAvatar(userprofile: userprofile, isBordered: true)//, borderColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : self.isChosen ? self.color.withAlphaComponent(0.4) : .systemBackground)
         avatar.layer.zPosition = 10
         avatar.alpha = 0
@@ -812,6 +840,10 @@ class ChoiceCell: UICollectionViewCell {
             return CGRect.zero
         }
         
+        var circleFrameTouchPosition: CGRect {
+            return CGRect(origin: lastPoint, size: .zero)
+        }
+        
         var circleFrameCenter: CGRect {
             var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
             let circlePathBounds = circlePathLayer.bounds
@@ -825,45 +857,49 @@ class ChoiceCell: UICollectionViewCell {
         }
         
         circlePathLayer.frame = animatedView.bounds
-        circlePathLayer.path = circlePath(circleFrameCenter).cgPath
+        circlePathLayer.path = circlePath(circleFrameTouchPosition).cgPath
         animatedView.layer.mask = circlePathLayer
-        if !animateOpacity {
-            animatedView.alpha = 1
-            animatedView.layer.opacity = 0
-        }
         
-        let center = (x: animatedView.bounds.midX, y: animatedView.bounds.midY)
+//        let center = lastPoint//(x: animatedView.bounds.midX, y: animatedView.bounds.midY)
         
-        let finalRadius = sqrt((center.x*center.x) + (center.y*center.y))
+        let finalRadius = max(abs(animatedView.bounds.width - lastPoint.x),
+                                  abs(animatedView.bounds.width - (animatedView.bounds.width - lastPoint.x)))//sqrt((center.x*center.x) + (center.y*center.y))
         
         let radiusInset = finalRadius
         
-        let outerRect = circleFrameCenter.insetBy(dx: -radiusInset, dy: -radiusInset)
+        let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
         
         let toPath = UIBezierPath(ovalIn: outerRect).cgPath
         
         let fromPath = circlePathLayer.path
         
-        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
-        
-        maskLayerAnimation.fromValue = fromPath
-        maskLayerAnimation.toValue = toPath
-        maskLayerAnimation.duration = duration
-        maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-        maskLayerAnimation.isRemovedOnCompletion = true
-        _completionBlocks.append({ animatedView.layer.mask = nil })
-        maskLayerAnimation.delegate = self
-        maskLayerAnimation.setValue(_completionBlocks, forKey: "maskCompletionBlocks")
-        circlePathLayer.add(maskLayerAnimation, forKey: "path")
+        let anim = Animations.get(property: .Path, fromValue: fromPath, toValue: toPath, duration: duration, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: .easeInEaseOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [])
+                
+        circlePathLayer.add(anim, forKey: "path")
         circlePathLayer.path = toPath
+//        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
+//
+//        maskLayerAnimation.fromValue = fromPath
+//        maskLayerAnimation.toValue = toPath
+//        maskLayerAnimation.duration = duration
+//        maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+//        maskLayerAnimation.isRemovedOnCompletion = true
+//        _completionBlocks.append({ animatedView.layer.mask = nil })
+//        maskLayerAnimation.delegate = self
+//        maskLayerAnimation.setValue(_completionBlocks, forKey: "maskCompletionBlocks")
+//        circlePathLayer.add(maskLayerAnimation, forKey: "path")
+//        circlePathLayer.path = toPath
 //        let fadeAnim        = CABasicAnimation(keyPath: "opacity")
 //        fadeAnim.fromValue = 0
 //        fadeAnim.toValue = 1
-        let opacityAnim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: duration, timingFunction: CAMediaTimingFunctionName.easeIn, delegate: nil)
+        guard animateOpacity else { return }
+        animatedView.alpha = 1
+        animatedView.layer.opacity = 0
+        let opacityAnim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: duration, timingFunction: CAMediaTimingFunctionName.easeOut, delegate: nil)
 //        opacityAnim.setValue(_completionBlocks, forKey: "completionBlocks")
 //        let groupAnim = Animations.group(animations: [maskLayerAnimation, opacityAnim], duration: duration, delegate: nil)
 //        let groupAnim = Animations.group(animations: [maskLayerAnimation, opacityAnim], repeatCount: 0, autoreverses: false, duration: duration, delay: 0, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: true)
-        
+
 //        circlePathLayer.add(groupAnim, forKey: "path")
 //        circlePathLayer.path = toPath
 //        animatedView.layer.opacity = 1
@@ -878,7 +914,7 @@ class ChoiceCell: UICollectionViewCell {
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         
         if mode == .ReadOnly {
-            self.selectionView.backgroundColor = self.color.withAlphaComponent(self.isChosen ? 1 : 0.35)
+            self.selectionView.backgroundColor = self.color.withAlphaComponent(self.isChosen ? 1 : 0.25)
 //            if isChosen {
 ////                contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue.withAlphaComponent(0.4) : color.withAlphaComponent(0.4)
 //                avatars.forEach {
@@ -904,6 +940,22 @@ class ChoiceCell: UICollectionViewCell {
         setNeedsLayout()
         constraint.constant = max(textView.contentSize.height, 40)
         layoutIfNeeded()
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touch = touches.first
+        guard let location = touch?.location(in: contentView) else { return }
+        
+        if let point = touch?.location(in: votersView), votersView.bounds.contains(point) {
+            callbackDelegate?.callbackReceived(self)
+        } else if let point = touch?.location(in: votersCountLabel), votersCountLabel.bounds.contains(point) {
+            callbackDelegate?.callbackReceived(self)
+        } else if let point = touch?.location(in: doubleDisclosureIndicator), doubleDisclosureIndicator.bounds.contains(point) {
+            callbackDelegate?.callbackReceived(self)
+        } else if let point = touch?.location(in: progressStack), progressStack.bounds.contains(point) {
+            lastPoint = point
+            super.touchesBegan(touches, with: event)
+        }
     }
 }
 

@@ -38,7 +38,7 @@ class LinkPreviewCell: UICollectionViewCell {
         
         NSLayoutConstraint.activate([
             horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
-            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
+//            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
             horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
             horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
         ])
@@ -74,7 +74,7 @@ class LinkPreviewCell: UICollectionViewCell {
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
         disclosureIndicator.tintColor = .secondaryLabel
         disclosureIndicator.contentMode = .center
-        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
+//        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
     }()
@@ -99,7 +99,7 @@ class LinkPreviewCell: UICollectionViewCell {
     private lazy var horizontalStack: UIStackView = {
         let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         rootStack.alignment = .center
-        rootStack.distribution = .fillProportionally
+//        rootStack.distribution = .fillProportionally
         rootStack.spacing = 4
         
         let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
@@ -184,7 +184,7 @@ class LinkPreviewCell: UICollectionViewCell {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),
+            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 50),
             verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
         ])
@@ -194,6 +194,8 @@ class LinkPreviewCell: UICollectionViewCell {
         
         openConstraint = linkPreview.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         openConstraint?.priority = .defaultLow
+        
+        disclosureLabel.widthAnchor.constraint(equalToConstant: self.disclosureLabel.text!.width(withConstrainedHeight: horizontalStack.frame.height, font: self.disclosureLabel.font)).isActive = true
 
         updateAppearance(animated: false)
     }

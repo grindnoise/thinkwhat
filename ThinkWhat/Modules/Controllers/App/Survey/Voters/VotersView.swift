@@ -73,13 +73,16 @@ extension VotersView: VotersControllerOutput {
                 self.answer.voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
                 self.collectionView.insertItems(at: [IndexPath(row: self.answer.voters.count - 1, section: 0)])
             }
-        case .failure:
-            showBanner(callbackDelegate: nil,
-                       bannerDelegate: self, text: "voters_load_error".localized,
-                       content: ImageSigns.exclamationMark,
-                       color: .systemRed,
-                       isModal: false,
-                       dismissAfter: 1)
+        case .failure(let error):
+#if DEBUG
+            error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+//            showBanner(callbackDelegate: nil,
+//                       bannerDelegate: self, text: "voters_load_error".localized,
+//                       content: ImageSigns.exclamationMark,
+//                       color: .systemRed,
+//                       isModal: false,
+//                       dismissAfter: 1)
         }
     }
     

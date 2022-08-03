@@ -164,7 +164,7 @@ extension PollView: CallbackObservable {
 //            if string == "vote_to_view_comments" {
 //                showBanner(callbackDelegate: self, bannerDelegate: self, text: string.localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
 //            }
-        } else if let instance = sender as? ChoiceCell {
+        } else if let instance = sender as? ChoiceCell, mode == .ReadOnly {
             viewInput?.onVotersTapped(answer: instance.item, color: instance.color)
         }
     }

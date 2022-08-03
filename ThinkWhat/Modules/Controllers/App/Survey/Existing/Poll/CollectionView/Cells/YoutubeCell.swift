@@ -34,7 +34,7 @@ class YoutubeCell: UICollectionViewCell {
         
         NSLayoutConstraint.activate([
             horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
-            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
+//            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
             horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
             horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
         ])
@@ -52,7 +52,7 @@ class YoutubeCell: UICollectionViewCell {
         let disclosureIndicator = UIImageView()
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
         disclosureIndicator.tintColor = .secondaryLabel
-        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
+//        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.contentMode = .center
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
@@ -92,7 +92,7 @@ class YoutubeCell: UICollectionViewCell {
         let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
         instance.alignment = .center
         instance.axis = .horizontal
-        instance.distribution = .fillProportionally
+//        instance.distribution = .fillProportionally
         instance.spacing = 4
         let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
         constraint.identifier = "height"
@@ -196,7 +196,7 @@ class YoutubeCell: UICollectionViewCell {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),
+            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 50),
             verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
 //            playerView.heightAnchor.constraint(equalTo: playerView.widthAnchor, multiplier: 9/16),
@@ -212,6 +212,9 @@ class YoutubeCell: UICollectionViewCell {
         closedConstraint?.priority = .defaultLow // use low priority so stack stays pinned to top of cell
         openConstraint = playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         openConstraint?.priority = .defaultLow
+        
+        disclosureLabel.widthAnchor.constraint(equalToConstant: self.disclosureLabel.text!.width(withConstrainedHeight: horizontalStack.frame.height, font: self.disclosureLabel.font)).isActive = true
+        
         updateAppearance(animated: false)
     }
     

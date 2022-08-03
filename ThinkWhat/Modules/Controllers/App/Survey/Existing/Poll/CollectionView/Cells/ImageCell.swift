@@ -62,7 +62,7 @@ class ImageCell: UICollectionViewCell {
         let instance = UIImageView()
         instance.image = UIImage(systemName: "chevron.down")
         instance.tintColor = .secondaryLabel
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.contentMode = .center
         instance.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         
@@ -88,7 +88,7 @@ class ImageCell: UICollectionViewCell {
             horizontalStack.topAnchor.constraint(equalTo: innerView.topAnchor),
             horizontalStack.bottomAnchor.constraint(equalTo: innerView.bottomAnchor, constant: -10),
             horizontalStack.leadingAnchor.constraint(equalTo: innerView.leadingAnchor, constant: 10),
-            horizontalStack.trailingAnchor.constraint(equalTo: innerView.trailingAnchor, constant: -10),
+//            horizontalStack.trailingAnchor.constraint(equalTo: innerView.trailingAnchor, constant: -10),
         ])
         
         return instance
@@ -118,7 +118,7 @@ class ImageCell: UICollectionViewCell {
         constraint.isActive = true
         instance.spacing = 4
         instance.axis = .horizontal
-        instance.distribution = .fillProportionally
+//        instance.distribution = .fillProportionally
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
@@ -230,7 +230,7 @@ class ImageCell: UICollectionViewCell {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor),//, constant: padding),
+            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 50),
             verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
             verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
         ])
@@ -245,6 +245,8 @@ class ImageCell: UICollectionViewCell {
         openConstraint =
             imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         openConstraint.priority = .defaultLow
+        
+        disclosureLabel.widthAnchor.constraint(equalToConstant: self.disclosureLabel.text!.width(withConstrainedHeight: horizontalStack.frame.height, font: self.disclosureLabel.font)).isActive = true
         
         updateAppearance(animated: false)
     }

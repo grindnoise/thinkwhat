@@ -213,7 +213,7 @@ class PollTitleCell: UICollectionViewCell {
         ])
         
 //        constraint = bottomView_2.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
+        constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -50)
         constraint.priority = .defaultLow
         constraint.isActive = true
         

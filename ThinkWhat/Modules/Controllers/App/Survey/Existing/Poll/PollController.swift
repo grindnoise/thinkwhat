@@ -50,6 +50,7 @@ class PollController: UIViewController {
     }
     private lazy var stackView: UIStackView = {
         let v = UIStackView()
+        v.accessibilityIdentifier = "stackView"
         v.spacing = 8
         observers.append(v.observe(\UIStackView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
             guard !self.isNil,
@@ -59,11 +60,13 @@ class PollController: UIViewController {
         })
         return v
     }()
-    private lazy var avatar: Avatar = {
-        return Avatar(gender: surveyReference.owner.gender, image: surveyReference.owner.image)
+    private lazy var avatar: NewAvatar = {
+        return NewAvatar(userprofile: surveyReference.owner)
+//        return Avatar(gender: surveyReference.owner.gender, image: surveyReference.owner.image)
     }()
     private lazy var progressIndicator: CircleButton = {
         let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: true)
+        customTitle.accessibilityIdentifier = "progressIndicator"
         customTitle.color = .clear
         customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
         customTitle.icon.backgroundColor = .clear
@@ -260,8 +263,24 @@ class PollController: UIViewController {
         
         indicator.translatesAutoresizingMaskIntoConstraints = false
         indicator.widthAnchor.constraint(equalTo: indicator.heightAnchor, multiplier: 1.0/1.0).isActive = true
+        
+//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+//        icon.backgroundColor = .clear
+//        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
+//        icon.isRounded = false
+//        icon.scaleMultiplicator = 1.4
+//        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
+//        self.navigationItem.titleView = icon
+//        self.navigationItem.titleView?.alpha = 0
+//
+//        self.navigationItem.titleView?.clipsToBounds = false
+        
 //        navigationBar.setNeedsLayout()
 //        navigationBar.layoutIfNeeded()
+        self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        self.avatar.alpha = 0
+        self.stackView.alpha = 0
     }
     
     private func setUpdater() {
@@ -567,7 +586,9 @@ class PollController: UIViewController {
         self.controllerInput = model
         self.controllerInput?
             .modelOutput = self
-        
+//        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationItem.largeTitleDisplayMode = .always
+
         setupUI()
         setObservers()
         performChecks()
@@ -577,8 +598,67 @@ class PollController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
+//        navigationController?.setNeedsStatusBarAppearanceUpdate()
+//        navigationController?.isNavigationBarHidden = false
+        
+        guard let navBar = navigationController?.navigationBar,
+              navBar.getSubview(type: UIStackView.self, identifier: "stackView").isNil
+        else {
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0.1, options: .curveEaseInOut) {
+                self.avatar.transform = .identity
+                self.stackView.transform = .identity
+                if let titleView = self.navigationItem.titleView {
+                    if titleView.alpha > 0.5 {
+                        self.avatar.alpha = 0
+                        self.stackView.alpha = 0
+//                        self.stackView.convert(self.stackView.frame.origin, to: UIScreen.main.coordinateSpace)
+                        titleView.alpha = 1
+                    } else {
+                        self.avatar.alpha = 1
+                        self.stackView.alpha = 1
+                        titleView.alpha = 0
+                    }
+                } else {
+                    self.avatar.alpha = 1
+                    self.stackView.alpha = 1
+                }
+            }
+            return
+        }
+        setupUI()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        guard self.navigationItem.titleView.isNil else { return }
+        
+        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+        icon.backgroundColor = .clear
+        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
+        icon.isRounded = false
+        icon.scaleMultiplicator = 1.4
+        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
+        self.navigationItem.titleView = icon
+        self.navigationItem.titleView?.alpha = 0
+        
+        self.navigationItem.titleView?.clipsToBounds = false
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
+            self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            self.avatar.alpha = 0
+            self.stackView.alpha = 0
+            if let titleView = self.navigationItem.titleView {
+                titleView.alpha = 0
+            }
+        }
     }
     
     override func willMove(toParent parent: UIViewController?) {
@@ -586,15 +666,24 @@ class PollController: UIViewController {
         guard parent.isNil else { return }
         clearNavigationBar(clear: true)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
+        
+        if let titleView = self.navigationItem.titleView, titleView.alpha < 0.5 {
+            self.navigationItem.titleView = nil
+        }
+        
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
             self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             self.avatar.alpha = 0
             self.stackView.alpha = 0
+            self.navigationItem.titleView?.alpha = 0
         } completion: { _ in
             self.avatar.removeFromSuperview()
             self.stackView.removeFromSuperview()
         }
+//        guard parent.isNil else { return }
+//        clearNavigationBar(clear: true)
+//        tabBarController?.setTabBarVisible(visible: true, animated: true)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -797,6 +886,8 @@ extension PollController: UINavigationControllerDelegate {
 // MARK: - CallbackObservable
 extension PollController: CallbackObservable {
     func callbackReceived(_ sender: Any) {
-        
+//        if sender is ChoiceCell, mode == .ReadOnly {
+//            print("")
+//        }
     }
 }

@@ -13,8 +13,13 @@ class PollDescriptionCell: UICollectionViewCell {
     // MARK: - Overriden properties
     override var isSelected: Bool {
         didSet {
+//            super.isSelected = isSelected
             guard isFoldable else { return }
-            updateAppearance()
+//            if isSelected, !closedConstraint.isNil, !closedConstraint!.isActive {
+//                updateAppearance()
+//            } else if !isSelected, !openConstraint.isNil, !openConstraint!.isActive {
+                updateAppearance()
+//            }
         }
     }
     
@@ -43,9 +48,9 @@ class PollDescriptionCell: UICollectionViewCell {
         
         NSLayoutConstraint.activate([
             horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
-            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
+//            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
             horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
-            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
+            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
         
         return instance
@@ -55,6 +60,21 @@ class PollDescriptionCell: UICollectionViewCell {
         instance.textColor = .secondaryLabel
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         instance.text = "details".localized.uppercased()
+        
+//        instance.translatesAutoresizingMaskIntoConstraints = false
+//        let constraint = instance.widthAnchor.constraint(equalToConstant: 100)
+//        constraint.identifier = "width"
+//        constraint.isActive = true
+        
+//        observers.append(instance.observe(\UILabel.contentSize, options: .new) { [weak self] view, change in
+//            guard let self = self,
+//                  let constraint = view.getAllConstraints().filter({ $0.identifier == "height" }).first,
+//                  let value = change.newValue else { return }
+//            self.setNeedsLayout()
+//            constraint.constant = value.height// + self.padding*2
+//            self.layoutIfNeeded()
+//        })
+        
         return instance
     }()
     private lazy var textView: UITextView = {
@@ -105,7 +125,7 @@ class PollDescriptionCell: UICollectionViewCell {
         let disclosureIndicator = UIImageView()
         disclosureIndicator.image = UIImage(systemName: "chevron.down")
         disclosureIndicator.tintColor = .secondaryLabel
-        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
+//        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
         disclosureIndicator.contentMode = .center
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
@@ -118,7 +138,25 @@ class PollDescriptionCell: UICollectionViewCell {
         constraint.isActive = true
         rootStack.alignment = .center
         rootStack.spacing = 4
-        rootStack.distribution = .fillProportionally
+//        rootStack.distribution = .fillProportionally
+        
+//        disclosureLabel.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            disclosureLabel.heightAnchor.constraint(equalTo: rootStack.heightAnchor),
+//            disclosureLabel.widthAnchor.constraint(equalToConstant: self.disclosureLabel.text!.width(withConstrainedHeight: rootStack.frame.height, font: self.disclosureLabel.font))
+//        ])
+//        disclosureLabel.heightAnchor.constraint(equalToConstant: <#T##CGFloat#>)
+//        rootStack.heightAnchor.constraint(equalTo: disclosureLabel.heightAnchor).isActive = true
+        
+//        observers.append(rootStack.observe(\UIStackView.bounds, options: .new) { [weak self] view, change in
+//            guard let self = self,
+//                  let constraint = self.disclosureLabel.getAllConstraints().filter({ $0.identifier == "width" }).first,
+//                  let value = change.newValue else { return }
+//            self.setNeedsLayout()
+//            constraint.constant = self.disclosureLabel.text!.width(withConstrainedHeight: value.height, font: self.disclosureLabel.font)
+//            self.layoutIfNeeded()
+//        })
+        
         return rootStack
     }()
     private lazy var verticalStack: UIStackView = {
@@ -185,6 +223,8 @@ class PollDescriptionCell: UICollectionViewCell {
         openConstraint =
             textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         openConstraint?.priority = .defaultLow
+        
+        disclosureLabel.widthAnchor.constraint(equalToConstant: self.disclosureLabel.text!.width(withConstrainedHeight: horizontalStack.frame.height, font: self.disclosureLabel.font)).isActive = true
         
         guard isFoldable else {
             openConstraint?.isActive = true
@@ -267,6 +307,13 @@ class PollDescriptionCell: UICollectionViewCell {
         constraint_2.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
         layoutIfNeeded()
     }
+    
+//    override func prepareForReuse() {
+//        super.prepareForReuse()
+//        openConstraint?.isActive = false
+//        closedConstraint?.isActive = true
+//        textView.frame = .zero
+//    }
 }
 
 ////

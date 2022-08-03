@@ -93,7 +93,7 @@ class PollCollectionView: UICollectionView {
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
 //            sectionLayout.interGroupSpacing = 20
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 40, trailing: 8)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
             return sectionLayout
         }
         
@@ -104,7 +104,8 @@ class PollCollectionView: UICollectionView {
         
         let descriptionCellRegistration = UICollectionView.CellRegistration<PollDescriptionCell, AnyHashable> { [weak self] cell, indexPath, item in
             cell.layer.masksToBounds = false
-            guard let self = self, cell.item.isNil else { return }
+            guard let self = self else { return }
+//            guard let self = self, cell.item.isNil else { return }
 //            cell.collectionView = self
             cell.item = self.poll
             cell.isFoldable = cell.item.isComplete
@@ -194,6 +195,8 @@ class PollCollectionView: UICollectionView {
                 let cell = collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
                                                                         for: indexPath,
                                                                         item: identifier)
+                collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                collectionView.deselectItem(at: indexPath, animated: true)
                 cell.layer.masksToBounds = false
                 return cell
             } else if section == .image {
@@ -314,8 +317,7 @@ class PollCollectionView: UICollectionView {
 // MARK: - BoundsListener
 extension PollCollectionView: BoundsListener {
     func onBoundsChanged(_ rect: CGRect) {
-        print(rect.size)
-        source.refresh(animatingDifferences: false)
+        source.refresh()//animatingDifferences: true)
     }
 }
 
