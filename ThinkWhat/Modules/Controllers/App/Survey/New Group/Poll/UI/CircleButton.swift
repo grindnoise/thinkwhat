@@ -212,10 +212,10 @@ class CircleButton: UIView, CAAnimationDelegate {
 
     //MARK: - Animation Setup
     
-    func addEnableAnimation(completionBlock: ((_ finished: Bool) -> Void)? = nil){
+    func addEnableAnimation(duration: TimeInterval = 0.35, completionBlock: ((_ finished: Bool) -> Void)? = nil){
         if completionBlock != nil{
             let completionAnim = CABasicAnimation(keyPath:"completionAnim")
-            completionAnim.duration = 0.35
+            completionAnim.duration = duration
             completionAnim.delegate = self
             completionAnim.setValue("enable", forKey:"animId")
             completionAnim.setValue(false, forKey:"needEndAnim")

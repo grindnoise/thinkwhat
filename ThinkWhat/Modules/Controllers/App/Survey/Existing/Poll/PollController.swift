@@ -8,9 +8,10 @@
 
 import UIKit
 import SafariServices
+import Combine
 
 class PollController: UIViewController {
-    
+
     enum Mode {
         case ReadOnly, Write
     }
@@ -82,13 +83,31 @@ class PollController: UIViewController {
         customTitle.oval.strokeStart = survey.isNil ? 0 : CGFloat(survey!.progress)
         return customTitle
     }()
+    private lazy var titleView: Icon = {
+        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+        icon.backgroundColor = .clear
+        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
+        icon.isRounded = false
+        icon.scaleMultiplicator = 1.4
+        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
+        
+        return icon
+    }()
     private var observers: [NSKeyValueObservation] = []
-    private var notifications: [Task<Void, Never>?] = []
+    private var tasks: [Task<Void, Never>?] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var hidesLargeTitle: Bool = false
+    
+    // MARK: - Overriden properties
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
+    }
     
     // MARK: - Destructor
     deinit {
-        notifications.forEach { $0?.cancel() }
+        tasks.forEach { $0?.cancel() }
         NotificationCenter.default.removeObserver(self)
+        subscriptions.forEach{ $0.cancel() }
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
@@ -111,10 +130,10 @@ class PollController: UIViewController {
     // MARK: - Private methods
     private func setupUI() {
         if !_survey.isNil { controllerOutput?.onLoadCallback() }
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        self.navigationController?.navigationBar.standardAppearance = appearance
-        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+//        let appearance = UINavigationBarAppearance()
+//        appearance.configureWithOpaqueBackground()
+//        self.navigationController?.navigationBar.standardAppearance = appearance
+//        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
@@ -153,6 +172,10 @@ class PollController: UIViewController {
         indicator.icon.scaleMultiplicator = 1.5
         indicator.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
         indicator.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
+        if !surveyReference.isComplete {
+            indicator.oval.opacity = 0
+            indicator.ovalBg.opacity = 0
+        }
         stackView.addArrangedSubview(indicator)
         
        
@@ -283,23 +306,7 @@ class PollController: UIViewController {
         self.stackView.alpha = 0
     }
     
-    private func setUpdater() {
-        //Set timer to request stats updates
-        //Update survey stats every n seconds
-        let events = EventEmitter().emit(every: 5)
-        notifications.append(Task { [weak self] in
-            for await _ in events {
-                guard let self = self else { return }
-
-                self.controllerInput?.updateResultsStats(self._surveyReference)
-            }
-        })
-    }
-    
     private func setObservers() {
-        
-        
-        
         guard let navBar = navigationController?.navigationBar else { return }
         observers.append(navBar.observe(\UINavigationBar.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
             guard let self = self,
@@ -313,7 +320,7 @@ class PollController: UIViewController {
                 icon.isRounded = false
                 icon.scaleMultiplicator = 1.4
                 icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
-                self.navigationItem.titleView = icon
+                self.navigationItem.titleView = self.titleView
                 self.navigationItem.titleView?.alpha = 0
                 
                 self.navigationItem.titleView?.clipsToBounds = false
@@ -328,7 +335,37 @@ class PollController: UIViewController {
             self.avatar.alpha = largeAlpha
             self.stackView.alpha = largeAlpha
         })
-        notifications.append(Task { [weak self] in
+    }
+    
+    private func setUpdaters() {
+        guard surveyReference.isComplete else { return }
+        
+        //Set timer to request stats updates
+        //Update survey stats every n seconds
+        let events = EventEmitter().emit(every: 5)
+        tasks.append(Task { [weak self] in
+            for await _ in events {
+                guard let self = self else { return }
+
+                self.controllerInput?.updateResultsStats(self._surveyReference)
+            }
+        })
+    }
+    
+    private func setSubscriptions() {
+        //Need to toggle navigationBar.prefersLargeTitles
+        if let controllerOutput = controllerOutput {
+            controllerOutput.scrollOffsetPublisher.sink { [weak self] in
+                guard let self = self else { return }
+                self.hidesLargeTitle = $0 != 0
+                self.navigationController?.navigationBar.prefersLargeTitles = true
+                self.navigationItem.largeTitleDisplayMode = .always
+            }.store(in: &subscriptions)
+        }
+    }
+    
+    private func setTasks() {
+        tasks.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
                 guard let self = self,
                       let instance = notification.object as? SurveyReference,
@@ -365,7 +402,7 @@ class PollController: UIViewController {
             }
         })
 
-        notifications.append(Task { [weak self] in
+        tasks.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
                 await MainActor.run {
                     guard let self = self,
@@ -375,7 +412,15 @@ class PollController: UIViewController {
 
                     switch instance.isComplete {
                     case true:
-                        self.setUpdater()
+                        if let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress") {
+                            let anim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.5, delegate: nil)
+                            indicator.oval.add(anim, forKey: nil)
+                            indicator.ovalBg.add(anim, forKey: nil)
+                            indicator.oval.opacity = 1
+                            indicator.ovalBg.opacity = 1
+                        }
+                        
+                        self.setUpdaters()
 
                         guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
                               marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty
@@ -411,7 +456,7 @@ class PollController: UIViewController {
             }
         })
 
-        notifications.append(Task { [weak self] in
+        tasks.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
                 await MainActor.run {
                     guard let self = self,
@@ -456,7 +501,7 @@ class PollController: UIViewController {
         })
 
         //Observe progress
-        notifications.append(Task { @MainActor [weak self] in
+        tasks.append(Task { @MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
                 guard let self = self,
                       let instance = notification.object as? SurveyReference,
@@ -467,9 +512,6 @@ class PollController: UIViewController {
                 indicator.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
             }
         })
-
-        guard surveyReference.isComplete else { return }
-        setUpdater()
     }
     
     private func performChecks() {
@@ -492,7 +534,8 @@ class PollController: UIViewController {
     
     private func setBarButtonItem() {
         var actionButton: UIBarButtonItem!
-        let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+        let image =  UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
+        let shareAction : UIAction = .init(title: "share".localized, image: image, identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
             guard let self = self, !self._survey.isNil else { return }
             // Setting description
             let firstActivityItem = self._surveyReference.title
@@ -541,7 +584,8 @@ class PollController: UIViewController {
         })
         
         if _survey.isOwn {
-            actionButton = UIBarButtonItem(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up"), primaryAction: shareAction, menu: nil)
+            let image =  UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
+            actionButton = UIBarButtonItem(title: "share".localized, image: image, primaryAction: shareAction, menu: nil)
             navigationItem.rightBarButtonItem = actionButton
         } else {
             let watchAction : UIAction = .init(title: _survey.isFavorite ? "don't_watch".localized : "watch".localized, image: UIImage(systemName: "binoculars"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
@@ -559,10 +603,10 @@ class PollController: UIViewController {
             })
             
             let actions = [watchAction, shareAction, claimAction]
-            
             let menu = UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+            let image =  UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
             
-            actionButton = UIBarButtonItem(title: "", image: UIImage(systemName: "ellipsis"), primaryAction: nil, menu: menu)
+            actionButton = UIBarButtonItem(title: "", image: image, primaryAction: nil, menu: menu)
         }
         navigationItem.rightBarButtonItem = actionButton
     }
@@ -586,66 +630,69 @@ class PollController: UIViewController {
         self.controllerInput = model
         self.controllerInput?
             .modelOutput = self
-//        navigationController?.navigationBar.prefersLargeTitles = true
-//        navigationItem.largeTitleDisplayMode = .always
 
         setupUI()
+        setTasks()
+        setSubscriptions()
         setObservers()
+        setUpdaters()
+        
         performChecks()
         navigationController?.delegate = self
-        setNavigationBarTintColor(.label)//traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+        setNavigationBarTintColor(.label)
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
-//        navigationController?.setNeedsStatusBarAppearanceUpdate()
-//        navigationController?.isNavigationBarHidden = false
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        self.navigationController?.navigationBar.standardAppearance = appearance
+        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.overrideUserInterfaceStyle = .unspecified
+        setNeedsStatusBarAppearanceUpdate()
         
-        guard let navBar = navigationController?.navigationBar,
-              navBar.getSubview(type: UIStackView.self, identifier: "stackView").isNil
-        else {
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0.1, options: .curveEaseInOut) {
-                self.avatar.transform = .identity
-                self.stackView.transform = .identity
-                if let titleView = self.navigationItem.titleView {
-                    if titleView.alpha > 0.5 {
-                        self.avatar.alpha = 0
-                        self.stackView.alpha = 0
-//                        self.stackView.convert(self.stackView.frame.origin, to: UIScreen.main.coordinateSpace)
-                        titleView.alpha = 1
-                    } else {
-                        self.avatar.alpha = 1
-                        self.stackView.alpha = 1
-                        titleView.alpha = 0
-                    }
-                } else {
-                    self.avatar.alpha = 1
-                    self.stackView.alpha = 1
-                }
-            }
-            return
+        if !hidesLargeTitle {
+            self.titleView.alpha = 0
         }
-        setupUI()
+        
+        navigationController?.navigationBar.prefersLargeTitles = hidesLargeTitle ? false : true
+        navigationItem.largeTitleDisplayMode = hidesLargeTitle ? .never : .always
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0.1, options: .curveEaseInOut, animations: {
+            self.avatar.transform = .identity
+            self.stackView.transform = .identity
+            self.avatar.alpha = self.hidesLargeTitle ? 0 : 1
+            self.stackView.alpha = self.hidesLargeTitle ? 0 : 1
+            self.titleView.alpha = !self.hidesLargeTitle ? 0 : 1
+        }) { _ in
+            guard !self.hidesLargeTitle else { return }
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
+                self.titleView.alpha = 0
+            }
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        guard self.navigationItem.titleView.isNil else { return }
-        
-        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-        icon.backgroundColor = .clear
-        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
-        icon.isRounded = false
-        icon.scaleMultiplicator = 1.4
-        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
-        self.navigationItem.titleView = icon
-        self.navigationItem.titleView?.alpha = 0
-        
-        self.navigationItem.titleView?.clipsToBounds = false
+
+        guard !hidesLargeTitle else { return }
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
+            self.titleView.alpha = 0
+//        }
+//        guard self.navigationItem.titleView.isNil else { return }
+//
+//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+//        icon.backgroundColor = .clear
+//        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
+//        icon.isRounded = false
+//        icon.scaleMultiplicator = 1.4
+//        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
+//        self.navigationItem.titleView = icon
+//        self.navigationItem.titleView?.alpha = 0
+//
+//        self.navigationItem.titleView?.clipsToBounds = false
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -653,17 +700,25 @@ class PollController: UIViewController {
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
             self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//            self.titleView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             self.avatar.alpha = 0
             self.stackView.alpha = 0
-            if let titleView = self.navigationItem.titleView {
-                titleView.alpha = 0
-            }
+            self.titleView.alpha = 0
         }
+        
+        guard !hidesLargeTitle else { return }
+
+        self.titleView.alpha = 0
     }
     
     override func willMove(toParent parent: UIViewController?) {
         super.willMove(toParent: parent)
         guard parent.isNil else { return }
+        
+        if !hidesLargeTitle {
+            self.titleView.alpha = 0
+        }
+        
         clearNavigationBar(clear: true)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
         
@@ -757,10 +812,6 @@ extension PollController: PollViewInput {
         return _showNext
     }
     
-    //    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor) {
-    //        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
-    //    }
-    
     func onURLTapped(_ url: URL) {
         var vc: SFSafariViewController!
         let config = SFSafariViewController.Configuration()
@@ -825,6 +876,22 @@ extension PollController: PollModelOutput {
         case .success:
             _mode = .ReadOnly
             userHasVoted = true
+            //Show edu info
+#if DEBUG
+            delayAsync(delay: 1) {
+                let popup = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.4)
+                popup.present(content: VoteEducation(topic: .Bankruptcy, color: .systemRed, callbackDelegate: popup))
+            }
+#else
+            delayAsync(delay: 1) {
+                guard UserDefaults.App.hasSeenPollVoteIntroduction.isNil else { return }
+                
+                let popup = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.4)
+                popup.present(content: VoteEducation(topic: .Bankruptcy, color: .systemRed, callbackDelegate: popup))
+                
+                UserDefaults.App.hasSeenPollVoteIntroduction = true
+            }
+#endif
         default:
 #if DEBUG
             print("")
@@ -889,5 +956,12 @@ extension PollController: CallbackObservable {
 //        if sender is ChoiceCell, mode == .ReadOnly {
 //            print("")
 //        }
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+extension PollController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 }

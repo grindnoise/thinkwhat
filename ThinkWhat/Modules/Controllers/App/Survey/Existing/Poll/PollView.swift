@@ -11,9 +11,12 @@ import Agrume
 
 class PollView: UIView {
     
+    // MARK: - Destructor
     deinit {
-        print("PollView deinit")
         NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
     }
     
     // MARK: - Initialization
@@ -37,9 +40,12 @@ class PollView: UIView {
         setupUI()
     }
     
-    // MARK: - Properties
+    // MARK: - Public properties
     weak var viewInput: (PollViewInput & UIViewController)?
+    @Published var lastContentOffsetY: CGFloat = 0
+    var scrollOffsetPublisher: Published<CGFloat>.Publisher { $lastContentOffsetY }
     
+    // MARK: - Private properties
     private lazy var collectionView: PollCollectionView = {
         let instance = PollCollectionView(host: self, poll: survey!, callbackDelegate: self)
         instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
@@ -61,7 +67,6 @@ class PollView: UIView {
 
 // MARK: - Controller Output
 extension PollView: PollControllerOutput {
-    
     func onAddFavoriteCallback() {
         guard surveyReference.isFavorite else { return }
         showBanner(bannerDelegate: self, text: "added_to_watch_list".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)

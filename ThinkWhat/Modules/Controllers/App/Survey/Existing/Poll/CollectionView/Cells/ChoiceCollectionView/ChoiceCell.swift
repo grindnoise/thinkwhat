@@ -14,7 +14,7 @@ class ChoiceCell: UICollectionViewCell {
     // MARK: - Overriden properties
     override var isSelected: Bool {
         didSet {
-            if mode == .Write {//}, isSelected == oldValue {
+            if mode == .Write, isSelected != oldValue {
                 setSelection()
             } else {
                 guard !item.isNil, item.totalVotes != 0 else { return }
@@ -29,14 +29,6 @@ class ChoiceCell: UICollectionViewCell {
             guard !item.isNil else { return }
             textView.text = item.description
             votersCountLabel.text = String(describing: item.totalVotes.roundedWithAbbreviations)
-//            votersLabel.text = "votes_total".localized.uppercased() + ": \(item.totalVotes.roundedWithAbbreviations)"
-            
-//            setNeedsDisplay()
-//            if let survey = item.survey, survey.isComplete {
-//                closedConstraint.isActive = false
-//                openConstraint.isActive = true
-//            }
-//            layoutIfNeeded()
             
             guard let color = item.survey?.topic.tagColor else { return }
             self.color = color
@@ -46,38 +38,17 @@ class ChoiceCell: UICollectionViewCell {
         didSet {
             if mode == .ReadOnly {
                 disclosureIndicator.alpha = item.totalVotes == 0 ? 0 : 1
-//                if oldValue == .Write {
-//                    closedConstraint.isActive = false
-//                    openConstraint.isActive = true
-//                    //                    setNeedsDisplay()
-////                    UIView.animate(withDuration: 0.3, delay: 0) {
-////                        self.setNeedsDisplay()
-////                        self.closedConstraint.constant += 58
-//
-////                        self.layoutIfNeeded()
-////                    }
-//
-////                    layoutIfNeeded()
-//                }
                 
                 setVoters()
                 setProgress(animated: oldValue == .Write)
                 setObservers()
-                
-                
-//                guard animated else {
-//                    horizontalStack.getSubview(type: UIImageView.self, identifier: "chevron")?.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
-//                    return
-//                }
-//
-//                UIView.animate(withDuration: 0.2) {
-//                    self.horizontalStack.getSubview(type: UIImageView.self, identifier: "chevron")?.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
-//                }
             }
 
             UIView.animate(withDuration: 0.2, delay: 0) {
                 if self.mode == .ReadOnly {
-                    self.selectionView.backgroundColor = self.color.withAlphaComponent(self.isChosen ? 1 : 0.25)
+                    self.selectionView.backgroundColor = self.color//.withAlphaComponent(self.isChosen ? 1 : 0.25)
+                    self.checkmarkIndicator.alpha = self.isChosen ? 1 : 0
+                    self.checkmarkIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.color
                 } else {
                     self.selectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.65)
                 }
@@ -85,42 +56,26 @@ class ChoiceCell: UICollectionViewCell {
                 if let imageView = self.horizontalStack.getSubview(type: UIImageView.self, identifier: "chevron") {
                     imageView.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
                 }
-                
-//                if let imageView = self.progressStack.getSubview(type: UIImageView.self, identifier: "chevron") {
-//                    imageView.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
-//                }
-                self.disclosureIndicator.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
+
+                self.disclosureIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
             }
         }
     }
     public var color: UIColor = .tertiarySystemBackground {
         didSet {
             votersCountLabel.textColor = item.totalVotes == 0 ? .secondaryLabel : color
-//            if mode == .ReadOnly, isChosen {
-//                contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiaryLabel : color.withAlphaComponent(0.4)
-//            }
+            if self.mode == .ReadOnly {
+                self.checkmarkIndicator.alpha = self.isChosen ? 1 : 0
+                self.checkmarkIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.color
+                self.selectionView.backgroundColor = self.color//.withAlphaComponent(self.isChosen ? 1 : 0.25)
+            } else {
+                self.selectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.65)
+            }
             
-//            avatars.forEach {
-//                guard isChosen else { return }
-//                $0.borderColor = traitCollection.userInterfaceStyle == .dark ? .tertiaryLabel : color.withAlphaComponent(0.4)
-//            }
-            
-//            UIView.animate(withDuration: 0.2, delay: 0) {
-                if self.mode == .ReadOnly {
-                    self.selectionView.backgroundColor = self.color.withAlphaComponent(self.isChosen ? 1 : 0.25)
-                } else {
-                    self.selectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.65)
-                }
-//                self.selectionView.backgroundColor = self.mode == .ReadOnly ? self.color.withAlphaComponent(0.65) : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color.withAlphaComponent(0.65)
-                
-                if let imageView = self.horizontalStack.getSubview(type: UIImageView.self, identifier: "chevron") {
-                    imageView.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
-                }
-//            if let imageView = self.progressStack.getSubview(type: UIImageView.self, identifier: "chevron") {
-//                imageView.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
-//            }
-            self.disclosureIndicator.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
-//            }
+            if let imageView = self.horizontalStack.getSubview(type: UIImageView.self, identifier: "chevron") {
+                imageView.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
+            }
+            self.disclosureIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
         }
     }
     public weak var host: ChoiceCollectionView?
@@ -256,15 +211,51 @@ class ChoiceCell: UICollectionViewCell {
         
         return instance
     }()
-    private lazy var disclosureIndicator: UIImageView = {
-        let disclosureIndicator = UIImageView()
-        disclosureIndicator.image = UIImage(systemName: "chevron.right")
-        disclosureIndicator.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
-//        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
-        disclosureIndicator.contentMode = .center
-        disclosureIndicator.alpha = 0
-        disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
-        return disclosureIndicator
+    private lazy var disclosureIndicator: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.alpha = 0
+        
+        let imageView = UIImageView()
+        imageView.accessibilityIdentifier = "imageView"
+        imageView.image = UIImage(systemName: "chevron.right")
+        imageView.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
+        imageView.contentMode = .center
+        imageView.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        instance.addSubview(imageView)
+        NSLayoutConstraint.activate([
+            imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 1/1),
+            imageView.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+            imageView.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+        ])
+        
+        return instance
+    }()
+    private lazy var checkmarkIndicator: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.alpha = 0
+        
+        let imageView = UIImageView()
+        imageView.accessibilityIdentifier = "imageView"
+        imageView.image = UIImage(systemName: "checkmark.seal.fill")
+        imageView.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
+        imageView.contentMode = .center
+        imageView.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .medium)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        instance.addSubview(imageView)
+        NSLayoutConstraint.activate([
+            imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 1/1),
+            imageView.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+            imageView.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+        ])
+        
+        return instance
     }()
     private lazy var doubleDisclosureIndicator: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "chevron.right.2"))
@@ -283,7 +274,7 @@ class ChoiceCell: UICollectionViewCell {
 //        imageView.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
 //        imageView.contentMode = .center
         
-        let instance = UIStackView(arrangedSubviews: [shadowView, disclosureIndicator])//imageView
+        let instance = UIStackView(arrangedSubviews: [checkmarkIndicator, shadowView, disclosureIndicator])//imageView
         instance.axis = .horizontal
         instance.spacing = 4
         
@@ -291,30 +282,24 @@ class ChoiceCell: UICollectionViewCell {
 //        constraint.identifier = "height"
 //        constraint.priority = .defaultLow
 //        constraint.isActive = true
-//        imageView.translatesAutoresizingMaskIntoConstraints = false
-//        shadowView.translatesAutoresizingMaskIntoConstraints = false
-
-//        NSLayoutConstraint.activate([
-//            shadowView.heightAnchor.constraint(equalTo: instance.heightAnchor),
-//            shadowView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.9),
-//            shadowView.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-//            shadowView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
-////            imageView.heightAnchor.constraint(equalTo: instance.heightAnchor),
-//        ])
-        
-        shadowView.translatesAutoresizingMaskIntoConstraints = false
+        checkmarkIndicator.translatesAutoresizingMaskIntoConstraints = false
         disclosureIndicator.translatesAutoresizingMaskIntoConstraints = false
-        
+        shadowView.translatesAutoresizingMaskIntoConstraints = false
+
         NSLayoutConstraint.activate([
+            checkmarkIndicator.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.065),
+            disclosureIndicator.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.065),
             shadowView.heightAnchor.constraint(equalTo: instance.heightAnchor),
             disclosureIndicator.heightAnchor.constraint(equalTo: instance.heightAnchor),
-//            votersLabel.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.6)
         ])
 
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [votersLabel, votersView, votersCountLabel, doubleDisclosureIndicator])
+        let spacer = UIView()
+        spacer.backgroundColor = .clear
+        
+        let instance = UIStackView(arrangedSubviews: [votersLabel, votersView, votersCountLabel, doubleDisclosureIndicator, spacer])
         instance.axis = .horizontal
         instance.clipsToBounds = false
         instance.spacing = 4
@@ -322,11 +307,13 @@ class ChoiceCell: UICollectionViewCell {
         votersLabel.translatesAutoresizingMaskIntoConstraints = false
         votersView.translatesAutoresizingMaskIntoConstraints = false
         doubleDisclosureIndicator.translatesAutoresizingMaskIntoConstraints = false
+        spacer.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             votersLabel.heightAnchor.constraint(equalTo: instance.heightAnchor),
             votersView.heightAnchor.constraint(equalTo: instance.heightAnchor),
             doubleDisclosureIndicator.heightAnchor.constraint(equalTo: instance.heightAnchor),
+            spacer.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.065),
 //            votersLabel.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.6)
         ])
 
@@ -340,8 +327,8 @@ class ChoiceCell: UICollectionViewCell {
         horizontalStack.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
-            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -16),
+            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),//, constant: 8),
+            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor),//, constant: -16),
             horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
             horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
@@ -420,7 +407,6 @@ class ChoiceCell: UICollectionViewCell {
         openConstraint = verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         openConstraint.priority = .defaultLow
         
-        
         observers.append(contentView.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
@@ -473,15 +459,18 @@ class ChoiceCell: UICollectionViewCell {
             }
             return
         }
-//        guard let constraint_1 = selectionView.getAllConstraints().filter({ $0.identifier == "width"}).first else { return }//,
-//              let constraint_2 = checkmark.getAllConstraints().filter({ $0.identifier == "width"}).first else { return }
-        guard isSelected else {
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-                self.selectionView.alpha =  self.isSelected ? 1 : 0
-            } completion: { _ in }
-            return
-        }
-        reveal(view: selectionView, duration: 0.275, animateOpacity: true, completionBlocks: [])
+        
+        checkmarkIndicator.transform = !isSelected ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseInOut) {
+            self.selectionView.alpha =  self.isSelected ? 1 : 0
+            self.checkmarkIndicator.alpha =  self.isSelected ? 1 : 0
+            self.checkmarkIndicator.transform = self.isSelected ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
+        } completion: { _ in }
+        
+        guard isSelected else { return }
+        
+        reveal(view: selectionView, duration: 0.2, animateOpacity: true, completionBlocks: [])
     }
     
     /// Updates the views to reflect changes in selection
@@ -914,7 +903,7 @@ class ChoiceCell: UICollectionViewCell {
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         
         if mode == .ReadOnly {
-            self.selectionView.backgroundColor = self.color.withAlphaComponent(self.isChosen ? 1 : 0.25)
+            self.selectionView.backgroundColor = self.color//.withAlphaComponent(self.isChosen ? 1 : 0.25)
 //            if isChosen {
 ////                contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue.withAlphaComponent(0.4) : color.withAlphaComponent(0.4)
 //                avatars.forEach {
@@ -933,6 +922,9 @@ class ChoiceCell: UICollectionViewCell {
 
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        votersLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+        votersCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
         textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                           forTextStyle: .body)
         guard let constraint = shadowView.getConstraint(identifier: "height") else { return }

@@ -38,16 +38,21 @@ class VotersController: UIViewController {
     }()
     private lazy var countLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.text = answer.totalVotes.roundedWithAbbreviations
+        label.textColor = .label
+        label.text = String(describing: answer.totalVotes)
         label.textAlignment = .center
-        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
+        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)
         label.numberOfLines = 1
         label.accessibilityIdentifier = "countLabel"
         
         return label
     }()
     private let padding: CGFloat = 8
+    
+    // MARK: - Overriden properties
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
     
     // MARK: - Destructor
     deinit {
@@ -77,49 +82,70 @@ class VotersController: UIViewController {
         
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         
+        let appearance = UINavigationBarAppearance()
+        appearance.backgroundColor = color
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+//        navigationBar.tintColor = .black
+        //        navigationBar.backgroundColor = color
+        
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         
-        let countWidth = min(answer.totalVotes.roundedWithAbbreviations.width(withConstrainedHeight: UINavigationController.Constants.ImageSizeForLargeState, font: countLabel.font), navigationBar.frame.width - UINavigationController.Constants.ImageRightMargin*2)
-        let titleWidth = min(answer.description.width(withConstrainedHeight: UINavigationController.Constants.ImageSizeForLargeState, font: titleLabel.font) + titleLabel.insets.left*4, navigationBar.frame.width - UINavigationController.Constants.ImageRightMargin*2 - padding) - countWidth
+//        let stackView = UIStackView()//frame: CGRect(origin: .zero, size: CGSize(width: navigationBar.frame.width*0.75, height: 40)))
+//        stackView.axis = .horizontal
+//        stackView.spacing = 4
         
-        navigationBar.addSubview(titleLabel)
-        navigationBar.addSubview(countLabel)
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        countLabel.translatesAutoresizingMaskIntoConstraints = false
+//        let test = UIView(frame: CGRect(origin: .zero, size: CGSize(width: navigationBar.frame.width*0.75, height: 40)))
+//        test.backgroundColor = .red
         
-        NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: UINavigationController.Constants.ImageRightMargin),
-            titleLabel.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-//            label.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-            titleLabel.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
-            countLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: padding),
-            countLabel.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-//            label.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-            countLabel.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
-        ])
+        navigationItem.titleView = countLabel
         
-        let titleConstraint = titleLabel.widthAnchor.constraint(equalToConstant: titleWidth)
-        titleConstraint.identifier = "width"
-        titleConstraint.isActive = true
+//        let countWidth = min(answer.totalVotes.roundedWithAbbreviations.width(withConstrainedHeight: UINavigationController.Constants.ImageSizeForLargeState, font: countLabel.font), navigationBar.frame.width - UINavigationController.Constants.ImageRightMargin*2)
+//        let titleWidth = min(answer.description.width(withConstrainedHeight: UINavigationController.Constants.ImageSizeForLargeState, font: titleLabel.font) + titleLabel.insets.left*4, navigationBar.frame.width - UINavigationController.Constants.ImageRightMargin*2 - padding) - countWidth
         
-        let countConstraint = countLabel.widthAnchor.constraint(equalToConstant: countWidth)
-        countConstraint.identifier = "width"
-        countConstraint.isActive = true
         
-        observers.append(titleLabel.observe(\InsetLabel.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            view.cornerRadius = newValue.height/2.25
-        })
         
-        observers.append(countLabel.observe(\UILabel.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            view.cornerRadius = newValue.height/2.25
-        })
-        
-        self.titleLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        self.countLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        self.titleLabel.alpha = 0
-        self.countLabel.alpha = 0
+//        let countWidth = min(answer.totalVotes.roundedWithAbbreviations.width(withConstrainedHeight: UINavigationController.Constants.ImageSizeForLargeState, font: countLabel.font), navigationBar.frame.width - UINavigationController.Constants.ImageRightMargin*2)
+//        let titleWidth = min(answer.description.width(withConstrainedHeight: UINavigationController.Constants.ImageSizeForLargeState, font: titleLabel.font) + titleLabel.insets.left*4, navigationBar.frame.width - UINavigationController.Constants.ImageRightMargin*2 - padding) - countWidth
+//
+//        navigationBar.addSubview(titleLabel)
+//        navigationBar.addSubview(countLabel)
+//        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+//        countLabel.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: UINavigationController.Constants.ImageRightMargin),
+//            titleLabel.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
+////            label.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState/2),
+//            titleLabel.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
+//            countLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: padding),
+//            countLabel.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
+////            label.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: UINavigationController.Constants.ImageBottomMarginForLargeState/2),
+//            countLabel.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
+//        ])
+//
+//        let titleConstraint = titleLabel.widthAnchor.constraint(equalToConstant: titleWidth)
+//        titleConstraint.identifier = "width"
+//        titleConstraint.isActive = true
+//
+//        let countConstraint = countLabel.widthAnchor.constraint(equalToConstant: countWidth)
+//        countConstraint.identifier = "width"
+//        countConstraint.isActive = true
+//
+//        observers.append(titleLabel.observe(\InsetLabel.bounds, options: .new) { view, change in
+//            guard let newValue = change.newValue else { return }
+//            view.cornerRadius = newValue.height/2.25
+//        })
+//
+//        observers.append(countLabel.observe(\UILabel.bounds, options: .new) { view, change in
+//            guard let newValue = change.newValue else { return }
+//            view.cornerRadius = newValue.height/2.25
+//        })
+//
+//        self.titleLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//        self.countLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//        self.titleLabel.alpha = 0
+//        self.countLabel.alpha = 0
     }
     
     private func setObservers() {
@@ -140,9 +166,10 @@ class VotersController: UIViewController {
         guard answer.voters.count > 1 else { return }
         let gesture = UITapGestureRecognizer(target: self, action: #selector(VotersController.showFilter))
         filterButton.addGestureRecognizer(gesture)
-        filterButton.contentMode = .scaleAspectFit
-        filterButton.image = ImageSigns.filter.image
-        filterButton.tintColor = .systemGray
+        filterButton.contentMode = .center
+        filterButton.image = UIImage(systemName: "slider.horizontal.3")
+        filterButton.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .large)
+        filterButton.tintColor = .label
         navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: filterButton)]
     }
     
@@ -174,9 +201,16 @@ class VotersController: UIViewController {
         self.controllerInput?
             .modelOutput = self
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-                navigationItem.largeTitleDisplayMode = .always
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
+        navigationController?.navigationBar.overrideUserInterfaceStyle = .light
+        setNeedsStatusBarAppearanceUpdate()
+//        UIApplication.shared.statusBarView?.overrideUserInterfaceStyle = .dark
+//        navigationController?.preferredStatusBarStyle = .lightContent
+//        navigationController?.navigationBar.prefersLargeTitles = true
+//                navigationItem.largeTitleDisplayMode = .always
 
+        navigationController?.navigationBar.prefersLargeTitles = false
+                navigationItem.largeTitleDisplayMode = .never
         
 //        self.view = view as UIView
         setFilterButton()
@@ -211,14 +245,14 @@ class VotersController: UIViewController {
         }
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        guard !controllerOutput.isNil else { return }
-        if isFilterEnabled {
-            filterButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
-        } else {
-            filterButton.tintColor = .systemGray
-        }
-    }
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        guard !controllerOutput.isNil else { return }
+//        if isFilterEnabled {
+//            filterButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        } else {
+//            filterButton.tintColor = .systemGray
+//        }
+//    }
 }
 
 // MARK: - View Input
@@ -226,9 +260,9 @@ extension VotersController: VotersViewInput {
     func setFilterEnabled(_ isOn: Bool) {
         isFilterEnabled = isOn
         if isOn {
-            filterButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+            filterButton.tintColor = .label
         } else {
-            filterButton.tintColor = .systemGray
+            filterButton.tintColor = .clear
         }
     }
     
@@ -260,3 +294,9 @@ extension VotersController: VotersModelOutput {
     }
 }
 
+// MARK: - UIGestureRecognizerDelegate
+extension VotersController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+}

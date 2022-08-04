@@ -269,3 +269,7 @@
 "added_to_watch_list" = "Poll was added to watch list";
 "votes_total" = "Votes";
 "voters" = "Voters";
+
+//Tutorials
+"poll_vote_edu_1" = "The poll will end and disappear from the lists after the required number of participants has been reached.";
+"poll_vote_edu_2" = "Add a poll to your watch list to see the result of the vote";

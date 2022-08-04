@@ -31,6 +31,10 @@ class ListController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
+        
         listSwitch.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
     }

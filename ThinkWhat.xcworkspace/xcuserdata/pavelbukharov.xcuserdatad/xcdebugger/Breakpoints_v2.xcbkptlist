@@ -1721,8 +1721,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Hot/HotView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "165"
-            endingLineNumber = "165"
+            startingLineNumber = "166"
+            endingLineNumber = "166"
             landmarkName = "getCard()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1848,8 +1848,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/List/ListController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "144"
-            endingLineNumber = "144"
+            startingLineNumber = "148"
+            endingLineNumber = "148"
             landmarkName = "callbackReceived(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1864,8 +1864,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/List/ListController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "82"
-            endingLineNumber = "82"
+            startingLineNumber = "86"
+            endingLineNumber = "86"
             landmarkName = "category"
             landmarkType = "24">
          </BreakpointContent>

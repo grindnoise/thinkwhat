@@ -35,6 +35,10 @@ class SurveyCell: UICollectionViewListCell {
                 titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
                 descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
             } else {
+                if !item.isOwn {
+                    topicStackView.removeArrangedSubview(progressView)
+                    progressView.removeFromSuperview()
+                }
                 titleLabel.textColor = .label
                 descriptionLabel.textColor = .label
             }
@@ -157,7 +161,7 @@ class SurveyCell: UICollectionViewListCell {
         let instance = InsetLabel()
         instance.insets = UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0)
         instance.textAlignment = .left
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)
         instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
         instance.textColor = .label
@@ -179,7 +183,7 @@ class SurveyCell: UICollectionViewListCell {
         let instance = InsetLabel()
         instance.insets = UIEdgeInsets(top: 5, left: 0, bottom: 10, right: 0)
         instance.textAlignment = .left
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .callout)
         instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
         instance.textColor = .label
@@ -431,7 +435,7 @@ class SurveyCell: UICollectionViewListCell {
 //            avatar.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
             avatar.topAnchor.constraint(equalTo: instance.topAnchor),
             avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-            avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.8),
+            avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.6),
 //            dateLabel.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
 //            dateLabel.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
         ])
@@ -440,10 +444,10 @@ class SurveyCell: UICollectionViewListCell {
     private lazy var firstnameLabel: ArcLabel = {
         let instance = ArcLabel()
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont(name: Fonts.Semibold, size: 9)//UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.text = "test"
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
         instance.accessibilityIdentifier = "firstnameLabel"
         return instance
     }()
@@ -452,10 +456,10 @@ class SurveyCell: UICollectionViewListCell {
         instance.angle = 4.7
         instance.clockwise = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont(name: Fonts.Semibold, size: 9)//UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.text = "test"
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
         instance.accessibilityIdentifier = "lastnameLabel"
         return instance
     }()
@@ -637,6 +641,7 @@ class SurveyCell: UICollectionViewListCell {
                         case true:
                             self.titleLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
                             self.descriptionLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+                            self.topicStackView.insertArrangedSubview(self.progressView, at: 1)
 
 //                            self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemGray : item.isComplete ? .systemGreen : .systemGray
                             var stackView: UIStackView!
@@ -858,6 +863,8 @@ class SurveyCell: UICollectionViewListCell {
 //        descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 //        descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
+        firstnameLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
+        lastnameLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
         
         if !item.isNil {
             if item.isComplete {
@@ -890,14 +897,14 @@ class SurveyCell: UICollectionViewListCell {
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                            forTextStyle: .title1)
+        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                            forTextStyle: .title2)
         ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .caption2)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .caption2)
         descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .body)
+                                            forTextStyle: .callout)
         topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
                                             forTextStyle: .footnote)
 //        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,

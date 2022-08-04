@@ -136,7 +136,7 @@ class QuestionCell: UICollectionViewCell {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: instance.topAnchor),
+            collectionView.topAnchor.constraint(equalTo: instance.topAnchor, constant: 20),
             collectionView.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
         ])

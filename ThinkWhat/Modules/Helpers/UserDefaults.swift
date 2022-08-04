@@ -165,6 +165,9 @@ extension UserDefaults {
         @UserDefault(key: "has_seen_poll_introduction", defaultValue: false)
         static var hasSeenPollIntroduction: Bool?
         
+        @UserDefault(key: "has_seen_poll_vote_introduction", defaultValue: false)
+        static var hasSeenPollVoteIntroduction: Bool?
+        
         @UserDefault(key: "min_api_version", defaultValue: 0.3)
         static var minAPIVersion: Double?
         
@@ -189,7 +192,8 @@ extension UserDefaults {
         static var hasSeenPollCreationIntroduction: Bool
         
         static func clear() {
-            UserDefaults.App.hasSeenPollIntroduction             = nil
+            UserDefaults.App.hasSeenPollIntroduction            = nil
+            UserDefaults.App.hasSeenPollVoteIntroduction        = nil
             UserDefaults.App.hasSeenAppIntroduction             = nil
             UserDefaults.App.minAPIVersion                      = nil
             UserDefaults.App.countryByIP                        = nil

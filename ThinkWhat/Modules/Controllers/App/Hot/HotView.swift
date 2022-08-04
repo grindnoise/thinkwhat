@@ -139,6 +139,7 @@ extension HotView: HotControllerOutput {
     }
     
     func onLoad() {
+        
         guard currentCard.isNil || nextCard.isNil else {
             return
         }

@@ -93,7 +93,7 @@ class PollCollectionView: UICollectionView {
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
 //            sectionLayout.interGroupSpacing = 20
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
             return sectionLayout
         }
         
@@ -356,6 +356,10 @@ extension PollCollectionView: UICollectionViewDelegate {
         collectionView.deselectItem(at: indexPath, animated: true)
         source.refresh()
         return false
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        host.lastContentOffsetY = scrollView.contentOffset.y
     }
 }
 

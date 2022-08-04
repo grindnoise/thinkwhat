@@ -38,9 +38,10 @@ struct Animations {
         
     }
     
-    static func get(property: AnimationProperty, fromValue: Any, toValue: Any, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true, completionBlocks: [Closure]? = nil) -> CAAnimation {
+    static func get(property: AnimationProperty, fromValue: Any, toValue: Any, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true, completionBlocks: [Closure]? = nil, delay: CFTimeInterval = 0.0) -> CAAnimation {
         
         let anim = CABasicAnimation(keyPath: property.rawValue)
+        anim.beginTime = CACurrentMediaTime() + delay
         anim.fromValue = fromValue
         anim.toValue = toValue
         anim.duration = duration

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 /// *View* sends user actions to the *Controller*.
 ///
@@ -69,6 +70,8 @@ protocol PollControllerOutput: AnyObject {
 //    var hasVoted: Bool { get }
 //    var showNext: Bool { get }
     var mode: PollController.Mode { get }
+//    @Published var lastContentOffsetY: CGFloat { get }
+    var scrollOffsetPublisher: Published<CGFloat>.Publisher { get }
     
 //    func onSurveyLoaded()
     func onLoadCallback()

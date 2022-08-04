@@ -84,6 +84,7 @@
 		AB2C03CE24407C5D001BFD75 /* LostConnectionAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2C03CD24407C5D001BFD75 /* LostConnectionAnimation.swift */; };
 		AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2C03D02440A611001BFD75 /* LostConnectionView.swift */; };
 		AB2C03D32440A61C001BFD75 /* LostConnectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB2C03D22440A61C001BFD75 /* LostConnectionView.xib */; };
+		AB2C29F5289C116900D409B7 /* VoteEducation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2C29F4289C116900D409B7 /* VoteEducation.swift */; };
 		AB2FBD02242A433000344DCC /* CheckBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2FBD01242A433000344DCC /* CheckBox.swift */; };
 		AB309C7927ADB4E1005BBCB4 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB309C7827ADB4E1005BBCB4 /* UserDefaults.swift */; };
 		AB30A4F9272AAD5300A7DCC0 /* Claim.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB30A4F8272AAD5200A7DCC0 /* Claim.swift */; };
@@ -641,6 +642,7 @@
 		AB2C03CD24407C5D001BFD75 /* LostConnectionAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LostConnectionAnimation.swift; sourceTree = "<group>"; };
 		AB2C03D02440A611001BFD75 /* LostConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LostConnectionView.swift; sourceTree = "<group>"; };
 		AB2C03D22440A61C001BFD75 /* LostConnectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LostConnectionView.xib; sourceTree = "<group>"; };
+		AB2C29F4289C116900D409B7 /* VoteEducation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoteEducation.swift; sourceTree = "<group>"; };
 		AB2FBD01242A433000344DCC /* CheckBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBox.swift; sourceTree = "<group>"; };
 		AB309C7827ADB4E1005BBCB4 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		AB30A4F8272AAD5200A7DCC0 /* Claim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Claim.swift; sourceTree = "<group>"; };
@@ -1408,6 +1410,22 @@
 				AB2C03CD24407C5D001BFD75 /* LostConnectionAnimation.swift */,
 			);
 			path = LostConnectionView;
+			sourceTree = "<group>";
+		};
+		AB2C29F2289C113200D409B7 /* Education */ = {
+			isa = PBXGroup;
+			children = (
+				AB2C29F3289C113D00D409B7 /* Poll vote */,
+			);
+			path = Education;
+			sourceTree = "<group>";
+		};
+		AB2C29F3289C113D00D409B7 /* Poll vote */ = {
+			isa = PBXGroup;
+			children = (
+				AB2C29F4289C116900D409B7 /* VoteEducation.swift */,
+			);
+			path = "Poll vote";
 			sourceTree = "<group>";
 		};
 		AB2FBD00242A431A00344DCC /* Answer */ = {
@@ -2664,6 +2682,7 @@
 		ABADF5A327F73C7400A26474 /* Content */ = {
 			isa = PBXGroup;
 			children = (
+				AB2C29F2289C113200D409B7 /* Education */,
 				AB7085E526CB99EE006F020F /* SideApp */,
 				AB1F34D1286B25A30086969E /* Image paste */,
 				AB1F34CC286B1CE80086969E /* URL paste */,
@@ -3561,6 +3580,7 @@
 				AB0AB63B27B5001F006FD33F /* ConditionsContract.swift in Sources */,
 				AB219CA22420D0400074CF9F /* SurveyYoutubeCell.swift in Sources */,
 				AB30A4F9272AAD5300A7DCC0 /* Claim.swift in Sources */,
+				AB2C29F5289C116900D409B7 /* VoteEducation.swift in Sources */,
 				AB9998BC280585B9009D0E4F /* UILabel.swift in Sources */,
 				AB52B734240E5D4B006DBDA8 /* ReadySign.swift in Sources */,
 				AB016BFE26CA73BA005C5A87 /* ButtonWithImage.swift in Sources */,

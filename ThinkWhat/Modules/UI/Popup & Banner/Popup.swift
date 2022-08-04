@@ -10,10 +10,14 @@ import UIKit
 
 class Popup: UIView {
     
-    // MARK: - Initialization
+    // MARK: - Destructor
     deinit {
-        print("Popup deinit")
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
     }
+    
+    // MARK: - Initialization
     
     init(frame: CGRect = UIScreen.main.bounds, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightScaleFactor _heightMultiplictator: CGFloat = 0.7) {
         self.heightScaleFactor = _heightMultiplictator
@@ -238,6 +242,8 @@ extension Popup: CallbackObservable {
             dismiss()
         } else if sender is PollCreationController.Hot {
             callbackDelegate?.callbackReceived(sender)
+            dismiss()
+        } else if sender is VoteEducation {
             dismiss()
         }
     }
