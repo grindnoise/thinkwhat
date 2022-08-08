@@ -136,7 +136,7 @@ class PollTitleCell: UICollectionViewCell {
         return verticalStack
     }()
     private var observers: [NSKeyValueObservation] = []
-    private let padding: CGFloat = 20
+    private let padding: CGFloat = 50
     private var constraint: NSLayoutConstraint!
     ///Store tasks from NotificationCenter's AsyncStream
     private var notifications: [Task<Void, Never>?] = []

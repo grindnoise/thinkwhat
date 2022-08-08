@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class PollCollectionView: UICollectionView {
     
@@ -38,6 +39,7 @@ class PollCollectionView: UICollectionView {
     }
     
     // MARK: - Private properties
+    private var subscriptions = Set<AnyCancellable>()
     private weak var host: PollView!
     private let poll: Survey
     private weak var callbackDelegate: CallbackObservable?
@@ -63,6 +65,14 @@ class PollCollectionView: UICollectionView {
             }
         }
     }
+//    public var colorSubject = PassthroughSubject<UIColor, Never>()
+//    @Published var colorPublisher: UIColor = .clear {
+//        didSet {
+//            print("received \(colorPublisher)")
+//        }
+//    }
+    public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
+    public var modeSubject = PassthroughSubject<PollController.Mode, Never>()
     
     // MARK: - Initialization
     init(host: PollView?, poll: Survey, callbackDelegate: CallbackObservable) {
@@ -132,11 +142,44 @@ class PollCollectionView: UICollectionView {
         let questionCellRegistration = UICollectionView.CellRegistration<QuestionCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self else { return }
             cell.mode = self.host.mode
-            guard cell.item.isNil else { return }
+//            guard cell.item.isNil else { return }
             cell.callbackDelegate = self
             cell.boundsListener = self
             cell.answerListener = self
             cell.item = self.poll
+            
+            self.modeSubject.sink {
+#if DEBUG
+                print("receiveCompletion: \($0)")
+#endif
+            } receiveValue:  {
+                cell.mode = $0
+            }.store(in: &self.subscriptions)
+            
+//            self.modeSubject.subscribe(cell.modeSubject)
+//            cell.modeSubject.sink {
+//                print($0)
+//            }
+////            cell.modeSubject.sink { [weak self] in
+////                guard let self = self,
+////                      let mode = $0
+////                else { return }
+////                print(mode)
+//////                self.colorSubject.send(color)
+////            }.store(in: &self.subscriptions)
+            
+            cell.colorSubject.sink { [weak self] in
+                guard let self = self,
+                      let color = $0
+                else { return }
+                self.colorSubject.send(color)
+//                self.colorSubject.send(completion: .finished)
+            }.store(in: &self.subscriptions)
+            
+//            cell.$colorPublisher.receive(on: RunLoop.main).sink { [weak self] in
+//                guard let self = self else { return }
+//                self.colorPublisher = $0
+//            }.store(in: &self.subscriptions)
         }
         
 //        let choicesCellRegistration = UICollectionView.CellRegistration<ChoiceSectionCell, AnyHashable> { [weak self] cell, indexPath, item in
@@ -146,9 +189,30 @@ class PollCollectionView: UICollectionView {
 //        }
 
         let voteCellRegistration = UICollectionView.CellRegistration<VoteCell, AnyHashable> { [weak self] cell, indexPath, item in
-            guard let self = self, cell.color.isNil else { return }
+            guard let self = self else { return }
             cell.callbackDelegate = self
-            cell.color = self.poll.topic.tagColor
+//            cell.color = self.poll.topic.tagColor
+
+//            cell.$color.sink { [weak self] in
+//                print($0)
+////                guard let self = self else { return }
+////                $0
+//            }
+            
+            self.colorSubject.sink {
+#if DEBUG
+                print("receiveCompletion: \($0)")
+#endif
+            } receiveValue: {
+                guard let color = $0 else { return }
+                cell.color = color
+            }.store(in: &self.subscriptions)
+//            cell.$color = self.colorSubject.value.publisher
+//            self.colorSubject.subscribe(cell.$color)
+            
+//            self.colorSubject.value.publisher.assign(to: &cell.$color)
+            
+
         }
         
         let commentsCellRegistration = UICollectionView.CellRegistration<CommentsSectionCell, AnyHashable> { [weak self] cell, indexPath, item in
@@ -277,11 +341,12 @@ class PollCollectionView: UICollectionView {
     public func onVoteCallback(_ result: Result<Bool, Error>){
         switch result {
         case .success:
-            guard let cell = visibleCells.filter({ $0.isKind(of: QuestionCell.self) }).first as? QuestionCell,
-                  let mode = host?.mode else { return }
-            cell.mode = mode
+            modeSubject.send(host.mode)
+            modeSubject.send(completion: .finished)
+//            guard let cell = visibleCells.filter({ $0.isKind(of: QuestionCell.self) }).first as? QuestionCell,
+//                  let mode = host?.mode else { return }
+//            cell.mode = mode
             //Remove .vote section
-//            guard let _ = visibleCells.filter({ $0.isKind(of: VoteCell.self) }).first as? VoteCell else { return }
             var snapshot = source.snapshot()
             snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .vote))
             snapshot.deleteSections([.vote])

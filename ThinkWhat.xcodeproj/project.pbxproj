@@ -247,9 +247,12 @@
 		AB61BA2F2782DDA200F89C4C /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB61BA2E2782DDA200F89C4C /* Media.swift */; };
 		AB63D7D6283FC03A00173116 /* TopicSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB63D7D5283FC03A00173116 /* TopicSelection.swift */; };
 		AB63D7D8283FC04F00173116 /* TopicSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB63D7D7283FC04F00173116 /* TopicSelection.xib */; };
+		AB649E2628A1597800978520 /* CommentParentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB649E2528A1597800978520 /* CommentParentCell.swift */; };
+		AB649E2828A15A9C00978520 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB649E2728A15A9C00978520 /* Comment.swift */; };
 		AB66B4DD282D06AC00244A38 /* ListSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66B4DC282D06AC00244A38 /* ListSwitch.swift */; };
 		AB66B4DF282D06B600244A38 /* ListSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB66B4DE282D06B600244A38 /* ListSwitch.xib */; };
 		AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */; };
+		AB6AFFCF289D514B00D260F4 /* Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6AFFCE289D514B00D260F4 /* Combine.swift */; };
 		AB6B071F247688600095721B /* delUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6B071E247688600095721B /* delUserViewController.swift */; };
 		AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */; };
 		AB7085E726CB9A1F006F020F /* SideApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7085E626CB9A1F006F020F /* SideApp.swift */; };
@@ -813,9 +816,12 @@
 		AB61BA2E2782DDA200F89C4C /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		AB63D7D5283FC03A00173116 /* TopicSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelection.swift; sourceTree = "<group>"; };
 		AB63D7D7283FC04F00173116 /* TopicSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TopicSelection.xib; sourceTree = "<group>"; };
+		AB649E2528A1597800978520 /* CommentParentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentParentCell.swift; sourceTree = "<group>"; };
+		AB649E2728A15A9C00978520 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		AB66B4DC282D06AC00244A38 /* ListSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListSwitch.swift; sourceTree = "<group>"; };
 		AB66B4DE282D06B600244A38 /* ListSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListSwitch.xib; sourceTree = "<group>"; };
 		AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconsStyleKit.swift; sourceTree = "<group>"; };
+		AB6AFFCE289D514B00D260F4 /* Combine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Combine.swift; sourceTree = "<group>"; };
 		AB6B071E247688600095721B /* delUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delUserViewController.swift; sourceTree = "<group>"; };
 		AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyIcons.swift; sourceTree = "<group>"; };
 		AB7085E626CB9A1F006F020F /* SideApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideApp.swift; sourceTree = "<group>"; };
@@ -1250,6 +1256,7 @@
 				AB913F782806FADF00609D51 /* UIViewController.swift */,
 				ABCBDA0F28759F2500888F23 /* UIFont+.swift */,
 				AB48E2B7287DD7D60020F81B /* UICollectionView+.swift */,
+				AB6AFFCE289D514B00D260F4 /* Combine.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1868,6 +1875,7 @@
 			children = (
 				AB4054FE28785A66000F7768 /* CommentsCollectionView.swift */,
 				AB40550028785AAB000F7768 /* CommentCell.swift */,
+				AB649E2528A1597800978520 /* CommentParentCell.swift */,
 			);
 			path = CommentsCollectionView;
 			sourceTree = "<group>";
@@ -2504,6 +2512,7 @@
 				AB1D845124EA91D200B75929 /* Topic.swift */,
 				ABEDC4E22450168D00FA9128 /* User.swift */,
 				AB48E2B5287DA68B0020F81B /* SurveyResult.swift */,
+				AB649E2728A15A9C00978520 /* Comment.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -3531,6 +3540,7 @@
 				AB30A4FD272AAEAD00A7DCC0 /* Answer.swift in Sources */,
 				AB4054FA28783E81000F7768 /* VoteCell.swift in Sources */,
 				AB3211AE288E810A00C736DE /* TopicHeaderCell.swift in Sources */,
+				AB649E2628A1597800978520 /* CommentParentCell.swift in Sources */,
 				AB37B9B22774BF3A00C7DEBC /* API.swift in Sources */,
 				AB87904D286DF03500C069BA /* ChoiceResultCell.swift in Sources */,
 				ABCDE35F260C7D3300ACF5A6 /* VerticalTextLayer.swift in Sources */,
@@ -3545,6 +3555,7 @@
 				AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */,
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
 				ABC18337284E502A005D1C31 /* ImageSelectionHeaderContent.swift in Sources */,
+				AB649E2828A15A9C00978520 /* Comment.swift in Sources */,
 				AB3EF64022F4480C004BA878 /* MailValidationViewController.swift in Sources */,
 				AB2AA1BB235DDC6F0086D16C /* SurveysViewController.swift in Sources */,
 				ABADF58827F2E4F300A26474 /* WebCell.swift in Sources */,
@@ -3667,6 +3678,7 @@
 				ABA448F327EE031D00F8E00D /* PollModel.swift in Sources */,
 				ABB9E887279EA6510018BB2E /* WelcomeView.swift in Sources */,
 				AB3C686B223FDEEA00B57580 /* _AuthViewController.swift in Sources */,
+				AB6AFFCF289D514B00D260F4 /* Combine.swift in Sources */,
 				AB72961027DA2F0F00D45B54 /* HotModel.swift in Sources */,
 				AB3A6F8C286F444F0073FFF7 /* ImageCell.swift in Sources */,
 				ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */,

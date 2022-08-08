@@ -13,7 +13,11 @@ class CommentsSectionCell: UICollectionViewCell {
     // MARK: - Public Properties
     ///Внимание, вызывается из collectionView.didSelect!
     override var isSelected: Bool { didSet { updateAppearance() } }
-    public weak var boundsListener: BoundsListener?
+//    public weak var boundsListener: BoundsListener? {
+//        didSet {
+//            collectionView.boundsListener = boundsListener
+//        }
+//    }
     var item: Survey! {
         didSet {
             guard !item.isNil else { return }
@@ -38,9 +42,9 @@ class CommentsSectionCell: UICollectionViewCell {
         
         NSLayoutConstraint.activate([
             horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
-            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
+//            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
             horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
-            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
+            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
         
         return instance
@@ -100,7 +104,20 @@ class CommentsSectionCell: UICollectionViewCell {
 //
 //        return instance
 //    }()
-    
+    private lazy var containerView: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.addSubview(collectionView)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: instance.topAnchor, constant: 20),
+            collectionView.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+        ])
+        
+        return instance
+    }()
     // Stacks
     private lazy var horizontalStack: UIStackView = {
         let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
@@ -109,11 +126,10 @@ class CommentsSectionCell: UICollectionViewCell {
         constraint.isActive = true
         rootStack.alignment = .center
         rootStack.spacing = 4
-        rootStack.distribution = .fillProportionally
         return rootStack
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, collectionView])
+        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, containerView])
         verticalStack.axis = .vertical
         verticalStack.spacing = padding
         return verticalStack

@@ -137,22 +137,22 @@ class PollController: UIViewController {
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-            
+        
         navigationBar.addSubview(avatar)
         avatar.translatesAutoresizingMaskIntoConstraints = false
         navigationItem.rightBarButtonItem?.isEnabled = !_survey.isNil
-
+        
         NSLayoutConstraint.activate([
             avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
             avatar.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
             avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor)
-            ])
+        ])
         
         stackView.axis = .horizontal
         navigationBar.addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
-
+        
         NSLayoutConstraint.activate([
             stackView.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageRightMargin),
             stackView.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
@@ -588,7 +588,7 @@ class PollController: UIViewController {
             actionButton = UIBarButtonItem(title: "share".localized, image: image, primaryAction: shareAction, menu: nil)
             navigationItem.rightBarButtonItem = actionButton
         } else {
-            let watchAction : UIAction = .init(title: _survey.isFavorite ? "don't_watch".localized : "watch".localized, image: UIImage(systemName: "binoculars"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+            let watchAction : UIAction = .init(title: _survey.isFavorite ? "don't_watch".localized : "watch".localized, image: UIImage(systemName: "binoculars.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
                 guard let self = self else { return }
                 guard let instance = self._survey,
                       instance.isComplete else {
@@ -797,6 +797,12 @@ class PollController: UIViewController {
 // MARK: - View Input
 extension PollController: PollViewInput {
     func onVotersTapped(answer: Answer, color: UIColor) {
+//        let appearance = UINavigationBarAppearance()
+//        appearance.backgroundColor = .black
+//        navigationController?.interactivePopGestureRecognizer?.delegate = self
+//        navigationController?.navigationBar.overrideUserInterfaceStyle = .light
+//        setNeedsStatusBarAppearanceUpdate()
+        
         navigationController?.pushViewController(VotersController(answer: answer, color: color), animated: true)
         //        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
     }

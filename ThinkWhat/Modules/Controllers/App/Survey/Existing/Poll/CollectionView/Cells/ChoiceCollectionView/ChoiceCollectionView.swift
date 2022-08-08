@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class ChoiceCollectionView: UICollectionView {
 
@@ -24,16 +25,17 @@ class ChoiceCollectionView: UICollectionView {
     }
     public weak var answerListener: AnswerListener?
     public weak var boundsListener: BoundsListener?
-    
-    // MARK: - Private properties
     public var mode: PollController.Mode = .Write {
         didSet {
+            modeSubject.send(mode)
+            modeSubject.send(completion: .finished)
             allowsMultipleSelection = mode == .ReadOnly ? true : false
-                            visibleCells.enumerated().forEach {
-                                guard let cell = $1 as? ChoiceCell else { return }
-                                cell.color = Colors.tags()[$0]
-                                cell.mode = mode
-                            }
+//                            visibleCells.enumerated().forEach {
+//                                guard let cell = $1 as? ChoiceCell else { return }
+//                                cell.color = Colors.tags()[$0]
+//                                cell.mode = mode
+//                            }
+            
             if oldValue != mode, mode == .ReadOnly {
 //                reload(animatingDifferences: true, shouldChangeColor: true)
 //                visibleCells.enumerated().forEach {
@@ -51,13 +53,30 @@ class ChoiceCollectionView: UICollectionView {
             }
         }
     }
+    
+    
+    // MARK: - Private properties
+    private var subscriptions = Set<AnyCancellable>()
     private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<Section, Answer>!
-    private var shouldChangeColor = false
+    private var modeSubject = PassthroughSubject<PollController.Mode, Never>()
+    
+//    @Published var colorPublisher: UIColor = .clear
+    public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
+    
+//    private var color: UIColor = .clear {
+//        didSet {
+//            colorPublisher = color
+//        }
+//    }
+//    public var colorSubject = CurrentValueSubject<UIColor, Never>(.clear)
+//    private var shouldChangeColor = true
+    
 
     
     // MARK: - Destructor
     deinit {
+        subscriptions.forEach { $0.cancel() }
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
@@ -95,16 +114,39 @@ class ChoiceCollectionView: UICollectionView {
         let cellRegistration = UICollectionView.CellRegistration<ChoiceCell, Answer> { [weak self] cell, indexPath, item in
             guard let self = self else { return }
             cell.callbackDelegate = self
-//            if cell.item.isNil {
-                var configuration = UIBackgroundConfiguration.listPlainCell()
-                configuration.backgroundColor = .clear
-                cell.backgroundConfiguration = configuration
-                cell.item = item
-                cell.automaticallyUpdatesBackgroundConfiguration = false
-//            }
+            //            if cell.item.isNil {
+            var configuration = UIBackgroundConfiguration.listPlainCell()
+            configuration.backgroundColor = .clear
+            cell.backgroundConfiguration = configuration
+            cell.item = item
+            cell.automaticallyUpdatesBackgroundConfiguration = false
+            //            }
             cell.mode = self.mode
-            guard self.shouldChangeColor else { return }
+            //            guard self.shouldChangeColor else { return }
             cell.color = Colors.tags()[indexPath.row]
+            cell.index = indexPath.row + 1
+            
+            self.modeSubject.sink {
+#if DEBUG
+                print("receiveCompletion: \($0)")
+#endif
+            } receiveValue: { [weak self] in
+                guard let self = self else { return }
+                cell.mode = $0
+                self.colorSubject.send(completion: .finished)
+            }.store(in: &self.subscriptions)
+
+            
+            cell.colorSubject.sink {
+#if DEBUG
+                print("receiveCompletion: \($0)")
+#endif
+            } receiveValue: { [weak self] in
+                guard let self = self,
+                      let color = $0
+                else { return }
+                self.colorSubject.send(color)
+            }.store(in: &self.subscriptions)
         }
         
         source = UICollectionViewDiffableDataSource<Section, Answer>(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
@@ -130,12 +172,12 @@ class ChoiceCollectionView: UICollectionView {
     
     public func reload(sorted: Bool = false, animatingDifferences: Bool = true, shouldChangeColor: Bool = false) {
         guard !dataItems.isEmpty else { return }
-        self.shouldChangeColor = shouldChangeColor
+//        self.shouldChangeColor = shouldChangeColor
         
-        visibleCells.enumerated().forEach {
-            guard let cell = $1 as? ChoiceCell else { return }
-            cell.color = Colors.tags()[$0]
-        }
+//        visibleCells.enumerated().forEach {
+//            guard let cell = $1 as? ChoiceCell else { return }
+//            cell.color = Colors.tags()[$0]
+//        }
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Answer>()
         snapshot.appendSections([.main,])

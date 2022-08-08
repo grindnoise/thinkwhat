@@ -64,7 +64,9 @@ class VoteEducation: UIView {
     }()
     private lazy var label: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+        instance.font = UIFont(name: Fonts.OpenSans.Regular.rawValue, size: 30)
+        instance.adjustsFontSizeToFitWidth = true
+        instance.minimumScaleFactor = 0.4
         instance.textColor = .label
         instance.numberOfLines = 0
         instance.textAlignment = .center
@@ -124,8 +126,8 @@ class VoteEducation: UIView {
     
     private func setupUI() {
         verticalStack.addEquallyTo(to: self)
-        delayAsync(delay: 1) {
-            self.icon.addEnableAnimation(duration: 1.5, completionBlock: { finished in
+        delayAsync(delay: 0.25) {
+            self.icon.addEnableAnimation(duration: 1.75, completionBlock: { finished in
                 self.icon.oval.opacity = 0
                 
                 let pathAnim = Animations.get(property: .Path, fromValue: (self.icon.icon.icon as! CAShapeLayer).path!, toValue: (self.icon.icon.getLayer(.Binoculars) as! CAShapeLayer).path!, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)

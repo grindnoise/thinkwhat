@@ -14,13 +14,17 @@ class CommentsCollectionView: UICollectionView {
         case main
     }
     
+    enum mode {
+        case Parent, Full
+    }
+    
     // MARK: - Public properties
-    public var dataItems: [Answer] {
+    public var dataItems: [Comment] {
         didSet {
             reload()
         }
     }
-//    weak var answerListener: AnswerListener?
+    public weak var boundsListener: BoundsListener?
     
     // MARK: - Private properties
     private weak var callbackDelegate: CallbackObservable?
@@ -29,7 +33,6 @@ class CommentsCollectionView: UICollectionView {
     
     // MARK: - Initialization
     init(dataItems: [Answer] = [], callbackDelegate: CallbackObservable) {
-//        self.listener = listener
         self.dataItems = dataItems
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.callbackDelegate = callbackDelegate
@@ -46,34 +49,62 @@ class CommentsCollectionView: UICollectionView {
 
     // MARK: - UI functions
     private func setupUI() {
-//        delegate = self
-////        contentInsetAdjustmentBehavior = .never
-////        contentInset = UIEdgeInsets.zero
-//        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-//            var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
+        delegate = self
+
+        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+            var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
 //            configuration.headerMode = .firstItemInSection
-//            configuration.backgroundColor = .clear
-//            configuration.showsSeparators = false
-////            configuration.contentInsetsReference = .none
-//            
-//            return NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
-//        }
-//        
-//        let cellRegistration = UICollectionView.CellRegistration<ChoiceCell, Answer> { cell, indexPath, item in
-//            guard cell.item.isNil else { return }
-//            var configuration = UIBackgroundConfiguration.listPlainCell()
-//            configuration.backgroundColor = .clear
-//            cell.backgroundConfiguration = configuration
-//            cell.item = item
-//            cell.automaticallyUpdatesBackgroundConfiguration = false
-//        }
-//        
-//        source = UICollectionViewDiffableDataSource<Section, Answer>(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
-//                return collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
-//                                                                    for: indexPath,
-//                                                                    item: identifier)
-//        }
-//        reload()
+            configuration.backgroundColor = .clear
+            configuration.showsSeparators = false
+            
+            let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 0, trailing: sectionLayout.contentInsets.trailing)
+            sectionLayout.interGroupSpacing = 20
+            return sectionLayout
+        }
+        
+        let cellRegistration = UICollectionView.CellRegistration<CommentCell, Answer> { [weak self] cell, indexPath, item in
+            guard let self = self else { return }
+            var configuration = UIBackgroundConfiguration.listPlainCell()
+            configuration.backgroundColor = .clear
+            cell.backgroundConfiguration = configuration
+            cell.item = item
+            cell.automaticallyUpdatesBackgroundConfiguration = false
+            //            }
+            cell.mode = self.mode
+            //            guard self.shouldChangeColor else { return }
+            cell.color = Colors.tags()[indexPath.row]
+            cell.index = indexPath.row + 1
+            
+            self.modeSubject.sink {
+#if DEBUG
+                print("receiveCompletion: \($0)")
+#endif
+            } receiveValue: { [weak self] in
+                guard let self = self else { return }
+                cell.mode = $0
+                self.colorSubject.send(completion: .finished)
+            }.store(in: &self.subscriptions)
+
+            
+//            cell.colorSubject.sink {
+//#if DEBUG
+//                print("receiveCompletion: \($0)")
+//#endif
+//            } receiveValue: { [weak self] in
+//                guard let self = self,
+//                      let color = $0
+//                else { return }
+//                self.colorSubject.send(color)
+//            }.store(in: &self.subscriptions)
+        }
+        
+        source = UICollectionViewDiffableDataSource<Section, Answer>(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
+                return collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+        }
+        
     }
     
     private func reload() {

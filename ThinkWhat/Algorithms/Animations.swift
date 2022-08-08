@@ -89,7 +89,7 @@ struct Animations {
         return rotationAnimation
     }
     
-    static func changeImageCrossDissolve(imageView: UIImageView, image: UIImage, duration: TimeInterval = 0.5) {
+    static func changeImageCrossDissolve(imageView: UIImageView, image: UIImage, duration: TimeInterval = 0.5, animations: [Closure] = []) {
         Task {
             await MainActor.run {
                 UIView.transition(with: imageView,
@@ -97,6 +97,7 @@ struct Animations {
                                   options: .transitionCrossDissolve,
                                   animations: {
                     imageView.image = image
+                    animations.forEach { $0() }
                 })
             }
         }

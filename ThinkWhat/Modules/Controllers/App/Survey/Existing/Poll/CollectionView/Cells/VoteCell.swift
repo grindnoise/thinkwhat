@@ -7,17 +7,32 @@
 //
 
 import UIKit
+//import Combine
 
 class VoteCell: UICollectionViewCell {
     
     // MARK: - Public properties
-    public var color: UIColor! {
+//    public var color: UIColor! = .clear {
+//        didSet {
+////            guard !color.isNil else { return }
+//            button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        }
+//    }
+    public weak var answer: Answer?
+//    public lazy var colorSubscriber: ColorSubscriber = {
+//        let instance = ColorSubscriber()
+//        let color = instance.receive()
+//
+//        return instance
+//    }()
+    var color: UIColor = .clear {
         didSet {
-            guard !color.isNil else { return }
-            button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+                guard let self = self else { return }
+                self.button.backgroundColor = self.color
+            }
         }
     }
-    public weak var answer: Answer?
     weak var callbackDelegate: CallbackObservable?
     
     // MARK: - Private properties
@@ -26,12 +41,21 @@ class VoteCell: UICollectionViewCell {
         instance.tintColor = .white
         instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
         instance.setTitle("vote".localized.uppercased(), for: .normal)
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        instance.backgroundColor = color
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4/1).isActive = true
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
     private let padding: CGFloat = 0
+    
+    // MARK: - Destructor
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -85,10 +109,10 @@ class VoteCell: UICollectionViewCell {
         })
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-    }
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        super.traitCollectionDidChange(previousTraitCollection)
+//        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//    }
 
     @objc
     private func handleTap() {

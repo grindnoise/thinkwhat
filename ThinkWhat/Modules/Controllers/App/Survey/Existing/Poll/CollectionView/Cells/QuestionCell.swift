@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class QuestionCell: UICollectionViewCell {
     
@@ -47,9 +48,13 @@ class QuestionCell: UICollectionViewCell {
         }
     }
     public weak var callbackDelegate: CallbackObservable?
-    
+    public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
+//    public var modeSubject = CurrentValueSubject<PollController.Mode?, Never>(nil)
+//    public var subscriptions = Set<AnyCancellable>()
+//    public var modeSubject = PassthroughSubject<PollController.Mode, Never>()
     
     // MARK: - Private properties
+    private var subscriptions = Set<AnyCancellable>()
     private lazy var headerContainer: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
@@ -67,6 +72,24 @@ class QuestionCell: UICollectionViewCell {
     }()
     private lazy var collectionView: ChoiceCollectionView = {
         let instance = ChoiceCollectionView(answerListener: answerListener, callbackDelegate: self)
+        
+        instance.colorSubject.sink {
+#if DEBUG
+                print("receiveCompletion: \($0)")
+#endif
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                  let color = $0
+            else { return }
+            self.colorSubject.send(color)
+//            self.colorSubject.send(completion: .finished)
+        }.store(in: &self.subscriptions)
+        
+//        instance.$colorPublisher.receive(on: RunLoop.main).sink { [weak self] in
+//            guard let self = self else { return }
+//            self.colorPublisher = $0
+//        }.store(in: &self.subscriptions)
+        
         return instance
         }()
     private let disclosureLabel: UILabel = {
@@ -162,6 +185,7 @@ class QuestionCell: UICollectionViewCell {
     
     // MARK: - Destructor
     deinit {
+        subscriptions.forEach { $0.cancel() }
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
