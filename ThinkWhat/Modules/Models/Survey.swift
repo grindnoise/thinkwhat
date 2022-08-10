@@ -112,6 +112,7 @@ class Survey: Decodable {
              views,
              media,
              answers,
+             comments,
              result,
              rating,
              progress,
@@ -161,6 +162,7 @@ class Survey: Decodable {
     var answersSortedByOrder:   [Answer] {
         return answers.sorted { $0.order < $1.order }
     }
+    var comments:               [Comment] = []
     var shareHash:              String = ""
     var shareEncryptedString:   String = ""
     var url:                    URL? = nil///hlink
@@ -320,6 +322,7 @@ class Survey: Decodable {
             type                    = _type
             media                   = try container.decode([Mediafile].self, forKey: .media)
             answers                 = try container.decode([Answer].self, forKey: .answers)
+            comments                = try container.decode([Comment].self, forKey: .comments)
             votesLimit              = try container.decode(Int.self, forKey: .voteCapacity)
             votesTotal              = try container.decode(Int.self, forKey: .totalVotes)
             watchers                = try container.decode(Int.self, forKey: .watchers)

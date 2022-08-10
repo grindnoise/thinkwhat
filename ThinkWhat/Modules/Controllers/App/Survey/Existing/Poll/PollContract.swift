@@ -30,6 +30,7 @@ protocol PollViewInput: AnyObject {
     func onExitWithSkip()
 //    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor)
     func onVotersTapped(answer: Answer, color: UIColor)
+    func postComment(_: String)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -46,6 +47,7 @@ protocol PollControllerInput: AnyObject {
     func vote(_: Answer)
     func addView()
     func updateResultsStats(_: SurveyReference)
+    func postComment(_: String)
 }
 
 /// *Model* returns the result to the *Controller*

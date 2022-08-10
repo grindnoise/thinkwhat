@@ -7,11 +7,11 @@
 //
 
 import UIKit
+import Combine
 
 class CommentsSectionCell: UICollectionViewCell {
     
     // MARK: - Public Properties
-    ///Внимание, вызывается из collectionView.didSelect!
     override var isSelected: Bool { didSet { updateAppearance() } }
 //    public weak var boundsListener: BoundsListener? {
 //        didSet {
@@ -21,19 +21,33 @@ class CommentsSectionCell: UICollectionViewCell {
     var item: Survey! {
         didSet {
             guard !item.isNil else { return }
-            collectionView.dataItems = item.answers
+//            collectionView.dataItems = item.answers
             disclosureIndicator.alpha = item.isCommentingAllowed ? 1 : 0
-            disclosureLabel.text = item.isCommentingAllowed ? "comments".localized.uppercased() + " (\(0))": "comments_disabled".localized.uppercased()
+            if item.isCommentingAllowed {
+                disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.comments.count)))"
+                collectionView.dataItems = item.comments
+            } else {
+                disclosureLabel.text = "comments_disabled".localized.uppercased()
+            }
             let constraint = collectionView.heightAnchor.constraint(equalToConstant: 1)
             constraint.priority = .defaultHigh
             constraint.identifier = "height"
             constraint.isActive = true
+            
+            if let labelConstraint = disclosureLabel.getConstraint(identifier: "width") {
+                labelConstraint.constant = disclosureLabel.text!.width(withConstrainedHeight: disclosureLabel.bounds.height, font: disclosureLabel.font)
+            }
+            
             setNeedsLayout()
             layoutIfNeeded()
         }
     }
+    public let commentSubject = CurrentValueSubject<String?, Never>(nil)
     
-    // MARK: - Private Properties
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
     private lazy var headerContainer: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
@@ -54,6 +68,11 @@ class CommentsSectionCell: UICollectionViewCell {
         instance.textColor = .secondaryLabel
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         instance.text = "comments".localized.uppercased()
+        
+        let constraint = instance.widthAnchor.constraint(equalToConstant: 100)
+        constraint.identifier = "width"
+        constraint.isActive = true
+        
         return instance
     }()
     private lazy var disclosureIndicator: UIImageView = {
@@ -66,10 +85,20 @@ class CommentsSectionCell: UICollectionViewCell {
         return disclosureIndicator
     }()
     private lazy var collectionView: CommentsCollectionView = {
-        let instance = CommentsCollectionView(callbackDelegate: self)
+        let instance = CommentsCollectionView(callbackDelegate: self, mode: .Root)
+        
+        instance.commentSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                  let string = $0
+            else { return }
+            self.commentSubject.send($0)
+//            self.commentSubject.send(completion: .finished)
+        }.store(in: &subscriptions)
+        
         return instance
         }()
-    private var observers: [NSKeyValueObservation] = []
     private lazy var icon: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
@@ -87,37 +116,6 @@ class CommentsSectionCell: UICollectionViewCell {
         
         return instance
     }()
-//    private lazy var emptyView: UIView = {
-//        let instance = UIView()
-//        instance.backgroundColor = .clear
-//        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
-//        constraint.identifier = "height"
-//        constraint.isActive = true
-//        instance.addSubview(horizontalStack)
-//        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
-//            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-//            horizontalStack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-//            horizontalStack.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.95),
-//        ])
-//
-//        return instance
-//    }()
-    private lazy var containerView: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.addSubview(collectionView)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: instance.topAnchor, constant: 20),
-            collectionView.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
-        ])
-        
-        return instance
-    }()
     // Stacks
     private lazy var horizontalStack: UIStackView = {
         let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
@@ -129,17 +127,27 @@ class CommentsSectionCell: UICollectionViewCell {
         return rootStack
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, containerView])
+        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, collectionView])//, containerView])
         verticalStack.axis = .vertical
         verticalStack.spacing = padding
         return verticalStack
     }()
     // Layout
     private let padding: CGFloat = 0
-    
     // Constraints
     private var closedConstraint: NSLayoutConstraint!
     private var openConstraint: NSLayoutConstraint!
+    
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -171,33 +179,33 @@ class CommentsSectionCell: UICollectionViewCell {
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
         ])
         
-//        let constraint =
-//            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-//        constraint.priority = .defaultLow
+        //        let constraint =
+        //            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        //        constraint.priority = .defaultLow
         closedConstraint =
-            disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        closedConstraint?.priority = .defaultLow // use low priority so stack stays pinned to top of cell
+        disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        closedConstraint.priority = .defaultLow // use low priority so stack stays pinned to top of cell
         
         openConstraint =
         collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        openConstraint?.priority = .defaultLow
+        openConstraint.priority = .defaultLow
         
         updateAppearance(animated: false)
     }
     
     /// Updates the views to reflect changes in selection
     private func updateAppearance(animated: Bool = true) {
-        closedConstraint?.isActive = isSelected
-        openConstraint?.isActive = !isSelected
+        closedConstraint.isActive = !isSelected
+        openConstraint.isActive = isSelected
 
         guard animated else {
             let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
-            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+            self.disclosureIndicator.transform = !self.isSelected ? upsideDown : .identity
             return
         }
         UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
             let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
-            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+            self.disclosureIndicator.transform = !self.isSelected ? upsideDown : .identity
         }
     }
     
@@ -210,14 +218,15 @@ class CommentsSectionCell: UICollectionViewCell {
             self.setNeedsLayout()
             constraint.constant = value.height
             self.layoutIfNeeded()
-            self.boundsListener?.onBoundsChanged(view.frame)
+//            self.boundsListener?.onBoundsChanged(view.frame)
         })
-        observers.append(collectionView.observe(\CommentsCollectionView.bounds, options: .new) { view, change in
-            guard let value = change.newValue else { return }
-            view.cornerRadius = value.width * 0.05
-        })
+//        observers.append(collectionView.observe(\CommentsCollectionView.bounds, options: .new) { view, change in
+//            guard let value = change.newValue else { return }
+//            view.cornerRadius = value.width * 0.05
+//        })
     }
     
+    // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         

@@ -8,37 +8,9 @@
 
 import UIKit
 import Agrume
+import Combine
 
 class PollView: UIView {
-    
-    // MARK: - Destructor
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-#if DEBUG
-        print("\(String(describing: type(of: self))).\(#function)")
-#endif
-    }
-    
-    // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        commonInit()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        commonInit()
-    }
-    
-    private func commonInit() {
-        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-        addSubview(contentView)
-        contentView.frame = self.bounds
-        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        self.addSubview(contentView)
-        guard !survey.isNil else { return }
-        setupUI()
-    }
     
     // MARK: - Public properties
     weak var viewInput: (PollViewInput & UIViewController)?
@@ -46,6 +18,9 @@ class PollView: UIView {
     var scrollOffsetPublisher: Published<CGFloat>.Publisher { $lastContentOffsetY }
     
     // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
     private lazy var collectionView: PollCollectionView = {
         let instance = PollCollectionView(host: self, poll: survey!, callbackDelegate: self)
         instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
@@ -63,6 +38,64 @@ class PollView: UIView {
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
     @IBOutlet var container: UIView!
+    
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+
+
+    // MARK: - Initialization
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        commonInit()
+    }
+    
+    private func commonInit() {
+        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        addSubview(contentView)
+        contentView.frame = self.bounds
+        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        self.addSubview(contentView)
+        setTasks()
+        guard !survey.isNil else { return }
+        setupUI()
+        
+    }
+    
+    private func setTasks() {
+        tasks.append( Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: UIResponder.keyboardDidShowNotification) {
+                guard let self = self else { return }
+                
+                let touch = UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard))
+                self.addGestureRecognizer(touch)
+            }
+        })
+    }
+    
+    @objc private func hideKeyboard() {
+        if let recognizer = gestureRecognizers?.first {
+            NotificationCenter.default.post(name: Notifications.System.HideKeyboard, object: nil)
+//            endEditing(true)
+            removeGestureRecognizer(recognizer)
+        }
+    }
+    
+    public func postComment(_ string: String) {
+        viewInput?.postComment(string)
+    }
 }
 
 // MARK: - Controller Output

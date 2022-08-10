@@ -285,6 +285,12 @@ class NewAvatar: UIView {
                   let newValue = change.newValue
             else { return }
             view.cornerRadius = newValue.height/2
+            if self.userprofile.isNil {
+                view.contentMode = .center
+                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.65, weight: .regular, scale: .medium)
+                instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
+                return
+            }
             guard let _ = self.userprofile.image else {
                 view.contentMode = .center
                 let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.65, weight: .regular, scale: .medium)

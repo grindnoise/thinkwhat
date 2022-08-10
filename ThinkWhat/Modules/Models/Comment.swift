@@ -29,19 +29,25 @@ class Comments {
 
 class Comment: Decodable {
     private enum CodingKeys: String, CodingKey {
-        case id, survey, parent, children, body
+        case id, survey, parent, children, body, replies
         case userprofile        = "user"
         case anonUsername       = "name"
         case createdAt          = "created_on"
         case childrenCount      = "children_count"
+        case replyTo            = "reply_to"
     }
     
     let id: Int
     let body: String
-    let survey: Survey
+    let surveyId: Int?
+    let replies: Int
+    var survey: Survey? {
+        return Surveys.shared.all.filter { $0.id == surveyId }.first
+    }
     var userprofile: Userprofile?
     let anonUsername: String
     let createdAt: Date
+    var replyTo: Comment?
     var isAnonymous: Bool {
         return userprofile.isNil && !anonUsername.isEmpty
     }
@@ -59,13 +65,14 @@ class Comment: Decodable {
             id              = try container.decode(Int.self, forKey: .id)
             body            = try container.decode(String.self, forKey: .body)
             anonUsername    = try container.decode(String.self, forKey: .anonUsername)
-            if let userprofileId = try container.decodeIfPresent(Int.self, forKey: .userprofile) {
-                userprofile = Userprofiles.shared.all.filter { $0.id == userprofileId }.first
+            let _userprofile = try container.decodeIfPresent(Userprofile.self, forKey: .userprofile)
+            if !_userprofile.isNil {
+                userprofile = Userprofiles.shared.all.filter({ $0.id == _userprofile!.id }).first ?? _userprofile
             }
-            let surveyId    = try container.decode(Int.self, forKey: .survey)
-            survey          = Surveys.shared.all.filter { $0.id == surveyId }.first!
+            surveyId        = try container.decode(Int.self, forKey: .survey)
             createdAt       = try container.decode(Date.self, forKey: .createdAt)
             children        = (try? container.decode([Comment].self, forKey: .children)) ?? []
+            replies         = try container.decode(Int.self, forKey: .replies)
             
             if Comments.shared.all.filter({ $0 == self }).isEmpty {
                 Comments.shared.all.append(self)

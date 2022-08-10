@@ -21,6 +21,9 @@
 "minimum_choices" = "2 choices are required at least";
 "minimum_limits" = "At least 10 participants required";
 "insufficient_balance" = "You don't have enough points for this publication";
+"replies" = "Replies";
+"reply" = "Reply";
+"add_comment" = "Add comment";
 
 //Common
 "title" = "Title";

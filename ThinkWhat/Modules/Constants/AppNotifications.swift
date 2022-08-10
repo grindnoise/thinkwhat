@@ -37,6 +37,7 @@ struct Notifications {
     
     struct System {
         static let UpdateStats                      = Notification.Name("NotificationUpdateStats")
+        static let HideKeyboard                     = Notification.Name("NotificationHideKeyboard")
     }
     
     struct SurveyAnswers {

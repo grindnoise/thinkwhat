@@ -796,6 +796,10 @@ class PollController: UIViewController {
 
 // MARK: - View Input
 extension PollController: PollViewInput {
+    func postComment(_ string: String) {
+        controllerInput?.postComment(string)
+    }
+    
     func onVotersTapped(answer: Answer, color: UIColor) {
 //        let appearance = UINavigationBarAppearance()
 //        appearance.backgroundColor = .black

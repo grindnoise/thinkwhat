@@ -16,6 +16,10 @@ class PollModel {
 
 // MARK: - Controller Input
 extension PollModel: PollControllerInput {
+    func postComment(_ comment: String) {
+        fatalError()
+    }
+    
     func addView() {
         guard !survey.isNil else { modelOutput?.onVoteCallback(.failure(APIError.badData)); return }
         

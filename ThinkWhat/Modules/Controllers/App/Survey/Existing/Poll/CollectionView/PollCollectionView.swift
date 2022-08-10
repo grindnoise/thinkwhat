@@ -87,9 +87,17 @@ class PollCollectionView: UICollectionView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Destructor
     deinit {
+//        observers.forEach { $0.invalidate() }
+//        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
+#endif
     }
+
     
     // MARK: - UI functions
     private func setupUI() {
@@ -216,9 +224,17 @@ class PollCollectionView: UICollectionView {
         }
         
         let commentsCellRegistration = UICollectionView.CellRegistration<CommentsSectionCell, AnyHashable> { [weak self] cell, indexPath, item in
-            cell.boundsListener = self
+//            cell.boundsListener = self
             guard let self = self, cell.item.isNil else { return }
             cell.item = self.poll
+            
+            cell.commentSubject.sink { [weak self] in
+                guard let self = self,
+                      let string = $0
+                else { return }
+                
+                self.host.postComment(string)
+            }.store(in: &self.subscriptions)
         }
 
 //        let headerRegistration = UICollectionView.SupplementaryRegistration <UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) { headerView, elementKind, indexPath in
@@ -394,6 +410,9 @@ extension PollCollectionView: UICollectionViewDelegate {
                 showBanner(callbackDelegate: host, bannerDelegate: host!, text: "vote_to_view_comments".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
                 return false
             }
+            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [.bottom])
+            source.refresh()
+            collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
             return true
         }
 //        // Allows for closing an already open cell
