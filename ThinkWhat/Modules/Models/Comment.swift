@@ -12,7 +12,15 @@ import SwiftyJSON
 class Comments {
     static let shared = Comments()
     private init() {}
-    var all: [Comment] = []
+    var all: [Comment] = [] {
+        didSet {
+//            Check for duplicates
+            guard let lastInstance = all.last else { return }
+            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
+                all.remove(object: lastInstance)
+            }
+        }
+    }
     
     func load(_ data: Data) {
         let decoder = JSONDecoder()
@@ -67,12 +75,15 @@ class Comment: Decodable {
             anonUsername    = try container.decode(String.self, forKey: .anonUsername)
             let _userprofile = try container.decodeIfPresent(Userprofile.self, forKey: .userprofile)
             if !_userprofile.isNil {
+//                Userprofiles.shared.current
                 userprofile = Userprofiles.shared.all.filter({ $0.id == _userprofile!.id }).first ?? _userprofile
+//                Userprofiles.shared.all.contains(Userprofiles.shared.current!)
             }
             surveyId        = try container.decode(Int.self, forKey: .survey)
             createdAt       = try container.decode(Date.self, forKey: .createdAt)
             children        = (try? container.decode([Comment].self, forKey: .children)) ?? []
             replies         = try container.decode(Int.self, forKey: .replies)
+            replyTo
             
             if Comments.shared.all.filter({ $0 == self }).isEmpty {
                 Comments.shared.all.append(self)

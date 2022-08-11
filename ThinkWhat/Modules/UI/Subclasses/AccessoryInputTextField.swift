@@ -68,6 +68,7 @@ final class AccessoryInputTextField: UITextField {
         instance.accessibilityIdentifier = "textView"
         instance.font = textViewFont
         instance.maxHeight = 80
+        instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: 8, bottom: instance.contentInset.bottom, right: 8)
         
         observers.append(instance.observe(\FlexibleTextView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
@@ -169,14 +170,15 @@ class FlexibleTextView: UITextView {
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         NotificationCenter.default.addObserver(self, selector: #selector(UITextInputDelegate.textDidChange(_:)), name: UITextView.textDidChangeNotification, object: self)
         placeholderTextView.font = font
-        addSubview(placeholderTextView)
-        
-        NSLayoutConstraint.activate([
-            placeholderTextView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            placeholderTextView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            placeholderTextView.topAnchor.constraint(equalTo: topAnchor),
-            placeholderTextView.bottomAnchor.constraint(equalTo: bottomAnchor),
-        ])
+        placeholderTextView.addEquallyTo(to: self)
+//        addSubview(placeholderTextView)
+//
+//        NSLayoutConstraint.activate([
+//            placeholderTextView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//            placeholderTextView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//            placeholderTextView.topAnchor.constraint(equalTo: topAnchor),
+//            placeholderTextView.bottomAnchor.constraint(equalTo: bottomAnchor),
+//        ])
     }
     
     required init?(coder aDecoder: NSCoder) {

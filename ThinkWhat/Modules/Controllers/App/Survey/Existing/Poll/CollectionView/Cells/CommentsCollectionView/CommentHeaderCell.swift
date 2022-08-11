@@ -18,31 +18,39 @@ class CommentHeaderCell: UICollectionReusableView {
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
-    private lazy var label: InsetLabel = {
-        let instance = InsetLabel()
+    private lazy var label: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         instance.isUserInteractionEnabled = true
-        instance.insets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
-        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onTap)))
-        let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        instance.translatesAutoresizingMaskIntoConstraints = false
         
-        let attrString = NSMutableAttributedString(string: "add_comment".localized, attributes: [
-            NSAttributedString.Key.font: font as Any,
-            NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
+        let label = UILabel()
+        label.accessibilityIdentifier = "label"
+        label.isUserInteractionEnabled = true
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onTap)))
+        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .callout)
+        label.text = "add_comment".localized
+        label.textColor = .secondaryLabel
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.backgroundColor = .clear
+        
+        let constraint = label.heightAnchor.constraint(equalToConstant: "add_comment".height(withConstrainedWidth: 1000, font: label.font))
+        constraint.identifier = "height"
+        constraint.isActive = true
+        
+        instance.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+            label.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
+            label.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
+            instance.bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: 8),
         ])
         
-        instance.attributedText = attrString
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        instance.heightAnchor.constraint(equalToConstant: "add_comment".height(withConstrainedWidth: 100, font: font!) + instance.insets.top*2).isActive = true
-        
-        observers.append(instance.observe(\InsetLabel.bounds, options: .new) { view, change in
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let newValue = change.newValue else { return }
             
             view.cornerRadius = newValue.size.height/2.25
-            guard view.insets == .zero else { return }
-            view.insets = UIEdgeInsets(top: view.insets.top,
-                                       left: newValue.size.height/2.25,
-                                       bottom: view.insets.top,
-                                       right: newValue.size.height/2.25)
         })
         
         return instance
@@ -77,13 +85,12 @@ class CommentHeaderCell: UICollectionReusableView {
         translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-//            label.heightAnchor.constraint(equalToConstant: 40),
-            label.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
-            label.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
-            label.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 8),
+            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+            label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
+            label.topAnchor.constraint(equalTo: topAnchor, constant: 8),
         ])
         
-        let constraint = bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: 8)
+        let constraint = bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: 16)
         constraint.priority = .defaultLow
         constraint.isActive = true
     }
@@ -91,5 +98,22 @@ class CommentHeaderCell: UICollectionReusableView {
     @objc
     private func onTap() {
         callback?()
+    }
+    
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        guard let instance = label.getSubview(type: UILabel.self, identifier: "label"),
+              let constraint = instance.getConstraint(identifier: "height")
+        else { return }
+        
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .callout)
+        setNeedsLayout()
+        constraint.constant = "add_comment".height(withConstrainedWidth: 1000, font: instance.font)
+        layoutIfNeeded()
     }
 }

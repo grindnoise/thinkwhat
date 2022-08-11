@@ -97,6 +97,11 @@ class QuestionCell: UICollectionViewCell {
         instance.textColor = .secondaryLabel
         instance.text = "poll_question".localized.uppercased()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
+        
+//        let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
+//        constraint.identifier = "width"
+//        constraint.isActive = true
+        
         return instance
     }()
     private lazy var textView: UITextView = {
@@ -280,11 +285,14 @@ class QuestionCell: UICollectionViewCell {
                                           forTextStyle: .body)
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                                  forTextStyle: .caption1)
-        guard let constraint_1 = self.textView.getAllConstraints().filter({ $0.identifier == "height" }).first,
-              let constraint_2 = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        guard let constraint_1 = self.textView.getConstraint(identifier: "height"),
+              let constraint_2 = horizontalStack.getConstraint(identifier: "height")//,
+//              let constraint_3 = disclosureLabel.getConstraint(identifier: "width")
+        else { return }
         setNeedsLayout()
         constraint_1.constant = textView.contentSize.height
         constraint_2.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
+//        constraint_3.constant = disclosureLabel.text!.width(withConstrainedHeight: 100, font: disclosureLabel.font)
         layoutIfNeeded()
     }
 }

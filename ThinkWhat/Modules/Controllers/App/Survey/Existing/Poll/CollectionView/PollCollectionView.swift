@@ -56,9 +56,9 @@ class PollCollectionView: UICollectionView {
                 snapshot.appendItems([7], toSection: .vote)
                 snapshot.appendSections([.comments])
                 snapshot.appendItems([8], toSection: .comments)
-                source.apply(snapshot, animatingDifferences: true) //{
-                //                self.scrollToItem(at: IndexPath(item: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
-                //            }
+                source.apply(snapshot, animatingDifferences: true) {
+                    self.scrollToItem(at: IndexPath(item: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
+                }
             }
             if let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-2)) as? VoteCell {
                 cell.answer = answer!
@@ -101,6 +101,7 @@ class PollCollectionView: UICollectionView {
     
     // MARK: - UI functions
     private func setupUI() {
+        
         delegate = self
         allowsMultipleSelection = true
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
@@ -126,7 +127,7 @@ class PollCollectionView: UICollectionView {
 //            guard let self = self, cell.item.isNil else { return }
 //            cell.collectionView = self
             cell.item = self.poll
-            cell.isFoldable = cell.item.isComplete
+            cell.isFoldable = cell.item.isOwn || cell.item.isComplete
         }
         imageCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.item.isNil else { return }
@@ -150,7 +151,7 @@ class PollCollectionView: UICollectionView {
         let questionCellRegistration = UICollectionView.CellRegistration<QuestionCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self else { return }
             cell.mode = self.host.mode
-//            guard cell.item.isNil else { return }
+            guard cell.item.isNil else { return }
             cell.callbackDelegate = self
             cell.boundsListener = self
             cell.answerListener = self
@@ -199,13 +200,6 @@ class PollCollectionView: UICollectionView {
         let voteCellRegistration = UICollectionView.CellRegistration<VoteCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self else { return }
             cell.callbackDelegate = self
-//            cell.color = self.poll.topic.tagColor
-
-//            cell.$color.sink { [weak self] in
-//                print($0)
-////                guard let self = self else { return }
-////                $0
-//            }
             
             self.colorSubject.sink {
 #if DEBUG
@@ -215,12 +209,6 @@ class PollCollectionView: UICollectionView {
                 guard let color = $0 else { return }
                 cell.color = color
             }.store(in: &self.subscriptions)
-//            cell.$color = self.colorSubject.value.publisher
-//            self.colorSubject.subscribe(cell.$color)
-            
-//            self.colorSubject.value.publisher.assign(to: &cell.$color)
-            
-
         }
         
         let commentsCellRegistration = UICollectionView.CellRegistration<CommentsSectionCell, AnyHashable> { [weak self] cell, indexPath, item in

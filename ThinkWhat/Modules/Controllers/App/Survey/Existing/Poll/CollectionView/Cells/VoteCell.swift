@@ -43,6 +43,12 @@ class VoteCell: UICollectionViewCell {
         instance.setTitle("vote".localized.uppercased(), for: .normal)
         instance.backgroundColor = color
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4/1).isActive = true
+        
+        observers.append(instance.observe(\UIButton.bounds, options: [.new]) { view, change in
+            guard let value = change.newValue else { return }
+            view.cornerRadius = value.height / 2.25
+        })
+        
         return instance
     }()
     private var observers: [NSKeyValueObservation] = []
@@ -50,11 +56,13 @@ class VoteCell: UICollectionViewCell {
     
     // MARK: - Destructor
     deinit {
+        observers.forEach { $0.invalidate() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
+
 
     
     // MARK: - Initialization
@@ -86,27 +94,18 @@ class VoteCell: UICollectionViewCell {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            button.topAnchor.constraint(equalTo: contentView.topAnchor),
             button.heightAnchor.constraint(equalToConstant: 50),
-            button.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
         ])
         
-        let constraint =
-        button.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        let constraint = contentView.bottomAnchor.constraint(equalTo: button.bottomAnchor, constant: 50)
         constraint.priority = .defaultLow
         constraint.isActive = true
-        
-        let constraint_2 =
-        button.topAnchor.constraint(equalTo: contentView.topAnchor)
-        constraint_2.priority = .defaultLow
-        constraint_2.isActive = true
     }
     
     private func setObservers() {
-        observers.append(button.observe(\UIButton.bounds, options: [.new]) { view, change in
-            guard let value = change.newValue else { return }
-            view.cornerRadius = value.height / 2.25
-        })
+        
     }
     
 //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

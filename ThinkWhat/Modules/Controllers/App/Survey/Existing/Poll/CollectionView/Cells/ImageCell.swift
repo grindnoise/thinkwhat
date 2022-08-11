@@ -56,6 +56,11 @@ class ImageCell: UICollectionViewCell {
         instance.textColor = .secondaryLabel
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         instance.text = "images".localized.uppercased()
+        
+        let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
+        constraint.identifier = "width"
+        constraint.isActive = true
+        
         return instance
     }()
     private lazy var disclosureIndicator: UIImageView = {
@@ -246,8 +251,6 @@ class ImageCell: UICollectionViewCell {
             imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         openConstraint.priority = .defaultLow
         
-        disclosureLabel.widthAnchor.constraint(equalToConstant: self.disclosureLabel.text!.width(withConstrainedHeight: horizontalStack.frame.height, font: self.disclosureLabel.font)).isActive = true
-        
         updateAppearance(animated: false)
     }
     
@@ -407,10 +410,13 @@ class ImageCell: UICollectionViewCell {
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                                 forTextStyle: .footnote)
-        guard let constraint = horizontalStack.getConstraint(identifier: "height") else { return }
+                                                 forTextStyle: .caption1)
+        guard let constraint = horizontalStack.getConstraint(identifier: "height"),
+              let constraint_2 = disclosureLabel.getConstraint(identifier: "width")
+        else { return }
         setNeedsLayout()
         constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
+        constraint_2.constant = disclosureLabel.text!.width(withConstrainedHeight: 100, font: disclosureLabel.font)
         layoutIfNeeded()
     }
     

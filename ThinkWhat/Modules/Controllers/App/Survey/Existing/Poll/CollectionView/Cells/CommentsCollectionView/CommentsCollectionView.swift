@@ -77,6 +77,7 @@ class CommentsCollectionView: UICollectionView {
             for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
                 guard let self = self else { return }
                 self.textField.resignFirstResponder()
+                Fade.shared.dismiss()
             }
         })
     }
@@ -102,12 +103,9 @@ class CommentsCollectionView: UICollectionView {
 
             supplementaryView.callback = { [weak self] in
                 guard let self = self else { return }
-////
+
                 self.textField.becomeFirstResponder()
-////                guard let accessory = self.textField.inputAccessoryView,
-////                      let textView = accessory.getSubview(type: FlexibleTextView.self, identifier: "textView")
-////                else { return }
-////                textView.becomeFirstResponder()
+                Fade.shared.present()
             }
         }
 
@@ -182,6 +180,7 @@ extension CommentsCollectionView: UITextFieldDelegate {
 extension CommentsCollectionView: AccessoryInputTextFieldDelegate {
     func onSendEvent(_ string: String) {
         textField.resignFirstResponder()
+        Fade.shared.dismiss()
         guard !string.isEmpty else { return }
         commentSubject.send(string)
 //        commentSubject.send(completion: .finished)

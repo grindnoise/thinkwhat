@@ -39,6 +39,11 @@ class ChoiceSectionCell: UICollectionViewCell {
         instance.textColor = .secondaryLabel
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
         instance.text = "vote_noun".localized.uppercased()
+        
+        let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
+        constraint.identifier = "width"
+        constraint.isActive = true
+        
         return instance
     }()
     private lazy var collectionView: ChoiceCollectionView = {
@@ -161,9 +166,12 @@ class ChoiceSectionCell: UICollectionViewCell {
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                                  forTextStyle: .footnote)
-        guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        guard let constraint = horizontalStack.getConstraint(identifier: "height"),
+              let constraint_2 = disclosureLabel.getConstraint(identifier: "width")
+        else { return }
         setNeedsLayout()
         constraint.constant = max(String(describing: item.rating).height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font), 40)
+        constraint_2.constant = disclosureLabel.text!.width(withConstrainedHeight: 100, font: disclosureLabel.font)
         layoutIfNeeded()
     }
 }

@@ -26,6 +26,7 @@ class PollView: UIView {
         instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
         //////            UIApplication.shared.windows[0].safeAreaInsets.bottom, right: 0.0)
         instance.layer.masksToBounds = false
+        instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: 100, right: instance.contentInset.right)
         return instance
     }()
     private var isLoadingData = false
@@ -62,6 +63,7 @@ class PollView: UIView {
         commonInit()
     }
     
+    // MARK: - Public methods
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
@@ -93,9 +95,15 @@ class PollView: UIView {
         }
     }
     
-    public func postComment(_ string: String) {
-        viewInput?.postComment(string)
+    // MARK: - Public methods
+    public func postComment(_ string: String, replyTo: Comment? = nil) {
+        viewInput?.postComment(string, replyTo: replyTo)
     }
+    
+//    override func layoutSubviews() {
+//        super.layoutSubviews()
+//        collectionView.contentInset = UIEdgeInsets(top: collectionView.contentInset.top, left: collectionView.contentInset.left, bottom: 50, right: collectionView.contentInset.right)
+//    }
 }
 
 // MARK: - Controller Output

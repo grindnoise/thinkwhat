@@ -16,8 +16,24 @@ class PollModel {
 
 // MARK: - Controller Input
 extension PollModel: PollControllerInput {
-    func postComment(_ comment: String) {
-        fatalError()
+    func postComment(_ comment: String, replyTo: Comment? = nil) {
+        guard let survey = survey else { modelOutput?.onVoteCallback(.failure(APIError.badData)); return }
+
+        Task {
+            do {
+                let instance = try await API.shared.surveys.postComment(comment, survey: survey, replyTo: replyTo)
+                await MainActor.run {
+                    modelOutput?.commentPostCallback(.success(instance))
+                }
+            } catch {
+                await MainActor.run {
+                    modelOutput?.commentPostCallback(.failure(error))
+                }
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
     }
     
     func addView() {

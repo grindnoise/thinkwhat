@@ -464,6 +464,7 @@
 		ABB9E89227A003540018BB2E /* WelcomeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABB9E89127A003540018BB2E /* WelcomeView.xib */; };
 		ABBA1988242B430100F11E0D /* AnswerHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA1986242B430100F11E0D /* AnswerHeaderCell.swift */; };
 		ABBA1989242B430100F11E0D /* AnswerHeaderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABBA1987242B430100F11E0D /* AnswerHeaderCell.xib */; };
+		ABBA29AB28A54F80000EBEE7 /* Fade.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA29AA28A54F80000EBEE7 /* Fade.swift */; };
 		ABBA73F12382896900540ECF /* UserSurveysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F02382896900540ECF /* UserSurveysViewController.swift */; };
 		ABBA73F42382BCCC00540ECF /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73F22382BCCC00540ECF /* StatisticsViewController.swift */; };
 		ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */; };
@@ -473,7 +474,7 @@
 		ABBA73FE2387C5A200540ECF /* FlameIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73FD2387C5A200540ECF /* FlameIcon.swift */; };
 		ABBA74002387E66F00540ECF /* CategoryIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */; };
 		ABBCF4142431F1F300BFEAB9 /* VerticallyCenteredTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBCF4132431F1F300BFEAB9 /* VerticallyCenteredTextView.swift */; };
-		ABBF8B0A28A3C6AE0071443C /* InputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBF8B0928A3C6AE0071443C /* InputTextField.swift */; };
+		ABBF8B0A28A3C6AE0071443C /* AccessoryInputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABBF8B0928A3C6AE0071443C /* AccessoryInputTextField.swift */; };
 		ABC18337284E502A005D1C31 /* ImageSelectionHeaderContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC18336284E5029005D1C31 /* ImageSelectionHeaderContent.swift */; };
 		ABC18339284E52A3005D1C31 /* ImageSelectionHeaderContent.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABC18338284E52A3005D1C31 /* ImageSelectionHeaderContent.xib */; };
 		ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C622E9B33700DEA9FD /* Mail.swift */; };
@@ -1038,6 +1039,7 @@
 		ABB9E89127A003540018BB2E /* WelcomeView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WelcomeView.xib; sourceTree = "<group>"; };
 		ABBA1986242B430100F11E0D /* AnswerHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerHeaderCell.swift; sourceTree = "<group>"; };
 		ABBA1987242B430100F11E0D /* AnswerHeaderCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AnswerHeaderCell.xib; sourceTree = "<group>"; };
+		ABBA29AA28A54F80000EBEE7 /* Fade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fade.swift; sourceTree = "<group>"; };
 		ABBA73F02382896900540ECF /* UserSurveysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysViewController.swift; sourceTree = "<group>"; };
 		ABBA73F22382BCCC00540ECF /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatisticsViewController.xib; sourceTree = "<group>"; };
@@ -1047,7 +1049,7 @@
 		ABBA73FD2387C5A200540ECF /* FlameIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameIcon.swift; sourceTree = "<group>"; };
 		ABBA73FF2387E66F00540ECF /* CategoryIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIcon.swift; sourceTree = "<group>"; };
 		ABBCF4132431F1F300BFEAB9 /* VerticallyCenteredTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticallyCenteredTextView.swift; sourceTree = "<group>"; };
-		ABBF8B0928A3C6AE0071443C /* InputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputTextField.swift; sourceTree = "<group>"; };
+		ABBF8B0928A3C6AE0071443C /* AccessoryInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryInputTextField.swift; sourceTree = "<group>"; };
 		ABC18336284E5029005D1C31 /* ImageSelectionHeaderContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionHeaderContent.swift; sourceTree = "<group>"; };
 		ABC18338284E52A3005D1C31 /* ImageSelectionHeaderContent.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageSelectionHeaderContent.xib; sourceTree = "<group>"; };
 		ABC3E7C622E9B33700DEA9FD /* Mail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail.swift; sourceTree = "<group>"; };
@@ -1547,7 +1549,7 @@
 				AB43A55F25E63BB800BF8749 /* PaddingLabel.swift */,
 				AB39F40E2847457200DEE0ED /* InsetTextField.swift */,
 				ABCE775C2848D378001E3413 /* InsetLabel.swift */,
-				ABBF8B0928A3C6AE0071443C /* InputTextField.swift */,
+				ABBF8B0928A3C6AE0071443C /* AccessoryInputTextField.swift */,
 			);
 			path = Subclasses;
 			sourceTree = "<group>";
@@ -2299,6 +2301,7 @@
 				ABADF59F27F7074100A26474 /* Banner.xib */,
 				AB883B2A2800704400DBE4EF /* Popup.swift */,
 				AB883B2C2800708500DBE4EF /* Popup.xib */,
+				ABBA29AA28A54F80000EBEE7 /* Fade.swift */,
 			);
 			path = "Popup & Banner";
 			sourceTree = "<group>";
@@ -3668,7 +3671,7 @@
 				AB72960F27DA2F0F00D45B54 /* HotView.swift in Sources */,
 				ABB8B18F2423C9DE00E8DFF3 /* SurveyImageCell.swift in Sources */,
 				AB51605C24EFEC79006A07B7 /* CategoryCollectionViewController.swift in Sources */,
-				ABBF8B0A28A3C6AE0071443C /* InputTextField.swift in Sources */,
+				ABBF8B0A28A3C6AE0071443C /* AccessoryInputTextField.swift in Sources */,
 				AB3C681C223FD04500B57580 /* SMSResponse.swift in Sources */,
 				AB8DA32C27A1591300F92C18 /* Auth.swift in Sources */,
 				AB8994F326C2BE6900F03375 /* InsufficientBalance.swift in Sources */,
@@ -3780,6 +3783,7 @@
 				ABF20FBA24CAE8610092B223 /* UserSubscriptionCell.swift in Sources */,
 				ABF27587280EDC810023CD1F /* VoterCell.swift in Sources */,
 				AB9A901228900C7C00E8197C /* SeparatorCell.swift in Sources */,
+				ABBA29AB28A54F80000EBEE7 /* Fade.swift in Sources */,
 				AB98308327B935DA002C5132 /* RecoverAccontViewController.swift in Sources */,
 				AB913F7D280715BB00609D51 /* PollResultCell.swift in Sources */,
 				AB913F752806C3C200609D51 /* DataCleanOnTerminateObservable.swift in Sources */,

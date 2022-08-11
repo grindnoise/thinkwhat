@@ -1311,6 +1311,30 @@ class API {
             }
         }
         
+        public func postComment(_ body: String, survey: Survey, replyTo: Comment? = nil) async throws -> Comment {
+            guard let url = API_URLS.Surveys.postComment else { throw APIError.invalidURL }
+            
+            var parameters: Parameters = ["survey": survey.id, "body": body,]
+            
+            if let replyId = replyTo?.id {
+                parameters["reply_to"] = replyId
+            }
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                
+                let instance = try decoder.decode(Comment.self, from: data)
+                return instance
+            } catch let error {
+                throw error
+            }
+        }
+        
         func post(_ parameters: Parameters) async throws {
             guard let url = API_URLS.Surveys.root else { throw APIError.invalidURL }
             

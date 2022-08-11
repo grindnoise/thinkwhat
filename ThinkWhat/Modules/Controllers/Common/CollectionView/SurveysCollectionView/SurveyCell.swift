@@ -42,6 +42,10 @@ class SurveyCell: UICollectionViewListCell {
                 titleLabel.textColor = .label
                 descriptionLabel.textColor = .label
             }
+            
+            commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
+            commentsView.alpha = item.commentsTotal == 0 ? 0 : 1
+            commentsLabel.alpha = item.commentsTotal == 0 ? 0 : 1
             //NSObject observation
 //            observers.append(item.observe(\SurveyReference.title, options: .new) { [weak self] _, change in
 //                guard let self = self,
@@ -157,6 +161,8 @@ class SurveyCell: UICollectionViewListCell {
 //    }()
     
     // MARK: - Private properties
+    private var tasks: [Task<Void, Never>?] = []
+    private var observers: [NSKeyValueObservation] = []
     private lazy var titleLabel: InsetLabel = {
         let instance = InsetLabel()
         instance.insets = UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0)
@@ -203,14 +209,14 @@ class SurveyCell: UICollectionViewListCell {
         return instance
     }()
     private let ratingView: UIImageView = {
-        let instance = UIImageView(image: UIImage(systemName: "star.fill"))
+        let instance = UIImageView(image: UIImage(systemName: "star.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small)))
         instance.tintColor = Colors.Tags.HoneyYellow
         instance.contentMode = .scaleAspectFit
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
         return instance
     }()
-    private lazy var ratingLabel: UILabel = {
+    @MainActor private lazy var ratingLabel: UILabel = {
         let instance = UILabel()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
@@ -227,11 +233,26 @@ class SurveyCell: UICollectionViewListCell {
         return instance
     }()
     private lazy var viewsView: UIImageView = {
-        let instance = UIImageView(image: UIImage(systemName: "eye.fill"))
+        let instance = UIImageView(image: UIImage(systemName: "eye.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small)))
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.contentMode = .scaleAspectFit
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
+        return instance
+    }()
+    private lazy var commentsView: UIImageView = {
+        let instance = UIImageView(image: UIImage(systemName: "bubble.right.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small)))
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.contentMode = .scaleAspectFit
+        instance.translatesAutoresizingMaskIntoConstraints = false
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
+        return instance
+    }()
+    @MainActor private lazy var commentsLabel: UILabel = {
+        let instance = UILabel()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+        instance.textAlignment = .center
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         return instance
     }()
     private lazy var avatar: NewAvatar = {
@@ -384,7 +405,7 @@ class SurveyCell: UICollectionViewListCell {
         return instance
     }()
     private lazy var statsStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
+        let instance = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel, commentsView, commentsLabel])
 //        instance.alignment = .center
         instance.spacing = 2
         return instance
@@ -487,15 +508,15 @@ class SurveyCell: UICollectionViewListCell {
         instance.spacing = 0
         return instance
     }()
-    private var observers: [NSKeyValueObservation] = []
     private let padding: CGFloat = 20
     private var constraint: NSLayoutConstraint!
     ///Store tasks from NotificationCenter's AsyncStream
-    private var notifications: [Task<Void, Never>?] = []
+    
     
     // MARK: - Destructor
     deinit {
-        notifications.forEach { $0?.cancel() }
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
@@ -513,7 +534,7 @@ class SurveyCell: UICollectionViewListCell {
     }
     
     func commonInit() {
-        setObservers()
+        setTasks()
         setupUI()
     }
 
@@ -544,8 +565,8 @@ class SurveyCell: UICollectionViewListCell {
         
     }
     
-    private func setObservers() {
-        if #available(iOS 15, *) {
+    private func setTasks() {
+//        if #available(iOS 15, *) {
 //            notifications.append(Task { [weak self] in
 //                guard !self.isNil else { return }
 //                for await _ in NotificationCenter.default.notifications(for: UIApplication.willResignActiveNotification) {
@@ -558,7 +579,7 @@ class SurveyCell: UICollectionViewListCell {
 //                    print("UIApplication.didBecomeActiveNotification")
 //                }
 //            })
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
                     await MainActor.run {
                         guard let self = self,
@@ -570,7 +591,7 @@ class SurveyCell: UICollectionViewListCell {
                     }
                 }
             })
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Rating) {
                     await MainActor.run {
                         guard let self = self,
@@ -582,7 +603,7 @@ class SurveyCell: UICollectionViewListCell {
                     }
                 }
             })
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
                     await MainActor.run {
                         guard let self = self,
@@ -627,7 +648,7 @@ class SurveyCell: UICollectionViewListCell {
                     }
                 }
             })
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
                     await MainActor.run {
                         guard let self = self,
@@ -688,7 +709,7 @@ class SurveyCell: UICollectionViewListCell {
                     }
                 }
             })
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
                     await MainActor.run {
                         guard let self = self,
@@ -732,7 +753,7 @@ class SurveyCell: UICollectionViewListCell {
                     }
                 }
             })
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
                     await MainActor.run {
                         guard let self = self,
@@ -752,24 +773,38 @@ class SurveyCell: UICollectionViewListCell {
                     }
                 }
             })
-        } else {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.updateViewsCount),
-                                                   name: Notifications.Surveys.Views,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.switchFavorite),
-                                                   name: Notifications.Surveys.SwitchFavorite,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.setCompleted),
-                                                   name: Notifications.Surveys.Completed,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.switchHot),
-                                                   name: Notifications.Surveys.SwitchHot,
-                                                   object: nil)
-        }
+        tasks.append(Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {
+                await MainActor.run {
+                    guard let self = self,
+                          let item = self.item,
+                          let object = notification.object as? SurveyReference,
+                          item === object
+                    else { return }
+                    self.commentsView.alpha = 1
+                    self.commentsLabel.alpha = 1
+                    self.commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
+                }
+            }
+        })
+//        } else {
+//            NotificationCenter.default.addObserver(self,
+//                                                   selector: #selector(self.updateViewsCount),
+//                                                   name: Notifications.Surveys.Views,
+//                                                   object: nil)
+//            NotificationCenter.default.addObserver(self,
+//                                                   selector: #selector(self.switchFavorite),
+//                                                   name: Notifications.Surveys.SwitchFavorite,
+//                                                   object: nil)
+//            NotificationCenter.default.addObserver(self,
+//                                                   selector: #selector(self.setCompleted),
+//                                                   name: Notifications.Surveys.Completed,
+//                                                   object: nil)
+//            NotificationCenter.default.addObserver(self,
+//                                                   selector: #selector(self.switchHot),
+//                                                   name: Notifications.Surveys.SwitchHot,
+//                                                   object: nil)
+//        }
     }
     
     private func setProgress() {
@@ -902,6 +937,8 @@ class SurveyCell: UICollectionViewListCell {
         ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .caption2)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .caption2)
+        commentsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .caption2)
         descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .callout)

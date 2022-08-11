@@ -24,7 +24,7 @@ class CommentsSectionCell: UICollectionViewCell {
 //            collectionView.dataItems = item.answers
             disclosureIndicator.alpha = item.isCommentingAllowed ? 1 : 0
             if item.isCommentingAllowed {
-                disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.comments.count)))"
+                disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
                 collectionView.dataItems = item.comments
             } else {
                 disclosureLabel.text = "comments_disabled".localized.uppercased()
@@ -133,7 +133,7 @@ class CommentsSectionCell: UICollectionViewCell {
         return verticalStack
     }()
     // Layout
-    private let padding: CGFloat = 0
+    private let padding: CGFloat = 8
     // Constraints
     private var closedConstraint: NSLayoutConstraint!
     private var openConstraint: NSLayoutConstraint!
@@ -153,6 +153,7 @@ class CommentsSectionCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setObservers()
+        setTasks()
         setupUI()
     }
     
@@ -183,11 +184,11 @@ class CommentsSectionCell: UICollectionViewCell {
         //            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         //        constraint.priority = .defaultLow
         closedConstraint =
-        disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
         closedConstraint.priority = .defaultLow // use low priority so stack stays pinned to top of cell
         
         openConstraint =
-        collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
         openConstraint.priority = .defaultLow
         
         updateAppearance(animated: false)
@@ -226,6 +227,21 @@ class CommentsSectionCell: UICollectionViewCell {
 //        })
     }
     
+    private func setTasks() {
+        tasks.append(Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {
+                await MainActor.run {
+                    guard let self = self,
+                          let item = self.item,
+                          let object = notification.object as? SurveyReference,
+                          item === object
+                    else { return }
+                    self.disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
+                }
+            }
+        })
+    }
+    
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -234,9 +250,12 @@ class CommentsSectionCell: UICollectionViewCell {
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                                  forTextStyle: .caption1)
-        guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        guard let constraint = horizontalStack.getConstraint(identifier: "height"),
+              let constraint_2 = disclosureLabel.getConstraint(identifier: "width")
+        else { return }
         setNeedsLayout()
         constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
+        constraint_2.constant = disclosureLabel.text!.width(withConstrainedHeight: 100, font: disclosureLabel.font)
         layoutIfNeeded()
     }
 }

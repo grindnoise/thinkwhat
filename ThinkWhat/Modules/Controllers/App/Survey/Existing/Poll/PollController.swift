@@ -83,16 +83,36 @@ class PollController: UIViewController {
         customTitle.oval.strokeStart = survey.isNil ? 0 : CGFloat(survey!.progress)
         return customTitle
     }()
-    private lazy var titleView: Icon = {
-        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-        icon.backgroundColor = .clear
-        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
-        icon.isRounded = false
-        icon.scaleMultiplicator = 1.4
-        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
-        
-        return icon
+    private lazy var titleView: CircleButton = {
+        let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: false)
+        customTitle.accessibilityIdentifier = "titleView"
+        customTitle.color = .clear
+        customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        customTitle.icon.backgroundColor = .clear
+        customTitle.layer.masksToBounds = false
+        customTitle.icon.layer.masksToBounds = false
+        customTitle.oval.masksToBounds = false
+        customTitle.icon.scaleMultiplicator = 1.7
+        customTitle.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
+        customTitle.state = .Off
+        customTitle.contentView.backgroundColor = .clear
+//        customTitle.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
+        customTitle.ovalBg.strokeStart = 0
+        customTitle.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : surveyReference.topic.tagColor.cgColor
+        customTitle.oval.lineCap = .round
+        customTitle.oval.strokeStart = survey.isNil ? 0 : CGFloat(survey!.progress)
+        return customTitle
     }()
+//    private lazy var titleView: Icon = {
+//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
+//        icon.backgroundColor = .clear
+//        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
+//        icon.isRounded = false
+//        icon.scaleMultiplicator = 1.4
+//        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
+//
+//        return icon
+//    }()
     private var observers: [NSKeyValueObservation] = []
     private var tasks: [Task<Void, Never>?] = []
     private var subscriptions = Set<AnyCancellable>()
@@ -138,6 +158,17 @@ class PollController: UIViewController {
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         
+        titleView.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
+        titleView.ovalBg.strokeStart = 0
+        titleView.color = surveyReference.topic.tagColor
+        if surveyReference.isOwn {
+            titleView.oval.opacity = 1
+            titleView.ovalBg.opacity = 1
+        } else if !surveyReference.isComplete {
+            titleView.oval.opacity = 0
+            titleView.ovalBg.opacity = 0
+        }
+        
         navigationBar.addSubview(avatar)
         avatar.translatesAutoresizingMaskIntoConstraints = false
         navigationItem.rightBarButtonItem?.isEnabled = !_survey.isNil
@@ -172,7 +203,10 @@ class PollController: UIViewController {
         indicator.icon.scaleMultiplicator = 1.5
         indicator.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
         indicator.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
-        if !surveyReference.isComplete {
+        if surveyReference.isOwn {
+            indicator.oval.opacity = 1
+            indicator.ovalBg.opacity = 1
+        } else if !surveyReference.isComplete {
             indicator.oval.opacity = 0
             indicator.ovalBg.opacity = 0
         }
@@ -287,19 +321,6 @@ class PollController: UIViewController {
         indicator.translatesAutoresizingMaskIntoConstraints = false
         indicator.widthAnchor.constraint(equalTo: indicator.heightAnchor, multiplier: 1.0/1.0).isActive = true
         
-//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-//        icon.backgroundColor = .clear
-//        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
-//        icon.isRounded = false
-//        icon.scaleMultiplicator = 1.4
-//        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
-//        self.navigationItem.titleView = icon
-//        self.navigationItem.titleView?.alpha = 0
-//
-//        self.navigationItem.titleView?.clipsToBounds = false
-        
-//        navigationBar.setNeedsLayout()
-//        navigationBar.layoutIfNeeded()
         self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         self.avatar.alpha = 0
@@ -310,22 +331,16 @@ class PollController: UIViewController {
         guard let navBar = navigationController?.navigationBar else { return }
         observers.append(navBar.observe(\UINavigationBar.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
             guard let self = self,
-                  let newValue = change.newValue else { return }
-            //                  let titleView = self.navigationItem.titleView else { return }
+                  let newValue = change.newValue
+            else { return }
             
             if self.navigationItem.titleView.isNil {
-                let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-                icon.backgroundColor = .clear
-                icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
-                icon.isRounded = false
-                icon.scaleMultiplicator = 1.4
-                icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
                 self.navigationItem.titleView = self.titleView
                 self.navigationItem.titleView?.alpha = 0
-                
                 self.navigationItem.titleView?.clipsToBounds = false
+                self.titleView.oval.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
+                self.titleView.ovalBg.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
             }
-            
             
             var largeAlpha: CGFloat = CGFloat(1) - max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             let smallAlpha: CGFloat = max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
@@ -412,6 +427,12 @@ class PollController: UIViewController {
 
                     switch instance.isComplete {
                     case true:
+                        let _anim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.5, delegate: nil)
+                        self.titleView.oval.add(_anim, forKey: nil)
+                        self.titleView.ovalBg.add(_anim, forKey: nil)
+                        self.titleView.oval.opacity = 1
+                        self.titleView.ovalBg.opacity = 1
+                
                         if let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress") {
                             let anim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.5, delegate: nil)
                             indicator.oval.add(anim, forKey: nil)
@@ -505,11 +526,13 @@ class PollController: UIViewController {
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
                 guard let self = self,
                       let instance = notification.object as? SurveyReference,
-                      self._surveyReference == instance,
-                      let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress")
+                      self._surveyReference == instance
                 else { return }
 
-                indicator.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
+                if let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress") {
+                    indicator.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
+                }
+                self.titleView.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
             }
         })
     }
@@ -678,21 +701,7 @@ class PollController: UIViewController {
         super.viewDidAppear(animated)
 
         guard !hidesLargeTitle else { return }
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
-            self.titleView.alpha = 0
-//        }
-//        guard self.navigationItem.titleView.isNil else { return }
-//
-//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-//        icon.backgroundColor = .clear
-//        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
-//        icon.isRounded = false
-//        icon.scaleMultiplicator = 1.4
-//        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
-//        self.navigationItem.titleView = icon
-//        self.navigationItem.titleView?.alpha = 0
-//
-//        self.navigationItem.titleView?.clipsToBounds = false
+        self.titleView.alpha = 0
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -767,9 +776,10 @@ class PollController: UIViewController {
         }
 
         
-        if let icon = navigationItem.titleView as? Icon {
-            icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+        if let icon = navigationItem.titleView as? CircleButton {
+            icon.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
         }
+        
         if isAddedToFavorite {
             watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
         } else {
@@ -795,9 +805,9 @@ class PollController: UIViewController {
 }
 
 // MARK: - View Input
-extension PollController: PollViewInput {
-    func postComment(_ string: String) {
-        controllerInput?.postComment(string)
+extension PollController: PollViewInput {    
+    func postComment(_ string: String, replyTo: Comment? = nil) {
+        controllerInput?.postComment(string, replyTo: replyTo)
     }
     
     func onVotersTapped(answer: Answer, color: UIColor) {
@@ -865,6 +875,10 @@ extension PollController: PollViewInput {
 
 // MARK: - Model Output
 extension PollController: PollModelOutput {
+    func commentPostCallback(_ result: Result<Comment, Error>) {
+        print(result)
+    }
+    
     func onExitWithSkip() {
         Task {
             try await Task.sleep(nanoseconds: UInt64(0.25 * 1_000_000_000))

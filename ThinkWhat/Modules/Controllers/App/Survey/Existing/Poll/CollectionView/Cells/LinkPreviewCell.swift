@@ -62,7 +62,11 @@ class LinkPreviewCell: UICollectionViewCell {
         instance.text = "web_link".localized.uppercased()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         instance.textColor = .secondaryLabel
-        instance.addEquallyTo(to: shadowView)
+        
+        let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
+        constraint.identifier = "width"
+        constraint.isActive = true
+//        instance.addEquallyTo(to: shadowView)
 //                let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
 //                constraint.identifier = "height"
 //                constraint.isActive = true
@@ -195,7 +199,7 @@ class LinkPreviewCell: UICollectionViewCell {
         openConstraint = linkPreview.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
         openConstraint?.priority = .defaultLow
         
-        disclosureLabel.widthAnchor.constraint(equalToConstant: self.disclosureLabel.text!.width(withConstrainedHeight: horizontalStack.frame.height, font: self.disclosureLabel.font)).isActive = true
+//        disclosureLabel.widthAnchor.constraint(equalToConstant: self.disclosureLabel.text!.width(withConstrainedHeight: horizontalStack.frame.height, font: self.disclosureLabel.font)).isActive = true
 
         updateAppearance(animated: false)
     }
@@ -244,9 +248,12 @@ class LinkPreviewCell: UICollectionViewCell {
         
         disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                                  forTextStyle: .caption1)
-        guard let constraint = horizontalStack.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        guard let constraint = horizontalStack.getConstraint(identifier: "height"),
+              let constraint_2 = disclosureLabel.getConstraint(identifier: "width")
+        else { return }
         setNeedsLayout()
         constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
+        constraint_2.constant = disclosureLabel.text!.width(withConstrainedHeight: 100, font: disclosureLabel.font)
         layoutIfNeeded()
     }
 }

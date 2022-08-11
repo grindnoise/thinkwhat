@@ -51,7 +51,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     }
     var color: UIColor = K_COLOR_RED {
         didSet {
-            icon.backgroundColor = color
+//            icon.backgroundColor = color
             oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor 
         }
     }
@@ -77,7 +77,7 @@ class CircleButton: UIView, CAAnimationDelegate {
     @IBOutlet var contentView: UIView! {
         didSet {
             contentView.clipsToBounds = false
-            contentView.backgroundColor = .systemBackground
+            contentView.backgroundColor = .clear
         }
     }
 //    @IBOutlet weak var icon: SurveyCategoryIcon! {
@@ -123,7 +123,7 @@ class CircleButton: UIView, CAAnimationDelegate {
         self.layer.insertSublayer(oval, at: 2)//(oval)
         layers["oval"] = oval
         
-        icon = Icon.getIcon(frame: .zero, category: .Outdoor/*category*/, backgroundColor: color, text: text)//SurveyCategoryIcon(frame: self.bounds)//getIcon(frame: self.bounds, category: category, color: color)
+        icon = Icon.getIcon(frame: .zero, category: .Outdoor/*category*/, backgroundColor: .clear, text: text)//SurveyCategoryIcon(frame: self.bounds)//getIcon(frame: self.bounds, category: category, color: color)
         self.addSubview(icon)
         if useAutoLayout {
             icon.translatesAutoresizingMaskIntoConstraints = false

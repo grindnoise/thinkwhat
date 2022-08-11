@@ -83,6 +83,7 @@ struct Notifications {
         static let Rating                           = Notification.Name("NotificationSurveyRating")
         static let Watchers                         = Notification.Name("NotificationSurveyWatchers")
         static let Likes                            = Notification.Name("NotificationSurveyLikes")
+        static let CommentsTotal                    = Notification.Name("NotificationCommentsTotal")
         
         
         static let SurveysStackUpdated              = Notification.Name("NotificationSurveysStackUpdated")

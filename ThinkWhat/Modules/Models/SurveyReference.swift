@@ -20,6 +20,7 @@ class SurveyReference: Decodable {// NSObject,
              owner = "userprofile",
              votesLimit = "vote_capacity",
              votesTotal = "votes_total",
+             commentsTotal = "comments_total",
              isHot = "is_hot",
              isAnonymous = "is_anonymous"
     }
@@ -117,6 +118,13 @@ class SurveyReference: Decodable {// NSObject,
 //    }
     var owner: Userprofile
     var votesTotal: Int
+    var commentsTotal: Int {
+        didSet {
+            guard oldValue != commentsTotal else { return }
+            NotificationCenter.default.post(name: Notifications.Surveys.CommentsTotal, object: self)
+            survey?.commentsTotal = commentsTotal
+        }
+    }
     var votesLimit: Int
     var survey: Survey? {
         return Surveys.shared.all.filter{ $0.reference == self }.first
@@ -126,8 +134,8 @@ class SurveyReference: Decodable {// NSObject,
             guard oldValue != progress else { return }
             NotificationCenter.default.post(name: Notifications.Surveys.Progress, object: self)
 //            Notification.send(names: [Notifications.Surveys.Progress])
-            guard let survey = survey else { return }
-            survey.progress = progress
+//            guard let survey = survey else { return }
+            survey?.progress = progress
         }
     }
     required init(from decoder: Decoder) throws {
@@ -157,6 +165,7 @@ class SurveyReference: Decodable {// NSObject,
             views       = try container.decode(Int.self, forKey: .views)
             votesLimit  = try container.decode(Int.self, forKey: .votesLimit)
             votesTotal  = try container.decode(Int.self, forKey: .votesTotal)
+            commentsTotal = try container.decode(Int.self, forKey: .commentsTotal)
             startDate   = try container.decode(Date.self, forKey: .startDate)
             isComplete  = try container.decode(Bool.self, forKey: .isComplete)
             isOwn       = try container.decode(Bool.self, forKey: .isOwn)
@@ -200,7 +209,8 @@ class SurveyReference: Decodable {// NSObject,
          votesLimit: Int = 0,
          isAnonymous: Bool,
          progress: Int = 0,
-         rating: Double = 0) {
+         rating: Double = 0,
+         commentsTotal: Int = 0) {
         
         self.id                      = id
         self.title                   = title
@@ -214,6 +224,7 @@ class SurveyReference: Decodable {// NSObject,
         self.isComplete              = isComplete
         self.isFavorite              = isFavorite
         self.votesTotal              = votesTotal
+        self.commentsTotal           = commentsTotal
         self.votesLimit              = votesLimit
 //        survey                  = _survey
         self.owner                   = owner

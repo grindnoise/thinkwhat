@@ -39,7 +39,7 @@ class ChoiceCell: UICollectionViewCell {
         didSet {
             if mode == .ReadOnly {
                 colorSubject.send(completion: .finished)
-                disclosureIndicator.alpha = item.totalVotes == 0 ? 0 : 1
+                disclosureIndicator.alpha = 1
                 
                 setVoters()
                 setProgress(animated: oldValue == .Write)
@@ -52,6 +52,7 @@ class ChoiceCell: UICollectionViewCell {
                 if self.mode == .ReadOnly {
                     self.selectionView.backgroundColor = self.color//.withAlphaComponent(self.isChosen ? 1 : 0.25)
 //                    self.checkmarkIndicator.alpha = 1// self.isChosen ? 1 : 0
+//                    self.disclosureIndicator.tintColor = self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray5 : self.color
                     self.checkmarkIndicator.tintColor = self.color
                 } else {
                     self.selectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color//.withAlphaComponent(0.65)
@@ -61,7 +62,7 @@ class ChoiceCell: UICollectionViewCell {
                     imageView.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
                 }
 
-                self.disclosureIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
+                self.disclosureIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray5 : self.color
             }
         }
     }
@@ -74,12 +75,13 @@ class ChoiceCell: UICollectionViewCell {
     public var color: UIColor = .tertiarySystemBackground {
         didSet {
             votersCountLabel.textColor = item.totalVotes == 0 ? .secondaryLabel : color
-            numberLabel.textColor = isChosen ? .white : color
+            numberLabel.textColor = isChosen ? .white : self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray4 : self.color
             
             if self.mode == .ReadOnly {
 //                self.checkmarkIndicator.alpha = 1//self.isChosen ? 1 : 0
                 self.checkmarkIndicator.tintColor = self.color
                 self.selectionView.backgroundColor = self.color//.withAlphaComponent(self.isChosen ? 1 : 0.25)
+//                self.disclosureIndicator.tintColor = self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray5 : self.color
             } else {
                 selectionView.backgroundColor = color//.withAlphaComponent(0.65)
                 self.checkmarkIndicator.tintColor = .systemGray5//self.color//.withAlphaComponent(0.65)
@@ -88,7 +90,7 @@ class ChoiceCell: UICollectionViewCell {
             if let imageView = self.horizontalStack.getSubview(type: UIImageView.self, identifier: "chevron") {
                 imageView.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
             }
-            self.disclosureIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
+            self.disclosureIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray5 : self.color
         }
     }
     public weak var host: ChoiceCollectionView?
@@ -664,7 +666,7 @@ class ChoiceCell: UICollectionViewCell {
             return
         }
         
-        numberLabel.textColor = isChosen ? .white : color
+        numberLabel.textColor = isChosen ? .white : self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray4 : self.color
         votersCountLabel.textColor = color
         votersCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
         if let constraint = horizontalStack.getConstraint(identifier: "height") {
@@ -1002,10 +1004,11 @@ class ChoiceCell: UICollectionViewCell {
         super.traitCollectionDidChange(previousTraitCollection)
         
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        numberLabel.textColor = isChosen ? .white : color
+        numberLabel.textColor = isChosen ? .white : self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray4 : self.color
 
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray5
-
+        self.disclosureIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray5 : self.color
+        
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         

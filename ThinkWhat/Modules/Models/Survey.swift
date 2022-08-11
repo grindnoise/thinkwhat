@@ -124,6 +124,7 @@ class Survey: Decodable {
              isFavorite = "is_favorite",
              isCommentingAllowed = "is_commenting_allowed",
              totalVotes = "votes_total",
+             commentsTotal = "comments_total",
              owner = "userprofile",
              isHot = "is_hot",
              isOwn = "is_own",
@@ -177,6 +178,11 @@ class Survey: Decodable {
     var votesTotal:             Int = 0 {
         didSet {
             reference.votesTotal = votesTotal
+        }
+    }
+    var commentsTotal:          Int {
+        didSet {
+            reference.commentsTotal = commentsTotal
         }
     }
     var watchers:               Int = 0
@@ -325,6 +331,7 @@ class Survey: Decodable {
             comments                = try container.decode([Comment].self, forKey: .comments)
             votesLimit              = try container.decode(Int.self, forKey: .voteCapacity)
             votesTotal              = try container.decode(Int.self, forKey: .totalVotes)
+            commentsTotal           = try container.decode(Int.self, forKey: .commentsTotal)
             watchers                = try container.decode(Int.self, forKey: .watchers)
             likes                   = try container.decode(Int.self, forKey: .likes)
             views                   = try container.decode(Int.self, forKey: .views)
@@ -551,10 +558,12 @@ class Surveys {
             let instance: SurveyReference? = SurveyReferences.shared.all.filter({ $0.id == Int(i.0) }).first ?? Surveys.shared.all.filter({ $0.reference.id == Int(i.0)}).first?.reference
             guard let instance = instance,
                   let progress = i.1["progress"].int,
-            let rating = i.1["rating"].double,
-                let views = i.1["views"].int else { return }
+                  let comments = i.1["comments"].int,
+                  let rating = i.1["rating"].double,
+                  let views = i.1["views"].int else { return }
             instance.progress = progress
             instance.rating = rating
+            instance.commentsTotal = comments
             instance.views = views
         }
     }
