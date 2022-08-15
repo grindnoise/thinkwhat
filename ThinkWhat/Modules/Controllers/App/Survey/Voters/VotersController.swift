@@ -215,12 +215,13 @@ class VotersController: UIViewController {
 //        self.view = view as UIView
         setFilterButton()
         loadData()
-        setupUI()
+//        setupUI()
         setObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setupUI()
         
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0.1, options: .curveEaseInOut) {
             self.countLabel.transform = .identity
@@ -230,20 +231,20 @@ class VotersController: UIViewController {
         }
     }
 
-    override func willMove(toParent parent: UIViewController?) {
-        super.willMove(toParent: parent)
-        guard parent.isNil else { return }
-//        clearNavigationBar(clear: true)
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
-            self.titleLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            self.countLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            self.titleLabel.alpha = 0
-            self.countLabel.alpha = 0
-        } completion: { _ in
-            self.titleLabel.removeFromSuperview()
-            self.countLabel.removeFromSuperview()
-        }
-    }
+//    override func willMove(toParent parent: UIViewController?) {
+//        super.willMove(toParent: parent)
+//        guard parent.isNil else { return }
+////        clearNavigationBar(clear: true)
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
+//            self.titleLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//            self.countLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//            self.titleLabel.alpha = 0
+//            self.countLabel.alpha = 0
+//        } completion: { _ in
+//            self.titleLabel.removeFromSuperview()
+//            self.countLabel.removeFromSuperview()
+//        }
+//    }
     
 //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 //        guard !controllerOutput.isNil else { return }

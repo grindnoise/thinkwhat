@@ -163,6 +163,6 @@ extension Topic: Hashable {
         hasher.combine(id)
     }
     static func == (lhs: Topic, rhs: Topic) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+        return lhs.hashValue == rhs.hashValue
     }
 }

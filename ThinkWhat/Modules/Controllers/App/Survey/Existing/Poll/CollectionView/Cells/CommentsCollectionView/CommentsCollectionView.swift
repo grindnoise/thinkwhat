@@ -20,12 +20,35 @@ class CommentsCollectionView: UICollectionView {
     }
 
     // MARK: - Public properties
+    public weak var survey: Survey!
     public var dataItems: [Comment] {
         didSet {
             reload()
         }
     }
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
+    public var commentsRequestSubject = CurrentValueSubject<[Comment]?, Never>(nil)
+//    public var commentsRequestSubject: CurrentValueSubject<[Comment], Never>!
+    //New user comment publisher
+    public var lastPostedComment: Comment? {
+        didSet {
+//            guard let lastPostedComment = lastPostedComment else {
+//                return
+//            }
+//            dataItems.insert(lastPostedComment, at: 0)
+            
+            //Clean tf on success
+            textField.text = ""
+//            var snapshot = source.snapshot()
+//            if let firstItem = snapshot.itemIdentifiers.first {
+//                snapshot.insertItems([lastPostedComment], beforeItem: firstItem)
+//            } else {
+//                snapshot.appendSections([.main,])
+//                snapshot.appendItems([lastPostedComment], toSection: .main)
+//            }
+//            source.apply(snapshot, animatingDifferences: true)
+        }
+    }
 //    public weak var boundsListener: BoundsListener?
 
     
@@ -43,9 +66,11 @@ class CommentsCollectionView: UICollectionView {
         return instance
     }()
     
+    
     // MARK: - Initialization
-    init(dataItems: [Comment] = [], callbackDelegate: CallbackObservable, mode: CommentsCollectionView.Mode) {
+    init(dataItems: [Comment] = [], callbackDelegate: CallbackObservable, mode: CommentsCollectionView.Mode, survey: Survey? = nil) {
         self.mode = mode
+        self.survey = survey
         self.dataItems = dataItems
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.callbackDelegate = callbackDelegate
@@ -77,7 +102,20 @@ class CommentsCollectionView: UICollectionView {
             for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
                 guard let self = self else { return }
                 self.textField.resignFirstResponder()
-                Fade.shared.dismiss()
+            }
+        })
+        tasks.append( Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Append) {
+                guard let self = self,
+                      let instance = notification.object as? Comment,
+                      instance.survey == self.survey
+                else { return }
+                
+                if instance.isOwn {
+                    self.dataItems.insert(instance, at: 0)
+                } else {
+                    self.dataItems.append(instance)
+                }
             }
         })
     }
@@ -145,14 +183,14 @@ class CommentsCollectionView: UICollectionView {
             return UICollectionReusableView()
         }
         
-        reload()
+        reload(animatingDifferences: false)
     }
 
-    private func reload() {
+    private func reload(animatingDifferences: Bool = true) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Comment>()
         snapshot.appendSections([.main,])
         snapshot.appendItems(dataItems, toSection: .main)
-        source.apply(snapshot, animatingDifferences: true)
+        source.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 }
 
@@ -166,6 +204,20 @@ extension CommentsCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        cell.setNeedsLayout()
+        cell.layoutIfNeeded()
+        
+        
+        if dataItems.count < 10 {
+//            if commentsRequestSubject.isNil { commentsRequestSubject = CurrentValueSubject<[Comment], Never>([]) }
+            commentsRequestSubject.send(dataItems)
+        } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
+//            if commentsRequestSubject.isNil { commentsRequestSubject = CurrentValueSubject<[Comment], Never>([]) }
+            commentsRequestSubject.send(dataItems)
+        }
     }
 }
 

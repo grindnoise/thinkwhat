@@ -30,11 +30,6 @@ class ChoiceCollectionView: UICollectionView {
             modeSubject.send(mode)
             modeSubject.send(completion: .finished)
             allowsMultipleSelection = mode == .ReadOnly ? true : false
-//                            visibleCells.enumerated().forEach {
-//                                guard let cell = $1 as? ChoiceCell else { return }
-//                                cell.color = Colors.tags()[$0]
-//                                cell.mode = mode
-//                            }
             
             if oldValue != mode, mode == .ReadOnly {
 //                reload(animatingDifferences: true, shouldChangeColor: true)
@@ -53,6 +48,7 @@ class ChoiceCollectionView: UICollectionView {
             }
         }
     }
+    public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
     
     
     // MARK: - Private properties
@@ -60,19 +56,6 @@ class ChoiceCollectionView: UICollectionView {
     private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<Section, Answer>!
     private var modeSubject = PassthroughSubject<PollController.Mode, Never>()
-    
-//    @Published var colorPublisher: UIColor = .clear
-    public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
-    
-//    private var color: UIColor = .clear {
-//        didSet {
-//            colorPublisher = color
-//        }
-//    }
-//    public var colorSubject = CurrentValueSubject<UIColor, Never>(.clear)
-//    private var shouldChangeColor = true
-    
-
     
     // MARK: - Destructor
     deinit {

@@ -35,6 +35,7 @@ class PollController: UIViewController {
     }
     private var _surveyReference: SurveyReference!
     private var _showNext: Bool = false
+    private var isNavBarReadyInstalled = false
     private let watchButton: UIImageView = {
         let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
         v.contentMode = .center
@@ -150,12 +151,14 @@ class PollController: UIViewController {
     // MARK: - Private methods
     private func setupUI() {
         if !_survey.isNil { controllerOutput?.onLoadCallback() }
+        
 //        let appearance = UINavigationBarAppearance()
 //        appearance.configureWithOpaqueBackground()
 //        self.navigationController?.navigationBar.standardAppearance = appearance
 //        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        guard let navigationBar = self.navigationController?.navigationBar else { return }
+        guard !isNavBarReadyInstalled, let navigationBar = self.navigationController?.navigationBar else { return }
         
+        isNavBarReadyInstalled = true
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         
         titleView.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
@@ -211,7 +214,6 @@ class PollController: UIViewController {
             indicator.ovalBg.opacity = 0
         }
         stackView.addArrangedSubview(indicator)
-        
        
         let titleContainer = UIView()
         titleContainer.backgroundColor = .clear
@@ -334,7 +336,7 @@ class PollController: UIViewController {
                   let newValue = change.newValue
             else { return }
             
-            if self.navigationItem.titleView.isNil {
+            if self.hidesLargeTitle, self.navigationItem.titleView.isNil {
                 self.navigationItem.titleView = self.titleView
                 self.navigationItem.titleView?.alpha = 0
                 self.navigationItem.titleView?.clipsToBounds = false
@@ -654,7 +656,7 @@ class PollController: UIViewController {
         self.controllerInput?
             .modelOutput = self
 
-        setupUI()
+//        setupUI()
         setTasks()
         setSubscriptions()
         setObservers()
@@ -668,37 +670,35 @@ class PollController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+//        setupUI()
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         self.navigationController?.navigationBar.standardAppearance = appearance
         self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationController?.navigationBar.overrideUserInterfaceStyle = .unspecified
         setNeedsStatusBarAppearanceUpdate()
-        
-        if !hidesLargeTitle {
-            self.titleView.alpha = 0
-        }
-        
+
         navigationController?.navigationBar.prefersLargeTitles = hidesLargeTitle ? false : true
         navigationItem.largeTitleDisplayMode = hidesLargeTitle ? .never : .always
         
+        guard hidesLargeTitle, navigationItem.titleView.isNil else { return }
+        
+        self.navigationItem.titleView = self.titleView
+        self.navigationItem.titleView?.clipsToBounds = false
+        self.titleView.oval.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
+        self.titleView.ovalBg.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setupUI()
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0.1, options: .curveEaseInOut, animations: {
             self.avatar.transform = .identity
             self.stackView.transform = .identity
             self.avatar.alpha = self.hidesLargeTitle ? 0 : 1
             self.stackView.alpha = self.hidesLargeTitle ? 0 : 1
-            self.titleView.alpha = !self.hidesLargeTitle ? 0 : 1
-        }) { _ in
-            guard !self.hidesLargeTitle else { return }
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
-                self.titleView.alpha = 0
-            }
-        }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+//            self.titleView.alpha = !self.hidesLargeTitle ? 0 : 1
+        }) { _ in }
 
         guard !hidesLargeTitle else { return }
         self.titleView.alpha = 0
@@ -718,6 +718,12 @@ class PollController: UIViewController {
         guard !hidesLargeTitle else { return }
 
         self.titleView.alpha = 0
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        navigationItem.titleView = nil
     }
     
     override func willMove(toParent parent: UIViewController?) {
@@ -805,7 +811,11 @@ class PollController: UIViewController {
 }
 
 // MARK: - View Input
-extension PollController: PollViewInput {    
+extension PollController: PollViewInput {
+    func requestComments(_ comments: [Comment]) {
+        controllerInput?.requestComments(comments)
+    }
+    
     func postComment(_ string: String, replyTo: Comment? = nil) {
         controllerInput?.postComment(string, replyTo: replyTo)
     }
@@ -816,6 +826,9 @@ extension PollController: PollViewInput {
 //        navigationController?.interactivePopGestureRecognizer?.delegate = self
 //        navigationController?.navigationBar.overrideUserInterfaceStyle = .light
 //        setNeedsStatusBarAppearanceUpdate()
+        if !hidesLargeTitle {
+            navigationItem.titleView = nil
+        }
         
         navigationController?.pushViewController(VotersController(answer: answer, color: color), animated: true)
         //        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
@@ -876,7 +889,7 @@ extension PollController: PollViewInput {
 // MARK: - Model Output
 extension PollController: PollModelOutput {
     func commentPostCallback(_ result: Result<Comment, Error>) {
-        print(result)
+        controllerOutput?.commentPostCallback(result)
     }
     
     func onExitWithSkip() {

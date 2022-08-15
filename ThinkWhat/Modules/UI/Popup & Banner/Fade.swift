@@ -17,7 +17,7 @@ class Fade: UIView {
         self.backgroundColor = UIColor.black.withAlphaComponent(0.8)
         self.frame = UIScreen.main.bounds
         self.alpha = 0
-        self.isUserInteractionEnabled = false
+        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     }
     
     // MARK: - Destructor
@@ -44,5 +44,11 @@ class Fade: UIView {
         UIView.animate(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
             self.alpha = 0
         })
+    }
+    
+    @objc
+    private func handleTap() {
+        NotificationCenter.default.post(name: Notifications.System.HideKeyboard, object: self)
+        dismiss()
     }
 }

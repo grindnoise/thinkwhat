@@ -16,8 +16,13 @@ class Comments {
         didSet {
 //            Check for duplicates
             guard let lastInstance = all.last else { return }
-            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
+            guard oldValue.filter({ $0 == lastInstance }).isEmpty else {
                 all.remove(object: lastInstance)
+                return
+            }
+            NotificationCenter.default.post(name: Notifications.Comments.Append, object: lastInstance)
+            if let survey = lastInstance.survey {
+                survey.reference.commentsTotal += 1
             }
         }
     }
@@ -55,7 +60,10 @@ class Comment: Decodable {
     var userprofile: Userprofile?
     let anonUsername: String
     let createdAt: Date
-    var replyTo: Comment?
+    let replyToId: Int?
+    var replyTo: Comment? {
+        return Comments.shared.all.filter { $0.id == replyToId }.first
+    }
     var isAnonymous: Bool {
         return userprofile.isNil && !anonUsername.isEmpty
     }
@@ -66,6 +74,14 @@ class Comment: Decodable {
     var isParentNode: Bool {
         return !children.isEmpty
     }
+    var isOwn: Bool {
+        guard let userprofile = userprofile,
+              let currentUser = Userprofiles.shared.current else {
+            return false
+        }
+        
+        return userprofile.id == currentUser.id
+    }
     
     required init(from decoder: Decoder) throws {
         do {
@@ -75,19 +91,18 @@ class Comment: Decodable {
             anonUsername    = try container.decode(String.self, forKey: .anonUsername)
             let _userprofile = try container.decodeIfPresent(Userprofile.self, forKey: .userprofile)
             if !_userprofile.isNil {
-//                Userprofiles.shared.current
                 userprofile = Userprofiles.shared.all.filter({ $0.id == _userprofile!.id }).first ?? _userprofile
-//                Userprofiles.shared.all.contains(Userprofiles.shared.current!)
             }
             surveyId        = try container.decode(Int.self, forKey: .survey)
             createdAt       = try container.decode(Date.self, forKey: .createdAt)
             children        = (try? container.decode([Comment].self, forKey: .children)) ?? []
             replies         = try container.decode(Int.self, forKey: .replies)
-            replyTo
+            replyToId       = try container.decodeIfPresent(Int.self, forKey: .replyTo)
             
             if Comments.shared.all.filter({ $0 == self }).isEmpty {
                 Comments.shared.all.append(self)
             }
+            
         } catch {
             throw error
         }
@@ -96,11 +111,12 @@ class Comment: Decodable {
 
 extension Comment: Hashable {
     func hash(into hasher: inout Hasher) {
-        hasher.combine(body)
+        hasher.combine(surveyId)
         hasher.combine(id)
+        hasher.combine(body)
     }
     static func == (lhs: Comment, rhs: Comment) -> Bool {
-        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+        return lhs.hashValue == rhs.hashValue
     }
 }
 

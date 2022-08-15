@@ -16,6 +16,16 @@ protocol AccessoryInputTextFieldDelegate: AnyObject {
 
 final class AccessoryInputTextField: UITextField {
     
+    override var text: String? {
+        didSet {
+            guard let text = text,
+                  text.isEmpty
+            else { return }
+            
+            textView.text = ""
+        }
+    }
+    
     // MARK: - Public properties
     public var placeholderText: String
     public var textViewFont: UIFont

@@ -22,7 +22,8 @@ class SurveyReference: Decodable {// NSObject,
              votesTotal = "votes_total",
              commentsTotal = "comments_total",
              isHot = "is_hot",
-             isAnonymous = "is_anonymous"
+             isAnonymous = "is_anonymous",
+             media = "media_preview"
     }
     
 //    //NS
@@ -138,6 +139,7 @@ class SurveyReference: Decodable {// NSObject,
             survey?.progress = progress
         }
     }
+    var media: Mediafile?
     required init(from decoder: Decoder) throws {
         do {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -172,6 +174,9 @@ class SurveyReference: Decodable {// NSObject,
             isFavorite  = try container.decode(Bool.self, forKey: .isFavorite)
             isHot       = try container.decode(Bool.self, forKey: .isHot)
             progress    = try container.decode(Int.self, forKey: .progress)
+            if let _media       = try container.decodeIfPresent([Mediafile].self, forKey: .media)?.first {
+                media = _media
+            }
             rating      = Double(try container.decode(String.self, forKey: .rating)) ?? 0
             //Check for existing instance by hashValue
             if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {

@@ -105,33 +105,36 @@ class SurveysCollectionView: UICollectionView {
     // MARK: - Private methods
     private func setupUI() {
         delegate = self
+//        bounces = false
         
         refreshControl = UIRefreshControl()
         refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
         refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
         
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
 //            layoutConfig.headerMode = .firstItemInSection
-            layoutConfig.backgroundColor = .clear
-            layoutConfig.showsSeparators = true
-//            layoutConfig.itemSeparatorHandler = {
-                
-//            }
+            layoutConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+            layoutConfig.showsSeparators = false//true
 //            if #available(iOS 14.5, *) {
 //                var separatorConfig = UIListSeparatorConfiguration(listAppearance: UICollectionLayoutListConfiguration.Appearance.grouped)
-//                separatorConfig.bottomSeparatorInsets = NSDirectionalEdgeInsets(top: <#T##CGFloat#>, leading: <#T##CGFloat#>, bottom: <#T##CGFloat#>, trailing: .greatestFiniteMagnitude)
+//                separatorConfig.bottomSeparatorInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 5, trailing: .greatestFiniteMagnitude)
 //                layoutConfig.separatorConfiguration = separatorConfig
 //            }
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
-            
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+            sectionLayout.interGroupSpacing = 16
             return sectionLayout
         }
         
         let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { cell, indexPath, item in
             cell.item = item
+            
+            var config = UIBackgroundConfiguration.listPlainCell()
+            config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+            cell.backgroundConfiguration = config
+            cell.automaticallyUpdatesBackgroundConfiguration = false
         }
         
         source = UICollectionViewDiffableDataSource<Section, SurveyReference>(collectionView: self) {
@@ -382,10 +385,18 @@ class SurveysCollectionView: UICollectionView {
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
+            layoutConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+            layoutConfig.showsSeparators = false//true
+
+            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+            sectionLayout.interGroupSpacing = 16
+            return sectionLayout
+        }
         refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
         searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//        collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-//        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     }
 }
 

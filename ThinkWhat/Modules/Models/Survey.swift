@@ -163,7 +163,7 @@ class Survey: Decodable {
     var answersSortedByOrder:   [Answer] {
         return answers.sorted { $0.order < $1.order }
     }
-    var comments:               [Comment] = []
+//    var comments:               [Comment] = []
     var shareHash:              String = ""
     var shareEncryptedString:   String = ""
     var url:                    URL? = nil///hlink
@@ -185,6 +185,14 @@ class Survey: Decodable {
             reference.commentsTotal = commentsTotal
         }
     }
+    var commentsSortedByDate: [Comment] {
+        let all = Comments.shared.all.filter { $0.survey == self }
+        //First of all own
+        let own = all.filter { $0.isOwn }.sorted { $0.createdAt < $1.createdAt }
+        let other = all.filter { !$0.isOwn }.sorted { $0.createdAt > $1.createdAt }
+        return own + other
+    }
+    
     var watchers:               Int = 0
     var result:                 [Int: Date]? {
         didSet {
@@ -328,7 +336,6 @@ class Survey: Decodable {
             type                    = _type
             media                   = try container.decode([Mediafile].self, forKey: .media)
             answers                 = try container.decode([Answer].self, forKey: .answers)
-            comments                = try container.decode([Comment].self, forKey: .comments)
             votesLimit              = try container.decode(Int.self, forKey: .voteCapacity)
             votesTotal              = try container.decode(Int.self, forKey: .totalVotes)
             commentsTotal           = try container.decode(Int.self, forKey: .commentsTotal)
@@ -345,6 +352,9 @@ class Survey: Decodable {
             let shareData           = try container.decode([String].self, forKey: .share_link)
             shareHash               = shareData.first ?? ""
             shareEncryptedString    = shareData.last ?? ""
+            
+            //Import comments
+            try container.decode([Comment].self, forKey: .comments)
             
             if let dict = try container.decodeIfPresent([String: Date].self, forKey: .result), !dict.isEmpty {
                 result = [Int(dict.keys.first!)!: dict.values.first!]

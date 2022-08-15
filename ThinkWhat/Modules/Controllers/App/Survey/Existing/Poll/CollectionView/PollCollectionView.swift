@@ -73,6 +73,7 @@ class PollCollectionView: UICollectionView {
 //    }
     public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
     public var modeSubject = PassthroughSubject<PollController.Mode, Never>()
+    public var lastPostedComment = CurrentValueSubject<Comment?, Never>(nil) 
     
     // MARK: - Initialization
     init(host: PollView?, poll: Survey, callbackDelegate: CallbackObservable) {
@@ -165,18 +166,6 @@ class PollCollectionView: UICollectionView {
                 cell.mode = $0
             }.store(in: &self.subscriptions)
             
-//            self.modeSubject.subscribe(cell.modeSubject)
-//            cell.modeSubject.sink {
-//                print($0)
-//            }
-////            cell.modeSubject.sink { [weak self] in
-////                guard let self = self,
-////                      let mode = $0
-////                else { return }
-////                print(mode)
-//////                self.colorSubject.send(color)
-////            }.store(in: &self.subscriptions)
-            
             cell.colorSubject.sink { [weak self] in
                 guard let self = self,
                       let color = $0
@@ -216,6 +205,7 @@ class PollCollectionView: UICollectionView {
             guard let self = self, cell.item.isNil else { return }
             cell.item = self.poll
             
+            //Subscription for posting
             cell.commentSubject.sink { [weak self] in
                 guard let self = self,
                       let string = $0
@@ -223,34 +213,25 @@ class PollCollectionView: UICollectionView {
                 
                 self.host.postComment(string)
             }.store(in: &self.subscriptions)
+            
+            //Subscription for request comments
+            cell.commentsRequestSubject.sink { [weak self] in
+                guard let self = self,
+                      let comments = $0 as? [Comment],
+                      comments.count > 0
+                else { return }
+                
+                self.host.requestComments(comments)
+            }.store(in: &self.subscriptions)
+            
+            //Subscibe for posted comment
+            self.lastPostedComment.sink {
+                guard let comment = $0 else { return }
+                
+                cell.lastPostedComment = comment
+            }.store(in: &self.subscriptions)
+            
         }
-
-//        let headerRegistration = UICollectionView.SupplementaryRegistration <UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) { headerView, elementKind, indexPath in
-//            
-//            guard let section = Section.init(rawValue: indexPath.section) else { return }
-//            
-//            if section == .title {
-//                headerView.heightAnchor.constraint(equalToConstant: 0).isActive = true
-//                return
-//            }
-//            
-//            var configuration = headerView.defaultContentConfiguration()
-//            configuration.text = "hide".localized
-//            configuration.textProperties.font = UIFont(name: Fonts.Regular, size: 14)!
-//            configuration.textProperties.color = .secondaryLabel
-//            configuration.directionalLayoutMargins = .init(top: 20.0, leading: 0.0, bottom: 10.0, trailing: 0.0)
-//            
-//            headerView.contentConfiguration = configuration
-//            headerView.accessories = [.outlineDisclosure(options: UICellAccessory.OutlineDisclosureOptions(style: .header)) {
-//                var currentSectionSnapshot = self.source.snapshot(for: section)
-//                if currentSectionSnapshot.items.filter { currentSectionSnapshot.isExpanded($0) }.isEmpty {
-//                    currentSectionSnapshot.collapse(currentSectionSnapshot.items)
-//                } else {
-//                    currentSectionSnapshot.expand(currentSectionSnapshot.items)
-//                }
-//                self.source.apply(currentSectionSnapshot, to: section, animatingDifferences: true)
-//            }]
-//        }
         
         source = UICollectionViewDiffableDataSource<Section, Int>(collectionView: self) { [unowned self]
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: Int) -> UICollectionViewCell? in

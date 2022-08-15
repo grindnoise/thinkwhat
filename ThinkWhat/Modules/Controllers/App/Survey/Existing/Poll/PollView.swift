@@ -77,29 +77,31 @@ class PollView: UIView {
     }
     
     private func setTasks() {
-        tasks.append( Task { @MainActor [weak self] in
-            for await _ in NotificationCenter.default.notifications(for: UIResponder.keyboardDidShowNotification) {
-                guard let self = self else { return }
-                
-                let touch = UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard))
-                self.addGestureRecognizer(touch)
-            }
-        })
+//        tasks.append( Task { @MainActor [weak self] in
+//            for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
+//                guard let self = self else { return }
+//                
+//                self.hideKeyboard()
+//            }
+//        })
     }
     
-    @objc private func hideKeyboard() {
-        if let recognizer = gestureRecognizers?.first {
-            NotificationCenter.default.post(name: Notifications.System.HideKeyboard, object: nil)
-//            endEditing(true)
-            removeGestureRecognizer(recognizer)
-        }
-    }
+//    @objc private func hideKeyboard() {
+//        if let recognizer = gestureRecognizers?.first {
+//            NotificationCenter.default.post(name: Notifications.System.HideKeyboard, object: nil)
+////            endEditing(true)
+//            removeGestureRecognizer(recognizer)
+//        }
+//    }
     
     // MARK: - Public methods
     public func postComment(_ string: String, replyTo: Comment? = nil) {
         viewInput?.postComment(string, replyTo: replyTo)
     }
     
+    public func requestComments(_ comments: [Comment]) {
+        viewInput?.requestComments(comments)
+    }
 //    override func layoutSubviews() {
 //        super.layoutSubviews()
 //        collectionView.contentInset = UIEdgeInsets(top: collectionView.contentInset.top, left: collectionView.contentInset.left, bottom: 50, right: collectionView.contentInset.right)
@@ -108,6 +110,15 @@ class PollView: UIView {
 
 // MARK: - Controller Output
 extension PollView: PollControllerOutput {
+    func commentPostCallback(_ result: Result<Comment, Error>) {
+        switch result {
+        case .success(let comment):
+            collectionView.lastPostedComment.send(comment)
+        case .failure(let error):
+            print(error)
+        }
+    }
+    
     func onAddFavoriteCallback() {
         guard surveyReference.isFavorite else { return }
         showBanner(bannerDelegate: self, text: "added_to_watch_list".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)

@@ -21,6 +21,8 @@ class CommentCell: UICollectionViewCell {
             textView.text = item.body
             dateLabel.text = item.createdAt.timeAgoDisplay()
             
+            replyButton.alpha = item.isOwn ? 0 : 1
+            
             if let userprofile = item.userprofile {
                 avatar.userprofile = userprofile
                 firstnameLabel.text = userprofile.firstName
@@ -45,6 +47,8 @@ class CommentCell: UICollectionViewCell {
 //                    repliesView.layoutIfNeeded()
 //                }
             }
+            
+            guard textView.getConstraint(identifier: "height").isNil else { return }
             
             let constraint = textView.heightAnchor.constraint(equalToConstant: 100)
             constraint.identifier = "height"
@@ -168,6 +172,7 @@ class CommentCell: UICollectionViewCell {
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.addTarget(self, action: #selector(self.claim), for: .touchUpInside)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        instance.alpha = 0
         
         return instance
     }()
@@ -389,6 +394,10 @@ class CommentCell: UICollectionViewCell {
         layoutIfNeeded()
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        avatar.clearImage()
+    }
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        print(touches)
 //    }

@@ -12,22 +12,36 @@ import Combine
 class CommentsSectionCell: UICollectionViewCell {
     
     // MARK: - Public Properties
-    override var isSelected: Bool { didSet { updateAppearance() } }
-//    public weak var boundsListener: BoundsListener? {
+    override var isSelected: Bool {
+        didSet {
+            guard let item = item,
+                  item.isCommentingAllowed
+            else { return }
+            updateAppearance()
+        }
+    }
+    //    public weak var boundsListener: BoundsListener? {
 //        didSet {
 //            collectionView.boundsListener = boundsListener
 //        }
 //    }
+    
     var item: Survey! {
         didSet {
             guard !item.isNil else { return }
-//            collectionView.dataItems = item.answers
+            collectionView.survey = item
             disclosureIndicator.alpha = item.isCommentingAllowed ? 1 : 0
+//            if item.reference.isComplete || item.reference.isOwn {
+//                openConstraint.isActive = true
+//            }
             if item.isCommentingAllowed {
+                
                 disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
-                collectionView.dataItems = item.comments
+                collectionView.dataItems = item.commentsSortedByDate
             } else {
                 disclosureLabel.text = "comments_disabled".localized.uppercased()
+                closedConstraint.isActive = true
+                openConstraint.isActive = false
             }
             let constraint = collectionView.heightAnchor.constraint(equalToConstant: 1)
             constraint.priority = .defaultHigh
@@ -43,6 +57,12 @@ class CommentsSectionCell: UICollectionViewCell {
         }
     }
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
+    public let commentsRequestSubject = CurrentValueSubject<[Comment], Never>([])
+    public var lastPostedComment: Comment? {
+        didSet {
+            collectionView.lastPostedComment = lastPostedComment
+        }
+    }
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -97,8 +117,26 @@ class CommentsSectionCell: UICollectionViewCell {
 //            self.commentSubject.send(completion: .finished)
         }.store(in: &subscriptions)
         
+        instance.commentsRequestSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                  let comments = $0 as? [Comment]
+            else { return }
+            self.commentsRequestSubject.send(comments)
+        }.store(in: &subscriptions)
+        
         return instance
         }()
+    private lazy var containerView: UIView = {
+       let instance = UIView()
+        instance.isUserInteractionEnabled = true
+        instance.backgroundColor = .clear
+        instance.heightAnchor.constraint(equalToConstant: 400).isActive = true
+        collectionView.addEquallyTo(to: instance)
+        
+        return instance
+    }()
     private lazy var icon: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
@@ -127,7 +165,7 @@ class CommentsSectionCell: UICollectionViewCell {
         return rootStack
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, collectionView])//, containerView])
+        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, containerView])// collectionView])//, containerView])
         verticalStack.axis = .vertical
         verticalStack.spacing = padding
         return verticalStack
@@ -180,15 +218,10 @@ class CommentsSectionCell: UICollectionViewCell {
             verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
         ])
         
-        //        let constraint =
-        //            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        //        constraint.priority = .defaultLow
-        closedConstraint =
-        disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
+        closedConstraint = disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
         closedConstraint.priority = .defaultLow // use low priority so stack stays pinned to top of cell
         
-        openConstraint =
-        collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
+        openConstraint = containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
         openConstraint.priority = .defaultLow
         
         updateAppearance(animated: false)
@@ -228,16 +261,14 @@ class CommentsSectionCell: UICollectionViewCell {
     }
     
     private func setTasks() {
-        tasks.append(Task { [weak self] in
+        tasks.append(Task { @MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {
-                await MainActor.run {
-                    guard let self = self,
-                          let item = self.item,
-                          let object = notification.object as? SurveyReference,
-                          item === object
-                    else { return }
-                    self.disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
-                }
+                guard let self = self,
+                      let item = self.item,
+                      let object = notification.object as? SurveyReference,
+                      item.reference == object
+                else { return }
+                self.disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
             }
         })
     }

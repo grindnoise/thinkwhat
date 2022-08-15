@@ -31,6 +31,7 @@ protocol PollViewInput: AnyObject {
 //    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor)
     func onVotersTapped(answer: Answer, color: UIColor)
     func postComment(_: String, replyTo: Comment?)
+    func requestComments(_:[Comment])
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -48,6 +49,7 @@ protocol PollControllerInput: AnyObject {
     func addView()
     func updateResultsStats(_: SurveyReference)
     func postComment(_: String, replyTo: Comment?)
+    func requestComments(_:[Comment])
 }
 
 /// *Model* returns the result to the *Controller*
@@ -82,4 +84,5 @@ protocol PollControllerOutput: AnyObject {
     func onClaimCallback(_: Result<Bool,Error>)
 //    func startLoading()
     func onAddFavoriteCallback()
+    func commentPostCallback(_: Result<Comment,Error>)
 }

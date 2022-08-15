@@ -180,7 +180,7 @@ class Avatar: UIView {
 class NewAvatar: UIView {
     
     // MARK: - Public properties
-    public var userprofile: Userprofile! {
+    public weak var userprofile: Userprofile! {
         didSet {
             guard !userprofile.isNil else { return }
             setImage()
@@ -353,7 +353,7 @@ class NewAvatar: UIView {
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.ImageDownloaded) {
                 guard let self = self,
                       let object = notification.object as? Userprofile,
-                      object === userprofile,
+                      object === self.userprofile,
                       let image = self.userprofile.image
                 else { return }
                 Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
@@ -363,20 +363,30 @@ class NewAvatar: UIView {
     
     private func setImage() {
         guard let image = userprofile.image else {
-            Task {
-                let image = try await userprofile.downloadImageAsync()
+            Task { [weak self] in
+                guard let self = self else { return }
+                let image = try await self.userprofile.downloadImageAsync()
                 await MainActor.run {
-                    imageView.contentMode = .scaleAspectFit
+                    self.imageView.contentMode = .scaleAspectFit
                 }
-                Animations.changeImageCrossDissolve(imageView: imageView, image: image)
+                Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
             }
             return
         }
-        Task { @MainActor in imageView.image = image }
+        Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            self.imageView.image = image
+            self.imageView.contentMode = .scaleAspectFit
+        }
     }
     
     // MARK: - Public methods
-    
+    public func clearImage() {
+        let largeConfig = UIImage.SymbolConfiguration(pointSize: imageView.bounds.height*0.65, weight: .regular, scale: .medium)
+        imageView.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
+        imageView.tintColor = .white
+        imageView.contentMode = .center
+    }
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
