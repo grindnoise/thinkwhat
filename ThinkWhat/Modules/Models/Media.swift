@@ -72,10 +72,10 @@ class Mediafile: Decodable {
         }
     }
     
-    func downloadImageAsync() async throws -> UIImage {
+    func downloadImageAsync(timeoutInterval: TimeInterval = 30) async throws -> UIImage {
         do {
             guard let url =  imageURL else { throw AppError.invalidURL }
-            image = try await API.shared.downloadImageAsync(from: url)
+            image = try await API.shared.downloadImageAsync(from: url, timeoutInterval: timeoutInterval)
             return image!
         } catch {
             throw error

@@ -96,16 +96,14 @@ class MainController: UITabBarController {//}, StorageProtocol {
             loadingIndicator!.layoutCentered(in: view, multiplier: 0.6)
             loadingIndicator!.addEnableAnimation()
         }
-        requestAttempt += 1
-        guard requestAttempt <= MAX_REQUEST_ATTEMPTS else {
-            onServerUnavailable()
-            return
-        }
+
         Task {
             do {
                 try await appLaunch()
             } catch {
-                loadData()
+                await MainActor.run {
+                    onServerUnavailable()
+                }
             }
         }
     }
@@ -125,7 +123,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 self.loadingIndicator?.removeFromSuperview()
             }
         }
-        requestAttempt = 0
+//        requestAttempt = 0
     }
     
 //    @objc private func updateStats() {
@@ -150,6 +148,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
         
         do {
             let json = try await API.shared.appLaunch()
+            API.shared.sessionManager.sessionConfiguration.waitsForConnectivity = true
             UserDefaults.App.minAPIVersion = json["api_version"].double
             ModelProperties.shared.importJson(json["field_properties"])
             PriceList.shared.importJson(json["pricelist"])
@@ -188,7 +187,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
                     error.printLocalized(class: type(of: self), functionName: #function)
 #endif
                 }
-                requestAttempt = 0
+//                requestAttempt = 0
             }
         } catch {
             throw error
@@ -197,7 +196,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     
     // MARK: - Properties
-    private var requestAttempt = 0
+//    private var requestAttempt = 0
     private var loadingIndicator: LoadingIndicator?
     private var apiUnavailableView: APIUnavailableView?
 //    private lazy var timers: [Timer] = {

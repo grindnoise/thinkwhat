@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import UIView_Shimmer
 
-class SurveyCell: UICollectionViewListCell {
+class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
     
     // MARK: - Public properties
     public weak var item: SurveyReference! {
@@ -24,12 +25,17 @@ class SurveyCell: UICollectionViewListCell {
                 if let image = item.media?.image {
                     imageView.image = image
                 } else {
+                    shimmeringAnimatedItems.append(imageView)
+                    setTemplateWithSubviews(true, viewBackgroundColor: .systemBackground)
+//                    setTemplateWithSubviews(true, viewBackgroundColor: .secondarySystemBackground)
                     Task { [weak self] in
                         guard let self = self else { return }
                         do {
                             let image = try await item.media?.downloadImageAsync()
                             await MainActor.run {
                                 self.imageView.image = image
+                                self.setTemplateWithSubviews(false)
+                                self.shimmeringAnimatedItems.remove(object: self.imageView)
                             }
                         } catch {
 #if DEBUG
@@ -191,6 +197,9 @@ class SurveyCell: UICollectionViewListCell {
 //    override var separatorLayoutGuide: UILayoutGuide = {
 //        return UILayoutGuide()
 //    }()
+    var shimmeringAnimatedItems: [UIView] = [] //{
+//        [imageView]
+//    }
     
     // MARK: - Private properties
     private var tasks: [Task<Void, Never>?] = []
@@ -1109,4 +1118,3 @@ class SurveyCell: UICollectionViewListCell {
         progressView.removeFromSuperview()
     }
 }
-

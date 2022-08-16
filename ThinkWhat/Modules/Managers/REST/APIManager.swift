@@ -19,7 +19,29 @@ class API {
     private init() {
         profiles.parent = self
         surveys.parent = self
+//        self.sessionManager.session.configuration.timeoutIntervalForRequest = 10
     }
+    
+    public let sessionManager: Session = {
+        let configuration = URLSessionConfiguration.af.default
+        configuration.timeoutIntervalForRequest = 2
+//        configuration.waitsForConnectivity = true
+//        configuration.requestCachePolicy = .returnCacheDataElseLoad
+        
+        let responseCacher = ResponseCacher(behavior: .modify { _, response in
+            let userInfo = ["date": Date()]
+            return CachedURLResponse(
+                response: response.response,
+                data: response.data,
+                userInfo: userInfo,
+                storagePolicy: .allowed)
+        })
+        
+        let interceptor = APIRequestInterceptor()
+        
+        return Session(configuration: configuration, interceptor: interceptor, eventMonitors: [NetworkLogger()])
+//        return Session(configuration: configuration, interceptor: interceptor, cachedResponseHandler: responseCacher, eventMonitors: [NetworkLogger()])
+    }()
     
     class func prepareUserData(firstName: String?, lastName: String?, email: String?, gender: Gender?, birthDate: String?, city: City?, image: UIImage?, vkID: String?, vkURL: String?, facebookID: String?, facebookURL: String?) -> [String: Any] {
         
@@ -125,10 +147,10 @@ class API {
                     proxyDictionary[kCFNetworkProxiesHTTPEnable as String] = 1
                     proxyDictionary[kCFStreamPropertyHTTPSProxyHost as String] = "68.183.56.239"
                     proxyDictionary[kCFStreamPropertyHTTPSProxyPort as String] = 8080
-                    AF.sessionConfiguration.timeoutIntervalForRequest = 15
-                    AF.sessionConfiguration.connectionProxyDictionary = proxyDictionary
+                    self.sessionManager.sessionConfiguration.timeoutIntervalForRequest = 15
+                    self.sessionManager.sessionConfiguration.connectionProxyDictionary = proxyDictionary
                 } else {
-                    AF.sessionConfiguration.timeoutIntervalForRequest = 10
+                    self.sessionManager.sessionConfiguration.timeoutIntervalForRequest = 10
                 }
             }
         }
@@ -136,7 +158,7 @@ class API {
     
     private func checkForReachability(completion: @escaping(ApiReachabilityState) -> ()) {
         let url = URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.CURRENT_TIME)
-        AF.request(url, method: .get, parameters: [:], encoding: URLEncoding(), headers: nil).response { response in
+        self.sessionManager.request(url, method: .get, parameters: [:], encoding: URLEncoding(), headers: nil).response { response in
             var state = ApiReachabilityState.None
             switch response.result {
             case .success:
@@ -262,7 +284,7 @@ class API {
     func loginViaMail(username: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { completion(.failure(APIError.invalidURL)); return }
         let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
-        AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
+        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
             switch response.result {
             case .success(let value):
                     guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
@@ -301,7 +323,7 @@ class API {
     func loginViaProvider(provider: AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { completion(.failure(APIError.invalidURL)); return }
         let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
-        AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).response { response in
+        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).response { response in
             switch response.result {
             case .success(let value):
                 guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
@@ -346,7 +368,7 @@ class API {
         }
         let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "token": token]
         
-        AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default).response { response in
+        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default).response { response in
             switch response.result {
             case .success(let value):
                 guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
@@ -372,7 +394,7 @@ class API {
     func signup(email: String, password: String, username: String, completion: @escaping (Result<Bool,Error>) -> ()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SIGNUP) else { completion(.failure(APIError.invalidURL)); return }
         let parameters = ["client_id": API_URLS.CLIENT_ID, "grant_type": "password", "email": "\(email)", "password": "\(password)", "username": "\(username)"]
-        AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default).response { response in
+        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default).response { response in
             switch response.result {
             case .success(let value):
                 guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
@@ -467,7 +489,7 @@ class API {
             
             
             
-            //                AF.upload(multipartFormData: { multipartFormData in
+            //                self.sessionManager.upload(multipartFormData: { multipartFormData in
             //
             //
             //                    var imgExt: FileFormat = .Unknown
@@ -513,7 +535,7 @@ class API {
             //                        completion(.failure(error))
             //                    }
             //                }
-            //                AF.upload(multipartFormData: { multipartFormData in
+            //                self.sessionManager.upload(multipartFormData: { multipartFormData in
             //                    var imgExt: FileFormat = .Unknown
             //                    var imageData: Data?
             //                    if let data = image.jpegData(compressionQuality: 1) {
@@ -682,7 +704,7 @@ class API {
             return
         }
         
-        AF.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
+        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
             switch response.result {
             case .success(let value):
                 guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
@@ -741,7 +763,7 @@ class API {
         
         func request() async throws -> Data {
             try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data,Error>) in
-                AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseData { response in
+                self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseData { response in
                     switch response.result {
                     case .success(let data):
                         guard let statusCode = response.response?.statusCode else { continuation.resume(throwing: APIError.httpStatusCodeMissing); return }
@@ -755,6 +777,9 @@ class API {
                             return
                         }
                     case let .failure(error):
+#if DEBUG
+                        print(error.localizedDescription)
+#endif
                         continuation.resume(throwing: error)
                         return
                     }
@@ -1521,7 +1546,7 @@ class API {
         accessControl { result in
             switch result {
             case .success:
-                AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: useHeaders ? self.headers() : nil).response { response in
+                self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: useHeaders ? self.headers() : nil).response { response in
                     switch response.result {
                     case .success(let value):
                         guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
@@ -1585,7 +1610,7 @@ class API {
 //            "Content-Type": "application/json"
 //        ]
 //
-//        AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).response { response in
+//        self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).response { response in
 //            switch response.result {
 //            case .success(let value):
 //                do {
@@ -1638,7 +1663,7 @@ class API {
         accessControl { result in
             switch result {
             case .success:
-                AF.download(url)
+                self.sessionManager.download(url)
                     .downloadProgress { progress in
                         downloadProgress(progress.fractionCompleted)
                     }
@@ -1657,7 +1682,7 @@ class API {
         accessControl { result in
             switch result {
             case .success:
-                AF.download(url)
+                self.sessionManager.download(url)
                     .downloadProgress { progress in
                         downloadProgress(progress.fractionCompleted)
                     }
@@ -1691,7 +1716,7 @@ class API {
 //        }
 //
 //        func performRequest() {
-//            AF.download(_url).responseData { response in
+//            self.sessionManager.download(_url).responseData { response in
 //                if let data = response.value {
 //                    let image = UIImage(data: data)
 //                    completion(image, nil)
@@ -1704,7 +1729,7 @@ class API {
     
     //progressClosure: @escaping (CGFloat) -> ()
     public func uploadMultipartFormData(url: URL, method: HTTPMethod, multipartDataForm: MultipartFormData, uploadProgress: @escaping (Double) -> ()?, completion: @escaping(Result<JSON,Error>) -> ()) {
-        AF.upload(multipartFormData: multipartDataForm, to: url, method: method, headers: headers())
+        self.sessionManager.upload(multipartFormData: multipartDataForm, to: url, method: method, headers: headers())
             .uploadProgress(closure: { prog in
                 print("Upload Progress: \(prog.fractionCompleted)")
                 uploadProgress(prog.fractionCompleted)
@@ -1728,7 +1753,7 @@ class API {
             }
         
         
-//        AF.upload(multipartFormData: { multipartFormData in
+//        self.sessionManager.upload(multipartFormData: { multipartFormData in
 //            var imgExt: FileFormat = .Unknown
 //            var imageData: Data?
 //            if let data = image.keys.first!.jpegData(compressionQuality: 1) {
@@ -1774,7 +1799,7 @@ class API {
     
     public func uploadMultipartFormDataAsync(url: URL, method: HTTPMethod, multipartDataForm: MultipartFormData, uploadProgress: @escaping (Double) -> ()?) async throws -> Data {
         try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data, Error>) in
-        AF.upload(multipartFormData: multipartDataForm, to: url, method: method, headers: headers())
+        self.sessionManager.upload(multipartFormData: multipartDataForm, to: url, method: method, headers: headers())
             .uploadProgress(closure: { prog in
                 uploadProgress(prog.fractionCompleted)
             }).response { response in
@@ -1809,20 +1834,21 @@ class API {
         }
     }
     
-    public func downloadImageAsync(from url: URL) async throws -> UIImage {
-        if #available(iOS 15.0, *) {
-            let request = URLRequest.init(url:url)
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw APIError.invalidURL }
-            guard let image = UIImage(data: data) else {
-                throw APIError.badImage
-            }
-            return image
-            //            guard let thumbnail = await maybeImage?.thumbnail else { throw FetchError.badImage }
-            //            return  UImage(uiImage: thumbnail)
-        } else {
+    public func downloadImageAsync(from url: URL, timeoutInterval: TimeInterval = 30) async throws -> UIImage {
+//        if #available(iOS 15.0, *) {
+//            var request = URLRequest.init(url:url)
+//            request.timeoutInterval = timeoutInterval
+//            let (data, response) = try await URLSession.shared.data(for: request)
+//            guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw APIError.invalidURL }
+//            guard let image = UIImage(data: data) else {
+//                throw APIError.badImage
+//            }
+//            return image
+//            //            guard let thumbnail = await maybeImage?.thumbnail else { throw FetchError.badImage }
+//            //            return  UImage(uiImage: thumbnail)
+//        } else {
             try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<UIImage, Error>) in
-                AF.download(url).responseData { response in
+                self.sessionManager.download(url).responseData { response in
                     switch response.result {
                     case .success(let data):
                         guard let statusCode = response.response?.statusCode else {
@@ -1839,8 +1865,8 @@ class API {
                     }
                 }
             }
-            fatalError("should not get here")
-        }
+//            fatalError("should not get here")
+//        }
     }
     
     public func getUserTopPublications(user: Userprofile, completion: @escaping(Result<JSON,Error>)->()) {
@@ -1892,7 +1918,7 @@ class API {
 //    }
     
     func cancelAllRequests() {
-        AF.session.getAllTasks { (tasks) in
+        self.sessionManager.session.getAllTasks { (tasks) in
             tasks.forEach { $0.cancel() }
         }
         //        self.session.session.getTasksWithCompletionHandler {

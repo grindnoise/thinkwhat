@@ -15,7 +15,7 @@ target 'ThinkWhat' do
     pod 'FBSDKShareKit'
     pod 'Swinject', '2.7.1'
     pod 'Alamofire', '~> 5.5'
-    pod 'VK-ios-sdk'
+    pod 'UIView-Shimmer', '~> 1.0'
     pod "YoutubePlayer-in-WKWebView", "~> 0.3.0"
     target 'ThinkWhatTests' do
 	pod 'Quick'

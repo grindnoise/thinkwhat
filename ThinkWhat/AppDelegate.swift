@@ -11,7 +11,7 @@ import CoreData
 //import Swinject
 import UserNotifications
 import FBSDKCoreKit
-import VK_ios_sdk
+//import VK_ios_sdk
 import SwiftyVK
 import GoogleSignIn
 
@@ -45,6 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        GIDSignIn.sharedInstance.restorePreviousSignIn()
 //        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
 //        Settings.shared.isAdvertiserTrackingEnabled = false
+//        NetworkReachability.shared.startNetworkMonitoring()
         return true
     }
 

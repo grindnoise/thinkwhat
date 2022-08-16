@@ -44,7 +44,7 @@ PODS:
   - SwiftyVK (3.4.2)
   - Swinject (2.7.1)
   - TTRangeSlider (1.0.6)
-  - VK-ios-sdk (1.5.1)
+  - UIView-Shimmer (1.0.4)
   - YoutubePlayer-in-WKWebView (0.3.4)
 
 DEPENDENCIES:
@@ -62,7 +62,7 @@ DEPENDENCIES:
   - SwiftyVK
   - Swinject (= 2.7.1)
   - TTRangeSlider
-  - VK-ios-sdk
+  - UIView-Shimmer (~> 1.0)
   - YoutubePlayer-in-WKWebView (~> 0.3.0)
 
 SPEC REPOS:
@@ -87,7 +87,7 @@ SPEC REPOS:
     - SwiftyVK
     - Swinject
     - TTRangeSlider
-    - VK-ios-sdk
+    - UIView-Shimmer
     - YoutubePlayer-in-WKWebView
 
 SPEC CHECKSUMS:
@@ -111,9 +111,9 @@ SPEC CHECKSUMS:
   SwiftyVK: 5005dac6e85f7b0fd44e21ed2f021a397dff4cab
   Swinject: ddf78b8486dd9b71a667b852cad919ab4484478e
   TTRangeSlider: 78188bea83f6471a06f75adbc88da5e990baeafe
-  VK-ios-sdk: 62a10b6571fbcda0657f455fedce7fedf55b4cd0
+  UIView-Shimmer: ff0a32c73d67c7dbdea3d9e530538b10d18aea56
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: 93e823761840e5db41ce5b1bf5539c521da74ed0
+PODFILE CHECKSUM: 7480b3e93c319df942021abc5ba81d7a2a3b94b9
 
 COCOAPODS: 1.11.2

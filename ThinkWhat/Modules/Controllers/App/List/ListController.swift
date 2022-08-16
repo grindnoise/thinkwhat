@@ -119,14 +119,16 @@ extension ListController: ListViewInput {
 // MARK: - Model Output
 extension ListController: ListModelOutput {
     func onRequestCompleted(_ result: Result<Bool, Error>) {
-        switch result {
-        case .success:
-            controllerOutput?.onRequestCompleted(result)
-        case .failure(let error):
-#if DEBUG
-            error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-        }
+        controllerOutput?.onRequestCompleted(result)
+//        switch result {
+//
+//        case .success:
+//            controllerOutput?.onRequestCompleted(result)
+//        case .failure(let error):
+//#if DEBUG
+//            error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//        }
     }
 }
 
