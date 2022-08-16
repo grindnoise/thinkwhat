@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        GIDSignIn.sharedInstance.restorePreviousSignIn()
 //        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
 //        Settings.shared.isAdvertiserTrackingEnabled = false
-//        NetworkReachability.shared.startNetworkMonitoring()
+        NetworkReachability.shared.startNetworkMonitoring()
         return true
     }
 
