@@ -12,7 +12,7 @@ import SwiftyJSON
 class SurveyReference: Decodable {// NSObject,
 
     private enum CodingKeys: String, CodingKey {
-        case id, type, title, category, likes, views, progress, rating, description,
+        case id, type, title, category, likes, views, progress, rating, description, share_link,
              startDate = "start_date",
              isComplete = "is_complete",
              isOwn = "is_own",
@@ -91,6 +91,8 @@ class SurveyReference: Decodable {// NSObject,
         didSet {
             guard oldValue != isFavorite else { return }
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: self)
+            guard let survey = survey else { return }
+            survey.isFavorite = isFavorite
 //            Notification.send(names: [Notifications.Surveys.SwitchFavorite])
         }
     }
@@ -134,12 +136,14 @@ class SurveyReference: Decodable {// NSObject,
         didSet {
             guard oldValue != progress else { return }
             NotificationCenter.default.post(name: Notifications.Surveys.Progress, object: self)
-//            Notification.send(names: [Notifications.Surveys.Progress])
-//            guard let survey = survey else { return }
             survey?.progress = progress
         }
     }
     var media: Mediafile?
+    var shareHash:              String = ""
+    var shareEncryptedString:   String = ""
+    
+    // MARK: - Initialization
     required init(from decoder: Decoder) throws {
         do {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -174,6 +178,10 @@ class SurveyReference: Decodable {// NSObject,
             isFavorite  = try container.decode(Bool.self, forKey: .isFavorite)
             isHot       = try container.decode(Bool.self, forKey: .isHot)
             progress    = try container.decode(Int.self, forKey: .progress)
+            let shareData           = try container.decode([String].self, forKey: .share_link)
+            shareHash               = shareData.first ?? ""
+            shareEncryptedString    = shareData.last ?? ""
+            
             if let _media       = try container.decodeIfPresent([Mediafile].self, forKey: .media)?.first {
                 media = _media
             }
@@ -191,8 +199,9 @@ class SurveyReference: Decodable {// NSObject,
 #if DEBUG
             print(error.localizedDescription)
             fatalError()
-#endif
+#else
             throw error
+#endif
         }
     }
     

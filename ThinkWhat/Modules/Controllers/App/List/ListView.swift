@@ -7,14 +7,49 @@
 //
 
 import UIKit
+import Combine
 
 class ListView: UIView {
     
     weak var viewInput: ListViewInput?
     
     // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
     private lazy var collectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(delegate: self, category: .New)
+        
+        instance.watchSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                let value = $0
+            else { return }
+            
+            self.viewInput?.addFavorite(value)
+        }.store(in: &self.subscriptions)
+        
+        instance.shareSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                let value = $0
+            else { return }
+            
+            self.viewInput?.share(value)
+        }.store(in: &self.subscriptions)
+        
+        instance.claimSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                let value = $0
+            else { return }
+            
+//            self.viewInput?.addFavorite(surveyReference: value)
+        }.store(in: &self.subscriptions)
+        
         return instance
     }()
 //    private lazy var featheredView: UIView = {
@@ -40,8 +75,6 @@ class ListView: UIView {
 //        instance.frame = frame
 //        return instance
 //    }()
-    private var observers: [NSKeyValueObservation] = []
-    private var notifications: [Task<Void, Never>?] = []
 //    private var hMaskLayer: CAGradientLayer!
     private lazy var background: UIView = {
         let instance = UIView()
@@ -82,8 +115,9 @@ class ListView: UIView {
     
     // MARK: - Destructor
     deinit {
-        ///Destruct notifications
-        notifications.forEach { $0?.cancel() }
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
@@ -120,7 +154,13 @@ class ListView: UIView {
 }
 
 // MARK: - Controller Output
-extension ListView: ListControllerOutput {    
+extension ListView: ListControllerOutput {
+    func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
+#if DEBUG
+      print(result)
+#endif
+    }
+    
     func onRequestCompleted(_ result: Result<Bool, Error>) {
         collectionView.endRefreshing()
     }

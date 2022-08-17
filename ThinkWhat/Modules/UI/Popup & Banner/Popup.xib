@@ -32,14 +32,14 @@
                     <rect key="frame" x="15.5" y="268.5" width="383" height="359"/>
                     <subviews>
                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="R6y-UU-KN5">
-                            <rect key="frame" x="16" y="8" width="351" height="343"/>
+                            <rect key="frame" x="16" y="16" width="351" height="327"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </view>
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
-                        <constraint firstAttribute="bottom" secondItem="R6y-UU-KN5" secondAttribute="bottom" constant="8" id="Unc-Bs-z3a"/>
-                        <constraint firstItem="R6y-UU-KN5" firstAttribute="top" secondItem="J0d-KJ-2ol" secondAttribute="top" constant="8" id="ddv-WJ-WEu"/>
+                        <constraint firstAttribute="bottom" secondItem="R6y-UU-KN5" secondAttribute="bottom" constant="16" id="Unc-Bs-z3a"/>
+                        <constraint firstItem="R6y-UU-KN5" firstAttribute="top" secondItem="J0d-KJ-2ol" secondAttribute="top" constant="16" id="ddv-WJ-WEu"/>
                         <constraint firstItem="R6y-UU-KN5" firstAttribute="leading" secondItem="J0d-KJ-2ol" secondAttribute="leading" constant="16" id="kxi-B6-zP6"/>
                         <constraint firstAttribute="trailing" secondItem="R6y-UU-KN5" secondAttribute="trailing" constant="16" id="s4u-Th-1XA"/>
                         <constraint firstAttribute="height" constant="359" identifier="height" id="uQC-SG-ur4"/>

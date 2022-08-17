@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class SurveysCollectionView: UICollectionView {
     
@@ -34,9 +35,14 @@ class SurveysCollectionView: UICollectionView {
             setDataSource()
         }
     }
+    public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+    public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+    public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     
     // MARK: - Private properties
-    private var notifications: [Task<Void, Never>?] = []
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
     private var source: UICollectionViewDiffableDataSource<Section, SurveyReference>!
     private var dataItems: [SurveyReference] {
         if category == .Topic, !topic.isNil {
@@ -48,7 +54,6 @@ class SurveysCollectionView: UICollectionView {
     }
     private weak var callbackDelegate: CallbackObservable?
 //    private var hMaskLayer: CAGradientLayer!
-    private var observers: [NSKeyValueObservation] = []
     private lazy var searchSpinner: UIActivityIndicatorView = {
         let instance = UIActivityIndicatorView(style: .large)
         instance.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
@@ -59,7 +64,9 @@ class SurveysCollectionView: UICollectionView {
     
     // MARK: - Destructor
     deinit {
-        notifications.forEach { $0?.cancel() }
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
@@ -131,6 +138,39 @@ class SurveysCollectionView: UICollectionView {
         let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { cell, indexPath, item in
             cell.item = item
             
+            //Add to watchlist
+            cell.watchSubject.sink {
+                print($0)
+            } receiveValue: { [weak self] in
+                guard let self = self,
+                    let value = $0 as? SurveyReference
+                else { return }
+                
+                self.watchSubject.send(value)
+            }.store(in: &self.subscriptions)
+            
+            //Share
+            cell.shareSubject.sink {
+                print($0)
+            } receiveValue: { [weak self] in
+                guard let self = self,
+                    let value = $0 as? SurveyReference
+                else { return }
+                
+                self.shareSubject.send(value)
+            }.store(in: &self.subscriptions)
+
+            //Claim
+            cell.claimSubject.sink {
+                print($0)
+            } receiveValue: { [weak self] in
+                guard let self = self,
+                    let value = $0 as? SurveyReference
+                else { return }
+                
+                self.claimSubject.send(value)
+            }.store(in: &self.subscriptions)
+            
             var config = UIBackgroundConfiguration.listPlainCell()
             config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
             cell.backgroundConfiguration = config
@@ -163,7 +203,7 @@ class SurveysCollectionView: UICollectionView {
             
             //Update survey stats every n seconds
             let events = EventEmitter().emit(every: 5)
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await _ in events {
                     guard let self = self,
                           let cells = visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell] else { return }
@@ -172,7 +212,7 @@ class SurveysCollectionView: UICollectionView {
             })
             
             //Survey claimed by user
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Claim) {
                     guard let self = self,
                           let instance = notification.object as? SurveyReference,
@@ -186,7 +226,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //Survey banned on server
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Ban) {
                     guard let self = self,
                           let instance = notification.object as? SurveyReference,
@@ -201,7 +241,7 @@ class SurveysCollectionView: UICollectionView {
 
 
             //Subscriptions added
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SubscriptionAppend) {
                     guard let self = self,
                           self.category == .Subscriptions,
@@ -216,7 +256,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //New added
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.NewAppend) {
                     guard let self = self,
                           self.category == .New,
@@ -231,7 +271,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //Top added
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopAppend) {
                     guard let self = self,
                           self.category == .Top,
@@ -246,7 +286,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //Own added
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.OwnAppend) {
                     guard let self = self,
                           self.category == .Own,
@@ -261,7 +301,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //Favorite added
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
                     guard let self = self,
                           self.category == .Favorite,
@@ -276,7 +316,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //Topic added
-            notifications.append(Task { [weak self] in
+            tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
                     guard let self = self,
                           self.category == .Topic,

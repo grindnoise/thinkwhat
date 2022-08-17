@@ -13,8 +13,8 @@ class NetworkLogger: EventMonitor {
     let queue = DispatchQueue(label: "PB.ThinkWhat.local.networklogger")
     //2
     func requestDidFinish(_ request: Request) {
-#if DEBUG
-        print(request.description)
+#if LOCAL
+//        print(request.description)
 #endif
     }
     //3
@@ -27,8 +27,8 @@ class NetworkLogger: EventMonitor {
         }
         if let json = try? JSONSerialization
             .jsonObject(with: data, options: .mutableContainers) {
-#if DEBUG
-            print(json)
+#if LOCAL
+//            print(json)
 #endif
         }
     }

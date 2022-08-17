@@ -505,6 +505,8 @@
 		ABE065072844B57100877D92 /* OptionSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE065062844B57100877D92 /* OptionSelection.swift */; };
 		ABE065092844B58400877D92 /* OptionSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABE065082844B58400877D92 /* OptionSelection.xib */; };
 		ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE43694251C7FD300C1428D /* CustomSwitch.swift */; };
+		ABE4927F28AD2B7400637A8B /* ClaimPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4927E28AD2B7400637A8B /* ClaimPopupContent.swift */; };
+		ABE4928228AD2DBF00637A8B /* ClaimCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4928128AD2DBF00637A8B /* ClaimCollectionView.swift */; };
 		ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */; };
 		ABEB5F7F285E1E0600C75C31 /* LimitsSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEB5F7E285E1E0600C75C31 /* LimitsSelectionView.swift */; };
 		ABEB5F81285E22FA00C75C31 /* LimitsSelectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABEB5F80285E22FA00C75C31 /* LimitsSelectionView.xib */; };
@@ -1084,6 +1086,8 @@
 		ABE065062844B57100877D92 /* OptionSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionSelection.swift; sourceTree = "<group>"; };
 		ABE065082844B58400877D92 /* OptionSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OptionSelection.xib; sourceTree = "<group>"; };
 		ABE43694251C7FD300C1428D /* CustomSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSwitch.swift; sourceTree = "<group>"; };
+		ABE4927E28AD2B7400637A8B /* ClaimPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimPopupContent.swift; sourceTree = "<group>"; };
+		ABE4928128AD2DBF00637A8B /* ClaimCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimCollectionView.swift; sourceTree = "<group>"; };
 		ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcLabel.swift; sourceTree = "<group>"; };
 		ABEB5F7E285E1E0600C75C31 /* LimitsSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitsSelectionView.swift; sourceTree = "<group>"; };
 		ABEB5F80285E22FA00C75C31 /* LimitsSelectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LimitsSelectionView.xib; sourceTree = "<group>"; };
@@ -2499,9 +2503,9 @@
 		AB9998BF2805989E009D0E4F /* Claim */ = {
 			isa = PBXGroup;
 			children = (
-				AB9998C42805B185009D0E4F /* ClaimCell */,
-				AB9998C0280598D1009D0E4F /* ClaimSelection.swift */,
-				AB9998C22805A117009D0E4F /* ClaimSelection.xib */,
+				ABE4928028AD2CF600637A8B /* del */,
+				ABE4927E28AD2B7400637A8B /* ClaimPopupContent.swift */,
+				ABE4928128AD2DBF00637A8B /* ClaimCollectionView.swift */,
 			);
 			path = Claim;
 			sourceTree = "<group>";
@@ -2942,6 +2946,16 @@
 				ABE065082844B58400877D92 /* OptionSelection.xib */,
 			);
 			path = "Options selection";
+			sourceTree = "<group>";
+		};
+		ABE4928028AD2CF600637A8B /* del */ = {
+			isa = PBXGroup;
+			children = (
+				AB9998C42805B185009D0E4F /* ClaimCell */,
+				AB9998C0280598D1009D0E4F /* ClaimSelection.swift */,
+				AB9998C22805A117009D0E4F /* ClaimSelection.xib */,
+			);
+			path = del;
 			sourceTree = "<group>";
 		};
 		ABEB5F7D285E1DE600C75C31 /* Limits */ = {
@@ -3709,6 +3723,7 @@
 				ABA448F327EE031D00F8E00D /* PollModel.swift in Sources */,
 				ABB9E887279EA6510018BB2E /* WelcomeView.swift in Sources */,
 				AB3C686B223FDEEA00B57580 /* _AuthViewController.swift in Sources */,
+				ABE4928228AD2DBF00637A8B /* ClaimCollectionView.swift in Sources */,
 				AB6AFFCF289D514B00D260F4 /* Combine.swift in Sources */,
 				AB72961027DA2F0F00D45B54 /* HotModel.swift in Sources */,
 				AB3A6F8C286F444F0073FFF7 /* ImageCell.swift in Sources */,
@@ -3822,6 +3837,7 @@
 				AB309C7927ADB4E1005BBCB4 /* UserDefaults.swift in Sources */,
 				AB7085E726CB9A1F006F020F /* SideApp.swift in Sources */,
 				ABADF58327F2338800A26474 /* _YoutubeCell.swift in Sources */,
+				ABE4927F28AD2B7400637A8B /* ClaimPopupContent.swift in Sources */,
 				ABA78295285898D600964FDE /* AddChoiceCollectionView.swift in Sources */,
 				ABADF57927F1DB0E00A26474 /* ImagesCell.swift in Sources */,
 				AB334FB9270C423400DD7332 /* ClockIndicator.swift in Sources */,

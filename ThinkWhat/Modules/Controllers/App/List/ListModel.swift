@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 class ListModel {
     
@@ -15,6 +16,30 @@ class ListModel {
 
 // MARK: - Controller Input
 extension ListModel: ListControllerInput {
+    func addFavorite(surveyReference: SurveyReference) {
+        Task {
+            do {
+                let data = try await API.shared.surveys.markFavoriteAsync(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
+                let json = try JSON(data: data, options: .mutableContainers)
+                guard let value = json["status"].string else { throw "Unknown error" }
+                guard value == "ok" else {
+                    guard let error = json["error"].string else { throw "Unknown error" }
+                    await MainActor.run {
+                        modelOutput?.onAddFavoriteCallback(.failure(error))
+                    }
+                    return
+                }
+                await MainActor.run {
+                    modelOutput?.onAddFavoriteCallback(.success(true))
+                }
+            } catch {
+                await MainActor.run {
+                    modelOutput?.onAddFavoriteCallback(.failure(error))
+                }
+            }
+        }
+    }
+    
     func updateSurveyStats(_ instances: [SurveyReference]) {
         Task {
             do {

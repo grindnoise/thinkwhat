@@ -20,6 +20,9 @@ protocol ListViewInput: class {
     func onSurveyTapped(_: SurveyReference)
     func onDataSourceRequest()
     func updateSurveyStats(_: [SurveyReference])
+    func addFavorite(_: SurveyReference)
+    func share(_: SurveyReference)
+    func claim(_: SurveyReference)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -31,6 +34,7 @@ protocol ListControllerInput: class {
     
     func onDataSourceRequest()
     func updateSurveyStats(_: [SurveyReference])
+    func addFavorite(surveyReference: SurveyReference)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -41,6 +45,7 @@ protocol ListModelOutput: class {
     var surveyCategory: Survey.SurveyCategory { get }
     
     func onRequestCompleted(_: Result<Bool, Error>)
+    func onAddFavoriteCallback(_: Result<Bool,Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -53,4 +58,5 @@ protocol ListControllerOutput: class {
     func onDidLoad()
     func onDataSourceChanged()
     func onRequestCompleted(_: Result<Bool, Error>)
+    func onAddFavoriteCallback(_: Result<Bool,Error>)
 }

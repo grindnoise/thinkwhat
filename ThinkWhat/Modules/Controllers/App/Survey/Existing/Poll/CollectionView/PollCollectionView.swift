@@ -57,7 +57,7 @@ class PollCollectionView: UICollectionView {
                 snapshot.appendSections([.comments])
                 snapshot.appendItems([8], toSection: .comments)
                 source.apply(snapshot, animatingDifferences: true) {
-                    self.scrollToItem(at: IndexPath(item: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
+//                    self.scrollToItem(at: IndexPath(item: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
                 }
             }
             if let cell = cellForItem(at: IndexPath(item: 0, section: numberOfSections-2)) as? VoteCell {

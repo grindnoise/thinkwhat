@@ -1300,9 +1300,10 @@ class API {
             
             let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default, headers: parent.headers())
             await MainActor.run {
-                if let survey = surveyReference.survey {
-                    survey.isFavorite = mark
-                }
+                surveyReference.isFavorite = mark
+//                if let survey = surveyReference.survey {
+//                    survey.isFavorite = mark
+//                }
             }
             return data
         }
