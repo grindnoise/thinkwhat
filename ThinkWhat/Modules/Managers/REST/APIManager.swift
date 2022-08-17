@@ -24,7 +24,7 @@ class API {
     
     public let sessionManager: Session = {
         let configuration = URLSessionConfiguration.af.default
-        configuration.timeoutIntervalForRequest = 2
+        configuration.timeoutIntervalForRequest = 21
 //        configuration.waitsForConnectivity = true
 //        configuration.requestCachePolicy = .returnCacheDataElseLoad
         
