@@ -1225,6 +1225,9 @@ class API {
                 let json = try JSON(data: data, options: .mutableContainers)
                 return json
             } catch let error {
+                await MainActor.run {
+                    NotificationCenter.default.post(name: Notifications.Surveys.ClaimFailure, object: survey.reference)
+                }
                 throw error
             }
         }

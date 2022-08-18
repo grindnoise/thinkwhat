@@ -113,11 +113,6 @@ class HotView: UIView {
 // MARK: - Controller Output
 extension HotView: HotControllerOutput {
     func onDidAppear() {
-#if DEBUG
-        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
-        banner.accessibilityIdentifier = "claim"
-        banner.present(content: ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: nil))
-#endif
         
         guard !Topics.shared.all.isEmpty, surveyStack.isEmpty else { return }
         viewInput?.onEmptyStack()
@@ -145,6 +140,12 @@ extension HotView: HotControllerOutput {
     }
     
     func onLoad() {
+        
+#if DEBUG
+        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
+        banner.accessibilityIdentifier = "claim"
+        banner.present(content: ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: nil))
+#endif
         
         guard currentCard.isNil || nextCard.isNil else {
             return

@@ -76,6 +76,8 @@
 "show_images" = "Show images";
 "hide_webview" = "Hide web link";
 "show_webview" = "Show web link";
+"sending" = "Sending";
+"choose_claim_reason" = "Complaint reason:";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";

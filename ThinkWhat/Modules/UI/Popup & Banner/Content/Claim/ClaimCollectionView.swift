@@ -7,15 +7,266 @@
 //
 
 import UIKit
+import Combine
 
-class ClaimCollectionView: UICollectionView {
+class ClaimCollectionView: UICollectionView, UICollectionViewDelegate {
     
+    private enum Section { case main }
+    
+    // MARK: - Public properties
+    public var claimSubject = CurrentValueSubject<Claim?, Never>(nil)
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //Collection
+    private var source: UICollectionViewDiffableDataSource<Section, Claim>!
+    private var dataItems: [Claim] {
+        return Claims.shared.all
+    }
+    
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
+    // MARK: - Initialization
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Private methods
+    private func setupUI() {
+        delegate = self
+        
+        collectionViewLayout = UICollectionViewCompositionalLayout { _, env -> NSCollectionLayoutSection? in
+            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
+            layoutConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+            layoutConfig.showsSeparators = false//true
+            layoutConfig.headerMode = .supplementary
+            layoutConfig.backgroundColor = .clear
+            
+            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0)
+//            sectionLayout.interGroupSpacing = 16
+            return sectionLayout
+        }
+        
+        let cellRegistration = UICollectionView.CellRegistration<ClaimCell, Claim> { cell, indexPath, item in
+            cell.item = item
+            
+            var config = UIBackgroundConfiguration.listPlainCell()
+            config.backgroundColor = .clear
+            cell.backgroundConfiguration = config
+//            cell.automaticallyUpdatesBackgroundConfiguration = false
+        }
+        
+        let headerRegistraition = UICollectionView.SupplementaryRegistration<UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) { [weak self] supplementaryView, elementKind, indexPath in
+            
+            guard let self = self else { return }
+            
+            var configuration = supplementaryView.defaultContentConfiguration()
+            configuration.text = "choose_claim_reason".localized.uppercased()
+            configuration.textProperties.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline)!
+            configuration.textProperties.color = .label
+            configuration.textProperties.alignment = .center
+            configuration.directionalLayoutMargins = .init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0)
+            
+            var config = UIBackgroundConfiguration.listPlainCell()
+            config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+            supplementaryView.backgroundConfiguration = config
+//            supplementaryView.automaticallyUpdatesBackgroundConfiguration = false
+            supplementaryView.contentConfiguration = configuration
+            supplementaryView.automaticallyUpdatesContentConfiguration = false
+        }
+        
+        source = UICollectionViewDiffableDataSource<Section, Claim>(collectionView: self) { collectionView, indexPath, itemIdentifier -> UICollectionViewCell in
+            
+            
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+        }
+        
+        source.supplementaryViewProvider = {
+            collectionView, elementKind, indexPath -> UICollectionReusableView? in
+            
+            return collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistraition, for: indexPath)
+        }
+        
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Claim>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(dataItems, toSection: .main)
+        source.apply(snapshot, animatingDifferences: false)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? ClaimCell,
+              let item = cell.item
+        else { return }
+        
+        claimSubject.send(item)
+    }
+}
+
+class ClaimCell: UICollectionViewListCell {
+    
+    // MARK: - Overriden properties
+    override var isSelected: Bool {
+        didSet {
+            updateAppearance()
+        }
+    }
+    
+    // MARK: - Public properties
+    public var item: Claim! {
+        didSet {
+            guard let item = item else { return }
+            
+            textView.text = item.description
+            guard let imageView = imageContainer.getSubview(type: UIImageView.self, identifier: "imageView"),
+                  let constraint = imageView.getConstraint(identifier: "heightAnchor"),
+                  let font = textView.font
+            else { return }
+            
+            setNeedsLayout()
+            constraint.constant = min("1".height(withConstrainedWidth: 100, font: font), imageContainer.bounds.height)
+            layoutIfNeeded()
+        }
+    }
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private lazy var imageContainer: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+
+        let imageView = UIImageView(image: UIImage(systemName: "circle.fill"))
+        imageView.accessibilityIdentifier = "imageView"
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1/1).isActive = true
+        imageView.tintColor = .secondaryLabel
+        imageView.contentMode = .center
+        
+        observers.append(imageView.observe(\UIImageView.bounds, options: .new) { view, change in
+            guard let newValue = change.newValue else { return }
+            
+            view.image = UIImage(systemName: "circlebadge.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height))
+        })
+        
+        instance.addSubview(imageView)
+        imageView.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
+        imageView.centerYAnchor.constraint(equalTo: instance.centerYAnchor).isActive = true
+        
+        let constraint = imageView.heightAnchor.constraint(equalToConstant: 10)
+        constraint.identifier = "heightAnchor"
+        constraint.isActive = true
+
+        return instance
+    }()
+    private lazy var textView: UITextView = {
+        let instance = UITextView()
+//        instance.contentInset = UIEdgeInsets(top: 0,
+//                                             left: 0,//,instance.contentInset.left,
+//                                             bottom: 0,
+//                                             right: 0)//instance.contentInset.right)
+        instance.isUserInteractionEnabled = false
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+        instance.backgroundColor = .clear
+        instance.isEditable = false
+        instance.isSelectable = false
+        
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+        constraint.identifier = "height"
+        constraint.isActive = true
+        
+        observers.append(instance.observe(\UITextView.contentSize, options: .new) { [weak self] view, change in
+            guard let self = self,
+                  let constraint = view.getAllConstraints().filter({ $0.identifier == "height" }).first,
+                  let value = change.newValue else { return }
+            self.setNeedsLayout()
+            constraint.constant = value.height// + self.padding*2
+            self.layoutIfNeeded()
+        })
+        return instance
+    }()
+    private lazy var horizontalStackView: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [imageContainer, textView])
+        instance.axis = .horizontal
+        instance.spacing = 0
+        
+        imageContainer.translatesAutoresizingMaskIntoConstraints = false
+        imageContainer.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.1).isActive = true
+        
+        return instance
+    }()
+    private let padding: CGFloat = 8
+    
+    // MARK: - Destructor
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
+    // MARK: - Initialization
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Private methods
+    private func setupUI() {
+        backgroundColor = .clear
+
+        contentView.addSubview(horizontalStackView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        horizontalStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            horizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+            horizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+            horizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+        ])
+        
+        let constraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        constraint.priority = .defaultLow
+        constraint.isActive = true
+    }
+    
+    private func updateAppearance() {
+        guard let imageView = imageContainer.getSubview(type: UIImageView.self, identifier: "imageView") else { return }
+        
+        Animations.changeImageCrossDissolve(imageView: imageView,
+                                            image: UIImage(systemName: isSelected ? "hand.thumbsdown.fill" : "circlebadge.fill")!,
+                                            duration: 0.1,
+                                            animations: [{ [weak self] in
+            guard let self = self else { return }
+            switch self.isSelected {
+            case true:
+                imageView.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+            case false:
+                imageView.tintColor = .secondaryLabel
+            }
+        }])
+    }
 }

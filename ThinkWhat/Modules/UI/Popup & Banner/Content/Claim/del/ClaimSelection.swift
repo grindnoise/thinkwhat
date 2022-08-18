@@ -139,7 +139,7 @@ class ClaimSelection: UIView {
                 isEnabled = true
                 //UI update
                 enable()
-                tableView.visibleCells.filter { ($0 as! ClaimCell).claim != choice }.forEach { ($0 as! ClaimCell).isChecked = false }
+                tableView.visibleCells.filter { ($0 as! _ClaimCell).claim != choice }.forEach { ($0 as! _ClaimCell).isChecked = false }
             }
         }
     }
@@ -187,7 +187,7 @@ extension ClaimSelection: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "claim", for: indexPath) as? ClaimCell, let claim = Claims.shared.all[indexPath.row] as? Claim {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "claim", for: indexPath) as? _ClaimCell, let claim = Claims.shared.all[indexPath.row] as? Claim {
             cell.setupUI(claim: claim, color: K_COLOR_RED)
             cell.isChecked = claim == choice
             return cell
@@ -196,7 +196,7 @@ extension ClaimSelection: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let cell = tableView.cellForRow(at: indexPath) as? ClaimCell {
+        if let cell = tableView.cellForRow(at: indexPath) as? _ClaimCell {
             cell.isChecked = true
             choice = cell.claim
         }

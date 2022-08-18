@@ -8,12 +8,14 @@
 
 import UIKit
 import Combine
-//struct ClaimItem: Hashable {
-//    let id = UUID()
-//    var claim: Claim
-//}
 
 class ClaimPopupContent: UIView {
+    
+    private enum ButtonState: String {
+        case Send = "sendButton"
+        case Sending = "sending"
+        case Close = "continueButton"
+    }
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -24,12 +26,35 @@ class ClaimPopupContent: UIView {
     private weak var callbackDelegate: CallbackObservable?
     private lazy var collectionView: ClaimCollectionView = {
         let instance = ClaimCollectionView()
-        instance.backgroundColor = .systemGray
+        
+        instance.claimSubject
+            .filter { !$0.isNil }
+            .map {
+                return $0
+            }
+            .assign(to: &self.$item)
+        
+        observers.append(instance.observe(\ClaimCollectionView.contentSize, options: .new) { [weak self] view, change in
+            guard let self = self,
+                  let newValue = change.newValue
+            else { return }
+            
+//            print(newValue.height + self.topContainer.bounds.height + self.bottomContainer.bounds.height)
+            
+            self.parent?.onContainerHeightChange(newValue.height +
+                                                 self.topContainer.bounds.height +
+                                                 self.bottomContainer.bounds.height +
+                                                 self.verticalStackView.spacing * CGFloat(self.verticalStackView.arrangedSubviews.count - 1))
+        })
         
         return instance
     }()
+    private var state: ButtonState = .Send
+    @Published private var item: Claim?
+    
+    // MARK: - UI properties
     private lazy var verticalStackView: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [topContainer, collectionView, bottomContainer])
+        let instance = UIStackView(arrangedSubviews: [topContainer, middleContainer, bottomContainer])
         instance.axis = .vertical
         instance.spacing = 16
         
@@ -37,14 +62,12 @@ class ClaimPopupContent: UIView {
         bottomContainer.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            topContainer.heightAnchor.constraint(equalToConstant: 70),
+            topContainer.heightAnchor.constraint(equalToConstant: 80),
             bottomContainer.heightAnchor.constraint(equalToConstant: 50),
         ])
         
         return instance
     }()
-    
-    // MARK: - UI properties
     private lazy var icon: Icon = {
         let instance = Icon()
         instance.backgroundColor = .clear
@@ -52,14 +75,14 @@ class ClaimPopupContent: UIView {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.scaleMultiplicator = 0.8
         instance.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-        instance.category = .Caution
+        instance.category = .ExclamationMark
         
         return instance
     }()
     private lazy var closeButton: UIButton = {
         let instance = UIButton()
         instance.backgroundColor = .clear
-        instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
+        instance.imageView?.tintColor = .secondaryLabel// traitCollection.userInterfaceStyle == .dark ? .systemBlue : .secondaryLabel
 //        instance.imageView?.contentMode = .scaleAspectFit
         instance.addTarget(self, action: #selector(self.close), for: .touchUpInside)
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
@@ -67,7 +90,7 @@ class ClaimPopupContent: UIView {
         observers.append(instance.observe(\UIButton.bounds, options: .new) { view, change in
             guard let newValue = change.newValue else { return }
             
-            view.setImage(UIImage(systemName: "xmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height * 0.65, weight: .bold)), for: .normal)
+            view.setImage(UIImage(systemName: "xmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .bold)), for: .normal)
         })
         
         return instance
@@ -83,12 +106,29 @@ class ClaimPopupContent: UIView {
         NSLayoutConstraint.activate([
             closeButton.topAnchor.constraint(equalTo: instance.topAnchor),
             closeButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
-            closeButton.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.1),
-            icon.topAnchor.constraint(equalTo: instance.topAnchor),
+            closeButton.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.25),
+            icon.topAnchor.constraint(equalTo: closeButton.bottomAnchor),
             icon.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
             icon.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-            
         ])
+        
+        return instance
+    }()
+    private lazy var middleContainer: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        collectionView.addEquallyTo(to: instance)
+//        instance.addSubview(collectionView)
+//        collectionView.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            collectionView.topAnchor.constraint(equalTo: instance.topAnchor),
+//            collectionView.leadingAnchor.constraint(equalTo: instance.trailingAnchor),
+//            collectionView.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.25),
+//            icon.topAnchor.constraint(equalTo: closeButton.bottomAnchor),
+//            icon.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+//            icon.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+//        ])
         
         return instance
     }()
@@ -96,24 +136,25 @@ class ClaimPopupContent: UIView {
         let instance = UIButton()
         
         instance.addTarget(self, action: #selector(self.send), for: .touchUpInside)
-//        if #available(iOS 15, *) {
-//            let attrString = AttributedString("sendButton".localized.uppercased(), attributes: AttributeContainer([
-//                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
-//                NSAttributedString.Key.foregroundColor: UIColor.white
-//            ]))
-//            var config = UIButton.Configuration.filled()
-//            config.attributedTitle = attrString
-//            config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-//            config.image = UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
-//            config.imagePlacement = .trailing
-//            config.imagePadding = 8.0
-//            config.contentInsets.leading = 20
-//            config.contentInsets.trailing = 20
-//
-//            instance.configuration = config
-//        } else {
-            let attrString = NSMutableAttributedString(string: "sendButton".localized.uppercased(), attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2) as Any,
+        if #available(iOS 15, *) {
+            let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.white
+            ]))
+            var config = UIButton.Configuration.filled()
+            config.attributedTitle = attrString
+            config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+            config.image = UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+            config.imagePlacement = .trailing
+            config.imagePadding = 8.0
+            config.contentInsets.leading = 20
+            config.contentInsets.trailing = 20
+            config.buttonSize = .large
+
+            instance.configuration = config
+        } else {
+            let attrString = NSMutableAttributedString(string: state.rawValue.localized.uppercased(), attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
                 NSAttributedString.Key.foregroundColor: UIColor.white
             ])
             instance.titleEdgeInsets.left = 20
@@ -124,12 +165,12 @@ class ClaimPopupContent: UIView {
 //            instance.imageEdgeInsets.right = 8
             instance.setAttributedTitle(attrString, for: .normal)
             instance.semanticContentAttribute = .forceRightToLeft
-            instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+            instance.backgroundColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
 
-            let constraint = instance.widthAnchor.constraint(equalToConstant: "sendButton".localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!))
+            let constraint = instance.widthAnchor.constraint(equalToConstant: state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)!))
             constraint.identifier = "width"
             constraint.isActive = true
-//        }
+        }
         
         observers.append(instance.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
             guard let self = self,
@@ -140,15 +181,10 @@ class ClaimPopupContent: UIView {
             
             guard let constraint = view.getConstraint(identifier: "width") else { return }
             self.setNeedsLayout()
-            constraint.constant = "sendButton".localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (view.imageView?.bounds.width ?? 0) + 40
+            constraint.constant = self.state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (view.imageView?.bounds.width ?? 0) + 60
             self.layoutIfNeeded()
         })
-        
-//        instance.translatesAutoresizingMaskIntoConstraints = false
-        
-        
-//        let constraint =
-        
+
         return instance
     }()
     private lazy var bottomContainer: UIView = {
@@ -185,26 +221,7 @@ class ClaimPopupContent: UIView {
         self.parent = parent
         setupUI()
         setTasks()
-        if #available(iOS 15, *) {
-            delayAsync(delay: 2) { [weak self] in
-                guard let self = self,
-                      !self.actionButton.configuration.isNil
-                else { return }
-                
-                let attrString = AttributedString("continueButton".localized.uppercased(), attributes: AttributeContainer([
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.white
-                ]))
-                UIView.transition(with: self.actionButton, duration: 0.15, options: .transitionCrossDissolve) {
-                    self.actionButton.configuration!.attributedTitle = attrString
-                }
-                self.actionButton.configuration!.showsActivityIndicator = false
-                self.actionButton.configuration?.image = nil
-            }
-            
-        } else {
-            
-        }
+        setSubscriptions()
     }
     
     required init?(coder: NSCoder) {
@@ -220,6 +237,18 @@ class ClaimPopupContent: UIView {
         verticalStackView.addEquallyTo(to: self)
     }
     
+    private func setSubscriptions() {
+        $item.sink { [weak self] in
+            guard let self = self,
+                  !$0.isNil
+            else { return }
+            
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
+                self.actionButton.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+            }
+        }.store(in: &subscriptions)
+    }
+    
     private func setTasks() {
         tasks.append(Task { @MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Claim) {
@@ -228,7 +257,18 @@ class ClaimPopupContent: UIView {
                       self.surveyReference == instance
                 else { return }
 
-                fatalError()
+                self.onSuccessCallback()
+            }
+        })
+        //Error
+        tasks.append(Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.ClaimFailure) {
+                guard let self = self,
+                      let instance = notification.object as? SurveyReference,
+                      self.surveyReference == instance
+                else { return }
+
+                self.onFailureCallback()
             }
         })
     }
@@ -240,10 +280,17 @@ class ClaimPopupContent: UIView {
     
     @objc
     private func send() {
+        guard !item.isNil else { return }
+        guard state != .Close else {
+            parent?.dismiss()
+            return
+        }
+        state = .Sending
+        
         actionButton.isUserInteractionEnabled = false
         if #available(iOS 15, *) {
             if !actionButton.configuration.isNil {
-                let attrString = AttributedString("SENDING", attributes: AttributeContainer([
+                let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
                     NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
                     NSAttributedString.Key.foregroundColor: UIColor.white
                 ]))
@@ -251,19 +298,131 @@ class ClaimPopupContent: UIView {
                     self.actionButton.configuration!.attributedTitle = attrString
                 }
                 actionButton.configuration!.showsActivityIndicator = true
-//                let transformer = UIConfigurationTextAttributesTransformer { incoming in
-//                    var outgoing = incoming
-//                        outgoing.foregroundColor = UIColor.black
-//                        outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)
-//                    return outgoing
-//                }
-//                actionButton.configuration!.titleTextAttributesTransformer = transformer
+                //                let transformer = UIConfigurationTextAttributesTransformer { incoming in
+                //                    var outgoing = incoming
+                //                        outgoing.foregroundColor = UIColor.black
+                //                        outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)
+                //                    return outgoing
+                //                }
+                //                actionButton.configuration!.titleTextAttributesTransformer = transformer
+                
+                delayAsync(delay: 2) { [weak self] in
+                    self?.onSuccessCallback()
+                }
             }
         } else {
+            actionButton.setImage(UIImage(), for: .normal)
+            actionButton.setAttributedTitle(nil, for: .normal)
+            let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                                  size: CGSize(width: actionButton.frame.height,
+                                                                               height: actionButton.frame.height)))
+            indicator.alpha = 0
+            indicator.layoutCentered(in: actionButton)
+            indicator.startAnimating()
+            indicator.color = .white
+            indicator.accessibilityIdentifier = "indicator"
+            UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
             
+            //        delayAsync(delay: 2) { [weak self] in
+            ////            self?.onSuccessCallback()
+            //            self?.onFailureCallback()
+            //        }
+        }
+    }
+    
+    private func onSuccessCallback() {
+        state = .Close
+        actionButton.isUserInteractionEnabled = true
+        
+        //Path animation
+        let pathAnim = Animations.get(property: .Path, fromValue: (self.icon.icon as! CAShapeLayer).path!, toValue: (self.icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.35, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
+        self.icon.icon.add(pathAnim, forKey: nil)
+        
+        self.parent?.resize(400, animationDuration: 1)
+        
+        //Hide close btn
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0) { [weak self] in
+            guard let self = self else { return }
+            
+            self.collectionView.alpha = 0
+            self.closeButton.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            self.closeButton.alpha = 0
+        }
+        
+        if #available(iOS 15, *) {
+            guard !actionButton.configuration.isNil else { return }
+            
+            let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.white
+            ]))
+            self.actionButton.configuration!.showsActivityIndicator = false
+            UIView.transition(with: self.actionButton, duration: 0.15, options: .transitionCrossDissolve) {
+                self.actionButton.configuration!.attributedTitle = attrString
+                self.actionButton.configuration!.image = UIImage(systemName: "arrow.forward", withConfiguration: UIImage.SymbolConfiguration(weight: .bold))
+            }
+        } else {
+            guard let indicator = actionButton.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator") else { return }
+            
+            UIView.animate(withDuration: 0.2) {
+                indicator.alpha = 0
+            } completion: { _ in
+                indicator.removeFromSuperview()
+                let attrString = NSMutableAttributedString(string: self.state.rawValue.localized.uppercased(), attributes: [
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.white
+                ])
+                self.actionButton.titleEdgeInsets.left = 20
+                self.actionButton.titleEdgeInsets.right = 20
+                self.actionButton.setImage(UIImage(systemName: "arrow.backward", withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
+                self.actionButton.imageView?.tintColor = .white
+                self.actionButton.imageEdgeInsets.left = 8
+                self.actionButton.setAttributedTitle(attrString, for: .normal)
+                self.actionButton.semanticContentAttribute = .forceRightToLeft
+            }
         }
     }
 
+    private func onFailureCallback() {
+        state = .Send
+        actionButton.isUserInteractionEnabled = true
+        
+        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+        banner.present(content: PlainBannerContent(text: AppError.server.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 1)
+        
+        if #available(iOS 15, *) {
+            guard !actionButton.configuration.isNil else { return }
+            
+            let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.white
+            ]))
+            self.actionButton.configuration!.showsActivityIndicator = false
+            UIView.transition(with: self.actionButton, duration: 0.15, options: .transitionCrossDissolve) {
+                self.actionButton.configuration!.attributedTitle = attrString
+                self.actionButton.setImage(UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+            }
+        } else {
+            guard let indicator = actionButton.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator") else { return }
+            
+            UIView.animate(withDuration: 0.2) {
+                indicator.alpha = 0
+            } completion: { _ in
+                indicator.removeFromSuperview()
+                let attrString = NSMutableAttributedString(string: self.state.rawValue.localized.uppercased(), attributes: [
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.white
+                ])
+                self.actionButton.titleEdgeInsets.left = 20
+                self.actionButton.titleEdgeInsets.right = 20
+                self.actionButton.setImage(UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+                self.actionButton.imageView?.tintColor = .white
+                self.actionButton.imageEdgeInsets.left = 8
+                self.actionButton.setAttributedTitle(attrString, for: .normal)
+                self.actionButton.semanticContentAttribute = .forceRightToLeft
+            }
+        }
+    }
     
     // MARK: - Public methods
     public func onChildHeightChange(_ height: CGFloat) {
@@ -274,13 +433,14 @@ class ClaimPopupContent: UIView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
+//        closeButton.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
+        icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed)
+        actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        closeButton.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
-        icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed)
-        actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+        
 //        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
 //                                            forTextStyle: .title1)
 //        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
@@ -328,3 +488,18 @@ class ClaimPopupContent: UIView {
 }
 
 
+extension ClaimPopupContent: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
+    }
+}

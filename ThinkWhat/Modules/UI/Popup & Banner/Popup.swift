@@ -91,7 +91,7 @@ class Popup: UIView {
         }
     }
     private var originalContainerHeight = CGFloat.zero
-    private var padding: CGFloat = 8
+    private var padding: CGFloat = 16
     private var isDismissing = false
     private var lastHeight: CGFloat = 0
     
@@ -190,15 +190,25 @@ class Popup: UIView {
     }
     
     public func onContainerHeightChange(_ height: CGFloat) {
-//        guard !isDismissing else { return }
+        //        guard !isDismissing else { return }
         guard lastHeight != height else { return }
         lastHeight = height
+        
         setNeedsLayout()
         self.height = min((height + padding*2), UIScreen.main.bounds.height * 0.8)//body.frame.width * heightScaleFactor
         heightConstraint.constant = self.height
         centerYConstraint.constant = yOrigin
         layoutIfNeeded()
     }
+    
+    public func resize(_ height: CGFloat, animationDuration: TimeInterval) {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: animationDuration, delay: 0) {
+            self.setNeedsLayout()
+            self.heightConstraint.constant = height
+            self.layoutIfNeeded()
+        }
+    }
+    
 }
 
 extension Popup: CallbackObservable {

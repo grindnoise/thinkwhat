@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ClaimCell: UITableViewCell {
+class _ClaimCell: UITableViewCell {
 
     deinit {
         print("ClaimCell deinit")
