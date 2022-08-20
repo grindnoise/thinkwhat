@@ -146,20 +146,9 @@ extension PollModel: PollControllerInput {
     }
     
     func claim(_ reason: Claim) {
-        guard !survey.isNil else { return }
+        guard let survey = survey else { return }
         Task {
-            let json = try await API.shared.surveys.claim(survey: survey!, reason: reason)
-            guard let value = json["status"].string else { throw "Unknown error" }
-            guard value == "ok" else {
-                guard let error = json["error"].string else { throw "Unknown error" }
-                await MainActor.run {
-                    modelOutput?.onClaimCallback(.failure(error))
-                }
-                return
-            }
-            await MainActor.run {
-                modelOutput?.onClaimCallback(.success(true))
-            }
+            try await API.shared.surveys.claim(surveyReference: survey.reference, reason: reason)
         }
     }
     

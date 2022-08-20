@@ -64,7 +64,7 @@ class SurveyCollectionCell: UICollectionViewListCell {
         newConfiguration.titleTopic = item.topic.title
         newConfiguration.titleTopicParent = item.topic.parent!.title
         newConfiguration.icon = Icon.Category(rawValue: item.topic.id) ?? .Null
-        newConfiguration.avatar = item.owner == Userprofiles.shared.anonymous ? UIImage(named: "anon") : item.owner.image 
+//        newConfiguration.avatar = item.owner == Userprofiles.shared.anonymous ? UIImage(named: "anon") : item.owner.image
         newConfiguration.isComplete = item.isComplete
         newConfiguration.progress = item.progress
         newConfiguration.views = item.views

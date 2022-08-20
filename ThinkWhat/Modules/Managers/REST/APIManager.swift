@@ -22,10 +22,10 @@ class API {
 //        self.sessionManager.session.configuration.timeoutIntervalForRequest = 10
     }
     
-    public let sessionManager: Session = {
+    public var sessionManager: Session = {
         let configuration = URLSessionConfiguration.af.default
         configuration.timeoutIntervalForRequest = 21
-//        configuration.waitsForConnectivity = true
+        configuration.waitsForConnectivity = true
 //        configuration.requestCachePolicy = .returnCacheDataElseLoad
         
         let responseCacher = ResponseCacher(behavior: .modify { _, response in
@@ -42,6 +42,25 @@ class API {
         return Session(configuration: configuration, interceptor: interceptor, eventMonitors: [NetworkLogger()])
 //        return Session(configuration: configuration, interceptor: interceptor, cachedResponseHandler: responseCacher, eventMonitors: [NetworkLogger()])
     }()
+    
+//    public func setWaitsForConnectivity() {
+//        let configuration = URLSessionConfiguration.af.default
+//        configuration.timeoutIntervalForRequest = 21
+//        configuration.waitsForConnectivity = true
+//
+////        let responseCacher = ResponseCacher(behavior: .modify { _, response in
+////            let userInfo = ["date": Date()]
+////            return CachedURLResponse(
+////                response: response.response,
+////                data: response.data,
+////                userInfo: userInfo,
+////                storagePolicy: .allowed)
+////        })
+//
+//        let interceptor = APIRequestInterceptor()
+//
+//        sessionManager = Session(configuration: configuration, interceptor: interceptor, eventMonitors: [NetworkLogger()])
+//    }
     
     class func prepareUserData(firstName: String?, lastName: String?, email: String?, gender: Gender?, birthDate: String?, city: City?, image: UIImage?, vkID: String?, vkURL: String?, facebookID: String?, facebookURL: String?) -> [String: Any] {
         
@@ -1213,20 +1232,18 @@ class API {
             }
         }
         
-        public func claim(survey: Survey, reason: Claim) async throws -> JSON {
+        public func claim(surveyReference: SurveyReference, reason: Claim) async throws  {
             guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_CLAIM) else { throw APIError.notFound }
-            let parameters: Parameters = ["survey": survey.id, "claim": reason.id]
+            let parameters: Parameters = ["survey": surveyReference.id, "claim": reason.id]
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
                 await MainActor.run {
-                    Surveys.shared.banned.append(survey)
+                    surveyReference.isClaimed = true
                 }
-                let json = try JSON(data: data, options: .mutableContainers)
-                return json
             } catch let error {
                 await MainActor.run {
-                    NotificationCenter.default.post(name: Notifications.Surveys.ClaimFailure, object: survey.reference)
+                    NotificationCenter.default.post(name: Notifications.Surveys.ClaimFailure, object: surveyReference)
                 }
                 throw error
             }

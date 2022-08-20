@@ -88,7 +88,7 @@ class SurveysCollectionView: UICollectionView {
         super.init(frame: .zero, collectionViewLayout: .init())
         callbackDelegate = delegate
         setupUI()
-        setObservers()
+        setTasks()
     }
     
     init(delegate: CallbackObservable, topic: Topic?) {
@@ -97,7 +97,7 @@ class SurveysCollectionView: UICollectionView {
         super.init(frame: .zero, collectionViewLayout: .init())
         callbackDelegate = delegate
         setupUI()
-        setObservers()
+        setTasks()
     }
 
     init(delegate: CallbackObservable, items: [SurveyReference]) {
@@ -106,7 +106,7 @@ class SurveysCollectionView: UICollectionView {
         super.init(frame: .zero, collectionViewLayout: .init())
         callbackDelegate = delegate
         setupUI()
-        setObservers()
+        setTasks()
     }
     
     // MARK: - Private methods
@@ -121,7 +121,8 @@ class SurveysCollectionView: UICollectionView {
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
 //            layoutConfig.headerMode = .firstItemInSection
-            layoutConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+//            layoutConfig.backgroundColor = .red
+            layoutConfig.backgroundColor = .clear
             layoutConfig.showsSeparators = false//true
 //            if #available(iOS 14.5, *) {
 //                var separatorConfig = UIListSeparatorConfiguration(listAppearance: UICollectionLayoutListConfiguration.Appearance.grouped)
@@ -142,37 +143,35 @@ class SurveysCollectionView: UICollectionView {
             cell.watchSubject.sink {
                 print($0)
             } receiveValue: { [weak self] in
-                guard let self = self,
-                    let value = $0 as? SurveyReference
-                else { return }
+                guard let self = self, !$0.isNil else { return }
+                guard $0!.isComplete else {
+                    showBanner(bannerDelegate: self, text: "finish_poll".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+                    return
+                }
                 
-                self.watchSubject.send(value)
+                self.watchSubject.send($0)
             }.store(in: &self.subscriptions)
             
             //Share
             cell.shareSubject.sink {
                 print($0)
             } receiveValue: { [weak self] in
-                guard let self = self,
-                    let value = $0 as? SurveyReference
-                else { return }
+                guard let self = self, !$0.isNil else { return }
                 
-                self.shareSubject.send(value)
+                self.shareSubject.send($0)
             }.store(in: &self.subscriptions)
 
             //Claim
             cell.claimSubject.sink {
                 print($0)
             } receiveValue: { [weak self] in
-                guard let self = self,
-                    let value = $0 as? SurveyReference
-                else { return }
+                guard let self = self, !$0.isNil else { return }
                 
-                self.claimSubject.send(value)
+                self.claimSubject.send($0)
             }.store(in: &self.subscriptions)
             
             var config = UIBackgroundConfiguration.listPlainCell()
-            config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+            config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
             cell.backgroundConfiguration = config
             cell.automaticallyUpdatesBackgroundConfiguration = false
         }
@@ -198,12 +197,12 @@ class SurveysCollectionView: UICollectionView {
         source.apply(snapshot, animatingDifferences: false)
     }
     
-    private func setObservers() {
+    private func setTasks() {
         if #available(iOS 15, *) {
             
             //Update survey stats every n seconds
             let events = EventEmitter().emit(every: 5)
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await _ in events {
                     guard let self = self,
                           let cells = visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell] else { return }
@@ -212,7 +211,7 @@ class SurveysCollectionView: UICollectionView {
             })
             
             //Survey claimed by user
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Claim) {
                     guard let self = self,
                           let instance = notification.object as? SurveyReference,
@@ -226,7 +225,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //Survey banned on server
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Ban) {
                     guard let self = self,
                           let instance = notification.object as? SurveyReference,
@@ -241,7 +240,7 @@ class SurveysCollectionView: UICollectionView {
 
 
             //Subscriptions added
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SubscriptionAppend) {
                     guard let self = self,
                           self.category == .Subscriptions,
@@ -256,7 +255,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //New added
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.NewAppend) {
                     guard let self = self,
                           self.category == .New,
@@ -271,7 +270,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //Top added
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopAppend) {
                     guard let self = self,
                           self.category == .Top,
@@ -286,7 +285,7 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //Own added
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.OwnAppend) {
                     guard let self = self,
                           self.category == .Own,
@@ -301,12 +300,11 @@ class SurveysCollectionView: UICollectionView {
             })
 
             //Favorite added
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
                     guard let self = self,
                           self.category == .Favorite,
-                          let instance = notification.object as? SurveyReference,
-                          !self.source.snapshot().itemIdentifiers.contains(instance)
+                          let instance = notification.object as? SurveyReference
                     else { return }
 
                     var snap = self.source.snapshot()
@@ -314,9 +312,23 @@ class SurveysCollectionView: UICollectionView {
                     await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
+            
+            //Favorite toggle
+            tasks.append(Task { [weak self] in
+                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteRemove) {
+                    guard let self = self,
+                          self.category == .Favorite,
+                          let instance = notification.object as? SurveyReference
+                    else { return }
+
+                    var snap = self.source.snapshot()
+                        snap.deleteItems([instance])
+                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                }
+            })
 
             //Topic added
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
                     guard let self = self,
                           self.category == .Topic,
@@ -425,16 +437,16 @@ class SurveysCollectionView: UICollectionView {
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
-            layoutConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
-            layoutConfig.showsSeparators = false//true
-
-            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-            sectionLayout.interGroupSpacing = 16
-            return sectionLayout
-        }
+//        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+//            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
+//            layoutConfig.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.5)//self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+//            layoutConfig.showsSeparators = false//true
+//
+//            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+//            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+//            sectionLayout.interGroupSpacing = 16
+//            return sectionLayout
+//        }
         refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
         searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
@@ -474,12 +486,12 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     
     @objc
     private func onRemove(_ notification: Notification) {
-//        setDataSource()
-        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
-        var snapshot = source.snapshot()
-        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
-        snapshot.deleteItems([instance!])
-        source.apply(snapshot, animatingDifferences: true)
+////        setDataSource()
+//        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
+//        var snapshot = source.snapshot()
+//        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
+//        snapshot.deleteItems([instance!])
+//        source.apply(snapshot, animatingDifferences: true)
     }
     
 //    @objc
@@ -500,5 +512,21 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         snapshot.appendSections([.main])
         snapshot.appendItems(dataItems, toSection: .main)
         source.apply(snapshot, animatingDifferences: animatingDifferences)
+    }
+}
+
+extension SurveysCollectionView: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
     }
 }

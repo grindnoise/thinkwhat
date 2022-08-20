@@ -7,8 +7,12 @@
 //
 
 import UIKit
+//import Combine
 
 class Popup: UIView {
+    
+//    // MARK: - Public properties
+//    public var claimSubject = CurrentValueSubject<Claim?, Never>(nil)
     
     // MARK: - Destructor
     deinit {

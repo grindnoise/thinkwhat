@@ -446,6 +446,7 @@
 		ABADF5A827F73CCB00A26474 /* PlainBannerContent.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF5A727F73CCB00A26474 /* PlainBannerContent.xib */; };
 		ABAEEE5A27A5D4A100E4EF29 /* VKDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABAEEE5927A5D4A100E4EF29 /* VKDelegate.swift */; };
 		ABAEEE5C27A5D7ED00E4EF29 /* VKWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABAEEE5B27A5D7ED00E4EF29 /* VKWorker.swift */; };
+		ABB1595D28B10C4A003ED9F5 /* Shimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB1595C28B10C4A003ED9F5 /* Shimmer.swift */; };
 		ABB19148286C526200C89142 /* ProcessInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB19147286C526200C89142 /* ProcessInfo.swift */; };
 		ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */; };
 		ABB46F372344B1F900AF212B /* CallbackObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F362344B1F900AF212B /* CallbackObservable.swift */; };
@@ -1027,6 +1028,7 @@
 		ABADF5A727F73CCB00A26474 /* PlainBannerContent.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlainBannerContent.xib; sourceTree = "<group>"; };
 		ABAEEE5927A5D4A100E4EF29 /* VKDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKDelegate.swift; sourceTree = "<group>"; };
 		ABAEEE5B27A5D7ED00E4EF29 /* VKWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKWorker.swift; sourceTree = "<group>"; };
+		ABB1595C28B10C4A003ED9F5 /* Shimmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shimmer.swift; sourceTree = "<group>"; };
 		ABB19147286C526200C89142 /* ProcessInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfo.swift; sourceTree = "<group>"; };
 		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABB46F362344B1F900AF212B /* CallbackObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallbackObservable.swift; sourceTree = "<group>"; };
@@ -1926,6 +1928,7 @@
 			isa = PBXGroup;
 			children = (
 				ABA6E18922FC358500F8F39A /* TextFields */,
+				ABB1595C28B10C4A003ED9F5 /* Shimmer.swift */,
 			);
 			path = "Custom classes";
 			sourceTree = "<group>";
@@ -3510,6 +3513,7 @@
 				AB3A47E2283F5CA700106407 /* RankingCreationView.swift in Sources */,
 				ABBA1988242B430100F11E0D /* AnswerHeaderCell.swift in Sources */,
 				ABCBDA0E28759EE300888F23 /* Fonts.swift in Sources */,
+				ABB1595D28B10C4A003ED9F5 /* Shimmer.swift in Sources */,
 				AB463FB527C3FDB3007D7240 /* UnderlinedSearchTextField.swift in Sources */,
 				AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */,
 				AB39899B28637E4F004C958E /* CostCollectionView.swift in Sources */,

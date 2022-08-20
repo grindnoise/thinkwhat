@@ -28,7 +28,7 @@ class CommentCell: UICollectionViewCell {
                 firstnameLabel.text = userprofile.firstName
                 lastnameLabel.text = userprofile.lastName
             } else {
-                avatar.userprofile = Userprofiles.shared.anonymous
+                avatar.userprofile = Userprofile.anonymous
             }
             
             disclosureButton.alpha = 0

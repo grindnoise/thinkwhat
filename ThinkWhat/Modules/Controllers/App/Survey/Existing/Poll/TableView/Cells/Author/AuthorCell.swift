@@ -77,7 +77,7 @@ class AuthorCell: UITableViewCell {
         stars.color = survey.topic.tagColor
         avatar.lightColor = survey.isAnonymous ? .black : survey.topic.tagColor
         favoriteLabel.text = "\(survey.likes)"
-        if survey.owner == Userprofiles.shared.anonymous {
+        if survey.owner == Userprofile.anonymous {
             avatar.image = UIImage(named: "anon")!
         } else if let image = survey.owner.image {
             avatar.image = image

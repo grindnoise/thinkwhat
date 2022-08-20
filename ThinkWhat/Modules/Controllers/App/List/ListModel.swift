@@ -16,6 +16,12 @@ class ListModel {
 
 // MARK: - Controller Input
 extension ListModel: ListControllerInput {
+    func claim(surveyReference: SurveyReference, claim: Claim) {
+        Task {
+            try await API.shared.surveys.claim(surveyReference: surveyReference, reason: claim)
+        }
+    }
+    
     func addFavorite(surveyReference: SurveyReference) {
         Task {
             do {

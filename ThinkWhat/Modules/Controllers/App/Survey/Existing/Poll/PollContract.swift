@@ -61,7 +61,6 @@ protocol PollModelOutput: AnyObject {
     func onLoadCallback(_: Result<Bool, Error>)
     func onAddFavoriteCallback(_: Result<Bool,Error>)
     func onVoteCallback(_: Result<Bool,Error>)
-    func onClaimCallback(_: Result<Bool,Error>)
     func commentPostCallback(_: Result<Comment,Error>)
 }
 
@@ -81,7 +80,6 @@ protocol PollControllerOutput: AnyObject {
 //    func onSurveyLoaded()
     func onLoadCallback()
     func onVoteCallback(_: Result<Bool,Error>)
-    func onClaimCallback(_: Result<Bool,Error>)
 //    func startLoading()
     func onAddFavoriteCallback()
     func commentPostCallback(_: Result<Comment,Error>)

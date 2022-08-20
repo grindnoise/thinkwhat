@@ -904,10 +904,6 @@ extension PollController: PollModelOutput {
         }
     }
     
-    func onClaimCallback(_ result: Result<Bool, Error>) {
-        controllerOutput?.onClaimCallback(result)
-    }
-    
     func onVoteCallback(_ result: Result<Bool, Error>) {
         switch result {
         case .success:

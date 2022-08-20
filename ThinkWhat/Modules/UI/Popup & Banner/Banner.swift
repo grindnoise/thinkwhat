@@ -14,7 +14,8 @@ class Banner: UIView {
         print("Banner deinit")
     }
     
-    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightDivisor _heightDivisor: CGFloat = 3.05) {
+    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightDivisor _heightDivisor: CGFloat = 3.05, fadeBackground: Bool) {
+        self.fadeBackground = fadeBackground
         super.init(frame: frame)
         self.callbackDelegate = callbackDelegate
         self.bannerDelegate = bannerDelegate
@@ -49,9 +50,15 @@ class Banner: UIView {
     
     // MARK: - IB Outlets
     @IBOutlet var contentView: UIView!
+    @IBOutlet weak var shadowView: UIView! {
+        didSet {
+            shadowView.backgroundColor = .clear
+            shadowView.clipsToBounds = false
+        }
+    }
     @IBOutlet weak var background: UIView! {
         didSet {
-            background.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+            background.backgroundColor = fadeBackground ? UIColor.black.withAlphaComponent(0.8) : .clear
             background.alpha = 0
         }
     }
@@ -60,7 +67,7 @@ class Banner: UIView {
             body.backgroundColor = UIColor { traitCollection in
                 switch traitCollection.userInterfaceStyle {
                 case .dark:
-                    return .secondarySystemBackground
+                    return .tertiarySystemBackground
                 default:
                     return .systemBackground
                 }
@@ -76,6 +83,7 @@ class Banner: UIView {
     }
     
     // MARK: - Properties
+    private let fadeBackground: Bool
     ///Geometry
     private var heightDivisor:  CGFloat = .zero
     private let topMargin:      CGFloat = 8
@@ -261,8 +269,8 @@ extension Banner: CallbackObservable {
     }
 }
 
-func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, content: UIView, color: UIColor = .systemRed, isModal: Bool = false, dismissAfter: TimeInterval = 1, identifier: String = "") {
-    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
+func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, content: UIView, color: UIColor = .systemRed, isModal: Bool = false, dismissAfter: TimeInterval = 1, identifier: String = "", fadeBackground: Bool = false) {
+    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate, fadeBackground: fadeBackground)
     banner.accessibilityIdentifier = identifier
     banner.present(content: PlainBannerContent(text: text, imageContent: content, color: color), isModal: isModal, dismissAfter: dismissAfter)
 }

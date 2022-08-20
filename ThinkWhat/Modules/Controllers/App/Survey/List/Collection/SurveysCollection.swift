@@ -261,14 +261,14 @@ extension SurveysCollection: UICollectionViewDelegate {
     
     @objc
     private func onRemove(_ notification: Notification) {
-//        setDataSource()
-        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
-        var snapshot = dataSource.snapshot()
-        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
-        snapshot.deleteItems([instance!])
-
-        // Display data in the collection view by applying the snapshot to data source
-        dataSource.apply(snapshot, animatingDifferences: true)
+////        setDataSource()
+//        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
+//        var snapshot = dataSource.snapshot()
+//        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
+//        snapshot.deleteItems([instance!])
+//
+//        // Display data in the collection view by applying the snapshot to data source
+//        dataSource.apply(snapshot, animatingDifferences: true)
     }
     
     @objc

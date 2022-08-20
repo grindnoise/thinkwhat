@@ -137,8 +137,8 @@ extension ListController: ListViewInput {
                      completion: nil)
     }
     
-    func claim(_: SurveyReference) {
-        fatalError()
+    func claim(surveyReference: SurveyReference, claim: Claim) {
+        controllerInput?.claim(surveyReference: surveyReference, claim: claim)
     }
     
     func addFavorite(_ surveyReference: SurveyReference) {

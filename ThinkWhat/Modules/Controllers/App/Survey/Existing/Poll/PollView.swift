@@ -140,10 +140,6 @@ extension PollView: PollControllerOutput {
         return viewInput?.showNext ?? false
     }
     
-    func onClaimCallback(_: Result<Bool, Error>) {
- 
-    }
-    
     func onVoteCallback(_ result: Result<Bool, Error>) {
         isUserInteractionEnabled = true
         //Hide vote button & show comments section

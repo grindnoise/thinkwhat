@@ -250,7 +250,8 @@ class WebViewCell: UICollectionViewCell {
                         UIApplication.shared.open(url, options: [:], completionHandler: {_ in})
                     }
                 } else if sideAppPreference == nil, tempAppPreference == nil, isTiTokInstalled {
-                    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self)
+                    
+                    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, fadeBackground: true)
                     let content = SideApp(app: .TikTok, callbackDelegate: banner)
                     banner.present(content: content, isModal: true)
                 }

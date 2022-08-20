@@ -323,7 +323,8 @@ extension YoutubeCell: WKYTPlayerViewDelegate {
         guard state == .buffering else { return }
         guard !sideAppPreference.isNil || !tempAppPreference.isNil else {
             playerView.stopVideo()
-            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self)
+            
+            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, fadeBackground: true)
             let content = SideApp(app: .Youtube, callbackDelegate: banner)
             banner.present(content: content, isModal: true)
             return

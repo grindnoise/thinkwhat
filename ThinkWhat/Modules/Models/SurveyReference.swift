@@ -91,9 +91,13 @@ class SurveyReference: Decodable {// NSObject,
         didSet {
             guard oldValue != isFavorite else { return }
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: self)
+            if isFavorite {
+                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteAppend, object: self)
+            } else {
+                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteRemove, object: self)
+            }
             guard let survey = survey else { return }
             survey.isFavorite = isFavorite
-//            Notification.send(names: [Notifications.Surveys.SwitchFavorite])
         }
     }
     
@@ -105,8 +109,9 @@ class SurveyReference: Decodable {// NSObject,
     }
     var isClaimed: Bool = false {
         didSet {
-            guard isClaimed else { return }
+            guard isClaimed, isClaimed != oldValue else { return }
             NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: self)
+            survey?.isClaimed = isClaimed
         }
     }
 //    var isFavorite: Bool {
@@ -155,7 +160,7 @@ class SurveyReference: Decodable {// NSObject,
                 throw "Type not defined"
             }
             isAnonymous             = try container.decode(Bool.self, forKey: .isAnonymous)
-            owner                   = Userprofiles.shared.anonymous
+            owner                   = Userprofile.anonymous
             let _owner              = try container.decodeIfPresent(Userprofile.self, forKey: .owner)
             if !_owner.isNil {
                 owner = Userprofiles.shared.all.filter({ $0.id == _owner!.id }).first ?? _owner!

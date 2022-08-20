@@ -898,12 +898,12 @@ class PollCreationView: UIView, UINavigationControllerDelegate {
 extension PollCreationView: PollCreationControllerOutput {
     func onImageCopiedToPasteBoard(_ image: UIImage) {
         guard imageItems.count < 3 else { return }
-        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self)
+        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, fadeBackground: false)
         banner.present(content: ImagePasteView(delegate: banner, image: image))
     }
     
     func onURLCopiedToPasteBoard(_ url: URL) {
-        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self)
+        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, fadeBackground: false)
         banner.present(content: URLPasteView(delegate: banner, url: url, color: K_COLOR_TABBAR))
     }
     

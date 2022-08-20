@@ -147,7 +147,7 @@ class Avatar: UIView {
             userPic.isUserInteractionEnabled = true
             userPic.contentMode = .scaleAspectFill
         }
-        userPic.backgroundColor = .lightGray
+//        userPic.backgroundColor = .lightGray
         userPic.addEquallyTo(to: container)
         userPic.addGestureRecognizer(UITapGestureRecognizer(target:self, action:#selector(self.handleTap)))
         
@@ -238,9 +238,9 @@ class NewAvatar: UIView {
         
         return instance
     }()
-    public lazy var coloredBackground: UIView = {
-        let instance = UIView()
-        instance.accessibilityIdentifier = "bg"
+    public lazy var coloredBackground: Shimmer = {
+        let instance = Shimmer()
+        instance.accessibilityIdentifier = "coloredBackground"
         instance.clipsToBounds = true
         instance.backgroundColor = borderColor
         
@@ -258,19 +258,19 @@ class NewAvatar: UIView {
             imageView.addEquallyTo(to: instance)
         }
         
-        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+        observers.append(instance.observe(\Shimmer.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width/2
         })
         
         return instance
     }()
-    private lazy var imageView: UIImageView = {
+    public lazy var imageView: UIImageView = {
         let instance = UIImageView()
         instance.contentMode = .scaleAspectFit
         instance.accessibilityIdentifier = "imageView"
         instance.layer.masksToBounds = true
-        instance.backgroundColor = .systemGray2
+        instance.backgroundColor = .clear//.systemGray2
         if let userprofile = userprofile, let image = userprofile.image {
             instance.image = image
         } else {
@@ -285,18 +285,23 @@ class NewAvatar: UIView {
                   let newValue = change.newValue
             else { return }
             view.cornerRadius = newValue.height/2
-            if self.userprofile.isNil {
-                view.contentMode = .center
-                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.65, weight: .regular, scale: .medium)
-                instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
+//            if self.userprofile.isNil {
+//                view.contentMode = .center
+//                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.65, weight: .regular, scale: .medium)
+//                instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
+//                return
+//            }
+            if self.userprofile == Userprofile.anonymous {
+                self.imageView.contentMode = .scaleAspectFit
+                self.imageView.image = UIImage(named: "anon")
                 return
             }
-            guard let _ = self.userprofile.image else {
-                view.contentMode = .center
-                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.65, weight: .regular, scale: .medium)
-                instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
-                return
-            }
+//            guard let _ = self.userprofile.image else {
+//                view.contentMode = .center
+//                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.65, weight: .regular, scale: .medium)
+//                instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
+//                return
+//            }
             view.contentMode = .scaleAspectFit
         })
         return instance
@@ -356,25 +361,49 @@ class NewAvatar: UIView {
                       object === self.userprofile,
                       let image = self.userprofile.image
                 else { return }
-                Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
+//                Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
+                self.coloredBackground.stopShimmering()
+                self.imageView.image = image
             }
         })
     }
     
     private func setImage() {
+//        guard !userprofile.isNil else { return }
+        guard userprofile != Userprofile.anonymous else {
+            self.imageView.contentMode = .scaleAspectFit
+            self.imageView.image = UIImage(named: "anon")
+            return
+        }
         guard let image = userprofile.image else {
+            coloredBackground.startShimmering()
             Task { [weak self] in
                 guard let self = self else { return }
-                let image = try await self.userprofile.downloadImageAsync()
-                await MainActor.run {
-                    self.imageView.contentMode = .scaleAspectFit
+                
+                do {
+                    let image = try await self.userprofile.downloadImageAsync()
+                    await MainActor.run {
+                        self.imageView.contentMode = .scaleAspectFit
+                    }
+//                    Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
+                    self.coloredBackground.stopShimmering()
+                    self.imageView.image = image
+                } catch {
+                    await MainActor.run {
+                        let largeConfig = UIImage.SymbolConfiguration(pointSize: self.imageView.bounds.height*0.65, weight: .regular, scale: .medium)
+                        self.imageView.tintColor = .white
+                        self.imageView.contentMode = .center
+//                        Animations.changeImageCrossDissolve(imageView: self.imageView, image: UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)!)
+                        self.coloredBackground.stopShimmering()
+                        self.imageView.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)!
+                    }
                 }
-                Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
             }
             return
         }
         Task { @MainActor [weak self] in
             guard let self = self else { return }
+            self.coloredBackground.stopShimmering()
             self.imageView.image = image
             self.imageView.contentMode = .scaleAspectFit
         }
@@ -382,10 +411,11 @@ class NewAvatar: UIView {
     
     // MARK: - Public methods
     public func clearImage() {
-        let largeConfig = UIImage.SymbolConfiguration(pointSize: imageView.bounds.height*0.65, weight: .regular, scale: .medium)
-        imageView.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
-        imageView.tintColor = .white
-        imageView.contentMode = .center
+//        let largeConfig = UIImage.SymbolConfiguration(pointSize: imageView.bounds.height*0.65, weight: .regular, scale: .medium)
+//        imageView.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
+//        imageView.tintColor = .white
+//        imageView.contentMode = .center
+        imageView.image = nil
     }
     
     // MARK: - Overriden methods

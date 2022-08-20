@@ -7,15 +7,16 @@
 //
 
 import UIKit
-import UIView_Shimmer
+//import UIView_Shimmer
 import Combine
 
-class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
+class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
     
     // MARK: - Public properties
     public weak var item: SurveyReference! {
         didSet {
             guard let item = item else { return }
+
 //            verticalStack.removeArrangedSubview(descriptionLabel)
 //            verticalStack.removeArrangedSubview(imageView)
 //            descriptionLabel.removeFromSuperview()
@@ -28,17 +29,14 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
                 if let image = item.media?.image {
                     imageView.image = image
                 } else {
-                    shimmeringAnimatedItems.append(imageView)
-                    setTemplateWithSubviews(true, viewBackgroundColor: .systemBackground)
-//                    setTemplateWithSubviews(true, viewBackgroundColor: .secondarySystemBackground)
+                    imageContainer.startShimmering()
                     Task { [weak self] in
                         guard let self = self else { return }
                         do {
                             let image = try await item.media?.downloadImageAsync()
                             await MainActor.run {
                                 self.imageView.image = image
-                                self.setTemplateWithSubviews(false)
-                                self.shimmeringAnimatedItems.remove(object: self.imageView)
+                                self.imageContainer.stopShimmering()
                             }
                         } catch {
 #if DEBUG
@@ -62,9 +60,24 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
             viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
             dateLabel.text = item.startDate.timeAgoDisplay()
             topicLabel.text = item.topic.title.uppercased()
-            firstnameLabel.text = item.owner.firstNameSingleWord
-            lastnameLabel.text = item.owner.lastNameSingleWord
-            avatar.userprofile = item.owner
+            
+            if item.isAnonymous {
+                avatar.userprofile = Userprofile.anonymous
+            } else {
+                avatar.userprofile = item.owner
+                if avatar.userprofile.image.isNil {
+//                    shimmeringAnimatedItems.append(avatar.imageView)
+//                } else {
+//                    shimmeringAnimatedItems.remove(object: avatar.imageView)
+                }
+                firstnameLabel.text = item.owner.firstNameSingleWord
+                lastnameLabel.text = item.owner.lastNameSingleWord
+            }
+            
+//            if !shimmeringAnimatedItems.isEmpty {
+//                setTemplateWithSubviews(true, viewBackgroundColor: .systemBackground)
+//            }
+            
             icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
             icon.category = Icon.Category(rawValue: item.topic.id) ?? .Null
             
@@ -103,6 +116,12 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
             
 //            avatar.shadowColor = item.topic.tagColor
 //            descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
+            
+//            if shimmeringAnimatedItems.isEmpty {
+//                setTemplateWithSubviews(false)
+//            } else {
+//                setTemplateWithSubviews(true, viewBackgroundColor: .systemBackground)
+//            }
             
             if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
                 label.text = String(describing: item.progress) + "%"
@@ -412,6 +431,7 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
             view.cornerRadius = newValue.height/2.25
         })
         label.addEquallyTo(to: instance)
+        
         return instance
     }()
     private lazy var icon: Icon = {
@@ -453,8 +473,8 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
         
         return instance
     }()
-    private lazy var imageContainer: UIView = {
-        let instance = UIView()
+    private lazy var imageContainer: Shimmer = {
+        let instance = Shimmer()
         instance.backgroundColor = .clear
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.addSubview(imageView)
@@ -496,7 +516,7 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
         let instance = UIButton()
         instance.setImage(UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(pointSize: instance.bounds.width, weight: UIImage.SymbolWeight.semibold, scale: .large)), for: .normal)
 //        instance.imageView?.contentMode = .scaleAspectFit
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
 //        instance.menu = menu
@@ -533,7 +553,7 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.font = UIFont(name: Fonts.Semibold, size: 9)//UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
-        instance.text = "test"
+        instance.text = ""
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
         instance.accessibilityIdentifier = "firstnameLabel"
         return instance
@@ -545,7 +565,7 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.font = UIFont(name: Fonts.Semibold, size: 9)//UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
-        instance.text = "test"
+        instance.text = ""
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
         instance.accessibilityIdentifier = "lastnameLabel"
         return instance
@@ -692,6 +712,21 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
     }
     
     private func setTasks() {
+        
+//        tasks.append(Task { [weak self] in
+//            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.ImageDownloaded) {
+//                guard let self = self,
+//                      let object = notification.object as? Userprofile,
+//                      let userprofile = self.avatar.userprofile,
+//                      object.id == userprofile.id
+//                else { return }
+//
+//                if self.shimmeringAnimatedItems.count == 1 {
+//                    self.shimmeringAnimatedItems.remove(object: self.avatar.imageView)
+//                    self.setTemplateWithSubviews(false)
+//                }
+//            }
+//        })
 //        if #available(iOS 15, *) {
 //            notifications.append(Task { [weak self] in
 //                guard !self.isNil else { return }
@@ -1024,10 +1059,9 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
             self.shareSubject.send(self.item)
         })
         
-        let watchAction : UIAction = .init(title: item.isFavorite ? "don't_watch".localized : "watch".localized, image: UIImage(systemName: "binoculars.fill"), identifier: nil, discoverabilityTitle: nil, attributes: item.isComplete ? .init() : .disabled, state: .off, handler: { [weak self] action in
-            guard let self = self else { return }
-            guard let instance = self.item,
-                  instance.isComplete
+        let watchAction : UIAction = .init(title: item.isFavorite ? "don't_watch".localized : "watch".localized, image: UIImage(systemName: "binoculars.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+            guard let self = self,
+                  let instance = self.item
             else { return }
             
             self.watchSubject.send(instance)
@@ -1036,12 +1070,19 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
 
         
         let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
-            guard let self = self else { return }
+            guard let self = self,
+                  let instance = self.item
+            else { return }
             
             self.claimSubject.send(self.item)
         })
         
-        let actions = [claimAction, watchAction, shareAction]
+        var actions: [UIAction] = []//[claimAction, watchAction, shareAction]
+        if !item.isOwn {
+            actions.append(claimAction)
+            actions.append(watchAction)
+        }
+        actions.append(shareAction)
         
         return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
     }
@@ -1063,7 +1104,7 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
         config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         backgroundConfiguration = config
         
-        menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+        menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
         icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
@@ -1156,6 +1197,14 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
     override func prepareForReuse() {
         super.prepareForReuse()
 
+        //Reset publishers
+        watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+        claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+        shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+        
+        firstnameLabel.text = ""
+        lastnameLabel.text = ""
+        avatar.clearImage()
         item = nil
         verticalStack.removeArrangedSubview(descriptionLabel)
         verticalStack.removeArrangedSubview(imageContainer)
@@ -1163,5 +1212,13 @@ class SurveyCell: UICollectionViewListCell, ShimmeringViewProtocol {
         imageContainer.removeFromSuperview()
         topicHorizontalStackView.removeArrangedSubview(progressView)
         progressView.removeFromSuperview()
+    }
+    
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        super.updateConfiguration(using: state)
+        
+        var config = UIBackgroundConfiguration.listPlainCell()
+        config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        backgroundConfiguration = config
     }
 }

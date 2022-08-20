@@ -12,10 +12,12 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="Banner" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
                 <outlet property="background" destination="ThP-Hz-SG0" id="3wn-6E-W5c"/>
-                <outlet property="body" destination="AB7-J0-o3H" id="m8I-pw-G4y"/>
+                <outlet property="body" destination="k0P-Na-v1c" id="ZqW-hi-aMo"/>
                 <outlet property="container" destination="Rar-ub-moY" id="vFX-2R-8SN"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="vbl-ul-dhk"/>
                 <outlet property="heightConstraint" destination="QWB-Lr-CVo" id="QfU-eX-RIu"/>
+                <outlet property="shadow" destination="AB7-J0-o3H" id="jSe-sE-x2d"/>
+                <outlet property="shadowView" destination="AB7-J0-o3H" id="JVF-Nd-lG9"/>
                 <outlet property="topConstraint" destination="585-1d-HCy" id="skO-HS-KJg"/>
             </connections>
         </placeholder>
@@ -31,18 +33,30 @@
                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AB7-J0-o3H">
                     <rect key="frame" x="15.5" y="52" width="383" height="120"/>
                     <subviews>
-                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rar-ub-moY">
-                            <rect key="frame" x="8.5" y="8" width="366" height="104"/>
-                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="k0P-Na-v1c">
+                            <rect key="frame" x="0.0" y="0.0" width="383" height="120"/>
+                            <subviews>
+                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rar-ub-moY">
+                                    <rect key="frame" x="8" y="8" width="367" height="104"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </view>
+                            </subviews>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <constraints>
+                                <constraint firstItem="Rar-ub-moY" firstAttribute="leading" secondItem="k0P-Na-v1c" secondAttribute="leading" constant="8" id="ZZW-UR-nUQ"/>
+                                <constraint firstItem="Rar-ub-moY" firstAttribute="top" secondItem="k0P-Na-v1c" secondAttribute="top" constant="8" id="gTL-fW-VTJ"/>
+                                <constraint firstAttribute="bottom" secondItem="Rar-ub-moY" secondAttribute="bottom" constant="8" id="uGM-KO-J5P"/>
+                                <constraint firstAttribute="trailing" secondItem="Rar-ub-moY" secondAttribute="trailing" constant="8" id="yKZ-aR-b0G"/>
+                            </constraints>
                         </view>
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
-                        <constraint firstItem="Rar-ub-moY" firstAttribute="width" secondItem="AB7-J0-o3H" secondAttribute="width" multiplier="0.955432" id="2mG-9M-lpA"/>
-                        <constraint firstItem="Rar-ub-moY" firstAttribute="centerY" secondItem="AB7-J0-o3H" secondAttribute="centerY" id="9a3-nW-1Dz"/>
-                        <constraint firstItem="Rar-ub-moY" firstAttribute="height" secondItem="AB7-J0-o3H" secondAttribute="height" multiplier="0.866667" id="Fzh-XV-Suk"/>
-                        <constraint firstItem="Rar-ub-moY" firstAttribute="centerX" secondItem="AB7-J0-o3H" secondAttribute="centerX" id="Fzj-7K-3uv"/>
+                        <constraint firstItem="k0P-Na-v1c" firstAttribute="top" secondItem="AB7-J0-o3H" secondAttribute="top" id="9Ys-hY-IqS"/>
+                        <constraint firstItem="k0P-Na-v1c" firstAttribute="leading" secondItem="AB7-J0-o3H" secondAttribute="leading" id="AxY-UE-xdQ"/>
                         <constraint firstAttribute="height" constant="120" id="QWB-Lr-CVo"/>
+                        <constraint firstAttribute="trailing" secondItem="k0P-Na-v1c" secondAttribute="trailing" id="am7-ir-txu"/>
+                        <constraint firstAttribute="bottom" secondItem="k0P-Na-v1c" secondAttribute="bottom" id="fix-Yl-1su"/>
                     </constraints>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">

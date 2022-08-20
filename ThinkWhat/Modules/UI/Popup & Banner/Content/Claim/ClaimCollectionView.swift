@@ -124,6 +124,7 @@ class ClaimCell: UICollectionViewListCell {
     // MARK: - Overriden properties
     override var isSelected: Bool {
         didSet {
+            guard oldValue != isSelected else { return }
             updateAppearance()
         }
     }
@@ -134,8 +135,9 @@ class ClaimCell: UICollectionViewListCell {
             guard let item = item else { return }
             
             textView.text = item.description
-            guard let imageView = imageContainer.getSubview(type: UIImageView.self, identifier: "imageView"),
-                  let constraint = imageView.getConstraint(identifier: "heightAnchor"),
+//            guard let imageView = imageContainer.getSubview(type: UIImageView.self, identifier: "imageView"),
+            guard let icon = imageContainer.getSubview(type: UIImageView.self, identifier: "icon"),
+                  let constraint = icon.getConstraint(identifier: "heightAnchor"),
                   let font = textView.font
             else { return }
             
@@ -151,26 +153,43 @@ class ClaimCell: UICollectionViewListCell {
         let instance = UIView()
         instance.backgroundColor = .clear
 
-        let imageView = UIImageView(image: UIImage(systemName: "circle.fill"))
-        imageView.accessibilityIdentifier = "imageView"
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1/1).isActive = true
-        imageView.tintColor = .secondaryLabel
-        imageView.contentMode = .center
+        let icon = Icon()
+        icon.accessibilityIdentifier = "icon"
+        icon.backgroundColor = .clear
+        icon.isRounded = false
+        icon.widthAnchor.constraint(equalTo: icon.heightAnchor, multiplier: 1/1).isActive = true
+        icon.scaleMultiplicator = 0.8
+        icon.iconColor = .systemGray2
+        icon.category = .Oval
+        icon.translatesAutoresizingMaskIntoConstraints = false
         
-        observers.append(imageView.observe(\UIImageView.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            
-            view.image = UIImage(systemName: "circlebadge.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height))
-        })
+        instance.addSubview(icon)
+        icon.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
+        icon.centerYAnchor.constraint(equalTo: instance.centerYAnchor).isActive = true
         
-        instance.addSubview(imageView)
-        imageView.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
-        imageView.centerYAnchor.constraint(equalTo: instance.centerYAnchor).isActive = true
-        
-        let constraint = imageView.heightAnchor.constraint(equalToConstant: 10)
+        let constraint = icon.heightAnchor.constraint(equalToConstant: 10)
         constraint.identifier = "heightAnchor"
         constraint.isActive = true
+//        let imageView = UIImageView(image: UIImage(systemName: "circle.fill"))
+//        imageView.accessibilityIdentifier = "imageView"
+//        imageView.translatesAutoresizingMaskIntoConstraints = false
+//        imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1/1).isActive = true
+//        imageView.tintColor = .secondaryLabel
+//        imageView.contentMode = .center
+//
+//        observers.append(imageView.observe(\UIImageView.bounds, options: .new) { view, change in
+//            guard let newValue = change.newValue else { return }
+//
+//            view.image = UIImage(systemName: "circlebadge.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height))
+//        })
+//
+//        instance.addSubview(imageView)
+//        imageView.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
+//        imageView.centerYAnchor.constraint(equalTo: instance.centerYAnchor).isActive = true
+//
+//        let constraint = imageView.heightAnchor.constraint(equalToConstant: 10)
+//        constraint.identifier = "heightAnchor"
+//        constraint.isActive = true
 
         return instance
     }()
@@ -254,19 +273,51 @@ class ClaimCell: UICollectionViewListCell {
     }
     
     private func updateAppearance() {
-        guard let imageView = imageContainer.getSubview(type: UIImageView.self, identifier: "imageView") else { return }
+        guard let icon = imageContainer.getSubview(type: Icon.self, identifier: "icon"),
+            let destinationPath = (icon.getLayer(isSelected ? .Thumbdown : .Oval) as? CAShapeLayer)?.path,
+            let finalPath = (isSelected ? destinationPath.getScaledPath(size: destinationPath.boundingBox.size, scaleMultiplicator: 0.65) : destinationPath) as? CGPath,
+            let shapeLayer = icon.icon as? CAShapeLayer
+        else { return }
         
-        Animations.changeImageCrossDissolve(imageView: imageView,
-                                            image: UIImage(systemName: isSelected ? "hand.thumbsdown.fill" : "circlebadge.fill")!,
-                                            duration: 0.1,
-                                            animations: [{ [weak self] in
-            guard let self = self else { return }
-            switch self.isSelected {
-            case true:
-                imageView.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-            case false:
-                imageView.tintColor = .secondaryLabel
-            }
-        }])
+        let pathAnim = Animations.get(property: .Path,
+                                      fromValue: shapeLayer.path as Any,
+                                      toValue: finalPath,
+                                      duration: isSelected ? 0.275 : 0.175,
+                                      delay: 0,
+                                      repeatCount: 0,
+                                      autoreverses: false,
+                                      timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                      delegate: nil,
+                                      isRemovedOnCompletion: true)
+        shapeLayer.add(pathAnim, forKey: nil)
+        shapeLayer.path = finalPath
+        
+        let colorAnim = Animations.get(property: .FillColor,
+                                             fromValue: icon.iconColor.cgColor as Any,
+                                             toValue: isSelected ? traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : UIColor.systemRed.cgColor : UIColor.systemGray2.cgColor as Any,
+                                             duration: isSelected ? 0.275 : 0.15,
+                                             delay: 0,
+                                             repeatCount: 0,
+                                             autoreverses: false,
+                                             timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                             delegate: nil,
+                                             isRemovedOnCompletion: false)
+        icon.icon.add(colorAnim, forKey: nil)
+
+        
+//        guard let imageView = imageContainer.getSubview(type: UIImageView.self, identifier: "imageView") else { return }
+//
+//        Animations.changeImageCrossDissolve(imageView: imageView,
+//                                            image: UIImage(systemName: isSelected ? "hand.thumbsdown.fill" : "circlebadge.fill")!,
+//                                            duration: 0.1,
+//                                            animations: [{ [weak self] in
+//            guard let self = self else { return }
+//            switch self.isSelected {
+//            case true:
+//                imageView.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+//            case false:
+//                imageView.tintColor = .secondaryLabel
+//            }
+//        }])
     }
 }

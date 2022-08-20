@@ -16,21 +16,21 @@ class Survey: Decodable {
         func dataItems(_ topic: Topic? = nil) -> [SurveyReference] {
             switch self {
             case .Hot:
-                return Surveys.shared.hot.map { return $0.reference }
+                return Surveys.shared.hot.map { return $0.reference }.filter { !$0.isClaimed && !$0.isBanned }
             case .New:
 //                return Surveys.shared.newReferences
-                return Surveys.shared.newReferences//.filter({ $0.isFavorite })// || !$0.isComplete })
+                return Surveys.shared.newReferences.filter { !$0.isClaimed && !$0.isBanned }//.filter({ $0.isFavorite })// || !$0.isComplete })
             case .Top:
 //                return Surveys.shared.topReferences
-                return Surveys.shared.topReferences//.filter({ $0.isFavorite })// || !$0.isComplete })
+                return Surveys.shared.topReferences.filter { !$0.isClaimed && !$0.isBanned }//.filter({ $0.isFavorite })// || !$0.isComplete })
             case .Own:
-                return Surveys.shared.ownReferences
+                return Surveys.shared.ownReferences.filter { !$0.isClaimed && !$0.isBanned }
             case .Favorite:
-                return Surveys.shared.favoriteReferences
+                return SurveyReferences.shared.all.filter { $0.isFavorite && !$0.isClaimed && !$0.isBanned }
             case .Subscriptions:
-                return Surveys.shared.subscriptions
+                return Surveys.shared.subscriptions.filter { !$0.isClaimed && !$0.isBanned }
             case .All:
-                return SurveyReferences.shared.all
+                return SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned }
             case .Topic:
                 guard !topic.isNil else { return [] }
 //                var all = SurveyReferences.shared.all.filter({ $0.topic == topic! })
@@ -43,7 +43,7 @@ class Survey: Decodable {
 //                    all.remove(object: $0)
 //                }
 //                return all
-                return SurveyReferences.shared.all.filter({ $0.topic == topic! }).uniqued()
+                return SurveyReferences.shared.all.filter({ $0.topic == topic! }).uniqued().filter { !$0.isClaimed && !$0.isBanned }
             case .Search:
                 fatalError()
             }
@@ -319,7 +319,7 @@ class Survey: Decodable {
                 throw "SurveyType not defined"
             }
             isAnonymous             = try container.decode(Bool.self, forKey: .isAnonymous)
-            owner                   = Userprofiles.shared.anonymous
+            owner                   = Userprofile.anonymous
             let _owner              = try container.decodeIfPresent(Userprofile.self, forKey: .owner)
             if !_owner.isNil {
                 owner = Userprofiles.shared.all.filter({ $0.id == _owner!.id }).first ?? _owner!
@@ -518,28 +518,28 @@ class Surveys {
     }
     var all:                     [Survey] = []
     var hot:                     [Survey] = []
-    var banned:                  [Survey] = [] {///Banned by user
-        didSet {
-            guard let instance = banned.last else { return }
-            hot.remove(object: instance)
-            hot.remove(object: instance)
-            ///Remove from lists
-            ///Top
-            if topReferences.contains(instance.reference) {
-                topReferences.remove(object: instance.reference)
-            } else if let existing = topReferences.filter({ $0 == instance.reference }).first {
-                topReferences.remove(object: existing)
-            }
-            ///New
-            if newReferences.contains(instance.reference) {
-                newReferences.remove(object: instance.reference)
-            } else if let existing = newReferences.filter({ $0 == instance.reference }).first {
-                newReferences.remove(object: existing)
-            }
-            NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: instance.reference)
-//            Notification.send(names: [Notifications.Surveys.Claimed])
-        }
-    }
+//    var banned:                  [Survey] = [] {///Banned by user
+//        didSet {
+//            guard let instance = banned.last else { return }
+//            hot.remove(object: instance)
+//            hot.remove(object: instance)
+//            ///Remove from lists
+//            ///Top
+//            if topReferences.contains(instance.reference) {
+//                topReferences.remove(object: instance.reference)
+//            } else if let existing = topReferences.filter({ $0 == instance.reference }).first {
+//                topReferences.remove(object: existing)
+//            }
+//            ///New
+//            if newReferences.contains(instance.reference) {
+//                newReferences.remove(object: instance.reference)
+//            } else if let existing = newReferences.filter({ $0 == instance.reference }).first {
+//                newReferences.remove(object: existing)
+//            }
+//            NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: instance.reference)
+////            Notification.send(names: [Notifications.Surveys.Claimed])
+//        }
+//    }
     var rejected: [Survey]  = [] {//Local list of rejected surveys, should be cleared periodically
         didSet {
             guard let instance = rejected.last else { return }

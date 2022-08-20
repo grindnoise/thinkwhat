@@ -22,7 +22,7 @@ protocol ListViewInput: class {
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(_: SurveyReference)
     func share(_: SurveyReference)
-    func claim(_: SurveyReference)
+    func claim(surveyReference: SurveyReference, claim: Claim)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -35,6 +35,7 @@ protocol ListControllerInput: class {
     func onDataSourceRequest()
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(surveyReference: SurveyReference)
+    func claim(surveyReference: SurveyReference, claim: Claim)
 }
 
 /// *Model* returns the result to the *Controller*

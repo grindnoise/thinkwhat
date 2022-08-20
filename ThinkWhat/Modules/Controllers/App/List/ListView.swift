@@ -44,8 +44,24 @@ class ListView: UIView {
             print($0)
         } receiveValue: { [weak self] in
             guard let self = self,
-                let value = $0
+                let surveyReference = $0
             else { return }
+            
+            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
+            banner.accessibilityIdentifier = "claim"
+            let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
+            
+            claimContent.claimSubject.sink {
+                print($0)
+            } receiveValue: { [weak self] in
+                guard let self = self,
+                    let claim = $0
+                else { return }
+                
+                self.viewInput?.claim(surveyReference: surveyReference, claim: claim)
+            }.store(in: &self.subscriptions)
+            
+            banner.present(content: claimContent)
             
 //            self.viewInput?.addFavorite(surveyReference: value)
         }.store(in: &self.subscriptions)
@@ -80,7 +96,7 @@ class ListView: UIView {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = false
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        instance.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.75)
         //        collectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
@@ -181,7 +197,7 @@ extension ListView: ListControllerOutput {
 extension ListView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+//        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     }
 }
 

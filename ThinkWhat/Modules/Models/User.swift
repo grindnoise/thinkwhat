@@ -41,17 +41,6 @@ class Userprofiles {
             UserDefaults.Profile.importData(from: current!)
         }
     }
-    lazy var anonymous: Userprofile = {
-        let user = Userprofile()
-        user!.image = UIImage(named: "anon")
-        user!.firstName = "anonymous".localized
-        user!.lastName = "user".localized
-        user!.id = 1010000110010011
-        user!.gender = .Unassigned
-        user!.cityTitle = ""
-        user!.email = ""
-        return user!
-    }()
 //    lazy var current: Userprofile {
 ////        return shared.all.filter({ $0.id == UserDefaults.Profile.id && $0.name == "\(User)) \(String(describing: profile.lastName))" }).first ?? Userprofile(id: profile.id!,
 ////                                                                                                                                                                                             name: "\(String(describing: profile.firstName)) \(String(describing: profile.lastName))",
@@ -100,6 +89,22 @@ class Userprofiles {
 }
 
 class Userprofile: Decodable {
+    static let anonymous: Userprofile = {
+        let instance = Userprofile()
+        instance!.image = nil
+        instance!.firstName = ""
+        instance!.lastName = ""
+        instance!.id = 1010000110010011
+        instance!.gender = .Unassigned
+        instance!.cityTitle = ""
+        instance!.email = ""
+        instance!.imageURL = nil
+        instance!.vkURL = nil
+        instance!.instagramURL = nil
+        instance!.facebookURL = nil
+        return instance!
+    }()
+    
     private enum CodingKeys: String, CodingKey {
         case id, age, gender, email, username, city,
              isBanned = "is_banned",
@@ -160,6 +165,7 @@ class Userprofile: Decodable {
                                                                             ofType: .Images,
                                                                             id: String(id),
                                                                             toDocumentNamed: "avatar.jpg").absoluteString
+                NotificationCenter.default.post(name: Notifications.Userprofiles.ImageDownloaded, object: self)
             } catch {
 #if DEBUG
                 print(error.localizedDescription)
@@ -386,7 +392,11 @@ class Userprofile: Decodable {
     func downloadImageAsync() async throws -> UIImage {
         do {
             guard let url =  imageURL else { throw AppError.invalidURL }
-            image = try await API.shared.downloadImageAsync(from: url)
+            
+            let _image = try await API.shared.downloadImageAsync(from: url)
+            await MainActor.run {
+                self.image = _image
+            }
             return image!
         } catch {
             throw error

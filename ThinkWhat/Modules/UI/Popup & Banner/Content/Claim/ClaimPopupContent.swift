@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import CoreData
 
 class ClaimPopupContent: UIView {
     
@@ -16,6 +17,9 @@ class ClaimPopupContent: UIView {
         case Sending = "sending"
         case Close = "continueButton"
     }
+    
+    // MARK: - Public properties
+    public var claimSubject = CurrentValueSubject<Claim?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -50,6 +54,40 @@ class ClaimPopupContent: UIView {
         return instance
     }()
     private var state: ButtonState = .Send
+    private lazy var label: UILabel = {
+        let instance = UILabel()
+        instance.alpha = 0
+        instance.numberOfLines = 0
+        instance.textAlignment = .center
+        instance.addEquallyTo(to: middleContainer)
+        
+        let textContent_1 = "claim_sent".localized + "\n" + "\n"
+        let textContent_2 = "thanks_for_feedback".localized
+        let paragraph = NSMutableParagraphStyle()
+        
+        if #available(iOS 15.0, *) {
+            paragraph.usesDefaultHyphenation = true
+        } else {
+            paragraph.hyphenationFactor = 1
+        }
+        paragraph.alignment = .center
+        
+        let attributedString = NSMutableAttributedString()
+        attributedString.append(NSAttributedString(string: textContent_1,
+                                                   attributes: [
+                                                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title1) as Any,
+                                                    NSAttributedString.Key.foregroundColor: UIColor.label,
+                                                   ] as [NSAttributedString.Key : Any]))
+        
+        attributedString.append(NSAttributedString(string: textContent_2,
+                                                   attributes: [
+                                                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title2) as Any,
+                                                    NSAttributedString.Key.foregroundColor: UIColor.label,
+                                                   ] as [NSAttributedString.Key : Any]))
+        instance.attributedText = attributedString
+        
+        return instance
+    }()
     @Published private var item: Claim?
     
     // MARK: - UI properties
@@ -283,11 +321,14 @@ class ClaimPopupContent: UIView {
         guard !item.isNil else { return }
         guard state != .Close else {
             parent?.dismiss()
-            return
+            return 
         }
         state = .Sending
         
         actionButton.isUserInteractionEnabled = false
+        claimSubject.send(item!)
+        claimSubject.send(completion: .finished)
+        
         if #available(iOS 15, *) {
             if !actionButton.configuration.isNil {
                 let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
@@ -306,9 +347,9 @@ class ClaimPopupContent: UIView {
                 //                }
                 //                actionButton.configuration!.titleTextAttributesTransformer = transformer
                 
-                delayAsync(delay: 2) { [weak self] in
-                    self?.onSuccessCallback()
-                }
+//                delayAsync(delay: 2) { [weak self] in
+//                    self?.onSuccessCallback()
+//                }
             }
         } else {
             actionButton.setImage(UIImage(), for: .normal)
@@ -335,18 +376,24 @@ class ClaimPopupContent: UIView {
         actionButton.isUserInteractionEnabled = true
         
         //Path animation
-        let pathAnim = Animations.get(property: .Path, fromValue: (self.icon.icon as! CAShapeLayer).path!, toValue: (self.icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.35, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
+        let pathAnim = Animations.get(property: .Path, fromValue: (self.icon.icon as! CAShapeLayer).path!, toValue: (self.icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
         self.icon.icon.add(pathAnim, forKey: nil)
         
-        self.parent?.resize(400, animationDuration: 1)
+        self.parent?.resize(400, animationDuration: 0.7)
         
         //Hide close btn
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0) { [weak self] in
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, animations: { [weak self] in
             guard let self = self else { return }
             
             self.collectionView.alpha = 0
             self.closeButton.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             self.closeButton.alpha = 0
+        }) { _ in
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.4, delay: 0) { [weak self] in
+                guard let self = self else { return }
+                
+                self.label.alpha = 1
+            }
         }
         
         if #available(iOS 15, *) {
@@ -364,7 +411,7 @@ class ClaimPopupContent: UIView {
         } else {
             guard let indicator = actionButton.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator") else { return }
             
-            UIView.animate(withDuration: 0.2) {
+            UIView.animate(withDuration: 0.25) {
                 indicator.alpha = 0
             } completion: { _ in
                 indicator.removeFromSuperview()
@@ -387,8 +434,10 @@ class ClaimPopupContent: UIView {
         state = .Send
         actionButton.isUserInteractionEnabled = true
         
-        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-        banner.present(content: PlainBannerContent(text: AppError.server.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 1)
+        showBanner(bannerDelegate: self, text: "", content: PlainBannerContent(text: AppError.server.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 1)
+        
+//        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+//        banner.present(content: PlainBannerContent(text: AppError.server.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 1)
         
         if #available(iOS 15, *) {
             guard !actionButton.configuration.isNil else { return }
@@ -435,7 +484,13 @@ class ClaimPopupContent: UIView {
         
 //        closeButton.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
         icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed)
-        actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+        
+        if #available(iOS 15, *) {
+            guard !actionButton.configuration.isNil else { return }
+            actionButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+        } else {
+            actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+        }
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }

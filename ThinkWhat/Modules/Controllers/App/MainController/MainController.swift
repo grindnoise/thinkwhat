@@ -148,7 +148,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
         
         do {
             let json = try await API.shared.appLaunch()
-            API.shared.sessionManager.sessionConfiguration.waitsForConnectivity = true
+//            API.shared.setWaitsForConnectivity()
             UserDefaults.App.minAPIVersion = json["api_version"].double
             ModelProperties.shared.importJson(json["field_properties"])
             PriceList.shared.importJson(json["pricelist"])

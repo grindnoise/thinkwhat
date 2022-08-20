@@ -39,7 +39,6 @@ protocol HotControllerInput: class {
 /// **Controller** conforms to this protocol
 protocol HotModelOutput: class {
     func onRequestCompleted()
-    func onClaimCallback(_: Result<Bool,Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
