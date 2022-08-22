@@ -82,6 +82,18 @@ class Comment: Decodable {
         
         return userprofile.id == currentUser.id
     }
+    var isBanned: Bool = false {
+        didSet {
+            guard isBanned else { return }
+            NotificationCenter.default.post(name: Notifications.Comments.Ban, object: self)
+        }
+    }
+    var isClaimed: Bool = false {
+        didSet {
+            guard isClaimed else { return }
+            NotificationCenter.default.post(name: Notifications.Comments.Claim, object: self)
+        }
+    }
     
     required init(from decoder: Decoder) throws {
         do {

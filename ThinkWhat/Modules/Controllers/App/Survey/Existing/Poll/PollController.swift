@@ -602,7 +602,7 @@ class PollController: UIViewController {
                 UIActivity.ActivityType.postToFacebook
             ]
             
-            activityViewController.isModalInPresentation = true
+            activityViewController.isModalInPresentation = false
             self.present(activityViewController,
                          animated: true,
                          completion: nil)
@@ -812,6 +812,14 @@ class PollController: UIViewController {
 
 // MARK: - View Input
 extension PollController: PollViewInput {
+    func onCommentClaim(comment: Comment, reason: Claim) {
+        controllerInput?.commentClaim(comment: comment, reason: reason)
+    }
+    
+    func openCommentThread(_ comment: Comment) {
+        navigationController?.pushViewController(CommentsController(comment), animated: true)
+    }
+    
     func requestComments(_ comments: [Comment]) {
         controllerInput?.requestComments(comments)
     }

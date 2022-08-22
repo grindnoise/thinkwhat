@@ -500,6 +500,10 @@
 		ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDA425023B0D7BF00BAC3A5 /* WebIcon.swift */; };
 		ABDAA38E248E7D3600569F68 /* ClaimViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDAA38D248E7D3600569F68 /* ClaimViewController.swift */; };
 		ABDAE152258211D5007DD188 /* 3_VotesCountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDAE151258211D5007DD188 /* 3_VotesCountViewController.swift */; };
+		ABDE82C128B38F18004E07BD /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDE82BF28B38F18004E07BD /* CommentsController.swift */; };
+		ABDE82C728B3906A004E07BD /* CommentsContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDE82C328B3906A004E07BD /* CommentsContract.swift */; };
+		ABDE82C928B3906A004E07BD /* CommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDE82C528B3906A004E07BD /* CommentsView.swift */; };
+		ABDE82CA28B3906A004E07BD /* CommentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDE82C628B3906A004E07BD /* CommentsModel.swift */; };
 		ABDEE85723702362009B52F3 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */; };
 		ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDFA748238C1B5C00321EE0 /* AddButton.swift */; };
 		ABE000B227E0855300B6B4CB /* DataObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE000B127E0855300B6B4CB /* DataObservable.swift */; };
@@ -1082,6 +1086,10 @@
 		ABDA425023B0D7BF00BAC3A5 /* WebIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebIcon.swift; sourceTree = "<group>"; };
 		ABDAA38D248E7D3600569F68 /* ClaimViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimViewController.swift; sourceTree = "<group>"; };
 		ABDAE151258211D5007DD188 /* 3_VotesCountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 3_VotesCountViewController.swift; sourceTree = "<group>"; };
+		ABDE82BF28B38F18004E07BD /* CommentsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsController.swift; sourceTree = "<group>"; };
+		ABDE82C328B3906A004E07BD /* CommentsContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsContract.swift; sourceTree = "<group>"; };
+		ABDE82C528B3906A004E07BD /* CommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsView.swift; sourceTree = "<group>"; };
+		ABDE82C628B3906A004E07BD /* CommentsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsModel.swift; sourceTree = "<group>"; };
 		ABDEE85623702362009B52F3 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		ABDFA748238C1B5C00321EE0 /* AddButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
 		ABE000B127E0855300B6B4CB /* DataObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataObservable.swift; sourceTree = "<group>"; };
@@ -2714,6 +2722,7 @@
 		ABADF59927F7009400A26474 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				ABDE82BE28B38ED5004E07BD /* Comments */,
 				ABD2A2B428841AE600591568 /* CollectionView */,
 				AB883B3428047FC300DBE4EF /* Image */,
 			);
@@ -2897,6 +2906,17 @@
 				ABF7354A270DC26E00F7C308 /* ClaimView.xib */,
 			);
 			path = Claim;
+			sourceTree = "<group>";
+		};
+		ABDE82BE28B38ED5004E07BD /* Comments */ = {
+			isa = PBXGroup;
+			children = (
+				ABDE82BF28B38F18004E07BD /* CommentsController.swift */,
+				ABDE82C328B3906A004E07BD /* CommentsContract.swift */,
+				ABDE82C528B3906A004E07BD /* CommentsView.swift */,
+				ABDE82C628B3906A004E07BD /* CommentsModel.swift */,
+			);
+			path = Comments;
 			sourceTree = "<group>";
 		};
 		ABDEE85523702324009B52F3 /* CategoryTableViewController */ = {
@@ -3505,6 +3525,7 @@
 				AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */,
 				AB98307027B54D43002C5132 /* ContentLoader.swift in Sources */,
 				ABB46F392344B2C300AF212B /* AuthNavigationController.swift in Sources */,
+				ABDE82C728B3906A004E07BD /* CommentsContract.swift in Sources */,
 				AB39899728636A70004C958E /* CostView.swift in Sources */,
 				AB3AF3672834E05F00160F0C /* OrderedSet.swift in Sources */,
 				AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */,
@@ -3553,6 +3574,7 @@
 				AB2FBD02242A433000344DCC /* CheckBox.swift in Sources */,
 				AB21970C26C11660005A7BA8 /* TotalCost.swift in Sources */,
 				AB3C6845223FD3EE00B57580 /* Facebook.swift in Sources */,
+				ABDE82CA28B3906A004E07BD /* CommentsModel.swift in Sources */,
 				AB3A47E3283F5CA700106407 /* RankingCreationModel.swift in Sources */,
 				AB38DD78281A777200FFEB3F /* SurveysCollection.swift in Sources */,
 				ABA7829728589C5E00964FDE /* AddChoiceCell.swift in Sources */,
@@ -3819,6 +3841,7 @@
 				ABF3DF1F283BC2DA00309AA9 /* HotCard.swift in Sources */,
 				ABB4AAAA2666335600D4738D /* NewSurveyTitle.swift in Sources */,
 				AB7C6FB42865AE3000000429 /* Error.swift in Sources */,
+				ABDE82C928B3906A004E07BD /* CommentsView.swift in Sources */,
 				ABF20FBA24CAE8610092B223 /* UserSubscriptionCell.swift in Sources */,
 				ABF27587280EDC810023CD1F /* VoterCell.swift in Sources */,
 				AB9A901228900C7C00E8197C /* SeparatorCell.swift in Sources */,
@@ -3829,6 +3852,7 @@
 				ABF27571280D76720023CD1F /* NextCell.swift in Sources */,
 				ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */,
 				AB7478BF2428951F00317EB6 /* CircularIndicatorImageView.swift in Sources */,
+				ABDE82C128B38F18004E07BD /* CommentsController.swift in Sources */,
 				ABEB5F7F285E1E0600C75C31 /* LimitsSelectionView.swift in Sources */,
 				AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */,
 				AB16401E281A9C8D001F33F8 /* SurveyCellContentView.swift in Sources */,

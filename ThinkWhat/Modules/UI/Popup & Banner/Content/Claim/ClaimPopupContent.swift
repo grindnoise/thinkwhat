@@ -309,6 +309,26 @@ class ClaimPopupContent: UIView {
                 self.onFailureCallback()
             }
         })
+        tasks.append(Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Claim) {
+                guard let self = self,
+                      let instance = notification.object as? Comment,
+                      instance.survey?.reference == self.surveyReference
+                else { return }
+
+                self.onSuccessCallback()
+            }
+        })
+        tasks.append( Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ClaimFailure) {
+                guard let self = self,
+                      let instance = notification.object as? Comment,
+                      instance.survey?.reference == self.surveyReference
+                else { return }
+                
+                self.onFailureCallback()
+            }
+        })
     }
     
     @objc

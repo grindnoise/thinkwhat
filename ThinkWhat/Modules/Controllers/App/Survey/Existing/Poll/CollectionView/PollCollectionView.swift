@@ -38,6 +38,13 @@ class PollCollectionView: UICollectionView {
         }
     }
     
+    // MARK: - Public properties
+    public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
+    public var modeSubject = PassthroughSubject<PollController.Mode, Never>()
+    public var lastPostedComment = CurrentValueSubject<Comment?, Never>(nil)
+    public var commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
+    
     // MARK: - Private properties
     private var subscriptions = Set<AnyCancellable>()
     private weak var host: PollView!
@@ -71,9 +78,8 @@ class PollCollectionView: UICollectionView {
 //            print("received \(colorPublisher)")
 //        }
 //    }
-    public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
-    public var modeSubject = PassthroughSubject<PollController.Mode, Never>()
-    public var lastPostedComment = CurrentValueSubject<Comment?, Never>(nil) 
+
+    
     
     // MARK: - Initialization
     init(host: PollView?, poll: Survey, callbackDelegate: CallbackObservable) {
@@ -205,6 +211,13 @@ class PollCollectionView: UICollectionView {
             guard let self = self, cell.item.isNil else { return }
             cell.item = self.poll
             
+            //Claim
+            cell.claimSubject.sink { [weak self] in
+                guard let self = self, !$0.isNil else { return }
+                
+                self.claimSubject.send($0)
+            }.store(in: &self.subscriptions)
+            
             //Subscription for posting
             cell.commentSubject.sink { [weak self] in
                 guard let self = self,
@@ -224,13 +237,21 @@ class PollCollectionView: UICollectionView {
                 self.host.requestComments(comments)
             }.store(in: &self.subscriptions)
             
+            //Subscibe for thread disclosure
+            cell.commentThreadSubject.sink { [weak self] in
+                guard let self = self,
+                      let comment = $0 as? Comment
+                else { return }
+                
+                self.commentThreadSubject.send(comment)
+            }.store(in: &self.subscriptions)
+            
             //Subscibe for posted comment
             self.lastPostedComment.sink {
                 guard let comment = $0 else { return }
                 
                 cell.lastPostedComment = comment
             }.store(in: &self.subscriptions)
-            
         }
         
         source = UICollectionViewDiffableDataSource<Section, Int>(collectionView: self) { [unowned self]

@@ -18,19 +18,17 @@ class CommentCell: UICollectionViewCell {
     public var item: Comment! {
         didSet {
             guard !item.isNil else { return }
+            
+            if !item.isOwn {
+                supplementaryStack.addArrangedSubview(claimButton)
+            }
+            
             textView.text = item.body
-            dateLabel.text = item.createdAt.timeAgoDisplay()
+            setHeader()
             
             replyButton.alpha = item.isOwn ? 0 : 1
             
-            if let userprofile = item.userprofile {
-                avatar.userprofile = userprofile
-                firstnameLabel.text = userprofile.firstName
-                lastnameLabel.text = userprofile.lastName
-            } else {
-                avatar.userprofile = Userprofile.anonymous
-            }
-            
+            avatar.userprofile = item.userprofile.isNil ? Userprofile.anonymous : item.userprofile!
             disclosureButton.alpha = 0
             
             if mode == .Root, item.replies != 0 {
@@ -47,14 +45,6 @@ class CommentCell: UICollectionViewCell {
 //                    repliesView.layoutIfNeeded()
 //                }
             }
-            
-            guard textView.getConstraint(identifier: "height").isNil else { return }
-            
-            let constraint = textView.heightAnchor.constraint(equalToConstant: 100)
-            constraint.identifier = "height"
-            constraint.isActive = true
-            setNeedsLayout()
-            layoutIfNeeded()
         }
     }
     public var mode: CommentsCollectionView.Mode = .Root {
@@ -62,6 +52,9 @@ class CommentCell: UICollectionViewCell {
             
         }
     }
+    public var commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public var replySubject = CurrentValueSubject<Comment?, Never>(nil)
+    public var claimSubject = CurrentValueSubject<Comment?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -76,16 +69,22 @@ class CommentCell: UICollectionViewCell {
         instance.contentInset = UIEdgeInsets(top: 1, left: 0, bottom: 1, right: 0)
         instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.reply)))
         
-        observers.append(instance.observe(\UITextView.contentSize, options: .new) { [weak self] view, change in
-            guard let self = self,
-                  let constraint = self.textView.getConstraint(identifier: "height"),
-                  let value = change.newValue
-            else { return }
-            
-            self.setNeedsLayout()
-            constraint.constant = value.height
-            self.layoutIfNeeded()
-        })
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+        constraint.identifier = "height"
+        constraint.isActive = true
+        
+        instance.publisher(for: \.contentSize, options: .new)
+            .sink { [unowned self] size in
+                guard let constraint = instance.getConstraint(identifier: "height") else { return }
+                
+                self.setNeedsLayout()
+                constraint.constant = size.height// * 1.5
+                self.layoutIfNeeded()
+                let space = constraint.constant - size.height
+                let inset = max(0, space/2)
+                instance.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
@@ -101,48 +100,27 @@ class CommentCell: UICollectionViewCell {
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "userView"
 
-        instance.addSubview(firstnameLabel)
-        instance.addSubview(lastnameLabel)
+//        instance.addSubview(firstnameLabel)
+//        instance.addSubview(lastnameLabel)
         instance.addSubview(avatar)
 
-        firstnameLabel.translatesAutoresizingMaskIntoConstraints = false
-        lastnameLabel.translatesAutoresizingMaskIntoConstraints = false
+//        firstnameLabel.translatesAutoresizingMaskIntoConstraints = false
+//        lastnameLabel.translatesAutoresizingMaskIntoConstraints = false
         avatar.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            firstnameLabel.topAnchor.constraint(equalTo: instance.topAnchor),
-            firstnameLabel.centerYAnchor.constraint(equalTo: lastnameLabel.centerYAnchor),
-            firstnameLabel.centerXAnchor.constraint(equalTo: lastnameLabel.centerXAnchor),
-            firstnameLabel.widthAnchor.constraint(equalTo: lastnameLabel.widthAnchor),
-            lastnameLabel.centerXAnchor.constraint(equalTo: avatar.centerXAnchor),
-            lastnameLabel.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
-            lastnameLabel.widthAnchor.constraint(equalTo: avatar.widthAnchor, multiplier: 1.8),
-//            avatar.topAnchor.constraint(equalTo: instance.topAnchor),
+//            firstnameLabel.topAnchor.constraint(equalTo: instance.topAnchor),
+//            firstnameLabel.centerYAnchor.constraint(equalTo: lastnameLabel.centerYAnchor),
+//            firstnameLabel.centerXAnchor.constraint(equalTo: lastnameLabel.centerXAnchor),
+//            firstnameLabel.widthAnchor.constraint(equalTo: lastnameLabel.widthAnchor),
+//            lastnameLabel.centerXAnchor.constraint(equalTo: avatar.centerXAnchor),
+//            lastnameLabel.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
+//            lastnameLabel.widthAnchor.constraint(equalTo: avatar.widthAnchor, multiplier: 1.8),
+////            avatar.topAnchor.constraint(equalTo: instance.topAnchor),
+            avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
             avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-            avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.6),
+            avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.75),
         ])
-        return instance
-    }()
-    private lazy var firstnameLabel: ArcLabel = {
-        let instance = ArcLabel()
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.font = UIFont(name: Fonts.Semibold, size: 10)//UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
-        instance.textAlignment = .center
-        instance.text = ""
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
-        instance.accessibilityIdentifier = "firstnameLabel"
-        return instance
-    }()
-    private lazy var lastnameLabel: ArcLabel = {
-        let instance = ArcLabel()
-        instance.angle = 4.7
-        instance.clockwise = false
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.font = UIFont(name: Fonts.Semibold, size: 10)//UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
-        instance.textAlignment = .center
-        instance.text = ""
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
-        instance.accessibilityIdentifier = "lastnameLabel"
         return instance
     }()
     //Date & claim
@@ -154,30 +132,39 @@ class CommentCell: UICollectionViewCell {
         instance.isUserInteractionEnabled = false
         instance.isSelectable = false
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-//        instance.contentInset = UIEdgeInsets(top: 1, left: 0, bottom: 1, right: 0)
         
         let constraint = instance.heightAnchor.constraint(equalToConstant: instance.contentSize.height/1.5)//instance.contentSize.height)//"text".height(withConstrainedWidth: 100, font: instance.font!))
         constraint.identifier = "height"
         constraint.isActive = true
         
-        let space = constraint.constant - instance.contentSize.height
-        let inset = max(0, space/2)
-        instance.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
-        
+        instance.publisher(for: \.contentSize, options: .new)
+            .sink { [unowned self] size in
+                guard let constraint = self.dateLabel.getConstraint(identifier: "height") else { return }
+                
+                self.setNeedsLayout()
+                constraint.constant = size.height// * 1.5
+                self.layoutIfNeeded()
+                let space = constraint.constant - size.height//self.textView.contentSize.height
+                let inset = max(0, space/2)
+                self.dateLabel.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
+            }
+            .store(in: &subscriptions)
+
         return instance
     }()
     private lazy var claimButton: UIButton = {
         let instance = UIButton()
-        instance.setImage(UIImage(systemName: "exclamationmark.square", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+        instance.setImage(UIImage(systemName: "exclamationmark.triangle", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.addTarget(self, action: #selector(self.claim), for: .touchUpInside)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        instance.contentMode = .bottom
 //        instance.alpha = 0
         
         return instance
     }()
     private lazy var supplementaryStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [dateLabel, claimButton])
+        let instance = UIStackView(arrangedSubviews: [dateLabel])//, claimButton])
         instance.axis = .horizontal
         instance.clipsToBounds = false
         instance.spacing = 4
@@ -206,6 +193,7 @@ class CommentCell: UICollectionViewCell {
     private lazy var repliesView: UIView = {
        let instance = UIView()
         instance.backgroundColor = .clear
+        instance.isUserInteractionEnabled = true
 //        instance.addSubview(replyButton)
 //        instance.addSubview(disclosureButton)
 //        instance.translatesAutoresizingMaskIntoConstraints = false
@@ -274,7 +262,7 @@ class CommentCell: UICollectionViewCell {
         instance.spacing = 0
         
         NSLayoutConstraint.activate([
-            userView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: mode == .Root ? 0.15 : 0.4),
+            userView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: mode == .Root ? 0.125 : 0.4),
         ])
 
         return instance
@@ -362,25 +350,32 @@ class CommentCell: UICollectionViewCell {
     
     @objc
     private func reply() {
-        print("")
+        guard let item = item else { return }
+        
+        replySubject.send(item)
     }
     
     @objc
     private func claim() {
+        guard let item = item else { return }
         
+        claimSubject.send(item)
     }
     
     @objc
     private func replies() {
+        guard let item = item,
+              item.replies != 0
+        else { return }
         
+        commentThreadSubject.send(item)
     }
     
     // MARK: - UI methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         claimButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        firstnameLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
-        lastnameLabel.textColor = firstnameLabel.textColor
+        setHeader()
         
         super.traitCollectionDidChange(previousTraitCollection)
         
@@ -394,9 +389,44 @@ class CommentCell: UICollectionViewCell {
         layoutIfNeeded()
     }
     
+    private func setHeader() {
+        let attrString = NSMutableAttributedString()
+        if !item.isAnonymous, let userprofile = item.userprofile {
+            if !userprofile.firstNameSingleWord.isEmpty {
+                let instance = NSAttributedString(string: userprofile.firstNameSingleWord + " ",
+                                                         attributes: [NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2) as Any,
+                                                                      NSAttributedString.Key.foregroundColor : traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.darkGray])
+                attrString.append(instance)
+                if !userprofile.lastNameSingleWord.isEmpty {
+                    let lastname = NSAttributedString(string: userprofile.lastNameSingleWord + " ",
+                                                             attributes: [NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2) as Any,
+                                                                          NSAttributedString.Key.foregroundColor : traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.darkGray])
+                    attrString.append(lastname)
+                }
+            } else {
+                let instance = NSAttributedString(string: userprofile.lastNameSingleWord + " ",
+                                                         attributes: [NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2) as Any,
+                                                                      NSAttributedString.Key.foregroundColor : traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.darkGray])
+                attrString.append(instance)
+            }
+        }
+        let date = NSAttributedString(string: item.createdAt.timeAgoDisplay(),
+                                      attributes: [NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2) as Any,
+                                                   NSAttributedString.Key.foregroundColor : traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.darkGray])
+        attrString.append(date)
+        dateLabel.attributedText = attrString
+    }
+    
     override func prepareForReuse() {
         super.prepareForReuse()
+        
+        commentThreadSubject = .init(nil)
+        replySubject = .init(nil)
+        claimSubject = .init(nil)
         avatar.clearImage()
+        item = nil
+        supplementaryStack.removeArrangedSubview(claimButton)
+        claimButton.removeFromSuperview()
     }
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        print(touches)

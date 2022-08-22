@@ -47,6 +47,9 @@ struct Notifications {
     
     struct Comments {
         static let Append                           = Notification.Name("NotificationCommentAppend")
+        static let Claim                            = Notification.Name("CommentClaim")
+        static let ClaimFailure                     = Notification.Name("CommentClaimFailure")
+        static let Ban                              = Notification.Name("CommentBan")
     }
     
     struct Surveys {

@@ -10,6 +10,8 @@ import UIKit
 import Combine
 
 class CommentsCollectionView: UICollectionView {
+    
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Comment>
 
     enum Section: Int {
         case main
@@ -20,13 +22,19 @@ class CommentsCollectionView: UICollectionView {
     }
 
     // MARK: - Public properties
-    public weak var survey: Survey!
-    public var dataItems: [Comment] {
+    public weak var survey: Survey! {
         didSet {
             reload()
         }
     }
+    public var dataItems: [Comment] {
+        guard let survey = survey else { return [] }
+        
+        return survey.commentsSortedByDate
+    }
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
+    public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
     public var commentsRequestSubject = CurrentValueSubject<[Comment]?, Never>(nil)
 //    public var commentsRequestSubject: CurrentValueSubject<[Comment], Never>!
     //New user comment publisher
@@ -68,10 +76,9 @@ class CommentsCollectionView: UICollectionView {
     
     
     // MARK: - Initialization
-    init(dataItems: [Comment] = [], callbackDelegate: CallbackObservable, mode: CommentsCollectionView.Mode, survey: Survey? = nil) {
+    init(callbackDelegate: CallbackObservable, mode: CommentsCollectionView.Mode, survey: Survey? = nil) {
         self.mode = mode
         self.survey = survey
-        self.dataItems = dataItems
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.callbackDelegate = callbackDelegate
         setupUI()
@@ -108,14 +115,43 @@ class CommentsCollectionView: UICollectionView {
             for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Append) {
                 guard let self = self,
                       let instance = notification.object as? Comment,
-                      instance.survey == self.survey
+                      instance.survey == self.survey,
+                      var snap = self.source.snapshot() as? Snapshot
                 else { return }
                 
-                if instance.isOwn {
-                    self.dataItems.insert(instance, at: 0)
-                } else {
-                    self.dataItems.append(instance)
-                }
+//                if instance.isOwn {
+//                    self.dataItems.insert(instance, at: 0)
+//                } else {
+                    snap.appendItems([instance], toSection: .main)
+//                }
+                
+                self.source.apply(snap, animatingDifferences: true)
+            }
+        })
+        tasks.append( Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Claim) {
+                guard let self = self,
+                      let instance = notification.object as? Comment,
+                      instance.survey == self.survey,
+                      var snap = self.source.snapshot() as? Snapshot,
+                      snap.itemIdentifiers.contains(instance)
+                else { return }
+                
+                snap.deleteItems([instance])
+                self.source.apply(snap, animatingDifferences: true)
+            }
+        })
+        tasks.append( Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Ban) {
+                guard let self = self,
+                      let instance = notification.object as? Comment,
+                      instance.survey == self.survey,
+                      var snap = self.source.snapshot() as? Snapshot,
+                      snap.itemIdentifiers.contains(instance)
+                else { return }
+                
+                snap.deleteItems([instance])
+                self.source.apply(snap, animatingDifferences: true)
             }
         })
     }
@@ -155,6 +191,34 @@ class CommentsCollectionView: UICollectionView {
             cell.item = item
             cell.automaticallyUpdatesBackgroundConfiguration = false
             cell.mode = .Root
+            
+            //Reply disclosure
+            cell.replySubject.sink { [weak self] in
+                guard let self = self,
+                      let item = $0
+                else { return }
+                
+                self.textField.becomeFirstResponder()
+                Fade.shared.present()
+            }.store(in: &self.subscriptions)
+            
+            //Thread disclosure
+            cell.commentThreadSubject.sink { [weak self] in
+                guard let self = self,
+                      let item = $0
+                else { return }
+                
+                self.commentThreadSubject.send(item)
+            }.store(in: &self.subscriptions)
+            
+            //Claim tap
+            cell.claimSubject.sink { [weak self] in
+                guard let self = self,
+                      let item = $0
+                else { return }
+                
+                self.claimSubject.send(item)
+            }.store(in: &self.subscriptions)
 
 //            self.modeSubject.sink {
 //#if DEBUG
@@ -197,9 +261,11 @@ class CommentsCollectionView: UICollectionView {
 // MARK: - UICollectionViewDelegate
 extension CommentsCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let cell = collectionView.cellForItem(at: indexPath) as? CommentCell {
-            //        answerListener?.onChoiceMade(cell.item)
-        }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? CommentCell,
+              cell.item.replies != 0
+        else { return }
+        
+        commentThreadSubject.send(cell.item)
     }
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
@@ -229,6 +295,7 @@ extension CommentsCollectionView: UITextFieldDelegate {
 
 }
 
+// MARK: - AccessoryInputTextFieldDelegate
 extension CommentsCollectionView: AccessoryInputTextFieldDelegate {
     func onSendEvent(_ string: String) {
         textField.resignFirstResponder()
@@ -236,5 +303,22 @@ extension CommentsCollectionView: AccessoryInputTextFieldDelegate {
         guard !string.isEmpty else { return }
         commentSubject.send(string)
 //        commentSubject.send(completion: .finished)
+    }
+}
+
+// MARK: - BannerObservable
+extension CommentsCollectionView: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
     }
 }

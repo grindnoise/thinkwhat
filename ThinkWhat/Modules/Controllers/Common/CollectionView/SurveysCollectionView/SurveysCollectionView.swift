@@ -220,7 +220,8 @@ class SurveysCollectionView: UICollectionView {
 
                     var snap = self.source.snapshot()
                     snap.deleteItems([instance])
-                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                    await self.source.apply(snap, animatingDifferences: true)
+//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
 
@@ -234,7 +235,8 @@ class SurveysCollectionView: UICollectionView {
 
                     var snap = self.source.snapshot()
                     snap.deleteItems([instance])
-                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                    await self.source.apply(snap, animatingDifferences: true)
+//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
 
@@ -250,7 +252,8 @@ class SurveysCollectionView: UICollectionView {
 
                     var snap = self.source.snapshot()
                     snap.appendItems([instance], toSection: .main)
-                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                    await self.source.apply(snap, animatingDifferences: true)
+//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
 
@@ -265,7 +268,8 @@ class SurveysCollectionView: UICollectionView {
 
                     var snap = self.source.snapshot()
                     snap.appendItems([instance], toSection: .main)
-                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                    await self.source.apply(snap, animatingDifferences: true)
+//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
 
@@ -280,7 +284,8 @@ class SurveysCollectionView: UICollectionView {
 
                     var snap = self.source.snapshot()
                     snap.appendItems([instance], toSection: .main)
-                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                    await self.source.apply(snap, animatingDifferences: true)
+//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
 
@@ -295,7 +300,8 @@ class SurveysCollectionView: UICollectionView {
 
                     var snap = self.source.snapshot()
                     snap.appendItems([instance], toSection: .main)
-                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                    await self.source.apply(snap, animatingDifferences: true)
+//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
 
@@ -309,12 +315,13 @@ class SurveysCollectionView: UICollectionView {
 
                     var snap = self.source.snapshot()
                     snap.appendItems([instance], toSection: .main)
-                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                    await self.source.apply(snap, animatingDifferences: true)
+//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
             
             //Favorite toggle
-            tasks.append(Task { [weak self] in
+            tasks.append(Task {@MainActor [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteRemove) {
                     guard let self = self,
                           self.category == .Favorite,
@@ -323,7 +330,8 @@ class SurveysCollectionView: UICollectionView {
 
                     var snap = self.source.snapshot()
                         snap.deleteItems([instance])
-                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                    await self.source.apply(snap, animatingDifferences: true)
+//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
 
@@ -338,7 +346,8 @@ class SurveysCollectionView: UICollectionView {
 
                     var snap = self.source.snapshot()
                     snap.appendItems([instance], toSection: .main)
-                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+                    await self.source.apply(snap, animatingDifferences: true)
+//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
                 }
             })
 

@@ -22,6 +22,7 @@ protocol PollViewInput: AnyObject {
     var mode: PollController.Mode { get }
     
     func onClaim(_: Claim)
+    func onCommentClaim(comment: Comment, reason: Claim)
     func onAddFavorite(_: Bool)
     func onVote(_: Answer)
     func onImageTapped(image: UIImage, title: String)
@@ -32,6 +33,7 @@ protocol PollViewInput: AnyObject {
     func onVotersTapped(answer: Answer, color: UIColor)
     func postComment(_: String, replyTo: Comment?)
     func requestComments(_:[Comment])
+    func openCommentThread(_: Comment)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -45,6 +47,7 @@ protocol PollControllerInput: AnyObject {
     func loadPoll(_: SurveyReference, incrementViewCounter: Bool)
     func addFavorite(_: Bool)
     func claim(_: Claim)
+    func commentClaim(comment: Comment, reason: Claim)
     func vote(_: Answer)
     func addView()
     func updateResultsStats(_: SurveyReference)

@@ -1381,6 +1381,29 @@ class API {
             }
         }
         
+        public func claimComment(comment: Comment, reason: Claim) async throws {
+            guard let url = API_URLS.Surveys.claimComment else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["comment_id": comment.id, "claim_id": reason.id]
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                
+                guard let json = try JSON(data: data, options: .mutableContainers) as? JSON,
+                      let status = json["status"].string,
+                      status == "ok"
+                else { return }
+                
+                comment.isClaimed = true
+            } catch let error {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                NotificationCenter.default.post(name: Notifications.Comments.ClaimFailure, object: comment)
+                throw error
+            }
+        }
+        
         public func requestRootComments(survey: Survey, excludedComments: [Comment] = []) async throws {
             guard let url = API_URLS.Surveys.getRootComments else { throw APIError.invalidURL }
             
@@ -1389,10 +1412,6 @@ class API {
             if !excludedComments.isEmpty {
                 parameters["ids"] = excludedComments.map { $0.id }
             }
-            
-#if DEBUG
-                print(parameters)
-#endif
             
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
@@ -1403,9 +1422,6 @@ class API {
                                                            DateFormatter.dateFormatter ]
                 await MainActor.run {
                     let instances = try? decoder.decode([Comment].self, from: data)
-#if DEBUG
-                    print(instances?.count)
-#endif
                 }
             } catch let error {
                 throw error

@@ -21,7 +21,7 @@ class Shimmer: UIView {
         instance.startPoint = CGPoint(x: 0.0, y: 0.5)
         instance.endPoint = CGPoint(x: 1.0, y: 0.5)
         instance.locations = [0.4, 0.5, 0.6]
-        instance.zPosition = .greatestFiniteMagnitude
+        instance.zPosition = 100//.greatestFiniteMagnitude
         layer.addSublayer(instance)
         
         return instance
@@ -34,7 +34,7 @@ class Shimmer: UIView {
                 animation.toValue = [0.8, 0.9, 1.0]
                 animation.isRemovedOnCompletion = false
                 animation.duration = 1.5
-                animation.repeatCount = HUGE
+                animation.repeatCount = 100//.greatestFiniteMagnitude
                 gradient.add(animation, forKey: "shimmering")
             } else {
                 gradient.removeAllAnimations()

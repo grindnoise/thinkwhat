@@ -37,7 +37,8 @@ class CommentsSectionCell: UICollectionViewCell {
             if item.isCommentingAllowed {
                 
                 disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
-                collectionView.dataItems = item.commentsSortedByDate
+//                collectionView.survey = item
+//                collectionView.dataItems = item.commentsSortedByDate
             } else {
                 disclosureLabel.text = "comments_disabled".localized.uppercased()
                 closedConstraint.isActive = true
@@ -57,6 +58,8 @@ class CommentsSectionCell: UICollectionViewCell {
         }
     }
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
+    public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentsRequestSubject = CurrentValueSubject<[Comment], Never>([])
     public var lastPostedComment: Comment? {
         didSet {
@@ -107,12 +110,24 @@ class CommentsSectionCell: UICollectionViewCell {
     private lazy var collectionView: CommentsCollectionView = {
         let instance = CommentsCollectionView(callbackDelegate: self, mode: .Root)
         
+        instance.claimSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                  let string = $0
+            else { return }
+            
+            self.claimSubject.send($0)
+//            self.claimSubject.send(completion: .finished)
+        }.store(in: &subscriptions)
+        
         instance.commentSubject.sink {
             print($0)
         } receiveValue: { [weak self] in
             guard let self = self,
                   let string = $0
             else { return }
+            
             self.commentSubject.send($0)
 //            self.commentSubject.send(completion: .finished)
         }.store(in: &subscriptions)
@@ -123,8 +138,17 @@ class CommentsSectionCell: UICollectionViewCell {
             guard let self = self,
                   let comments = $0 as? [Comment]
             else { return }
+            
             self.commentsRequestSubject.send(comments)
         }.store(in: &subscriptions)
+        
+        instance.commentThreadSubject.sink { [weak self] in
+            guard let self = self,
+                  let value = $0
+            else { return }
+            
+            self.commentThreadSubject.send(value)
+        }
         
         return instance
         }()

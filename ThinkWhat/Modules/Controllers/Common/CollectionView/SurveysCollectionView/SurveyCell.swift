@@ -17,6 +17,61 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         didSet {
             guard let item = item else { return }
 
+            //Update survey stats every n seconds
+            let events = eventEmitter.emit(every: 2)
+            animTask = Task {@MainActor [weak self] in
+                for await _ in events {
+                    guard let self = self,
+                          let item = self.item,
+                          item.isHot,
+                          let initialCategory = Icon.Category(rawValue: item.topic.id) as? Icon.Category,
+                          let destinationCategory = self.icon.category != .Hot ? .Hot : Icon.Category(rawValue: item.topic.id)! as? Icon.Category,
+                          let destinationColor = self.icon.category != .Hot ? UIColor.systemRed : UIColor.white as? UIColor,
+                          let destinationPath = (icon.getLayer(destinationCategory) as? CAShapeLayer)?.path,
+//                          let finalPath = self.icon.category != .Hot ? destinationPath.getScaledPath(size: destinationPath.boundingBox.size, scaleMultiplicator: 1) : destinationPath as? CGPath,
+                          let shapeLayer = icon.icon as? CAShapeLayer
+                    else { return }
+                    
+                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.75, delay: 0) {
+                        self.icon.backgroundColor = destinationCategory == .Hot ? .clear : self.item.topic.tagColor
+                    }
+
+                    let pathAnim = Animations.get(property: .Path,
+                                                  fromValue: shapeLayer.path as Any,
+                                                  toValue: destinationPath,
+                                                  duration: 0.35,
+                                                  delay: 0,
+                                                  repeatCount: 0,
+                                                  autoreverses: false,
+                                                  timingFunction: CAMediaTimingFunctionName.easeIn,
+                                                  delegate: self,
+                                                  isRemovedOnCompletion: false,
+                                                  completionBlocks:
+                                                    [{ [weak self] in
+                                                        guard let self = self else { return }
+                                                        self.icon.category = destinationCategory
+                                                    }])
+                    shapeLayer.add(pathAnim, forKey: nil)
+                    shapeLayer.path = destinationPath
+                    
+                    
+                    
+                    let colorAnim = Animations.get(property: .FillColor,
+                                                   fromValue: self.icon.iconColor.cgColor as Any,
+                                                   toValue: destinationColor.cgColor as Any,
+                                                         duration: 0.35,
+                                                         delay: 0,
+                                                         repeatCount: 0,
+                                                         autoreverses: false,
+                                                         timingFunction: CAMediaTimingFunctionName.easeIn,
+                                                         delegate: nil,
+                                                         isRemovedOnCompletion: false)
+                    self.icon.icon.add(colorAnim, forKey: nil)
+                    self.icon.iconColor = destinationColor
+                }
+            }
+            
+            
 //            verticalStack.removeArrangedSubview(descriptionLabel)
 //            verticalStack.removeArrangedSubview(imageView)
 //            descriptionLabel.removeFromSuperview()
@@ -187,18 +242,18 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                 instance.addEquallyTo(to: container)
                 marksStackView.addArrangedSubview(container)
             }
-            if item.isHot {
-                let container = UIView()
-                container.backgroundColor = .clear
-                container.accessibilityIdentifier = "isHot"
-                container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                
-                let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-                instance.tintColor = .systemRed
-                instance.contentMode = .scaleAspectFit
-                instance.addEquallyTo(to: container)
-                marksStackView.addArrangedSubview(container)
-            }
+//            if item.isHot {
+//                let container = UIView()
+//                container.backgroundColor = .clear
+//                container.accessibilityIdentifier = "isHot"
+//                container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+//
+//                let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+//                instance.tintColor = .systemRed
+//                instance.contentMode = .scaleAspectFit
+//                instance.addEquallyTo(to: container)
+//                marksStackView.addArrangedSubview(container)
+//            }
             
             if titleLabel.getConstraint(identifier: "height").isNil, descriptionLabel.getConstraint(identifier: "height").isNil, topicView.getConstraint(identifier: "height").isNil {
                 let constraint = titleLabel.heightAnchor.constraint(equalToConstant: 300)
@@ -228,6 +283,10 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    private lazy var eventEmitter: EventEmitter = {
+        return EventEmitter()
+    }()
+    private var animTask: Task<Void, Never>?
     private lazy var titleLabel: UILabel = {
         let instance = UILabel()
         instance.textAlignment = .left
@@ -438,7 +497,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         let instance = Icon(category: Icon.Category.Anon)
         instance.iconColor = .white
         instance.isRounded = true
-//        instance.scaleMultiplicator = 1.2
+        instance.scaleMultiplicator = 1.7
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         
         observers.append(instance.observe(\Icon.bounds, options: .new) { view, change in
@@ -740,6 +799,8 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
 //                    print("UIApplication.didBecomeActiveNotification")
 //                }
 //            })
+        
+
             tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
                     await MainActor.run {
@@ -874,50 +935,50 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                     }
                 }
             })
-            tasks.append(Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
-                    await MainActor.run {
-                        guard let self = self,
-                              let item = self.item,
-                              let object = notification.object as? SurveyReference,
-                              item === object
-                        else { return }
-                        switch item.isHot {
-                        case true:
-                            var stackView: UIStackView!
-                            if let _stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
-                                stackView = _stackView
-                            } else {
-                                stackView = UIStackView()
-                                stackView.spacing = 0
-                                stackView.backgroundColor = .clear
-                                stackView.accessibilityIdentifier = "marksStackView"
-                                self.observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
-                                    guard let newValue = change.newValue else { return }
-                                    view.cornerRadius = newValue.height/2.25
-                                })
-                                self.topicHorizontalStackView.addArrangedSubview(stackView)
-                            }
-                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isHot"}).isEmpty else { return }
-                            let container = UIView()
-                            container.backgroundColor = .clear
-                            container.accessibilityIdentifier = "isHot"
-                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                            
-                            let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-                            instance.tintColor = .systemRed
-                            instance.contentMode = .scaleAspectFit
-                            instance.addEquallyTo(to: container)
-                            stackView.insertArrangedSubview(container, at: stackView.arrangedSubviews.count == 0 ? 0 : stackView.arrangedSubviews.count)
-                        case false:
-                            guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
-                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isHot" }).first else { return }
-                            stackView.removeArrangedSubview(mark)
-                            mark.removeFromSuperview()
-                        }
-                    }
-                }
-            })
+//            tasks.append(Task { [weak self] in
+//                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
+//                    await MainActor.run {
+//                        guard let self = self,
+//                              let item = self.item,
+//                              let object = notification.object as? SurveyReference,
+//                              item === object
+//                        else { return }
+//                        switch item.isHot {
+//                        case true:
+//                            var stackView: UIStackView!
+//                            if let _stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
+//                                stackView = _stackView
+//                            } else {
+//                                stackView = UIStackView()
+//                                stackView.spacing = 0
+//                                stackView.backgroundColor = .clear
+//                                stackView.accessibilityIdentifier = "marksStackView"
+//                                self.observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
+//                                    guard let newValue = change.newValue else { return }
+//                                    view.cornerRadius = newValue.height/2.25
+//                                })
+//                                self.topicHorizontalStackView.addArrangedSubview(stackView)
+//                            }
+//                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isHot"}).isEmpty else { return }
+//                            let container = UIView()
+//                            container.backgroundColor = .clear
+//                            container.accessibilityIdentifier = "isHot"
+//                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+//
+//                            let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+//                            instance.tintColor = .systemRed
+//                            instance.contentMode = .scaleAspectFit
+//                            instance.addEquallyTo(to: container)
+//                            stackView.insertArrangedSubview(container, at: stackView.arrangedSubviews.count == 0 ? 0 : stackView.arrangedSubviews.count)
+//                        case false:
+//                            guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
+//                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isHot" }).first else { return }
+//                            stackView.removeArrangedSubview(mark)
+//                            mark.removeFromSuperview()
+//                        }
+//                    }
+//                }
+//            })
             tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
                     await MainActor.run {
@@ -1202,6 +1263,12 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
         shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
         
+        eventEmitter.task?.cancel()
+        animTask?.cancel()
+        
+        icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        icon.setIconColor(.white)
+        
         firstnameLabel.text = ""
         lastnameLabel.text = ""
         avatar.clearImage()
@@ -1220,5 +1287,12 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         var config = UIBackgroundConfiguration.listPlainCell()
         config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
         backgroundConfiguration = config
+    }
+}
+extension SurveyCell: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
+            completionBlocks.forEach{ $0() }
+        }
     }
 }

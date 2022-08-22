@@ -24,9 +24,28 @@ class PollView: UIView {
     private lazy var collectionView: PollCollectionView = {
         let instance = PollCollectionView(host: self, poll: survey!, callbackDelegate: self)
         instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
-        //////            UIApplication.shared.windows[0].safeAreaInsets.bottom, right: 0.0)
         instance.layer.masksToBounds = false
         instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: 100, right: instance.contentInset.right)
+        
+        //Claim
+        instance.claimSubject.sink { [unowned self] in
+            guard let item = $0 else { return }
+            
+            //Show popup
+            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
+            banner.accessibilityIdentifier = "claim"
+            let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
+            
+            claimContent.claimSubject.sink { [weak self] in
+                guard let self = self,
+                      let claim = $0
+                else { return }
+                
+                self.viewInput?.onCommentClaim(comment: item, reason: claim)
+            }.store(in: &self.subscriptions)
+            
+            banner.present(content: claimContent)
+        }.store(in: &subscriptions)
         return instance
     }()
     private var isLoadingData = false
