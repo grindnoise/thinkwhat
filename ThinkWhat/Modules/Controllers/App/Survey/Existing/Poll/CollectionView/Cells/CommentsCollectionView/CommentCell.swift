@@ -305,7 +305,7 @@ class CommentCell: UICollectionViewCell {
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setObservers()
+        setTasks()
         setupUI()
     }
     
@@ -340,8 +340,22 @@ class CommentCell: UICollectionViewCell {
         closedConstraint.isActive = true
     }
     
-    private func setObservers() {
-        
+    private func setTasks() {
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {
+                guard let self = self,
+                      let instance = notification.object as? Comment,
+                      instance == self.item
+                else { return }
+                
+                self.disclosureButton.alpha = 1
+                let attrString = NSMutableAttributedString(string: "\(instance.replies)", attributes: [
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+                ])
+                self.disclosureButton.setAttributedTitle(attrString, for: .normal)
+            }
+        })
     }
     
     private func updateAppearance() {

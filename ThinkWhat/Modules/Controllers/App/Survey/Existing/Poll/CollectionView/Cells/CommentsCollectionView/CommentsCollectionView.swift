@@ -20,6 +20,10 @@ class CommentsCollectionView: UICollectionView {
     enum Mode {
         case Root, Reply
     }
+    
+    enum CommentMode {
+        case Root, Reply
+    }
 
     // MARK: - Public properties
     public weak var survey: Survey! {
@@ -33,6 +37,7 @@ class CommentsCollectionView: UICollectionView {
         return survey.commentsSortedByDate
     }
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
+    public let replySubject = CurrentValueSubject<[Comment: String]?, Never>(nil)
     public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
     public var commentsRequestSubject = CurrentValueSubject<[Comment]?, Never>(nil)
@@ -62,6 +67,12 @@ class CommentsCollectionView: UICollectionView {
     
     // MARK: - Private properties
     private var mode: Mode
+    private var commentMode: CommentMode = .Root
+    private var replyTo: Comment? {
+        didSet {
+            commentMode = replyTo.isNil ? .Root : .Reply
+        }
+    }
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
@@ -105,27 +116,32 @@ class CommentsCollectionView: UICollectionView {
 
     // MARK: - UI functions
     private func setTasks() {
-        tasks.append( Task { @MainActor [weak self] in
+        tasks.append( Task { [weak self] in
             for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
                 guard let self = self else { return }
-                self.textField.resignFirstResponder()
+                await MainActor.run {
+                    self.textField.resignFirstResponder()
+                }
             }
         })
-        tasks.append( Task { @MainActor [weak self] in
+        tasks.append( Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Append) {
                 guard let self = self,
                       let instance = notification.object as? Comment,
+                      instance.replyToId.isNil,
                       instance.survey == self.survey,
                       var snap = self.source.snapshot() as? Snapshot
                 else { return }
                 
-//                if instance.isOwn {
-//                    self.dataItems.insert(instance, at: 0)
-//                } else {
+                if instance.isOwn && abs(instance.createdAt.days(from: Date())) < 1, let firstItem = snap.itemIdentifiers.first as? Comment {
+                    snap.insertItems([instance], beforeItem: firstItem)
+                } else {
                     snap.appendItems([instance], toSection: .main)
-//                }
+                }
                 
-                self.source.apply(snap, animatingDifferences: true)
+                await MainActor.run {
+                    self.source.apply(snap, animatingDifferences: true)
+                }
             }
         })
         tasks.append( Task { @MainActor [weak self] in
@@ -178,6 +194,8 @@ class CommentsCollectionView: UICollectionView {
             supplementaryView.callback = { [weak self] in
                 guard let self = self else { return }
 
+                self.textField.staticText = ""
+                self.replyTo = nil
                 self.textField.becomeFirstResponder()
                 Fade.shared.present()
             }
@@ -198,6 +216,14 @@ class CommentsCollectionView: UICollectionView {
                       let item = $0
                 else { return }
                 
+                if let userprofile = item.userprofile {
+                    if !userprofile.firstNameSingleWord.isEmpty {
+                        self.textField.staticText = "@" + userprofile.firstNameSingleWord
+                    } else if !userprofile.lastNameSingleWord.isEmpty {
+                        self.textField.staticText = "@" + userprofile.lastNameSingleWord
+                    }
+                }
+                self.replyTo = item
                 self.textField.becomeFirstResponder()
                 Fade.shared.present()
             }.store(in: &self.subscriptions)
@@ -261,11 +287,22 @@ class CommentsCollectionView: UICollectionView {
 // MARK: - UICollectionViewDelegate
 extension CommentsCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? CommentCell,
-              cell.item.replies != 0
-        else { return }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? CommentCell else { return }
         
-        commentThreadSubject.send(cell.item)
+        if cell.item.replies != 0 {
+            commentThreadSubject.send(cell.item)
+        } else if !cell.item.isOwn {
+            Fade.shared.present()
+            if let userprofile = cell.item.userprofile {
+                if !userprofile.firstNameSingleWord.isEmpty {
+                    textField.staticText = "@" + userprofile.firstNameSingleWord
+                } else if !userprofile.lastNameSingleWord.isEmpty {
+                    textField.staticText = "@" + userprofile.lastNameSingleWord
+                }
+            }
+            replyTo = cell.item
+            textField.becomeFirstResponder()
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
@@ -298,9 +335,17 @@ extension CommentsCollectionView: UITextFieldDelegate {
 // MARK: - AccessoryInputTextFieldDelegate
 extension CommentsCollectionView: AccessoryInputTextFieldDelegate {
     func onSendEvent(_ string: String) {
+        
         textField.resignFirstResponder()
         Fade.shared.dismiss()
         guard !string.isEmpty else { return }
+        guard replyTo.isNil else {
+            guard let item = replyTo,
+                  let trimmed = string.replacingOccurrences(of: textField.staticText + " ", with: "") as? String
+            else { return }
+            replySubject.send([item: trimmed])
+            return
+        }
         commentSubject.send(string)
 //        commentSubject.send(completion: .finished)
     }

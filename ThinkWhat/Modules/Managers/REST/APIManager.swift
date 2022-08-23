@@ -1375,6 +1375,13 @@ class API {
                                                            DateFormatter.dateFormatter ]
                 
                 let instance = try decoder.decode(Comment.self, from: data)
+                if let parent = replyTo, let survey = replyTo?.survey {
+                    parent.replies += 1
+                    survey.reference.commentsTotal += 1
+                    await MainActor.run {
+                        NotificationCenter.default.post(name: Notifications.Comments.ChildrenCountChange, object: parent)
+                    }
+                }
                 return instance
             } catch let error {
                 throw error

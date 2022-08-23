@@ -186,11 +186,13 @@ class Survey: Decodable {
         }
     }
     var commentsSortedByDate: [Comment] {
-        let all = Comments.shared.all.filter { $0.survey == self && $0.isClaimed == false && $0.isBanned == false }
-        //First of all own
-        let own = all.filter { $0.isOwn }.sorted { $0.createdAt < $1.createdAt }
-        let other = all.filter { !$0.isOwn }.sorted { $0.createdAt > $1.createdAt }
-        return own + other
+        return Comments.shared.all.filter { $0.survey == self && $0.isClaimed == false && $0.isBanned == false }
+//            .sorted { $0.createdAt > $1.createdAt }
+//        let all = Comments.shared.all.filter { $0.survey == self && $0.isClaimed == false && $0.isBanned == false }
+//        //First of all own
+//        let own = all.filter { $0.isOwn }.sorted { $0.createdAt < $1.createdAt }
+//        let other = all.filter { !$0.isOwn }.sorted { $0.createdAt > $1.createdAt }
+//        return own + other
     }
     
     var watchers:               Int = 0

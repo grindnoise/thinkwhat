@@ -29,6 +29,11 @@ final class AccessoryInputTextField: UITextField {
     // MARK: - Public properties
     public var placeholderText: String
     public var textViewFont: UIFont
+    public var staticText: String = "" {
+        didSet {
+            textView.staticText = staticText
+        }
+    }
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -155,6 +160,46 @@ final class AccessoryInputTextField: UITextField {
 
 class FlexibleTextView: UITextView {
     // limit the height of expansion per intrinsicContentSize
+    
+    fileprivate var staticText: String = "" {
+        didSet {
+            guard !staticText.isEmpty else {
+                text = ""
+                placeholderTextView.isHidden = !text.isEmpty
+                attributedText = NSAttributedString(string: "test", attributes: [
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.label,
+                    NSAttributedString.Key.backgroundColor: UIColor.clear
+                    ])
+                attributedText = NSAttributedString(string: "", attributes: [
+                    NSAttributedString.Key.font: font as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.label,
+                    NSAttributedString.Key.backgroundColor: UIColor.clear
+                    ])
+                return
+            }
+            text = ""
+            placeholderTextView.isHidden = true
+            attributedText =  NSAttributedString(string: staticText, attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .body) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label,
+                NSAttributedString.Key.backgroundColor: UIColor.systemGray2
+            ])
+            let attrString = NSMutableAttributedString()
+            attrString.append(NSAttributedString(string: staticText, attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .body) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label,
+                NSAttributedString.Key.backgroundColor: UIColor.systemGray2
+            ]))
+            staticText += " "
+            attrString.append(NSAttributedString(string: " ", attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label,
+                NSAttributedString.Key.backgroundColor: UIColor.clear
+                ]))
+            attributedText = attrString
+        }
+    }
     var maxHeight: CGFloat = 0.0
     private let placeholderTextView: UITextView = {
         let tv = UITextView()
@@ -176,6 +221,7 @@ class FlexibleTextView: UITextView {
     
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
+        delegate = self
         isScrollEnabled = false
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         NotificationCenter.default.addObserver(self, selector: #selector(UITextInputDelegate.textDidChange(_:)), name: UITextView.textDidChangeNotification, object: self)
@@ -241,6 +287,23 @@ class FlexibleTextView: UITextView {
         // needed incase isScrollEnabled is set to true which stops automatically calling invalidateIntrinsicContentSize()
         invalidateIntrinsicContentSize()
         placeholderTextView.isHidden = !text.isEmpty
+    }
+    
+    
+}
+
+extension FlexibleTextView: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        guard !staticText.isEmpty else { return true }
+        
+        let minCharacters = staticText.count
+
+        if range.location < minCharacters { return false }
+        
+        if text.count + minCharacters < minCharacters {
+            return false
+        }
+        return true
     }
 }
 

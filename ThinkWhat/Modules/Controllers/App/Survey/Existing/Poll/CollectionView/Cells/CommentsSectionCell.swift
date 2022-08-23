@@ -58,6 +58,7 @@ class CommentsSectionCell: UICollectionViewCell {
         }
     }
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
+    public let replySubject = CurrentValueSubject<[Comment: String]?, Never>(nil)
     public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentsRequestSubject = CurrentValueSubject<[Comment], Never>([])
@@ -132,11 +133,22 @@ class CommentsSectionCell: UICollectionViewCell {
 //            self.commentSubject.send(completion: .finished)
         }.store(in: &subscriptions)
         
+        instance.replySubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                  let string = $0
+            else { return }
+            
+            self.replySubject.send($0)
+//            self.commentSubject.send(completion: .finished)
+        }.store(in: &subscriptions)
+        
         instance.commentsRequestSubject.sink {
             print($0)
         } receiveValue: { [weak self] in
             guard let self = self,
-                  let comments = $0 as? [Comment]
+                  let comments = $0
             else { return }
             
             self.commentsRequestSubject.send(comments)
@@ -148,7 +160,7 @@ class CommentsSectionCell: UICollectionViewCell {
             else { return }
             
             self.commentThreadSubject.send(value)
-        }
+        }.store(in: &subscriptions)
         
         return instance
         }()
@@ -292,7 +304,12 @@ class CommentsSectionCell: UICollectionViewCell {
                       let object = notification.object as? SurveyReference,
                       item.reference == object
                 else { return }
+                
                 self.disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
+                guard let constraint = self.disclosureLabel.getConstraint(identifier: "width") else { return }
+                self.setNeedsLayout()
+                constraint.constant = self.disclosureLabel.text!.width(withConstrainedHeight: 100, font: self.disclosureLabel.font)
+                self.layoutIfNeeded()
             }
         })
     }

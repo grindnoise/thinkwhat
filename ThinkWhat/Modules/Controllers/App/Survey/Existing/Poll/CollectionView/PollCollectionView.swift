@@ -218,13 +218,24 @@ class PollCollectionView: UICollectionView {
                 self.claimSubject.send($0)
             }.store(in: &self.subscriptions)
             
-            //Subscription for posting
+            //Subscription for commenting
             cell.commentSubject.sink { [weak self] in
                 guard let self = self,
                       let string = $0
                 else { return }
                 
                 self.host.postComment(string)
+            }.store(in: &self.subscriptions)
+            
+            //Subscription for reply to comment
+            cell.replySubject.sink { [weak self] in
+                guard let self = self,
+                      let dict = $0,
+                      let string = dict.values.first,
+                      let comment = dict.keys.first
+                else { return }
+                
+                self.host.postComment(string, replyTo: comment)
             }.store(in: &self.subscriptions)
             
             //Subscription for request comments

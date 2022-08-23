@@ -46,6 +46,16 @@ class PollView: UIView {
             
             banner.present(content: claimContent)
         }.store(in: &subscriptions)
+        
+        //Subscibe for thread disclosure
+        instance.commentThreadSubject.sink { [weak self] in
+            guard let self = self,
+                  let comment = $0 as? Comment
+            else { return }
+            
+            self.viewInput?.openCommentThread(comment)
+        }.store(in: &self.subscriptions)
+        
         return instance
     }()
     private var isLoadingData = false

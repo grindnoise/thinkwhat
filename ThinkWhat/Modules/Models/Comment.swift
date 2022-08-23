@@ -21,9 +21,9 @@ class Comments {
                 return
             }
             NotificationCenter.default.post(name: Notifications.Comments.Append, object: lastInstance)
-            if let survey = lastInstance.survey {
-                survey.reference.commentsTotal += 1
-            }
+//            if let survey = lastInstance.survey {
+//                survey.reference.commentsTotal += 1
+//            }
         }
     }
     
@@ -53,7 +53,7 @@ class Comment: Decodable {
     let id: Int
     let body: String
     let surveyId: Int?
-    let replies: Int
+    var replies: Int
     var survey: Survey? {
         return Surveys.shared.all.filter { $0.id == surveyId }.first
     }
@@ -61,6 +61,7 @@ class Comment: Decodable {
     let anonUsername: String
     let createdAt: Date
     let replyToId: Int?
+//    let parentId: Int?
     var replyTo: Comment? {
         return Comments.shared.all.filter { $0.id == replyToId }.first
     }
@@ -70,7 +71,11 @@ class Comment: Decodable {
     var parent: Comment? {
         return Comments.shared.all.filter({ $0.children.contains(self) }).first
     }
-    var children: [Comment] = []
+    var children: [Comment] = [] //{
+//        didSet {
+//            NotificationCenter.default.post(name: Notifications.Comments.ChildrenCountChange, object: self)
+//        }
+//    }
     var isParentNode: Bool {
         return !children.isEmpty
     }
@@ -110,6 +115,7 @@ class Comment: Decodable {
             children        = (try? container.decode([Comment].self, forKey: .children)) ?? []
             replies         = try container.decode(Int.self, forKey: .replies)
             replyToId       = try container.decodeIfPresent(Int.self, forKey: .replyTo)
+//            parentId        = try container.decodeIfPresent(Int.self, forKey: .parent)
             
             if Comments.shared.all.filter({ $0 == self }).isEmpty {
                 Comments.shared.all.append(self)

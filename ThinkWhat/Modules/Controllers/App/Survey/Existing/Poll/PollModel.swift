@@ -48,6 +48,7 @@ extension PollModel: PollControllerInput {
         Task {
             do {
                 let instance = try await API.shared.surveys.postComment(comment, survey: survey, replyTo: replyTo)
+                guard replyTo.isNil else { return }
                 await MainActor.run {
                     modelOutput?.commentPostCallback(.success(instance))
                 }
