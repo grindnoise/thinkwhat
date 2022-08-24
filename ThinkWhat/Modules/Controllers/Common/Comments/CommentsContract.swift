@@ -16,7 +16,7 @@ protocol CommentsViewInput: class {
     var controllerOutput: CommentsControllerOutput? { get set }
     var controllerInput: CommentsControllerInput? { get set }
     
-    // View input methods here
+    func requestComments(exclude: [Comment])
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -26,14 +26,14 @@ protocol CommentsControllerInput: class {
     
     var modelOutput: CommentsModelOutput? { get set }
     
-    // Controller input methods here
+    func requestComments(rootComment: Comment, exclude: [Comment])
 }
 
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
 protocol CommentsModelOutput: class {
-    // Model output methods here
+    var survey: Survey? { get }
 }
 
 /// *Controller* returns a UI-representable result to the *View*

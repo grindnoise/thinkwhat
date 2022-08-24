@@ -7,17 +7,75 @@
 //
 
 import UIKit
+import Combine
 
 class CommentsView: UIView {
     
-    // MARK: - Properties
+    // MARK: - Public properties
     weak var viewInput: CommentsViewInput?
+    public var rootComment: Comment
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    private lazy var collectionView: CommentsCollectionView = {
+        let instance = CommentsCollectionView(rootComment: rootComment, survey: rootComment.survey)
+        
+        instance.claimSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                  let string = $0
+            else { return }
+            
+        }.store(in: &subscriptions)
+        
+        instance.commentSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                  let string = $0
+            else { return }
+            
+            
+        }.store(in: &subscriptions)
+        
+        instance.replySubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                  let string = $0
+            else { return }
+            
+        }.store(in: &subscriptions)
+        
+        instance.commentsRequestSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                  let comments = $0
+            else { return }
+            
+            self.viewInput?.requestComments(exclude: comments)
+        }.store(in: &subscriptions)
+        
+        instance.commentThreadSubject.sink { [weak self] in
+            guard let self = self,
+                  let value = $0
+            else { return }
+            
+            
+        }.store(in: &subscriptions)
+        
+        return instance
+        }()
     
     // MARK: - Destructor
     deinit {
-//        observers.forEach { $0.invalidate() }
-//        tasks.forEach { $0?.cancel() }
-//        subscriptions.forEach { $0.cancel() }
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
@@ -25,9 +83,14 @@ class CommentsView: UIView {
     }
     
     // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(comment: Comment) {
+        self.rootComment = comment
+        super.init(frame: .zero)
         setupUI()
+    }
+    
+    override init(frame: CGRect) {
+        fatalError("init(frame:) has not been implemented")
     }
     
     required init?(coder: NSCoder) {
@@ -36,7 +99,8 @@ class CommentsView: UIView {
     
     // MARK: - Private methods
     private func setupUI() {
-        backgroundColor = .red
+        backgroundColor = .systemBackground
+        collectionView.addEquallyTo(to: self)
     }
     
     // MARK: - Overriden methods

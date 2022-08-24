@@ -41,8 +41,7 @@ class CommentsController: UIViewController {
     // MARK: - Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-       
-        let view = CommentsView()
+        let view = CommentsView(comment: item)
         let model = CommentsModel()
                
         self.controllerOutput = view
@@ -53,6 +52,8 @@ class CommentsController: UIViewController {
             .modelOutput = self
         
         self.view = view as UIView
+        
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
 
     // MARK: - Properties
@@ -62,10 +63,14 @@ class CommentsController: UIViewController {
 
 // MARK: - View Input
 extension CommentsController: CommentsViewInput {
-    // Implement methods
+    func requestComments(exclude: [Comment]) {
+        controllerInput?.requestComments(rootComment: item, exclude: exclude)
+    }
 }
 
 // MARK: - Model Output
 extension CommentsController: CommentsModelOutput {
-    // Implement methods
+    var survey: Survey? {
+        return item.survey
+    }
 }

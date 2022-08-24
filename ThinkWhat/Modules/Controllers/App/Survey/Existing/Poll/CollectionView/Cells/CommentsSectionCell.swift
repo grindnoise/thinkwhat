@@ -109,7 +109,7 @@ class CommentsSectionCell: UICollectionViewCell {
         return disclosureIndicator
     }()
     private lazy var collectionView: CommentsCollectionView = {
-        let instance = CommentsCollectionView(callbackDelegate: self, mode: .Root)
+        let instance = CommentsCollectionView(rootComment: nil)
         
         instance.claimSubject.sink {
             print($0)

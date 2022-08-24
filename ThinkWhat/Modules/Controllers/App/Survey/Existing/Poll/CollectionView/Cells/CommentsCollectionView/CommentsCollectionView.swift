@@ -18,7 +18,7 @@ class CommentsCollectionView: UICollectionView {
     }
 
     enum Mode {
-        case Root, Reply
+        case Root, Tree
     }
     
     enum CommentMode {
@@ -31,9 +31,19 @@ class CommentsCollectionView: UICollectionView {
             reload()
         }
     }
+    public var rootComment: Comment? {
+        didSet {
+            guard !rootComment.isNil else { return }
+            mode = .Tree
+            reload()
+        }
+    }
     public var dataItems: [Comment] {
+        if let rootComment = rootComment, mode == .Tree {
+            var items = [rootComment] + rootComment.children
+            return items
+        }
         guard let survey = survey else { return [] }
-        
         return survey.commentsSortedByDate
     }
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
@@ -76,7 +86,6 @@ class CommentsCollectionView: UICollectionView {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    private weak var callbackDelegate: CallbackObservable?
     private var source: UICollectionViewDiffableDataSource<Section, Comment>!
     private lazy var textField: AccessoryInputTextField = {
         let instance = AccessoryInputTextField(placeholder: "add_comment".localized, font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!, delegate: self)
@@ -87,11 +96,11 @@ class CommentsCollectionView: UICollectionView {
     
     
     // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable, mode: CommentsCollectionView.Mode, survey: Survey? = nil) {
-        self.mode = mode
+    init(rootComment: Comment?, survey: Survey? = nil) {
         self.survey = survey
+        self.rootComment = rootComment
+        self.mode = rootComment.isNil ? .Root : .Tree
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
-        self.callbackDelegate = callbackDelegate
         setupUI()
         setTasks()
     }
@@ -180,7 +189,9 @@ class CommentsCollectionView: UICollectionView {
 //            configuration.headerMode = .firstItemInSection
             configuration.backgroundColor = .clear
             configuration.showsSeparators = false
-            configuration.headerMode = .supplementary
+            if self.mode == .Root {
+                configuration.headerMode = .supplementary
+            }
 
             let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
             sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 0, trailing: sectionLayout.contentInsets.trailing)
@@ -208,7 +219,12 @@ class CommentsCollectionView: UICollectionView {
             cell.backgroundConfiguration = configuration
             cell.item = item
             cell.automaticallyUpdatesBackgroundConfiguration = false
-            cell.mode = .Root
+            if self.mode == .Tree {
+                cell.mode = indexPath.row == 0 ? .Root : .Tree
+            } else {
+                cell.mode = .Root
+            }
+                
             
             //Reply disclosure
             cell.replySubject.sink { [weak self] in
@@ -315,10 +331,8 @@ extension CommentsCollectionView: UICollectionViewDelegate {
         
         
         if dataItems.count < 10 {
-//            if commentsRequestSubject.isNil { commentsRequestSubject = CurrentValueSubject<[Comment], Never>([]) }
             commentsRequestSubject.send(dataItems)
         } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
-//            if commentsRequestSubject.isNil { commentsRequestSubject = CurrentValueSubject<[Comment], Never>([]) }
             commentsRequestSubject.send(dataItems)
         }
     }

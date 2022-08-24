@@ -262,7 +262,7 @@ class CommentCell: UICollectionViewCell {
         instance.spacing = 0
         
         NSLayoutConstraint.activate([
-            userView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: mode == .Root ? 0.125 : 0.4),
+            userView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: mode == .Root ? 0.125 : 0.2),
         ])
 
         return instance

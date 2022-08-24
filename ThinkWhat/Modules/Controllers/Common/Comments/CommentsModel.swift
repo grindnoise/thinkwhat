@@ -15,5 +15,15 @@ class CommentsModel {
 
 // MARK: - Controller Input
 extension CommentsModel: CommentsControllerInput {
-    // Implement methods
+    func requestComments(rootComment: Comment, exclude: [Comment]) {
+        Task {
+            do {
+                try await API.shared.surveys.requestChildComments(rootComment: rootComment, excludedComments: exclude)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
 }

@@ -1435,6 +1435,30 @@ class API {
             }
         }
         
+        public func requestChildComments(rootComment: Comment, excludedComments: [Comment] = []) async throws {
+            guard let url = API_URLS.Surveys.getChildComments else { throw APIError.invalidURL }
+            
+            var parameters: Parameters = ["root_id": rootComment.id]
+            
+            if !excludedComments.isEmpty {
+                parameters["ids"] = excludedComments.map { $0.id }
+            }
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                await MainActor.run {
+                    let instances = try? decoder.decode([Comment].self, from: data)
+                }
+            } catch let error {
+                throw error
+            }
+        }
+        
         func post(_ parameters: Parameters) async throws {
             guard let url = API_URLS.Surveys.root else { throw APIError.invalidURL }
             
