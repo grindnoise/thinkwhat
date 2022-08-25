@@ -16,7 +16,6 @@
                 <outlet property="container" destination="Rar-ub-moY" id="vFX-2R-8SN"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="vbl-ul-dhk"/>
                 <outlet property="heightConstraint" destination="QWB-Lr-CVo" id="QfU-eX-RIu"/>
-                <outlet property="shadow" destination="AB7-J0-o3H" id="jSe-sE-x2d"/>
                 <outlet property="shadowView" destination="AB7-J0-o3H" id="JVF-Nd-lG9"/>
                 <outlet property="topConstraint" destination="585-1d-HCy" id="skO-HS-KJg"/>
             </connections>

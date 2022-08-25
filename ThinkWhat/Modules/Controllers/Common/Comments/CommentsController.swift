@@ -63,6 +63,10 @@ class CommentsController: UIViewController {
 
 // MARK: - View Input
 extension CommentsController: CommentsViewInput {
+    func postComment(_ body: String, replyTo: Comment?) {
+        controllerInput?.postComment(body, replyTo: replyTo)
+    }
+    
     func requestComments(exclude: [Comment]) {
         controllerInput?.requestComments(rootComment: item, exclude: exclude)
     }
@@ -70,6 +74,10 @@ extension CommentsController: CommentsViewInput {
 
 // MARK: - Model Output
 extension CommentsController: CommentsModelOutput {
+    func commentPostFailure() {
+        controllerOutput?.commentPostFailure()
+    }
+    
     var survey: Survey? {
         return item.survey
     }

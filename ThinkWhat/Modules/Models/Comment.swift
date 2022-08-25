@@ -20,6 +20,10 @@ class Comments {
                 all.remove(object: lastInstance)
                 return
             }
+            guard lastInstance.isParentNode else {
+                NotificationCenter.default.post(name: Notifications.Comments.ChildAppend, object: lastInstance)
+                return
+            }
             NotificationCenter.default.post(name: Notifications.Comments.Append, object: lastInstance)
 //            if let survey = lastInstance.survey {
 //                survey.reference.commentsTotal += 1
@@ -53,6 +57,7 @@ class Comment: Decodable {
     let id: Int
     let body: String
     let surveyId: Int?
+    let parentId: Int?
     var replies: Int
     var survey: Survey? {
         return Surveys.shared.all.filter { $0.id == surveyId }.first
@@ -69,7 +74,8 @@ class Comment: Decodable {
         return userprofile.isNil && !anonUsername.isEmpty
     }
     var parent: Comment? {
-        return Comments.shared.all.filter({ $0.children.contains(self) }).first
+        return Comments.shared.all.filter({ $0.id == parentId }).first
+//        return Comments.shared.all.filter({ $0.children.contains(self) }).first
     }
     var children: [Comment] = [] //{
 //        didSet {
@@ -77,7 +83,8 @@ class Comment: Decodable {
 //        }
 //    }
     var isParentNode: Bool {
-        return !children.isEmpty
+        return parentId.isNil
+//        return !children.isEmpty
     }
     var isOwn: Bool {
         guard let userprofile = userprofile,
@@ -115,7 +122,7 @@ class Comment: Decodable {
             children        = (try? container.decode([Comment].self, forKey: .children)) ?? []
             replies         = try container.decode(Int.self, forKey: .replies)
             replyToId       = try container.decodeIfPresent(Int.self, forKey: .replyTo)
-//            parentId        = try container.decodeIfPresent(Int.self, forKey: .parent)
+            parentId        = try container.decodeIfPresent(Int.self, forKey: .parent)
             
             if Comments.shared.all.filter({ $0 == self }).isEmpty {
                 Comments.shared.all.append(self)

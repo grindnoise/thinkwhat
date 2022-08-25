@@ -45,8 +45,12 @@ class CommentsView: UIView {
             print($0)
         } receiveValue: { [weak self] in
             guard let self = self,
-                  let string = $0
+                  let dict = $0,
+                  let replyObject = dict.keys.first,
+                  let body = dict.values.first
             else { return }
+            
+            self.viewInput?.postComment(body, replyTo: replyObject)
             
         }.store(in: &subscriptions)
         
@@ -111,7 +115,23 @@ class CommentsView: UIView {
 
 // MARK: - Controller Output
 extension CommentsView: CommentsControllerOutput {
-
+    func commentPostFailure() {
+        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark)
+    }
 }
 
-
+extension CommentsView: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let banner = sender as? Popup {
+            banner.removeFromSuperview()
+        }
+    }
+}

@@ -17,6 +17,7 @@ protocol CommentsViewInput: class {
     var controllerInput: CommentsControllerInput? { get set }
     
     func requestComments(exclude: [Comment])
+    func postComment(_: String, replyTo: Comment?)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -27,6 +28,7 @@ protocol CommentsControllerInput: class {
     var modelOutput: CommentsModelOutput? { get set }
     
     func requestComments(rootComment: Comment, exclude: [Comment])
+    func postComment(_: String, replyTo: Comment?)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -34,6 +36,8 @@ protocol CommentsControllerInput: class {
 /// **Controller** conforms to this protocol
 protocol CommentsModelOutput: class {
     var survey: Survey? { get }
+    
+    func commentPostFailure()
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -42,5 +46,5 @@ protocol CommentsModelOutput: class {
 protocol CommentsControllerOutput: class {
     var viewInput: CommentsViewInput? { get set }
     
-    // Controller output methods here
+    func commentPostFailure()
 }

@@ -39,6 +39,8 @@ final class AccessoryInputTextField: UITextField {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    private let minLength: Int
+    private let maxLength: Int
     private weak var customDelegate: AccessoryInputTextFieldDelegate?
     //UI
     private lazy var accessoryInputView: ZeroSizedIntrisicContentView = {
@@ -78,7 +80,7 @@ final class AccessoryInputTextField: UITextField {
         return instance
     }()
     private lazy var textView: FlexibleTextView = {
-        let instance = FlexibleTextView()
+        let instance = FlexibleTextView(minLength: minLength, maxLength: maxLength)
         instance.placeholder = "add_comment".localized
         instance.accessibilityIdentifier = "textView"
         instance.font = textViewFont
@@ -104,7 +106,9 @@ final class AccessoryInputTextField: UITextField {
 #endif
     }
     
-    init(placeholder: String = "", font: UIFont, delegate: AccessoryInputTextFieldDelegate) {
+    init(placeholder: String = "", font: UIFont, delegate: AccessoryInputTextFieldDelegate, minLength: Int = .zero, maxLength: Int = .max) {
+        self.maxLength = maxLength
+        self.minLength = minLength
         self.customDelegate = delegate
         self.placeholderText = placeholder
         self.textViewFont = font
@@ -160,6 +164,9 @@ final class AccessoryInputTextField: UITextField {
 
 class FlexibleTextView: UITextView {
     // limit the height of expansion per intrinsicContentSize
+    
+    private let minLength: Int
+    private let maxLength: Int
     
     fileprivate var staticText: String = "" {
         didSet {
@@ -219,23 +226,35 @@ class FlexibleTextView: UITextView {
         }
     }
     
-    override init(frame: CGRect, textContainer: NSTextContainer?) {
-        super.init(frame: frame, textContainer: textContainer)
+    init(minLength: Int, maxLength: Int) {
+        self.minLength = minLength
+        self.maxLength = maxLength
+        super.init(frame: .zero, textContainer: nil)
         delegate = self
         isScrollEnabled = false
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         NotificationCenter.default.addObserver(self, selector: #selector(UITextInputDelegate.textDidChange(_:)), name: UITextView.textDidChangeNotification, object: self)
         placeholderTextView.font = font
         placeholderTextView.addEquallyTo(to: self)
-//        addSubview(placeholderTextView)
-//
-//        NSLayoutConstraint.activate([
-//            placeholderTextView.leadingAnchor.constraint(equalTo: leadingAnchor),
-//            placeholderTextView.trailingAnchor.constraint(equalTo: trailingAnchor),
-//            placeholderTextView.topAnchor.constraint(equalTo: topAnchor),
-//            placeholderTextView.bottomAnchor.constraint(equalTo: bottomAnchor),
-//        ])
     }
+    
+//    override init(frame: CGRect, textContainer: NSTextContainer?) {
+//        super.init(frame: frame, textContainer: textContainer)
+//        delegate = self
+//        isScrollEnabled = false
+//        autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//        NotificationCenter.default.addObserver(self, selector: #selector(UITextInputDelegate.textDidChange(_:)), name: UITextView.textDidChangeNotification, object: self)
+//        placeholderTextView.font = font
+//        placeholderTextView.addEquallyTo(to: self)
+////        addSubview(placeholderTextView)
+////
+////        NSLayoutConstraint.activate([
+////            placeholderTextView.leadingAnchor.constraint(equalTo: leadingAnchor),
+////            placeholderTextView.trailingAnchor.constraint(equalTo: trailingAnchor),
+////            placeholderTextView.topAnchor.constraint(equalTo: topAnchor),
+////            placeholderTextView.bottomAnchor.constraint(equalTo: bottomAnchor),
+////        ])
+//    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

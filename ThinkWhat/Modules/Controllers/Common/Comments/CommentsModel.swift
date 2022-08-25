@@ -15,6 +15,22 @@ class CommentsModel {
 
 // MARK: - Controller Input
 extension CommentsModel: CommentsControllerInput {
+    func postComment(_ body: String, replyTo: Comment?) {
+        guard let survey = replyTo?.replyTo?.survey else { return }
+        Task {
+            do {
+                let _ = try await API.shared.surveys.postComment(body, survey: survey, replyTo: replyTo)
+            } catch {
+                await MainActor.run {
+                    modelOutput?.commentPostFailure()
+                }
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
+    
     func requestComments(rootComment: Comment, exclude: [Comment]) {
         Task {
             do {

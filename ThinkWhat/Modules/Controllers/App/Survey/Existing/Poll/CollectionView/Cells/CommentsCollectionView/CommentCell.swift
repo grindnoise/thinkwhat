@@ -23,8 +23,8 @@ class CommentCell: UICollectionViewCell {
                 supplementaryStack.addArrangedSubview(claimButton)
             }
             
-            textView.text = item.body
             setHeader()
+            setBody()
             
             replyButton.alpha = item.isOwn ? 0 : 1
             
@@ -49,7 +49,19 @@ class CommentCell: UICollectionViewCell {
     }
     public var mode: CommentsCollectionView.Mode = .Root {
         didSet {
+            guard oldValue != mode else { return }
             
+            setBody()
+            
+            if mode == .Tree {
+                disclosureButton.alpha = 0
+            }
+            
+            guard let constraint = horizontalStack.getConstraint(identifier: "leadingAnchor") else { return }
+            
+            setNeedsLayout()
+            constraint.constant = mode == .Tree ? avatar.bounds.width : 0
+            layoutIfNeeded()
         }
     }
     public var commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
@@ -261,9 +273,11 @@ class CommentCell: UICollectionViewCell {
         instance.clipsToBounds = false
         instance.spacing = 0
         
-        NSLayoutConstraint.activate([
-            userView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: mode == .Root ? 0.125 : 0.2),
-        ])
+        userView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.125).isActive = true
+        
+//        NSLayoutConstraint.activate([
+//            userView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: mode == .Root ? 0.125 : 0.2),
+//        ])
 
         return instance
     }()
@@ -287,8 +301,8 @@ class CommentCell: UICollectionViewCell {
         return instance
     }()
     // Constraints
-    private var closedConstraint: NSLayoutConstraint!
-    private var openConstraint: NSLayoutConstraint!
+//    private var closedConstraint: NSLayoutConstraint!
+//    private var openConstraint: NSLayoutConstraint!
     
     // MARK: - Destructor
     deinit {
@@ -328,16 +342,20 @@ class CommentCell: UICollectionViewCell {
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
             horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor),// constant: padding),
-            horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),// constant: padding),
+//            horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),// constant: padding),
             horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),// constant: padding),
         ])
         
-        openConstraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        openConstraint.priority = .defaultLow
+        let constraint = horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
+        constraint.identifier = "leadingAnchor"
+        constraint.isActive = true
         
-        closedConstraint = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        closedConstraint.priority = .defaultLow
-        closedConstraint.isActive = true
+//        openConstraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+//        openConstraint.priority = .defaultLow
+        
+        let bottomAnchor = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        bottomAnchor.priority = .defaultLow
+        bottomAnchor.isActive = true
     }
     
     private func setTasks() {
@@ -348,7 +366,7 @@ class CommentCell: UICollectionViewCell {
                       instance == self.item
                 else { return }
                 
-                self.disclosureButton.alpha = 1
+                self.disclosureButton.alpha = self.mode == .Root ? 1 : 0
                 let attrString = NSMutableAttributedString(string: "\(instance.replies)", attributes: [
                     NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote) as Any,
                     NSAttributedString.Key.foregroundColor: UIColor.systemBlue
@@ -429,6 +447,42 @@ class CommentCell: UICollectionViewCell {
                                                    NSAttributedString.Key.foregroundColor : traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.darkGray])
         attrString.append(date)
         dateLabel.attributedText = attrString
+    }
+    
+    private func setBody() {
+        if mode == .Tree {
+            if let survey = item.survey, survey.isAnonymous {
+                
+            } else if let replyItem = item.replyTo, !replyItem.isParentNode, let userprofile = replyItem.userprofile {
+                let attrString = NSMutableAttributedString()
+                if !userprofile.firstNameSingleWord.isEmpty {
+                    let reply = NSAttributedString(string: "@" + userprofile.firstNameSingleWord, attributes: [
+                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+                        NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+                    ])
+                    let body = NSAttributedString(string: " " + item.body, attributes: [
+                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote) as Any,
+                        NSAttributedString.Key.foregroundColor: UIColor.label
+                    ])
+                    attrString.append(reply)
+                    attrString.append(body)
+                } else if !userprofile.lastNameSingleWord.isEmpty {
+                    let reply = NSAttributedString(string: "@" + userprofile.lastNameSingleWord, attributes: [
+                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+                        NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+                    ])
+                    let body = NSAttributedString(string: " " + item.body, attributes: [
+                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote) as Any,
+                        NSAttributedString.Key.foregroundColor: UIColor.label
+                    ])
+                    attrString.append(reply)
+                    attrString.append(body)
+                }
+                textView.attributedText = attrString
+            }
+        } else {
+            textView.text = item.body
+        }
     }
     
     override func prepareForReuse() {

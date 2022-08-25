@@ -118,6 +118,9 @@ class ModelProperties {
     private var _surveyAnswerMaxFreeCount:   Int = 0
     private var _surveyMediaTitleMinLength:  Int = 0
     private var _surveyMediaTitleMaxLength:  Int = 0
+    private var _commentMinLength:           Int = 0
+    private var _commentMaxLength:           Int = 0
+    
 
     var surveyTitleMinLength:       Int { return { _surveyTitleMinLength }()}
     var surveyTitleMaxLength:       Int { return { _surveyTitleMaxLength }()}
@@ -132,6 +135,8 @@ class ModelProperties {
     var surveyQuestionMaxLength:    Int { return { _surveyQuestionMaxLength }()}
     var surveyMediaTitleMinLength:  Int { return { _surveyMediaTitleMinLength }()}
     var surveyMediaTitleMaxLength:  Int { return { _surveyMediaTitleMaxLength }()}
+    var commentMinLength:           Int { return { _commentMinLength }()}
+    var commentMaxLength:           Int { return { _commentMaxLength }()}
     
     func importJson(_ json: JSON) {
         for i in json {
@@ -165,6 +170,13 @@ class ModelProperties {
                     if j.0 == "title", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
                         _surveyMediaTitleMinLength = dict["min_length"]!
                         _surveyMediaTitleMaxLength = dict["max_length"]!
+                    }
+                }
+            } else if i.0 == "comment" {
+                for j in i.1 {
+                    if j.0 == "body", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
+                        _commentMinLength = dict["min_length"]!
+                        _commentMaxLength = dict["max_length"]!
                     }
                 }
             }

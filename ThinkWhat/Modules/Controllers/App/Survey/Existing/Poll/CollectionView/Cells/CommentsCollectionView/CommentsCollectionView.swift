@@ -31,7 +31,7 @@ class CommentsCollectionView: UICollectionView {
             reload()
         }
     }
-    public var rootComment: Comment? {
+    public weak var rootComment: Comment? {
         didSet {
             guard !rootComment.isNil else { return }
             mode = .Tree
@@ -40,8 +40,7 @@ class CommentsCollectionView: UICollectionView {
     }
     public var dataItems: [Comment] {
         if let rootComment = rootComment, mode == .Tree {
-            var items = [rootComment] + rootComment.children
-            return items
+            return [rootComment] + Comments.shared.all.filter { $0.parentId == rootComment.id }
         }
         guard let survey = survey else { return [] }
         return survey.commentsSortedByDate
@@ -78,7 +77,7 @@ class CommentsCollectionView: UICollectionView {
     // MARK: - Private properties
     private var mode: Mode
     private var commentMode: CommentMode = .Root
-    private var replyTo: Comment? {
+    private weak var replyTo: Comment? {
         didSet {
             commentMode = replyTo.isNil ? .Root : .Reply
         }
@@ -88,7 +87,7 @@ class CommentsCollectionView: UICollectionView {
     private var tasks: [Task<Void, Never>?] = []
     private var source: UICollectionViewDiffableDataSource<Section, Comment>!
     private lazy var textField: AccessoryInputTextField = {
-        let instance = AccessoryInputTextField(placeholder: "add_comment".localized, font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!, delegate: self)
+        let instance = AccessoryInputTextField(placeholder: "add_comment".localized, font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!, delegate: self, minLength: ModelProperties.shared.commentMinLength, maxLength: ModelProperties.shared.commentMinLength)
 //        addSubview(instance)
         
         return instance
@@ -136,6 +135,7 @@ class CommentsCollectionView: UICollectionView {
         tasks.append( Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Append) {
                 guard let self = self,
+                      self.mode == .Root,
                       let instance = notification.object as? Comment,
                       instance.replyToId.isNil,
                       instance.survey == self.survey,
@@ -153,7 +153,23 @@ class CommentsCollectionView: UICollectionView {
                 }
             }
         })
-        tasks.append( Task { @MainActor [weak self] in
+        tasks.append( Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildAppend) {
+                guard let self = self,
+                      self.mode == .Tree,
+                      let instance = notification.object as? Comment,
+                      instance.parent == self.rootComment,
+                      var snap = self.source.snapshot() as? Snapshot
+                else { return }
+                
+                snap.appendItems([instance], toSection: .main)
+                
+                await MainActor.run {
+                    self.source.apply(snap, animatingDifferences: true)
+                }
+            }
+        })
+        tasks.append( Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Claim) {
                 guard let self = self,
                       let instance = notification.object as? Comment,
@@ -163,10 +179,12 @@ class CommentsCollectionView: UICollectionView {
                 else { return }
                 
                 snap.deleteItems([instance])
-                self.source.apply(snap, animatingDifferences: true)
+                await MainActor.run {
+                    self.source.apply(snap, animatingDifferences: true)
+                }
             }
         })
-        tasks.append( Task { @MainActor [weak self] in
+        tasks.append( Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Ban) {
                 guard let self = self,
                       let instance = notification.object as? Comment,
@@ -176,7 +194,9 @@ class CommentsCollectionView: UICollectionView {
                 else { return }
                 
                 snap.deleteItems([instance])
-                self.source.apply(snap, animatingDifferences: true)
+                await MainActor.run {
+                    self.source.apply(snap, animatingDifferences: true)
+                }
             }
         })
     }
