@@ -34,6 +34,7 @@ protocol PollViewInput: AnyObject {
     func postComment(_: String, replyTo: Comment?)
     func requestComments(_:[Comment])
     func openCommentThread(_: Comment)
+    func deleteComment(_:Comment)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -53,6 +54,7 @@ protocol PollControllerInput: AnyObject {
     func updateResultsStats(_: SurveyReference)
     func postComment(_: String, replyTo: Comment?)
     func requestComments(_:[Comment])
+    func deleteComment(_:Comment)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -65,6 +67,7 @@ protocol PollModelOutput: AnyObject {
     func onAddFavoriteCallback(_: Result<Bool,Error>)
     func onVoteCallback(_: Result<Bool,Error>)
     func commentPostCallback(_: Result<Comment,Error>)
+    func commentDeleteError()
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -86,4 +89,5 @@ protocol PollControllerOutput: AnyObject {
 //    func startLoading()
     func onAddFavoriteCallback()
     func commentPostCallback(_: Result<Comment,Error>)
+    func commentDeleteError()
 }

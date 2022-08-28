@@ -60,6 +60,7 @@ class CommentsSectionCell: UICollectionViewCell {
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
     public let replySubject = CurrentValueSubject<[Comment: String]?, Never>(nil)
     public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public var deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentsRequestSubject = CurrentValueSubject<[Comment], Never>([])
     public var lastPostedComment: Comment? {
@@ -143,6 +144,15 @@ class CommentsSectionCell: UICollectionViewCell {
             self.replySubject.send($0)
 //            self.commentSubject.send(completion: .finished)
         }.store(in: &subscriptions)
+        
+        //Delete comment
+        instance.deleteSubject.sink { [weak self] in
+            guard let self = self,
+                  let comment = $0
+            else { return }
+            
+            self.deleteSubject.send(comment)
+        }.store(in: &self.subscriptions)
         
         instance.commentsRequestSubject.sink {
             print($0)

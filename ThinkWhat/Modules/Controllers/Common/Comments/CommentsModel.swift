@@ -15,6 +15,19 @@ class CommentsModel {
 
 // MARK: - Controller Input
 extension CommentsModel: CommentsControllerInput {
+    func postClaim(comment: Comment, reason: Claim) {
+        Task {
+            do {
+                try await API.shared.surveys.claimComment(comment: comment, reason: reason)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+
+    }
+    
     func postComment(_ body: String, replyTo: Comment?) {
         guard let survey = replyTo?.replyTo?.survey else { return }
         Task {

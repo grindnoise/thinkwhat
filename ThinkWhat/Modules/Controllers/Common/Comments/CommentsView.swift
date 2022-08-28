@@ -26,9 +26,23 @@ class CommentsView: UIView {
             print($0)
         } receiveValue: { [weak self] in
             guard let self = self,
-                  let string = $0
+                  let comment = $0,
+                  let surveyReference = comment.survey?.reference
             else { return }
             
+            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
+            banner.accessibilityIdentifier = "claim"
+            let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
+            
+            claimContent.claimSubject.sink { [weak self] in
+                guard let self = self,
+                      let reason = $0
+                else { return }
+                
+                self.viewInput?.postClaim(comment: comment, reason: reason)
+            }.store(in: &self.subscriptions)
+            
+            banner.present(content: claimContent)
         }.store(in: &subscriptions)
         
         instance.commentSubject.sink {
@@ -120,6 +134,7 @@ extension CommentsView: CommentsControllerOutput {
     }
 }
 
+// MARK: - BannerObservable
 extension CommentsView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     
@@ -133,5 +148,12 @@ extension CommentsView: BannerObservable {
         } else if let banner = sender as? Popup {
             banner.removeFromSuperview()
         }
+    }
+}
+
+// MARK: - CallbackObservable
+extension CommentsView: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        
     }
 }

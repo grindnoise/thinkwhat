@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class CommentCell: UICollectionViewCell {
+class CommentCell: UICollectionViewListCell {
     
     // MARK: - Override
     override var isSelected: Bool { didSet { updateAppearance() }}
@@ -19,8 +19,19 @@ class CommentCell: UICollectionViewCell {
         didSet {
             guard !item.isNil else { return }
             
+            menuButton.menu = prepareMenu()
+            menuButton.showsMenuAsPrimaryAction = true
+            
             if !item.isOwn {
-                supplementaryStack.addArrangedSubview(claimButton)
+                verticalStack.addArrangedSubview(repliesView)
+                repliesView.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
+                let bottomAnchor = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+                bottomAnchor.priority = .defaultLow
+                bottomAnchor.isActive = true
+            } else {
+                let bottomAnchor = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+                bottomAnchor.priority = .defaultLow
+                bottomAnchor.isActive = true
             }
             
             setHeader()
@@ -60,18 +71,21 @@ class CommentCell: UICollectionViewCell {
             guard let constraint = horizontalStack.getConstraint(identifier: "leadingAnchor") else { return }
             
             setNeedsLayout()
-            constraint.constant = mode == .Tree ? avatar.bounds.width : 0
+            constraint.constant = mode == .Tree ? avatar.bounds.width/2 : 0
             layoutIfNeeded()
         }
     }
     public var commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
     public var replySubject = CurrentValueSubject<Comment?, Never>(nil)
     public var claimSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public var deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    // UI
+    private let padding: CGFloat = 8
     private lazy var textView: UITextView = {
         let instance = UITextView()
         instance.isUserInteractionEnabled = false
@@ -100,7 +114,6 @@ class CommentCell: UICollectionViewCell {
         
         return instance
     }()
-    private let padding: CGFloat = 8
     private lazy var avatar: NewAvatar = {
         let instance = NewAvatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
@@ -164,11 +177,11 @@ class CommentCell: UICollectionViewCell {
 
         return instance
     }()
-    private lazy var claimButton: UIButton = {
+    private lazy var menuButton: UIButton = {
         let instance = UIButton()
-        instance.setImage(UIImage(systemName: "exclamationmark.triangle", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+        instance.setImage(UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        instance.addTarget(self, action: #selector(self.claim), for: .touchUpInside)
+//        instance.addTarget(self, action: #selector(self.claim), for: .touchUpInside)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
 //        instance.contentMode = .bottom
 //        instance.alpha = 0
@@ -176,7 +189,7 @@ class CommentCell: UICollectionViewCell {
         return instance
     }()
     private lazy var supplementaryStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [dateLabel])//, claimButton])
+        let instance = UIStackView(arrangedSubviews: [dateLabel, menuButton])
         instance.axis = .horizontal
         instance.clipsToBounds = false
         instance.spacing = 4
@@ -190,7 +203,7 @@ class CommentCell: UICollectionViewCell {
     }()
     private lazy var disclosureButton: UIButton = {
         let instance = UIButton()
-        instance.setImage(UIImage(systemName: "bubble.left.and.bubble.right.fill", withConfiguration:  UIImage.SymbolConfiguration(font: UIFont.scaledFont(fontName: Fonts.OpenSans.Light.rawValue, forTextStyle: .caption2)!, scale: .medium)), for: .normal)
+        instance.setImage(UIImage(systemName: "bubble.right.fill", withConfiguration:  UIImage.SymbolConfiguration(font: UIFont.scaledFont(fontName: Fonts.OpenSans.Light.rawValue, forTextStyle: .footnote)!, scale: .medium)), for: .normal)
 //        instance.semanticContentAttribute = .forceRightToLeft
         instance.tintColor = .systemBlue//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
         instance.addTarget(self, action: #selector(self.replies), for: .touchUpInside)
@@ -250,7 +263,7 @@ class CommentCell: UICollectionViewCell {
     }()
     private lazy var replyButton: UIButton = {
         let instance = UIButton()
-        instance.setImage(UIImage(systemName: "arrowshape.turn.up.left.fill", withConfiguration:  UIImage.SymbolConfiguration(font: UIFont.scaledFont(fontName: Fonts.OpenSans.Light.rawValue, forTextStyle: .caption2)!, scale: .medium)), for: .normal)
+        instance.setImage(UIImage(systemName: "arrowshape.turn.up.left.fill", withConfiguration:  UIImage.SymbolConfiguration(font: UIFont.scaledFont(fontName: Fonts.OpenSans.Light.rawValue, forTextStyle: .footnote)!, scale: .medium)), for: .normal)
         instance.tintColor = .systemBlue //traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
         instance.addTarget(self, action: #selector(self.reply), for: .touchUpInside)
         let attrString = NSMutableAttributedString(string: "reply".localized.uppercased(), attributes: [
@@ -281,9 +294,8 @@ class CommentCell: UICollectionViewCell {
 
         return instance
     }()
-    
     private lazy var verticalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [supplementaryStack, textView, repliesView])
+        let instance = UIStackView(arrangedSubviews: [supplementaryStack, textView])//, repliesView])
         instance.axis = .vertical
         instance.alignment = .center
         instance.clipsToBounds = false
@@ -295,7 +307,7 @@ class CommentCell: UICollectionViewCell {
         NSLayoutConstraint.activate([
             supplementaryStack.widthAnchor.constraint(equalTo: instance.widthAnchor),
             textView.widthAnchor.constraint(equalTo: instance.widthAnchor),
-            repliesView.widthAnchor.constraint(equalTo: instance.widthAnchor),
+//            repliesView.widthAnchor.constraint(equalTo: instance.widthAnchor),
         ])
         
         return instance
@@ -314,7 +326,6 @@ class CommentCell: UICollectionViewCell {
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
-
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -325,6 +336,11 @@ class CommentCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Public methods
+    public func hideDisclosure() {
+        disclosureButton.alpha = 0
     }
     
     // MARK: - Private methods
@@ -353,12 +369,14 @@ class CommentCell: UICollectionViewCell {
 //        openConstraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
 //        openConstraint.priority = .defaultLow
         
-        let bottomAnchor = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        bottomAnchor.priority = .defaultLow
-        bottomAnchor.isActive = true
+//        let bottomAnchor = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+//        bottomAnchor.priority = .defaultLow
+//        bottomAnchor.isActive = true
     }
     
     private func setTasks() {
+        guard mode == .Root else { return }
+        
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {
                 guard let self = self,
@@ -403,24 +421,6 @@ class CommentCell: UICollectionViewCell {
         commentThreadSubject.send(item)
     }
     
-    // MARK: - UI methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        claimButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        setHeader()
-        
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        //Set dynamic font size
-        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                          forTextStyle: .footnote)
-        guard let constraint = textView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
-        setNeedsLayout()
-        constraint.constant = textView.contentSize.height
-        layoutIfNeeded()
-    }
-    
     private func setHeader() {
         let attrString = NSMutableAttributedString()
         if !item.isAnonymous, let userprofile = item.userprofile {
@@ -455,29 +455,27 @@ class CommentCell: UICollectionViewCell {
                 
             } else if let replyItem = item.replyTo, !replyItem.isParentNode, let userprofile = replyItem.userprofile {
                 let attrString = NSMutableAttributedString()
-                if !userprofile.firstNameSingleWord.isEmpty {
-                    let reply = NSAttributedString(string: "@" + userprofile.firstNameSingleWord, attributes: [
-                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-                        NSAttributedString.Key.foregroundColor: UIColor.systemBlue
-                    ])
-                    let body = NSAttributedString(string: " " + item.body, attributes: [
-                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote) as Any,
-                        NSAttributedString.Key.foregroundColor: UIColor.label
-                    ])
+                if !userprofile.firstNameSingleWord.isEmpty || !userprofile.lastNameSingleWord.isEmpty {
+                    var reply: NSAttributedString!
+                    if !userprofile.firstNameSingleWord.isEmpty {
+                        reply = NSAttributedString(string: "@" + userprofile.firstNameSingleWord, attributes: [
+                            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+                            NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+                        ])
+                    } else if !userprofile.lastNameSingleWord.isEmpty {
+                        reply = NSAttributedString(string: "@" + userprofile.lastNameSingleWord, attributes: [
+                            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+                            NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+                        ])
+                    }
                     attrString.append(reply)
-                    attrString.append(body)
-                } else if !userprofile.lastNameSingleWord.isEmpty {
-                    let reply = NSAttributedString(string: "@" + userprofile.lastNameSingleWord, attributes: [
-                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-                        NSAttributedString.Key.foregroundColor: UIColor.systemBlue
-                    ])
-                    let body = NSAttributedString(string: " " + item.body, attributes: [
-                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote) as Any,
-                        NSAttributedString.Key.foregroundColor: UIColor.label
-                    ])
-                    attrString.append(reply)
-                    attrString.append(body)
                 }
+                let body = NSAttributedString(string: " " + item.body, attributes: [
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.label
+                ])
+
+                attrString.append(body)
                 textView.attributedText = attrString
             }
         } else {
@@ -485,18 +483,78 @@ class CommentCell: UICollectionViewCell {
         }
     }
     
+    private func prepareMenu() -> UIMenu {
+        var actions: [UIAction]!
+        if item.isOwn {
+            let deleteAction : UIAction = .init(title: "delete".localized, image: UIImage(systemName: "trash.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
+                guard let self = self,
+                      let instance = self.item
+                else { return }
+                
+                self.deleteSubject.send(instance)
+            })
+            actions = [deleteAction]
+        } else {
+            let replyAction : UIAction = .init(title: "reply".localized, image: UIImage(systemName: "arrowshape.turn.up.left.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+                guard let self = self,
+                      let instance = self.item
+                else { return }
+                
+                self.replySubject.send(instance)
+            })
+            replyAction.accessibilityIdentifier = "reply"
+            
+            
+            let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
+                guard let self = self,
+                      let instance = self.item
+                else { return }
+                
+                self.claimSubject.send(instance)
+            })
+            actions = [claimAction, replyAction]
+        }
+        
+        return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+    }
+    
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        setHeader()
+        
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                          forTextStyle: .footnote)
+        guard let constraint = textView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        setNeedsLayout()
+        constraint.constant = textView.contentSize.height
+        layoutIfNeeded()
+    }
+
     override func prepareForReuse() {
         super.prepareForReuse()
         
         commentThreadSubject = .init(nil)
         replySubject = .init(nil)
         claimSubject = .init(nil)
+        deleteSubject = .init(nil)
         avatar.clearImage()
         item = nil
-        supplementaryStack.removeArrangedSubview(claimButton)
-        claimButton.removeFromSuperview()
+//        supplementaryStack.removeArrangedSubview(menuButton)
+//        menuButton.removeFromSuperview()
+        verticalStack.removeArrangedSubview(repliesView)
+        repliesView.removeFromSuperview()
     }
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        print(touches)
-//    }
+    
+    override func updateConstraints() {
+        super.updateConstraints()
+
+        separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -100).isActive = true
+        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 100).isActive = true
+    }
 }

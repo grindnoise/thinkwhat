@@ -812,6 +812,10 @@ class PollController: UIViewController {
 
 // MARK: - View Input
 extension PollController: PollViewInput {
+    func deleteComment(_ comment: Comment) {
+        controllerInput?.deleteComment(comment)
+    }
+    
     func onCommentClaim(comment: Comment, reason: Claim) {
         controllerInput?.commentClaim(comment: comment, reason: reason)
     }
@@ -896,6 +900,10 @@ extension PollController: PollViewInput {
 
 // MARK: - Model Output
 extension PollController: PollModelOutput {
+    func commentDeleteError() {
+        controllerOutput?.commentDeleteError()
+    }
+    
     func commentPostCallback(_ result: Result<Comment, Error>) {
         controllerOutput?.commentPostCallback(result)
     }

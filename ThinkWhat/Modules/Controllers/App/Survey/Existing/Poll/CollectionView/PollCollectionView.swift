@@ -227,6 +227,15 @@ class PollCollectionView: UICollectionView {
                 self.host.postComment(string)
             }.store(in: &self.subscriptions)
             
+            //Subscription for commenting
+            cell.deleteSubject.sink { [weak self] in
+                guard let self = self,
+                      let comment = $0
+                else { return }
+                
+                self.host.deleteComment(comment)
+            }.store(in: &self.subscriptions)
+            
             //Subscription for reply to comment
             cell.replySubject.sink { [weak self] in
                 guard let self = self,

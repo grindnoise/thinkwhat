@@ -20,7 +20,7 @@ class Shimmer: UIView {
         instance.colors = [dark, light, dark]
         instance.startPoint = CGPoint(x: 0.0, y: 0.5)
         instance.endPoint = CGPoint(x: 1.0, y: 0.5)
-        instance.locations = [0.4, 0.5, 0.6]
+        instance.locations = [0.4, 0.55, 0.7]
         instance.zPosition = 100//.greatestFiniteMagnitude
         layer.addSublayer(instance)
         

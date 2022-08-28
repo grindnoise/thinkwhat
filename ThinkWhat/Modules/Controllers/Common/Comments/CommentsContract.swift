@@ -18,6 +18,7 @@ protocol CommentsViewInput: class {
     
     func requestComments(exclude: [Comment])
     func postComment(_: String, replyTo: Comment?)
+    func postClaim(comment: Comment, reason: Claim)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -29,6 +30,7 @@ protocol CommentsControllerInput: class {
     
     func requestComments(rootComment: Comment, exclude: [Comment])
     func postComment(_: String, replyTo: Comment?)
+    func postClaim(comment: Comment, reason: Claim)
 }
 
 /// *Model* returns the result to the *Controller*

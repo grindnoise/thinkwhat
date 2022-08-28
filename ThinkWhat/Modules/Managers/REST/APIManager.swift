@@ -1375,13 +1375,21 @@ class API {
                                                            DateFormatter.dateFormatter ]
                 
                 let instance = try decoder.decode(Comment.self, from: data)
-                if let parent = replyTo, let survey = replyTo?.survey {
-                    parent.replies += 1
-                    survey.reference.commentsTotal += 1
-                    await MainActor.run {
-                        NotificationCenter.default.post(name: Notifications.Comments.ChildrenCountChange, object: parent)
+                
+                //Root comment children count increase notification
+                if let replyTo = replyTo {
+                    //Find root node
+                    let rootNode: Comment? = replyTo.isParentNode ? replyTo : replyTo.parent
+                    
+                    if let rootNode = rootNode {
+                        rootNode.replies += 1
+                        survey.reference.commentsTotal += 1
+                        await MainActor.run {
+                            NotificationCenter.default.post(name: Notifications.Comments.ChildrenCountChange, object: rootNode)
+                        }
                     }
                 }
+ 
                 return instance
             } catch let error {
                 throw error
@@ -1410,6 +1418,33 @@ class API {
                 throw error
             }
         }
+        
+        public func deleteComment(comment: Comment) async throws {
+            guard let url = API_URLS.Surveys.deleteComment else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["comment_id": comment.id]
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                
+                guard let json = try JSON(data: data, options: .mutableContainers) as? JSON,
+                      let status = json["status"].string,
+                      status == "ok"
+                else { return }
+                
+                await MainActor.run {
+                    Comments.shared.all.remove(object: comment)
+                    NotificationCenter.default.post(name: Notifications.Comments.Delete, object: comment)
+                }
+                
+            } catch let error {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                throw error
+            }
+        }
+
         
         public func requestRootComments(survey: Survey, excludedComments: [Comment] = []) async throws {
             guard let url = API_URLS.Surveys.getRootComments else { throw APIError.invalidURL }

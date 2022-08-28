@@ -33,7 +33,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                     else { return }
                     
                     UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.75, delay: 0) {
-                        self.icon.backgroundColor = destinationCategory == .Hot ? .clear : self.item.topic.tagColor
+                        self.icon.backgroundColor = destinationCategory == .Hot ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
                     }
 
                     let pathAnim = Animations.get(property: .Path,
@@ -573,9 +573,9 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
     }()
     private lazy var menuButton: UIButton = {
         let instance = UIButton()
-        instance.setImage(UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(pointSize: instance.bounds.width, weight: UIImage.SymbolWeight.semibold, scale: .large)), for: .normal)
+        instance.setImage(UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(pointSize: instance.bounds.width, weight: UIImage.SymbolWeight.regular, scale: .large)), for: .normal)
 //        instance.imageView?.contentMode = .scaleAspectFit
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
 //        instance.menu = menu
@@ -1165,8 +1165,10 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         backgroundConfiguration = config
         
-        menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-        icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        if icon.category != .Hot {
+            icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        }
         progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         commentsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray

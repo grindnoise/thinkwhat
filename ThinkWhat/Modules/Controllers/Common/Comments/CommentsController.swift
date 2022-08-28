@@ -11,6 +11,10 @@ import Combine
 
 class CommentsController: UIViewController {
 
+    // MARK: - MVC
+    var controllerOutput: CommentsControllerOutput?
+    var controllerInput: CommentsControllerInput?
+    
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
@@ -54,15 +58,31 @@ class CommentsController: UIViewController {
         self.view = view as UIView
         
         navigationController?.navigationBar.prefersLargeTitles = false
+        title = "replies".localized + " (\(item.replies))"
+        setTasks()
     }
-
-    // MARK: - Properties
-    var controllerOutput: CommentsControllerOutput?
-    var controllerInput: CommentsControllerInput?
+    
+    // MARK: - Private methods
+    private func setTasks() {
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {
+                guard let self = self,
+                      let instance = notification.object as? Comment,
+                      instance == self.item
+                else { return }
+                
+                title = "replies".localized + " (\(item.replies))"
+            }
+        })
+    }
 }
 
 // MARK: - View Input
 extension CommentsController: CommentsViewInput {
+    func postClaim(comment: Comment, reason: Claim) {
+        controllerInput?.postClaim(comment: comment, reason: reason)
+    }
+    
     func postComment(_ body: String, replyTo: Comment?) {
         controllerInput?.postComment(body, replyTo: replyTo)
     }

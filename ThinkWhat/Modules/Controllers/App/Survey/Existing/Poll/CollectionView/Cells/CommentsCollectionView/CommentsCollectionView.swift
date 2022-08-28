@@ -40,7 +40,7 @@ class CommentsCollectionView: UICollectionView {
     }
     public var dataItems: [Comment] {
         if let rootComment = rootComment, mode == .Tree {
-            return [rootComment] + Comments.shared.all.filter { $0.parentId == rootComment.id }
+            return [rootComment] + Comments.shared.all.filter { $0.parentId == rootComment.id && !$0.isClaimed && !$0.isBanned }
         }
         guard let survey = survey else { return [] }
         return survey.commentsSortedByDate
@@ -48,6 +48,7 @@ class CommentsCollectionView: UICollectionView {
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
     public let replySubject = CurrentValueSubject<[Comment: String]?, Never>(nil)
     public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public var deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
     public var commentsRequestSubject = CurrentValueSubject<[Comment]?, Never>(nil)
 //    public var commentsRequestSubject: CurrentValueSubject<[Comment], Never>!
@@ -142,7 +143,7 @@ class CommentsCollectionView: UICollectionView {
                       var snap = self.source.snapshot() as? Snapshot
                 else { return }
                 
-                if instance.isOwn && abs(instance.createdAt.days(from: Date())) < 1, let firstItem = snap.itemIdentifiers.first as? Comment {
+                if instance.isOwn && abs(instance.createdAt.days(from: Date())) < 1, let firstItem = snap.itemIdentifiers.first as? Comment, self.mode == .Root {
                     snap.insertItems([instance], beforeItem: firstItem)
                 } else {
                     snap.appendItems([instance], toSection: .main)
@@ -185,6 +186,21 @@ class CommentsCollectionView: UICollectionView {
             }
         })
         tasks.append( Task { [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Delete) {
+                guard let self = self,
+                      let instance = notification.object as? Comment,
+                      instance.survey == self.survey,
+                      var snap = self.source.snapshot() as? Snapshot,
+                      snap.itemIdentifiers.contains(instance)
+                else { return }
+                
+                snap.deleteItems([instance])
+                await MainActor.run {
+                    self.source.apply(snap, animatingDifferences: true)
+                }
+            }
+        })
+        tasks.append( Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Ban) {
                 guard let self = self,
                       let instance = notification.object as? Comment,
@@ -204,22 +220,41 @@ class CommentsCollectionView: UICollectionView {
     private func setupUI() {
         delegate = self
         addSubview(textField)
-        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+        collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
             var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
-//            configuration.headerMode = .firstItemInSection
+//            configuration.headerMode = .supplementary
             configuration.backgroundColor = .clear
-            configuration.showsSeparators = false
-            if self.mode == .Root {
-                configuration.headerMode = .supplementary
+            configuration.showsSeparators = true
+            if #available(iOS 14.5, *) {
+                configuration.itemSeparatorHandler = { indexPath, config -> UIListSeparatorConfiguration in
+                    var config = UIListSeparatorConfiguration(listAppearance: .plain)
+                    config.topSeparatorVisibility = .hidden
+                    if self.mode == .Tree, indexPath.row == 0 {
+                        config.bottomSeparatorVisibility = .visible
+                    } else {
+                        config.bottomSeparatorVisibility = .hidden
+                    }
+                    return config
+                }
             }
 
+            configuration.headerMode = self.mode == .Root ? .supplementary : .firstItemInSection
+
             let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 0, trailing: sectionLayout.contentInsets.trailing)
-            sectionLayout.interGroupSpacing = 10
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: self.mode == .Tree ? 8 : 0,
+                                                                  leading: self.mode == .Tree ? 8 : sectionLayout.contentInsets.leading,
+                                                                  bottom: self.mode == .Tree ? 8 : 0,
+                                                                  trailing: self.mode == .Tree ? 8 : sectionLayout.contentInsets.trailing)
+            sectionLayout.interGroupSpacing = 16
             return sectionLayout
         }
         
-        let headerCellRegistration = UICollectionView.SupplementaryRegistration<CommentHeaderCell>(elementKind: UICollectionView.elementKindSectionHeader) { [weak self] supplementaryView, elementKind, indexPath in
+//        let headerRegistration = UICollectionView.SupplementaryRegistration
+//        <UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) {
+//            [unowned self] (headerView, elementKind, indexPath) in
+//        }
+        
+        let headerCellRegistration = UICollectionView.SupplementaryRegistration<CommentSupplementaryCell>(elementKind: UICollectionView.elementKindSectionHeader) { [weak self] supplementaryView, elementKind, indexPath in
             guard let self = self else { return }
 
             supplementaryView.callback = { [weak self] in
@@ -234,13 +269,20 @@ class CommentsCollectionView: UICollectionView {
 
         let rootCellRegistration = UICollectionView.CellRegistration<CommentCell, Comment> { [weak self] cell, indexPath, item in
             guard let self = self else { return }
-            var configuration = UIBackgroundConfiguration.listPlainCell()
+            
+            var configuration: UIBackgroundConfiguration!
+            if self.mode == .Tree {
+                configuration =  indexPath.row == 0 ? UIBackgroundConfiguration.listGroupedHeaderFooter() : UIBackgroundConfiguration.listGroupedCell()
+            } else {
+                configuration = UIBackgroundConfiguration.listPlainCell()
+            }
             configuration.backgroundColor = .clear
             cell.backgroundConfiguration = configuration
             cell.item = item
             cell.automaticallyUpdatesBackgroundConfiguration = false
             if self.mode == .Tree {
                 cell.mode = indexPath.row == 0 ? .Root : .Tree
+                cell.hideDisclosure()
             } else {
                 cell.mode = .Root
             }
@@ -282,6 +324,14 @@ class CommentsCollectionView: UICollectionView {
                 self.claimSubject.send(item)
             }.store(in: &self.subscriptions)
 
+            //Claim tap
+            cell.deleteSubject.sink { [weak self] in
+                guard let self = self,
+                      let item = $0
+                else { return }
+                
+                self.deleteSubject.send(item)
+            }.store(in: &self.subscriptions)
 //            self.modeSubject.sink {
 //#if DEBUG
 //                print("receiveCompletion: \($0)")

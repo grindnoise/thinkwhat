@@ -16,6 +16,21 @@ class PollModel {
 
 // MARK: - Controller Input
 extension PollModel: PollControllerInput {
+    func deleteComment(_ comment: Comment) {
+        Task {
+            do {
+                try await API.shared.surveys.deleteComment(comment: comment)
+            } catch {
+                await MainActor.run {
+                    modelOutput?.commentDeleteError()
+                }
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+
+    }
     func commentClaim(comment: Comment, reason: Claim) {
         Task {
             do {

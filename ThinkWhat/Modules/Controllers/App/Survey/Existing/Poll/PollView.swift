@@ -56,6 +56,8 @@ class PollView: UIView {
             self.viewInput?.openCommentThread(comment)
         }.store(in: &self.subscriptions)
         
+        
+        
         return instance
     }()
     private var isLoadingData = false
@@ -131,6 +133,10 @@ class PollView: UIView {
     public func requestComments(_ comments: [Comment]) {
         viewInput?.requestComments(comments)
     }
+    
+    public func deleteComment(_ comment: Comment) {
+        viewInput?.deleteComment(comment)
+    }
 //    override func layoutSubviews() {
 //        super.layoutSubviews()
 //        collectionView.contentInset = UIEdgeInsets(top: collectionView.contentInset.top, left: collectionView.contentInset.left, bottom: 50, right: collectionView.contentInset.right)
@@ -139,6 +145,10 @@ class PollView: UIView {
 
 // MARK: - Controller Output
 extension PollView: PollControllerOutput {
+    func commentDeleteError() {
+        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+    }
+    
     func commentPostCallback(_ result: Result<Comment, Error>) {
         switch result {
         case .success(let comment):

@@ -250,7 +250,7 @@
 		AB61BA2F2782DDA200F89C4C /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB61BA2E2782DDA200F89C4C /* Media.swift */; };
 		AB63D7D6283FC03A00173116 /* TopicSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB63D7D5283FC03A00173116 /* TopicSelection.swift */; };
 		AB63D7D8283FC04F00173116 /* TopicSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB63D7D7283FC04F00173116 /* TopicSelection.xib */; };
-		AB649E2628A1597800978520 /* CommentHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB649E2528A1597800978520 /* CommentHeaderCell.swift */; };
+		AB649E2628A1597800978520 /* CommentSupplementaryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB649E2528A1597800978520 /* CommentSupplementaryCell.swift */; };
 		AB649E2828A15A9C00978520 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB649E2728A15A9C00978520 /* Comment.swift */; };
 		AB66B4DD282D06AC00244A38 /* ListSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66B4DC282D06AC00244A38 /* ListSwitch.swift */; };
 		AB66B4DF282D06B600244A38 /* ListSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB66B4DE282D06B600244A38 /* ListSwitch.xib */; };
@@ -459,6 +459,7 @@
 		ABB4AAAA2666335600D4738D /* NewSurveyTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB4AAA92666335600D4738D /* NewSurveyTitle.swift */; };
 		ABB4C3F82653C40800C2B1BF /* delBasic.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB4C3F72653C40800C2B1BF /* delBasic.swift */; };
 		ABB6397628816B9000E4B4EF /* LinkPreviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB6397528816B8F00E4B4EF /* LinkPreviewCell.swift */; };
+		ABB80C8928B8ED76003D6C20 /* CommentHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB80C8828B8ED76003D6C20 /* CommentHeaderCell.swift */; };
 		ABB8B18F2423C9DE00E8DFF3 /* SurveyImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB8B18E2423C9DE00E8DFF3 /* SurveyImageCell.swift */; };
 		ABB8B1912423D11600E8DFF3 /* Slide.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB8B1902423D11600E8DFF3 /* Slide.swift */; };
 		ABB8B1932423D13900E8DFF3 /* Slide.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABB8B1922423D13900E8DFF3 /* Slide.xib */; };
@@ -833,7 +834,7 @@
 		AB61BA2E2782DDA200F89C4C /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		AB63D7D5283FC03A00173116 /* TopicSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelection.swift; sourceTree = "<group>"; };
 		AB63D7D7283FC04F00173116 /* TopicSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TopicSelection.xib; sourceTree = "<group>"; };
-		AB649E2528A1597800978520 /* CommentHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentHeaderCell.swift; sourceTree = "<group>"; };
+		AB649E2528A1597800978520 /* CommentSupplementaryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentSupplementaryCell.swift; sourceTree = "<group>"; };
 		AB649E2728A15A9C00978520 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		AB66B4DC282D06AC00244A38 /* ListSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListSwitch.swift; sourceTree = "<group>"; };
 		AB66B4DE282D06B600244A38 /* ListSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListSwitch.xib; sourceTree = "<group>"; };
@@ -1045,6 +1046,7 @@
 		ABB4AAA92666335600D4738D /* NewSurveyTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyTitle.swift; sourceTree = "<group>"; };
 		ABB4C3F72653C40800C2B1BF /* delBasic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delBasic.swift; sourceTree = "<group>"; };
 		ABB6397528816B8F00E4B4EF /* LinkPreviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewCell.swift; sourceTree = "<group>"; };
+		ABB80C8828B8ED76003D6C20 /* CommentHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentHeaderCell.swift; sourceTree = "<group>"; };
 		ABB8B18E2423C9DE00E8DFF3 /* SurveyImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyImageCell.swift; sourceTree = "<group>"; };
 		ABB8B1902423D11600E8DFF3 /* Slide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Slide.swift; sourceTree = "<group>"; };
 		ABB8B1922423D13900E8DFF3 /* Slide.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Slide.xib; sourceTree = "<group>"; };
@@ -1913,7 +1915,8 @@
 			children = (
 				AB4054FE28785A66000F7768 /* CommentsCollectionView.swift */,
 				AB40550028785AAB000F7768 /* CommentCell.swift */,
-				AB649E2528A1597800978520 /* CommentHeaderCell.swift */,
+				AB649E2528A1597800978520 /* CommentSupplementaryCell.swift */,
+				ABB80C8828B8ED76003D6C20 /* CommentHeaderCell.swift */,
 			);
 			path = CommentsCollectionView;
 			sourceTree = "<group>";
@@ -3602,13 +3605,14 @@
 				AB0980DC24CF04A100A02405 /* UserActivityCell.swift in Sources */,
 				AB04144F244EF3A600336857 /* SurveyStackViewController.swift in Sources */,
 				AB4366192873059200A0CB1C /* ImageViewer.swift in Sources */,
+				ABB80C8928B8ED76003D6C20 /* CommentHeaderCell.swift in Sources */,
 				AB5CA11824F5418500F55DEC /* TransitionCoordinator.swift in Sources */,
 				AB0BFDF3252DC9E400BD5EFF /* MegaphoneIcon.swift in Sources */,
 				AB8F28B027C0DEEB008E4ED0 /* NSLayoutConstraint.swift in Sources */,
 				AB30A4FD272AAEAD00A7DCC0 /* Answer.swift in Sources */,
 				AB4054FA28783E81000F7768 /* VoteCell.swift in Sources */,
 				AB3211AE288E810A00C736DE /* TopicHeaderCell.swift in Sources */,
-				AB649E2628A1597800978520 /* CommentHeaderCell.swift in Sources */,
+				AB649E2628A1597800978520 /* CommentSupplementaryCell.swift in Sources */,
 				AB37B9B22774BF3A00C7DEBC /* APIManager.swift in Sources */,
 				AB87904D286DF03500C069BA /* ChoiceResultCell.swift in Sources */,
 				ABCDE35F260C7D3300ACF5A6 /* VerticalTextLayer.swift in Sources */,
