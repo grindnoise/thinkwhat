@@ -29,8 +29,8 @@ extension PollModel: PollControllerInput {
 #endif
             }
         }
-
     }
+    
     func commentClaim(comment: Comment, reason: Claim) {
         Task {
             do {

@@ -64,14 +64,16 @@ class CommentsController: UIViewController {
     
     // MARK: - Private methods
     private func setTasks() {
-        tasks.append(Task {@MainActor [weak self] in
+        tasks.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {
                 guard let self = self,
                       let instance = notification.object as? Comment,
                       instance == self.item
                 else { return }
                 
-                title = "replies".localized + " (\(item.replies))"
+                await MainActor.run {
+                    self.title = "replies".localized + " (\(instance.replies))"
+                }
             }
         })
     }
@@ -79,6 +81,10 @@ class CommentsController: UIViewController {
 
 // MARK: - View Input
 extension CommentsController: CommentsViewInput {
+    func deleteComment(_ comment: Comment) {
+        controllerInput?.deleteComment(comment)
+    }
+    
     func postClaim(comment: Comment, reason: Claim) {
         controllerInput?.postClaim(comment: comment, reason: reason)
     }
@@ -94,6 +100,10 @@ extension CommentsController: CommentsViewInput {
 
 // MARK: - Model Output
 extension CommentsController: CommentsModelOutput {
+    func commentDeleteError() {
+        controllerOutput?.commentDeleteError()
+    }
+    
     func commentPostFailure() {
         controllerOutput?.commentPostFailure()
     }

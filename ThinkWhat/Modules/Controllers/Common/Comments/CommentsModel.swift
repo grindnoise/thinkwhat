@@ -15,6 +15,21 @@ class CommentsModel {
 
 // MARK: - Controller Input
 extension CommentsModel: CommentsControllerInput {
+    func deleteComment(_ comment: Comment) {
+        Task {
+            do {
+                try await API.shared.surveys.deleteComment(comment: comment)
+            } catch {
+                await MainActor.run {
+                    modelOutput?.commentDeleteError()
+                }
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
+    
     func postClaim(comment: Comment, reason: Claim) {
         Task {
             do {

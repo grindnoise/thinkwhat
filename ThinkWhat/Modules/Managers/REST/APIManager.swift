@@ -1376,17 +1376,19 @@ class API {
                 
                 let instance = try decoder.decode(Comment.self, from: data)
                 
+                NotificationCenter.default.post(name: Notifications.Comments.Post, object: nil)
+                
                 //Root comment children count increase notification
                 if let replyTo = replyTo {
                     //Find root node
                     let rootNode: Comment? = replyTo.isParentNode ? replyTo : replyTo.parent
                     
                     if let rootNode = rootNode {
-                        rootNode.replies += 1
-                        survey.reference.commentsTotal += 1
-                        await MainActor.run {
+//                        await MainActor.run {
+                            rootNode.replies += 1
+                            survey.reference.commentsTotal += 1
                             NotificationCenter.default.post(name: Notifications.Comments.ChildrenCountChange, object: rootNode)
-                        }
+//                        }
                     }
                 }
  
@@ -1434,7 +1436,8 @@ class API {
                 
                 await MainActor.run {
                     Comments.shared.all.remove(object: comment)
-                    NotificationCenter.default.post(name: Notifications.Comments.Delete, object: comment)
+//                    NotificationCenter.default.post(name: Notifications.Comments.Delete, object: comment)
+                    comment.isDeleted = true
                 }
                 
             } catch let error {

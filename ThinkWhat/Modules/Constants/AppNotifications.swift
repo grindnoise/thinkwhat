@@ -46,6 +46,7 @@ struct Notifications {
     }
     
     struct Comments {
+        static let Post                             = Notification.Name("NotificationCommentPost")
         static let Append                           = Notification.Name("NotificationCommentAppend")
         static let ChildAppend                      = Notification.Name("NotificationCommentChildAppend")
         static let Claim                            = Notification.Name("CommentClaim")

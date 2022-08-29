@@ -19,6 +19,7 @@ class CommentCell: UICollectionViewListCell {
         didSet {
             guard !item.isNil else { return }
             
+//            setTasks()
             menuButton.menu = prepareMenu()
             menuButton.showsMenuAsPrimaryAction = true
             
@@ -26,7 +27,7 @@ class CommentCell: UICollectionViewListCell {
                 verticalStack.addArrangedSubview(repliesView)
                 repliesView.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
                 let bottomAnchor = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-                bottomAnchor.priority = .defaultLow
+                bottomAnchor.priority = .defaultHigh
                 bottomAnchor.isActive = true
             } else {
                 let bottomAnchor = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
@@ -45,7 +46,7 @@ class CommentCell: UICollectionViewListCell {
             if mode == .Root, item.replies != 0 {
                 disclosureButton.alpha = 1
                 let attrString = NSMutableAttributedString(string: "\(item.replies)", attributes: [
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote) as Any,
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
                     NSAttributedString.Key.foregroundColor: UIColor.systemBlue
                 ])
                 disclosureButton.setAttributedTitle(attrString, for: .normal)
@@ -267,14 +268,14 @@ class CommentCell: UICollectionViewListCell {
         instance.tintColor = .systemBlue //traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
         instance.addTarget(self, action: #selector(self.reply), for: .touchUpInside)
         let attrString = NSMutableAttributedString(string: "reply".localized.uppercased(), attributes: [
-            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote) as Any,
+            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
             NSAttributedString.Key.foregroundColor: UIColor.systemBlue
         ])
         instance.setAttributedTitle(attrString, for: .normal)
 //        instance.contentVerticalAlignment = .fill
 //        instance.contentHorizontalAlignment = .fill
 //        instance.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        let constraint = instance.heightAnchor.constraint(equalToConstant: "text".height(withConstrainedWidth: 1000, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)!))
+        let constraint = instance.heightAnchor.constraint(equalToConstant: "text".height(withConstrainedWidth: 1000, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)!))
         constraint.identifier = "height"
         constraint.isActive = true
         
@@ -375,21 +376,25 @@ class CommentCell: UICollectionViewListCell {
     }
     
     private func setTasks() {
-        guard mode == .Root else { return }
+//        guard mode == .Root else { return }
+//        guard tasks.isEmpty else { return }
         
-        tasks.append(Task {@MainActor [weak self] in
+        tasks.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {
                 guard let self = self,
                       let instance = notification.object as? Comment,
-                      instance == self.item
+                      instance == self.item,
+                      self.mode == .Root
                 else { return }
                 
-                self.disclosureButton.alpha = self.mode == .Root ? 1 : 0
-                let attrString = NSMutableAttributedString(string: "\(instance.replies)", attributes: [
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote) as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.systemBlue
-                ])
-                self.disclosureButton.setAttributedTitle(attrString, for: .normal)
+                await MainActor.run {
+                    self.disclosureButton.alpha = self.mode == .Root ? 1 : 0
+                    let attrString = NSMutableAttributedString(string: "\(instance.replies)", attributes: [
+                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+                        NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+                    ])
+                    self.disclosureButton.setAttributedTitle(attrString, for: .normal)
+                }
             }
         })
     }
@@ -539,16 +544,18 @@ class CommentCell: UICollectionViewListCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
+        item = nil
         commentThreadSubject = .init(nil)
         replySubject = .init(nil)
         claimSubject = .init(nil)
         deleteSubject = .init(nil)
         avatar.clearImage()
-        item = nil
 //        supplementaryStack.removeArrangedSubview(menuButton)
 //        menuButton.removeFromSuperview()
         verticalStack.removeArrangedSubview(repliesView)
         repliesView.removeFromSuperview()
+//        tasks.forEach { $0?.cancel() }
+//        setTasks()
     }
     
     override func updateConstraints() {

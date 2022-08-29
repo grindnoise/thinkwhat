@@ -19,6 +19,7 @@ protocol CommentsViewInput: class {
     func requestComments(exclude: [Comment])
     func postComment(_: String, replyTo: Comment?)
     func postClaim(comment: Comment, reason: Claim)
+    func deleteComment(_:Comment)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -31,6 +32,7 @@ protocol CommentsControllerInput: class {
     func requestComments(rootComment: Comment, exclude: [Comment])
     func postComment(_: String, replyTo: Comment?)
     func postClaim(comment: Comment, reason: Claim)
+    func deleteComment(_:Comment)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -40,6 +42,7 @@ protocol CommentsModelOutput: class {
     var survey: Survey? { get }
     
     func commentPostFailure()
+    func commentDeleteError()
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -49,4 +52,5 @@ protocol CommentsControllerOutput: class {
     var viewInput: CommentsViewInput? { get set }
     
     func commentPostFailure()
+    func commentDeleteError()
 }

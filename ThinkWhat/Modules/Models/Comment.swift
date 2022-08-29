@@ -14,20 +14,25 @@ class Comments {
     private init() {}
     var all: [Comment] = [] {
         didSet {
-//            Check for duplicates
-            guard let lastInstance = all.last else { return }
-            guard oldValue.filter({ $0 == lastInstance }).isEmpty else {
-                all.remove(object: lastInstance)
-                return
+            //Append
+            if oldValue.count < all.count {
+                //            Check for duplicates
+                guard let lastInstance = all.last else { return }
+                guard oldValue.filter({ $0 == lastInstance }).isEmpty else {
+                    all.remove(object: lastInstance)
+                    return
+                }
+                guard lastInstance.isParentNode else {
+                    NotificationCenter.default.post(name: Notifications.Comments.ChildAppend, object: lastInstance)
+                    return
+                }
+                //            if lastInstance.isBanned
+                guard !lastInstance.isDeleted else { return }
+                NotificationCenter.default.post(name: Notifications.Comments.Append, object: lastInstance)
+                //            if let survey = lastInstance.survey {
+                //                survey.reference.commentsTotal += 1
+                //            }
             }
-            guard lastInstance.isParentNode else {
-                NotificationCenter.default.post(name: Notifications.Comments.ChildAppend, object: lastInstance)
-                return
-            }
-            NotificationCenter.default.post(name: Notifications.Comments.Append, object: lastInstance)
-//            if let survey = lastInstance.survey {
-//                survey.reference.commentsTotal += 1
-//            }
         }
     }
     
@@ -98,6 +103,12 @@ class Comment: Decodable {
         didSet {
             guard isBanned else { return }
             NotificationCenter.default.post(name: Notifications.Comments.Ban, object: self)
+        }
+    }
+    var isDeleted: Bool = false {
+        didSet {
+            guard isDeleted else { return }
+            NotificationCenter.default.post(name: Notifications.Comments.Delete, object: self)
         }
     }
     var isClaimed: Bool = false {

@@ -60,7 +60,7 @@ class CommentsSectionCell: UICollectionViewCell {
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
     public let replySubject = CurrentValueSubject<[Comment: String]?, Never>(nil)
     public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
-    public var deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public let deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentsRequestSubject = CurrentValueSubject<[Comment], Never>([])
     public var lastPostedComment: Comment? {

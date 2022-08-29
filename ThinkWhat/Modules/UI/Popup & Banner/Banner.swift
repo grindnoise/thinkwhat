@@ -7,53 +7,29 @@
 //
 
 import UIKit
+import Combine
 
 class Banner: UIView {
-    
-    deinit {
-        print("Banner deinit")
-    }
-    
-    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightDivisor _heightDivisor: CGFloat = 3.05, fadeBackground: Bool) {
-        self.fadeBackground = fadeBackground
-        super.init(frame: frame)
-        self.callbackDelegate = callbackDelegate
-        self.bannerDelegate = bannerDelegate
-        self.heightDivisor = _heightDivisor
-        commonInit()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: - Initialization
-    private func commonInit() {
-        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-        backgroundColor                 = .clear
-        bounds                          = UIScreen.main.bounds
-        contentView.frame               = bounds
-        contentView.autoresizingMask    = [.flexibleHeight, .flexibleWidth]
-        appDelegate.window?.addSubview(self)
-        addSubview(contentView)
-        
-        //Set default height
-        setNeedsLayout()
-        height                      = contentView.bounds.width/heightDivisor
-        heightConstraint.constant   = height
-        topConstraint.constant      = yOrigin//-(topConstraint.constant + height)
-        layoutIfNeeded()
-        let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:)))
-        body.addGestureRecognizer(gestureRecognizer)
-        body.cornerRadius = body.frame.width * 0.05
-    }
     
     // MARK: - IB Outlets
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var shadowView: UIView! {
         didSet {
-            shadowView.backgroundColor = .clear
+            shadowView.layer.masksToBounds = false
             shadowView.clipsToBounds = false
+            shadowView.backgroundColor = .clear
+            shadowView.accessibilityIdentifier = "shadow"
+            shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+            shadowView.layer.shadowRadius = 5
+            shadowView.layer.shadowOffset = .zero
+            shadowView.publisher(for: \.bounds, options: .new)
+                .sink { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath
+                }
+                .store(in: &subscriptions)
         }
     }
     @IBOutlet weak var background: UIView! {
@@ -62,16 +38,14 @@ class Banner: UIView {
             background.alpha = 0
         }
     }
+    @IBOutlet weak var coloredBackround: UIView! {
+        didSet {
+            coloredBackround.backgroundColor =  traitCollection.userInterfaceStyle == .dark ? .clear : color
+        }
+    }
     @IBOutlet weak var body: UIView! {
         didSet {
-            body.backgroundColor = UIColor { traitCollection in
-                switch traitCollection.userInterfaceStyle {
-                case .dark:
-                    return .tertiarySystemBackground
-                default:
-                    return .systemBackground
-                }
-            }
+            body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .white
         }
     }
     @IBOutlet weak var container: UIView!
@@ -110,6 +84,60 @@ class Banner: UIView {
     ///Delegates
     private weak var callbackDelegate : CallbackObservable?
     private weak var bannerDelegate: BannerObservable?
+    private var color: UIColor = .clear
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
+    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, backgroundColor: UIColor = .clear, heightDivisor _heightDivisor: CGFloat = 6, fadeBackground: Bool) {
+        self.fadeBackground = fadeBackground
+        super.init(frame: frame)
+        self.callbackDelegate = callbackDelegate
+        self.bannerDelegate = bannerDelegate
+        self.heightDivisor = _heightDivisor
+        self.color = backgroundColor
+        commonInit()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Initialization
+    private func commonInit() {
+        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        backgroundColor                 = .clear
+        bounds                          = UIScreen.main.bounds
+        contentView.frame               = bounds
+        contentView.autoresizingMask    = [.flexibleHeight, .flexibleWidth]
+        appDelegate.window?.addSubview(self)
+        addSubview(contentView)
+        
+        //Set default height
+        setNeedsLayout()
+        height                      = contentView.bounds.width/heightDivisor
+        heightConstraint.constant   = height
+        topConstraint.constant      = yOrigin//-(topConstraint.constant + height)
+        layoutIfNeeded()
+        let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:)))
+        body.addGestureRecognizer(gestureRecognizer)
+        body.cornerRadius = body.frame.width * 0.05
+    }
+    
+    
     
     func present(content: UIView, isModal _isModal: Bool = false, dismissAfter seconds: TimeInterval = 0) {
         content.frame = container.frame
@@ -269,10 +297,10 @@ extension Banner: CallbackObservable {
     }
 }
 
-func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, content: UIView, color: UIColor = .systemRed, isModal: Bool = false, dismissAfter: TimeInterval = 1, identifier: String = "", fadeBackground: Bool = false) {
-    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate, fadeBackground: fadeBackground)
+func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, content: UIView, color: UIColor = .systemRed, textColor: UIColor = .label, isModal: Bool = false, dismissAfter: TimeInterval = 1, backgroundColor: UIColor = . clear, identifier: String = "", fadeBackground: Bool = false) {
+    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate, backgroundColor: backgroundColor, fadeBackground: fadeBackground)
     banner.accessibilityIdentifier = identifier
-    banner.present(content: PlainBannerContent(text: text, imageContent: content, color: color), isModal: isModal, dismissAfter: dismissAfter)
+    banner.present(content: PlainBannerContent(text: text, imageContent: content, color: color, textColor: textColor), isModal: isModal, dismissAfter: dismissAfter)
 }
 //
 //func showPopup(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: UIView, color: UIColor = .systemRed, isModal: Bool = true, shouldDismissAfter: TimeInterval = 1, accessibilityIdentifier: String = "", callbackPassthrough: Bool = false) {

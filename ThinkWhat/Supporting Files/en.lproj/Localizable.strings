@@ -162,6 +162,8 @@
 "points" = " votes";
 "support_poll" = "Support poll";
 "next" = "Next";
+"comment_posted" = "Comment has been posted";
+"comment_deleted" = "Comment has been deleted";
 
 //Voters VC
 "voters_load_error" = "Error occured during loading voters list";

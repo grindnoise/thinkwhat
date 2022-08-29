@@ -146,7 +146,7 @@ class PollView: UIView {
 // MARK: - Controller Output
 extension PollView: PollControllerOutput {
     func commentDeleteError() {
-        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: ImageSigns.exclamationMark, color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemRed.withAlphaComponent(1))
     }
     
     func commentPostCallback(_ result: Result<Comment, Error>) {
@@ -160,7 +160,7 @@ extension PollView: PollControllerOutput {
     
     func onAddFavoriteCallback() {
         guard surveyReference.isFavorite else { return }
-        showBanner(bannerDelegate: self, text: "added_to_watch_list".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+        showBanner(bannerDelegate: self, text: "added_to_watch_list".localized, content: ImageSigns.binocularsFilled, color: UIColor.white, textColor: .white, dismissAfter: 0.5, backgroundColor: UIColor.systemIndigo.withAlphaComponent(1))
     }
     
     var mode: PollController.Mode {

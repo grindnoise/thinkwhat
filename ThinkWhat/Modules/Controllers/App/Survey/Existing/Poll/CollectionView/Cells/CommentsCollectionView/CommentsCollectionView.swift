@@ -45,11 +45,11 @@ class CommentsCollectionView: UICollectionView {
         guard let survey = survey else { return [] }
         return survey.commentsSortedByDate
     }
-    public let commentSubject = CurrentValueSubject<String?, Never>(nil)
-    public let replySubject = CurrentValueSubject<[Comment: String]?, Never>(nil)
-    public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public var commentSubject = CurrentValueSubject<String?, Never>(nil)
+    public var replySubject = CurrentValueSubject<[Comment: String]?, Never>(nil)
+    public var claimSubject = CurrentValueSubject<Comment?, Never>(nil)
     public var deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
-    public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
+    public var commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
     public var commentsRequestSubject = CurrentValueSubject<[Comment]?, Never>(nil)
 //    public var commentsRequestSubject: CurrentValueSubject<[Comment], Never>!
     //New user comment publisher
@@ -126,6 +126,15 @@ class CommentsCollectionView: UICollectionView {
     // MARK: - UI functions
     private func setTasks() {
         tasks.append( Task { [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: Notifications.Comments.Post) {
+                guard let self = self else { return }
+                //Post notification
+                await MainActor.run {
+                    showBanner(bannerDelegate: self, text: "comment_posted".localized, content: UIImageView(image: UIImage(systemName: "checkmark.bubble.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemGreen.withAlphaComponent(1))
+                }
+            }
+        })
+        tasks.append( Task { [weak self] in
             for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
                 guard let self = self else { return }
                 await MainActor.run {
@@ -138,6 +147,7 @@ class CommentsCollectionView: UICollectionView {
                 guard let self = self,
                       self.mode == .Root,
                       let instance = notification.object as? Comment,
+                      !instance.isDeleted,
                       instance.replyToId.isNil,
                       instance.survey == self.survey,
                       var snap = self.source.snapshot() as? Snapshot
@@ -159,6 +169,7 @@ class CommentsCollectionView: UICollectionView {
                 guard let self = self,
                       self.mode == .Tree,
                       let instance = notification.object as? Comment,
+                      !instance.isDeleted,
                       instance.parent == self.rootComment,
                       var snap = self.source.snapshot() as? Snapshot
                 else { return }
@@ -197,6 +208,7 @@ class CommentsCollectionView: UICollectionView {
                 snap.deleteItems([instance])
                 await MainActor.run {
                     self.source.apply(snap, animatingDifferences: true)
+                    showBanner(bannerDelegate: self, text: "comment_deleted".localized, content: UIImageView(image: UIImage(systemName: "trash.fill")), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemRed.withAlphaComponent(1))
                 }
             }
         })

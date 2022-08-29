@@ -10,14 +10,34 @@ import UIKit
 
 class PlainBannerContent: UIView {
     
+    // MARK: - IB Outlets
+    @IBOutlet var contentView: UIView!
+    @IBOutlet weak var imageContainer: UIView! {
+        didSet {
+            imageContent.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : color
+            imageContent.addEquallyTo(to: imageContainer)
+            guard imageContent.isKind(of: UIImageView.self) else { return }
+            (imageContent as! UIImageView).contentMode = .scaleAspectFit
+        }
+    }
+    @IBOutlet weak var label: UILabel!
+    
+    // MARK: - Properties
+    private let text: String
+    private var imageContent: UIView!
+    private let color: UIColor
+    private let textColor: UIColor
+    private var observers: [NSKeyValueObservation] = []
+    
     deinit {
         print("PlainBannerContent deinit")
     }
     
-    init(text _text: String, imageContent _imageContent: UIView, color _color: UIColor) {
+    init(text _text: String, imageContent _imageContent: UIView, color _color: UIColor, textColor: UIColor = .label) {
         self.text = _text
         self.color = _color
         self.imageContent = _imageContent
+        self.textColor = textColor
         super.init(frame: CGRect.zero)
         commonInit()
     }
@@ -45,32 +65,16 @@ class PlainBannerContent: UIView {
             paragraph.alignment = .center
             let string = self.text
             let attributedText = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-            attributedText.addAttributes(StringAttributes.getAttributes(font: UIFont(name: StringAttributes.Fonts.Style.Regular, size: label.bounds.width * 0.045)!, foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
+            attributedText.addAttributes(StringAttributes.getAttributes(font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title3)!, foregroundColor: self.traitCollection.userInterfaceStyle == .dark ? .label : self.textColor, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
             label.attributedText = attributedText
             guard label.numberOfTotatLines > 1 else { return }
             label.textAlignment = .left
         })
     }
     
-    // MARK: - IB Outlets
-    @IBOutlet var contentView: UIView!
-    @IBOutlet weak var imageContainer: UIView! {
-        didSet {
-            imageContent.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            imageContent.addEquallyTo(to: imageContainer)
-            guard imageContent.isKind(of: UIImageView.self) else { return }
-            (imageContent as! UIImageView).contentMode = .scaleAspectFit
-        }
-    }
-    @IBOutlet weak var label: UILabel!
-    
-    // MARK: - Properties
-    private let text: String
-    private var imageContent: UIView!
-    private let color: UIColor
-    private var observers: [NSKeyValueObservation] = []
+   
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        imageContent.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        imageContent.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : color
     }
 }

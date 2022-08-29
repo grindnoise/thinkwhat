@@ -86,6 +86,15 @@ class CommentsView: UIView {
             
         }.store(in: &subscriptions)
         
+        //Delete comment
+        instance.deleteSubject.sink { [weak self] in
+            guard let self = self,
+                  let comment = $0
+            else { return }
+            
+            self.viewInput?.deleteComment(comment)
+        }.store(in: &self.subscriptions)
+        
         return instance
         }()
     
@@ -129,6 +138,10 @@ class CommentsView: UIView {
 
 // MARK: - Controller Output
 extension CommentsView: CommentsControllerOutput {
+    func commentDeleteError() {
+        showBanner(bannerDelegate: self, text: "added_to_watch_list".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill")), color: UIColor.white, textColor: .white, dismissAfter: 0.5, backgroundColor: UIColor.systemIndigo.withAlphaComponent(1))
+    }
+    
     func commentPostFailure() {
         showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark)
     }
