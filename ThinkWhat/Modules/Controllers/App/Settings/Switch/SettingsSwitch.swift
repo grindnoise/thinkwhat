@@ -11,7 +11,7 @@ import UIKit
 class SettingsSwitch: UIView {
 
     enum State {
-        case Read, Edit, Settings
+        case Profile, Settings
     }
     
     // MARK: - Initialization
@@ -45,8 +45,8 @@ class SettingsSwitch: UIView {
     }
     
     private func setupUI() {
-        read.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-        read.tintColor = .white
+        profile.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+        profile.tintColor = .white
         bg.insertSubview(mark, at: 0)
         bg.clipsToBounds = false
         mark.clipsToBounds = false
@@ -54,19 +54,16 @@ class SettingsSwitch: UIView {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        read.tintColor = state == .Read ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        edit.tintColor = state == .Edit ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        settings.tintColor = state == .Settings ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        profile.tintColor = state == .Profile ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
+        settings.tintColor = state == .Settings ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
         mark.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
     @objc
     private func handleTap(recognizer: UITapGestureRecognizer) {
         guard let v = recognizer.view else { return }
-        if v === read {
-            state = .Read
-        } else if v === edit {
-            state = .Edit
+        if v === profile {
+            state = .Profile
         } else if v === settings {
             state = .Settings
         }
@@ -74,22 +71,13 @@ class SettingsSwitch: UIView {
     
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var bg: UIView!
-    @IBOutlet weak var read: UIImageView! {
+    @IBOutlet weak var profile: UIImageView! {
         didSet {
-            read.isUserInteractionEnabled = true
-            read.contentMode = .center
-            read.image = ImageSigns.personFilled.image
-            read.tintColor = .secondaryLabel
-            read.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
-        }
-    }
-    @IBOutlet weak var edit: UIImageView! {
-        didSet {
-            edit.isUserInteractionEnabled = true
-            edit.contentMode = .center
-            edit.image = ImageSigns.pencil.image
-            edit.tintColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-            edit.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
+            profile.isUserInteractionEnabled = true
+            profile.contentMode = .center
+            profile.image = ImageSigns.personFilled.image
+            profile.tintColor = .secondaryLabel
+            profile.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
         }
     }
     @IBOutlet weak var settings: UIImageView! {
@@ -102,25 +90,21 @@ class SettingsSwitch: UIView {
         }
     }
     
-    var state: SettingsSwitch.State = .Read {
+    var state: SettingsSwitch.State = .Profile {
         didSet {
             guard state != oldValue else { return }
             callbackDelegate?.callbackReceived(state)
             var oldView: UIView!
             switch oldValue {
-            case .Read:
-                oldView = read
-            case .Edit:
-                oldView = edit
+            case .Profile:
+                oldView = profile
             case .Settings:
                 oldView = settings
             }
             var newView: UIView!
             switch state {
-            case .Read:
-                newView = read
-            case .Edit:
-                newView = edit
+            case .Profile:
+                newView = profile
             case .Settings:
                 newView = settings
             }

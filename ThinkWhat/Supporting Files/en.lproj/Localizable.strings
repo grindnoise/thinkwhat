@@ -24,6 +24,9 @@
 "replies" = "Replies";
 "reply" = "Reply";
 "add_comment" = "Add comment";
+"pseudonym" = "Anonymous#";
+"pseudonym_placeholder" = "Your pseudonym";
+"add_pseudonym" = "Enter pseudonym";
 
 //Common
 "title" = "Title";
@@ -125,7 +128,7 @@
 "profile_fill" = "Fill in profile";
 
 //FillProfile VC
-"firstNameTF" = "First Name";
+"firstNameTF" = "First name";
 "lastNameTF" = "Last name";
 "birthDateTF" = "Birth date";
 "cityTF" = "City";
@@ -162,8 +165,8 @@
 "points" = " votes";
 "support_poll" = "Support poll";
 "next" = "Next";
-"comment_posted" = "Comment has been posted";
-"comment_deleted" = "Comment has been deleted";
+"comment_posted" = "Comment posted";
+"comment_deleted" = "Comment deleted";
 
 //Voters VC
 "voters_load_error" = "Error occured during loading voters list";
@@ -272,7 +275,7 @@
 "share" = "Share";
 "watch" = "Watch";
 "don't_watch" = "Don't watch";
-"vote_to_view_comments" = "To see comments and comment first vote";
+"vote_to_view_comments" = "Take the survey first";
 "added_to_watch_list" = "Poll was added to watch list";
 "votes_total" = "Votes";
 "voters" = "Voters";

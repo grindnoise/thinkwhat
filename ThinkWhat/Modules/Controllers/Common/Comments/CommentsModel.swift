@@ -43,11 +43,11 @@ extension CommentsModel: CommentsControllerInput {
 
     }
     
-    func postComment(_ body: String, replyTo: Comment?) {
+    func postComment(body: String, replyTo: Comment?, username: String?) {
         guard let survey = replyTo?.replyTo?.survey else { return }
         Task {
             do {
-                let _ = try await API.shared.surveys.postComment(body, survey: survey, replyTo: replyTo)
+                let _ = try await API.shared.surveys.postComment(body, survey: survey, replyTo: replyTo, username: username)
             } catch {
                 await MainActor.run {
                     modelOutput?.commentPostFailure()

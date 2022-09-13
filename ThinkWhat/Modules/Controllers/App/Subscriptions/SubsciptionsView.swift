@@ -21,44 +21,44 @@ class SubsciptionsView: UIView {
         let instance = SurveysCollectionView(delegate: self, category: .Subscriptions)
         return instance
     }()
-    private lazy var featheredLayer: CAGradientLayer = {
-        let instance = CAGradientLayer()
-        let outerColor = UIColor.clear.cgColor
-        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
-//        instance.startPoint = CGPoint(x: 0, y: 0.5);
-//        instance.endPoint = CGPoint(x: 1.0, y: 0.5);
-        // without specifying startPoint and endPoint, we get a vertical gradient
-        instance.colors = [outerColor, innerColor, innerColor, outerColor]
-        instance.locations = [0.0, 0.025, 0.975, 1.0]
-        instance.frame = frame
-        return instance
-    }()
+//    private lazy var featheredLayer: CAGradientLayer = {
+//        let instance = CAGradientLayer()
+//        let outerColor = UIColor.clear.cgColor
+//        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
+////        instance.startPoint = CGPoint(x: 0, y: 0.5);
+////        instance.endPoint = CGPoint(x: 1.0, y: 0.5);
+//        // without specifying startPoint and endPoint, we get a vertical gradient
+//        instance.colors = [outerColor, innerColor, innerColor, outerColor]
+//        instance.locations = [0.0, 0.025, 0.975, 1.0]
+//        instance.frame = frame
+//        return instance
+//    }()
     private lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = true
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         instance.addEquallyTo(to: shadowView)
-//        collectionView.addEquallyTo(to: instance)
+        collectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
         })
         return instance
     }()
-    private lazy var featheredView: UIView = {
-        let instance = UIView()
-        instance.accessibilityIdentifier = "feathered"
-        instance.layer.masksToBounds = true
-        instance.backgroundColor = .clear
-        instance.addEquallyTo(to: background)
-        observers.append(instance.observe(\UIView.bounds, options: .new) { [weak self] view, change in
-            guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
-            self.featheredLayer.frame = newValue
-        })
-        collectionView.addEquallyTo(to: instance)
-        return instance
-    }()
+//    private lazy var featheredView: UIView = {
+//        let instance = UIView()
+//        instance.accessibilityIdentifier = "feathered"
+//        instance.layer.masksToBounds = true
+//        instance.backgroundColor = .clear
+//        instance.addEquallyTo(to: background)
+//        observers.append(instance.observe(\UIView.bounds, options: .new) { [weak self] view, change in
+//            guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
+//            self.featheredLayer.frame = newValue
+//        })
+//        collectionView.addEquallyTo(to: instance)
+//        return instance
+//    }()
     private var observers: [NSKeyValueObservation] = []
     private var notifications: [Task<Void, Never>?] = []
     private var shadowObserver: NSKeyValueObservation!
@@ -139,7 +139,7 @@ class SubsciptionsView: UIView {
     private func setupUI() {
         subscriptionsCollectionView.register(UINib(nibName: "VoterCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
         setText()
-        featheredView.layer.mask = featheredLayer
+//        featheredView.layer.mask = featheredLayer
     }
     
     private func setText() {
@@ -178,9 +178,9 @@ class SubsciptionsView: UIView {
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        let outerColor = UIColor.clear.cgColor
-        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
-        featheredLayer.colors = [outerColor, innerColor,innerColor,outerColor]
+//        let outerColor = UIColor.clear.cgColor
+//        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
+//        featheredLayer.colors = [outerColor, innerColor,innerColor,outerColor]
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         

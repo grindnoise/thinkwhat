@@ -12,21 +12,20 @@
             <connections>
                 <outlet property="bg" destination="iwD-jd-JYK" id="kJX-XA-hMa"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="uK9-2E-vXx"/>
-                <outlet property="edit" destination="Jlr-2s-uGr" id="cSv-fn-gIF"/>
-                <outlet property="read" destination="jpP-nO-8oe" id="hB0-5W-bhs"/>
+                <outlet property="profile" destination="jpP-nO-8oe" id="hB0-5W-bhs"/>
                 <outlet property="settings" destination="hCF-9c-DhK" id="7o0-Em-ovF"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
-            <rect key="frame" x="0.0" y="0.0" width="200" height="50"/>
+            <rect key="frame" x="0.0" y="0.0" width="115" height="50"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iwD-jd-JYK">
-                    <rect key="frame" x="0.0" y="0.0" width="200" height="50"/>
+                    <rect key="frame" x="0.0" y="0.0" width="115" height="50"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" baselineRelativeArrangement="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uMH-Qi-fDp">
-                            <rect key="frame" x="0.0" y="0.0" width="200" height="50"/>
+                            <rect key="frame" x="0.0" y="0.0" width="115" height="50"/>
                             <subviews>
                                 <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jpP-nO-8oe">
                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
@@ -34,19 +33,13 @@
                                         <constraint firstAttribute="width" secondItem="jpP-nO-8oe" secondAttribute="height" multiplier="1:1" identifier="first" id="zZ5-BW-hnC"/>
                                     </constraints>
                                 </imageView>
-                                <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Jlr-2s-uGr">
-                                    <rect key="frame" x="75" y="0.0" width="50" height="50"/>
-                                </imageView>
                                 <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hCF-9c-DhK">
-                                    <rect key="frame" x="150" y="0.0" width="50" height="50"/>
+                                    <rect key="frame" x="65" y="0.0" width="50" height="50"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="hCF-9c-DhK" secondAttribute="height" multiplier="1:1" identifier="fourth" id="kW1-l7-4ff"/>
                                     </constraints>
                                 </imageView>
                             </subviews>
-                            <constraints>
-                                <constraint firstItem="Jlr-2s-uGr" firstAttribute="width" secondItem="Jlr-2s-uGr" secondAttribute="height" multiplier="1:1" identifier="second" id="HB4-oa-oFc"/>
-                            </constraints>
                         </stackView>
                     </subviews>
                     <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>

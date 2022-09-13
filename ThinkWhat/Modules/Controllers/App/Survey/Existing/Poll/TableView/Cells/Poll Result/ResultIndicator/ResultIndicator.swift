@@ -86,7 +86,7 @@ class ResultIndicator: UIView {
 //        }
 //    }
 //    private var imageViews: [Avatar] = []
-    private var highlightedAvatar: Avatar? {
+    private var highlightedAvatar: delAvatar? {
         didSet {
             if highlightedAvatar != nil, highlightedAvatar != oldValue {
                 highlightedAvatar?.layer.zPosition += 10
@@ -126,8 +126,8 @@ class ResultIndicator: UIView {
             }
         }
     }
-    private var avatars: [Avatar] = []
-    private var interactionViews: [[UIView: Avatar]] = []
+    private var avatars: [delAvatar] = []
+    private var interactionViews: [[UIView: delAvatar]] = []
     var answer: Answer!
     private func setupImages() {
         switch mode {
@@ -152,7 +152,7 @@ class ResultIndicator: UIView {
                     if i == 5 {
                         break
                     }
-                    let avatar = Avatar(frame: .zero)
+                    let avatar = delAvatar(frame: .zero)
                     avatar.layer.zPosition = 10 - CGFloat(i)
                     avatars.append(avatar)
                     actionView.addSubview(avatar)

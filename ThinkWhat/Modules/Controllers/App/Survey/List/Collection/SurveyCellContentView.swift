@@ -103,7 +103,7 @@ class SurveyCellContentView: UIView, UIContentView {
         }
     }
     @IBOutlet weak var viewsLabel: UILabel!
-    @IBOutlet weak var avatar: Avatar! {
+    @IBOutlet weak var avatar: delAvatar! {
         didSet {
             avatar.backgroundColor = .clear
         }

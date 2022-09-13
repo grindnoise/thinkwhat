@@ -49,6 +49,7 @@ struct DjangoVariables {
         static let facebookURL              = "facebook_url"
         static let vkURL                    = "vk_url"
         static let city                     = "city"
+        static let locale                   = "locale"
     }
     struct Survey {
         static let category                 = "category"
@@ -120,6 +121,8 @@ class ModelProperties {
     private var _surveyMediaTitleMaxLength:  Int = 0
     private var _commentMinLength:           Int = 0
     private var _commentMaxLength:           Int = 0
+    private var _anonMinLength:           Int = 0
+    private var _anonMaxLength:           Int = 0
     
 
     var surveyTitleMinLength:       Int { return { _surveyTitleMinLength }()}
@@ -137,6 +140,9 @@ class ModelProperties {
     var surveyMediaTitleMaxLength:  Int { return { _surveyMediaTitleMaxLength }()}
     var commentMinLength:           Int { return { _commentMinLength }()}
     var commentMaxLength:           Int { return { _commentMaxLength }()}
+    var anonMinLength:              Int { return { _anonMinLength }()}
+    var anonMaxLength:              Int { return { _anonMaxLength }()}
+
     
     func importJson(_ json: JSON) {
         for i in json {
@@ -161,7 +167,7 @@ class ModelProperties {
                     } else if j.0 == "description", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
                         _surveyAnswerTextMinLength = dict["min_length"]!
                         _surveyAnswerTextMaxLength = dict["max_length"]!
-                    } else if j.0 == "free_count", let value = j.1.intValue as? Int {
+                    } else if j.0 == "free_count", let value = j.1.int {
                         _surveyAnswerMaxFreeCount = value
                     }
                 }
@@ -177,6 +183,9 @@ class ModelProperties {
                     if j.0 == "body", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
                         _commentMinLength = dict["min_length"]!
                         _commentMaxLength = dict["max_length"]!
+                    } else if j.0 == "anon", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
+                        _anonMinLength = dict["min_length"]!
+                        _anonMaxLength = dict["max_length"]!
                     }
                 }
             }

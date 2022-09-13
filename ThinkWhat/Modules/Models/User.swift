@@ -132,13 +132,32 @@ class Userprofile: Decodable {
 
     var id:                 Int
 //    var username:           String
-    var firstName:          String
-    var lastName:           String
+    var firstName:          String {
+        didSet {
+            guard oldValue != firstName else { return }
+            NotificationCenter.default.post(name: Notifications.Userprofiles.FirstNameChanged, object: self)
+        }
+    }
+    var lastName:           String {
+        didSet {
+            guard oldValue != lastName else { return }
+            NotificationCenter.default.post(name: Notifications.Userprofiles.LastNameChanged, object: self)
+        }
+    }
     var name: String {
         return "\(firstName) \(lastName)"
     }
     var email:              String
-    var birthDate:          Date?
+    var birthDate:          Date? {
+        didSet {
+            guard let birthDate = birthDate,
+                  oldValue != birthDate,
+                  isCurrent
+            else { return }
+            
+            NotificationCenter.default.post(name: Notifications.Userprofiles.BirthDateChanged, object: self)
+        }
+    }
     var age: Int {
         return birthDate?.age ?? 18
     }
@@ -204,6 +223,13 @@ class Userprofile: Decodable {
             return lastName
         }
         return components.first!
+    }
+    var isCurrent: Bool {
+        guard let current = Userprofiles.shared.current,
+              current.id == id
+        else { return false }
+        
+        return true
     }
 //    init(id _id: Int,
 //         firstName _firstName: String,
@@ -308,9 +334,18 @@ class Userprofile: Decodable {
                     }
                 }
             }
-            if Userprofiles.shared.all.filter({ $0 == self }).isEmpty {
-                Userprofiles.shared.all.append(self)
+            
+            //Update current
+            guard isCurrent else {
+                if Userprofiles.shared.all.filter({ $0 == self }).isEmpty {
+                    Userprofiles.shared.all.append(self)
+                }
+                return
             }
+            
+            Userprofiles.shared.current?.firstName = firstName
+            Userprofiles.shared.current?.lastName = lastName
+            Userprofiles.shared.current?.birthDate = birthDate
         } catch {
 #if DEBUG
             error.printLocalized(class: type(of: self), functionName: #function)

@@ -43,7 +43,7 @@ class Fade: UIView {
     func dismiss(duration: TimeInterval = 0.25) {
         UIView.animate(withDuration: duration, delay: 0, options: [.curveEaseInOut], animations: {
             self.alpha = 0
-        })
+        }) { _ in self.removeFromSuperview()}
     }
     
     @objc

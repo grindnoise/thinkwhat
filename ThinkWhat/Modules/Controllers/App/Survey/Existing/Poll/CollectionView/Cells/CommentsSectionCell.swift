@@ -58,7 +58,9 @@ class CommentsSectionCell: UICollectionViewCell {
         }
     }
     public let commentSubject = CurrentValueSubject<String?, Never>(nil)
+    public let anonCommentSubject = CurrentValueSubject<[String: String]?, Never>(nil)
     public let replySubject = CurrentValueSubject<[Comment: String]?, Never>(nil)
+    public let anonReplySubject = CurrentValueSubject<[Comment: [String: String]]?, Never>(nil)
     public let claimSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
     public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
@@ -112,9 +114,7 @@ class CommentsSectionCell: UICollectionViewCell {
     private lazy var collectionView: CommentsCollectionView = {
         let instance = CommentsCollectionView(rootComment: nil)
         
-        instance.claimSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
+        instance.claimSubject.sink { [weak self] in
             guard let self = self,
                   let string = $0
             else { return }
@@ -123,9 +123,7 @@ class CommentsSectionCell: UICollectionViewCell {
 //            self.claimSubject.send(completion: .finished)
         }.store(in: &subscriptions)
         
-        instance.commentSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
+        instance.commentSubject.sink { [weak self] in
             guard let self = self,
                   let string = $0
             else { return }
@@ -134,15 +132,28 @@ class CommentsSectionCell: UICollectionViewCell {
 //            self.commentSubject.send(completion: .finished)
         }.store(in: &subscriptions)
         
-        instance.replySubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
+        instance.replySubject.sink { [weak self] in
             guard let self = self,
-                  let string = $0
+                  let reply = $0
             else { return }
             
-            self.replySubject.send($0)
-//            self.commentSubject.send(completion: .finished)
+            self.replySubject.send(reply)
+        }.store(in: &subscriptions)
+        
+        instance.anonCommentSubject.sink { [weak self] in
+            guard let self = self,
+                  let dict = $0
+            else { return }
+            
+            self.anonCommentSubject.send(dict)
+        }.store(in: &subscriptions)
+        
+        instance.anonReplySubject.sink { [weak self] in
+            guard let self = self,
+                  let dict = $0
+            else { return }
+            
+            self.anonReplySubject.send(dict)
         }.store(in: &subscriptions)
         
         //Delete comment
@@ -154,9 +165,7 @@ class CommentsSectionCell: UICollectionViewCell {
             self.deleteSubject.send(comment)
         }.store(in: &self.subscriptions)
         
-        instance.commentsRequestSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
+        instance.commentsRequestSubject.sink { [weak self] in
             guard let self = self,
                   let comments = $0
             else { return }
@@ -173,7 +182,7 @@ class CommentsSectionCell: UICollectionViewCell {
         }.store(in: &subscriptions)
         
         return instance
-        }()
+    }()
     private lazy var containerView: UIView = {
        let instance = UIView()
         instance.isUserInteractionEnabled = true

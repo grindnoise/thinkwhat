@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CurrentUserProfileView: UIView {
+class _CurrentUserProfileView: UIView {
     
     // MARK: - Initialization
     init(frame: CGRect, callbackDelegate: CallbackObservable) {
@@ -233,7 +233,7 @@ class CurrentUserProfileView: UIView {
 
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var avatar: Avatar! 
+    @IBOutlet weak var avatar: delAvatar! 
     @IBOutlet weak var name: UILabel! {
         didSet {
             name.numberOfLines = 0
@@ -295,7 +295,7 @@ class CurrentUserProfileView: UIView {
     }
 }
 
-extension CurrentUserProfileView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension _CurrentUserProfileView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return Userprofiles.shared.current?.topPublicationCategories?.count ?? 0
     }

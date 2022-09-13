@@ -31,7 +31,7 @@ protocol PollViewInput: AnyObject {
     func onExitWithSkip()
 //    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor)
     func onVotersTapped(answer: Answer, color: UIColor)
-    func postComment(_: String, replyTo: Comment?)
+    func postComment(body: String, replyTo: Comment?, username: String?)
     func requestComments(_:[Comment])
     func openCommentThread(_: Comment)
     func deleteComment(_:Comment)
@@ -52,7 +52,7 @@ protocol PollControllerInput: AnyObject {
     func vote(_: Answer)
     func addView()
     func updateResultsStats(_: SurveyReference)
-    func postComment(_: String, replyTo: Comment?)
+    func postComment(body: String, replyTo: Comment?, username: String?)
     func requestComments(_:[Comment])
     func deleteComment(_:Comment)
 }

@@ -62,8 +62,8 @@ class PollController: UIViewController {
         })
         return v
     }()
-    private lazy var avatar: NewAvatar = {
-        return NewAvatar(userprofile: surveyReference.owner)
+    private lazy var avatar: Avatar = {
+        return Avatar(userprofile: surveyReference.owner)
 //        return Avatar(gender: surveyReference.owner.gender, image: surveyReference.owner.image)
     }()
     private lazy var progressIndicator: CircleButton = {
@@ -617,7 +617,7 @@ class PollController: UIViewController {
                 guard let self = self else { return }
                 guard let instance = self._survey,
                       instance.isComplete else {
-                    showBanner(bannerDelegate: self.controllerOutput as! BannerObservable, text: "finish_poll".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+                    showBanner(bannerDelegate: self, text: "finish_poll".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
                     return }
                 self.controllerInput?.addFavorite(!instance.isFavorite)
             })
@@ -828,8 +828,8 @@ extension PollController: PollViewInput {
         controllerInput?.requestComments(comments)
     }
     
-    func postComment(_ string: String, replyTo: Comment? = nil) {
-        controllerInput?.postComment(string, replyTo: replyTo)
+    func postComment(body: String, replyTo: Comment? = nil, username: String? = nil) {
+        controllerInput?.postComment(body: body, replyTo: replyTo, username: username)
     }
     
     func onVotersTapped(answer: Answer, color: UIColor) {

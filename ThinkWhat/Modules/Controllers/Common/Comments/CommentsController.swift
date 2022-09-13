@@ -89,8 +89,8 @@ extension CommentsController: CommentsViewInput {
         controllerInput?.postClaim(comment: comment, reason: reason)
     }
     
-    func postComment(_ body: String, replyTo: Comment?) {
-        controllerInput?.postComment(body, replyTo: replyTo)
+    func postComment(body: String, replyTo: Comment?, username: String? = nil) {
+        controllerInput?.postComment(body: body, replyTo: replyTo, username: username)
     }
     
     func requestComments(exclude: [Comment]) {

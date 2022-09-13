@@ -17,7 +17,7 @@ protocol CommentsViewInput: class {
     var controllerInput: CommentsControllerInput? { get set }
     
     func requestComments(exclude: [Comment])
-    func postComment(_: String, replyTo: Comment?)
+    func postComment(body: String, replyTo: Comment?, username: String?)
     func postClaim(comment: Comment, reason: Claim)
     func deleteComment(_:Comment)
 }
@@ -30,7 +30,7 @@ protocol CommentsControllerInput: class {
     var modelOutput: CommentsModelOutput? { get set }
     
     func requestComments(rootComment: Comment, exclude: [Comment])
-    func postComment(_: String, replyTo: Comment?)
+    func postComment(body: String, replyTo: Comment?, username: String?)
     func postClaim(comment: Comment, reason: Claim)
     func deleteComment(_:Comment)
 }

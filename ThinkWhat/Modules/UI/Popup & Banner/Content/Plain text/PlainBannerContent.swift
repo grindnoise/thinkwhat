@@ -33,6 +33,7 @@ class PlainBannerContent: UIView {
         print("PlainBannerContent deinit")
     }
     
+    // MARK: - Initialization
     init(text _text: String, imageContent _imageContent: UIView, color _color: UIColor, textColor: UIColor = .label) {
         self.text = _text
         self.color = _color
@@ -46,7 +47,6 @@ class PlainBannerContent: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Initialization
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         backgroundColor = .clear
@@ -65,15 +65,14 @@ class PlainBannerContent: UIView {
             paragraph.alignment = .center
             let string = self.text
             let attributedText = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-            attributedText.addAttributes(StringAttributes.getAttributes(font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title3)!, foregroundColor: self.traitCollection.userInterfaceStyle == .dark ? .label : self.textColor, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
+            attributedText.addAttributes(StringAttributes.getAttributes(font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title3)!, foregroundColor: self.traitCollection.userInterfaceStyle == .dark ? .label : self.textColor, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
             label.attributedText = attributedText
             guard label.numberOfTotatLines > 1 else { return }
             label.textAlignment = .left
         })
     }
     
-   
-    
+    // MARK: - Overridden
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         imageContent.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : color
     }

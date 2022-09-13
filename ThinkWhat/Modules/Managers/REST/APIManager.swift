@@ -62,18 +62,41 @@ class API {
 //        sessionManager = Session(configuration: configuration, interceptor: interceptor, eventMonitors: [NetworkLogger()])
 //    }
     
-    class func prepareUserData(firstName: String?, lastName: String?, email: String?, gender: Gender?, birthDate: String?, city: City?, image: UIImage?, vkID: String?, vkURL: String?, facebookID: String?, facebookURL: String?) -> [String: Any] {
+    class func prepareUserData(firstName: String? = nil,
+                               lastName: String? = nil,
+                               email: String? = nil,
+                               gender: Gender? = nil,
+                               birthDate: String? = nil,
+                               city: City? = nil,
+                               image: UIImage? = nil,
+                               vkID: String? = nil,
+                               vkURL: String? = nil,
+                               facebookID: String? = nil,
+                               facebookURL: String? = nil,
+                               locale: String? = nil) -> [String: Any] {
         
         var parameters = [String: Any]()
-        if !firstName.isNil {
-            parameters["owner.\(DjangoVariables.User.firstName)"] = firstName!
+        if !firstName.isNil || !lastName.isNil || !email.isNil {
+            var dict: [String: Any] = [:]
+            if let firstName = firstName, !firstName.isEmpty {
+                dict[DjangoVariables.User.firstName] = firstName
+            }
+            if let lastName = lastName, !lastName.isEmpty {
+                dict[DjangoVariables.User.lastName] = lastName
+            }
+            if let email = email, !email.isEmpty {
+                dict[DjangoVariables.User.email] = email
+            }
+            parameters["owner"] = dict
+//            parameters["owner.\(DjangoVariables.User.firstName)"] = firstName!
+//        }
+//        if !lastName.isNil {
+//            parameters["owner.\(DjangoVariables.User.lastName)"] = lastName!
+//        }
+//        if !email.isNil {
+//            parameters["owner.\(DjangoVariables.User.email)"] = email!
         }
-        if !lastName.isNil {
-            parameters["owner.\(DjangoVariables.User.lastName)"] = lastName!
-        }
-        if !email.isNil {
-            parameters["owner.\(DjangoVariables.User.email)"] = email!
-        }
+        
         if !gender.isNil {
             parameters[DjangoVariables.UserProfile.gender] = gender!.rawValue
         }
@@ -94,6 +117,9 @@ class API {
         }
         if !image.isNil {
             parameters[DjangoVariables.UserProfile.image] = image!
+        }
+        if !locale.isNil {
+            parameters[DjangoVariables.UserProfile.locale] = locale!
         }
 //        if !city.isNil {
 //            parameters[DjangoVariables.UserProfile.city] = city!.id
@@ -302,6 +328,9 @@ class API {
     
     func loginViaMail(username: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { completion(.failure(APIError.invalidURL)); return }
+#if DEBUG
+      print(password)
+#endif
         let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
         self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
             switch response.result {
@@ -459,7 +488,11 @@ class API {
     }
     
     func isUsernameEmailAvailable(email: String, username: String, completion: @escaping(Result<Bool, Error>)->()) {
-        self.request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(email.isEmpty ? API_URLS.USERNAME_EXISTS : API_URLS.EMAIL_EXISTS), httpMethod: .get, parameters: email.isEmpty ? ["username": username] : ["email": email], encoding: URLEncoding.default) { result in
+        self.request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(email.isEmpty ? API_URLS.USERNAME_EXISTS : API_URLS.EMAIL_EXISTS),
+                     httpMethod: .get,
+                     parameters: email.isEmpty ? ["username": username] : ["email": email],
+                     encoding: URLEncoding.default,
+                     accessControl: false) { result in
             switch result {
             case .success(let json):
                 print(json)
@@ -1357,13 +1390,17 @@ class API {
             }
         }
         
-        public func postComment(_ body: String, survey: Survey, replyTo: Comment? = nil) async throws -> Comment {
+        public func postComment(_ body: String, survey: Survey, replyTo: Comment? = nil, username: String? = nil) async throws -> Comment {
             guard let url = API_URLS.Surveys.postComment else { throw APIError.invalidURL }
             
             var parameters: Parameters = ["survey": survey.id, "body": body,]
             
             if let replyId = replyTo?.id {
                 parameters["reply_to"] = replyId
+            }
+            
+            if let username = username {
+                parameters["anon"] = username
             }
             
             do {
@@ -1648,30 +1685,51 @@ class API {
         }
     }
     
-    public func request(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, useHeaders: Bool = true, completion: @escaping(Result<JSON, Error>)->()) {
-        accessControl { result in
-            switch result {
-            case .success:
-                self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: useHeaders ? self.headers() : nil).response { response in
-                    switch response.result {
-                    case .success(let value):
-                        guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
-                        guard let data = value else { completion(.failure(APIError.badData)); return }
-                        guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: String(decoding: data, as: UTF8.self)))); return }
-                        do {
-                            //TODO: Определиться с инициализацией JSON
-                            let json = try JSON(data: data, options: .mutableContainers)
-                            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
-                            completion(.success(json))
-                        } catch let error {
-                            completion(.failure(error))
+    public func request(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, useHeaders: Bool = true, accessControl useAccessControl: Bool = true, completion: @escaping(Result<JSON, Error>)->()) {
+        if useAccessControl {
+            accessControl { result in
+                switch result {
+                case .success:
+                    self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: useHeaders ? self.headers() : nil).response { response in
+                        switch response.result {
+                        case .success(let value):
+                            guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
+                            guard let data = value else { completion(.failure(APIError.badData)); return }
+                            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: String(decoding: data, as: UTF8.self)))); return }
+                            do {
+                                //TODO: Определиться с инициализацией JSON
+                                let json = try JSON(data: data, options: .mutableContainers)
+                                guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+                                completion(.success(json))
+                            } catch let error {
+                                completion(.failure(error))
+                            }
+                        case .failure(let error):
+                            completion(.failure(self.parseAFError(error)))
                         }
-                    case .failure(let error):
-                        completion(.failure(self.parseAFError(error)))
                     }
+                case .failure(let error):
+                    completion(.failure(error))
                 }
-            case .failure(let error):
-                completion(.failure(error))
+            }
+        } else {
+            self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: useHeaders ? self.headers() : nil).response { response in
+                switch response.result {
+                case .success(let value):
+                    guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
+                    guard let data = value else { completion(.failure(APIError.badData)); return }
+                    guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: String(decoding: data, as: UTF8.self)))); return }
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: data, options: .mutableContainers)
+                        guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+                        completion(.success(json))
+                    } catch let error {
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    completion(.failure(self.parseAFError(error)))
+                }
             }
         }
         
@@ -1998,7 +2056,11 @@ class API {
         guard let url = URL(string: API_URLS.Geocoding.countryByIP) else {
             return
         }
-        request(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, useHeaders: false) { result in
+        request(url: url, httpMethod: .get,
+                parameters: nil,
+                encoding: URLEncoding.default,
+                useHeaders: false,
+                accessControl: false) { result in
             switch result {
             case .success(let json):
                 guard let code = json["countryCode"].string else { return }

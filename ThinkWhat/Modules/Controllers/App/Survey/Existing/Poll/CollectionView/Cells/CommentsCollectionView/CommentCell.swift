@@ -115,8 +115,8 @@ class CommentCell: UICollectionViewListCell {
         
         return instance
     }()
-    private lazy var avatar: NewAvatar = {
-        let instance = NewAvatar(isShadowed: true)
+    private lazy var avatar: Avatar = {
+        let instance = Avatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()
@@ -446,6 +446,11 @@ class CommentCell: UICollectionViewListCell {
                                                                       NSAttributedString.Key.foregroundColor : traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.darkGray])
                 attrString.append(instance)
             }
+        } else {
+            let instance = NSAttributedString(string: item.anonUsername + " ",
+                                                     attributes: [NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2) as Any,
+                                                                  NSAttributedString.Key.foregroundColor : traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.darkGray])
+            attrString.append(instance)
         }
         let date = NSAttributedString(string: item.createdAt.timeAgoDisplay(),
                                       attributes: [NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2) as Any,
@@ -456,10 +461,14 @@ class CommentCell: UICollectionViewListCell {
     
     private func setBody() {
         if mode == .Tree {
-            if let survey = item.survey, survey.isAnonymous {
-                
+            let attrString = NSMutableAttributedString()
+            if let survey = item.survey, survey.isAnonymous, let reply = item.replyTo {
+                let reply = NSAttributedString(string: "@" + reply.anonUsername, attributes: [
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+                ])
+                attrString.append(reply)
             } else if let replyItem = item.replyTo, !replyItem.isParentNode, let userprofile = replyItem.userprofile {
-                let attrString = NSMutableAttributedString()
                 if !userprofile.firstNameSingleWord.isEmpty || !userprofile.lastNameSingleWord.isEmpty {
                     var reply: NSAttributedString!
                     if !userprofile.firstNameSingleWord.isEmpty {
@@ -475,14 +484,14 @@ class CommentCell: UICollectionViewListCell {
                     }
                     attrString.append(reply)
                 }
-                let body = NSAttributedString(string: " " + item.body, attributes: [
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote) as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.label
-                ])
-
-                attrString.append(body)
-                textView.attributedText = attrString
             }
+            let body = NSAttributedString(string: " " + item.body, attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label
+            ])
+            
+            attrString.append(body)
+            textView.attributedText = attrString
         } else {
             textView.text = item.body
         }

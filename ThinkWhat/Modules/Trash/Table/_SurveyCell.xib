@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -25,7 +23,7 @@
                             <constraint firstAttribute="width" constant="15" id="Yfq-4E-r3h"/>
                         </constraints>
                     </imageView>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dO9-2m-2cG" customClass="Avatar" customModule="ThinkWhat" customModuleProvider="target">
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dO9-2m-2cG" customClass="delAvatar" customModule="ThinkWhat" customModuleProvider="target">
                         <rect key="frame" x="244" y="30" width="40" height="40"/>
                         <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
@@ -177,14 +175,6 @@
             <point key="canvasLocation" x="137.68115942028987" y="80.357142857142847"/>
         </tableViewCell>
     </objects>
-    <designables>
-        <designable name="Aus-Lg-nvc">
-            <size key="intrinsicContentSize" width="31" height="14.5"/>
-        </designable>
-        <designable name="enh-D8-9ut">
-            <size key="intrinsicContentSize" width="31" height="14.5"/>
-        </designable>
-    </designables>
     <resources>
         <systemColor name="systemGray2Color">
             <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

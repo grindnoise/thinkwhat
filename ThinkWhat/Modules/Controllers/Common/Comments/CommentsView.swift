@@ -45,32 +45,37 @@ class CommentsView: UIView {
             banner.present(content: claimContent)
         }.store(in: &subscriptions)
         
-        instance.commentSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
-            guard let self = self,
-                  let string = $0
-            else { return }
-            
-            
-        }.store(in: &subscriptions)
+//        instance.commentSubject.sink { [weak self] in
+//            guard let self = self,
+//                  let string = $0
+//            else { return }
+//
+//
+//        }.store(in: &subscriptions)
         
-        instance.replySubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
+        instance.replySubject.sink { [weak self] in
             guard let self = self,
                   let dict = $0,
                   let replyObject = dict.keys.first,
                   let body = dict.values.first
             else { return }
             
-            self.viewInput?.postComment(body, replyTo: replyObject)
-            
+            self.viewInput?.postComment(body: body, replyTo: replyObject, username: nil)
         }.store(in: &subscriptions)
         
-        instance.commentsRequestSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
+        instance.anonReplySubject.sink { [weak self] in
+            guard let self = self,
+                  let dict = $0,
+                  let innerDict = dict.values.first,
+                  let comment = dict.keys.first,
+                  let username = innerDict.values.first,
+                  let body = innerDict.keys.first
+            else { return }
+            
+            self.viewInput?.postComment(body: body, replyTo: comment, username: username)
+        }.store(in: &self.subscriptions)
+        
+        instance.commentsRequestSubject.sink { [weak self] in
             guard let self = self,
                   let comments = $0
             else { return }

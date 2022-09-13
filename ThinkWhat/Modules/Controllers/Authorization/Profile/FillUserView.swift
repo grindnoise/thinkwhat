@@ -7,12 +7,9 @@
 //
 
 import UIKit
+import Combine
 
 class FillUserView: UIView {
-    
-    deinit {
-        print("FillUserView deinit")
-    }
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -23,9 +20,10 @@ class FillUserView: UIView {
     }
     @IBOutlet weak var scrollContentView: UIView!
     @IBOutlet weak var stackView: UIStackView!
-    @IBOutlet weak var avatar: Avatar! {
+    @IBOutlet weak var avatar: delAvatar! {
         didSet {
-            avatar.delegate = self
+//            avatar.delegate = self
+            avatar.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onImageTap)))
             guard let path = UserDefaults.Profile.imagePath,
                   let url = URL(string: path),
                   let data = try? Data(contentsOf: url),
@@ -204,12 +202,15 @@ class FillUserView: UIView {
             }
             return
         }
+        
         guard let image = avatar.image,
               let firstName = firstNameTF.text,
               let lastName = lastNameTF.text,
               !birthDateTF.text.isNil else {
-                  fatalError()
-              }
+#if DEBUG
+            fatalError()
+#endif
+        }
         continueButton.setTitle("", for: .normal)
         let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
                                                               size: CGSize(width: continueButton.frame.height,
@@ -230,6 +231,63 @@ class FillUserView: UIView {
                                      vkURL: links[SocialMedia.VK],
                                      facebookID: nil,
                                      facebookURL: links[SocialMedia.Facebook])
+    }
+    
+    // MARK: - Public properties
+    weak var viewInput: FillUserViewInput?
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    private var isCorrect = false
+    private var isNameFilled = false {
+        didSet {
+            if isNameFilled {
+                firstNameTF.hideSign()
+                if isNameFilled && isBirthDateFilled {
+                    isCorrect = true
+                }
+            } else {
+                isCorrect = false
+            }
+        }
+    }
+    private let datePicker = UIDatePicker()
+    private var isBirthDateFilled = false {
+        didSet {
+            if isBirthDateFilled {
+                birthDateTF.hideSign()
+                if isNameFilled && isBirthDateFilled {
+                    isCorrect = true
+                }
+            } else {
+                isCorrect = false
+            }
+        }
+    }
+    private var isImageChanged = false
+    ///Distance in points between `hyperlinkTF` and `hyperlinkActionButton`
+    private var distance: CGFloat = .zero
+    ///Used to validate `hyperlinkTF.text` designated by provider
+    private var social: SocialMedia?
+    private var links = [SocialMedia: String]()
+    private var city: City? {
+        didSet {
+            guard !city.isNil else { return }
+            viewInput?.onCitySelected(city!)
+        }
+    }
+    
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
     }
     
     // MARK: - Initialization
@@ -275,46 +333,8 @@ class FillUserView: UIView {
     
     
     
-    // MARK: - Properties
-    weak var viewInput: FillUserViewInput?
-    private var isCorrect = false
-    private var isNameFilled = false {
-        didSet {
-            if isNameFilled {
-                firstNameTF.hideSign()
-                if isNameFilled && isBirthDateFilled {
-                    isCorrect = true
-                }
-            } else {
-                isCorrect = false
-            }
-        }
-    }
-    private let datePicker = UIDatePicker()
-    private var isBirthDateFilled = false {
-        didSet {
-            if isBirthDateFilled {
-                birthDateTF.hideSign()
-                if isNameFilled && isBirthDateFilled {
-                    isCorrect = true
-                }
-            } else {
-                isCorrect = false
-            }
-        }
-    }
-    private var isImageChanged = false
-    ///Distance in points between `hyperlinkTF` and `hyperlinkActionButton`
-    private var distance: CGFloat = .zero
-    ///Used to validate `hyperlinkTF.text` designated by provider
-    private var social: SocialMedia?
-    private var links = [SocialMedia: String]()
-    private var city: City? {
-        didSet {
-            guard !city.isNil else { return }
-            viewInput?.onCitySelected(city!)
-        }
-    }
+    
+    
     
     ///`KeyboardScrollable` protocol properties
     internal var textFields: [UITextField] = [UITextField]()
@@ -367,11 +387,7 @@ extension FillUserView: FillUserControllerOutput {
         datePicker.date = Date()
         datePicker.datePickerMode = .date
         datePicker.locale = .current
-        if #available(iOS 14, *)  {
-            datePicker.preferredDatePickerStyle = .inline
-        } else if #available(iOS 13.4, *) {
-            datePicker.preferredDatePickerStyle = .wheels
-        }
+        datePicker.preferredDatePickerStyle = .inline
         datePicker.addTarget(self, action: #selector(handleDateSelected), for: .valueChanged)
         datePicker.datePickerMode = .date
         datePicker.backgroundColor   = .systemBackground
@@ -484,6 +500,7 @@ extension FillUserView {
         cityTF.tintColor = destinationColor
     }
     
+    // MARK: - Private methods
     private func onHyperlinkInteraction(constraint: NSLayoutConstraint, distance: CGFloat) {
         if distance < 0 {
             continueButton.alpha = 0
@@ -557,6 +574,11 @@ extension FillUserView {
     @objc
     private func handleDateSelected() {
         birthDateTF.text = dateFormatter.string(from: datePicker.date)
+    }
+    
+    @objc
+    private func onImageTap() {
+        viewInput?.onImageTap()
     }
 }
 
@@ -770,10 +792,10 @@ extension FillUserView: KeyboardScrollable {
     }
 }
 
-extension FillUserView: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-        if (sender as AnyObject).isKind(of: Avatar.self) {
-            viewInput?.onImageTap()
-        }
-    }
-}
+//extension FillUserView: CallbackObservable {
+//    func callbackReceived(_ sender: Any) {
+//        if (sender as AnyObject).isKind(of: Avatar.self) {
+//            viewInput?.onImageTap()
+//        }
+//    }
+//}

@@ -11,9 +11,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SettingsView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
-                <outlet property="card" destination="rZI-3R-6zP" id="hDW-a6-yO7"/>
-                <outlet property="cardShadow" destination="1Xp-Vl-7xd" id="ozv-X8-Vc1"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="qPL-Ir-YKz"/>
+                <outlet property="shadowView" destination="gVE-3a-veI" id="jEJ-lY-Ar7"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -21,43 +20,33 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uWz-vL-QHb">
-                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
-                    <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Xp-Vl-7xd">
-                            <rect key="frame" x="10" y="10" width="394" height="798"/>
-                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="boolean" keyPath="shadow" value="YES"/>
-                            </userDefinedRuntimeAttributes>
-                        </view>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rZI-3R-6zP">
-                            <rect key="frame" x="10" y="10" width="394" height="798"/>
-                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        </view>
-                    </subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fKJ-Ul-nvQ">
+                    <rect key="frame" x="0.0" y="44" width="414" height="0.0"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstItem="1Xp-Vl-7xd" firstAttribute="width" secondItem="rZI-3R-6zP" secondAttribute="width" id="0jw-3q-rAd"/>
-                        <constraint firstItem="1Xp-Vl-7xd" firstAttribute="height" secondItem="rZI-3R-6zP" secondAttribute="height" id="Bmg-Ed-Mwx"/>
-                        <constraint firstAttribute="bottom" secondItem="rZI-3R-6zP" secondAttribute="bottom" constant="10" id="cTQ-VR-GM2"/>
-                        <constraint firstItem="rZI-3R-6zP" firstAttribute="leading" secondItem="uWz-vL-QHb" secondAttribute="leading" constant="10" id="f0W-nK-YB1"/>
-                        <constraint firstAttribute="trailing" secondItem="rZI-3R-6zP" secondAttribute="trailing" constant="10" id="gbw-Ee-VVM"/>
-                        <constraint firstItem="1Xp-Vl-7xd" firstAttribute="centerY" secondItem="rZI-3R-6zP" secondAttribute="centerY" id="kp0-CR-s0U"/>
-                        <constraint firstItem="1Xp-Vl-7xd" firstAttribute="centerX" secondItem="rZI-3R-6zP" secondAttribute="centerX" id="mif-3q-pSN"/>
-                        <constraint firstItem="rZI-3R-6zP" firstAttribute="top" secondItem="uWz-vL-QHb" secondAttribute="top" constant="10" id="tD5-Lj-6HL"/>
+                        <constraint firstAttribute="height" id="6a7-0U-h4K"/>
                     </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="shadow" value="YES"/>
+                    </userDefinedRuntimeAttributes>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gVE-3a-veI">
+                    <rect key="frame" x="10" y="54" width="394" height="798"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="uWz-vL-QHb" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="28e-2c-0yh"/>
-                <constraint firstItem="uWz-vL-QHb" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="3nt-2U-XFc"/>
-                <constraint firstItem="uWz-vL-QHb" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="hbY-QF-g9H"/>
-                <constraint firstItem="uWz-vL-QHb" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="qqW-QX-VgP"/>
+                <constraint firstItem="fKJ-Ul-nvQ" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="4t9-ma-kN9"/>
+                <constraint firstItem="fKJ-Ul-nvQ" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="AVk-GB-NGe"/>
+                <constraint firstItem="gVE-3a-veI" firstAttribute="top" secondItem="fKJ-Ul-nvQ" secondAttribute="bottom" constant="10" id="BeB-nW-Ast"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="fKJ-Ul-nvQ" secondAttribute="trailing" id="HCf-cC-l41"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="gVE-3a-veI" secondAttribute="trailing" constant="10" id="NZa-V9-4Bq"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="gVE-3a-veI" secondAttribute="bottom" constant="10" id="lel-P9-uJS"/>
+                <constraint firstItem="gVE-3a-veI" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="rah-pQ-amq"/>
             </constraints>
-            <point key="canvasLocation" x="139" y="82"/>
+            <point key="canvasLocation" x="137.68115942028987" y="81.696428571428569"/>
         </view>
     </objects>
     <resources>

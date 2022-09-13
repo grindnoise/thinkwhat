@@ -46,7 +46,9 @@ class CommentsCollectionView: UICollectionView {
         return survey.commentsSortedByDate
     }
     public var commentSubject = CurrentValueSubject<String?, Never>(nil)
+    public var anonCommentSubject = CurrentValueSubject<[String: String]?, Never>(nil)
     public var replySubject = CurrentValueSubject<[Comment: String]?, Never>(nil)
+    public var anonReplySubject = CurrentValueSubject<[Comment: [String: String]]?, Never>(nil)
     public var claimSubject = CurrentValueSubject<Comment?, Never>(nil)
     public var deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
     public var commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
@@ -88,8 +90,8 @@ class CommentsCollectionView: UICollectionView {
     private var tasks: [Task<Void, Never>?] = []
     private var source: UICollectionViewDiffableDataSource<Section, Comment>!
     private lazy var textField: AccessoryInputTextField = {
-        let instance = AccessoryInputTextField(placeholder: "add_comment".localized, font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!, delegate: self, minLength: ModelProperties.shared.commentMinLength, maxLength: ModelProperties.shared.commentMinLength)
-//        addSubview(instance)
+        let instance = AccessoryInputTextField(placeholder: "add_comment".localized, font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!, delegate: self, minLength: ModelProperties.shared.commentMinLength, maxLength: ModelProperties.shared.commentMaxLength, isAnon: survey.isAnonymous)
+        addSubview(instance)
         
         return instance
     }()
@@ -231,7 +233,7 @@ class CommentsCollectionView: UICollectionView {
     
     private func setupUI() {
         delegate = self
-        addSubview(textField)
+//        addSubview(textField)
         collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
             var configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
 //            configuration.headerMode = .supplementary
@@ -305,8 +307,10 @@ class CommentsCollectionView: UICollectionView {
                 guard let self = self,
                       let item = $0
                 else { return }
-                
-                if let userprofile = item.userprofile {
+             
+                if item.isAnonymous {
+                    self.textField.staticText = "@" + item.anonUsername
+                } else if let userprofile = item.userprofile {
                     if !userprofile.firstNameSingleWord.isEmpty {
                         self.textField.staticText = "@" + userprofile.firstNameSingleWord
                     } else if !userprofile.lastNameSingleWord.isEmpty {
@@ -391,7 +395,9 @@ extension CommentsCollectionView: UICollectionViewDelegate {
             commentThreadSubject.send(cell.item)
         } else if !cell.item.isOwn {
             Fade.shared.present()
-            if let userprofile = cell.item.userprofile {
+            if cell.item.isAnonymous {
+                textField.staticText = "@" + cell.item.anonUsername
+            } else if let userprofile = cell.item.userprofile {
                 if !userprofile.firstNameSingleWord.isEmpty {
                     textField.staticText = "@" + userprofile.firstNameSingleWord
                 } else if !userprofile.lastNameSingleWord.isEmpty {
@@ -444,6 +450,20 @@ extension CommentsCollectionView: AccessoryInputTextFieldDelegate {
         }
         commentSubject.send(string)
 //        commentSubject.send(completion: .finished)
+    }
+    
+    func onAnonSendEvent(username: String, text: String) {
+        textField.resignFirstResponder()
+        Fade.shared.dismiss()
+        guard !text.isEmpty else { return }
+        guard replyTo.isNil else {
+            guard let item = replyTo,
+                  let trimmed = text.replacingOccurrences(of: textField.staticText + " ", with: "") as? String
+            else { return }
+            anonReplySubject.send([item: [trimmed: username]])
+            return
+        }
+        anonCommentSubject.send([text: username])
     }
 }
 

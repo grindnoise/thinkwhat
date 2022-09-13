@@ -110,7 +110,7 @@ class ChoiceCell: UICollectionViewCell {
             topConstraint.isActive = true
         }
     }
-    private lazy var avatars: [NewAvatar] = []
+    private lazy var avatars: [Avatar] = []
     private lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
@@ -700,7 +700,7 @@ class ChoiceCell: UICollectionViewCell {
         }
 
         voters.enumerated().forEach { index, userprofile in
-            let avatar = NewAvatar(userprofile: userprofile, isBordered: true)//, borderColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : self.isChosen ? self.color.withAlphaComponent(0.4) : .systemBackground)
+            let avatar = Avatar(userprofile: userprofile, isBordered: true)//, borderColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : self.isChosen ? self.color.withAlphaComponent(0.4) : .systemBackground)
             avatar.layer.zPosition = 10 - CGFloat(index)
             avatars.append(avatar)
             votersView.addSubview(avatar)
@@ -747,7 +747,7 @@ class ChoiceCell: UICollectionViewCell {
     
     //Live voters updates
     private func updateVoters(userprofile: Userprofile) {
-        let avatar = NewAvatar(userprofile: userprofile, isBordered: true)//, borderColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : self.isChosen ? self.color.withAlphaComponent(0.4) : .systemBackground)
+        let avatar = Avatar(userprofile: userprofile, isBordered: true)//, borderColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : self.isChosen ? self.color.withAlphaComponent(0.4) : .systemBackground)
         avatar.layer.zPosition = 10
         avatar.alpha = 0
         avatars.forEach{ $0.layer.zPosition -= 1 }
@@ -868,7 +868,7 @@ class ChoiceCell: UICollectionViewCell {
             }
          
             guard let leading = avatars.first,
-                  let middle = avatars[1] as? NewAvatar,
+                  let middle = avatars[1] as? Avatar,
                   let trailing = avatars.last,
                   let leadingConstraint = leading.getConstraint(identifier: "centerXAnchor"),
                   let middleConstraint = middle.getConstraint(identifier: "centerXAnchor"),

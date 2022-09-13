@@ -19,6 +19,7 @@ class Banner: UIView {
             shadowView.clipsToBounds = false
             shadowView.backgroundColor = .clear
             shadowView.accessibilityIdentifier = "shadow"
+            guard shadowed else { return }
             shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
             shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
             shadowView.layer.shadowRadius = 5
@@ -73,6 +74,7 @@ class Banner: UIView {
     private var timer:  Timer?
     private var timeElapsed: TimeInterval = 0
     private var isModal = false
+    private var shadowed: Bool
     private var isInteracting = false {
         didSet {
             if isInteracting {
@@ -102,8 +104,15 @@ class Banner: UIView {
 #endif
     }
     
-    init(frame: CGRect, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, backgroundColor: UIColor = .clear, heightDivisor _heightDivisor: CGFloat = 6, fadeBackground: Bool) {
+    init(frame: CGRect,
+         callbackDelegate: CallbackObservable?,
+         bannerDelegate: BannerObservable?,
+         backgroundColor: UIColor = .clear,
+         heightDivisor _heightDivisor: CGFloat = 6,
+         fadeBackground: Bool,
+         shadowed: Bool = true) {
         self.fadeBackground = fadeBackground
+        self.shadowed = shadowed
         super.init(frame: frame)
         self.callbackDelegate = callbackDelegate
         self.bannerDelegate = bannerDelegate
@@ -297,8 +306,8 @@ extension Banner: CallbackObservable {
     }
 }
 
-func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, content: UIView, color: UIColor = .systemRed, textColor: UIColor = .label, isModal: Bool = false, dismissAfter: TimeInterval = 1, backgroundColor: UIColor = . clear, identifier: String = "", fadeBackground: Bool = false) {
-    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate, backgroundColor: backgroundColor, fadeBackground: fadeBackground)
+func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, content: UIView, color: UIColor = .systemRed, textColor: UIColor = .label, isModal: Bool = false, dismissAfter: TimeInterval = 1, backgroundColor: UIColor = . clear, identifier: String = "", fadeBackground: Bool = false, shadowed: Bool = true) {
+    let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate, backgroundColor: backgroundColor, fadeBackground: fadeBackground, shadowed: shadowed)
     banner.accessibilityIdentifier = identifier
     banner.present(content: PlainBannerContent(text: text, imageContent: content, color: color, textColor: textColor), isModal: isModal, dismissAfter: dismissAfter)
 }

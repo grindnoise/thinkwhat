@@ -167,7 +167,7 @@ class CardView: UIView, HotCard {
             icon.backgroundColor = .clear
         }
     }
-    @IBOutlet weak var avatar: Avatar! {
+    @IBOutlet weak var avatar: delAvatar! {
         didSet {
             avatar.backgroundColor = .clear
         }

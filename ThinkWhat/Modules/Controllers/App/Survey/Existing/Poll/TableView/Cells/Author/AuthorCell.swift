@@ -13,7 +13,7 @@ class AuthorCell: UITableViewCell {
     private var survey: Survey!
     private var isSetupComplete = false
     @IBOutlet weak var topic: UILabel!
-    @IBOutlet weak var avatar: Avatar! {
+    @IBOutlet weak var avatar: delAvatar! {
         didSet {
             avatar.backgroundColor = .clear
             let touch = UITapGestureRecognizer(target:self, action:#selector(self.handleTap(recognizer:)))

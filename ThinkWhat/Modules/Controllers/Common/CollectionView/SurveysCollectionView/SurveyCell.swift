@@ -377,8 +377,8 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         return instance
     }()
-    private lazy var avatar: NewAvatar = {
-        let instance = NewAvatar(isShadowed: true)
+    private lazy var avatar: Avatar = {
+        let instance = Avatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()

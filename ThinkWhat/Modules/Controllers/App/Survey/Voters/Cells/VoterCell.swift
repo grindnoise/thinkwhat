@@ -50,7 +50,7 @@ class VoterCell: UICollectionViewCell {
 //    }
 //    private var isViewSetupComplete = false
     
-    @IBOutlet weak var avatar: Avatar!
+    @IBOutlet weak var avatar: delAvatar!
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var checkmark: UIImageView! {
         didSet {

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 struct TopicCellConfiguration: UIContentConfiguration, Hashable {
 
@@ -27,13 +28,32 @@ struct TopicCellConfiguration: UIContentConfiguration, Hashable {
 
 class TopicCell: UICollectionViewListCell {
         
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    
     // MARK: - Public properties
     public var item: TopicItem!
     public var callback: Closure?
+    public var touchSubject = CurrentValueSubject<[Topic: CGPoint]?, Never>(nil)
+    
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
     
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:)))
+        addGestureRecognizer(tapRecognizer)
     }
     
     required init?(coder: NSCoder) {
@@ -66,12 +86,32 @@ class TopicCell: UICollectionViewListCell {
         }), isHidden: false, reservedLayoutWidth: nil, tintColor: tintColor, maintainsFixedSize: true)
         accessories = [UICellAccessory.customView(configuration: accessoryConfig)]
     }
+    
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        let touch = touches.first
+//        guard let point = touch?.location(in: self) else { return }
+//
+//        super.touchesBegan(touches, with: event)
+//        guard let item = item else { return }
+//        touchSubject.send([item.topic: point])
+//    }
+    
+    override func prepareForReuse() {
+        touchSubject = .init(nil)
+        super.prepareForReuse()
+    }
+    
+    @objc
+    private func handleTap(recognizer: UITapGestureRecognizer) {
+        guard let item = item else { return }
+        touchSubject.send([item.topic: recognizer.location(ofTouch: 0, in: self)])
+    }
 }
 
 class TopicCellContent: UIView, UIContentView {
 
     // MARK: - Public properties
-    var configuration: UIContentConfiguration {
+    public var configuration: UIContentConfiguration {
         get {
             currentConfiguration
         }
@@ -84,8 +124,10 @@ class TopicCellContent: UIView, UIContentView {
     }
     
     // MARK: - Private properties
-    private var currentConfiguration: TopicCellConfiguration!
     private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    private var currentConfiguration: TopicCellConfiguration!
     private lazy var horizontalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [iconContainer, titleLabel, viewsLabel])
         instance.axis = .horizontal
@@ -153,6 +195,17 @@ class TopicCellContent: UIView, UIContentView {
     }()
     private let padding: CGFloat = 10
     
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
     // MARK: - Initalization
     init(configuration: TopicCellConfiguration) {
         super.init(frame: .zero)
@@ -212,13 +265,10 @@ class TopicCellContent: UIView, UIContentView {
 
     private func setObservers() {}
     
-    
-
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
-//        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : tit
         guard let item = currentConfiguration.topicItem else { return }
 
         (icon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : item.topic.tagColor.cgColor

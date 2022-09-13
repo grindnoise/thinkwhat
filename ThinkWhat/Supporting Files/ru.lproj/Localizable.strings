@@ -15,7 +15,7 @@
 "tiktok_web_error" = "Ошибка при загрузке TikTok";
 "image_loading_error" = "Произошла ошибка, изображение не было загружено";
 "maximum_characters_exceeded" = "Превышено максимальное количество: ";
-"minimum_characters_needed" = "Минимальное количество симоволов: ";
+"minimum_characters_needed" = "Минимальное количество знаков: ";
 "invalid_url" = "Некорректный формат ссылки";
 "images_limit" = "Вы можете прикрепить не более 3-х изображений";
 "minimum_choices" = "Необходимо минимум 2 варианта";
@@ -24,6 +24,9 @@
 "replies" = "Ответы";
 "reply" = "Ответить";
 "add_comment" = "Напишите комментарий";
+"pseudonym" = "Аноним#";
+"pseudonym_placeholder" = "Ваш псевдоним";
+"add_pseudonym" = "Ввeдите псевдоним";
 
 //Common
 "title" = "Титул";
@@ -162,8 +165,8 @@
 "points" = " голоса";
 "support_poll" = "Поддержать опрос";
 "next" = "Следующий";
-"comment_posted" = "Комментарий был опубликован";
-"comment_deleted" = "Комментарий был удален";
+"comment_posted" = "Комментарий опубликован";
+"comment_deleted" = "Комментарий удален";
 
 //Voters VC
 "voters_load_error" = "Возникла ошибка при загрузке пользователей";
@@ -272,7 +275,7 @@
 "share" = "Поделиться";
 "watch" = "Отслеживать";
 "don't_watch" = "Не отслеживать";
-"vote_to_view_comments" = "Чтобы увидеть комментарии и комментрировать необходимо сначала проголосовать";
+"vote_to_view_comments" = "Сначала пройдите опрос";
 "added_to_watch_list" = "Результаты опроса отслеживается";
 "votes_total" = "Голосов";
 "voters" = "Проголосовашие";

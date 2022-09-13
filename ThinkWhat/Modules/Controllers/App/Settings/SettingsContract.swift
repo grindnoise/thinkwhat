@@ -11,38 +11,37 @@ import UIKit
 /// *View* sends user actions to the *Controller*.
 ///
 /// **Controller** conforms to this protocol
-protocol SettingsViewInput: class {
+protocol SettingsViewInput: AnyObject {
     
     var controllerOutput: SettingsControllerOutput? { get set }
     var controllerInput: SettingsControllerInput? { get set }
     
-    func onSocialTapped(_: URL)
+    func updateUsername(_: [String: String])
+    func updateBirthDate(_: Date)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
 ///
 /// **Model** conforms to this protocol
-protocol SettingsControllerInput: class {
+protocol SettingsControllerInput: AnyObject {
     
     var modelOutput: SettingsModelOutput? { get set }
     
-    // Controller input methods here
+    func updateUserprofile(parameters: [String: Any], image: UIImage?)
 }
 
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
-protocol SettingsModelOutput: class {
-    // Model output methods here
+protocol SettingsModelOutput: AnyObject {
+    func onError(_: Error)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
-protocol SettingsControllerOutput: class {
+protocol SettingsControllerOutput: AnyObject {
     var viewInput: SettingsViewInput? { get set }
-    
-    func onDidLayout()
-    func onWillAppear()
-//    func onDidLoad()
+
+    func onError(_: Error)
 }

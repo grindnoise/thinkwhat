@@ -35,10 +35,9 @@ class TopicsController: UIViewController {
                 imageName = "arrow.backward"
             case .Topic:
                 guard let topic = topic else { return }
-                controllerOutput?.onTopicMode(topic)
+//                controllerOutput?.onTopicMode(topic)
                 imageName = "arrow.backward"
-                guard let title = self.topic?.title else { return }
-                navigationItem.title = title
+                navigationItem.title = topic.title
             default:
                 if let recognizer = view.gestureRecognizers?.first {
                     view.removeGestureRecognizer(recognizer)

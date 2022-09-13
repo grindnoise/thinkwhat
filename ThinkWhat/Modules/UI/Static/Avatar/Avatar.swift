@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Avatar: UIView {
+class delAvatar: UIView {
     
     private var gender: Gender = .Male
     @MainActor public var image: UIImage? {
@@ -177,7 +177,7 @@ class Avatar: UIView {
     }
 }
 
-class NewAvatar: UIView {
+class Avatar: UIView {
     
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {

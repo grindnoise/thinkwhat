@@ -126,8 +126,8 @@ class PollView: UIView {
 //    }
     
     // MARK: - Public methods
-    public func postComment(_ string: String, replyTo: Comment? = nil) {
-        viewInput?.postComment(string, replyTo: replyTo)
+    public func postComment(body: String, replyTo: Comment? = nil, username: String? = nil) {
+        viewInput?.postComment(body: body, replyTo: replyTo, username: username)
     }
     
     public func requestComments(_ comments: [Comment]) {

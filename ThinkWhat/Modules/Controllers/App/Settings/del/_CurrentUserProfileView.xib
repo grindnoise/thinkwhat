@@ -12,7 +12,7 @@
         </array>
     </customFonts>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CurrentUserProfileView" customModule="ThinkWhat" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="_CurrentUserProfileView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
                 <outlet property="avatar" destination="09V-lK-3wV" id="gDc-u1-RLW"/>
                 <outlet property="balance" destination="CUe-k9-OCp" id="b8P-hp-olB"/>
@@ -38,7 +38,7 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Gez-E8-5Ry">
                     <rect key="frame" x="0.0" y="0.0" width="400" height="280"/>
                     <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="09V-lK-3wV" customClass="Avatar" customModule="ThinkWhat" customModuleProvider="target">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="09V-lK-3wV" customClass="delAvatar" customModule="ThinkWhat" customModuleProvider="target">
                             <rect key="frame" x="16" y="16" width="168" height="168"/>
                             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>

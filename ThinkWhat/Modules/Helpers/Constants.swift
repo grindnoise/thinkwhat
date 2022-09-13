@@ -106,7 +106,7 @@ enum SessionType: String {
     case unauthorized   = "unauthorized"
 }
 
-enum Gender: String {
+enum Gender: String, CaseIterable {
     case Male           = "Male"
     case Female         = "Female"
     case Unassigned     = "Unassigned"

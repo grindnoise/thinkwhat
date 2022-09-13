@@ -145,7 +145,7 @@ class SurveysCollectionView: UICollectionView {
             } receiveValue: { [weak self] in
                 guard let self = self, !$0.isNil else { return }
                 guard $0!.isComplete else {
-                    showBanner(bannerDelegate: self, text: "finish_poll".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+                    showBanner(bannerDelegate: self, text: "finish_poll".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
                     return
                 }
                 

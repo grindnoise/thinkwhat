@@ -57,12 +57,12 @@ extension PollModel: PollControllerInput {
         }
     }
     
-    func postComment(_ comment: String, replyTo: Comment? = nil) {
+    func postComment(body: String, replyTo: Comment? = nil, username: String? = nil) {
         guard let survey = survey else { modelOutput?.onVoteCallback(.failure(APIError.badData)); return }
 
         Task {
             do {
-                let instance = try await API.shared.surveys.postComment(comment, survey: survey, replyTo: replyTo)
+                let instance = try await API.shared.surveys.postComment(body, survey: survey, replyTo: replyTo, username: username)
                 guard replyTo.isNil else { return }
                 await MainActor.run {
                     modelOutput?.commentPostCallback(.success(instance))

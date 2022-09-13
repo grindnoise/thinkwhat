@@ -221,10 +221,20 @@ class PollCollectionView: UICollectionView {
             //Subscription for commenting
             cell.commentSubject.sink { [weak self] in
                 guard let self = self,
-                      let string = $0
+                      let body = $0
                 else { return }
                 
-                self.host.postComment(string)
+                self.host.postComment(body: body)
+            }.store(in: &self.subscriptions)
+            
+            cell.anonCommentSubject.sink { [weak self] in
+                guard let self = self,
+                      let dict = $0,
+                      let username = dict.values.first,
+                      let body = dict.keys.first
+                else { return }
+                
+                self.host.postComment(body: body, username: username)
             }.store(in: &self.subscriptions)
             
             //Subscription for commenting
@@ -240,11 +250,23 @@ class PollCollectionView: UICollectionView {
             cell.replySubject.sink { [weak self] in
                 guard let self = self,
                       let dict = $0,
-                      let string = dict.values.first,
+                      let body = dict.values.first,
                       let comment = dict.keys.first
                 else { return }
                 
-                self.host.postComment(string, replyTo: comment)
+                self.host.postComment(body: body, replyTo: comment)
+            }.store(in: &self.subscriptions)
+            
+            cell.anonReplySubject.sink { [weak self] in
+                guard let self = self,
+                      let dict = $0,
+                      let innerDict = dict.values.first,
+                      let comment = dict.keys.first,
+                      let username = innerDict.values.first,
+                      let body = innerDict.keys.first
+                else { return }
+                
+                self.host.postComment(body: body, replyTo: comment, username: username)
             }.store(in: &self.subscriptions)
             
             //Subscription for request comments
@@ -417,7 +439,7 @@ extension PollCollectionView: UICollectionViewDelegate {
                         shouldSelectItemAt indexPath: IndexPath) -> Bool {
         if let _ = cellForItem(at: indexPath) as? CommentsSectionCell {
             guard host?.mode == .ReadOnly else {
-                showBanner(callbackDelegate: host, bannerDelegate: host!, text: "vote_to_view_comments".localized, content: ImageSigns.exclamationMark, dismissAfter: 1)
+                showBanner(bannerDelegate: host, text: "vote_to_view_comments".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
                 return false
             }
             collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [.bottom])

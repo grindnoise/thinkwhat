@@ -112,10 +112,10 @@ class SignupView: UIView {
         indicator.color = .white
         UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
         isUserInteractionEnabled = false
-        viewInput?.onCaptchaValidation { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
+//        viewInput?.onCaptchaValidation { [weak self] result in
+//            guard let self = self else { return }
+//            switch result {
+//            case .success:
                 self.viewInput?.onSignup(username: username, email: email, password: password) { [weak self] result in
                     guard let self = self else { return }
                     self.isUserInteractionEnabled = false
@@ -130,25 +130,28 @@ class SignupView: UIView {
                         switch result  {
                         case .success:
                             self.signupButton.setTitle(NSLocalizedString("success", comment: ""), for: .normal)
+                            delayAsync(delay: 0.5) {
+                                self.viewInput?.onSignupSuccess()
+                            }
                         case .failure(let error):
                             showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                         }
                     }
                 }
-            case .failure(let error):
-                self.isUserInteractionEnabled = true
-                UIView.animate(withDuration: 0.2,
-                               delay: 0,
-                               options: [.curveEaseInOut]) {
-                    indicator.alpha = 0
-                } completion: { _ in
-                    indicator.stopAnimating()
-                    indicator.removeFromSuperview()
-                    self.signupButton.setTitle(#keyPath(SignupView.signupButton).localized, for: .normal)
-                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-                }
-            }
-        }
+//            case .failure(let error):
+//                self.isUserInteractionEnabled = true
+//                UIView.animate(withDuration: 0.2,
+//                               delay: 0,
+//                               options: [.curveEaseInOut]) {
+//                    indicator.alpha = 0
+//                } completion: { _ in
+//                    indicator.stopAnimating()
+//                    indicator.removeFromSuperview()
+//                    self.signupButton.setTitle(#keyPath(SignupView.signupButton).localized, for: .normal)
+//                    showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+//                }
+//            }
+//        }
     }
     
     @IBAction func loginTapped(_ sender: Any) {

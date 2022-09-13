@@ -6,12 +6,12 @@
 //  Copyright © 2022 Pavel Bukharov. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import Combine
 
 protocol AccessoryInputTextFieldDelegate: AnyObject {
     func onSendEvent(_: String)
+    func onAnonSendEvent(username: String, text: String)
 }
 
 final class AccessoryInputTextField: UITextField {
@@ -42,11 +42,11 @@ final class AccessoryInputTextField: UITextField {
     private let minLength: Int
     private let maxLength: Int
     private weak var customDelegate: AccessoryInputTextFieldDelegate?
+    private var isAnon = false
     //UI
     private lazy var accessoryInputView: ZeroSizedIntrisicContentView = {
         let instance = ZeroSizedIntrisicContentView()
         instance.autoresizingMask = .flexibleHeight
-        
         instance.addSubview(textView)
         instance.addSubview(sendButton)
         
@@ -54,17 +54,36 @@ final class AccessoryInputTextField: UITextField {
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         sendButton.setContentHuggingPriority(UILayoutPriority(rawValue: 1000), for: NSLayoutConstraint.Axis.horizontal)
         sendButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: NSLayoutConstraint.Axis.horizontal)
-
-        NSLayoutConstraint.activate([
-            textView.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
-            textView.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: 0),
-            textView.topAnchor.constraint(equalTo: instance.topAnchor,constant: 8),
-            textView.bottomAnchor.constraint(equalTo: instance.layoutMarginsGuide.bottomAnchor, constant: -8),
-            sendButton.leadingAnchor.constraint(equalTo: textView.trailingAnchor, constant: 0),
-            sendButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
-            sendButton.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
-//            sendButton.bottomAnchor.constraint(equalTo: instance.layoutMarginsGuide.bottomAnchor, constant: -8),
-        ])
+        
+        if isAnon {
+            instance.addSubview(usernameTextView)
+            usernameTextView.translatesAutoresizingMaskIntoConstraints = false
+            
+            NSLayoutConstraint.activate([
+                usernameTextView.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
+                usernameTextView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.5),
+//                usernameTextView.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
+                usernameTextView.topAnchor.constraint(equalTo: instance.topAnchor,constant: 8),
+                textView.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
+                textView.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: 0),
+                textView.topAnchor.constraint(equalTo: usernameTextView.bottomAnchor,constant: 8),
+                textView.bottomAnchor.constraint(equalTo: instance.layoutMarginsGuide.bottomAnchor, constant: -8),
+                sendButton.leadingAnchor.constraint(equalTo: textView.trailingAnchor, constant: 0),
+                sendButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
+                sendButton.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                textView.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
+                textView.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: 0),
+                textView.topAnchor.constraint(equalTo: instance.topAnchor,constant: 8),
+                textView.bottomAnchor.constraint(equalTo: instance.layoutMarginsGuide.bottomAnchor, constant: -8),
+                sendButton.leadingAnchor.constraint(equalTo: textView.trailingAnchor, constant: 0),
+                sendButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
+                sendButton.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
+            ])
+        }
+        
         
         return instance
     }()
@@ -94,6 +113,22 @@ final class AccessoryInputTextField: UITextField {
         
         return instance
     }()
+    private lazy var usernameTextView: FlexibleTextView = {
+        let instance = FlexibleTextView(minLength: 3, maxLength: 20)
+        instance.placeholder = "pseudonym_placeholder".localized
+        instance.accessibilityIdentifier = "usernameTextView"
+        instance.text = "pseudonym".localized
+        instance.font = textViewFont
+        instance.maxHeight = 80
+        instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: 8, bottom: instance.contentInset.bottom, right: 8)
+        
+        observers.append(instance.observe(\FlexibleTextView.bounds, options: .new) { view, change in
+            guard let value = change.newValue else { return }
+            view.cornerRadius = value.height/2
+        })
+        
+        return instance
+    }()
     
     // MARK: - Destructor
     deinit {
@@ -106,12 +141,13 @@ final class AccessoryInputTextField: UITextField {
 #endif
     }
     
-    init(placeholder: String = "", font: UIFont, delegate: AccessoryInputTextFieldDelegate, minLength: Int = .zero, maxLength: Int = .max) {
+    init(placeholder: String = "", font: UIFont, delegate: AccessoryInputTextFieldDelegate, minLength: Int = .zero, maxLength: Int = .max, isAnon: Bool = false) {
         self.maxLength = maxLength
         self.minLength = minLength
         self.customDelegate = delegate
         self.placeholderText = placeholder
         self.textViewFont = font
+        self.isAnon = isAnon
         super.init(frame: .zero)
         setupUI()
     }
@@ -139,8 +175,22 @@ final class AccessoryInputTextField: UITextField {
     
     @objc
     private func handleSend() {
+        if isAnon, usernameTextView.text.count < ModelProperties.shared.anonMinLength {
+            showBanner(bannerDelegate: self, text: "add_pseudonym".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1), shadowed: false)
+            return
+        }
+        
+        guard textView.text.count >= minLength else {
+            showBanner(bannerDelegate: self, text: "minimum_characters_needed".localized + "\(minLength)", content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1), shadowed: false)
+            return
+        }
+        
         textView.resignFirstResponder()
-        customDelegate?.onSendEvent(textView.text)
+        if isAnon {
+            customDelegate?.onAnonSendEvent(username: usernameTextView.text, text: textView.text)
+        } else {
+            customDelegate?.onSendEvent(textView.text)
+        }
     }
     
     // MARK: - Public methods
@@ -162,170 +212,6 @@ final class AccessoryInputTextField: UITextField {
     }
 }
 
-class FlexibleTextView: UITextView {
-    // limit the height of expansion per intrinsicContentSize
-    
-    private let minLength: Int
-    private let maxLength: Int
-    
-    fileprivate var staticText: String = "" {
-        didSet {
-            guard !staticText.isEmpty else {
-                text = ""
-                placeholderTextView.isHidden = !text.isEmpty
-                attributedText = NSAttributedString(string: "test", attributes: [
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.label,
-                    NSAttributedString.Key.backgroundColor: UIColor.clear
-                    ])
-                attributedText = NSAttributedString(string: "", attributes: [
-                    NSAttributedString.Key.font: font as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.label,
-                    NSAttributedString.Key.backgroundColor: UIColor.clear
-                    ])
-                return
-            }
-            text = ""
-            placeholderTextView.isHidden = true
-            attributedText =  NSAttributedString(string: staticText, attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .body) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.label,
-                NSAttributedString.Key.backgroundColor: UIColor.systemGray2
-            ])
-            let attrString = NSMutableAttributedString()
-            attrString.append(NSAttributedString(string: staticText, attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .body) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.label,
-                NSAttributedString.Key.backgroundColor: UIColor.systemGray2
-            ]))
-            staticText += " "
-            attrString.append(NSAttributedString(string: " ", attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.label,
-                NSAttributedString.Key.backgroundColor: UIColor.clear
-                ]))
-            attributedText = attrString
-        }
-    }
-    var maxHeight: CGFloat = 0.0
-    private let placeholderTextView: UITextView = {
-        let tv = UITextView()
-        tv.translatesAutoresizingMaskIntoConstraints = false
-        tv.backgroundColor = .clear
-        tv.isScrollEnabled = false
-        tv.isUserInteractionEnabled = false
-        tv.textColor = UIColor.gray
-        return tv
-    }()
-    var placeholder: String? {
-        get {
-            return placeholderTextView.text
-        }
-        set {
-            placeholderTextView.text = newValue
-        }
-    }
-    
-    init(minLength: Int, maxLength: Int) {
-        self.minLength = minLength
-        self.maxLength = maxLength
-        super.init(frame: .zero, textContainer: nil)
-        delegate = self
-        isScrollEnabled = false
-        autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        NotificationCenter.default.addObserver(self, selector: #selector(UITextInputDelegate.textDidChange(_:)), name: UITextView.textDidChangeNotification, object: self)
-        placeholderTextView.font = font
-        placeholderTextView.addEquallyTo(to: self)
-    }
-    
-//    override init(frame: CGRect, textContainer: NSTextContainer?) {
-//        super.init(frame: frame, textContainer: textContainer)
-//        delegate = self
-//        isScrollEnabled = false
-//        autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//        NotificationCenter.default.addObserver(self, selector: #selector(UITextInputDelegate.textDidChange(_:)), name: UITextView.textDidChangeNotification, object: self)
-//        placeholderTextView.font = font
-//        placeholderTextView.addEquallyTo(to: self)
-////        addSubview(placeholderTextView)
-////
-////        NSLayoutConstraint.activate([
-////            placeholderTextView.leadingAnchor.constraint(equalTo: leadingAnchor),
-////            placeholderTextView.trailingAnchor.constraint(equalTo: trailingAnchor),
-////            placeholderTextView.topAnchor.constraint(equalTo: topAnchor),
-////            placeholderTextView.bottomAnchor.constraint(equalTo: bottomAnchor),
-////        ])
-//    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override var text: String! {
-        didSet {
-            invalidateIntrinsicContentSize()
-            placeholderTextView.isHidden = !text.isEmpty
-        }
-    }
-    
-    override var font: UIFont? {
-        didSet {
-            placeholderTextView.font = font
-            invalidateIntrinsicContentSize()
-        }
-    }
-    
-    override var contentInset: UIEdgeInsets {
-        didSet {
-            placeholderTextView.contentInset = contentInset
-        }
-    }
-    
-    override var intrinsicContentSize: CGSize {
-        var size = super.intrinsicContentSize
-        
-        if size.height == UIView.noIntrinsicMetric {
-            // force layout
-            layoutManager.glyphRange(for: textContainer)
-            size.height = layoutManager.usedRect(for: textContainer).height + textContainerInset.top + textContainerInset.bottom
-        }
-        
-        if maxHeight > 0.0 && size.height > maxHeight {
-            size.height = maxHeight
-            
-            if !isScrollEnabled {
-                isScrollEnabled = true
-            }
-        } else if isScrollEnabled {
-            isScrollEnabled = false
-        }
-        
-        return size
-    }
-    
-    @objc private func textDidChange(_ note: Notification) {
-        // needed incase isScrollEnabled is set to true which stops automatically calling invalidateIntrinsicContentSize()
-        invalidateIntrinsicContentSize()
-        placeholderTextView.isHidden = !text.isEmpty
-    }
-    
-    
-}
-
-extension FlexibleTextView: UITextViewDelegate {
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        guard !staticText.isEmpty else { return true }
-        
-        let minCharacters = staticText.count
-
-        if range.location < minCharacters { return false }
-        
-        if text.count + minCharacters < minCharacters {
-            return false
-        }
-        return true
-    }
-}
-
 class ZeroSizedIntrisicContentView: UIView {
     
     // this is needed so that the inputAccesoryView is properly sized from the auto layout constraints
@@ -333,5 +219,22 @@ class ZeroSizedIntrisicContentView: UIView {
     
     override var intrinsicContentSize: CGSize {
         return CGSize.zero
+    }
+}
+
+// MARK: - BannerObservable
+extension AccessoryInputTextField: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
     }
 }

@@ -7,64 +7,59 @@
 //
 
 import UIKit
+import Combine
 
 class TopicsView: UIView {
     
     // MARK: - Public properties
     weak var viewInput: TopicsViewInput?
     
-    // MARK: - private properties
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
     private lazy var surveysCollectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(delegate: self, category: .Search)
         instance.alpha = 0
         return instance
     }()
+    private var touchLocation: CGPoint = .zero
     private lazy var collectionView: TopicsCollectionView = {
         let instance = TopicsCollectionView(callbackDelegate: self)
+        
+        instance.touchSubject.sink { [weak self] in
+            guard let self = self,
+                  let dict = $0,
+                  let point = dict.values.first,
+                  let topic = dict.keys.first
+            else { return }
+            
+            self.viewInput?.onTopicSelected(topic)
+//            let location = instance.convert(point, to: self)
+
+            self.touchLocation = point
+            self.surveysCollectionView.topic = topic
+            self.surveysCollectionView.alpha = 1
+            self.surveysCollectionView.backgroundColor = self.background.backgroundColor
+            self.reveal(present: true, location: point, view: self.surveysCollectionView, fadeView: self.collectionView, duration: 0.5)//, animateOpacity: false)
+        }.store(in: &subscriptions)
+        
         return instance
     }()
-//    private lazy var featheredLayer: CAGradientLayer = {
-//        let instance = CAGradientLayer()
-//        let outerColor = UIColor.clear.cgColor
-//        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
-////        instance.startPoint = CGPoint(x: 0, y: 0.5);
-////        instance.endPoint = CGPoint(x: 1.0, y: 0.5);
-//        // without specifying startPoint and endPoint, we get a vertical gradient
-//        instance.colors = [outerColor, innerColor, innerColor, outerColor]
-//        instance.locations = [0.0, 0.025, 0.975, 1.0]
-//        instance.frame = frame
-//        return instance
-//    }()
     private lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = true
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
 //        instance.addEquallyTo(to: shadowView)
-        collectionView.addEquallyTo(to: instance)
+                collectionView.addEquallyTo(to: instance)
+                surveysCollectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
         })
         return instance
     }()
-//    private lazy var featheredView: UIView = {
-//        let instance = UIView()
-//        instance.accessibilityIdentifier = "feathered"
-//        instance.layer.masksToBounds = true
-//        instance.backgroundColor = .clear
-//        instance.addEquallyTo(to: background)
-//        observers.append(instance.observe(\UIView.bounds, options: .new) { [weak self] view, change in
-//            guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
-//            self.featheredLayer.frame = newValue
-//        })
-//        topicsCollectionView.addEquallyTo(to: instance)
-//        surveysCollectionView.addEquallyTo(to: instance)
-////        topicsCollectionView.addEquallyTo(to: instance)
-//        return instance
-//    }()
-    private var observers: [NSKeyValueObservation] = []
-    private var notifications: [Task<Void, Never>?] = []
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -84,6 +79,17 @@ class TopicsView: UIView {
             })
             background.addEquallyTo(to: shadowView)
         }
+    }
+    
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
     }
     
     // MARK: - Initialization
@@ -115,96 +121,155 @@ class TopicsView: UIView {
 //        featheredView.layer.mask = featheredLayer
     }
     
-    private func reveal(unfold: Bool = true, view animatedView: UIView, duration: TimeInterval, completionBlocks: [Closure] = []) {
-        
+//    private func reveal(unfold: Bool = true, view animatedView: UIView, duration: TimeInterval, completionBlocks: [Closure] = []) {
+//
+//        let circlePathLayer = CAShapeLayer()
+//        var _completionBlocks = completionBlocks
+//        var circleFrameTopCenter: CGRect {
+//            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+//            let circlePathBounds = circlePathLayer.bounds
+//            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+//            circleFrame.origin.y = circlePathBounds.minY - circleFrame.minY
+//            return circleFrame
+//        }
+//
+//        var circleFrameTop: CGRect {
+//            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+//            let circlePathBounds = circlePathLayer.bounds
+//            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+//            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+//            return circleFrame
+//        }
+//
+//        var circleFrameTopLeft: CGRect {
+//            return CGRect.zero
+//        }
+//
+//        var circleFrameCenter: CGRect {
+//            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+//            let circlePathBounds = circlePathLayer.bounds
+//            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+//            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+//            return circleFrame
+//        }
+//
+//        func circlePath(_ rect: CGRect) -> UIBezierPath {
+//            return UIBezierPath(ovalIn: rect)
+//        }
+//
+//        circlePathLayer.frame = animatedView.bounds
+//        circlePathLayer.path = circlePath(circleFrameCenter).cgPath
+//        animatedView.layer.mask = circlePathLayer
+//
+//        let center = (x: animatedView.bounds.midX, y: animatedView.bounds.midY)
+//
+//        let finalRadius = sqrt((center.x*center.x) + (center.y*center.y))
+//
+//        let radiusInset = finalRadius
+//
+//        let outerRect = circleFrameCenter.insetBy(dx: -radiusInset, dy: -radiusInset)
+//
+//        let toPath = UIBezierPath(ovalIn: outerRect).cgPath
+//
+//        let fromPath = circlePathLayer.path
+//
+//        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
+//
+//        maskLayerAnimation.fromValue = unfold ? fromPath : toPath
+//        maskLayerAnimation.toValue = !unfold ? fromPath : toPath
+//        maskLayerAnimation.duration = duration
+//        maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+//        maskLayerAnimation.isRemovedOnCompletion = true
+//        _completionBlocks.append(
+//            {
+////                guard unfold else {
+////                    circlePathLayer.path = circlePathLayer.path
+////                    return
+////                }
+//                animatedView.layer.mask = nil
+//                if !unfold {
+//                    animatedView.layer.opacity = 0
+//                }
+//            }
+//        )
+//        maskLayerAnimation.delegate = self
+//        maskLayerAnimation.setValue(_completionBlocks, forKey: "maskCompletionBlocks")
+//        circlePathLayer.add(maskLayerAnimation, forKey: "path")
+//        if unfold {
+//            circlePathLayer.path = toPath
+//        } else {
+//            circlePathLayer.path = fromPath
+//        }
+//    }
+    private func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, fadeView: UIView, duration: TimeInterval, animateOpacity: Bool = true) {
+
         let circlePathLayer = CAShapeLayer()
-        var _completionBlocks = completionBlocks
-        var circleFrameTopCenter: CGRect {
-            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
-            let circlePathBounds = circlePathLayer.bounds
-            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
-            circleFrame.origin.y = circlePathBounds.minY - circleFrame.minY
-            return circleFrame
+
+        var circleFrameTouchPosition: CGRect {
+            return CGRect(origin: location, size: .zero)
         }
-        
-        var circleFrameTop: CGRect {
-            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
-            let circlePathBounds = circlePathLayer.bounds
-            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
-            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
-            return circleFrame
-        }
-        
+
         var circleFrameTopLeft: CGRect {
             return CGRect.zero
         }
-        
-        var circleFrameCenter: CGRect {
-            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
-            let circlePathBounds = circlePathLayer.bounds
-            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
-            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
-            return circleFrame
-        }
-        
+
         func circlePath(_ rect: CGRect) -> UIBezierPath {
             return UIBezierPath(ovalIn: rect)
         }
-        
-        circlePathLayer.frame = animatedView.bounds
-        circlePathLayer.path = circlePath(circleFrameCenter).cgPath
-        animatedView.layer.mask = circlePathLayer
 
-        let center = (x: animatedView.bounds.midX, y: animatedView.bounds.midY)
-        
-        let finalRadius = sqrt((center.x*center.x) + (center.y*center.y))
-        
-        let radiusInset = finalRadius
-        
-        let outerRect = circleFrameCenter.insetBy(dx: -radiusInset, dy: -radiusInset)
-        
+        circlePathLayer.frame = revealView.bounds
+        circlePathLayer.path = circlePath(location == .zero ? circleFrameTopLeft : circleFrameTouchPosition).cgPath
+        revealView.layer.mask = circlePathLayer
+
+        let radiusInset =  sqrt(revealView.bounds.height*revealView.bounds.height + revealView.bounds.width*revealView.bounds.width + location.x*location.x + location.y*location.y)
+
+        let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
+
         let toPath = UIBezierPath(ovalIn: outerRect).cgPath
-        
+
         let fromPath = circlePathLayer.path
-        
-        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
-        
-        maskLayerAnimation.fromValue = unfold ? fromPath : toPath
-        maskLayerAnimation.toValue = !unfold ? fromPath : toPath
-        maskLayerAnimation.duration = duration
-        maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-        maskLayerAnimation.isRemovedOnCompletion = true
-        _completionBlocks.append(
-            {
-//                guard unfold else {
-//                    circlePathLayer.path = circlePathLayer.path
-//                    return
-//                }
-                animatedView.layer.mask = nil
-                if !unfold {
-                    animatedView.layer.opacity = 0
-                }
+
+        let anim = Animations.get(property: .Path, fromValue: present ? fromPath as Any : toPath, toValue: !present ? fromPath as Any : toPath, duration: duration, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: present ? .easeInEaseOut : .easeOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [{
+            revealView.layer.mask = nil
+            if !present {
+//                circlePathLayer.path = CGPath(rect: .zero, transform: nil)
+                revealView.layer.opacity = 0
+//////                animatedView.alpha = 0
+////                            animatedView.layer.mask = nil
             }
-        )
-        maskLayerAnimation.delegate = self
-        maskLayerAnimation.setValue(_completionBlocks, forKey: "maskCompletionBlocks")
-        circlePathLayer.add(maskLayerAnimation, forKey: "path")
-        if unfold {
-            circlePathLayer.path = toPath
-        } else {
-            circlePathLayer.path = fromPath
-        }
+        }])
+
+        circlePathLayer.add(anim, forKey: "path")
+        circlePathLayer.path = !present ? fromPath : toPath
+        
+        let grayLayer = CALayer()
+        grayLayer.frame = fadeView.layer.frame
+        grayLayer.backgroundColor = UIColor.systemGray.cgColor
+        grayLayer.opacity = present ? 0 : 1
+        
+        fadeView.layer.addSublayer(grayLayer)
+        
+        let opacityAnim = Animations.get(property: .Opacity, fromValue: present ? 0 : 1, toValue: present ? 1 : 0, duration: duration, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, completionBlocks: [{
+            grayLayer.removeFromSuperlayer()
+        }])
+        grayLayer.add(opacityAnim, forKey: nil)
+        grayLayer.opacity = !present ? 0 : 1
     }
     
     // MARK: - Overrriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         collectionView.backgroundColor = .clear
-        let outerColor = UIColor.clear.cgColor
-        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
-//        featheredLayer.colors = [outerColor, innerColor,innerColor,outerColor]
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     }
+    
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        let touch = touches.first
+//        guard let point = touch?.location(in: contentView) else { return }
+//
+//        lastPoint = point
+//        super.touchesBegan(touches, with: event)
+//    }
 }
 
 // MARK: - Controller Output
@@ -217,20 +282,17 @@ extension TopicsView: TopicsControllerOutput {
         surveysCollectionView.endRefreshing()
     }
     
-    func onTopicMode(_ instance: Topic) {
-        surveysCollectionView.topic = instance
-        surveysCollectionView.alpha = 1
-        surveysCollectionView.backgroundColor = background.backgroundColor
-        reveal(view: surveysCollectionView, duration: 0.3)
-    }
+//    func onTopicMode(_ instance: Topic) {
+//        surveysCollectionView.topic = instance
+//        surveysCollectionView.alpha = 1
+//        surveysCollectionView.backgroundColor = background.backgroundColor
+//        reveal(view: surveysCollectionView, duration: 0.3)
+//    }
     
     func onDefaultMode() {
         surveysCollectionView.alpha = 1
         collectionView.backgroundColor = background.backgroundColor
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0) {
-//            self.surveysCollectionView.alpha = 0
-//        }
-        reveal(unfold: false, view: surveysCollectionView, duration: 0.3)
+        reveal(present: false, location: touchLocation, view: surveysCollectionView, fadeView: collectionView, duration: 0.5)
     }
     
     func onSearchMode() {
@@ -238,7 +300,8 @@ extension TopicsView: TopicsControllerOutput {
         surveysCollectionView.alpha = 1
 //        surveysCollectionView.layer.mask = nil
         surveysCollectionView.backgroundColor = background.backgroundColor
-        reveal(view: surveysCollectionView, duration: 0.3)
+        touchLocation = CGPoint(x: bounds.maxX, y: bounds.minY)
+        reveal(present: true, location: touchLocation, view: surveysCollectionView, fadeView: collectionView, duration: 0.5)
     }
     
     func onSearchCompleted(_ instances: [SurveyReference]) {
@@ -274,484 +337,3 @@ extension TopicsView: CAAnimationDelegate {
         }
     }
 }
-
-
-
-
-
-
-
-//class TopicsView: UIView {
-//
-//    enum Mode {
-//        case Parent, Child, List, Search
-//    }
-//
-//    // MARK: - Initialization
-//    override init(frame: CGRect) {
-//        super.init(frame: frame)
-//        commonInit()
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        super.init(coder: coder)
-//        commonInit()
-//    }
-//
-//    private func commonInit() {
-//        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-//        addSubview(contentView)
-//        contentView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            contentView.topAnchor.constraint(equalTo: topAnchor),
-//            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-//            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-//            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-//        ])
-//        setupUI()
-//        setText()
-//        setObservers()
-//    }
-//
-//    private func setObservers() {
-//        let names = [Notifications.Surveys.Claimed,
-//                     Notifications.Surveys.Completed,
-//                     Notifications.Surveys.Rejected]
-//        names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.updateStats), name: $0, object: nil) }
-//    }
-//
-//    @objc
-//    func updateStats() {
-//        if mode == .Parent || mode == .Child {
-//            UIView.transition(with: label, duration: 0.3, options: .transitionCrossDissolve, animations: {
-//                self.mode == .Parent ? self.setText() : self.setChildText()
-//            }) { _ in }
-//        }
-//    }
-//
-//    override func layoutSubviews() {
-//
-//    }
-//
-//    // MARK: - Properties
-//    weak var viewInput: TopicsViewInput?
-//    private var isSetupCompleted = false
-//    private var shadowPath: CGPath!
-//    private let reuseIdentifier = "category"
-//    private let itemsPerRow: CGFloat = 3
-//    private let sectionInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 10.0)
-//    private var needsAnimation = true
-//    private let parents = Topics.shared.all.filter({ $0.isParentNode })
-//    private var parent: Topic!
-//    private var child: Topic!
-//    private var list: (UIView & SurveyDataSource)! {
-//        didSet {
-//            guard !list.isNil else { return }
-//            list.addEquallyTo(to: card)
-//            list.alpha = 0
-//        }
-//    }
-//    var currentIndex: IndexPath = IndexPath(row: 0, section: 0)
-//    var mode: TopicsController.Mode {
-//        return viewInput?.mode ?? .Parent
-//    }
-//
-//    // MARK: - IB outlets
-//    @IBOutlet var contentView: UIView!
-//    @IBOutlet weak var card: UIView! {
-//        didSet {
-//            card.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-//        }
-//    }
-//    @IBOutlet weak var cardShadow: UIView!
-//    @IBOutlet weak var icon: Icon! {
-//        didSet {
-//            icon.alpha = 0
-//        }
-//    }
-//    @IBOutlet weak var collectionView: UICollectionView! {
-//        didSet {
-////            collectionView.delegate = self
-////            collectionView.dataSource = self
-//        }
-//    }
-//    @IBOutlet weak var label: UILabel!
-//    @IBOutlet weak var labelConstraint: NSLayoutConstraint!
-//}
-//
-//// MARK: - Controller Output
-//extension TopicsView: TopicsControllerOutput {
-//    var topic: Topic? {
-//        return child
-//    }
-//
-//    func onWillAppear() {
-////        setText()
-//    }
-//
-//    func onDidLayout() {
-//        guard !isSetupCompleted else { return }
-//        isSetupCompleted = true
-//        ///Add shadow
-//        transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//        alpha = 0
-//        cardShadow.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-//        shadowPath = UIBezierPath(roundedRect: cardShadow.bounds, cornerRadius: cardShadow.frame.width * 0.05).cgPath
-//        cardShadow.layer.shadowPath = shadowPath
-//        cardShadow.layer.shadowRadius = 7
-//        cardShadow.layer.shadowOffset = .zero
-//        cardShadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-//        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
-//            self.alpha = 1
-//            self.transform = .identity
-//        } completion: { _ in
-//            self.collectionView.delegate = self
-//            self.collectionView.dataSource = self
-//        }
-//    }
-//
-//    func onChildMode() {
-//        guard let currentCell = collectionView.cellForItem(at: currentIndex) as? CategoryCollectionViewCell else { return }
-//
-//        icon.backgroundColor = currentCell.icon.backgroundColor
-//        icon.category = currentCell.icon.category
-//        icon.alpha = 0
-//
-//        let temp = Icon(frame: CGRect(origin: currentCell.icon.superview!.convert(currentCell.icon.frame.origin, to: card),
-//                                                    size: currentCell.icon.frame.size))
-//        temp.iconColor = currentCell.icon.iconColor
-//        temp.backgroundColor = currentCell.icon.backgroundColor
-//        temp.category = currentCell.icon.category
-//        card.addSubview(temp)
-//        currentCell.alpha = 0
-//
-//        let destinationLayer = icon.icon as! CAShapeLayer
-//        let destinationPath = destinationLayer.path
-//        let anim = Animations.get(property: .Path,
-//                                  fromValue: (currentCell.icon.icon as! CAShapeLayer).path as Any,
-//                                      toValue: destinationPath as Any,
-//                                      duration: 0.225,
-//                                      delay: 0,
-//                                      repeatCount: 0,
-//                                      autoreverses: false,
-//                                      timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-//                                      delegate: nil,
-//                                      isRemovedOnCompletion: false)
-//        temp.icon.add(anim, forKey: nil)
-//        (temp.icon as! CAShapeLayer).path = destinationPath
-//
-//        let destinationOrigin = icon.superview!.convert(icon.frame.origin, to: card)
-//        let destinationSize = icon.frame.size
-//        UIView.transition(with: label, duration: 0.225, options: .transitionCrossDissolve, animations: {
-////            self.label.text = currentCell.category.title.uppercased()
-//            self.setChildText()
-//        }) { _ in }
-//
-//        collectionView.reloadSections(IndexSet(arrayLiteral: 0))
-//
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.225, delay: 0, options: .curveEaseInOut) {
-//            self.label.setNeedsLayout()
-//            self.labelConstraint.constant += self.icon.frame.width
-//            self.label.layoutIfNeeded()
-//            temp.frame.origin = destinationOrigin
-//            temp.frame.size = destinationSize
-////            self.back.alpha = 1
-//        } completion: { _ in
-//            temp.removeFromSuperview()
-//            self.icon.alpha = 1
-//        }
-//    }
-//
-//    func onParentMode() {
-////        setText()
-//        collectionView.reloadSections(IndexSet(arrayLiteral: 0))
-//        guard let currentCell = collectionView.cellForItem(at: currentIndex) as? CategoryCollectionViewCell else { return }
-//
-//        let temp = Icon(frame: CGRect(origin: icon.superview!.convert(icon.frame.origin, to: card),
-//                                                    size: icon.frame.size))
-//        temp.iconColor = currentCell.icon.iconColor
-//        temp.backgroundColor = currentCell.icon.backgroundColor
-//        temp.category = currentCell.icon.category
-//        card.addSubview(temp)
-//        icon.alpha = 0
-//
-//        let destinationLayer = currentCell.icon.icon as! CAShapeLayer
-//        let destinationPath = destinationLayer.path
-//        let anim = Animations.get(property: .Path,
-//                                      fromValue: (icon.icon as! CAShapeLayer).path as Any,
-//                                      toValue: destinationPath as Any,
-//                                      duration: 0.225,
-//                                      delay: 0,
-//                                      repeatCount: 0,
-//                                      autoreverses: false,
-//                                      timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-//                                      delegate: nil,
-//                                      isRemovedOnCompletion: false)
-//        temp.icon.add(anim, forKey: nil)
-//        (temp.icon as! CAShapeLayer).path = destinationPath
-//
-//        let destinationOrigin = currentCell.icon.superview!.convert(currentCell.icon.frame.origin, to: card)
-//        let destinationSize = currentCell.icon.frame.size
-//
-//        UIView.transition(with: label, duration: 0.225, options: .transitionCrossDissolve, animations: {
-//            self.setText()
-//        }) { _ in }
-//
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.225, delay: 0, options: .curveEaseInOut) {
-//            self.label.setNeedsLayout()
-//            self.labelConstraint.constant -= self.icon.frame.width
-//            self.label.layoutIfNeeded()
-//            temp.frame.origin = destinationOrigin
-//            temp.frame.size = destinationSize
-////            currentCell.alpha = 0
-//        } completion: { _ in
-//            temp.removeFromSuperview()
-////            currentCell.alpha = 1
-////            currentCell.alpha = 1
-//        }
-//    }
-//
-//    func onListMode() {
-//        if list.isNil {
-//            if #available(iOS 14, *)  {
-//                list = SurveysCollection(delegate: self, topic: child)
-//            } else {
-//                list = SurveyTable(delegate: self, topic: child)
-//            }
-//        }
-//
-//        list.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-//            self.collectionView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//            self.collectionView.alpha = 0
-//            self.icon.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//            self.icon.alpha = 0
-//            self.label.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//            self.label.alpha = 0
-//            self.list.alpha = 1
-//            self.list.transform = .identity
-//        } completion: { _ in
-////            self.list.reload()
-//        }
-//    }
-//
-//    func onListToChildMode() {
-//        setChildText()
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-//            self.collectionView.alpha = 1
-//            self.collectionView.transform = .identity
-//            self.icon.alpha = 1
-//            self.icon.transform = .identity
-//            self.label.alpha = 1
-//            self.label.transform = .identity
-//            self.list.alpha = 0
-//            self.list.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//        } completion: { _ in
-//            self.list.removeFromSuperview()
-//            self.list = nil
-//        }
-//    }
-//
-//    func onSearchToParentMode() {
-//        guard !list.isNil else { return }
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-//            self.collectionView.alpha = 1
-//            self.collectionView.transform = .identity
-//            self.label.alpha = 1
-//            self.label.transform = .identity
-//            self.list.alpha = 0
-//            self.list.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//        } completion: { _ in
-//            self.list.removeFromSuperview()
-//            self.list = nil
-//        }
-//    }
-//
-//    func onSearchMode() {
-//        if list.isNil {
-//            if #available(iOS 14, *)  {
-//                list = SurveysCollection(delegate: self, items: [])
-//            } else {
-//                list = SurveyTable(delegate: self, items: [])//topic: child), topic: child)
-//            }
-//        }
-//
-//        list.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-//            self.collectionView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//            self.collectionView.alpha = 0
-//            self.icon.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//            self.icon.alpha = 0
-//            self.label.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-//            self.label.alpha = 0
-//            self.list.alpha = 1
-//            self.list.transform = .identity
-//        } completion: { _ in }
-//    }
-//
-//    func onSearchCompleted(_ items: [SurveyReference]) {
-//        guard mode == .Search, !list.isNil else { return }
-//        list.fetchResult = items
-//    }
-//
-//    func onError() {
-//        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark, dismissAfter: 1)
-//    }
-//}
-//
-//// MARK: - UI Setup
-//extension TopicsView {
-//    private func setupUI() {
-//        card.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-//        card.layer.masksToBounds = true
-//        card.layer.cornerRadius = card.frame.width * 0.05
-//        alpha = 0
-//        collectionView?.register(UINib(nibName: "CategoryCollectionViewCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
-//    }
-//
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        cardShadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-//        card.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-////        back.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .secondaryLabel
-//    }
-//
-//    private func setText() {
-//        let attributedText = NSMutableAttributedString()
-//        attributedText.append(NSAttributedString(string: "publications_active_total".localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: UIScreen.main.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//        attributedText.append(NSAttributedString(string: "\n\(Topics.shared.active)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: UIScreen.main.bounds.width * 0.05), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//        label.textAlignment = .center
-//        label.attributedText = attributedText
-//    }
-//
-//    private func setChildText() {
-//        let attributedText = NSMutableAttributedString()
-//        attributedText.append(NSAttributedString(string: parent.title.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: UIScreen.main.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//        attributedText.append(NSAttributedString(string: "\n\(parent.visibleCount)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: UIScreen.main.bounds.width * 0.05), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//        label.textAlignment = .center
-//        label.attributedText = attributedText
-//    }
-//
-//}
-//
-//extension TopicsView: CallbackObservable {
-//    func callbackReceived(_ sender: Any) {
-//        if let instance = sender as? SurveyReference {
-//            viewInput?.onSurveyTapped(instance)
-//        } else if #available(iOS 14, *) {
-//            if sender is SurveysCollection || sender is SurveyTable {
-//                if mode == .Search {
-//
-//                } else {
-//                    viewInput?.onDataSourceRequest(child)
-//                }
-//            }
-//        } else {
-//            if sender is SurveyTable {
-//                if mode == .Search {
-//
-//                } else {
-//                    viewInput?.onDataSourceRequest(child)
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//extension TopicsView: BannerObservable {
-//    func onBannerWillAppear(_ sender: Any) {}
-//
-//    func onBannerWillDisappear(_ sender: Any) {}
-//
-//    func onBannerDidAppear(_ sender: Any) {}
-//
-//    func onBannerDidDisappear(_ sender: Any) {
-//        if let banner = sender as? Banner {
-//            banner.removeFromSuperview()
-//        } else if let popup = sender as? Popup {
-//            popup.removeFromSuperview()
-//        }
-//    }
-//}
-//
-//extension TopicsView: UICollectionViewDelegate, UICollectionViewDataSource {
-//    func numberOfSections(in collectionView: UICollectionView) -> Int {
-//        return 1
-//    }
-//
-//
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return mode == .Parent ? parents.count : parent.children.count
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? CategoryCollectionViewCell {
-//            let dataItems = mode == .Parent ? parents : parent.children
-//            if let category = dataItems[indexPath.row] as? Topic {
-//                cell.childColor = category.tagColor
-//                cell.category = category
-//            }
-//            cell.setupUI()
-//            return cell
-//        }
-//        return UICollectionViewCell()
-//    }
-//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        guard mode == .Parent else { return }
-//        cell.alpha = 0
-//        cell.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-//        UIView.animate(
-//            withDuration: 0.2,
-//            delay: (Double(arc4random_uniform(6)) * 0.01) * Double(arc4random_uniform(5)),//Double(indexPath.row),
-//            options: [.curveEaseInOut],
-//            animations: {
-//                cell.alpha = 1
-//                cell.transform = .identity
-//            }) {
-//                _ in
-//                self.needsAnimation = (self.collectionView.visibleCells.count < (indexPath.row + 1))
-//            }
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        if let cell = collectionView.cellForItem(at: indexPath) as? CategoryCollectionViewCell, let category = cell.category {
-//            if mode == .Parent {
-//                currentIndex = indexPath
-//                parent = cell.category
-//                viewInput?.mode = .Child
-//            } else if mode == .Child {
-//                child = cell.category
-//                viewInput?.mode = .List
-//            }
-//        }
-//    }
-//}
-//
-//
-//extension TopicsView: UICollectionViewDelegateFlowLayout {
-//    //1 collectionView(_:layout:sizeForItemAt:) is responsible for telling the layout the size of a given cell
-//    func collectionView(_ collectionView: UICollectionView,
-//                        layout collectionViewLayout: UICollectionViewLayout,
-//                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        //2
-//        let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
-//        let availableWidth = collectionView.frame.width - paddingSpace
-//        let widthPerItem = availableWidth / itemsPerRow
-//        return CGSize(width: widthPerItem, height: widthPerItem * 1.3)
-//    }
-//
-//    //3
-//    func collectionView(_ collectionView: UICollectionView,
-//                        layout collectionViewLayout: UICollectionViewLayout,
-//                        insetForSectionAt section: Int) -> UIEdgeInsets {
-//        return sectionInsets
-//    }
-//
-//    // 4
-//    func collectionView(_ collectionView: UICollectionView,
-//                        layout collectionViewLayout: UICollectionViewLayout,
-//                        minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-//        return sectionInsets.left
-//    }
-//}
-//
-//

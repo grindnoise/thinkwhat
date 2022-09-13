@@ -52,7 +52,7 @@ protocol TopicsControllerOutput: AnyObject {
     func onSearchMode()
     func onSearchCompleted(_: [SurveyReference])
     func onRequestCompleted(_: Result<Bool, Error>)
-    func onTopicMode(_: Topic)
+//    func onTopicMode(_: Topic)
     func beginSearchRefreshing()
 //    var topic: Topic? { get }
     
