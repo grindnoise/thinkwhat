@@ -19,6 +19,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
     //Publishers
     public let namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
     public let datePublisher = CurrentValueSubject<Date?, Never>(nil)
+    public let genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -78,6 +79,15 @@ class CurrentUserProfileCollectionView: UICollectionView {
                 else { return }
                 
                 self.datePublisher.send(date)
+            }.store(in: &self.subscriptions)
+            
+            //Gender
+            cell.genderPublisher.sink { [weak self] in
+                guard let self = self,
+                      let gender = $0
+                else { return }
+                
+                self.genderPublisher.send(gender)
             }.store(in: &self.subscriptions)
             
             guard let userprofile = Userprofiles.shared.current,

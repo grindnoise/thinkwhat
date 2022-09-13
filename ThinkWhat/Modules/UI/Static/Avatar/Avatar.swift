@@ -180,6 +180,11 @@ class delAvatar: UIView {
 class Avatar: UIView {
     
     // MARK: - Public properties
+    public var isEditable: Bool {
+        didSet {
+            
+        }
+    }
     public weak var userprofile: Userprofile! {
         didSet {
             guard !userprofile.isNil else { return }
@@ -202,42 +207,6 @@ class Avatar: UIView {
             shadowView.layer.shadowColor = shadowColor.withAlphaComponent(0.4).cgColor
         }
     }
-    
-    // MARK: - Private properties
-    private var notifications: [Task<Void, Never>?] = []
-    private var observers: [NSKeyValueObservation] = []
-    private lazy var shadowView: UIView = {
-        let instance = UIView()
-        instance.layer.masksToBounds = false
-        instance.backgroundColor = .clear
-        instance.accessibilityIdentifier = "shadowView"
-        instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
-        instance.layer.shadowRadius = 4
-        instance.layer.shadowOffset = .zero
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            view.layer.shadowPath = UIBezierPath(ovalIn: newValue).cgPath
-        })
-        background.addEquallyTo(to: instance)
-        return instance
-    }()
-    public lazy var background: UIView = {
-        let instance = UIView()
-        instance.accessibilityIdentifier = "bg"
-        instance.clipsToBounds = true
-        instance.backgroundColor = .systemBackground
-        
-        coloredBackground.addEquallyTo(to: instance)
-        
-        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-            guard let value = change.newValue else { return }
-            view.cornerRadius = value.width/2
-        })
-        
-        return instance
-    }()
     public lazy var coloredBackground: Shimmer = {
         let instance = Shimmer()
         instance.accessibilityIdentifier = "coloredBackground"
@@ -307,6 +276,92 @@ class Avatar: UIView {
         return instance
     }()
     
+    // MARK: - Private properties
+    private var notifications: [Task<Void, Never>?] = []
+    private var observers: [NSKeyValueObservation] = []
+    private lazy var shadowView: UIView = {
+        let instance = UIView()
+        instance.layer.masksToBounds = false
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "shadowView"
+        instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
+        instance.layer.shadowRadius = 4
+        instance.layer.shadowOffset = .zero
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let newValue = change.newValue else { return }
+            view.layer.shadowPath = UIBezierPath(ovalIn: newValue).cgPath
+        })
+        background.addEquallyTo(to: instance)
+        return instance
+    }()
+    private lazy var imageButton: UIButton = {
+       let instance = UIButton()
+        
+        if #available(iOS 15, *) {
+            var config = UIButton.Configuration.plain()
+            config.image = UIImage(systemName: "pencil.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+                guard let self = self else { return .systemGray }
+
+                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            }
+            config.buttonSize = .large
+
+            instance.configuration = config
+        } else {
+            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label,
+            ])
+            instance.setAttributedTitle(attrString, for: .normal)
+            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            instance.titleEdgeInsets.left = 2
+//            instance.titleEdgeInsets.right = 8
+            instance.titleEdgeInsets.top = 2
+            instance.titleEdgeInsets.bottom = 2
+            instance.setImage(UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            instance.imageView?.contentMode = .scaleAspectFit
+            instance.imageEdgeInsets.left = 10
+            instance.imageEdgeInsets.top = 2
+            instance.imageEdgeInsets.bottom = 2
+            instance.imageEdgeInsets.right = 2
+            instance.semanticContentAttribute = .forceRightToLeft
+            instance.backgroundColor = .secondarySystemBackground
+
+            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
+            constraint.identifier = "width"
+            constraint.isActive = true
+        }
+        
+        observers.append(instance.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
+            guard let self = self,
+                  let newValue = change.newValue
+            else { return }
+            
+            view.cornerRadius = newValue.height * 0.15
+        })
+        return instance
+    }()
+    public lazy var background: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "bg"
+        instance.clipsToBounds = true
+        instance.backgroundColor = .systemBackground
+        
+        coloredBackground.addEquallyTo(to: instance)
+        
+        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
+            guard let value = change.newValue else { return }
+            view.cornerRadius = value.width/2
+        })
+        
+        return instance
+    }()
+    
+    
     // MARK: - Destructor
     deinit {
         notifications.forEach { $0?.cancel() }
@@ -317,7 +372,8 @@ class Avatar: UIView {
     }
 
     // MARK: - Initialization
-    init(userprofile: Userprofile? = nil, isShadowed: Bool = false, isBordered: Bool = false, borderColor: UIColor = .clear) {
+    init(userprofile: Userprofile? = nil, isShadowed: Bool = false, isBordered: Bool = false, borderColor: UIColor = .clear, isEditable: Bool = false) {
+        self.isEditable = isEditable
         self.isShadowed = isShadowed
         self.isBordered = isBordered
         self.borderColor = borderColor

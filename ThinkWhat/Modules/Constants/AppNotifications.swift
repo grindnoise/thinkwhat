@@ -35,6 +35,7 @@ struct Notifications {
         static let FirstNameChanged                 = Notification.Name("NotificationUserprofilesFirstNameChanged")
         static let LastNameChanged                  = Notification.Name("NotificationUserprofilesLastNameChanged")
         static let BirthDateChanged                 = Notification.Name("NotificationUserprofilesBirthDateChanged")
+        static let GenderChanged                    = Notification.Name("NotificationUserprofilesGenderChanged")
         static let ImageDownloaded                  = Notification.Name("ImageDownloaded")
     }
     

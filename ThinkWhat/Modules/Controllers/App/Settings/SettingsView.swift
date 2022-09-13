@@ -49,6 +49,12 @@ class SettingsView: UIView {
             self.viewInput?.updateBirthDate(date)
         }.store(in: &subscriptions)
         
+        instance.genderPublisher.sink { [unowned self] in
+            guard let gender = $0 else { return }
+            
+            self.viewInput?.updateGender(gender)
+        }.store(in: &subscriptions)
+        
         return instance
     }()
     

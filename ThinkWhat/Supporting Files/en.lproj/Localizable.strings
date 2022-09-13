@@ -81,6 +81,7 @@
 "show_webview" = "Show web link";
 "sending" = "Sending";
 "choose_claim_reason" = "Complaint reason:";
+"age" = "Age";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";

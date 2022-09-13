@@ -18,6 +18,7 @@ protocol SettingsViewInput: AnyObject {
     
     func updateUsername(_: [String: String])
     func updateBirthDate(_: Date)
+    func updateGender(_: Gender)
 }
 
 /// *Controller* tells the *Model* what to do based on the input

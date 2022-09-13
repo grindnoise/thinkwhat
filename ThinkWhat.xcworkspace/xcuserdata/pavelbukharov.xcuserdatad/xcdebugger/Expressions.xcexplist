@@ -2289,10 +2289,10 @@
          contextName = "Userprofile.init(from:):User.swift">
          <PersistentStrings>
             <PersistentString
-               value = "Topics.shared">
+               value = "gender">
             </PersistentString>
             <PersistentString
-               value = "city!.localized ?? city!.name">
+               value = "Userprofiles.shared.current?.gender">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

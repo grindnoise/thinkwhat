@@ -161,7 +161,15 @@ class Userprofile: Decodable {
     var age: Int {
         return birthDate?.age ?? 18
     }
-    var gender:             Gender
+    var gender:             Gender {
+        didSet {
+            guard oldValue != gender,
+                  isCurrent
+            else { return }
+            
+            NotificationCenter.default.post(name: Notifications.Userprofiles.GenderChanged, object: self)
+        }
+    }
     var imageURL:           URL?
     var instagramURL:       URL?
     var tiktokURL:          URL?
@@ -346,6 +354,7 @@ class Userprofile: Decodable {
             Userprofiles.shared.current?.firstName = firstName
             Userprofiles.shared.current?.lastName = lastName
             Userprofiles.shared.current?.birthDate = birthDate
+            Userprofiles.shared.current?.gender = gender
         } catch {
 #if DEBUG
             error.printLocalized(class: type(of: self), functionName: #function)

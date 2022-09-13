@@ -81,6 +81,7 @@
 "show_webview" = "Показать веб ссылку";
 "sending" = "Отправка";
 "choose_claim_reason" = "Причина жалобы:";
+"age" = "Возраст";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";

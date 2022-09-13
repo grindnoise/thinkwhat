@@ -17,6 +17,7 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             guard let userprofile = userprofile else { return }
             
             avatar.userprofile = userprofile
+            avatar.isEditable = true
             setupLabels()
             setupButtons()
         }
@@ -24,6 +25,8 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
     //Publishers
     public let namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
     public let datePublisher = CurrentValueSubject<Date?, Never>(nil)
+    public let genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
+    public let imagePublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -58,45 +61,12 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
         
         return instance
     }()
-//    private lazy var gender: UILabel = {
-//        let instance = UILabel()
-//        instance.isUserInteractionEnabled = true
-//        instance.textAlignment = .right
-//        instance.numberOfLines = 2
-//        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
-//        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.edit(recognizer:))))
-//        instance.textColor = .secondaryLabel
-//
-//        let heightConstraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!))
-//        heightConstraint.identifier = "height"
-//        heightConstraint.isActive = true
-//
-//        let widthConstraint = instance.widthAnchor.constraint(equalToConstant: "test".width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!))
-//        widthConstraint.identifier = "width"
-//        widthConstraint.isActive = true
-//
-////        instance.publisher(for: \.contentSize, options: .new)
-////            .sink { [unowned self] size in
-////                guard let constraint = instance.getConstraint(identifier: "height") else { return }
-////
-////                self.setNeedsLayout()
-////                constraint.constant = size.height// * 1.5
-////                self.layoutIfNeeded()
-////                let space = constraint.constant - size.height
-////                let inset = max(0, space/2)
-////                instance.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
-////            }
-////            .store(in: &subscriptions)
-//
-//        return instance
-//    }()
     private lazy var genderButton: UIButton = {
        let instance = UIButton()
         
-//        instance.addTarget(self, action: #selector(self.send), for: .touchUpInside)
         instance.showsMenuAsPrimaryAction = true
+        instance.menu = prepareMenu()
         if #available(iOS 15, *) {
-//            Userprofiles.shared.current?.gender.rawValue.localized
             let attrString = AttributedString("TEST", attributes: AttributeContainer([
                 NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline) as Any,
                 NSAttributedString.Key.foregroundColor: UIColor.label
@@ -122,72 +92,158 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
 
             instance.configuration = config
         } else {
-//            let attrString = NSMutableAttributedString(string: "test", attributes: [
-//                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3) as Any,
-//                NSAttributedString.Key.foregroundColor: UIColor.white
-//            ])
-////            instance.titleEdgeInsets.left = 20
-////            instance.titleEdgeInsets.right = 20
-//            instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
-//            instance.imageView?.tintColor = .white
-//            instance.imageEdgeInsets.left = 4
-////            instance.imageEdgeInsets.right = 8
-//            instance.setAttributedTitle(attrString, for: .normal)
-//            instance.semanticContentAttribute = .forceRightToLeft
-//            instance.backgroundColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-//
-//            let constraint = instance.widthAnchor.constraint(equalToConstant: "test".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!))
-//            constraint.identifier = "width"
-//            constraint.isActive = true
+            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label,
+            ])
+            instance.setAttributedTitle(attrString, for: .normal)
+            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            instance.titleEdgeInsets.left = 2
+//            instance.titleEdgeInsets.right = 8
+            instance.titleEdgeInsets.top = 2
+            instance.titleEdgeInsets.bottom = 2
+            instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            instance.imageView?.contentMode = .scaleAspectFit
+            instance.imageEdgeInsets.left = 10
+            instance.imageEdgeInsets.top = 2
+            instance.imageEdgeInsets.bottom = 2
+            instance.imageEdgeInsets.right = 2
+            instance.semanticContentAttribute = .forceRightToLeft
+            instance.backgroundColor = .secondarySystemBackground
+
+            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
+            constraint.identifier = "width"
+            constraint.isActive = true
         }
         
+        observers.append(instance.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
+            guard let self = self,
+                  let newValue = change.newValue
+            else { return }
+            
+            view.cornerRadius = newValue.height * 0.15
+        })
+        return instance
+    }()
+    private lazy var ageButton: UIButton = {
+       let instance = UIButton()
+        
+        instance.addTarget(self, action: #selector(self.editAge), for: .touchUpInside)
+        if #available(iOS 15, *) {
+            let attrString = AttributedString("TEST", attributes: AttributeContainer([
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label
+            ]))
+            var config = UIButton.Configuration.filled()
+            config.cornerStyle = .medium
+            config.attributedTitle = attrString
+            config.image = UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+            config.imagePlacement = .trailing
+            config.imagePadding = 4
+            config.contentInsets.leading = 8
+            config.contentInsets.trailing = 4
+            config.contentInsets.top = 2
+            config.contentInsets.bottom = 2
+            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+                guard let self = self else { return .systemGray }
+
+                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            }
+            config.buttonSize = .large
+            config.baseBackgroundColor = .secondarySystemBackground
+            config.baseForegroundColor = .label
+
+            instance.configuration = config
+        } else {
+            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label,
+            ])
+            instance.setAttributedTitle(attrString, for: .normal)
+            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            instance.titleEdgeInsets.left = 2
+//            instance.titleEdgeInsets.right = 8
+            instance.titleEdgeInsets.top = 2
+            instance.titleEdgeInsets.bottom = 2
+            instance.setImage(UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            instance.imageView?.contentMode = .scaleAspectFit
+            instance.imageEdgeInsets.left = 10
+            instance.imageEdgeInsets.top = 2
+            instance.imageEdgeInsets.bottom = 2
+            instance.imageEdgeInsets.right = 2
+            instance.semanticContentAttribute = .forceRightToLeft
+            instance.backgroundColor = .secondarySystemBackground
+
+            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
+            constraint.identifier = "width"
+            constraint.isActive = true
+        }
+        
+        observers.append(instance.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
+            guard let self = self,
+                  let newValue = change.newValue
+            else { return }
+            
+            view.cornerRadius = newValue.height * 0.15
+        })
+        return instance
+    }()
+//    private lazy var imageButton: UIButton = {
+//       let instance = UIButton()
+//
+//        if #available(iOS 15, *) {
+//            var config = UIButton.Configuration.plain()
+//            config.image = UIImage(systemName: "pencil.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+//            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+//                guard let self = self else { return .systemGray }
+//
+//                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//            }
+//            config.buttonSize = .large
+//
+//            instance.configuration = config
+//        } else {
+//            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
+//                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+//                NSAttributedString.Key.foregroundColor: UIColor.label,
+//            ])
+//            instance.setAttributedTitle(attrString, for: .normal)
+//            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//            instance.titleEdgeInsets.left = 2
+////            instance.titleEdgeInsets.right = 8
+//            instance.titleEdgeInsets.top = 2
+//            instance.titleEdgeInsets.bottom = 2
+//            instance.setImage(UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+//            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//            instance.imageView?.contentMode = .scaleAspectFit
+//            instance.imageEdgeInsets.left = 10
+//            instance.imageEdgeInsets.top = 2
+//            instance.imageEdgeInsets.bottom = 2
+//            instance.imageEdgeInsets.right = 2
+//            instance.semanticContentAttribute = .forceRightToLeft
+//            instance.backgroundColor = .secondarySystemBackground
+//
+//            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
+//            constraint.identifier = "width"
+//            constraint.isActive = true
+//        }
+//
 //        observers.append(instance.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
 //            guard let self = self,
 //                  let newValue = change.newValue
 //            else { return }
 //
-//            guard let constraint = view.getConstraint(identifier: "width") else { return }
-//            self.setNeedsLayout()
-//            constraint.constant = self.state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (view.imageView?.bounds.width ?? 0) + 60
-//            self.layoutIfNeeded()
+//            view.cornerRadius = newValue.height * 0.15
 //        })
-        return instance
-    }()
-    private lazy var age: UILabel = {
-        let instance = UILabel()
-        instance.isUserInteractionEnabled = true
-        instance.textAlignment = .left
-        instance.numberOfLines = 2
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
-        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.edit(recognizer:))))
-        instance.textColor = .secondaryLabel
-        
-        let widthConstraint = instance.widthAnchor.constraint(equalToConstant: "test".width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!))
-        widthConstraint.identifier = "width"
-        widthConstraint.isActive = true
-        
-//        let constraint = instance.widthAnchor.constraint(equalToConstant: 100)
-//        constraint.identifier = "widthAnchor"
-//        constraint.isActive = true
-        
-//        instance.publisher(for: \.contentSize, options: .new)
-//            .sink { [unowned self] size in
-//                guard let constraint = instance.getConstraint(identifier: "height") else { return }
-//
-//                self.setNeedsLayout()
-//                constraint.constant = size.height// * 1.5
-//                self.layoutIfNeeded()
-//                let space = constraint.constant - size.height
-//                let inset = max(0, space/2)
-//                instance.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
-//            }
-//            .store(in: &subscriptions)
-        
-        return instance
-    }()
+//        return instance
+//    }()
     private lazy var avatar: Avatar = {
         let instance = Avatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.clipsToBounds = false
+        
         return instance
     }()
     private lazy var userView: UIView = {
@@ -207,37 +263,8 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
         
         return instance
     }()
-//    private lazy var genderAgeView: UIView = {
-//        let instance = UIView()
-//        instance.isUserInteractionEnabled = true
-//        instance.clipsToBounds = false
-//        instance.backgroundColor = .clear
-//        instance.accessibilityIdentifier = "genderAgeView"
-//
-//        let horizontalStack = UIStackView(arrangedSubviews: [genderButton, age])//gender
-//        horizontalStack.axis = .horizontal
-//        horizontalStack.alignment = .center
-//        horizontalStack.clipsToBounds = false
-//        horizontalStack.isUserInteractionEnabled = true
-//        horizontalStack.spacing = 4
-//
-//        horizontalStack.heightAnchor.constraint(equalTo: genderButton.heightAnchor).isActive = true
-////        horizontalStack.heightAnchor.constraint(equalTo: gender.heightAnchor).isActive = true
-//
-//        instance.addSubview(horizontalStack)
-//
-//        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
-//            horizontalStack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-//            instance.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor)
-//        ])
-//
-//        return instance
-//    }()
     private lazy var verticalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [userView, username, genderButton])
+        let instance = UIStackView(arrangedSubviews: [userView, username, horizontalStack])// genderButton, ageButton])
         instance.axis = .vertical
         instance.alignment = .center
         instance.clipsToBounds = false
@@ -250,9 +277,26 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             userView.widthAnchor.constraint(equalTo: instance.widthAnchor),
             userView.heightAnchor.constraint(equalToConstant: 200),
             username.widthAnchor.constraint(equalTo: instance.widthAnchor),
-//            genderAgeView.widthAnchor.constraint(equalTo: instance.widthAnchor),
-//            repliesView.widthAnchor.constraint(equalTo: instance.widthAnchor),
         ])
+        
+        return instance
+    }()
+    private lazy var horizontalStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [genderButton, ageButton])
+        instance.axis = .horizontal
+//        instance.alignment = .center
+        instance.clipsToBounds = false
+        instance.spacing = 4
+        instance.distribution = .fillProportionally
+        
+//        userView.translatesAutoresizingMaskIntoConstraints = false
+//        username.translatesAutoresizingMaskIntoConstraints = false
+//        
+//        NSLayoutConstraint.activate([
+//            userView.widthAnchor.constraint(equalTo: instance.widthAnchor),
+//            userView.heightAnchor.constraint(equalToConstant: 200),
+//            username.widthAnchor.constraint(equalTo: instance.widthAnchor),
+//        ])
         
         return instance
     }()
@@ -304,42 +348,6 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
         
         return instance
     }()
-//    private lazy var genderTextField: UITextField = {
-//        let instance = UITextField(frame: .zero)
-//        instance.inputView = genderPicker
-//
-//        let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 44))
-//        toolBar.isTranslucent = true
-//        toolBar.tintColor = UIColor { traitCollection in
-//            switch traitCollection.userInterfaceStyle {
-//            case .dark:
-//                return UIColor.systemBlue
-//            default:
-//                return K_COLOR_RED
-//            }
-//        }
-//        toolBar.backgroundColor = .tertiarySystemBackground
-//        toolBar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
-//        toolBar.superview?.backgroundColor = .tertiarySystemBackground
-//        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: nil, action: #selector(self.genderSelected))
-//        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-//        toolBar.items = [space, doneButton]
-//        toolBar.barStyle = .default
-//        instance.inputAccessoryView = toolBar
-//
-//        addSubview(instance)
-//
-//        return instance
-//    }()
-//    private lazy var genderPicker: UIPickerView = {
-//       let instance = UIPickerView()
-//        instance.delegate = self
-//        instance.dataSource = self
-//        instance.backgroundColor = .tertiarySystemBackground
-//        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//
-//        return instance
-//    }()
     
     // MARK: - Destructor
     deinit {
@@ -434,7 +442,19 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
                       instance.isCurrent
                 else { return }
                     
-                self.setupLabels(animated: true)
+                self.setupButtons(animated: true)
+            }
+        })
+        
+        //Birth date change
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.GenderChanged) {
+                guard let self = self,
+                      let instance = notification.object as? Userprofile,
+                      instance.isCurrent
+                else { return }
+                    
+                self.setupButtons(animated: true)
             }
         })
     }
@@ -447,12 +467,25 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             let _ = credentialsTextField.becomeFirstResponder()
 //        } else if v === gender {
 //            genderTextField.becomeFirstResponder()
-        } else if v === age {
-            let _ = ageTextField.becomeFirstResponder()
-            guard let date = Userprofiles.shared.current?.birthDate else { return }
-            datePicker.date = date
+//        } else if v === age {
+//            let _ = ageTextField.becomeFirstResponder()
+//            guard let date = Userprofiles.shared.current?.birthDate else { return }
+//            datePicker.date = date
         }
         Fade.shared.present()
+    }
+    
+    @objc
+    private func editAge() {
+        Fade.shared.present()
+        let _ = ageTextField.becomeFirstResponder()
+        guard let date = Userprofiles.shared.current?.birthDate else { return }
+        datePicker.date = date
+    }
+    
+    @objc
+    private func editImage() {
+        
     }
     
     private func setupLabels(animated: Bool = false) {
@@ -482,28 +515,28 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             }
         }
         
-        if animated {
-            UIView.transition(with: age, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
-                guard let self = self else { return }
-                
-                self.age.text = String(describing: userprofile.age)
-            } completion: { _ in }
-        } else {
-            age.text = String(describing: userprofile.age)
-        }
+//        if animated {
+//            UIView.transition(with: age, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+//                guard let self = self else { return }
+//
+//                self.age.text = String(describing: userprofile.age)
+//            } completion: { _ in }
+//        } else {
+//            age.text = String(describing: userprofile.age)
+//        }
         
         
 //        gender.text = userprofile.gender.rawValue.localized.lowercased() + ","
         
-        guard let constraint_1 = username.getConstraint(identifier: "height"),
+        guard let constraint_1 = username.getConstraint(identifier: "height")
 //              let constraint_2 = gender.getConstraint(identifier: "width"),
-              let constraint_3 = age.getConstraint(identifier: "width")
+//              let constraint_3 = age.getConstraint(identifier: "width")
         else { return }
         
         setNeedsLayout()
         constraint_1.constant = username.text!.height(withConstrainedWidth: username.bounds.width, font: username.font)
 //        constraint_2.constant = gender.text!.width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
-        constraint_3.constant = age.text!.width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
+//        constraint_3.constant = age.text!.width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
         layoutIfNeeded()
     }
     
@@ -513,30 +546,61 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
         if #available(iOS 15, *) {
             if !genderButton.configuration.isNil {
                 let attrString = AttributedString(userprofile.gender.rawValue.localized.capitalized, attributes: AttributeContainer([
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline) as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.label
                 ]))
-                UIView.transition(with: genderButton, duration: 0.1, options: .transitionCrossDissolve) {
-                    self.genderButton.configuration!.attributedTitle = attrString
+                if animated {
+                    UIView.transition(with: genderButton, duration: 0.1, options: .transitionCrossDissolve) {
+                        self.genderButton.configuration!.attributedTitle = attrString
+                    }
+                }else {
+                    genderButton.configuration!.attributedTitle = attrString
                 }
             }
         } else {
-//            actionButton.setImage(UIImage(), for: .normal)
-//            actionButton.setAttributedTitle(nil, for: .normal)
-//            let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
-//                                                                  size: CGSize(width: actionButton.frame.height,
-//                                                                               height: actionButton.frame.height)))
-//            indicator.alpha = 0
-//            indicator.layoutCentered(in: actionButton)
-//            indicator.startAnimating()
-//            indicator.color = .white
-//            indicator.accessibilityIdentifier = "indicator"
-//            UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
-//
-//            //        delayAsync(delay: 2) { [weak self] in
-//            ////            self?.onSuccessCallback()
-//            //            self?.onFailureCallback()
-//            //        }
+        let attrString = NSMutableAttributedString(string: userprofile.gender.rawValue.localized.capitalized, attributes: [
+            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+            NSAttributedString.Key.foregroundColor: UIColor.label,
+        ])
+            genderButton.setAttributedTitle(attrString, for: .normal)
+            
+            guard let constraint = genderButton.getConstraint(identifier: "width"),
+                  let userprofile = Userprofiles.shared.current
+            else { return }
+            
+            self.setNeedsLayout()
+            constraint.constant = userprofile.gender.rawValue.localized.capitalized.width(withConstrainedHeight: genderButton.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline)!) + genderButton.imageEdgeInsets.left + genderButton.imageEdgeInsets.right + (genderButton.imageView?.bounds.width ?? 0) + genderButton.titleEdgeInsets.left*4
+            self.layoutIfNeeded()
+        }
+        
+        if #available(iOS 15, *) {
+            if !ageButton.configuration.isNil {
+                let attrString = AttributedString("age".localized + ": " + String(describing: userprofile.age), attributes: AttributeContainer([
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.label
+                ]))
+                if animated {
+                    UIView.transition(with: ageButton, duration: 0.1, options: .transitionCrossDissolve) {
+                        self.ageButton.configuration!.attributedTitle = attrString
+                    }
+                }else {
+                    ageButton.configuration!.attributedTitle = attrString
+                }
+            }
+        } else {
+            let attrString = NSMutableAttributedString(string: "age".localized + ": " + String(describing: userprofile.age), attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label,
+            ])
+            ageButton.setAttributedTitle(attrString, for: .normal)
+            
+            guard let constraint = ageButton.getConstraint(identifier: "width"),
+                  let userprofile = Userprofiles.shared.current
+            else { return }
+            
+            self.setNeedsLayout()
+            constraint.constant = ("age".localized + ": " + String(describing: userprofile.age)).width(withConstrainedHeight: ageButton.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline)!) + ageButton.imageEdgeInsets.left + ageButton.imageEdgeInsets.right + (ageButton.imageView?.bounds.width ?? 0) + ageButton.titleEdgeInsets.left*4
+            self.layoutIfNeeded()
         }
     }
     
@@ -547,12 +611,26 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
         datePublisher.send(datePicker.date)
     }
     
-//    @objc
-//    private func genderSelected() {
-//        genderTextField.resignFirstResponder()
-//        Fade.shared.dismiss()
-////        datePublisher.send(datePicker.date)
-//    }
+    private func prepareMenu() -> UIMenu {
+        var actions: [UIAction]!
+        
+        let male: UIAction = .init(title: Gender.Male.rawValue.localized.capitalized, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.genderPublisher.send(Gender.Male)
+        })
+        
+        let female: UIAction = .init(title: Gender.Female.rawValue.localized.capitalized, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.genderPublisher.send(Gender.Female)
+        })
+
+        
+        actions = [male, female]
+        
+        return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+    }
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -571,7 +649,7 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
         
         username.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
 //        gender.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
-        age.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
+//        age.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
         
         setNeedsLayout()
         constraint_1.constant = username.text!.height(withConstrainedWidth: username.bounds.width, font: username.font)
@@ -590,29 +668,3 @@ extension CurrentUserCredentialsCell: UsernameInputTextFieldDelegate {
         namePublisher.send(credentials)
     }
 }
-
-//extension CurrentUserCredentialsCell: UIPickerViewDataSource, UIPickerViewDelegate {
-//    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-//        1
-//    }
-//
-//    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-//        2
-//    }
-//
-//    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
-//        return NSAttributedString(string: Gender.allCases[row].rawValue.localized.lowercased(),
-//                                  attributes: [
-//                                      NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline) as Any,
-//                                      NSAttributedString.Key.foregroundColor: UIColor.label
-//                                  ])
-//    }
-//
-//    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-////        toolbarPicker?.toolbar.items?.forEach { button in
-////            button.title = (button.style == .done ? "select" : "cancel").localized
-////            controller?.onLanguageChanged(selectedLanguage)
-////        }
-//    }
-//}
-

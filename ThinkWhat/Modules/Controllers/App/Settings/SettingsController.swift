@@ -61,6 +61,11 @@ class SettingsController: UIViewController {
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+    func updateGender(_ gender: Gender) {
+        let parameters = API.prepareUserData(gender: gender)
+        controllerInput?.updateUserprofile(parameters: parameters, image: nil)
+    }
+    
     func updateBirthDate(_ date: Date) {
         let parameters = API.prepareUserData(birthDate: dateFormatter.string(from: date))
         controllerInput?.updateUserprofile(parameters: parameters, image: nil)
