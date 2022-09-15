@@ -57,9 +57,10 @@ class FillUserView: UIView {
     }
     @IBOutlet weak var cityTF: UnderlinedSearchTextField! {
         didSet {
-            if let cityName = UserDefaults.Profile.city {
-                cityTF.text! = cityName
-            }
+//            if let cityName = UserDefaults.Profile.city {
+//                cityTF.text! = cityName
+//            }
+            cityTF.text! = UserDefaults.Profile.city
             cityTF.placeholder = #keyPath(FillUserView.cityTF).localized
             textFields.append(cityTF)
 //            let tfWarningColor = UIColor { traitCollection in

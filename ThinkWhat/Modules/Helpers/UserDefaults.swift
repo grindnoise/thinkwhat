@@ -27,8 +27,8 @@ extension UserDefaults {
         @UserDefault(key: "email", defaultValue: nil)
         static var email: String?
         
-        @UserDefault(key: "city", defaultValue: nil)
-        static var city: String? {
+        @UserDefault(key: "city", defaultValue: "")
+        static var city: String {
             didSet {
                 print(oldValue)
                 print(city)
@@ -93,7 +93,7 @@ extension UserDefaults {
             UserDefaults.Profile.id             = nil
             UserDefaults.Profile.firstName      = nil
             UserDefaults.Profile.lastName       = nil
-            UserDefaults.Profile.city           = nil
+            UserDefaults.Profile.city           = ""
             
 //            UserDefaults.Profile.username       = nil
             UserDefaults.Profile.email          = nil

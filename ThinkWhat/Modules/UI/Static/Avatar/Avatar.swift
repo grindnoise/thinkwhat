@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class delAvatar: UIView {
     
@@ -179,12 +180,11 @@ class delAvatar: UIView {
 
 class Avatar: UIView {
     
-    // MARK: - Public properties
-    public var isEditable: Bool {
-        didSet {
-            
-        }
+    enum Mode {
+        case Default, Editing, Choice
     }
+    
+    // MARK: - Public properties
     public weak var userprofile: Userprofile! {
         didSet {
             guard !userprofile.isNil else { return }
@@ -207,6 +207,33 @@ class Avatar: UIView {
             shadowView.layer.shadowColor = shadowColor.withAlphaComponent(0.4).cgColor
         }
     }
+    public lazy var buttonBgLightColor: UIColor = .systemBackground{
+        didSet {
+            guard traitCollection.userInterfaceStyle != .dark else { return }
+            button.backgroundColor = buttonBgLightColor
+        }
+    }
+    public lazy var buttonBgDarkColor: UIColor = .systemBackground{
+        didSet {
+            guard traitCollection.userInterfaceStyle == .dark else { return }
+            button.backgroundColor = buttonBgDarkColor
+        }
+    }
+
+    public lazy var background: UIView = {
+        let instance = UIView()
+        instance.accessibilityIdentifier = "bg"
+        instance.clipsToBounds = true
+        instance.backgroundColor = .systemBackground
+        
+        coloredBackground.addEquallyTo(to: instance)
+        
+        instance.publisher(for: \.bounds, options: .new).sink { rect in
+            instance.cornerRadius = rect.height/2
+        }.store(in: &subscriptions)
+        
+        return instance
+    }()
     public lazy var coloredBackground: Shimmer = {
         let instance = Shimmer()
         instance.accessibilityIdentifier = "coloredBackground"
@@ -227,10 +254,11 @@ class Avatar: UIView {
             imageView.addEquallyTo(to: instance)
         }
         
-        observers.append(instance.observe(\Shimmer.bounds, options: .new) { view, change in
-            guard let value = change.newValue else { return }
-            view.cornerRadius = value.width/2
-        })
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.cornerRadius = rect.height/2
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
@@ -240,6 +268,9 @@ class Avatar: UIView {
         instance.accessibilityIdentifier = "imageView"
         instance.layer.masksToBounds = true
         instance.backgroundColor = .clear//.systemGray2
+        instance.isUserInteractionEnabled = true
+        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+        
         if let userprofile = userprofile, let image = userprofile.image {
             instance.image = image
         } else {
@@ -249,36 +280,37 @@ class Avatar: UIView {
             instance.contentMode = .center
         }
         
-        observers.append(instance.observe(\UIImageView.bounds, options: .new) { [weak self] view, change in
-            guard let self = self,
-                  let newValue = change.newValue
-            else { return }
-            view.cornerRadius = newValue.height/2
-//            if self.userprofile.isNil {
-//                view.contentMode = .center
-//                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.65, weight: .regular, scale: .medium)
-//                instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
-//                return
-//            }
-            if self.userprofile == Userprofile.anonymous {
-                self.imageView.contentMode = .scaleAspectFit
-                self.imageView.image = UIImage(named: "anon")
+        instance.publisher(for: \.bounds, options: .new).sink { [weak self] rect in
+            instance.cornerRadius = rect.height/2
+            
+            guard let self = self, self.userprofile == Userprofile.anonymous else {
+                instance.contentMode = .scaleAspectFit
                 return
             }
-//            guard let _ = self.userprofile.image else {
-//                view.contentMode = .center
-//                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height*0.65, weight: .regular, scale: .medium)
-//                instance.image = UIImage(systemName: "face.smiling.fill", withConfiguration: largeConfig)
-//                return
-//            }
-            view.contentMode = .scaleAspectFit
-        })
+            
+            instance.contentMode = .scaleAspectFit
+            instance.image = UIImage(named: "anon")
+        }.store(in: &subscriptions)
+        
         return instance
     }()
+    public var choiceColor: UIColor = .clear {
+        didSet {
+            guard oldValue != choiceColor, mode == .Choice else { return }
+            
+            button.tintColor = choiceColor
+        }
+    }
+    //Publishers
+    public let galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public let previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
     
     // MARK: - Private properties
-    private var notifications: [Task<Void, Never>?] = []
     private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //UI
     private lazy var shadowView: UIView = {
         let instance = UIView()
         instance.layer.masksToBounds = false
@@ -296,75 +328,70 @@ class Avatar: UIView {
         background.addEquallyTo(to: instance)
         return instance
     }()
-    private lazy var imageButton: UIButton = {
-       let instance = UIButton()
-        
-        if #available(iOS 15, *) {
-            var config = UIButton.Configuration.plain()
-            config.image = UIImage(systemName: "pencil.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
-            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
-                guard let self = self else { return .systemGray }
+    private lazy var button: UIButton = {
+        let instance = UIButton()
+        instance.showsMenuAsPrimaryAction = true
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+//        instance.addTarget(self, action: #selector(self.handleButtonTap), for: .touchUpInside)
+//        if #available(iOS 15, *) {
+//            var config = UIButton.Configuration.plain()
+//            config.baseBackgroundColor = .systemBackground
+//            config.image = UIImage(systemName: "pencil", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+//            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+//                guard let self = self else { return .systemGray }
+//
+//                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//            }
+////            config.buttonSize = .large
+//
+//            instance.configuration = config
+//        } else {
+//            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
+//                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+//                NSAttributedString.Key.foregroundColor: UIColor.label,
+//            ])
+//            instance.setAttributedTitle(attrString, for: .normal)
+//            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//            instance.titleEdgeInsets.left = 2
+////            instance.titleEdgeInsets.right = 8
+//            instance.titleEdgeInsets.top = 2
+//            instance.titleEdgeInsets.bottom = 2
+//            instance.setImage(UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+//            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//            instance.imageView?.contentMode = .scaleAspectFit
+//            instance.imageEdgeInsets.left = 10
+//            instance.imageEdgeInsets.top = 2
+//            instance.imageEdgeInsets.bottom = 2
+//            instance.imageEdgeInsets.right = 2
+//            instance.semanticContentAttribute = .forceRightToLeft
+//            instance.backgroundColor = .secondarySystemBackground
+//
+//            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
+//            constraint.identifier = "width"
+//            constraint.isActive = true
+//        }
 
-                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-            }
-            config.buttonSize = .large
-
-            instance.configuration = config
-        } else {
-            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.label,
-            ])
-            instance.setAttributedTitle(attrString, for: .normal)
-            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            instance.titleEdgeInsets.left = 2
-//            instance.titleEdgeInsets.right = 8
-            instance.titleEdgeInsets.top = 2
-            instance.titleEdgeInsets.bottom = 2
-            instance.setImage(UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-            instance.imageView?.contentMode = .scaleAspectFit
-            instance.imageEdgeInsets.left = 10
-            instance.imageEdgeInsets.top = 2
-            instance.imageEdgeInsets.bottom = 2
-            instance.imageEdgeInsets.right = 2
-            instance.semanticContentAttribute = .forceRightToLeft
-            instance.backgroundColor = .secondarySystemBackground
-
-            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
-            constraint.identifier = "width"
-            constraint.isActive = true
-        }
-        
-        observers.append(instance.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
+        instance.publisher(for: \.bounds, options: .new).sink { [weak self] rect in
             guard let self = self,
-                  let newValue = change.newValue
+                  self.mode != .Default
             else { return }
             
-            view.cornerRadius = newValue.height * 0.15
-        })
-        return instance
-    }()
-    public lazy var background: UIView = {
-        let instance = UIView()
-        instance.accessibilityIdentifier = "bg"
-        instance.clipsToBounds = true
-        instance.backgroundColor = .systemBackground
-        
-        coloredBackground.addEquallyTo(to: instance)
-        
-        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-            guard let value = change.newValue else { return }
-            view.cornerRadius = value.width/2
-        })
+            instance.cornerRadius = rect.height/2
+            instance.setImage(UIImage(systemName: self.mode == .Editing ? "pencil" : "circlebadge.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5, weight: .heavy)), for: .normal)
+            instance.imageView?.contentMode = .center
+        }.store(in: &subscriptions)
         
         return instance
     }()
-    
+    private var mode: Mode = .Default
     
     // MARK: - Destructor
     deinit {
-        notifications.forEach { $0?.cancel() }
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
@@ -372,8 +399,8 @@ class Avatar: UIView {
     }
 
     // MARK: - Initialization
-    init(userprofile: Userprofile? = nil, isShadowed: Bool = false, isBordered: Bool = false, borderColor: UIColor = .clear, isEditable: Bool = false) {
-        self.isEditable = isEditable
+    init(userprofile: Userprofile? = nil, isShadowed: Bool = false, isBordered: Bool = false, borderColor: UIColor = .clear, mode: Mode = .Default) {
+        self.mode = mode
         self.isShadowed = isShadowed
         self.isBordered = isBordered
         self.borderColor = borderColor
@@ -407,10 +434,41 @@ class Avatar: UIView {
             shadowView.trailingAnchor.constraint(equalTo: trailingAnchor),
             shadowView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
+        
+        guard mode != .Default else { return }
+        
+        button.menu = prepareMenu()
+        addSubview(button)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            button.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.25),
+        ])
+        
+        let constraintX = button.centerXAnchor.constraint(equalTo: leadingAnchor)
+        constraintX.isActive = true
+        constraintX.identifier = "constraintX"
+        
+        let constraintY = button.centerYAnchor.constraint(equalTo: topAnchor)
+        constraintY.isActive = true
+        constraintY.identifier = "constraintY"
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if mode == .Editing || mode == .Choice {
+            guard let constraintY = button.getConstraint(identifier: "constraintY"),
+                  let constraintX = button.getConstraint(identifier: "constraintX")
+            else { return }
+            
+            let point = pointOnCircle(center: CGPoint(x: bounds.midX, y: bounds.midY), radius: bounds.height/2, angleInDegrees: 135)
+            constraintY.constant = point.y
+            constraintX.constant = point.x
+        }
     }
     
     private func setObservers() {
-        notifications.append(Task { [weak self] in
+        tasks.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.ImageDownloaded) {
                 guard let self = self,
                       let object = notification.object as? Userprofile,
@@ -465,6 +523,51 @@ class Avatar: UIView {
         }
     }
     
+    private func pointOnCircle(center: CGPoint, radius: CGFloat, angleInDegrees: CGFloat) -> CGPoint {
+        func deg2rad(_ number: Double) -> CGFloat {
+            return number * .pi / 180
+        }
+        
+        let radian = deg2rad(angleInDegrees)
+        
+        return CGPoint(x: center.x + radius * sin(radian),
+                       y: center.y + radius * cos(radian))
+    }
+    
+    private func prepareMenu() -> UIMenu {
+        var actions: [UIAction]!
+        
+        switch mode {
+        case .Editing:
+            let camera: UIAction = .init(title: "camera".localized.capitalized, image: UIImage(systemName: "camera.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+                guard let self = self else { return }
+                
+                self.cameraPublisher.send(true)
+            })
+            
+            let photos: UIAction = .init(title: "photo_album".localized.capitalized, image: UIImage(systemName: "photo"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+                guard let self = self else { return }
+                
+                self.galleryPublisher.send(true)
+            })
+            
+            actions = [photos, camera]
+        case .Choice:
+            print("")
+        default:
+            print("")
+        }
+        
+        return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+    }
+    
+    @objc
+    private func handleTap() {
+        guard let image = imageView.image else { return }
+        
+        previewPublisher.send(image)
+    }
+    
     // MARK: - Public methods
     public func clearImage() {
 //        let largeConfig = UIImage.SymbolConfiguration(pointSize: imageView.bounds.height*0.65, weight: .regular, scale: .medium)
@@ -474,8 +577,61 @@ class Avatar: UIView {
         imageView.image = nil
     }
     
+    public func imageUploadStarted(_ image: UIImage) {
+        guard mode == .Editing else { return }
+        
+        let fade = UIView()
+        fade.backgroundColor = .black.withAlphaComponent(0.6)
+        fade.accessibilityIdentifier = "fade"
+        fade.alpha = 0
+        fade.addEquallyTo(to: imageView)
+        
+        let spinner = UIActivityIndicatorView()
+        spinner.accessibilityIdentifier = "spinner"
+        spinner.style = .large
+        spinner.alpha = 0
+        spinner.color = .white
+        spinner.startAnimating()
+        spinner.addEquallyTo(to: imageView)
+        
+        Animations.changeImageCrossDissolve(imageView: imageView, image: image)
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0) { [weak self] in
+            guard let self = self else { return }
+            
+            self.button.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+            self.button.alpha = 0
+            fade.alpha = 1
+            spinner.alpha = 1
+        }
+    }
+    
+    public func imageUploadFinished(_ image: UIImage) {
+        Animations.changeImageCrossDissolve(imageView: imageView, image: image)
+        
+        guard let fade = imageView.getSubview(type: UIView.self, identifier: "fade"),
+              let spinner = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "spinner")
+        else { return }
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, animations: { [weak self] in
+            guard let self = self else { return }
+            
+            self.button.transform = .identity
+            self.button.alpha = 1
+            fade.alpha = 0
+            spinner.alpha = 0
+        }) { _ in
+            fade.removeFromSuperview()
+            spinner.removeFromSuperview()
+        }
+    }
+    
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
         shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
     }
 }

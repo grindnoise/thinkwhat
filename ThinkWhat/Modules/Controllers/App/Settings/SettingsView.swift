@@ -8,11 +8,12 @@
 
 import UIKit
 import Combine
+import Agrume
 
 class SettingsView: UIView {
     
     // MARK: - Public properties
-    weak var viewInput: SettingsViewInput?
+    weak var viewInput: (SettingsViewInput & UIViewController)?
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -54,6 +55,38 @@ class SettingsView: UIView {
             
             self.viewInput?.updateGender(gender)
         }.store(in: &subscriptions)
+        
+        instance.cameraPublisher.sink { [unowned self] in
+            guard !$0.isNil else { return }
+            
+            self.viewInput?.openCamera()
+        }.store(in: &subscriptions)
+        
+        instance.galleryPublisher.sink { [unowned self] in
+            guard !$0.isNil else { return }
+            
+            self.viewInput?.openGallery()
+        }.store(in: &subscriptions)
+        
+        instance.previewPublisher.sink { [weak self] in
+            guard let self = self,
+                  let image = $0,
+                  let controller = self.viewInput
+            else { return }
+            
+            let agrume = Agrume(images: [image], startIndex: 0, background: .colored(.black))
+            agrume.show(from: controller)
+            
+        }.store(in: &subscriptions)
+        
+        instance.cityPublisher.sink { [weak self] in
+            guard let self = self,
+                  let city = $0
+            else { return }
+            
+            fatalError()
+        }.store(in: &self.subscriptions)
+
         
         return instance
     }()

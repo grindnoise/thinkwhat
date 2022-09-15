@@ -9,11 +9,28 @@
 import UIKit
 import SafariServices
 
-class SettingsController: UIViewController {
+class SettingsController: UIViewController, UINavigationControllerDelegate {
     
     enum Mode {
         case Profile, Settings
     }
+    
+    // MARK: - Public properties
+    var controllerOutput: SettingsControllerOutput?
+    var controllerInput: SettingsControllerInput?
+    var mode: SettingsController.Mode = .Profile
+    
+    // MARK: - Private properties
+    private lazy var settingsSwitch: SettingsSwitch = {
+        return SettingsSwitch(callbackDelegate: self)
+    }()
+    private lazy var imagePicker: UIImagePickerController = {
+        let instance = UIImagePickerController()
+        instance.delegate = self
+        instance.allowsEditing = true
+        
+        return instance
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,18 +66,20 @@ class SettingsController: UIViewController {
             ])
     }
 
-    // MARK: - Properties
-    var controllerOutput: SettingsControllerOutput?
-    var controllerInput: SettingsControllerInput?
-    
-    var mode: SettingsController.Mode = .Profile
-    private lazy var settingsSwitch: SettingsSwitch = {
-        return SettingsSwitch(callbackDelegate: self)
-    }()
 }
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+    func openCamera() {
+        imagePicker.sourceType = UIImagePickerController.SourceType.camera
+        present(imagePicker, animated: true, completion: nil)
+    }
+    
+    func openGallery() {
+        imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
+        present(imagePicker, animated: true, completion: nil)
+    }
+    
     func updateGender(_ gender: Gender) {
         let parameters = API.prepareUserData(gender: gender)
         controllerInput?.updateUserprofile(parameters: parameters, image: nil)
@@ -110,5 +129,22 @@ extension SettingsController: CallbackObservable {
                 navigationItem.title = "settings".localized
             }
         }
+    }
+}
+
+extension SettingsController: UIImagePickerControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let origImage = info[.editedImage] as? UIImage,
+              let resizedImage = origImage.resized(to: CGSize(width: 200, height: 200)) as? UIImage,
+              let imageData = resizedImage.jpegData(compressionQuality: 0.4),
+              let compressedImage = UIImage(data: imageData),
+              let userprofile = Userprofiles.shared.current
+        else { return }
+        
+        let parameters = API.prepareUserData(image: compressedImage)
+        controllerInput?.updateUserprofile(parameters: parameters, image: compressedImage)
+        NotificationCenter.default.post(name: Notifications.System.ImageUploadStart, object: [userprofile: compressedImage])
+        
+        dismiss(animated: true)
     }
 }

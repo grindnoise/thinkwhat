@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class CurrentUserCredentialsCell: UICollectionViewCell {
+class CurrentUserCredentialsCell: UICollectionViewListCell {
  
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {
@@ -17,7 +17,6 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             guard let userprofile = userprofile else { return }
             
             avatar.userprofile = userprofile
-            avatar.isEditable = true
             setupLabels()
             setupButtons()
         }
@@ -26,7 +25,9 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
     public let namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
     public let datePublisher = CurrentValueSubject<Date?, Never>(nil)
     public let genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
-    public let imagePublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public let galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public let previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -46,26 +47,27 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
         constraint.identifier = "height"
         constraint.isActive = true
         
-//        instance.publisher(for: \.contentSize, options: .new)
-//            .sink { [unowned self] size in
-//                guard let constraint = instance.getConstraint(identifier: "height") else { return }
-//
-//                self.setNeedsLayout()
-//                constraint.constant = size.height// * 1.5
-//                self.layoutIfNeeded()
-//                let space = constraint.constant - size.height
-//                let inset = max(0, space/2)
-//                instance.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
-//            }
-//            .store(in: &subscriptions)
+        //        instance.publisher(for: \.contentSize, options: .new)
+        //            .sink { [unowned self] size in
+        //                guard let constraint = instance.getConstraint(identifier: "height") else { return }
+        //
+        //                self.setNeedsLayout()
+        //                constraint.constant = size.height// * 1.5
+        //                self.layoutIfNeeded()
+        //                let space = constraint.constant - size.height
+        //                let inset = max(0, space/2)
+        //                instance.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
+        //            }
+        //            .store(in: &subscriptions)
         
         return instance
     }()
     private lazy var genderButton: UIButton = {
-       let instance = UIButton()
-        
+        let instance = UIButton()
+        instance.titleLabel?.numberOfLines = 1
         instance.showsMenuAsPrimaryAction = true
         instance.menu = prepareMenu()
+        
         if #available(iOS 15, *) {
             let attrString = AttributedString("TEST", attributes: AttributeContainer([
                 NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline) as Any,
@@ -76,7 +78,7 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             config.attributedTitle = attrString
             config.image = UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
             config.imagePlacement = .trailing
-            config.imagePadding = 4
+            config.imagePadding = 6
             config.contentInsets.leading = 8
             config.contentInsets.trailing = 4
             config.contentInsets.top = 2
@@ -87,7 +89,7 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
                 return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
             }
             config.buttonSize = .large
-            config.baseBackgroundColor = .secondarySystemBackground
+            config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
             config.baseForegroundColor = .label
 
             instance.configuration = config
@@ -98,10 +100,6 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             ])
             instance.setAttributedTitle(attrString, for: .normal)
             instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            instance.titleEdgeInsets.left = 2
-//            instance.titleEdgeInsets.right = 8
-            instance.titleEdgeInsets.top = 2
-            instance.titleEdgeInsets.bottom = 2
             instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
             instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
             instance.imageView?.contentMode = .scaleAspectFit
@@ -110,20 +108,17 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             instance.imageEdgeInsets.bottom = 2
             instance.imageEdgeInsets.right = 2
             instance.semanticContentAttribute = .forceRightToLeft
-            instance.backgroundColor = .secondarySystemBackground
+            instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
 
             let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
             constraint.identifier = "width"
             constraint.isActive = true
         }
         
-        observers.append(instance.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
-            guard let self = self,
-                  let newValue = change.newValue
-            else { return }
-            
-            view.cornerRadius = newValue.height * 0.15
-        })
+        instance.publisher(for: \.bounds, options: .new).sink { rect in
+            instance.cornerRadius = rect.height * 0.15
+        }.store(in: &subscriptions)
+        
         return instance
     }()
     private lazy var ageButton: UIButton = {
@@ -140,7 +135,7 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             config.attributedTitle = attrString
             config.image = UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
             config.imagePlacement = .trailing
-            config.imagePadding = 4
+            config.imagePadding = 6
             config.contentInsets.leading = 8
             config.contentInsets.trailing = 4
             config.contentInsets.top = 2
@@ -151,7 +146,7 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
                 return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
             }
             config.buttonSize = .large
-            config.baseBackgroundColor = .secondarySystemBackground
+            config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
             config.baseForegroundColor = .label
 
             instance.configuration = config
@@ -174,7 +169,7 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             instance.imageEdgeInsets.bottom = 2
             instance.imageEdgeInsets.right = 2
             instance.semanticContentAttribute = .forceRightToLeft
-            instance.backgroundColor = .secondarySystemBackground
+            instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
 
             let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
             constraint.identifier = "width"
@@ -190,59 +185,34 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
         })
         return instance
     }()
-//    private lazy var imageButton: UIButton = {
-//       let instance = UIButton()
-//
-//        if #available(iOS 15, *) {
-//            var config = UIButton.Configuration.plain()
-//            config.image = UIImage(systemName: "pencil.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
-//            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
-//                guard let self = self else { return .systemGray }
-//
-//                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//            }
-//            config.buttonSize = .large
-//
-//            instance.configuration = config
-//        } else {
-//            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
-//                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
-//                NSAttributedString.Key.foregroundColor: UIColor.label,
-//            ])
-//            instance.setAttributedTitle(attrString, for: .normal)
-//            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//            instance.titleEdgeInsets.left = 2
-////            instance.titleEdgeInsets.right = 8
-//            instance.titleEdgeInsets.top = 2
-//            instance.titleEdgeInsets.bottom = 2
-//            instance.setImage(UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-//            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//            instance.imageView?.contentMode = .scaleAspectFit
-//            instance.imageEdgeInsets.left = 10
-//            instance.imageEdgeInsets.top = 2
-//            instance.imageEdgeInsets.bottom = 2
-//            instance.imageEdgeInsets.right = 2
-//            instance.semanticContentAttribute = .forceRightToLeft
-//            instance.backgroundColor = .secondarySystemBackground
-//
-//            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
-//            constraint.identifier = "width"
-//            constraint.isActive = true
-//        }
-//
-//        observers.append(instance.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
-//            guard let self = self,
-//                  let newValue = change.newValue
-//            else { return }
-//
-//            view.cornerRadius = newValue.height * 0.15
-//        })
-//        return instance
-//    }()
     private lazy var avatar: Avatar = {
-        let instance = Avatar(isShadowed: true)
+        let instance = Avatar(isShadowed: true, mode: .Editing)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.clipsToBounds = false
+        instance.buttonBgDarkColor = .secondarySystemBackground
+        
+        //Catch image tap
+        instance.previewPublisher.sink { [weak self] in
+            guard let self = self,
+                  let image = $0
+            else { return }
+            
+            self.previewPublisher.send(image)
+        }.store(in: &subscriptions)
+        
+        //Catch camera tap
+        instance.cameraPublisher.sink { [weak self] in
+            guard let self = self, !$0.isNil else { return }
+            
+            self.cameraPublisher.send(true)
+        }.store(in: &subscriptions)
+        
+        //Catch photo tap
+        instance.galleryPublisher.sink { [weak self] in
+            guard let self = self, !$0.isNil else { return }
+            
+            self.galleryPublisher.send(true)
+        }.store(in: &subscriptions)
         
         return instance
     }()
@@ -390,7 +360,7 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
             verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
         ])
         
-        let constraint = genderButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        let constraint = genderButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
         constraint.priority = .defaultLow
         constraint.identifier = "bottomAnchor"
         constraint.isActive = true
@@ -455,6 +425,49 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
                 else { return }
                     
                 self.setupButtons(animated: true)
+            }
+        })
+        
+        //Image upload began
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.System.ImageUploadStart) {
+                guard let self = self,
+                      let dict = notification.object as? [Userprofile: UIImage],
+                      let userprofile = dict.keys.first,
+                      let image = dict.values.first,
+                      userprofile.isCurrent
+                else { return }
+                  
+                delayAsync(delay: 0.25) {
+                    self.avatar.imageUploadStarted(image)
+                }
+            }
+        })
+        
+        //Image upload finished
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.ImageDownloaded) {
+                guard let self = self,
+                      let instance = notification.object as? Userprofile,
+                      instance.isCurrent,
+                      let image = instance.image
+                else { return }
+                    
+                self.avatar.imageUploadFinished(image)
+                
+                showBanner(bannerDelegate: self, text: "image_uploaded".localized, content: UIImageView(image: UIImage(systemName: "photo", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemGreen, shadowed: true)
+            }
+        })
+        
+        //Image upload failure
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.System.ImageUploadFailure) {
+                guard let self = self,
+                      let instance = notification.object as? Userprofile,
+                      instance.isCurrent
+                else { return }
+                    
+                showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemRed, shadowed: true)
             }
         })
     }
@@ -614,13 +627,13 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
     private func prepareMenu() -> UIMenu {
         var actions: [UIAction]!
         
-        let male: UIAction = .init(title: Gender.Male.rawValue.localized.capitalized, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+        let male: UIAction = .init(title: Gender.Male.rawValue.localized.capitalized, image: UIImage(named: "male", in: .main, with: UIImage.SymbolConfiguration(scale: .small)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
             guard let self = self else { return }
             
             self.genderPublisher.send(Gender.Male)
         })
         
-        let female: UIAction = .init(title: Gender.Female.rawValue.localized.capitalized, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+        let female: UIAction = .init(title: Gender.Female.rawValue.localized.capitalized, image: UIImage(named: "female", in: .main, with: UIImage.SymbolConfiguration(scale: .small)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
             guard let self = self else { return }
             
             self.genderPublisher.send(Gender.Female)
@@ -639,6 +652,16 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
         
         datePicker.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         
+        if #available(iOS 15, *) {
+            if !genderButton.configuration.isNil, !ageButton.configuration.isNil {
+                genderButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+                ageButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+            }
+        } else {
+            genderButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+            ageButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        }
+        
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
@@ -656,6 +679,13 @@ class CurrentUserCredentialsCell: UICollectionViewCell {
 //        constraint_2.constant = "test".height(withConstrainedWidth: gender.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
         layoutIfNeeded()
     }
+    
+    override func updateConstraints() {
+        super.updateConstraints()
+    
+        separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+    }
 }
 
 // MARK: - UsernameInputTextFieldDelegate
@@ -666,5 +696,21 @@ extension CurrentUserCredentialsCell: UsernameInputTextFieldDelegate {
         guard !credentials.isEmpty else { return }
         
         namePublisher.send(credentials)
+    }
+}
+
+extension CurrentUserCredentialsCell: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
     }
 }

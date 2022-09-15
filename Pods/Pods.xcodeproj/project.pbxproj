@@ -17,6 +17,7 @@
 				D71C0FF7BA35C105E2D31FBE8BED39F7 /* PBXTargetDependency */,
 			);
 			name = FBSDKLoginKit;
+			productName = FBSDKLoginKit;
 		};
 		28907903AF6DD0AD321D92CD660E7E23 /* FBSDKCoreKit */ = {
 			isa = PBXAggregateTarget;
@@ -29,6 +30,7 @@
 				55BEBB96244FC4F3DA4BD823624E2611 /* PBXTargetDependency */,
 			);
 			name = FBSDKCoreKit;
+			productName = FBSDKCoreKit;
 		};
 		479BDBD165CD08E2159181E58CD2078F /* FBAEMKit */ = {
 			isa = PBXAggregateTarget;
@@ -40,6 +42,7 @@
 				FA868F91D24D6DCBFF139AB9426E2B0E /* PBXTargetDependency */,
 			);
 			name = FBAEMKit;
+			productName = FBAEMKit;
 		};
 		56F4191D8CB8B4E6B4E5E4FA1A9F0F46 /* FBSDKShareKit */ = {
 			isa = PBXAggregateTarget;
@@ -51,6 +54,7 @@
 				13F2EA510EC629E281809790EE525E7F /* PBXTargetDependency */,
 			);
 			name = FBSDKShareKit;
+			productName = FBSDKShareKit;
 		};
 		8EA62FEAB23070050EFD4D4508D659E5 /* FBSDKCoreKit_Basics */ = {
 			isa = PBXAggregateTarget;
@@ -61,6 +65,7 @@
 			dependencies = (
 			);
 			name = FBSDKCoreKit_Basics;
+			productName = FBSDKCoreKit_Basics;
 		};
 /* End PBXAggregateTarget section */
 
@@ -298,7 +303,7 @@
 		642948C8806AE1CEB67C9DB15FAC51D4 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83951417E776477830DBE84555D98A25 /* Array+Extensions.swift */; };
 		65054EAABB264069BDD4B9EAFBA02616 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7685BD14D892E243B4206CB972642BC /* Token.swift */; };
 		655D8680939320656CEC56E49B3FB2A9 /* BoundedTextDecorator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE5AF279239E9C2121C6D9681847194 /* BoundedTextDecorator.swift */; };
-		65EB7AF9936060C3C620A99B2595C587 /* GoogleSignIn-GoogleSignIn in Resources */ = {isa = PBXBuildFile; fileRef = E5BA41B7F2E1FE47F9ABCAC27C9E4281 /* GoogleSignIn-GoogleSignIn */; };
+		65EB7AF9936060C3C620A99B2595C587 /* GoogleSignIn.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E5BA41B7F2E1FE47F9ABCAC27C9E4281 /* GoogleSignIn.bundle */; };
 		668569999C4882072215401D033D0A15 /* OIDScopeUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = DE1408480073A408CF8593431F176410 /* OIDScopeUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		668C0DD7FD7319968D04D0987E4A1934 /* GIDProfileData_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = D41A40A7C78267A5AFAE4ACD9A1AA434 /* GIDProfileData_Private.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		669679242CFB3B6EC7083FF13C6AC685 /* Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642D4F811297BE4A2DDD8999519BB456 /* Photos.swift */; };
@@ -367,7 +372,7 @@
 		86F4E1225226178417266AF433B58871 /* GIDSignInInternalOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 57DB0D790208322660BC14AC44EB953F /* GIDSignInInternalOptions.m */; };
 		86FC9FF902D2250F3D6AE9EB255278CB /* OIDErrorUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 65C16F288B835EC985AE4E7259A9DF34 /* OIDErrorUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		87247AC4394B82088C2FA820B2BA65B5 /* OIDFieldMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = 124FE3E8764A12B165315AC942776E39 /* OIDFieldMapping.m */; };
-		874157E461B501F20836FF6456594C11 /* ReCaptcha-ReCaptcha in Resources */ = {isa = PBXBuildFile; fileRef = 14F3CD37BA3C6247B2DFA29F42314874 /* ReCaptcha-ReCaptcha */; };
+		874157E461B501F20836FF6456594C11 /* ReCaptcha.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 14F3CD37BA3C6247B2DFA29F42314874 /* ReCaptcha.bundle */; };
 		87569E4FA2E43E090F847B1A2D6467B5 /* SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9D25AD9D20573EA91AF134B8095D6F /* SessionState.swift */; };
 		875809B1FFC6E4DA65316CC18B4FB791 /* ServiceEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E954CE4E0A4E7605EB6993750F3551F6 /* ServiceEntry.swift */; };
 		87C74E704D13451D3CB5F494CF0885A4 /* NMBStringify.m in Sources */ = {isa = PBXBuildFile; fileRef = 40024F87C44E2467066B0DCF520FC310 /* NMBStringify.m */; settings = {COMPILER_FLAGS = "-DPRODUCT_NAME=Nimble/Nimble"; }; };
@@ -1076,7 +1081,7 @@
 /* Begin PBXFileReference section */
 		00B606DED478C628DDD16015D83FF09E /* Alamofire-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Alamofire-prefix.pch"; sourceTree = "<group>"; };
 		00EE6A54B80297E38E5C12FE4067B7C0 /* Quick-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Quick-dummy.m"; sourceTree = "<group>"; };
-		0116EC32C5A2D90D7E67EA905C2DCF1F /* uk.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = uk.lproj; path = GoogleSignIn/Sources/Strings/uk.lproj; sourceTree = "<group>"; };
+		0116EC32C5A2D90D7E67EA905C2DCF1F /* uk.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = uk.lproj; path = GoogleSignIn/Sources/Strings/uk.lproj; sourceTree = "<group>"; };
 		011B1C6F284AB2E14C58BA02D304C6DA /* GTMSessionFetcher-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "GTMSessionFetcher-Info.plist"; sourceTree = "<group>"; };
 		0146D538876AEB212C5A9AE7DE16E80B /* ApiError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ApiError.swift; path = Library/Sources/Errors/ApiError.swift; sourceTree = "<group>"; };
 		01F28DC5455CDFBC66B3DAA7080EF8D1 /* Configuration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Configuration.swift; path = Sources/Quick/Configuration/Configuration.swift; sourceTree = "<group>"; };
@@ -1095,24 +1100,24 @@
 		05CFE7C283287BF5E640E1E0E014DAC1 /* ReCaptchaWebViewManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReCaptchaWebViewManager.swift; path = ReCaptcha/Classes/ReCaptchaWebViewManager.swift; sourceTree = "<group>"; };
 		05D18681A966C1EF2A37CEB4757B9C14 /* HTTPMethod.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HTTPMethod.swift; path = Source/HTTPMethod.swift; sourceTree = "<group>"; };
 		061111C84205F4B7E6F96A33A6E0BF51 /* SwiftyJSON.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = SwiftyJSON.modulemap; sourceTree = "<group>"; };
-		064C6668D27587EACF913EDC31380A02 /* he.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = he.lproj; path = GoogleSignIn/Sources/Strings/he.lproj; sourceTree = "<group>"; };
+		064C6668D27587EACF913EDC31380A02 /* he.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = he.lproj; path = GoogleSignIn/Sources/Strings/he.lproj; sourceTree = "<group>"; };
 		068C96C53E761E99FA737F96FAF4A396 /* UITextField+IBL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UITextField+IBL10n.swift"; path = "Source/IBInspectables/UIKit/Common/UITextField+IBL10n.swift"; sourceTree = "<group>"; };
 		0697874BB81E5A8D5F3D822172E8D579 /* Storage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Storage.swift; path = Library/Sources/API/Storage.swift; sourceTree = "<group>"; };
 		073549D63E77A6CF0DFC22EFCEBC0A54 /* DispatchQueue+Throttle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "DispatchQueue+Throttle.swift"; path = "ReCaptcha/Classes/DispatchQueue+Throttle.swift"; sourceTree = "<group>"; };
-		073D8E02C14CEC2B4CFF7EFB34635B63 /* nl.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = nl.lproj; path = GoogleSignIn/Sources/Strings/nl.lproj; sourceTree = "<group>"; };
+		073D8E02C14CEC2B4CFF7EFB34635B63 /* nl.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = nl.lproj; path = GoogleSignIn/Sources/Strings/nl.lproj; sourceTree = "<group>"; };
 		077C9BF071F24FB349C1F35B2151642C /* NimbleXCTestHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NimbleXCTestHandler.swift; path = Sources/Nimble/Adapters/NimbleXCTestHandler.swift; sourceTree = "<group>"; };
 		07D162EF9EC96BF64A38B3A251E1BF9C /* ServiceEntry.TypeForwarding.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ServiceEntry.TypeForwarding.swift; path = Sources/ServiceEntry.TypeForwarding.swift; sourceTree = "<group>"; };
 		07DE0C8C161AA81083FCEEAD3FD80F70 /* OperationConvertible.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OperationConvertible.swift; path = Library/Sources/Extensions/OperationConvertible.swift; sourceTree = "<group>"; };
-		084702682C14576C3212F46B1FD259B1 /* sv.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = sv.lproj; path = GoogleSignIn/Sources/Strings/sv.lproj; sourceTree = "<group>"; };
+		084702682C14576C3212F46B1FD259B1 /* sv.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = sv.lproj; path = GoogleSignIn/Sources/Strings/sv.lproj; sourceTree = "<group>"; };
 		088D95D0161F674422E27A651485B3AA /* Logger.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Logger.swift; path = Source/Core/Logger/Logger.swift; sourceTree = "<group>"; };
 		09D8E5221A7FE058B86D2D4F04ED7358 /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; sourceTree = "<group>"; };
 		0A8ADBC27EA94BBEDFFF0079124613CC /* SessionsStorage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SessionsStorage.swift; path = Library/Sources/Sessions/Management/SessionsStorage.swift; sourceTree = "<group>"; };
 		0AE3F4E4DE13CC1CE76DB7AB1AC39861 /* CwlPreconditionTesting.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CwlPreconditionTesting.h; path = Carthage/Checkouts/CwlPreconditionTesting/Sources/CwlPreconditionTesting/include/CwlPreconditionTesting.h; sourceTree = "<group>"; };
 		0AF5CBCDA8A015F5CD727E827F0D692C /* Container.Arguments.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Container.Arguments.swift; path = Sources/Container.Arguments.swift; sourceTree = "<group>"; };
-		0C63DA8A5521A52A8A923C8697C7ED62 /* fr_CA.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = fr_CA.lproj; path = GoogleSignIn/Sources/Strings/fr_CA.lproj; sourceTree = "<group>"; };
+		0C63DA8A5521A52A8A923C8697C7ED62 /* fr_CA.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = fr_CA.lproj; path = GoogleSignIn/Sources/Strings/fr_CA.lproj; sourceTree = "<group>"; };
 		0D631E9908483F9525A6B3F36F16CC61 /* Quick */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Quick; path = Quick.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D7DD69772DE5C190D0B39B1D9D1BEA0 /* Lock.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Lock.swift; path = Library/Sources/Utils/Lock.swift; sourceTree = "<group>"; };
-		0D83CBDD7026E2CB36511B85ECCAC864 /* FBAEMKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = FBAEMKit.xcframework; path = XCFrameworks/FBAEMKit.xcframework; sourceTree = "<group>"; };
+		0D83CBDD7026E2CB36511B85ECCAC864 /* FBAEMKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; name = FBAEMKit.xcframework; path = XCFrameworks/FBAEMKit.xcframework; sourceTree = "<group>"; };
 		0DB8077A9C3CE27C5C2152DDEA670BBC /* VKNotificationCenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VKNotificationCenter.swift; path = Library/Sources/Extensions/VKNotificationCenter.swift; sourceTree = "<group>"; };
 		0E24CDC0A0A4D349E009BD21A9E167F1 /* GIDSignInStrings.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GIDSignInStrings.h; path = GoogleSignIn/Sources/GIDSignInStrings.h; sourceTree = "<group>"; };
 		0E6CCD208A3475AEB1657830CACF4959 /* MatcherFunc.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MatcherFunc.swift; path = Sources/Nimble/Matchers/MatcherFunc.swift; sourceTree = "<group>"; };
@@ -1131,17 +1136,17 @@
 		146F8E1FB85398C396313BFE019AC026 /* World.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = World.swift; path = Sources/Quick/World.swift; sourceTree = "<group>"; };
 		14D82E658ADF3F61FF50E423A56C66B4 /* Pods-ThinkWhat-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-ThinkWhat-Info.plist"; sourceTree = "<group>"; };
 		14DF42C1D8F3362CE45A98C218B03EF3 /* RightToLeftTextDecorator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RightToLeftTextDecorator.swift; path = Source/Core/TextDecorator/RightToLeftTextDecorator.swift; sourceTree = "<group>"; };
-		14F3CD37BA3C6247B2DFA29F42314874 /* ReCaptcha-ReCaptcha */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "ReCaptcha-ReCaptcha"; path = ReCaptcha.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		14F3CD37BA3C6247B2DFA29F42314874 /* ReCaptcha.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReCaptcha.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		151DB1A6795FD1B215A799301BD7A712 /* NSNumber+Localizable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "NSNumber+Localizable.swift"; path = "Source/Extensions/NSNumber+Localizable.swift"; sourceTree = "<group>"; };
 		15656AA464E053647F9659B12BD7D477 /* Closures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Closures.swift; path = Sources/Quick/Hooks/Closures.swift; sourceTree = "<group>"; };
 		1621347928323D5D8A0893F8E0F28DA4 /* GoogleSignIn.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GoogleSignIn.h; path = GoogleSignIn/Sources/Public/GoogleSignIn/GoogleSignIn.h; sourceTree = "<group>"; };
 		166358C4754955B6DD5357555324F705 /* VK.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VK.swift; path = Library/Sources/Common/VK.swift; sourceTree = "<group>"; };
 		16A93AF4CE50679055AA032A6F15987D /* GIDGoogleUser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GIDGoogleUser.h; path = GoogleSignIn/Sources/Public/GoogleSignIn/GIDGoogleUser.h; sourceTree = "<group>"; };
 		16C398ADF0F01C9878E492FC1C2AF992 /* AccentedTextDecorator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccentedTextDecorator.swift; path = Source/Core/TextDecorator/AccentedTextDecorator.swift; sourceTree = "<group>"; };
-		16FE1F709947E24FBE70CA71CD56C12C /* Plural.stringsdict */ = {isa = PBXFileReference; includeInIndex = 1; name = Plural.stringsdict; path = Source/Core/Plural/Plural.stringsdict; sourceTree = "<group>"; };
+		16FE1F709947E24FBE70CA71CD56C12C /* Plural.stringsdict */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.stringsdict; name = Plural.stringsdict; path = Source/Core/Plural/Plural.stringsdict; sourceTree = "<group>"; };
 		1858A9AB46DC282F57680817BE13A1BD /* SwiftyGif-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyGif-prefix.pch"; sourceTree = "<group>"; };
 		186D1BB4DD559A92E92D80551FC20EA8 /* Agrume */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Agrume; path = Agrume.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		1873168D787E44F0100A5278BE71F939 /* pl.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = pl.lproj; path = GoogleSignIn/Sources/Strings/pl.lproj; sourceTree = "<group>"; };
+		1873168D787E44F0100A5278BE71F939 /* pl.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = pl.lproj; path = GoogleSignIn/Sources/Strings/pl.lproj; sourceTree = "<group>"; };
 		18A372BB9428975460D30EF1AE47DB98 /* OIDServiceConfiguration.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = OIDServiceConfiguration.m; path = Source/AppAuthCore/OIDServiceConfiguration.m; sourceTree = "<group>"; };
 		18DFE1E84B1B78DE65B30678C065B708 /* OIDAuthState+IOS.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "OIDAuthState+IOS.m"; path = "Source/AppAuth/iOS/OIDAuthState+IOS.m"; sourceTree = "<group>"; };
 		1916667E4E0607069C421E128EDB9EA9 /* Alamofire.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Alamofire.swift; path = Source/Alamofire.swift; sourceTree = "<group>"; };
@@ -1169,7 +1174,7 @@
 		1DAE51AB2A65B9D20119ACEADF49D843 /* AgrumeDataSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgrumeDataSource.swift; path = Agrume/AgrumeDataSource.swift; sourceTree = "<group>"; };
 		1DB3C8E6F8591F9DEBE246B72D92E9BC /* SharePreviewController_iOS.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SharePreviewController_iOS.swift; path = Library/UI/iOS/Share/SharePreviewController_iOS.swift; sourceTree = "<group>"; };
 		1DF5AF249AE0E5DD97806D1288F6CA4D /* GIDGoogleUser.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GIDGoogleUser.m; path = GoogleSignIn/Sources/GIDGoogleUser.m; sourceTree = "<group>"; };
-		1E7744DA7FCCE481F346FBBFA261930C /* mach_excServer.c */ = {isa = PBXFileReference; includeInIndex = 1; name = mach_excServer.c; path = Carthage/Checkouts/CwlPreconditionTesting/Sources/CwlMachBadInstructionHandler/mach_excServer.c; sourceTree = "<group>"; };
+		1E7744DA7FCCE481F346FBBFA261930C /* mach_excServer.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = mach_excServer.c; path = Carthage/Checkouts/CwlPreconditionTesting/Sources/CwlMachBadInstructionHandler/mach_excServer.c; sourceTree = "<group>"; };
 		1EE4E48F2FA5DA53B9764276AE2D8A2A /* ObjcAssociatedWeakObject.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ObjcAssociatedWeakObject.swift; path = SwiftyGif/ObjcAssociatedWeakObject.swift; sourceTree = "<group>"; };
 		1F85FB3DDD5B0110E88A34E3278B906E /* BeLessThan.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BeLessThan.swift; path = Sources/Nimble/Matchers/BeLessThan.swift; sourceTree = "<group>"; };
 		1FA913F9C24F92ACEF31011F1620BDA2 /* Notes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Notes.swift; path = Library/Sources/API/Notes.swift; sourceTree = "<group>"; };
@@ -1189,7 +1194,7 @@
 		2423CDFE62E1DD2BD95677CEEA6FE591 /* ParameterEncoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ParameterEncoder.swift; path = Source/ParameterEncoder.swift; sourceTree = "<group>"; };
 		24C8478A051E12D20F5794D02B45B8DB /* SwiftyGif-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyGif-umbrella.h"; sourceTree = "<group>"; };
 		24EF41D6312044D509CAFABC31E9F3B0 /* AgrumeCell.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgrumeCell.swift; path = Agrume/AgrumeCell.swift; sourceTree = "<group>"; };
-		2504CC91B20CBAC30E1EF3DFDE5B242E /* es_MX.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = es_MX.lproj; path = GoogleSignIn/Sources/Strings/es_MX.lproj; sourceTree = "<group>"; };
+		2504CC91B20CBAC30E1EF3DFDE5B242E /* es_MX.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = es_MX.lproj; path = GoogleSignIn/Sources/Strings/es_MX.lproj; sourceTree = "<group>"; };
 		257E2B2ACED6FC3EABBE0D05E2755A7D /* OIDAuthorizationService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDAuthorizationService.h; path = Source/AppAuthCore/OIDAuthorizationService.h; sourceTree = "<group>"; };
 		25B2F960C1523DBAD80656EF0A7CB29B /* String+Dict.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "String+Dict.swift"; path = "ReCaptcha/Classes/String+Dict.swift"; sourceTree = "<group>"; };
 		25CAA439AB93EE97D8ADC8E56F3F244C /* OIDTokenRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = OIDTokenRequest.m; path = Source/AppAuthCore/OIDTokenRequest.m; sourceTree = "<group>"; };
@@ -1231,7 +1236,7 @@
 		31CEE697984446CC078D2D45A7590902 /* SharePreferencesController_iOS.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SharePreferencesController_iOS.swift; path = Library/UI/iOS/Share/SharePreferencesController_iOS.swift; sourceTree = "<group>"; };
 		3247472497244B5407481EB096CCF687 /* Expression.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Expression.swift; path = Sources/Nimble/Expression.swift; sourceTree = "<group>"; };
 		325B81C15928AA60853DEBF036A183FF /* SourceLocation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SourceLocation.swift; path = Sources/Nimble/Utils/SourceLocation.swift; sourceTree = "<group>"; };
-		32718151B193A98074BBC010BA9D39FB /* cs.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = cs.lproj; path = GoogleSignIn/Sources/Strings/cs.lproj; sourceTree = "<group>"; };
+		32718151B193A98074BBC010BA9D39FB /* cs.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = cs.lproj; path = GoogleSignIn/Sources/Strings/cs.lproj; sourceTree = "<group>"; };
 		32F9198AC3CAB888F7FE4A23CB323740 /* UILabel+IBL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UILabel+IBL10n.swift"; path = "Source/IBInspectables/UIKit/Common/UILabel+IBL10n.swift"; sourceTree = "<group>"; };
 		33178F4ACAD75F3D4035C59FB3CC312F /* SwiftyVK.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SwiftyVK.h; path = Library/Sources/SwiftyVK.h; sourceTree = "<group>"; };
 		3321ADB91C08BADF8D69744A157F8E7B /* FBSDKCoreKit_Basics.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = FBSDKCoreKit_Basics.release.xcconfig; sourceTree = "<group>"; };
@@ -1247,7 +1252,7 @@
 		36DB81385690178D25F09B0A800B9BF2 /* RequestTaskMap.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RequestTaskMap.swift; path = Source/RequestTaskMap.swift; sourceTree = "<group>"; };
 		370F04CAD53D3874B9DD5CCFFAD920EB /* OIDExternalUserAgentCatalyst.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDExternalUserAgentCatalyst.h; path = Source/AppAuth/iOS/OIDExternalUserAgentCatalyst.h; sourceTree = "<group>"; };
 		3722D1221B4869362C4781C5DDB2B86C /* YoutubePlayer-in-WKWebView-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "YoutubePlayer-in-WKWebView-dummy.m"; sourceTree = "<group>"; };
-		37379863ACD297862A957DE411414999 /* hr.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = hr.lproj; path = GoogleSignIn/Sources/Strings/hr.lproj; sourceTree = "<group>"; };
+		37379863ACD297862A957DE411414999 /* hr.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = hr.lproj; path = GoogleSignIn/Sources/Strings/hr.lproj; sourceTree = "<group>"; };
 		378E8267773FE9E6D6AE80E7AE591C9E /* Friends.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Friends.swift; path = Library/Sources/API/Friends.swift; sourceTree = "<group>"; };
 		3825A230BDBAD709FAB21DCF45380930 /* QuickTestSuite.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = QuickTestSuite.swift; path = Sources/Quick/QuickTestSuite.swift; sourceTree = "<group>"; };
 		384D52D65688754318CA8EC0BA5BAA38 /* ConnectionObserver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConnectionObserver.swift; path = Library/Sources/Utils/ConnectionObserver.swift; sourceTree = "<group>"; };
@@ -1259,7 +1264,7 @@
 		39FC65CA04B2A18C82945A3A01255E5D /* SessionsHolder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SessionsHolder.swift; path = Library/Sources/Sessions/Management/SessionsHolder.swift; sourceTree = "<group>"; };
 		3A093D34F2AFBC97A8E03D85B144A5A6 /* Swinject.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Swinject.modulemap; sourceTree = "<group>"; };
 		3B86538C5486EAF07DC21299533BB9B5 /* L10n+CustomStringConvertible.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "L10n+CustomStringConvertible.swift"; path = "Source/Core/Extensions/L10n+CustomStringConvertible.swift"; sourceTree = "<group>"; };
-		3B9BFEBE16174F0F9F303B50BEDDE7E4 /* hi.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = hi.lproj; path = GoogleSignIn/Sources/Strings/hi.lproj; sourceTree = "<group>"; };
+		3B9BFEBE16174F0F9F303B50BEDDE7E4 /* hi.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = hi.lproj; path = GoogleSignIn/Sources/Strings/hi.lproj; sourceTree = "<group>"; };
 		3BCC8E23EABAD932EAF57676560384A4 /* GIDMDMPasscodeState.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GIDMDMPasscodeState.m; path = GoogleSignIn/Sources/GIDMDMPasscodeState.m; sourceTree = "<group>"; };
 		3BDDB9EF75CA0492C2D9E33145F906CD /* WKYTPlayerView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = WKYTPlayerView.h; path = WKYTPlayerView/WKYTPlayerView.h; sourceTree = "<group>"; };
 		3C0DEB4C39C754B093635F9D2AB1BDE5 /* Contain.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Contain.swift; path = Sources/Nimble/Matchers/Contain.swift; sourceTree = "<group>"; };
@@ -1284,15 +1289,15 @@
 		44232B7D25749A2DE104A39458220EF6 /* SwiftyGif.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SwiftyGif.debug.xcconfig; sourceTree = "<group>"; };
 		4605783A94E4C86C14027BDF54E18BEC /* OIDClientMetadataParameters.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = OIDClientMetadataParameters.m; path = Source/AppAuthCore/OIDClientMetadataParameters.m; sourceTree = "<group>"; };
 		462CF7E429E1433D13BA1A54DC1D5EA8 /* VKAppProxy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VKAppProxy.swift; path = Library/Sources/Extensions/VKAppProxy.swift; sourceTree = "<group>"; };
-		463880439CB2462769A1964A14D12272 /* FBSDKShareKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = FBSDKShareKit.xcframework; path = XCFrameworks/FBSDKShareKit.xcframework; sourceTree = "<group>"; };
+		463880439CB2462769A1964A14D12272 /* FBSDKShareKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; name = FBSDKShareKit.xcframework; path = XCFrameworks/FBSDKShareKit.xcframework; sourceTree = "<group>"; };
 		46C081EED4F133B8ACF42474C563229E /* TTRangeSlider.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = TTRangeSlider.debug.xcconfig; sourceTree = "<group>"; };
 		46C54465C0F9E6E1084FDAECFA7D14B8 /* VKFileManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VKFileManager.swift; path = Library/Sources/Extensions/VKFileManager.swift; sourceTree = "<group>"; };
 		46CDF53296F6643EEF95AD9F324B0684 /* OIDAuthorizationService+IOS.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "OIDAuthorizationService+IOS.m"; path = "Source/AppAuth/iOS/OIDAuthorizationService+IOS.m"; sourceTree = "<group>"; };
-		46DFC2AAA9311DC06E3DAA502D55386F /* zh_CN.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = zh_CN.lproj; path = GoogleSignIn/Sources/Strings/zh_CN.lproj; sourceTree = "<group>"; };
+		46DFC2AAA9311DC06E3DAA502D55386F /* zh_CN.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = zh_CN.lproj; path = GoogleSignIn/Sources/Strings/zh_CN.lproj; sourceTree = "<group>"; };
 		48037A6D25F9CA87548656D09D7FF30D /* Wall.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Wall.swift; path = Library/Sources/API/Wall.swift; sourceTree = "<group>"; };
 		482EFB3F568B734F98729254BCC11387 /* UIView-Shimmer-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIView-Shimmer-prefix.pch"; sourceTree = "<group>"; };
 		48A1C1B45527A55040449FEA2F9F924E /* SwiftyJSON-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-umbrella.h"; sourceTree = "<group>"; };
-		494600C5C6B30F0D7D05EA273DC18800 /* nb.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = nb.lproj; path = GoogleSignIn/Sources/Strings/nb.lproj; sourceTree = "<group>"; };
+		494600C5C6B30F0D7D05EA273DC18800 /* nb.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = nb.lproj; path = GoogleSignIn/Sources/Strings/nb.lproj; sourceTree = "<group>"; };
 		496FA14AB55ED48E37881FB98D1A4F36 /* StringResource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StringResource.swift; path = Source/Core/Resource/Resource/StringResource.swift; sourceTree = "<group>"; };
 		498C2D3346AA5112AACD3A73B283E76D /* AgrumePhotoLibraryHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgrumePhotoLibraryHelper.swift; path = Agrume/AgrumePhotoLibraryHelper.swift; sourceTree = "<group>"; };
 		4A84A1E678215001C0A5C983D6C41A4B /* Reachability.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = Library/Sources/Utils/Reachability.swift; sourceTree = "<group>"; };
@@ -1319,7 +1324,7 @@
 		4F9D7C5751B629877EE1860AA1B8E0E3 /* GIDAuthStateMigration.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GIDAuthStateMigration.m; path = GoogleSignIn/Sources/GIDAuthStateMigration.m; sourceTree = "<group>"; };
 		500DF92FF04ACFAD2999396F7BD04FFD /* Numbers+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Numbers+Extensions.swift"; path = "Library/Sources/Extensions/Numbers+Extensions.swift"; sourceTree = "<group>"; };
 		507F07EDAD51469542F0D876630E109F /* KeychainProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = KeychainProvider.swift; path = Library/Sources/Utils/KeychainProvider.swift; sourceTree = "<group>"; };
-		50D3D03757F8A2043FD19E96754DD32E /* en_GB.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = en_GB.lproj; path = GoogleSignIn/Sources/Strings/en_GB.lproj; sourceTree = "<group>"; };
+		50D3D03757F8A2043FD19E96754DD32E /* en_GB.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = en_GB.lproj; path = GoogleSignIn/Sources/Strings/en_GB.lproj; sourceTree = "<group>"; };
 		5161B3BDB98004A76BFF5D3E1C355640 /* UIBarItem+IBL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UIBarItem+IBL10n.swift"; path = "Source/IBInspectables/UIKit/Common/UIBarItem+IBL10n.swift"; sourceTree = "<group>"; };
 		517905F9AFC39CB1FDD1C23FDC2AC624 /* RedirectHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RedirectHandler.swift; path = Source/RedirectHandler.swift; sourceTree = "<group>"; };
 		519B5F11AB0740A1D252760542D19F8C /* BeEmpty.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BeEmpty.swift; path = Sources/Nimble/Matchers/BeEmpty.swift; sourceTree = "<group>"; };
@@ -1329,7 +1334,7 @@
 		522025CC0512B78A1516E0D0A312FC2F /* AllPass.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AllPass.swift; path = Sources/Nimble/Matchers/AllPass.swift; sourceTree = "<group>"; };
 		523033C517286C2FA43AA475E1988A5D /* OnePixelConstraint_iOS.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnePixelConstraint_iOS.swift; path = Library/UI/iOS/Components/OnePixelConstraint_iOS.swift; sourceTree = "<group>"; };
 		52DEAEC0C6981299438D2ECBE99A7AA3 /* VKError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VKError.swift; path = Library/Sources/Errors/VKError.swift; sourceTree = "<group>"; };
-		5449275E37B0A997C066D748A696595C /* el.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = el.lproj; path = GoogleSignIn/Sources/Strings/el.lproj; sourceTree = "<group>"; };
+		5449275E37B0A997C066D748A696595C /* el.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = el.lproj; path = GoogleSignIn/Sources/Strings/el.lproj; sourceTree = "<group>"; };
 		5464052EE2FCA86E651B8E7C42FD1EB5 /* GTMAppAuth-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "GTMAppAuth-umbrella.h"; sourceTree = "<group>"; };
 		54B813F1B734EF100E07BFCDD2EB79DF /* NMBExpectation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NMBExpectation.swift; path = Sources/Nimble/Adapters/NMBExpectation.swift; sourceTree = "<group>"; };
 		54BAF07AB2C4516756D8EE3F894F3187 /* Pods-ThinkWhat-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-ThinkWhat-dummy.m"; sourceTree = "<group>"; };
@@ -1342,13 +1347,13 @@
 		55ED4A526E595AAD3EA13A0B4DB82A74 /* AppAuth-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "AppAuth-Info.plist"; sourceTree = "<group>"; };
 		561BB3E3C417F2C983ECBB14CBDCE21A /* HTTPHeaders.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HTTPHeaders.swift; path = Source/HTTPHeaders.swift; sourceTree = "<group>"; };
 		56CD6FBD857263E298099EF3F1D54208 /* BeginWith.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BeginWith.swift; path = Sources/Nimble/Matchers/BeginWith.swift; sourceTree = "<group>"; };
-		574068059B3841F1B98D612F1A60EB36 /* th.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = th.lproj; path = GoogleSignIn/Sources/Strings/th.lproj; sourceTree = "<group>"; };
+		574068059B3841F1B98D612F1A60EB36 /* th.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = th.lproj; path = GoogleSignIn/Sources/Strings/th.lproj; sourceTree = "<group>"; };
 		5750D258165C63EFD11C729597B5844D /* OIDTokenResponse.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDTokenResponse.h; path = Source/AppAuthCore/OIDTokenResponse.h; sourceTree = "<group>"; };
 		57DB0D790208322660BC14AC44EB953F /* GIDSignInInternalOptions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GIDSignInInternalOptions.m; path = GoogleSignIn/Sources/GIDSignInInternalOptions.m; sourceTree = "<group>"; };
 		581DA0A314567C776D4CA30B784E2005 /* URLConvertible+URLRequestConvertible.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "URLConvertible+URLRequestConvertible.swift"; path = "Source/URLConvertible+URLRequestConvertible.swift"; sourceTree = "<group>"; };
 		586AE69FD7C1830DFFD022D6F71325A2 /* CookiesStorage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CookiesStorage.swift; path = Library/Sources/Networking/Cookies/CookiesStorage.swift; sourceTree = "<group>"; };
 		593FE79C94A6DB622E0559ABBF2CEB07 /* ReCaptchaDecoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReCaptchaDecoder.swift; path = ReCaptcha/Classes/ReCaptchaDecoder.swift; sourceTree = "<group>"; };
-		59483E02931CF1AC940FF1DD0CAE8888 /* id.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = id.lproj; path = GoogleSignIn/Sources/Strings/id.lproj; sourceTree = "<group>"; };
+		59483E02931CF1AC940FF1DD0CAE8888 /* id.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = id.lproj; path = GoogleSignIn/Sources/Strings/id.lproj; sourceTree = "<group>"; };
 		596C076C2072788EA82E8AF850CEF08E /* Nimble-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Nimble-prefix.pch"; sourceTree = "<group>"; };
 		59C6C5E3FB291E35D34D912E42F55CE5 /* Task.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Task.swift; path = Library/Sources/Networking/Task/Task.swift; sourceTree = "<group>"; };
 		59FE13D3F7CCCB71761F515500D39DA1 /* Agrume-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Agrume-prefix.pch"; sourceTree = "<group>"; };
@@ -1360,7 +1365,7 @@
 		5D3B61F8B09F3E6BC3B0BA8C65A2A6D0 /* AssertionRecorder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AssertionRecorder.swift; path = Sources/Nimble/Adapters/AssertionRecorder.swift; sourceTree = "<group>"; };
 		5D797E9A5C5782CE845840781FA1CC81 /* Alamofire */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Alamofire; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D98450F18EA120904E3A8D6C1F8C335 /* Dependencies.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Dependencies.swift; path = Library/Sources/Dependecies/Dependencies.swift; sourceTree = "<group>"; };
-		5E39A6D5CCEDB5B423A39032E795561C /* en.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = en.lproj; path = GoogleSignIn/Sources/Strings/en.lproj; sourceTree = "<group>"; };
+		5E39A6D5CCEDB5B423A39032E795561C /* en.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = en.lproj; path = GoogleSignIn/Sources/Strings/en.lproj; sourceTree = "<group>"; };
 		5ED859882D2A0DCCA9C244013EC919EE /* OIDURLQueryComponent.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDURLQueryComponent.h; path = Source/AppAuthCore/OIDURLQueryComponent.h; sourceTree = "<group>"; };
 		5F4E0D32C073E5C6470EBB9D84F2C4D1 /* SwiftyVK */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SwiftyVK; path = SwiftyVK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		604EBE511767CF36D6EE01CC4FA5A7C8 /* Fave.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Fave.swift; path = Library/Sources/API/Fave.swift; sourceTree = "<group>"; };
@@ -1389,13 +1394,13 @@
 		6855566AE19B1791068AA3E9323B7C1C /* Pods-ThinkWhat-ThinkWhatTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-ThinkWhat-ThinkWhatTests-frameworks.sh"; sourceTree = "<group>"; };
 		6886273C61747DAC38797046A27ADB4F /* FBSDKShareKit-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "FBSDKShareKit-xcframeworks.sh"; sourceTree = "<group>"; };
 		68F71C7B65414C5DB766CB524B895BAE /* Behavior.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Behavior.swift; path = Sources/Quick/Behavior.swift; sourceTree = "<group>"; };
-		690B3E0EB4F539015C2668148B2A5235 /* zh_TW.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = zh_TW.lproj; path = GoogleSignIn/Sources/Strings/zh_TW.lproj; sourceTree = "<group>"; };
+		690B3E0EB4F539015C2668148B2A5235 /* zh_TW.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = zh_TW.lproj; path = GoogleSignIn/Sources/Strings/zh_TW.lproj; sourceTree = "<group>"; };
 		69164138F6971367F3F0EA78A1A6C28B /* IBL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IBL10n.swift; path = Source/IBInspectables/Core/IBL10n.swift; sourceTree = "<group>"; };
 		695F8E9B8DD703775EE95154AC2D2A2D /* OIDTokenRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDTokenRequest.h; path = Source/AppAuthCore/OIDTokenRequest.h; sourceTree = "<group>"; };
 		69A9DF53C75DFEA4D7968F98497A73A0 /* LocalizedStringsConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocalizedStringsConfiguration.swift; path = Source/Core/LocalizedStringsConfiguration.swift; sourceTree = "<group>"; };
 		69CA02BE1B157FDCC3A9AC93484453F1 /* Pods-ThinkWhat-ThinkWhatTests */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-ThinkWhat-ThinkWhatTests"; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6A2F4208583B243994E1E10C2E2E9E75 /* ro.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = ro.lproj; path = GoogleSignIn/Sources/Strings/ro.lproj; sourceTree = "<group>"; };
-		6A5AA2FABE9C2CE4BFDA77337EEB62A8 /* de.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = de.lproj; path = GoogleSignIn/Sources/Strings/de.lproj; sourceTree = "<group>"; };
+		6A2F4208583B243994E1E10C2E2E9E75 /* ro.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ro.lproj; path = GoogleSignIn/Sources/Strings/ro.lproj; sourceTree = "<group>"; };
+		6A5AA2FABE9C2CE4BFDA77337EEB62A8 /* de.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = de.lproj; path = GoogleSignIn/Sources/Strings/de.lproj; sourceTree = "<group>"; };
 		6A8D6999F827A738B4C105203E3801A6 /* SwiftyVK-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyVK-umbrella.h"; sourceTree = "<group>"; };
 		6ADEA7F633F6D0E519E6981FB43AA5D2 /* Attempt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Attempt.swift; path = Library/Sources/Networking/Attempt/Attempt.swift; sourceTree = "<group>"; };
 		6B24DE150426C4E8F4F22D58068C8532 /* StringEncoding+Alamofire.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "StringEncoding+Alamofire.swift"; path = "Source/StringEncoding+Alamofire.swift"; sourceTree = "<group>"; };
@@ -1408,7 +1413,7 @@
 		6CD4D6830A83ED50B3019E2237EB52C0 /* BeLessThanOrEqual.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BeLessThanOrEqual.swift; path = Sources/Nimble/Matchers/BeLessThanOrEqual.swift; sourceTree = "<group>"; };
 		6CE98D3B52BBCB6972A8D4EADE74B714 /* UIView-Shimmer-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIView-Shimmer-dummy.m"; sourceTree = "<group>"; };
 		6CFB6DCC953CDDB4B67EA3313F8BD9D8 /* L10n+deprecated.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "L10n+deprecated.swift"; path = "Source/Core/Extensions/L10n+deprecated.swift"; sourceTree = "<group>"; };
-		6DB1627004397E2AE9E69C222DD2B5DA /* pt_PT.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = pt_PT.lproj; path = GoogleSignIn/Sources/Strings/pt_PT.lproj; sourceTree = "<group>"; };
+		6DB1627004397E2AE9E69C222DD2B5DA /* pt_PT.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = pt_PT.lproj; path = GoogleSignIn/Sources/Strings/pt_PT.lproj; sourceTree = "<group>"; };
 		6E337D25D75765C53AB5970E05DB563E /* Container.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Container.swift; path = Sources/Container.swift; sourceTree = "<group>"; };
 		6E43E5E7995539BDB7DB0275E8D1427D /* GTMAppAuthFetcherAuthorization+Keychain.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "GTMAppAuthFetcherAuthorization+Keychain.h"; path = "GTMAppAuth/Sources/Public/GTMAppAuth/GTMAppAuthFetcherAuthorization+Keychain.h"; sourceTree = "<group>"; };
 		6FD122EA0AB9AB2A8FFA5F676C795DF0 /* GTMAppAuth */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = GTMAppAuth; path = GTMAppAuth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1420,14 +1425,14 @@
 		710CF80A6D493E1279D57EAEA466388F /* InstanceWrapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = InstanceWrapper.swift; path = Sources/InstanceWrapper.swift; sourceTree = "<group>"; };
 		7171730DA6ECA7D6195C1890DF443B06 /* Quick.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Quick.debug.xcconfig; sourceTree = "<group>"; };
 		718D97033C2AAB7521101978C513404F /* GTMSessionFetcher.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = GTMSessionFetcher.modulemap; sourceTree = "<group>"; };
-		726F5B8BC22CE081690F8B2CB681F0DC /* Roboto-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "Roboto-Bold.ttf"; path = "GoogleSignIn/Sources/Resources/Roboto-Bold.ttf"; sourceTree = "<group>"; };
+		726F5B8BC22CE081690F8B2CB681F0DC /* Roboto-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "Roboto-Bold.ttf"; path = "GoogleSignIn/Sources/Resources/Roboto-Bold.ttf"; sourceTree = "<group>"; };
 		72D2CC6C5AD45036F3CB937FAE6E13AE /* HooksPhase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HooksPhase.swift; path = Sources/Quick/Hooks/HooksPhase.swift; sourceTree = "<group>"; };
 		72D52D3C63B3C1B908B63FF07CA27EC1 /* UIView+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UIView+Extensions.swift"; path = "Sources/UIView-Shimmer/UIView+Extensions/UIView+Extensions.swift"; sourceTree = "<group>"; };
 		72D56C996F61B649F4567539078C9A2A /* MultipartUpload.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MultipartUpload.swift; path = Source/MultipartUpload.swift; sourceTree = "<group>"; };
 		7364A2BFBE81704059557EE7D421707E /* World+DSL.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "World+DSL.swift"; path = "Sources/Quick/DSL/World+DSL.swift"; sourceTree = "<group>"; };
 		73B1709F689215C60CF211BA98C5BCFF /* GIDCallbackQueue.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GIDCallbackQueue.m; path = GoogleSignIn/Sources/GIDCallbackQueue.m; sourceTree = "<group>"; };
 		746F89C114E30D0CFF5DF41BCF391327 /* GTMSessionFetcher.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GTMSessionFetcher.debug.xcconfig; sourceTree = "<group>"; };
-		759F02543303D4240184C5ED3F51D7DA /* pt.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = pt.lproj; path = GoogleSignIn/Sources/Strings/pt.lproj; sourceTree = "<group>"; };
+		759F02543303D4240184C5ED3F51D7DA /* pt.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = pt.lproj; path = GoogleSignIn/Sources/Strings/pt.lproj; sourceTree = "<group>"; };
 		76176EEB2C07D355CA44AC05E834B3FE /* Quick-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Quick-umbrella.h"; sourceTree = "<group>"; };
 		76EE7080EED3D774037563FF068E480F /* UIView-Shimmer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "UIView-Shimmer.release.xcconfig"; sourceTree = "<group>"; };
 		770C672B90EF01EC8199B16F1CC9AC0C /* SessionDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SessionDelegate.swift; path = Source/SessionDelegate.swift; sourceTree = "<group>"; };
@@ -1463,7 +1468,7 @@
 		7FB25C48C79FC19518409250ADF5E337 /* Agrume-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Agrume-umbrella.h"; sourceTree = "<group>"; };
 		7FD60456BCF587625E224361A2BFFB0F /* ObjectScope.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ObjectScope.swift; path = Sources/ObjectScope.swift; sourceTree = "<group>"; };
 		804E808C207E9947DC94E97464171016 /* GoogleSignIn.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = GoogleSignIn.modulemap; sourceTree = "<group>"; };
-		815F8D9859979A57D294EC6BCED026C9 /* ms.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = ms.lproj; path = GoogleSignIn/Sources/Strings/ms.lproj; sourceTree = "<group>"; };
+		815F8D9859979A57D294EC6BCED026C9 /* ms.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ms.lproj; path = GoogleSignIn/Sources/Strings/ms.lproj; sourceTree = "<group>"; };
 		81DE596183FDAA2801BC70309599F938 /* OneVariationsMethod.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OneVariationsMethod.swift; path = "Library/Sources/API Supporting/Methods/OneVariationsMethod.swift"; sourceTree = "<group>"; };
 		81FC7F4F8343F654A69C8DA387F31EF7 /* MatchError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MatchError.swift; path = Sources/Nimble/Matchers/MatchError.swift; sourceTree = "<group>"; };
 		83399ECE227579E8CCE5B2E29BC216F9 /* IDGenerator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IDGenerator.swift; path = Library/Sources/Utils/IDGenerator.swift; sourceTree = "<group>"; };
@@ -1473,7 +1478,7 @@
 		8607BE2F8AFE180F81249A0499A1CA96 /* DSL.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DSL.swift; path = Sources/Nimble/DSL.swift; sourceTree = "<group>"; };
 		871C92E269858C892F132749BE20ADDE /* ResourceBundle-GoogleSignIn-GoogleSignIn-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-GoogleSignIn-GoogleSignIn-Info.plist"; sourceTree = "<group>"; };
 		880D586AD4246FDB13A460B104A9B354 /* GTMKeychain.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GTMKeychain.h; path = GTMAppAuth/Sources/Public/GTMAppAuth/GTMKeychain.h; sourceTree = "<group>"; };
-		885EEFAB542B0E2A3C84384E6946FA0C /* FBSDKCoreKit_Basics.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = FBSDKCoreKit_Basics.xcframework; path = XCFrameworks/FBSDKCoreKit_Basics.xcframework; sourceTree = "<group>"; };
+		885EEFAB542B0E2A3C84384E6946FA0C /* FBSDKCoreKit_Basics.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; name = FBSDKCoreKit_Basics.xcframework; path = XCFrameworks/FBSDKCoreKit_Basics.xcframework; sourceTree = "<group>"; };
 		886488DC5CA806B5C0D6C2CA5E3A1319 /* ImageDownloader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageDownloader.swift; path = Agrume/ImageDownloader.swift; sourceTree = "<group>"; };
 		893234A468B582A63BFDE9EE0CB2E2BC /* Scopes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Scopes.swift; path = Library/Sources/Common/Scopes.swift; sourceTree = "<group>"; };
 		894F9335CF6A588E9B78BEE399DA81CA /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -1503,7 +1508,7 @@
 		8FEA3099119400A0E4EB5784E5021530 /* AppAuthCore.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AppAuthCore.h; path = Source/AppAuthCore.h; sourceTree = "<group>"; };
 		905417B323944CF54A8EBE28E8CAFC21 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/CFNetwork.framework; sourceTree = DEVELOPER_DIR; };
 		9065DD7A9B9C1485262775D9915445FB /* OIDExternalUserAgentIOS.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDExternalUserAgentIOS.h; path = Source/AppAuth/iOS/OIDExternalUserAgentIOS.h; sourceTree = "<group>"; };
-		907DEBC9AC0B75232EA236A32F07A068 /* tr.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = tr.lproj; path = GoogleSignIn/Sources/Strings/tr.lproj; sourceTree = "<group>"; };
+		907DEBC9AC0B75232EA236A32F07A068 /* tr.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = tr.lproj; path = GoogleSignIn/Sources/Strings/tr.lproj; sourceTree = "<group>"; };
 		90F1B27BB7A955AF6FB2A212E9F52A66 /* ReCaptcha */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = ReCaptcha; path = ReCaptcha.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9196D88A5729C0FE6BA285099700ABFD /* OIDGrantTypes.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = OIDGrantTypes.m; path = Source/AppAuthCore/OIDGrantTypes.m; sourceTree = "<group>"; };
 		91F6E2FC443EEE7667BEF57F4CCFC205 /* L10n+Localizable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "L10n+Localizable.swift"; path = "Source/Core/Extensions/L10n+Localizable.swift"; sourceTree = "<group>"; };
@@ -1530,15 +1535,15 @@
 		98F805DEACD7E022C09FD280BF660FD0 /* GTMSessionFetcher-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "GTMSessionFetcher-dummy.m"; sourceTree = "<group>"; };
 		98FEFFA5A68DBB4E299A3DD8706F9BCE /* Pods-ThinkWhat-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-ThinkWhat-acknowledgements.markdown"; sourceTree = "<group>"; };
 		9965376CF25DE659D6169C4443F092F9 /* YoutubePlayer-in-WKWebView-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "YoutubePlayer-in-WKWebView-prefix.pch"; sourceTree = "<group>"; };
-		99A4031C4C1B7235BA598F77FE54CD13 /* fr.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = fr.lproj; path = GoogleSignIn/Sources/Strings/fr.lproj; sourceTree = "<group>"; };
+		99A4031C4C1B7235BA598F77FE54CD13 /* fr.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = fr.lproj; path = GoogleSignIn/Sources/Strings/fr.lproj; sourceTree = "<group>"; };
 		9A8CEFABEA6EE6C449082119C721B39E /* Pods-ThinkWhat-ThinkWhatTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-ThinkWhat-ThinkWhatTests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		9B1A8D8295BFDF5440AA068576B8E2F6 /* SwiftyGif.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SwiftyGif.h; path = SwiftyGif/SwiftyGif.h; sourceTree = "<group>"; };
 		9B336E96368052BA14C294539790C006 /* NSBundle+GID3PAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSBundle+GID3PAdditions.m"; path = "GoogleSignIn/Sources/NSBundle+GID3PAdditions.m"; sourceTree = "<group>"; };
 		9B39C885118B76368825C7375C4C9E36 /* DoubleLengthTextDecorator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DoubleLengthTextDecorator.swift; path = Source/Core/TextDecorator/DoubleLengthTextDecorator.swift; sourceTree = "<group>"; };
 		9B68C2A531153072AAD7D650D50B057E /* SynchronizedResolver.Arguments.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SynchronizedResolver.Arguments.swift; path = Sources/SynchronizedResolver.Arguments.swift; sourceTree = "<group>"; };
 		9BD54B129647A7865B120F2FC0BB54EE /* SwiftyGif-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SwiftyGif-dummy.m"; sourceTree = "<group>"; };
-		9CD2938EF2C447814EFCE220063B5664 /* ar.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = ar.lproj; path = GoogleSignIn/Sources/Strings/ar.lproj; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9CD2938EF2C447814EFCE220063B5664 /* ar.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ar.lproj; path = GoogleSignIn/Sources/Strings/ar.lproj; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9E047E8268E9AF63738FDA427064D957 /* OIDResponseTypes.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDResponseTypes.h; path = Source/AppAuthCore/OIDResponseTypes.h; sourceTree = "<group>"; };
 		9E0A3B346BB3D4062B957D709C8118BA /* AppAuth.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AppAuth.release.xcconfig; sourceTree = "<group>"; };
 		9E136EA225EC025363A5D9BD3897BAA2 /* OIDAuthStateChangeDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDAuthStateChangeDelegate.h; path = Source/AppAuthCore/OIDAuthStateChangeDelegate.h; sourceTree = "<group>"; };
@@ -1557,7 +1562,7 @@
 		A4E12CEAC6A6ECEC1876FADE6CEA9529 /* OIDExternalUserAgentCatalyst.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = OIDExternalUserAgentCatalyst.m; path = Source/AppAuth/iOS/OIDExternalUserAgentCatalyst.m; sourceTree = "<group>"; };
 		A53BEF1D0E1C3FF551C13F43E9E4A26F /* GIDMDMPasscodeState_Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GIDMDMPasscodeState_Private.h; path = GoogleSignIn/Sources/GIDMDMPasscodeState_Private.h; sourceTree = "<group>"; };
 		A566AFBAD8A9AF15DA7EE9B4560AC9DB /* Predicate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Predicate.swift; path = Sources/Nimble/Matchers/Predicate.swift; sourceTree = "<group>"; };
-		A5AD5768E0ACFA0382D7D05E6ED73D04 /* recaptcha.html */ = {isa = PBXFileReference; includeInIndex = 1; name = recaptcha.html; path = ReCaptcha/Assets/recaptcha.html; sourceTree = "<group>"; };
+		A5AD5768E0ACFA0382D7D05E6ED73D04 /* recaptcha.html */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.html; name = recaptcha.html; path = ReCaptcha/Assets/recaptcha.html; sourceTree = "<group>"; };
 		A5DC10DDE93A28C8C55E5CEAD3A0BC23 /* ShareNavigationController_iOS.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ShareNavigationController_iOS.swift; path = Library/UI/iOS/Share/ShareNavigationController_iOS.swift; sourceTree = "<group>"; };
 		A70AB84F8B30FAE1E99BEF73CD5E380B /* GIDScopes.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GIDScopes.m; path = GoogleSignIn/Sources/GIDScopes.m; sourceTree = "<group>"; };
 		A70CC07B74BEBB9193D5D1C2E29CCE73 /* MultipartBodyBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MultipartBodyBuilder.swift; path = Library/Sources/Networking/URLs/MultipartBodyBuilder.swift; sourceTree = "<group>"; };
@@ -1566,7 +1571,7 @@
 		A7B7B6A50B3F82D98948F70F41A54307 /* NumericPluralArg.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NumericPluralArg.swift; path = Source/Core/Plural/NumericPluralArg.swift; sourceTree = "<group>"; };
 		A7BF0338DECFCD4AC6EEBC471A24A718 /* TTRangeSlider.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TTRangeSlider.m; path = Pod/Classes/TTRangeSlider.m; sourceTree = "<group>"; };
 		A7C6303DF01F4FC27EED2DCAB6794200 /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ThinkWhat-ThinkWhatTests.local.xcconfig"; sourceTree = "<group>"; };
-		A7D11F06DC11909DD18F45CEC5963EB1 /* es.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = es.lproj; path = GoogleSignIn/Sources/Strings/es.lproj; sourceTree = "<group>"; };
+		A7D11F06DC11909DD18F45CEC5963EB1 /* es.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = es.lproj; path = GoogleSignIn/Sources/Strings/es.lproj; sourceTree = "<group>"; };
 		A81A79FB3D616FBCFE2CFC0CBD4E9A8C /* OIDExternalUserAgentIOSCustomBrowser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDExternalUserAgentIOSCustomBrowser.h; path = Source/AppAuth/iOS/OIDExternalUserAgentIOSCustomBrowser.h; sourceTree = "<group>"; };
 		A8CA926B4A6723C504E055EA4AA6BE95 /* BeGreaterThanOrEqualTo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BeGreaterThanOrEqualTo.swift; path = Sources/Nimble/Matchers/BeGreaterThanOrEqualTo.swift; sourceTree = "<group>"; };
 		A96CE6D9C648EC4754EE8B1BEC63D958 /* SwiftyJSON.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = Source/SwiftyJSON/SwiftyJSON.swift; sourceTree = "<group>"; };
@@ -1641,7 +1646,7 @@
 		C3AEB51248C6BEDBDD0B4661C985D5BA /* RequestCallbacks.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RequestCallbacks.swift; path = "Library/Sources/API Supporting/Request/RequestCallbacks.swift"; sourceTree = "<group>"; };
 		C3DD67DA8AACA844B79C5DCD81EA2905 /* Response.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Response.swift; path = "Library/Sources/API Supporting/Response.swift"; sourceTree = "<group>"; };
 		C4052D01203141CA7827AD776F2C3638 /* GTMSessionUploadFetcher.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GTMSessionUploadFetcher.h; path = Source/GTMSessionUploadFetcher.h; sourceTree = "<group>"; };
-		C42B77D9CA141572199A8EA9D8376CD4 /* ca.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = ca.lproj; path = GoogleSignIn/Sources/Strings/ca.lproj; sourceTree = "<group>"; };
+		C42B77D9CA141572199A8EA9D8376CD4 /* ca.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ca.lproj; path = GoogleSignIn/Sources/Strings/ca.lproj; sourceTree = "<group>"; };
 		C466C1022F408B056374AAA9949842EB /* TTRangeSlider.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = TTRangeSlider.release.xcconfig; sourceTree = "<group>"; };
 		C6616264CC1B5E731253E132C930DDB1 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		C67A8D6F5D9FD21A25020D72F78A102A /* CachedResponseHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CachedResponseHandler.swift; path = Source/CachedResponseHandler.swift; sourceTree = "<group>"; };
@@ -1651,7 +1656,7 @@
 		C72EFC829FD3F3540E9A4C93996A3BA7 /* Notifacations.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Notifacations.swift; path = Library/Sources/API/Notifacations.swift; sourceTree = "<group>"; };
 		C75A9CA6566706EA5324DA430A25CCCF /* Nimble.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Nimble.modulemap; sourceTree = "<group>"; };
 		C79960E5CE0437A4443677F014B0609A /* GIDScopes.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GIDScopes.h; path = GoogleSignIn/Sources/GIDScopes.h; sourceTree = "<group>"; };
-		C7DFF1F70FA51B3638C880E71584924A /* FBSDKCoreKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = FBSDKCoreKit.xcframework; path = XCFrameworks/FBSDKCoreKit.xcframework; sourceTree = "<group>"; };
+		C7DFF1F70FA51B3638C880E71584924A /* FBSDKCoreKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; name = FBSDKCoreKit.xcframework; path = XCFrameworks/FBSDKCoreKit.xcframework; sourceTree = "<group>"; };
 		C8011774060DC7B8051E0F689ECC01C0 /* Nimble.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Nimble.debug.xcconfig; sourceTree = "<group>"; };
 		C8DB5DC6B12FB0FF5EB952C1AC9E2EE4 /* URLSessionConfiguration+Alamofire.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "URLSessionConfiguration+Alamofire.swift"; path = "Source/URLSessionConfiguration+Alamofire.swift"; sourceTree = "<group>"; };
 		C92BA8BB08C790BE6395BB20567330B2 /* UISearchBar+IBL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UISearchBar+IBL10n.swift"; path = "Source/IBInspectables/UIKit/iOS/UISearchBar+IBL10n.swift"; sourceTree = "<group>"; };
@@ -1673,7 +1678,7 @@
 		CE7748FCE2989C267BA56B9017D0143D /* OIDExternalUserAgentSession.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDExternalUserAgentSession.h; path = Source/AppAuthCore/OIDExternalUserAgentSession.h; sourceTree = "<group>"; };
 		CE7DF3C3FACE98FDF25E4C6D723BF644 /* Utils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = Library/Sources/API/Utils.swift; sourceTree = "<group>"; };
 		CEDCB57E58D58461BCD1169F44D99955 /* ExampleGroup.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExampleGroup.swift; path = Sources/Quick/ExampleGroup.swift; sourceTree = "<group>"; };
-		D0B5D28918E9D28F51F6D35E2C782B8D /* it.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = it.lproj; path = GoogleSignIn/Sources/Strings/it.lproj; sourceTree = "<group>"; };
+		D0B5D28918E9D28F51F6D35E2C782B8D /* it.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = it.lproj; path = GoogleSignIn/Sources/Strings/it.lproj; sourceTree = "<group>"; };
 		D0EEDAA46B3BB1C87A1314FD74BA8F01 /* Gifts.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Gifts.swift; path = Library/Sources/API/Gifts.swift; sourceTree = "<group>"; };
 		D0EFDF9652CBC2B8A1F3995723F3DF75 /* Callsite.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Callsite.swift; path = Sources/Quick/Callsite.swift; sourceTree = "<group>"; };
 		D1796F572B474164D4AB5DB6F7550BD5 /* Expectation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Expectation.swift; path = Sources/Nimble/Expectation.swift; sourceTree = "<group>"; };
@@ -1686,7 +1691,7 @@
 		D39E0A268ECA073AB2BB6847E526574A /* ReCaptcha.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReCaptcha.swift; path = ReCaptcha/Classes/ReCaptcha.swift; sourceTree = "<group>"; };
 		D3B125A0088861B4D278EECB3D46D5FB /* OIDEndSessionResponse.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDEndSessionResponse.h; path = Source/AppAuthCore/OIDEndSessionResponse.h; sourceTree = "<group>"; };
 		D41A40A7C78267A5AFAE4ACD9A1AA434 /* GIDProfileData_Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GIDProfileData_Private.h; path = GoogleSignIn/Sources/GIDProfileData_Private.h; sourceTree = "<group>"; };
-		D41AFE87B02E1ABE236205D8DBA2EDC8 /* pt_BR.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = pt_BR.lproj; path = GoogleSignIn/Sources/Strings/pt_BR.lproj; sourceTree = "<group>"; };
+		D41AFE87B02E1ABE236205D8DBA2EDC8 /* pt_BR.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = pt_BR.lproj; path = GoogleSignIn/Sources/Strings/pt_BR.lproj; sourceTree = "<group>"; };
 		D4D390E4F57EFBE07B29C1E4850C8742 /* URL+FileName.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "URL+FileName.swift"; path = "Sources/Quick/URL+FileName.swift"; sourceTree = "<group>"; };
 		D4DF02A476F2DB12A9E6209BAA37479D /* YoutubePlayer-in-WKWebView-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "YoutubePlayer-in-WKWebView-umbrella.h"; sourceTree = "<group>"; };
 		D550AF8221F0ABA73566A99DAC8CE842 /* NSBundle+GID3PAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSBundle+GID3PAdditions.h"; path = "GoogleSignIn/Sources/NSBundle+GID3PAdditions.h"; sourceTree = "<group>"; };
@@ -1713,8 +1718,8 @@
 		DB91069B2A0303CC22F04DDBD7CB3CCF /* OIDEndSessionRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = OIDEndSessionRequest.m; path = Source/AppAuthCore/OIDEndSessionRequest.m; sourceTree = "<group>"; };
 		DBAEC907DC2B28242E2796FEB95113EA /* Number+Localizable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Number+Localizable.swift"; path = "Source/Extensions/Number+Localizable.swift"; sourceTree = "<group>"; };
 		DD34798216477CC1A5593B7315F3CDEC /* Agrume-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Agrume-dummy.m"; sourceTree = "<group>"; };
-		DD64FA63050A0DEAD6957FE289A05B70 /* fi.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = fi.lproj; path = GoogleSignIn/Sources/Strings/fi.lproj; sourceTree = "<group>"; };
-		DE04E1E43C6E46FE9162396184FE90B3 /* sk.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = sk.lproj; path = GoogleSignIn/Sources/Strings/sk.lproj; sourceTree = "<group>"; };
+		DD64FA63050A0DEAD6957FE289A05B70 /* fi.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = fi.lproj; path = GoogleSignIn/Sources/Strings/fi.lproj; sourceTree = "<group>"; };
+		DE04E1E43C6E46FE9162396184FE90B3 /* sk.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = sk.lproj; path = GoogleSignIn/Sources/Strings/sk.lproj; sourceTree = "<group>"; };
 		DE0FAB1DA724AB86C0E299518F5E580A /* YoutubePlayer-in-WKWebView */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "YoutubePlayer-in-WKWebView"; path = YoutubePlayer_in_WKWebView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE1408480073A408CF8593431F176410 /* OIDScopeUtilities.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDScopeUtilities.h; path = Source/AppAuthCore/OIDScopeUtilities.h; sourceTree = "<group>"; };
 		DE1B7AFB5FC1575C3324990B8BEB9FDE /* SynchronouslyTask.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SynchronouslyTask.swift; path = Library/Sources/Networking/Task/SynchronouslyTask.swift; sourceTree = "<group>"; };
@@ -1741,7 +1746,7 @@
 		E4810E8212B67AA92E059AE8D162768F /* OIDURLSessionProvider.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = OIDURLSessionProvider.m; path = Source/AppAuthCore/OIDURLSessionProvider.m; sourceTree = "<group>"; };
 		E483D9EBA949D38C3EF37B55FE9B6F12 /* Swinject-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Swinject-umbrella.h"; sourceTree = "<group>"; };
 		E4D79480199E045D64BE8663A05BB5E8 /* Concurrency.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Concurrency.swift; path = Source/Concurrency.swift; sourceTree = "<group>"; };
-		E5BA41B7F2E1FE47F9ABCAC27C9E4281 /* GoogleSignIn-GoogleSignIn */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "GoogleSignIn-GoogleSignIn"; path = GoogleSignIn.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5BA41B7F2E1FE47F9ABCAC27C9E4281 /* GoogleSignIn.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleSignIn.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		E60D7732F03F993A4D77460B34E27CA2 /* GIDConfiguration.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GIDConfiguration.h; path = GoogleSignIn/Sources/Public/GoogleSignIn/GIDConfiguration.h; sourceTree = "<group>"; };
 		E6701D718307B59A01520E3C76E96F1F /* FBSDKLoginKit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = FBSDKLoginKit.debug.xcconfig; sourceTree = "<group>"; };
 		E6C1D5A2B03257458F218D086980F9D6 /* OIDAuthorizationRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = OIDAuthorizationRequest.h; path = Source/AppAuthCore/OIDAuthorizationRequest.h; sourceTree = "<group>"; };
@@ -1750,14 +1755,14 @@
 		E7F6573778E177DAD2816DAD00AEFA2E /* NSImageView+SwiftyGif.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "NSImageView+SwiftyGif.swift"; path = "SwiftyGif/NSImageView+SwiftyGif.swift"; sourceTree = "<group>"; };
 		E7FE9B3AB925ECA40AA493FD0FA9BC20 /* OIDRegistrationResponse.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = OIDRegistrationResponse.m; path = Source/AppAuthCore/OIDRegistrationResponse.m; sourceTree = "<group>"; };
 		E85A1DA7EB2583811950CFE55E266900 /* Pages.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Pages.swift; path = Library/Sources/API/Pages.swift; sourceTree = "<group>"; };
-		E876E35FB5DE605A19F88BE4F1033BC3 /* ja.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = ja.lproj; path = GoogleSignIn/Sources/Strings/ja.lproj; sourceTree = "<group>"; };
+		E876E35FB5DE605A19F88BE4F1033BC3 /* ja.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ja.lproj; path = GoogleSignIn/Sources/Strings/ja.lproj; sourceTree = "<group>"; };
 		E89CF71B6E7CBE51543ECC1D27F14AD7 /* google@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "google@2x.png"; path = "GoogleSignIn/Sources/Resources/google@2x.png"; sourceTree = "<group>"; };
-		E8B2D0AAFA71B129F17212216B9D40AD /* hu.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = hu.lproj; path = GoogleSignIn/Sources/Strings/hu.lproj; sourceTree = "<group>"; };
+		E8B2D0AAFA71B129F17212216B9D40AD /* hu.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = hu.lproj; path = GoogleSignIn/Sources/Strings/hu.lproj; sourceTree = "<group>"; };
 		E8B62778E57BBD526CDC43AF20CDE1F1 /* Pods-ThinkWhat.alpha.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ThinkWhat.alpha.xcconfig"; sourceTree = "<group>"; };
 		E8D33CA0B4AEC8B7CCCEBFCA05549F81 /* Swinject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Swinject.debug.xcconfig; sourceTree = "<group>"; };
 		E92888C40C166CF23333FA4D083ED892 /* ContainElementSatisfying.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContainElementSatisfying.swift; path = Sources/Nimble/Matchers/ContainElementSatisfying.swift; sourceTree = "<group>"; };
 		E9430EA2459F3A5A0A7AACB26D005D58 /* Newsfeed.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Newsfeed.swift; path = Library/Sources/API/Newsfeed.swift; sourceTree = "<group>"; };
-		E9437B15F13DCB909A7900DED9596048 /* ru.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = ru.lproj; path = GoogleSignIn/Sources/Strings/ru.lproj; sourceTree = "<group>"; };
+		E9437B15F13DCB909A7900DED9596048 /* ru.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ru.lproj; path = GoogleSignIn/Sources/Strings/ru.lproj; sourceTree = "<group>"; };
 		E954CE4E0A4E7605EB6993750F3551F6 /* ServiceEntry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ServiceEntry.swift; path = Sources/ServiceEntry.swift; sourceTree = "<group>"; };
 		E9788AC3118F76CDAEB90851727B56D8 /* Error+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Error+Extensions.swift"; path = "Library/Sources/Extensions/Error+Extensions.swift"; sourceTree = "<group>"; };
 		E9E7A97080DD4AB9E323F54421E9D5D3 /* google.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = google.png; path = GoogleSignIn/Sources/Resources/google.png; sourceTree = "<group>"; };
@@ -1765,7 +1770,7 @@
 		EAF426988664F57BE781F3912067EEB2 /* ReCaptchaResult.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReCaptchaResult.swift; path = ReCaptcha/Classes/ReCaptchaResult.swift; sourceTree = "<group>"; };
 		EB369CB6BFFB70B8AF27F3A28E8C69F4 /* GIDAuthentication.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GIDAuthentication.h; path = GoogleSignIn/Sources/Public/GoogleSignIn/GIDAuthentication.h; sourceTree = "<group>"; };
 		ECBA36F27EFECD885F4547CCFAA2DB39 /* SpinLock.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SpinLock.swift; path = Sources/SpinLock.swift; sourceTree = "<group>"; };
-		ECCC624E4A7FFEF8178C8BB6DAE5498C /* FBSDKLoginKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; name = FBSDKLoginKit.xcframework; path = XCFrameworks/FBSDKLoginKit.xcframework; sourceTree = "<group>"; };
+		ECCC624E4A7FFEF8178C8BB6DAE5498C /* FBSDKLoginKit.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; name = FBSDKLoginKit.xcframework; path = XCFrameworks/FBSDKLoginKit.xcframework; sourceTree = "<group>"; };
 		ECD8DE7B696B05335C6EA063D084DDFA /* Alamofire-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Alamofire-dummy.m"; sourceTree = "<group>"; };
 		ECE27C313CB466489644D9BA4C1FF5FA /* Bundle+utils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Bundle+utils.swift"; path = "Source/Core/Extensions/Bundle+utils.swift"; sourceTree = "<group>"; };
 		ED00611A30A51EA6C91A2A6B789741DC /* GTMOAuth2KeychainCompatibility.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GTMOAuth2KeychainCompatibility.m; path = GTMAppAuth/Sources/GTMOAuth2KeychainCompatibility.m; sourceTree = "<group>"; };
@@ -1792,14 +1797,14 @@
 		F3EFE8170922321C45F5E53196292C7B /* ResourceContainer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ResourceContainer.swift; path = Source/Core/Resource/ResourceContainer.swift; sourceTree = "<group>"; };
 		F3F9C38EF0FF45CA27618864D419A5A1 /* UIView+Shimmer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UIView+Shimmer.swift"; path = "Sources/UIView-Shimmer/UIView+Extensions/UIView+Shimmer.swift"; sourceTree = "<group>"; };
 		F471A2DE2A92426F6E6C788713D29CD1 /* GoogleSignIn.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GoogleSignIn.debug.xcconfig; sourceTree = "<group>"; };
-		F54A7F5335259782E703460B1B7720B6 /* vi.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = vi.lproj; path = GoogleSignIn/Sources/Strings/vi.lproj; sourceTree = "<group>"; };
+		F54A7F5335259782E703460B1B7720B6 /* vi.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = vi.lproj; path = GoogleSignIn/Sources/Strings/vi.lproj; sourceTree = "<group>"; };
 		F7580F8FEE647452B10DA834C9FE7B5E /* YoutubePlayer-in-WKWebView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "YoutubePlayer-in-WKWebView.release.xcconfig"; sourceTree = "<group>"; };
 		F7DB6A00E63A9DCA34775592D5E6C683 /* FBSDKCoreKit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = FBSDKCoreKit.release.xcconfig; sourceTree = "<group>"; };
 		F8253B492CA67636AC6B8E6FE93FE11C /* Localizable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Localizable.swift; path = Source/Core/Localizable.swift; sourceTree = "<group>"; };
 		F892E03570E8D3B4C954113B0F77E295 /* EmptyResource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EmptyResource.swift; path = Source/Core/Resource/Resource/EmptyResource.swift; sourceTree = "<group>"; };
-		F89EFF9D925C7E7CC53D49EFAE4A0247 /* da.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = da.lproj; path = GoogleSignIn/Sources/Strings/da.lproj; sourceTree = "<group>"; };
+		F89EFF9D925C7E7CC53D49EFAE4A0247 /* da.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = da.lproj; path = GoogleSignIn/Sources/Strings/da.lproj; sourceTree = "<group>"; };
 		F907BB7E7E5290BC39EC5C74360BCCB8 /* InstanceStorage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = InstanceStorage.swift; path = Sources/InstanceStorage.swift; sourceTree = "<group>"; };
-		F9DC8B2B7C15E38AF34CEFE3D017A6B4 /* ko.lproj */ = {isa = PBXFileReference; includeInIndex = 1; name = ko.lproj; path = GoogleSignIn/Sources/Strings/ko.lproj; sourceTree = "<group>"; };
+		F9DC8B2B7C15E38AF34CEFE3D017A6B4 /* ko.lproj */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder; name = ko.lproj; path = GoogleSignIn/Sources/Strings/ko.lproj; sourceTree = "<group>"; };
 		FAAEB31C50B23CBA662A1BCF86EB0960 /* Plural.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Plural.swift; path = Source/Core/Plural/Plural.swift; sourceTree = "<group>"; };
 		FB4EE9B150E37D958F04E66E0A5E4130 /* OIDURLQueryComponent.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = OIDURLQueryComponent.m; path = Source/AppAuthCore/OIDURLQueryComponent.m; sourceTree = "<group>"; };
 		FC237860359294412A7511AC7A4BDE3B /* Leads.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Leads.swift; path = Library/Sources/API/Leads.swift; sourceTree = "<group>"; };
@@ -2056,7 +2061,6 @@
 				EE8B748F0FE63B1FC955A22A2D4F84FC /* Validation.swift */,
 				42DE7EE4F57470D12C2CB98320B4BFF6 /* Support Files */,
 			);
-			name = Alamofire;
 			path = Alamofire;
 			sourceTree = "<group>";
 		};
@@ -2097,7 +2101,6 @@
 				BF3B47114117BB19DC6A3B5FDAD8F8D2 /* XCTestSuite+QuickTestSuiteBuilder.m */,
 				C370942C90E5D0954714B61ED4463636 /* Support Files */,
 			);
-			name = Quick;
 			path = Quick;
 			sourceTree = "<group>";
 		};
@@ -2260,7 +2263,6 @@
 				E1CACAC623F6C51844414D2AA4973B14 /* Resources */,
 				3960650FF800012F63FEB0534365F88F /* Support Files */,
 			);
-			name = SwiftyVK;
 			path = SwiftyVK;
 			sourceTree = "<group>";
 		};
@@ -2289,7 +2291,6 @@
 				6B8E6E655A6DA464AF0ABFDD5102AB17 /* Frameworks */,
 				23C4A97E89D88FEBD9C05EE402082183 /* Support Files */,
 			);
-			name = FBSDKCoreKit_Basics;
 			path = FBSDKCoreKit_Basics;
 			sourceTree = "<group>";
 		};
@@ -2299,7 +2300,6 @@
 				A96CE6D9C648EC4754EE8B1BEC63D958 /* SwiftyJSON.swift */,
 				EC43E7A1E4E843F9F3D6C7BC618F45EE /* Support Files */,
 			);
-			name = SwiftyJSON;
 			path = SwiftyJSON;
 			sourceTree = "<group>";
 		};
@@ -2325,7 +2325,6 @@
 				ED00611A30A51EA6C91A2A6B789741DC /* GTMOAuth2KeychainCompatibility.m */,
 				EBA9E75EBCA9CFCDB19574C20BE94CAB /* Support Files */,
 			);
-			name = GTMAppAuth;
 			path = GTMAppAuth;
 			sourceTree = "<group>";
 		};
@@ -2346,7 +2345,6 @@
 				FD3262871A5117B497854500011C76C4 /* With.swift */,
 				918706B55A603E32EAE59934474821D3 /* Support Files */,
 			);
-			name = Agrume;
 			path = Agrume;
 			sourceTree = "<group>";
 		};
@@ -2420,7 +2418,6 @@
 				AFE352FC8017CBDC737B913C9D91D9C9 /* Frameworks */,
 				6525E3831FAA346CB116938587765872 /* Support Files */,
 			);
-			name = FBSDKLoginKit;
 			path = FBSDKLoginKit;
 			sourceTree = "<group>";
 		};
@@ -2531,7 +2528,6 @@
 				3622DA29B34772245E5E6CDFE3615FAC /* Resources */,
 				F2ED99DD6087C7486EA93296569A3EC0 /* Support Files */,
 			);
-			name = GoogleSignIn;
 			path = GoogleSignIn;
 			sourceTree = "<group>";
 		};
@@ -2542,7 +2538,7 @@
 				5D797E9A5C5782CE845840781FA1CC81 /* Alamofire */,
 				3FD1B4C1246D643E9476438C28048FA8 /* AppAuth */,
 				FD56AB51475BC5F592781EE2692D1412 /* GoogleSignIn */,
-				E5BA41B7F2E1FE47F9ABCAC27C9E4281 /* GoogleSignIn-GoogleSignIn */,
+				E5BA41B7F2E1FE47F9ABCAC27C9E4281 /* GoogleSignIn.bundle */,
 				6FD122EA0AB9AB2A8FFA5F676C795DF0 /* GTMAppAuth */,
 				C1998E0D8085221AD87F89B614C10E52 /* GTMSessionFetcher */,
 				7D89B15E8EC593168732FFBFF33172E9 /* L10n-swift */,
@@ -2551,7 +2547,7 @@
 				69CA02BE1B157FDCC3A9AC93484453F1 /* Pods-ThinkWhat-ThinkWhatTests */,
 				0D631E9908483F9525A6B3F36F16CC61 /* Quick */,
 				90F1B27BB7A955AF6FB2A212E9F52A66 /* ReCaptcha */,
-				14F3CD37BA3C6247B2DFA29F42314874 /* ReCaptcha-ReCaptcha */,
+				14F3CD37BA3C6247B2DFA29F42314874 /* ReCaptcha.bundle */,
 				7AD67EFB9A7864151301DC2890207AA2 /* SwiftyGif */,
 				E23C076BA70925415F490FEDB215DA92 /* SwiftyJSON */,
 				5F4E0D32C073E5C6470EBB9D84F2C4D1 /* SwiftyVK */,
@@ -2699,7 +2695,6 @@
 				2DA0D037D2845EEFE56EF1D2BB5E9A3F /* Frameworks */,
 				863EA521BAF4F087EF17FDFEFCCE6C72 /* Support Files */,
 			);
-			name = FBSDKCoreKit;
 			path = FBSDKCoreKit;
 			sourceTree = "<group>";
 		};
@@ -2790,7 +2785,6 @@
 				2978F4C26AEA6D3E7D7A0797205B7BF2 /* UIView_Shimmer.h */,
 				4B943B12337B47652AD46B72FCD3CD5A /* Support Files */,
 			);
-			name = "UIView-Shimmer";
 			path = "UIView-Shimmer";
 			sourceTree = "<group>";
 		};
@@ -2802,7 +2796,6 @@
 				C439B67D8EEE5902AB5923CC87F26430 /* Resources */,
 				877A19BBBD752AADDC16A1569A1CCD48 /* Support Files */,
 			);
-			name = "YoutubePlayer-in-WKWebView";
 			path = "YoutubePlayer-in-WKWebView";
 			sourceTree = "<group>";
 		};
@@ -2830,7 +2823,6 @@
 				E7DE6520D2DA19E73E0B3402A701DC1B /* Core */,
 				8032FE4003A22864012B3A5150626BA7 /* Support Files */,
 			);
-			name = ReCaptcha;
 			path = ReCaptcha;
 			sourceTree = "<group>";
 		};
@@ -2909,7 +2901,6 @@
 				2C647325F037E86100D8DECA457A5F47 /* XCTestObservationCenter+Register.m */,
 				9FB34AD508236E63E25E4223701A2106 /* Support Files */,
 			);
-			name = Nimble;
 			path = Nimble;
 			sourceTree = "<group>";
 		};
@@ -2919,7 +2910,6 @@
 				09C547AE5C712F94BE29838ADE311C65 /* Frameworks */,
 				9C69ECBEB217A7BF691FF774F07D3F96 /* Support Files */,
 			);
-			name = FBAEMKit;
 			path = FBAEMKit;
 			sourceTree = "<group>";
 		};
@@ -3024,7 +3014,6 @@
 				90395E4BC4C7B5F6CC48F8DF3DA9AFC0 /* IBInspectable */,
 				7719B91728B9D728E239BD2128DF0FE2 /* Support Files */,
 			);
-			name = "L10n-swift";
 			path = "L10n-swift";
 			sourceTree = "<group>";
 		};
@@ -3066,7 +3055,6 @@
 				4326A0BD2DD0A32CAF27FC7B3B2FE64D /* UnavailableItems.swift */,
 				45BE93437393ABE592D521A4E4AEDCDA /* Support Files */,
 			);
-			name = Swinject;
 			path = Swinject;
 			sourceTree = "<group>";
 		};
@@ -3076,7 +3064,6 @@
 				5C5C6EFD3456002FF9E82574C50074F2 /* Core */,
 				197D26DC738895938D710E7CBC759FBB /* Support Files */,
 			);
-			name = GTMSessionFetcher;
 			path = GTMSessionFetcher;
 			sourceTree = "<group>";
 		};
@@ -3132,7 +3119,6 @@
 				49FF913DC747C0C9E90A343710C6DF67 /* Frameworks */,
 				C81E2015401E9957E2F641B6415F3A27 /* Support Files */,
 			);
-			name = FBSDKShareKit;
 			path = FBSDKShareKit;
 			sourceTree = "<group>";
 		};
@@ -3170,7 +3156,6 @@
 				B800BA9A6F18B72356CF6D54C2C3E64F /* UIImageView+SwiftyGif.swift */,
 				DD6A09EB37B51F4E5A73F202D91B36FB /* Support Files */,
 			);
-			name = SwiftyGif;
 			path = SwiftyGif;
 			sourceTree = "<group>";
 		};
@@ -3267,7 +3252,6 @@
 				B946A02AFED838348047D587A27B2B7C /* TTRangeSliderDelegate.h */,
 				6B2CCD2185C14FCBA2185C06BEF95F4B /* Support Files */,
 			);
-			name = TTRangeSlider;
 			path = TTRangeSlider;
 			sourceTree = "<group>";
 		};
@@ -3307,7 +3291,6 @@
 				E99F3E7A79D3FD9E5EB7228D5B370589 /* ExternalUserAgent */,
 				AD31F02BFEF5662183991E41D360C926 /* Support Files */,
 			);
-			name = AppAuth;
 			path = AppAuth;
 			sourceTree = "<group>";
 		};
@@ -3751,7 +3734,7 @@
 			);
 			name = "GoogleSignIn-GoogleSignIn";
 			productName = GoogleSignIn;
-			productReference = E5BA41B7F2E1FE47F9ABCAC27C9E4281 /* GoogleSignIn-GoogleSignIn */;
+			productReference = E5BA41B7F2E1FE47F9ABCAC27C9E4281 /* GoogleSignIn.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
 		8627999EF1D5E93E13DAFF580DA8CDCF /* GTMAppAuth */ = {
@@ -3938,7 +3921,7 @@
 			);
 			name = "ReCaptcha-ReCaptcha";
 			productName = ReCaptcha;
-			productReference = 14F3CD37BA3C6247B2DFA29F42314874 /* ReCaptcha-ReCaptcha */;
+			productReference = 14F3CD37BA3C6247B2DFA29F42314874 /* ReCaptcha.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
 		EAAA1AD3A8A1B59AB91319EE40752C6D /* Alamofire */ = {
@@ -4171,7 +4154,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				65EB7AF9936060C3C620A99B2595C587 /* GoogleSignIn-GoogleSignIn in Resources */,
+				65EB7AF9936060C3C620A99B2595C587 /* GoogleSignIn.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4279,7 +4262,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				874157E461B501F20836FF6456594C11 /* ReCaptcha-ReCaptcha in Resources */,
+				874157E461B501F20836FF6456594C11 /* ReCaptcha.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5663,6 +5646,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GoogleSignIn";
+				DEVELOPMENT_TEAM = YR8888VBGA;
 				IBSC_MODULE = GoogleSignIn;
 				INFOPLIST_FILE = "Target Support Files/GoogleSignIn/ResourceBundle-GoogleSignIn-GoogleSignIn-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -5763,6 +5747,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -6021,6 +6006,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GoogleSignIn";
+				DEVELOPMENT_TEAM = YR8888VBGA;
 				IBSC_MODULE = GoogleSignIn;
 				INFOPLIST_FILE = "Target Support Files/GoogleSignIn/ResourceBundle-GoogleSignIn-GoogleSignIn-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -6249,6 +6235,7 @@
 			baseConfigurationReference = DB385A65D0B249D739B4AFE01AE1066C /* ReCaptcha.release.xcconfig */;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/ReCaptcha";
+				DEVELOPMENT_TEAM = YR8888VBGA;
 				IBSC_MODULE = ReCaptcha;
 				INFOPLIST_FILE = "Target Support Files/ReCaptcha/ResourceBundle-ReCaptcha-ReCaptcha-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -6421,6 +6408,7 @@
 			baseConfigurationReference = EDD4A25389EED52307A3ADCF2B3C499C /* GoogleSignIn.release.xcconfig */;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GoogleSignIn";
+				DEVELOPMENT_TEAM = YR8888VBGA;
 				IBSC_MODULE = GoogleSignIn;
 				INFOPLIST_FILE = "Target Support Files/GoogleSignIn/ResourceBundle-GoogleSignIn-GoogleSignIn-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -6642,6 +6630,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/ReCaptcha";
+				DEVELOPMENT_TEAM = YR8888VBGA;
 				IBSC_MODULE = ReCaptcha;
 				INFOPLIST_FILE = "Target Support Files/ReCaptcha/ResourceBundle-ReCaptcha-ReCaptcha-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -6713,6 +6702,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/ReCaptcha";
+				DEVELOPMENT_TEAM = YR8888VBGA;
 				IBSC_MODULE = ReCaptcha;
 				INFOPLIST_FILE = "Target Support Files/ReCaptcha/ResourceBundle-ReCaptcha-ReCaptcha-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -7024,6 +7014,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7244,6 +7235,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7311,6 +7303,7 @@
 			baseConfigurationReference = 05BB82F63BF356A399D565F9D924F958 /* ReCaptcha.debug.xcconfig */;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/ReCaptcha";
+				DEVELOPMENT_TEAM = YR8888VBGA;
 				IBSC_MODULE = ReCaptcha;
 				INFOPLIST_FILE = "Target Support Files/ReCaptcha/ResourceBundle-ReCaptcha-ReCaptcha-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -7623,6 +7616,7 @@
 			baseConfigurationReference = F471A2DE2A92426F6E6C788713D29CD1 /* GoogleSignIn.debug.xcconfig */;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/GoogleSignIn";
+				DEVELOPMENT_TEAM = YR8888VBGA;
 				IBSC_MODULE = GoogleSignIn;
 				INFOPLIST_FILE = "Target Support Files/GoogleSignIn/ResourceBundle-GoogleSignIn-GoogleSignIn-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -8589,6 +8583,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

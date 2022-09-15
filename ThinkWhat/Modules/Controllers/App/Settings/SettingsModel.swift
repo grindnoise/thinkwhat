@@ -34,7 +34,12 @@ extension SettingsModel: SettingsControllerInput {
                 error.printLocalized(class: type(of: self), functionName: #function)
 #endif
                 await MainActor.run {
-                    modelOutput?.onError(error)
+                    guard !image.isNil, let userpofile = Userprofiles.shared.current else {
+                        modelOutput?.onError(error)
+                        return
+                    }
+                    
+                    NotificationCenter.default.post(name: Notifications.System.ImageUploadFailure, object: userpofile)
                 }
             }
         }

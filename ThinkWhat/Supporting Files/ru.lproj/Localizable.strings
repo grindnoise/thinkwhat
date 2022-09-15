@@ -82,6 +82,7 @@
 "sending" = "Отправка";
 "choose_claim_reason" = "Причина жалобы:";
 "age" = "Возраст";
+"image_uploaded" = "Изображение успешно загружено";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";

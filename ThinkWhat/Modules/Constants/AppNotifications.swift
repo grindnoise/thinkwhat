@@ -42,6 +42,8 @@ struct Notifications {
     struct System {
         static let UpdateStats                      = Notification.Name("NotificationUpdateStats")
         static let HideKeyboard                     = Notification.Name("NotificationHideKeyboard")
+        static let ImageUploadStart                 = Notification.Name("NotificationImageUploadStart")
+        static let ImageUploadFailure               = Notification.Name("NotificationImageUploadFailure")
     }
     
     struct SurveyAnswers {

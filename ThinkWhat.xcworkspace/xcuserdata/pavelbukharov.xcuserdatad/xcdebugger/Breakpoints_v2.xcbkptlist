@@ -2126,6 +2126,21 @@
                   endingLineNumber = "222"
                   offsetFromSymbolStart = "88">
                </Location>
+               <Location
+                  uuid = "999B85CB-B911-47BD-B44F-DFC587CC2AA2 - afd3381fe13ce38f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Alamofire.NetworkReachabilityManager.notifyListener(__C.SCNetworkReachabilityFlags) -&gt; ()"
+                  moduleName = "Alamofire"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/Pods/Alamofire/Source/NetworkReachabilityManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "222"
+                  endingLineNumber = "222"
+                  offsetFromSymbolStart = "60">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -2191,6 +2206,70 @@
             endingLineNumber = "68"
             landmarkName = "SurveysCollectionView"
             landmarkType = "3">
+            <Locations>
+               <Location
+                  uuid = "63B829E5-6D7D-4AE5-9BFA-C0F4D024D7B8 - ba1199ddf78f1dbc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.SurveysCollectionView.__deallocating_deinit"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/Common/CollectionView/SurveysCollectionView/SurveysCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "68"
+                  endingLineNumber = "68"
+                  offsetFromSymbolStart = "228">
+               </Location>
+               <Location
+                  uuid = "63B829E5-6D7D-4AE5-9BFA-C0F4D024D7B8 - 4dc142e7a707dff5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 (Swift.Optional&lt;Swift.Task&lt;(), Swift.Never&gt;&gt;) -&gt; () in ThinkWhat__local_.SurveysCollectionView.deinit"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/Common/CollectionView/SurveysCollectionView/SurveysCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "68"
+                  endingLineNumber = "68"
+                  offsetFromSymbolStart = "32">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "59AF609C-F7CF-46F7-8E7A-D1CBEF3AE17D"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/CurrentUserProfileCollectionView/Cells/CurrentUserCredentialsCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "458"
+            endingLineNumber = "458"
+            landmarkName = "setTasks()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "612737E8-EC26-4EAF-9096-B6095A80E14E"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/CurrentUserProfileCollectionView/Cells/CurrentUserCredentialsCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "470"
+            endingLineNumber = "470"
+            landmarkName = "setTasks()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

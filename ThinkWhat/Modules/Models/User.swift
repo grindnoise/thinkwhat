@@ -182,7 +182,7 @@ class Userprofile: Decodable {
             }
         }
     }
-    var cityTitle:          String?
+    var cityTitle:          String = ""
     var image:              UIImage? {
         didSet {
             guard let imageData = image?.jpeg else { return }

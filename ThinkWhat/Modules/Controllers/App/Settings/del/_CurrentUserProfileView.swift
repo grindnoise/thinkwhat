@@ -87,7 +87,7 @@ class _CurrentUserProfileView: UIView {
         }
         
         attributedText.append(NSAttributedString(string: "\(currentUser.firstNameSingleWord)" + (!currentUser.lastNameSingleWord.isEmpty ? "\n\(currentUser.lastNameSingleWord)" : ""), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: name.frame.width * nameMultiplier), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        attributedText.append(NSAttributedString(string: "\n\(currentUser.age), \(currentUser.gender.rawValue.localized.lowercased())" + (!currentUser.cityTitle.isNil ? ", \(currentUser.cityTitle!)" : ""), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: name.frame.width * infoMultiplier), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        attributedText.append(NSAttributedString(string: "\n\(currentUser.age), \(currentUser.gender.rawValue.localized.lowercased())" + (!currentUser.cityTitle.isEmpty ? ", \(currentUser.cityTitle)" : ""), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: name.frame.width * infoMultiplier), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         name.attributedText = attributedText
         
         let preferencesText = NSMutableAttributedString()

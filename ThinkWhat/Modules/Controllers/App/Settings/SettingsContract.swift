@@ -19,6 +19,8 @@ protocol SettingsViewInput: AnyObject {
     func updateUsername(_: [String: String])
     func updateBirthDate(_: Date)
     func updateGender(_: Gender)
+    func openCamera()
+    func openGallery()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -42,7 +44,7 @@ protocol SettingsModelOutput: AnyObject {
 ///
 /// **View** conforms to this protocol
 protocol SettingsControllerOutput: AnyObject {
-    var viewInput: SettingsViewInput? { get set }
+    var viewInput: (SettingsViewInput & UIViewController)? { get set }
 
     func onError(_: Error)
 }

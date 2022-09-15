@@ -65,7 +65,7 @@ class PlainBannerContent: UIView {
             paragraph.alignment = .center
             let string = self.text
             let attributedText = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-            attributedText.addAttributes(StringAttributes.getAttributes(font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title3)!, foregroundColor: self.traitCollection.userInterfaceStyle == .dark ? .label : self.textColor, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
+            attributedText.addAttributes(StringAttributes.getAttributes(font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline)!, foregroundColor: self.traitCollection.userInterfaceStyle == .dark ? .label : self.textColor, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
             label.attributedText = attributedText
             guard label.numberOfTotatLines > 1 else { return }
             label.textAlignment = .left
