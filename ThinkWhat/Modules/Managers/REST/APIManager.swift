@@ -73,6 +73,8 @@ class API {
                                vkURL: String? = nil,
                                facebookID: String? = nil,
                                facebookURL: String? = nil,
+                               tiktokURL: String? = nil,
+                               instagramURL: String? = nil,
                                locale: String? = nil) -> [String: Any] {
         
         var parameters = [String: Any]()
@@ -114,6 +116,12 @@ class API {
         }
         if !facebookURL.isNil {
             parameters[DjangoVariables.UserProfile.facebookURL] = facebookURL!
+        }
+        if !instagramURL.isNil {
+            parameters[DjangoVariables.UserProfile.instagramURL] = instagramURL!
+        }
+        if !tiktokURL.isNil {
+            parameters[DjangoVariables.UserProfile.tiktokURL] = tiktokURL!
         }
         if !image.isNil {
             parameters[DjangoVariables.UserProfile.image] = image!

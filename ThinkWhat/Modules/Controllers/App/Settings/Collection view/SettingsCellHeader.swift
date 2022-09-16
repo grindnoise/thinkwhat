@@ -10,12 +10,19 @@ import UIKit
 import Combine
 
 class SettingsCellHeader: UICollectionReusableView {
+    
+    enum Mode: String {
+        case City = "cityTF"
+        case SocialMedia = "social_media"
+        case Interests = "interests"
+    }
+    
     // MARK: - Public properties
-    public var title: String = "" {
+    public var mode: Mode! {
         didSet {
-            guard !title.isEmpty else { return }
+            guard let mode = mode else { return }
             
-            headerLabel.text = title.localized.uppercased()
+            headerLabel.text = mode.rawValue.localized.uppercased()
             
             guard let constraint = headerLabel.getConstraint(identifier: "width") else { return }
             
@@ -36,6 +43,13 @@ class SettingsCellHeader: UICollectionReusableView {
             }) { _ in }
         }
     }
+    public var isHelpEnabled = false {
+        didSet {
+            guard oldValue != isHelpEnabled else { return }
+            
+            self.help.alpha = isHelpEnabled ? 1 : 0
+        }
+    }
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -46,7 +60,7 @@ class SettingsCellHeader: UICollectionReusableView {
     private lazy var headerLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
-        instance.text = title.localized.uppercased()
+        instance.text = ""//title.localized.uppercased()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
         
         let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
@@ -73,6 +87,23 @@ class SettingsCellHeader: UICollectionReusableView {
 
         return instance
     }()
+    private lazy var help: UIImageView = {
+        let instance = UIImageView()
+        instance.backgroundColor = .clear
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+        instance.contentMode = .center
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instance.alpha = isHelpEnabled ? 1 : 0
+        instance.isUserInteractionEnabled = true
+        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.helpTap)))
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.setImage(UIImage(systemName: "questionmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.75))!)
+            }
+            .store(in: &subscriptions)
+
+        return instance
+    }()
     private lazy var headerContainer: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
@@ -85,10 +116,16 @@ class SettingsCellHeader: UICollectionReusableView {
         horizontalStack.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 16),
+            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
             horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
             horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
+        
+        return instance
+    }()
+    private lazy var horizontalStack: UIStackView = {
+       let instance = UIStackView(arrangedSubviews: [headerContainer, help])
+        instance.axis = .horizontal
         
         return instance
     }()
@@ -120,14 +157,14 @@ class SettingsCellHeader: UICollectionReusableView {
         backgroundColor = .clear
         clipsToBounds = true
         
-        addSubview(headerContainer)
-        headerContainer.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(horizontalStack)
+        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            headerContainer.topAnchor.constraint(equalTo: topAnchor, constant: padding),
-            headerContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
-            headerContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
-            headerContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding),
+            horizontalStack.topAnchor.constraint(equalTo: topAnchor, constant: padding),
+            horizontalStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            horizontalStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            horizontalStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding),
         ])
 //
 //        let constraint = genderButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
@@ -137,7 +174,85 @@ class SettingsCellHeader: UICollectionReusableView {
     }
     
     private func setTasks() {
-        
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.FacebookURL) {
+                guard let self = self,
+                      self.mode == .SocialMedia,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.isBadgeEnabled = false
+            }
+        })
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.InstagramURL) {
+                guard let self = self,
+                      self.mode == .SocialMedia,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.isBadgeEnabled = false
+            }
+        })
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.TikTokURL) {
+                guard let self = self,
+                      self.mode == .SocialMedia,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.isBadgeEnabled = false
+            }
+        })
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NoSocialURL) {
+                guard let self = self,
+                      self.mode == .SocialMedia,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.isBadgeEnabled = true
+            }
+        })
     }
     
+    @objc
+    private func helpTap() {
+        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
+        banner.present(content: HelpPopupContent(callbackDelegate: self, parent: banner))
+    }
+    
+    // MARK: - Overridden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        badge.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        help.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    }
+}
+
+extension SettingsCellHeader: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let banner = sender as? Popup {
+            banner.removeFromSuperview()
+        }
+    }
+}
+
+extension SettingsCellHeader: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        
+    }
 }

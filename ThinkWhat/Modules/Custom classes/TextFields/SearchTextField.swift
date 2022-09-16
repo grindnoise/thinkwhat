@@ -86,6 +86,7 @@ open class SearchTextField: UITextField {
     
     /// Start showing the default loading indicator, useful for searches that take some time.
     open func showLoadingIndicator() {
+        self.isSpinning = true
         self.rightViewMode = .always
         indicator.startAnimating()
     }
@@ -95,6 +96,7 @@ open class SearchTextField: UITextField {
     
     /// Hide the default loading indicator
     open func stopLoadingIndicator() {
+        self.isSpinning = false
         self.rightViewMode = .never
         indicator.stopAnimating()
     }
@@ -132,6 +134,7 @@ open class SearchTextField: UITextField {
     open var tableYOffset: CGFloat = 0.0
     open var tableCornerRadius: CGFloat = 2.0
     open var tableBottomMargin: CGFloat = 10.0
+    public private(set) var isSpinning = false
     
     ////////////////////////////////////////////////////////////////////////
     // Private implementation

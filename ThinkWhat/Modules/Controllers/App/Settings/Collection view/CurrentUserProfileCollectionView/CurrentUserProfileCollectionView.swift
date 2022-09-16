@@ -12,7 +12,7 @@ import Combine
 class CurrentUserProfileCollectionView: UICollectionView {
     
     enum Section: Int {
-        case Credentials, City
+        case Credentials, City, SocialMedia, Interests
     }
     
     // MARK: - Public properties
@@ -23,7 +23,14 @@ class CurrentUserProfileCollectionView: UICollectionView {
     public let galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
-    public let cityPublisher = CurrentValueSubject<City?, Never>(nil)
+    public let citySelectionPublisher = CurrentValueSubject<City?, Never>(nil)
+    public let cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
+    public let facebookPublisher = CurrentValueSubject<String?, Never>(nil)
+    public let instagramPublisher = CurrentValueSubject<String?, Never>(nil)
+    public let tiktokPublisher = CurrentValueSubject<String?, Never>(nil)
+    public let googlePublisher = CurrentValueSubject<String?, Never>(nil)
+    public let twitterPublisher = CurrentValueSubject<String?, Never>(nil)
+    public let openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -60,7 +67,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
         collectionViewLayout = UICollectionViewCompositionalLayout{ section, environment -> NSCollectionLayoutSection in
             var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
             configuration.backgroundColor = .clear
-
+            
             if #available(iOS 14.5, *) {
                 configuration.showsSeparators = true
                 configuration.itemSeparatorHandler = { indexPath, config -> UIListSeparatorConfiguration in
@@ -129,14 +136,14 @@ class CurrentUserProfileCollectionView: UICollectionView {
                 guard let self = self, !$0.isNil else { return }
                 
                 self.cameraPublisher.send(true)
-            }.store(in: &subscriptions)
+            }.store(in: &self.subscriptions)
             
             //Catch photo tap
             cell.galleryPublisher.sink { [weak self] in
                 guard let self = self, !$0.isNil else { return }
                 
                 self.galleryPublisher.send(true)
-            }.store(in: &subscriptions)
+            }.store(in: &self.subscriptions)
                         
             cell.previewPublisher.sink { [weak self] in
                 guard let self = self,
@@ -144,7 +151,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
                 else { return }
                 
                 self.previewPublisher.send(image)
-            }.store(in: &subscriptions)
+            }.store(in: &self.subscriptions)
             
             guard let userprofile = Userprofiles.shared.current,
                   cell.userprofile.isNil
@@ -154,6 +161,24 @@ class CurrentUserProfileCollectionView: UICollectionView {
         }
         
         let cityCellRegistration = UICollectionView.CellRegistration<CurrentUserCityCell, AnyHashable> { [unowned self] cell, indexPath, item in
+            
+            //Fetch
+            cell.cityFetchPublisher.sink { [weak self] in
+                guard let self = self,
+                      let string = $0
+                else { return }
+                
+                self.cityFetchPublisher.send(string)
+            }.store(in: &self.subscriptions)
+            
+            //Selection
+            cell.citySelectionPublisher.sink { [weak self] in
+                guard let self = self,
+                      let city = $0
+                else { return }
+                
+                self.citySelectionPublisher.send(city)
+            }.store(in: &self.subscriptions)
             
 //            let headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .cell)
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
@@ -167,19 +192,109 @@ class CurrentUserProfileCollectionView: UICollectionView {
             cell.cityTitle = userprofile.cityTitle
         }
         
+        let socialCellRegistration = UICollectionView.CellRegistration<CurrentUserSocialMediaCell, AnyHashable> { [unowned self] cell, indexPath, item in
+            
+            //Facebook
+            cell.facebookPublisher.sink { [weak self] in
+                guard let self = self,
+                      let url = $0
+                else { return }
+                
+                self.facebookPublisher.send(url)
+            }.store(in: &self.subscriptions)
+            
+            //Instagram
+            cell.instagramPublisher.sink { [weak self] in
+                guard let self = self,
+                      let url = $0
+                else { return }
+                
+                self.instagramPublisher.send(url)
+            }.store(in: &self.subscriptions)
+            
+            //Instagram
+            cell.tiktokPublisher.sink { [weak self] in
+                guard let self = self,
+                      let url = $0
+                else { return }
+                
+                self.tiktokPublisher.send(url)
+            }.store(in: &self.subscriptions)
+            
+            //URL
+            cell.openURLPublisher.sink { [weak self] in
+                guard let self = self,
+                      let url = $0
+                else { return }
+                
+                self.openURLPublisher.send(url)
+            }.store(in: &self.subscriptions)
+//            //Google
+//            cell.googlePublisher.sink { [weak self] in
+//                guard let self = self,
+//                      let string = $0
+//                else { return }
+//
+//            }.store(in: &self.subscriptions)
+//
+//            //Twitter
+//            cell.twitterPublisher.sink { [weak self] in
+//                guard let self = self,
+//                      let string = $0
+//                else { return }
+//
+//            }.store(in: &self.subscriptions)
+            
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+            backgroundConfig.backgroundColor = .clear
+            cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            cell.backgroundConfiguration = backgroundConfig
+                        
+            guard let userprofile = Userprofiles.shared.current else { return }
+            
+            cell.userprofile = userprofile
+        }
+        
+        let interestsCellRegistration = UICollectionView.CellRegistration<CurrentUserInterestsCell, AnyHashable> { [unowned self] cell, indexPath, item in
+            
+//            //Twitter
+//            cell.twitterPublisher.sink { [weak self] in
+//                guard let self = self,
+//                      let string = $0
+//                else { return }
+//
+//            }.store(in: &self.subscriptions)
+            
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+            backgroundConfig.backgroundColor = .clear
+            cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            cell.backgroundConfiguration = backgroundConfig
+                        
+            guard let userprofile = Userprofiles.shared.current else { return }
+            
+            cell.userprofile = userprofile
+        }
+        
         let headerRegistraition = UICollectionView.SupplementaryRegistration<SettingsCellHeader>(elementKind: UICollectionView.elementKindSectionHeader) { [unowned self] supplementaryView, elementKind, indexPath in
             
-            guard let section = Section(rawValue: indexPath.section) else { return }
+            guard let section = Section(rawValue: indexPath.section),
+                  let userprofile = Userprofiles.shared.current
+            else { return }
             
             switch section {
             case .City:
-                supplementaryView.title = "cityTF"
-                guard let userprofile = Userprofiles.shared.current else { return }
+                supplementaryView.mode = .City
                 supplementaryView.isBadgeEnabled = userprofile.cityTitle.isEmpty ? true : false
+            case .SocialMedia:
+                supplementaryView.mode = .SocialMedia
+                supplementaryView.isHelpEnabled = true
+                supplementaryView.isBadgeEnabled = userprofile.hasSocialMedia ? false : true
+            case .Interests:
+                supplementaryView.mode = .Interests
+                supplementaryView.isHelpEnabled = true
             default:
                 print("")
             }
-            
         }
         
         source = UICollectionViewDiffableDataSource<Section, Int>(collectionView: self) { [unowned self]
@@ -191,6 +306,14 @@ class CurrentUserProfileCollectionView: UICollectionView {
                                                                     item: identifier)
             } else if section == .City {
                 return collectionView.dequeueConfiguredReusableCell(using: cityCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            } else if section == .SocialMedia {
+                return collectionView.dequeueConfiguredReusableCell(using: socialCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            } else if section == .Interests {
+                return collectionView.dequeueConfiguredReusableCell(using: interestsCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
             }
@@ -205,17 +328,26 @@ class CurrentUserProfileCollectionView: UICollectionView {
         }
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-        snapshot.appendSections([.Credentials, .City])
+        snapshot.appendSections([.Credentials, .City, .SocialMedia, .Interests])
         snapshot.appendItems([0], toSection: .Credentials)
         snapshot.appendItems([1], toSection: .City)
+        snapshot.appendItems([2], toSection: .SocialMedia)
+        snapshot.appendItems([3], toSection: .Interests)
         source.apply(snapshot, animatingDifferences: false)
     }
 }
 
 extension CurrentUserProfileCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let cell = collectionView.cellForItem(at: indexPath) as? CurrentUserCityCell {
-            cell.selectCity()
-        }
+//        if let cell = collectionView.cellForItem(at: indexPath) as? CurrentUserCityCell {
+//            cell.selectCity()
+//        }
     }
 }
+
+//// MARK: - UICollectionViewDelegate
+//extension CurrentUserProfileCollectionView: UIScrollViewDelegate {
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        endEditing(true)
+//    }
+//}

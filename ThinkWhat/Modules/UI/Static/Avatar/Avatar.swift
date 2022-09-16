@@ -301,6 +301,13 @@ class Avatar: UIView {
             button.tintColor = choiceColor
         }
     }
+    @MainActor public private(set) var isUploading = false {
+        didSet {
+#if DEBUG
+      print(isUploading)
+#endif
+        }
+    }
     //Publishers
     public let galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
@@ -580,6 +587,8 @@ class Avatar: UIView {
     public func imageUploadStarted(_ image: UIImage) {
         guard mode == .Editing else { return }
         
+        isUploading = true
+        
         let fade = UIView()
         fade.backgroundColor = .black.withAlphaComponent(0.6)
         fade.accessibilityIdentifier = "fade"
@@ -607,6 +616,7 @@ class Avatar: UIView {
     }
     
     public func imageUploadFinished(_ image: UIImage) {
+        isUploading = false
         Animations.changeImageCrossDissolve(imageView: imageView, image: image)
         
         guard let fade = imageView.getSubview(type: UIView.self, identifier: "fade"),

@@ -171,10 +171,40 @@ class Userprofile: Decodable {
         }
     }
     var imageURL:           URL?
-    var instagramURL:       URL?
-    var tiktokURL:          URL?
+    var facebookURL:        URL? {
+        didSet {
+            guard !facebookURL.isNil, oldValue != facebookURL else {
+                if instagramURL.isNil && tiktokURL.isNil {
+                    NotificationCenter.default.post(name: Notifications.Userprofiles.NoSocialURL, object: self)
+                }
+                return
+            }
+            NotificationCenter.default.post(name: Notifications.Userprofiles.FacebookURL, object: self)
+        }
+    }
+    var instagramURL:       URL? {
+        didSet {
+            guard !facebookURL.isNil, oldValue != facebookURL else {
+                if facebookURL.isNil && tiktokURL.isNil {
+                    NotificationCenter.default.post(name: Notifications.Userprofiles.NoSocialURL, object: self)
+                }
+                return
+            }
+            NotificationCenter.default.post(name: Notifications.Userprofiles.InstagramURL, object: self)
+        }
+    }
+    var tiktokURL:          URL? {
+        didSet {
+            guard !facebookURL.isNil, oldValue != facebookURL else {
+                if instagramURL.isNil && facebookURL.isNil {
+                    NotificationCenter.default.post(name: Notifications.Userprofiles.NoSocialURL, object: self)
+                }
+                return
+            }
+            NotificationCenter.default.post(name: Notifications.Userprofiles.TikTokURL, object: self)
+        }
+    }
     var vkURL:              URL?
-    var facebookURL:        URL?
     var city:               City? {
         didSet {
             if !city.isNil {
@@ -192,6 +222,7 @@ class Userprofile: Decodable {
                                                                             ofType: .Images,
                                                                             id: String(id),
                                                                             toDocumentNamed: "avatar.jpg").absoluteString
+//                guard !isCurrent else { return }
                 NotificationCenter.default.post(name: Notifications.Userprofiles.ImageDownloaded, object: self)
             } catch {
 #if DEBUG
@@ -237,6 +268,12 @@ class Userprofile: Decodable {
               current.id == id
         else { return false }
         
+        return true
+    }
+    var hasSocialMedia: Bool {
+        guard !facebookURL.isNil || !instagramURL.isNil || !tiktokURL.isNil else {
+            return false
+        }
         return true
     }
 //    init(id _id: Int,
@@ -355,12 +392,18 @@ class Userprofile: Decodable {
             Userprofiles.shared.current?.lastName = lastName
             Userprofiles.shared.current?.birthDate = birthDate
             Userprofiles.shared.current?.gender = gender
+            Userprofiles.shared.current?.city = city
+            Userprofiles.shared.current?.cityTitle = cityTitle
+            Userprofiles.shared.current?.facebookURL = facebookURL
+            Userprofiles.shared.current?.instagramURL = instagramURL
+            Userprofiles.shared.current?.tiktokURL = tiktokURL
         } catch {
 #if DEBUG
             error.printLocalized(class: type(of: self), functionName: #function)
             fatalError()
-#endif
+#else
             throw error
+#endif
         }
     }
     

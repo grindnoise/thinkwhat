@@ -79,14 +79,53 @@ class SettingsView: UIView {
             
         }.store(in: &subscriptions)
         
-        instance.cityPublisher.sink { [weak self] in
+        instance.cityFetchPublisher.sink { [weak self] in
+            guard let self = self,
+                  let string = $0
+            else { return }
+            
+            self.viewInput?.onCitySearch(string)
+        }.store(in: &self.subscriptions)
+
+        instance.citySelectionPublisher.sink { [weak self] in
             guard let self = self,
                   let city = $0
             else { return }
             
-            fatalError()
+            self.viewInput?.updateCity(city)
         }.store(in: &self.subscriptions)
-
+        
+        instance.facebookPublisher.sink { [weak self] in
+            guard let self = self,
+                  let url = $0
+            else { return }
+            
+            self.viewInput?.updateFacebook(url)
+        }.store(in: &self.subscriptions)
+        
+        instance.instagramPublisher.sink { [weak self] in
+            guard let self = self,
+                  let url = $0
+            else { return }
+            
+            self.viewInput?.updateInstagram(url)
+        }.store(in: &self.subscriptions)
+        
+        instance.tiktokPublisher.sink { [weak self] in
+            guard let self = self,
+                  let url = $0
+            else { return }
+            
+            self.viewInput?.updateTiktok(url)
+        }.store(in: &self.subscriptions)
+        
+        instance.openURLPublisher.sink { [weak self] in
+            guard let self = self,
+                  let url = $0
+            else { return }
+            
+            self.viewInput?.openURL(url)
+        }.store(in: &self.subscriptions)
         
         return instance
     }()
@@ -130,6 +169,8 @@ class SettingsView: UIView {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        
+        setTasks()
         setupUI()
     }
     
@@ -143,6 +184,26 @@ class SettingsView: UIView {
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
+        
+        let touch = UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard))
+        addGestureRecognizer(touch)
+    }
+    
+    private func setTasks() {
+//        //Hide keyboard
+//        tasks.append( Task {@MainActor [weak self] in
+//            for await _ in NotificationCenter.default.notifications(for: UIApplication.keyboardDidShowNotification) {
+//                guard let self = self else { return }
+//
+//                let touch = UITapGestureRecognizer(target:self, action:#selector(self.hideKeyboard))
+//                self.addGestureRecognizer(touch)
+//            }
+//        })
+    }
+    
+    @objc
+    private func hideKeyboard() {
+        endEditing(true)
     }
     
     // MARK: - Overrriden methods
@@ -150,6 +211,11 @@ class SettingsView: UIView {
         profileView.backgroundColor = .clear
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        print(touches)
     }
 }
 

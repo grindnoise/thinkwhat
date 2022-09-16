@@ -36,7 +36,16 @@ struct Notifications {
         static let LastNameChanged                  = Notification.Name("NotificationUserprofilesLastNameChanged")
         static let BirthDateChanged                 = Notification.Name("NotificationUserprofilesBirthDateChanged")
         static let GenderChanged                    = Notification.Name("NotificationUserprofilesGenderChanged")
-        static let ImageDownloaded                  = Notification.Name("ImageDownloaded")
+        static let ImageDownloaded                  = Notification.Name("NotificationUserprofilesImageDownloaded")
+        static let FacebookURL                      = Notification.Name("NotificationUserprofilesFacebookURL")
+        static let InstagramURL                     = Notification.Name("NotificationUserprofilesInstagramURL")
+        static let TikTokURL                        = Notification.Name("NotificationUserprofilesTikTokURL")
+        static let NoSocialURL                      = Notification.Name("NotificationUserprofilesNoSocialURL")
+    }
+    
+    struct Cities {
+        static let FetchResult                      = Notification.Name("NotificationCitiesFetchResult")
+        static let FetchError                       = Notification.Name("NotificationCitiesFetchError")
     }
     
     struct System {

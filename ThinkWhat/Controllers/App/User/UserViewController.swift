@@ -192,16 +192,16 @@ extension UserViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.section == 0 {
-            if let cell = tableView.dequeueReusableCell(withIdentifier: "interest", for: indexPath) as? InterestCell {
-                if !cell.isViewSetupComplete {
-                    cell.userprofile = userprofile
-                    cell.collectionView.delegate = cell
-                    cell.isViewSetupComplete = true
-                }
-                return cell
-            }
-        }
+//        if indexPath.section == 0 {
+//            if let cell = tableView.dequeueReusableCell(withIdentifier: "interest", for: indexPath) as? InterestCell {
+//                if !cell.isViewSetupComplete {
+//                    cell.userprofile = userprofile
+//                    cell.collectionView.delegate = cell
+//                    cell.isViewSetupComplete = true
+//                }
+//                return cell
+//            }
+//        }
         return UITableViewCell()
     }
     

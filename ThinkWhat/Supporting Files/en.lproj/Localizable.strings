@@ -134,6 +134,7 @@
 "lastNameTF" = "Last name";
 "birthDateTF" = "Birth date";
 "cityTF" = "City";
+"city_placeholder" = "Enter city";
 
 //Hot VC
 "hot" = "Hot";
@@ -178,13 +179,6 @@
 "subscribed_for" = "Subscribed for";
 "unsubscribe" = "Unsubscribe";
 "unsubscribe_question" = "Are you sure to unsubscribe?";
-
-//Settings VC
-"completed" = "Сompleted";
-"preferences" = "My preferences:";
-"my_balance" = "My balance:";
-"points" = "Points";
-"top_up" = "Top up";
 
 //New VC
 "rating" = "Rating";
@@ -281,6 +275,25 @@
 "added_to_watch_list" = "Poll was added to watch list";
 "votes_total" = "Votes";
 "voters" = "Voters";
+
+//Settings VC
+"social_media" = "Social media";
+"facebook" = "Facebook";
+"google" = "Google";
+"twitter" = "Twitter";
+"tiktok" = "TikTok";
+"instagram" = "Instagram";
+"facebook_link" = "Facebook link";
+"google_link" = "Google link";
+"twitter_link" = "Twitter link";
+"tiktok_link" = "TikTok link";
+"instagram_link" = "Instagram link";
+"completed" = "Сompleted";
+"preferences" = "My preferences:";
+"my_balance" = "My balance:";
+"points" = "Points";
+"top_up" = "Top up";
+"interests" = "Interests";
 
 //Tutorials
 "poll_vote_edu_1" = "The poll will end and disappear from the lists after the required number of participants has been reached.";

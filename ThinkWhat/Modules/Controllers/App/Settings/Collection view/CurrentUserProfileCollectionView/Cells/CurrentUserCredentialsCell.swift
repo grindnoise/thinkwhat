@@ -450,7 +450,8 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
                 guard let self = self,
                       let instance = notification.object as? Userprofile,
                       instance.isCurrent,
-                      let image = instance.image
+                      let image = instance.image,
+                      self.avatar.isUploading
                 else { return }
                     
                 self.avatar.imageUploadFinished(image)
@@ -478,12 +479,6 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
         
         if v === username {
             let _ = credentialsTextField.becomeFirstResponder()
-//        } else if v === gender {
-//            genderTextField.becomeFirstResponder()
-//        } else if v === age {
-//            let _ = ageTextField.becomeFirstResponder()
-//            guard let date = Userprofiles.shared.current?.birthDate else { return }
-//            datePicker.date = date
         }
         Fade.shared.present()
     }

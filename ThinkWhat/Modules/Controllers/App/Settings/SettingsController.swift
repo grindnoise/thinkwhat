@@ -70,6 +70,25 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+    func updateFacebook(_ string: String) {
+        let parameters = API.prepareUserData(facebookURL: string)
+        controllerInput?.updateUserprofile(parameters: parameters, image: nil)
+    }
+    
+    func updateInstagram(_ string: String) {
+        let parameters = API.prepareUserData(instagramURL: string)
+        controllerInput?.updateUserprofile(parameters: parameters, image: nil)
+    }
+    
+    func updateTiktok(_ string: String) {
+        let parameters = API.prepareUserData(tiktokURL: string)
+        controllerInput?.updateUserprofile(parameters: parameters, image: nil)
+    }
+    
+    func onCitySearch(_ instance: String) {
+        controllerInput?.fetchCity(instance)
+    }
+    
     func openCamera() {
         imagePicker.sourceType = UIImagePickerController.SourceType.camera
         present(imagePicker, animated: true, completion: nil)
@@ -95,7 +114,21 @@ extension SettingsController: SettingsViewInput {
         controllerInput?.updateUserprofile(parameters: parameters, image: nil)
     }
     
+    func updateCity(_ instance: City) {
+        controllerInput?.saveCity(instance)
+        let parameters = API.prepareUserData(city: instance)
+        controllerInput?.updateUserprofile(parameters: parameters, image: nil)
+    }
+    
     func onSocialTapped(_ url: URL) {
+        var vc: SFSafariViewController!
+        let config = SFSafariViewController.Configuration()
+        config.entersReaderIfAvailable = true
+        vc = SFSafariViewController(url: url, configuration: config)
+        present(vc, animated: true)
+    }
+    
+    func openURL(_ url: URL) {
         var vc: SFSafariViewController!
         let config = SFSafariViewController.Configuration()
         config.entersReaderIfAvailable = true

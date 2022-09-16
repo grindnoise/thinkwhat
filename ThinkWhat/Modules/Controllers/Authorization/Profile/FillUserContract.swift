@@ -11,7 +11,7 @@ import UIKit
 /// *View* sends user actions to the *Controller*.
 ///
 /// **Controller** conforms to this protocol
-protocol FillUserViewInput: class {
+protocol FillUserViewInput: AnyObject {
     
     var controllerOutput: FillUserControllerOutput? { get set }
     var controllerInput: FillUserControllerInput? { get set }
@@ -27,7 +27,7 @@ protocol FillUserViewInput: class {
 /// *Controller* tells the *Model* what to do based on the input
 ///
 /// **Model** conforms to this protocol
-protocol FillUserControllerInput: class {
+protocol FillUserControllerInput: AnyObject {
     
     var modelOutput: FillUserModelOutput? { get set }
     func validateHyperlink(socialMedia: SocialMedia, hyperlink: String) throws
@@ -39,7 +39,7 @@ protocol FillUserControllerInput: class {
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
-protocol FillUserModelOutput: class {
+protocol FillUserModelOutput: AnyObject {
     func onFetchCityComplete(_: [City])
     func onFetchCityError(_: Error)
     func onUpdateProfileComplete(_: Result<Bool,Error>)
@@ -48,7 +48,7 @@ protocol FillUserModelOutput: class {
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
-protocol FillUserControllerOutput: class {
+protocol FillUserControllerOutput: AnyObject {
     var viewInput: FillUserViewInput? { get set }
     func onDidLayout()
     func onCityFetchResults(_:[City])

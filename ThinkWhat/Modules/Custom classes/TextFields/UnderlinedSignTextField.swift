@@ -26,9 +26,14 @@ class UnderlinedSignTextField: UnderlinedTextField {
         }
     }
     
+    public var isShowingSign = false
     public var customRightView: UIView? {
         didSet {
-            guard !rightView.isNil else { oldValue?.removeFromSuperview(); return }
+            guard !rightView.isNil else {
+                oldValue?.removeFromSuperview()
+//                clearButtonMode = .always
+                return
+            }
             rightView!.subviews.filter({ $0 == oldValue }).first?.removeFromSuperview()
             customRightView?.addEquallyTo(to: rightView!)//, multiplier: 1.25)
         }
@@ -64,7 +69,7 @@ class UnderlinedSignTextField: UnderlinedTextField {
     private var warningSign:    Icon!
     private var lowerTextView:  UITextView!
     private var spinner: UIActivityIndicatorView?
-    
+    private var lowerTextFieldTopConstant: CGFloat
 
     private var signSize = CGSize(width: 32, height: 32) {
         didSet {
@@ -109,6 +114,14 @@ class UnderlinedSignTextField: UnderlinedTextField {
 //            }
 //        }
 //    }
+    init(lowerTextFieldTopConstant: CGFloat = 0) {
+        self.lowerTextFieldTopConstant = lowerTextFieldTopConstant
+        super.init(frame: .zero)
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
@@ -142,9 +155,10 @@ class UnderlinedSignTextField: UnderlinedTextField {
         superview?.addSubview(lowerTextView)
         lowerTextView.translatesAutoresizingMaskIntoConstraints = false
         lowerTextView.heightAnchor.constraint(equalToConstant: 16).isActive = true
-        lowerTextView.topAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        lowerTextView.topAnchor.constraint(equalTo: bottomAnchor, constant: lowerTextFieldTopConstant).isActive = true
         lowerTextView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         lowerTextView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        lowerTextView.backgroundColor = .clear
         ///Add custom view
         guard !customRightView.isNil else { return }
         customRightView?.addEquallyTo(to: rightView!,
@@ -162,6 +176,7 @@ class UnderlinedSignTextField: UnderlinedTextField {
     }
     
     public func showSign(state: SignState) {
+        isShowingSign = true
         switch state {
         case .Approved:
             UIView.animate(withDuration: 0.15, animations: {
@@ -197,6 +212,7 @@ class UnderlinedSignTextField: UnderlinedTextField {
     }
     
     public func hideSign() {
+        isShowingSign = false
         UIView.animate(withDuration: 0.2) {
             self.checkSign.alpha = 0
             self.warningSign.alpha = 0

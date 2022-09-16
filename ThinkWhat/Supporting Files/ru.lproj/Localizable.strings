@@ -134,6 +134,7 @@
 "lastNameTF" = "Фамилия";
 "birthDateTF" = "Дата рождения";
 "cityTF" = "Город";
+"city_placeholder" = "Введите город";
 
 //Hot VC
 "hot" = "Горячие";
@@ -178,13 +179,6 @@
 "subscribed_for" = "Подписки";
 "unsubscribe" = "Отписаться";
 "unsubscribe_question" = "Вы уверены, что хотите отписаться?";
-
-//Settings VC
-"completed" = "Пройдено";
-"preferences" = "Мои предпочтения:";
-"my_balance" = "Мой баланс:";
-"points" = "Баллов";
-"top_up" = "Пополнить";
 
 //New VC
 "rating" = "Рейтинг";
@@ -281,6 +275,25 @@
 "added_to_watch_list" = "Результаты опроса отслеживается";
 "votes_total" = "Голосов";
 "voters" = "Проголосовашие";
+
+//Settings VC
+"social_media" = "Cоциальные сети";
+"facebook" = "Facebook";
+"google" = "Google";
+"twitter" = "Twitter";
+"tiktok" = "TikTok";
+"instagram" = "Instagram";
+"facebook_link" = "Адрес на Facebook";
+"google_link" = "Адрес на Google";
+"twitter_link" = "Адрес на Twitter";
+"tiktok_link" = "Адрес на TikTok";
+"instagram_link" = "Адрес на Instagram";
+"completed" = "Пройдено";
+"preferences" = "Мои предпочтения:";
+"my_balance" = "Мой баланс:";
+"points" = "Баллов";
+"top_up" = "Пополнить";
+"interests" = "Интересы";
 
 //Tutorials
 "poll_vote_edu_1" = "Опрос завершится и исчезнет из списков после того, как наберется необходимое количество участников.";

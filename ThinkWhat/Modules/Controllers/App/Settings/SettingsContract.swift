@@ -19,8 +19,14 @@ protocol SettingsViewInput: AnyObject {
     func updateUsername(_: [String: String])
     func updateBirthDate(_: Date)
     func updateGender(_: Gender)
+    func updateCity(_ : City)
+    func updateFacebook(_ : String)
+    func updateInstagram(_ : String)
+    func updateTiktok(_ : String)
     func openCamera()
     func openGallery()
+    func openURL(_ : URL)
+    func onCitySearch(_ : String)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -31,6 +37,8 @@ protocol SettingsControllerInput: AnyObject {
     var modelOutput: SettingsModelOutput? { get set }
     
     func updateUserprofile(parameters: [String: Any], image: UIImage?)
+    func fetchCity(_: String)
+    func saveCity(_: City)
 }
 
 /// *Model* returns the result to the *Controller*
