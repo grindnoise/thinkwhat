@@ -56,16 +56,32 @@ class SettingsCellHeader: UICollectionReusableView {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
-    private let padding: CGFloat = 4
+    private let padding: CGFloat = 8
     private lazy var headerLabel: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
         instance.text = ""//title.localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
         
-        let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
-        constraint.identifier = "width"
-        constraint.isActive = true
+        let widthConstraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
+        widthConstraint.identifier = "width"
+        widthConstraint.isActive = true
+        
+        let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 300, font: instance.font))
+        heightConstraint.identifier = "height"
+        heightConstraint.isActive = true
+        
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { [weak self] rect in
+                guard let self = self,
+                      let constraint = instance.getConstraint(identifier: "height")
+                else { return }
+                
+                self.setNeedsLayout()
+                constraint.constant = instance.text!.height(withConstrainedWidth: 300, font: instance.font)
+                self.layoutIfNeeded()
+            }
+            .store(in: &subscriptions)
 
         return instance
     }()
@@ -98,7 +114,7 @@ class SettingsCellHeader: UICollectionReusableView {
         instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.helpTap)))
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
-                instance.setImage(UIImage(systemName: "questionmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.75))!)
+                instance.setImage(UIImage(systemName: "questionmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height))!)
             }
             .store(in: &subscriptions)
 
@@ -222,8 +238,18 @@ class SettingsCellHeader: UICollectionReusableView {
     
     @objc
     private func helpTap() {
+        var text = ""
+        switch mode {
+        case .SocialMedia:
+            text = "social_media_help"
+        case .Interests:
+            text = "interests_help"
+        default:
+            print("")
+        }
+        
         let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
-        banner.present(content: HelpPopupContent(callbackDelegate: self, parent: banner))
+        banner.present(content: HelpPopupContent(callbackDelegate: self, parent: banner, text: text.localized))
     }
     
     // MARK: - Overridden methods

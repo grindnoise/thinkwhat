@@ -640,7 +640,7 @@ class Surveys {
                 if key == Category.Hot.rawValue {
                     let instances = try decoder.decode([Survey].self, from: value.rawData())
                     if instances.isEmpty {
-                        notifications.append(Notifications.Surveys.Empty)
+                        notifications.append(Notifications.Surveys.EmptyReceived)
                         Notification.send(names: notifications.uniqued())
 //                        return
                     }
@@ -667,7 +667,7 @@ class Surveys {
 //                        }
 //                        notifications.append(notification)
 //                        Notification.send(names: notifications.uniqued())
-                        notifications.append(Notifications.Surveys.Empty)
+                        notifications.append(Notifications.Surveys.EmptyReceived)
                     }
                     for instance in instances {
                         let instance = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance

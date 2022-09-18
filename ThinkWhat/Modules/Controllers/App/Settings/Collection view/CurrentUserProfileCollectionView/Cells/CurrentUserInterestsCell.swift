@@ -16,6 +16,7 @@ class CurrentUserInterestsCell: UICollectionViewListCell {
         didSet {
             guard !userprofile.isNil else { return }
             
+            collectionView.userprofile = userprofile
         }
     }
     //Publishers
@@ -27,11 +28,36 @@ class CurrentUserInterestsCell: UICollectionViewListCell {
     private var tasks: [Task<Void, Never>?] = []
     //UI
     private let padding: CGFloat = 8
-    private lazy var collectionView: UICollectionView = {
-        let instance = UICollectionView()
+    private lazy var collectionView: InterestsCollectionView = {
+        let instance = InterestsCollectionView()
         instance.backgroundColor = .clear
         
-        instance.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+        constraint.priority = .defaultHigh
+        constraint.identifier = "height"
+        constraint.isActive = true
+        
+        instance.publisher(for: \.contentSize, options: .new)
+            .sink { [weak self] rect in
+                guard let self = self,
+                      let constraint = instance.getConstraint(identifier: "height")
+                else { return }
+                
+                self.setNeedsLayout()
+                constraint.constant = rect.height
+                self.layoutIfNeeded()
+            }
+            .store(in: &subscriptions)
+
+        instance.interestPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let topic = $0
+                else { return }
+                
+                self.interestPublisher.send(topic)
+            }
+            .store(in: &subscriptions)
         
 //        let stack = UIStackView(arrangedSubviews: [tiktokIcon, tiktokTextField, tiktokButton])
 //        stack.axis = .horizontal

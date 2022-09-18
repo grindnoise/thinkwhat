@@ -173,7 +173,7 @@ class Userprofile: Decodable {
     var imageURL:           URL?
     var facebookURL:        URL? {
         didSet {
-            guard !facebookURL.isNil, oldValue != facebookURL else {
+            guard !facebookURL.isNil else {
                 if instagramURL.isNil && tiktokURL.isNil {
                     NotificationCenter.default.post(name: Notifications.Userprofiles.NoSocialURL, object: self)
                 }
@@ -184,7 +184,7 @@ class Userprofile: Decodable {
     }
     var instagramURL:       URL? {
         didSet {
-            guard !facebookURL.isNil, oldValue != facebookURL else {
+            guard !instagramURL.isNil else {
                 if facebookURL.isNil && tiktokURL.isNil {
                     NotificationCenter.default.post(name: Notifications.Userprofiles.NoSocialURL, object: self)
                 }
@@ -195,7 +195,7 @@ class Userprofile: Decodable {
     }
     var tiktokURL:          URL? {
         didSet {
-            guard !facebookURL.isNil, oldValue != facebookURL else {
+            guard !tiktokURL.isNil else {
                 if instagramURL.isNil && facebookURL.isNil {
                     NotificationCenter.default.post(name: Notifications.Userprofiles.NoSocialURL, object: self)
                 }

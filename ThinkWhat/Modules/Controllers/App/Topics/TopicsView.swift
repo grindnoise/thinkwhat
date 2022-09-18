@@ -19,7 +19,7 @@ class TopicsView: UIView {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     private lazy var surveysCollectionView: SurveysCollectionView = {
-        let instance = SurveysCollectionView(delegate: self, category: .Search)
+        let instance = SurveysCollectionView(category: .Search)
         instance.alpha = 0
         return instance
     }()

@@ -18,8 +18,40 @@ class ListView: UIView {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     private lazy var collectionView: SurveysCollectionView = {
-        let instance = SurveysCollectionView(delegate: self, category: .New)
+        let instance = SurveysCollectionView(category: .New)
         
+        //Pagination
+        instance.paginationPublisher
+            .sink { [weak self] in
+            guard let self = self, !$0.isNil else { return }
+                  
+            self.viewInput?.onDataSourceRequest()
+        }
+            .store(in: &subscriptions)
+        
+        //Row selected
+        instance.rowPublisher
+            .sink { [weak self] in
+            guard let self = self,
+                  let instance = $0
+            else { return }
+                  
+            self.viewInput?.onSurveyTapped(instance)
+        }
+            .store(in: &subscriptions)
+        
+        //Update stats (exclude refs)
+        instance.updateStatsPublisher
+            .sink { [weak self] in
+            guard let self = self,
+                  let instances = $0
+            else { return }
+                  
+            self.viewInput?.updateSurveyStats(instances)
+        }
+            .store(in: &subscriptions)
+        
+        //Add to watch list
         instance.watchSubject.sink {
             print($0)
         } receiveValue: { [weak self] in
@@ -204,12 +236,8 @@ extension ListView {
 // MARK: - CallbackObservable
 extension ListView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
-        if let instance = sender as? SurveyReference {
-            viewInput?.onSurveyTapped(instance)
-        } else if sender is SurveysCollectionView {
-            viewInput?.onDataSourceRequest()
-        } else if let instances = sender as? [SurveyReference] {
-            viewInput?.updateSurveyStats(instances)
+        if let instances = sender as? [SurveyReference] {
+            
         }
     }
 }

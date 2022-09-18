@@ -31,6 +31,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
     public let googlePublisher = CurrentValueSubject<String?, Never>(nil)
     public let twitterPublisher = CurrentValueSubject<String?, Never>(nil)
     public let openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
+    public let interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -75,12 +76,13 @@ class CurrentUserProfileCollectionView: UICollectionView {
                     var config = UIListSeparatorConfiguration(listAppearance: .plain)
                     config.topSeparatorVisibility = .hidden
                     config.bottomSeparatorVisibility = .hidden
+                    config.color = .systemGray5
                     
                     guard let section = Section(rawValue: indexPath.section), section != .Credentials else { return config }
                     
-                    config.topSeparatorInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                    config.topSeparatorInsets = NSDirectionalEdgeInsets(top: 1.2, leading: 0, bottom: 0, trailing: 0)
                     config.topSeparatorVisibility = .visible
-                    config.bottomSeparatorInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                    config.bottomSeparatorInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 1.2, trailing: 0)
                     config.bottomSeparatorVisibility = .visible
                     
                     return config
@@ -257,13 +259,16 @@ class CurrentUserProfileCollectionView: UICollectionView {
         
         let interestsCellRegistration = UICollectionView.CellRegistration<CurrentUserInterestsCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
-//            //Twitter
-//            cell.twitterPublisher.sink { [weak self] in
-//                guard let self = self,
-//                      let string = $0
-//                else { return }
-//
-//            }.store(in: &self.subscriptions)
+            //Topic tapped
+            cell.interestPublisher
+                .sink { [weak self] in
+                    guard let self = self,
+                          let topic = $0
+                    else { return }
+                    
+                    self.interestPublisher.send(topic)
+                }
+                .store(in: &subscriptions)
             
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .clear

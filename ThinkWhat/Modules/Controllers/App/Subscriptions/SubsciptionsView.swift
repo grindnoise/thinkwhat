@@ -18,7 +18,7 @@ class SubsciptionsView: UIView {
     private var needsAnimation = true
     private var isRevealed = false
     private lazy var collectionView: SurveysCollectionView = {
-        let instance = SurveysCollectionView(delegate: self, category: .Subscriptions)
+        let instance = SurveysCollectionView(category: .Subscriptions)
         return instance
     }()
 //    private lazy var featheredLayer: CAGradientLayer = {

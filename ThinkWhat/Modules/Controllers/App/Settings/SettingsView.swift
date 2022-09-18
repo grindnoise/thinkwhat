@@ -127,6 +127,16 @@ class SettingsView: UIView {
             self.viewInput?.openURL(url)
         }.store(in: &self.subscriptions)
         
+        instance.interestPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let topic = $0
+                else { return }
+                
+                self.viewInput?.onTopicSelected(topic)
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     

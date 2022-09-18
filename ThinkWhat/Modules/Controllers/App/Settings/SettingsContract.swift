@@ -27,6 +27,7 @@ protocol SettingsViewInput: AnyObject {
     func openGallery()
     func openURL(_ : URL)
     func onCitySearch(_ : String)
+    func onTopicSelected(_: Topic)
 }
 
 /// *Controller* tells the *Model* what to do based on the input

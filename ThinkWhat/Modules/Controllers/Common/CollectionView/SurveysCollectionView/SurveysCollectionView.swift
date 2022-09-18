@@ -35,9 +35,13 @@ class SurveysCollectionView: UICollectionView {
             setDataSource()
         }
     }
+    //Publishers
     public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+    public var paginationPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public var rowPublisher = CurrentValueSubject<SurveyReference?, Never>(nil)
+    public var updateStatsPublisher = CurrentValueSubject<[SurveyReference]?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -52,7 +56,16 @@ class SurveysCollectionView: UICollectionView {
         }
         return category.dataItems()
     }
-    private weak var callbackDelegate: CallbackObservable?
+    
+    private var loadingInProgress = false
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        
+        indicator.hidesWhenStopped = true
+        
+        return indicator
+    }()
 //    private var hMaskLayer: CAGradientLayer!
     private lazy var searchSpinner: UIActivityIndicatorView = {
         let instance = UIActivityIndicatorView(style: .large)
@@ -83,10 +96,9 @@ class SurveysCollectionView: UICollectionView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(delegate: CallbackObservable, category: Survey.SurveyCategory) {
+    init(category: Survey.SurveyCategory) {
         self.category = category
         super.init(frame: .zero, collectionViewLayout: .init())
-        callbackDelegate = delegate
         setupUI()
         setTasks()
     }
@@ -95,16 +107,14 @@ class SurveysCollectionView: UICollectionView {
         self.topic = topic
         self.category = .Topic
         super.init(frame: .zero, collectionViewLayout: .init())
-        callbackDelegate = delegate
         setupUI()
         setTasks()
     }
 
-    init(delegate: CallbackObservable, items: [SurveyReference]) {
+    init(items: [SurveyReference]) {
         self.fetchResult = items
         self.category = .Search
         super.init(frame: .zero, collectionViewLayout: .init())
-        callbackDelegate = delegate
         setupUI()
         setTasks()
     }
@@ -112,7 +122,15 @@ class SurveysCollectionView: UICollectionView {
     // MARK: - Private methods
     private func setupUI() {
         delegate = self
-//        bounces = false
+        //        bounces = false
+        
+        let layoutGuide = safeAreaLayoutGuide
+        addSubview(loadingIndicator)
+        
+        NSLayoutConstraint.activate([
+            layoutGuide.centerXAnchor.constraint(equalTo: loadingIndicator.centerXAnchor),
+            layoutGuide.bottomAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 10)
+        ])
         
         refreshControl = UIRefreshControl()
         refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
@@ -120,15 +138,15 @@ class SurveysCollectionView: UICollectionView {
         
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
-//            layoutConfig.headerMode = .firstItemInSection
-//            layoutConfig.backgroundColor = .red
+            //            layoutConfig.headerMode = .firstItemInSection
+            //            layoutConfig.backgroundColor = .red
             layoutConfig.backgroundColor = .clear
             layoutConfig.showsSeparators = false//true
-//            if #available(iOS 14.5, *) {
-//                var separatorConfig = UIListSeparatorConfiguration(listAppearance: UICollectionLayoutListConfiguration.Appearance.grouped)
-//                separatorConfig.bottomSeparatorInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 5, trailing: .greatestFiniteMagnitude)
-//                layoutConfig.separatorConfiguration = separatorConfig
-//            }
+            //            if #available(iOS 14.5, *) {
+            //                var separatorConfig = UIListSeparatorConfiguration(listAppearance: UICollectionLayoutListConfiguration.Appearance.grouped)
+            //                separatorConfig.bottomSeparatorInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 5, trailing: .greatestFiniteMagnitude)
+            //                layoutConfig.separatorConfiguration = separatorConfig
+            //            }
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
             sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
@@ -160,7 +178,7 @@ class SurveysCollectionView: UICollectionView {
                 
                 self.shareSubject.send($0)
             }.store(in: &self.subscriptions)
-
+            
             //Claim
             cell.claimSubject.sink {
                 print($0)
@@ -178,16 +196,16 @@ class SurveysCollectionView: UICollectionView {
         
         source = UICollectionViewDiffableDataSource<Section, SurveyReference>(collectionView: self) {
             collectionView, indexPath, identifier -> UICollectionViewCell? in
-//            guard let self = self else { return UICollectionViewCell() }
-//            guard self.category == .Subscriptions else {
-//                return collectionView.dequeueConfiguredReusableCell(using: surveyCellRegistration,
-//                                                                    for: indexPath,
-//                                                                    item: identifier)
-//            }
+            //            guard let self = self else { return UICollectionViewCell() }
+            //            guard self.category == .Subscriptions else {
+            //                return collectionView.dequeueConfiguredReusableCell(using: surveyCellRegistration,
+            //                                                                    for: indexPath,
+            //                                                                    item: identifier)
+            //            }
             let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
-//            cell.item = identifier
+            //            cell.item = identifier
             return cell
         }
         
@@ -198,194 +216,174 @@ class SurveysCollectionView: UICollectionView {
     }
     
     private func setTasks() {
-        if #available(iOS 15, *) {
-            
-            //Update survey stats every n seconds
-            let events = EventEmitter().emit(every: 5)
-            tasks.append(Task {@MainActor [weak self] in
-                for await _ in events {
-                    guard let self = self,
-                          let cells = visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell] else { return }
-                    self.callbackDelegate?.callbackReceived(cells.compactMap({ $0.item }))
-                }
-            })
-            
-            //Survey claimed by user
-            tasks.append(Task {@MainActor [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Claim) {
-                    guard let self = self,
-                          let instance = notification.object as? SurveyReference,
-                          self.source.snapshot().itemIdentifiers.contains(instance)
-                    else { return }
-
-                    var snap = self.source.snapshot()
-                    snap.deleteItems([instance])
-                    await self.source.apply(snap, animatingDifferences: true)
-//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-                }
-            })
-
-            //Survey banned on server
-            tasks.append(Task {@MainActor [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Ban) {
-                    guard let self = self,
-                          let instance = notification.object as? SurveyReference,
-                          self.source.snapshot().itemIdentifiers.contains(instance)
-                    else { return }
-
-                    var snap = self.source.snapshot()
-                    snap.deleteItems([instance])
-                    await self.source.apply(snap, animatingDifferences: true)
-//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-                }
-            })
-
-
-            //Subscriptions added
-            tasks.append(Task {@MainActor [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SubscriptionAppend) {
-                    guard let self = self,
-                          self.category == .Subscriptions,
-                          let instance = notification.object as? SurveyReference,
-                          !self.source.snapshot().itemIdentifiers.contains(instance)
-                    else { return }
-
-                    var snap = self.source.snapshot()
-                    snap.appendItems([instance], toSection: .main)
-                    await self.source.apply(snap, animatingDifferences: true)
-//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-                }
-            })
-
-            //New added
-            tasks.append(Task {@MainActor [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.NewAppend) {
-                    guard let self = self,
-                          self.category == .New,
-                          let instance = notification.object as? SurveyReference,
-                          !self.source.snapshot().itemIdentifiers.contains(instance)
-                    else { return }
-
-                    var snap = self.source.snapshot()
-                    snap.appendItems([instance], toSection: .main)
-                    await self.source.apply(snap, animatingDifferences: true)
-//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-                }
-            })
-
-            //Top added
-            tasks.append(Task {@MainActor [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopAppend) {
-                    guard let self = self,
-                          self.category == .Top,
-                          let instance = notification.object as? SurveyReference,
-                          !self.source.snapshot().itemIdentifiers.contains(instance)
-                    else { return }
-
-                    var snap = self.source.snapshot()
-                    snap.appendItems([instance], toSection: .main)
-                    await self.source.apply(snap, animatingDifferences: true)
-//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-                }
-            })
-
-            //Own added
-            tasks.append(Task {@MainActor [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.OwnAppend) {
-                    guard let self = self,
-                          self.category == .Own,
-                          let instance = notification.object as? SurveyReference,
-                          !self.source.snapshot().itemIdentifiers.contains(instance)
-                    else { return }
-
-                    var snap = self.source.snapshot()
-                    snap.appendItems([instance], toSection: .main)
-                    await self.source.apply(snap, animatingDifferences: true)
-//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-                }
-            })
-
-            //Favorite added
-            tasks.append(Task {@MainActor [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
-                    guard let self = self,
-                          self.category == .Favorite,
-                          let instance = notification.object as? SurveyReference
-                    else { return }
-
-                    var snap = self.source.snapshot()
-                    snap.appendItems([instance], toSection: .main)
-                    await self.source.apply(snap, animatingDifferences: true)
-//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-                }
-            })
-            
-            //Favorite toggle
-            tasks.append(Task {@MainActor [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteRemove) {
-                    guard let self = self,
-                          self.category == .Favorite,
-                          let instance = notification.object as? SurveyReference
-                    else { return }
-
-                    var snap = self.source.snapshot()
-                        snap.deleteItems([instance])
-                    await self.source.apply(snap, animatingDifferences: true)
-//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-                }
-            })
-
-            //Topic added
-            tasks.append(Task {@MainActor [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
-                    guard let self = self,
-                          self.category == .Topic,
-                          let instance = notification.object as? SurveyReference,
-                          !self.source.snapshot().itemIdentifiers.contains(instance)
-                    else { return }
-
-                    var snap = self.source.snapshot()
-                    snap.appendItems([instance], toSection: .main)
-                    await self.source.apply(snap, animatingDifferences: true)
-//                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-                }
-            })
-
-
-        } else {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.appendItemIdentifier(notification:)),
-                                                   name: Notifications.Surveys.SubscriptionAppend,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.appendItemIdentifier(notification:)),
-                                                   name: Notifications.Surveys.TopicAppend,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.appendItemIdentifier(notification:)),
-                                                   name: Notifications.Surveys.FavoriteAppend,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.appendItemIdentifier(notification:)),
-                                                   name: Notifications.Surveys.OwnAppend,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.appendItemIdentifier(notification:)),
-                                                   name: Notifications.Surveys.TopAppend,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.appendItemIdentifier(notification:)),
-                                                   name: Notifications.Surveys.NewAppend,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.removeItemIdentifier(notification:)),
-                                                   name: Notifications.Surveys.Claim,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.removeItemIdentifier(notification:)),
-                                                   name: Notifications.Surveys.Ban,
-                                                   object: nil)
-        }
+        
+        //Update survey stats every n seconds
+        let events = EventEmitter().emit(every: 5)
+        tasks.append(Task {@MainActor [weak self] in
+            for await _ in events {
+                guard let self = self,
+                      let cells = visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell]
+                else { return }
+                
+                self.updateStatsPublisher.send((cells.compactMap({ $0.item })))
+            }
+        })
+        
+        //Empty received
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.EmptyReceived) {
+                guard let self = self else { return }
+                
+                self.loadingIndicator.stopAnimating()
+            }
+        })
+        
+        //Survey claimed by user
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Claim) {
+                guard let self = self,
+                      let instance = notification.object as? SurveyReference,
+                      self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.deleteItems([instance])
+                self.source.apply(snap, animatingDifferences: true)
+                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
+        
+        //Survey banned on server
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Ban) {
+                guard let self = self,
+                      let instance = notification.object as? SurveyReference,
+                      self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.deleteItems([instance])
+                self.source.apply(snap, animatingDifferences: true)
+                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
+        
+        
+        //Subscriptions added
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SubscriptionAppend) {
+                guard let self = self,
+                      self.category == .Subscriptions,
+                      let instance = notification.object as? SurveyReference,
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.appendItems([instance], toSection: .main)
+                self.source.apply(snap, animatingDifferences: true)
+                self.loadingIndicator.stopAnimating()
+                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
+        
+        //New added
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.NewAppend) {
+                guard let self = self,
+                      self.category == .New,
+                      let instance = notification.object as? SurveyReference,
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.appendItems([instance], toSection: .main)
+                self.source.apply(snap, animatingDifferences: true)
+                self.loadingIndicator.stopAnimating()
+                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
+        
+        //Top added
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopAppend) {
+                guard let self = self,
+                      self.category == .Top,
+                      let instance = notification.object as? SurveyReference,
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.appendItems([instance], toSection: .main)
+                self.source.apply(snap, animatingDifferences: true)
+                self.loadingIndicator.stopAnimating()
+                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
+        
+        //Own added
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.OwnAppend) {
+                guard let self = self,
+                      self.category == .Own,
+                      let instance = notification.object as? SurveyReference,
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.appendItems([instance], toSection: .main)
+                self.source.apply(snap, animatingDifferences: true)
+                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
+        
+        //Favorite added
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
+                guard let self = self,
+                      self.category == .Favorite,
+                      let instance = notification.object as? SurveyReference
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.appendItems([instance], toSection: .main)
+                self.source.apply(snap, animatingDifferences: true)
+                self.loadingIndicator.stopAnimating()
+                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
+        
+        //Favorite toggle
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteRemove) {
+                guard let self = self,
+                      self.category == .Favorite,
+                      let instance = notification.object as? SurveyReference
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.deleteItems([instance])
+                self.source.apply(snap, animatingDifferences: true)
+                
+                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
+        
+        //Topic added
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
+                guard let self = self,
+                      self.category == .Topic,
+                      let instance = notification.object as? SurveyReference,
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.appendItems([instance], toSection: .main)
+                self.source.apply(snap, animatingDifferences: true)
+                self.loadingIndicator.stopAnimating()
+                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
     }
     
     // MARK: - Public methods
@@ -407,41 +405,6 @@ class SurveysCollectionView: UICollectionView {
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
             self.searchSpinner.alpha = 1
         } completion: { _ in self.searchSpinner.stopAnimating() }
-    }
-    
-    //Old-fashioned observation
-    @objc func appendItemIdentifier(notification: Notification) {
-        if notification.name == Notifications.Surveys.SubscriptionAppend, category == .Subscriptions, let instance = notification.object as? SurveyReference, !source.snapshot().itemIdentifiers.contains(instance) {
-            var snap = self.source.snapshot()
-            snap.appendItems([instance], toSection: .main)
-            source.apply(snap, animatingDifferences: true)
-        } else if notification.name == Notifications.Surveys.NewAppend, category == .New, let instance = notification.object as? SurveyReference, !source.snapshot().itemIdentifiers.contains(instance) {
-            var snap = self.source.snapshot()
-            snap.appendItems([instance], toSection: .main)
-            source.apply(snap, animatingDifferences: true)
-        } else if notification.name == Notifications.Surveys.TopAppend, category == .Top, let instance = notification.object as? SurveyReference, !source.snapshot().itemIdentifiers.contains(instance) {
-            var snap = self.source.snapshot()
-            snap.appendItems([instance], toSection: .main)
-            source.apply(snap, animatingDifferences: true)
-        } else if notification.name == Notifications.Surveys.OwnAppend, category == .Own, let instance = notification.object as? SurveyReference, !source.snapshot().itemIdentifiers.contains(instance) {
-            var snap = self.source.snapshot()
-            snap.appendItems([instance], toSection: .main)
-            source.apply(snap, animatingDifferences: true)
-        } else if notification.name == Notifications.Surveys.FavoriteAppend, category == .Favorite, let instance = notification.object as? SurveyReference, !source.snapshot().itemIdentifiers.contains(instance) {
-            var snap = self.source.snapshot()
-            snap.appendItems([instance], toSection: .main)
-            source.apply(snap, animatingDifferences: true)
-        }
-    }
-    
-    @objc func removeItemIdentifier(notification: Notification) {
-        guard let instance = notification.object as? SurveyReference,
-              source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-
-        var snap = self.source.snapshot()
-        snap.deleteItems([instance])
-        source.apply(snap, animatingDifferences: true)
     }
     
     // MARK: - Overriden methods
@@ -469,10 +432,8 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let cell = collectionView.cellForItem(at: indexPath) as? SurveyCollectionCell {
-            callbackDelegate?.callbackReceived(cell.item as Any)
-        } else if let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell {
-            callbackDelegate?.callbackReceived(cell.item as Any)
+        if let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell {
+            rowPublisher.send(cell.item)
         }
         deselect()
     }
@@ -482,15 +443,17 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         cell.layoutIfNeeded()
         
         if dataItems.count < 10 {
-            callbackDelegate?.callbackReceived(self)
+            loadingIndicator.startAnimating()
+            paginationPublisher.send(true)
         } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
-                callbackDelegate?.callbackReceived(self)
+            paginationPublisher.send(true)
+            loadingIndicator.startAnimating()
         }
     }
     
     @objc
     private func refresh() {
-        callbackDelegate?.callbackReceived(self)
+        paginationPublisher.send(true)
     }
     
     @objc

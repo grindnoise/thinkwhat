@@ -10,16 +10,40 @@ import UIKit
 import Combine
 
 class InterestsCollectionView: UICollectionView {
+    
     enum Section { case Main }
     
+    enum GridItemSize: CGFloat {
+        case half = 0.5
+        case third = 0.33333
+        case quarter = 0.25
+    }
+    
     // MARK: - Public properties
+    public weak var userprofile: Userprofile! {
+        didSet {
+            guard let userprofile = userprofile else { return }
+            
+            reload(animated: false)
+        }
+    }
+    
+    //Publishers
+    public let interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    
     //Collection
     private var source: UICollectionViewDiffableDataSource<Section, Topic>!
+    
+    private var gridItemSize: GridItemSize = .half {
+        didSet {
+            setCollectionViewLayout(createLayout(), animated: true)
+        }
+    }
     
     // MARK: - Deinitialization
     deinit {
@@ -44,35 +68,29 @@ class InterestsCollectionView: UICollectionView {
     
     // MARK: - Private methods
     private func setupUI() {
-//        delegate = self
         
-        collectionViewLayout = UICollectionViewCompositionalLayout{ section, environment -> NSCollectionLayoutSection in
-            var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
-            configuration.backgroundColor = .clear
-            
-            let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: environment)
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-            return sectionLayout
-        }
+        let layout = TagCellLayout(alignment: .left, delegate: self)
+        collectionViewLayout = layout///createLayout()
         
         let interestCellRegistration = UICollectionView.CellRegistration<InterestCell, Topic> { [unowned self] cell, indexPath, item in
             
-//            //Twitter
-//            cell.twitterPublisher.sink { [weak self] in
-//                guard let self = self,
-//                      let string = $0
-//                else { return }
-//
-//            }.store(in: &self.subscriptions)
+            //Tap
+            cell.interestPublisher.sink { [weak self] in
+                guard let self = self,
+                      let topic = $0
+                else { return }
+
+                self.interestPublisher.send(topic)
+            }.store(in: &self.subscriptions)
             
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .clear
             cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
             cell.backgroundConfiguration = backgroundConfig
                         
-            guard let userprofile = Userprofiles.shared.current else { return }
+            guard cell.item.isNil else { return }
             
-//            cell.userprofile = userprofile
+            cell.item = item
         }
         
         
@@ -83,21 +101,72 @@ class InterestsCollectionView: UICollectionView {
                                                                 item: identifier)
         }
         
-//        var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-//        snapshot.appendSections([.Credentials, .City, .SocialMedia, .Interests])
-//        snapshot.appendItems([0], toSection: .Credentials)
-//        snapshot.appendItems([1], toSection: .City)
-//        snapshot.appendItems([2], toSection: .SocialMedia)
-//        snapshot.appendItems([3], toSection: .Interests)
-//        source.apply(snapshot, animatingDifferences: false)
+        guard !userprofile.isNil else { return }
+
+        reload(animated: true)
     }
+    
+    private func createLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(gridItemSize.rawValue),
+                                              heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = .uniform(size: 0)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .fractionalWidth(gridItemSize.rawValue))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        
+        return layout
+    }
+    
     // MARK: - Public methods
+
     
     // MARK: - Private methods
+    private func reload(animated: Bool) {
+        
+        guard let container = userprofile.sortedTopPublicationCategories,
+              let items = container.compactMap ({ dict in
+                  return dict.keys.first
+              }) as? [Topic]
+        else { return }
+        
+        var snap = NSDiffableDataSourceSnapshot<Section, Topic>()
+        snap.appendSections([.Main])
+        snap.appendItems(items, toSection: .Main)
+        source.apply(snap, animatingDifferences: animated)
+    }
     
     // MARK: - Overridden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
+    }
+}
+
+extension InterestsCollectionView: TagCellLayoutDelegate {
+    
+    func tagCellLayoutTagSize(layout: TagCellLayout, atIndex index: Int) -> CGSize {
+        guard let container = userprofile.sortedTopPublicationCategories,
+              let items = container.compactMap ({ dict in
+                  return dict.keys.first
+              }) as? [Topic],
+              items.count > index
+        else { return .zero }
+        
+        return CGSize(width: items[index].title.width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!) + 18 + 4,
+                      height: items[index].title.height(withConstrainedWidth: 300, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!) + 2 + 8)
+        //        if index == longTagIndex || index == (longTagIndex + 3) {
+//            var s = textSize(text: longString, font: UIFont.systemFont(ofSize: 17.0), collectionView: self)
+//            s.height += 8.0
+//            return s
+//        } else {
+//            let width = CGFloat(index % 2 == 0 ? 80 : 120)
+//            return CGSize(width: width, height: oneLineHeight)
+//        }
     }
 }

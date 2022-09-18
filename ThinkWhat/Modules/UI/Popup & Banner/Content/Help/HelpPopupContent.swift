@@ -20,35 +20,21 @@ class HelpPopupContent: UIView {
     private weak var callbackDelegate: CallbackObservable?
     private lazy var label: UILabel = {
         let instance = UILabel()
-        instance.alpha = 0
+        instance.alpha = 1
         instance.numberOfLines = 0
         instance.textAlignment = .center
-        instance.addEquallyTo(to: middleContainer)
+//        instance.addEquallyTo(to: middleContainer)
+        instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title2)
+        instance.translatesAutoresizingMaskIntoConstraints = false
+    
+        middleContainer.addSubview(instance)
         
-        let textContent_1 = "claim_sent".localized + "\n" + "\n"
-        let textContent_2 = "thanks_for_feedback".localized
-        let paragraph = NSMutableParagraphStyle()
-        
-        if #available(iOS 15.0, *) {
-            paragraph.usesDefaultHyphenation = true
-        } else {
-            paragraph.hyphenationFactor = 1
-        }
-        paragraph.alignment = .center
-        
-        let attributedString = NSMutableAttributedString()
-        attributedString.append(NSAttributedString(string: textContent_1,
-                                                   attributes: [
-                                                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title1) as Any,
-                                                    NSAttributedString.Key.foregroundColor: UIColor.label,
-                                                   ] as [NSAttributedString.Key : Any]))
-        
-        attributedString.append(NSAttributedString(string: textContent_2,
-                                                   attributes: [
-                                                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title2) as Any,
-                                                    NSAttributedString.Key.foregroundColor: UIColor.label,
-                                                   ] as [NSAttributedString.Key : Any]))
-        instance.attributedText = attributedString
+        NSLayoutConstraint.activate([
+            instance.topAnchor.constraint(equalTo: middleContainer.topAnchor),
+            instance.bottomAnchor.constraint(equalTo: middleContainer.bottomAnchor),
+            instance.leadingAnchor.constraint(equalTo: middleContainer.leadingAnchor, constant: 8),
+            instance.trailingAnchor.constraint(equalTo: middleContainer.trailingAnchor, constant: -8),
+        ])
         
         return instance
     }()
@@ -97,7 +83,7 @@ class HelpPopupContent: UIView {
     }()
     private lazy var middleContainer: UIView = {
         let instance = UIView()
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        instance.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
 
         instance.publisher(for: \.bounds)
             .sink { rect in
@@ -189,10 +175,11 @@ class HelpPopupContent: UIView {
     }
     
     // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable, parent: Popup?) {
+    init(callbackDelegate: CallbackObservable, parent: Popup?, text: String) {
         super.init(frame: .zero)
         self.callbackDelegate = callbackDelegate
         self.parent = parent
+        self.label.text = text
         setupUI()
     }
     

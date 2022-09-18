@@ -70,17 +70,37 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+    
+    func onTopicSelected(_ topic: Topic) {
+        
+        guard let navigationController = navigationController else { return }
+        
+        navigationController.pushViewController(SurveysController(topic), animated: true)
+    }
+    
     func updateFacebook(_ string: String) {
+        guard let userprofile = Userprofiles.shared.current else { return }
+        
+        guard string != (userprofile.facebookURL?.absoluteString ?? "") else { return }
+        
         let parameters = API.prepareUserData(facebookURL: string)
         controllerInput?.updateUserprofile(parameters: parameters, image: nil)
     }
     
     func updateInstagram(_ string: String) {
+        guard let userprofile = Userprofiles.shared.current else { return }
+        
+        guard string != (userprofile.instagramURL?.absoluteString ?? "") else { return }
+        
         let parameters = API.prepareUserData(instagramURL: string)
         controllerInput?.updateUserprofile(parameters: parameters, image: nil)
     }
     
     func updateTiktok(_ string: String) {
+        guard let userprofile = Userprofiles.shared.current else { return }
+        
+        guard string != (userprofile.tiktokURL?.absoluteString ?? "") else { return }
+        
         let parameters = API.prepareUserData(tiktokURL: string)
         controllerInput?.updateUserprofile(parameters: parameters, image: nil)
     }
