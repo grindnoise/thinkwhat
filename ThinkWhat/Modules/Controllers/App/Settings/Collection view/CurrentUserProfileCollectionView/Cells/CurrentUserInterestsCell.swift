@@ -20,7 +20,7 @@ class CurrentUserInterestsCell: UICollectionViewListCell {
         }
     }
     //Publishers
-    public let interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
+    public var interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -139,6 +139,12 @@ class CurrentUserInterestsCell: UICollectionViewListCell {
         super.traitCollectionDidChange(previousTraitCollection)
         
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
     }
 }
 

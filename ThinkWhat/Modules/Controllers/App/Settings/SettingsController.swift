@@ -50,9 +50,53 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         tabBarController?.setTabBarVisible(visible: true, animated: true)
+        
+        settingsSwitch.alpha = 1
+        settingsSwitch.transform = .identity
+        
+        guard let navigationBar = self.navigationController?.navigationBar else { return }
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.shadowColor = nil
+        
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
     }
+    
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//
+//        guard settingsSwitch.alpha == 0 else { return }
+//
+//        settingsSwitch.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.settingsSwitch.alpha = 1
+//            self.settingsSwitch.transform = .identity
+//        }
+//    }
+//
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
 
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+            guard let self = self else { return }
+
+            self.settingsSwitch.alpha = 0
+            self.settingsSwitch.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        }
+    }
+}
+
+private extension SettingsController {
     private func setupUI() {
         navigationController?.navigationBar.prefersLargeTitles = true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
@@ -62,20 +106,20 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
             settingsSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             settingsSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
             settingsSwitch.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState * 0.97),
-            settingsSwitch.widthAnchor.constraint(equalTo: settingsSwitch.heightAnchor, multiplier: 3)
-            ])
+            settingsSwitch.widthAnchor.constraint(equalTo: settingsSwitch.heightAnchor, multiplier: 2.1)
+        ])
     }
-
 }
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
     
     func onTopicSelected(_ topic: Topic) {
-        
-        guard let navigationController = navigationController else { return }
-        
-        navigationController.pushViewController(SurveysController(topic), animated: true)
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(SurveysController(topic), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
     func updateFacebook(_ string: String) {

@@ -295,7 +295,9 @@
 "top_up" = "Top up";
 "interests" = "Interests";
 "social_media_help" = "Attach a profile on a social network so that other users can communicate with you (optional)";
-"interests_help" = "Top of your interests by topics of publications in which you vote";
+"interests_help" = "Top your interests by most visited publications";
+"stats" = "Statistics";
+"my_publications" = "My publications";
 
 //Tutorials
 "poll_vote_edu_1" = "The poll will end and disappear from the lists after the required number of participants has been reached.";

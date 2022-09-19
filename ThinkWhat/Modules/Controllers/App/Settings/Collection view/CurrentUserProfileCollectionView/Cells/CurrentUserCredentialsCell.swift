@@ -438,25 +438,33 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
                       userprofile.isCurrent
                 else { return }
                   
-                delayAsync(delay: 0.25) {
+                delayAsync(delay: 0.15) {
                     self.avatar.imageUploadStarted(image)
                 }
             }
         })
         
         //Image upload finished
-        tasks.append( Task {@MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.ImageDownloaded) {
+        tasks.append( Task { [weak self] in//@MainActor
+//            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.ImageDownloaded) {
+//                guard let self = self,
+//                      let instance = notification.object as? Userprofile,
+            //                      instance.isCurrent,
+            //                      let image = instance.image,
+            //                      self.avatar.isUploading
+            //                else { return }
+            
+            for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.CurrentUserImageUpdated) {
                 guard let self = self,
-                      let instance = notification.object as? Userprofile,
-                      instance.isCurrent,
-                      let image = instance.image,
-                      self.avatar.isUploading
+                      let instance = Userprofiles.shared.current,
+                      let image = instance.image
                 else { return }
-                    
-                self.avatar.imageUploadFinished(image)
                 
-                showBanner(bannerDelegate: self, text: "image_uploaded".localized, content: UIImageView(image: UIImage(systemName: "photo", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemGreen, shadowed: true)
+                await MainActor.run {
+                    self.avatar.imageUploadFinished(image)
+                    
+                    showBanner(bannerDelegate: self, text: "image_uploaded".localized, content: UIImageView(image: UIImage(systemName: "photo", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemGreen, shadowed: true)
+                }
             }
         })
         

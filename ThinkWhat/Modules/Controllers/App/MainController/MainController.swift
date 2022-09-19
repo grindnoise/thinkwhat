@@ -14,6 +14,13 @@ import SwiftyJSON
 
 class MainController: UITabBarController {//}, StorageProtocol {
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return selectedViewController?.preferredStatusBarStyle ?? .lightContent
+    }
+    override var childForStatusBarStyle: UIViewController? {
+        return selectedViewController
+    }
+    
     // MARK: - Lifecycle Methods
     deinit {
         print("MainController deinit()")
@@ -44,9 +51,11 @@ class MainController: UITabBarController {//}, StorageProtocol {
                                         title: String,
                                         image: UIImage?,
                                         selectedImage: UIImage?)-> UIViewController {
-            let navigationController = CustomNavigationController(rootViewController: rootViewController)
+            let navigationController = NavigationController(rootViewController: rootViewController)
+//            let navigationController = CustomNavigationController(rootViewController: rootViewController)
             navigationController.title = title.localized
             navigationController.tabBarItem.title = title.localized
+            navigationController.modalPresentationCapturesStatusBarAppearance = true
 //            let attributedText = NSMutableAttributedString()
 //            attributedText.append(NSAttributedString(string: title.localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 10), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
 //            navigationController.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 10)] as [NSAttributedString.Key : Any], for: .normal)
@@ -176,7 +185,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
                         self.loadingIndicator?.removeFromSuperview()
                         self.setTabBarVisible(visible: true, animated: true)
                         self.viewControllers?.forEach {
-                            guard let nav = $0 as? CustomNavigationController,
+                            guard let nav = $0 as? UINavigationController,// CustomNavigationController,
                                   let target = nav.viewControllers.first as? DataObservable else { return }
                             target.onDataLoaded()
 //                            self.timers.forEach { $0.fire() }
@@ -214,12 +223,12 @@ extension MainController: UITabBarControllerDelegate {
     }
     
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        guard let navigationController = viewController as? CustomNavigationController, let vc = navigationController.viewControllers.first else { return }
+        guard let vc = navigationController?.viewControllers.first else { return }
         if vc.isKind(of: HotController.self) {
-            navigationController.title = "hot".localized
+            navigationController?.title = "hot".localized
             vc.navigationItem.title = "hot".localized
         } else if vc.isKind(of: SubsciptionsController.self) {
-            navigationController.title = "subscriptions".localized
+            navigationController?.title = "subscriptions".localized
             vc.navigationItem.title = "subscriptions".localized
         }
     }

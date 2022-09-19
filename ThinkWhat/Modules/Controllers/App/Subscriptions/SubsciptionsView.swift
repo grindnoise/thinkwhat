@@ -37,7 +37,7 @@ class SubsciptionsView: UIView {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = true
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        instance.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.75)
         instance.addEquallyTo(to: shadowView)
         collectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in

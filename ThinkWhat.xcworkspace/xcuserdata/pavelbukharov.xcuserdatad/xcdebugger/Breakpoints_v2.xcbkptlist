@@ -493,8 +493,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "485"
             endingLineNumber = "485"
-            landmarkName = "toggleSwitch(isOn:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -612,8 +612,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "89"
             endingLineNumber = "89"
-            landmarkName = "type"
-            landmarkType = "24">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -629,8 +629,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "93"
             endingLineNumber = "93"
-            landmarkName = "type"
-            landmarkType = "24">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -873,8 +873,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "819"
             endingLineNumber = "819"
-            landmarkName = "SurveysViewController"
-            landmarkType = "3">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1513,8 +1513,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Settings/Switch/SettingsSwitch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "64"
-            endingLineNumber = "64"
+            startingLineNumber = "66"
+            endingLineNumber = "66"
             landmarkName = "handleTap(recognizer:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1529,8 +1529,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Settings/Switch/SettingsSwitch.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "95"
-            endingLineNumber = "95"
+            startingLineNumber = "97"
+            endingLineNumber = "97"
             landmarkName = "state"
             landmarkType = "24">
          </BreakpointContent>
@@ -1784,8 +1784,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/List/ListController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "209"
-            endingLineNumber = "209"
+            startingLineNumber = "204"
+            endingLineNumber = "204"
             landmarkName = "callbackReceived(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2027,8 +2027,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/MainController/MainController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "187"
-            endingLineNumber = "187"
+            startingLineNumber = "196"
+            endingLineNumber = "196"
             landmarkName = "appLaunch()"
             landmarkType = "7">
          </BreakpointContent>
@@ -2111,6 +2111,70 @@
             endingLineNumber = "122"
             landmarkName = "UIView"
             landmarkType = "21">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "769832C4-5698-4520-A763-114085E0352D"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/CurrentUserProfileCollectionView/Cells/CurrentUserInterestsCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
+            landmarkName = "collectionView"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1498F7FA-8BB1-48FD-A052-2DFC0EAA8DBD"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/CurrentUserProfileCollectionView/CurrentUserProfileCollectionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "268"
+            endingLineNumber = "268"
+            landmarkName = "setupUI()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "03BCE153-D30D-433B-92E0-E5C6C165A4B0"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/InterestsCollectionView/InterestCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "100"
+            endingLineNumber = "100"
+            landmarkName = "handleTap()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E39D4F6A-38FF-4158-9908-41E6A64410F3"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/InterestsCollectionView/InterestsCollectionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
+            landmarkName = "setupUI()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

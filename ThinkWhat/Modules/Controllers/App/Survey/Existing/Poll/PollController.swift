@@ -676,7 +676,7 @@ class PollController: UIViewController {
         self.navigationController?.navigationBar.standardAppearance = appearance
         self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationController?.navigationBar.overrideUserInterfaceStyle = .unspecified
-        setNeedsStatusBarAppearanceUpdate()
+//        setNeedsStatusBarAppearanceUpdate()
 
         navigationController?.navigationBar.prefersLargeTitles = hidesLargeTitle ? false : true
         navigationItem.largeTitleDisplayMode = hidesLargeTitle ? .never : .always
@@ -846,13 +846,6 @@ extension PollController: PollViewInput {
         //        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
     }
     
-    func onImageTapped(mediafile: Mediafile) {
-        let backItem = UIBarButtonItem()
-        backItem.title = ""
-        navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(ImageViewer(mediafile: mediafile), animated: true)
-    }
-    
     var showNext: Bool {
         return _showNext
     }
@@ -863,10 +856,6 @@ extension PollController: PollViewInput {
         config.entersReaderIfAvailable = true
         vc = SFSafariViewController(url: url, configuration: config)
         present(vc, animated: true)
-    }
-    
-    func onImageTapped(image: UIImage, title: String) {
-        navigationController?.pushViewController(ImageController(image: image, title: title), animated: true)
     }
     
     func onVote(_ choice: Answer) {

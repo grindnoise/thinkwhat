@@ -25,6 +25,37 @@ extension UINavigationController {
         /// Height of NavBar for Small state. Usually it's just 44
         static let NavBarHeightSmallState: CGFloat = 44
         /// Height of NavBar for Large state. Usually it's just 96.5 but if you have a custom font for the title, please make sure to edit this value since it changes the height for Large state of NavBar
+
         static let NavBarHeightLargeState: CGFloat = 96.5
+    }
+}
+
+extension UINavigationController {
+    open override var childForStatusBarStyle: UIViewController? {
+        return self.topViewController
+    }
+
+    open override var childForStatusBarHidden: UIViewController? {
+        return self.topViewController
+    }
+}
+
+extension UITabBarController {
+    open override var childForStatusBarStyle: UIViewController? {
+        return self.children.first
+    }
+
+    open override var childForStatusBarHidden: UIViewController? {
+        return self.children.first
+    }
+}
+
+extension UISplitViewController {
+    open override var childForStatusBarStyle: UIViewController? {
+        return self.children.first
+    }
+
+    open override var childForStatusBarHidden: UIViewController? {
+        return self.children.first
     }
 }

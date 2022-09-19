@@ -23,30 +23,30 @@ class VotersController: UIViewController {
     private var isFilterEnabled = false
     private var filters: [String: AnyObject] = [:]
     private var requestAttempt = 0
-    private lazy var titleLabel: InsetLabel = {
-        let label = InsetLabel()
-        label.insets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
-        label.backgroundColor = color
-        label.textColor = .black
-        label.text = answer.description
-        label.textAlignment = .center
-        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
-        label.numberOfLines = 1
-        label.accessibilityIdentifier = "titleLabel"
-        
-        return label
-    }()
-    private lazy var countLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .label
-        label.text = String(describing: answer.totalVotes)
-        label.textAlignment = .center
-        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)
-        label.numberOfLines = 1
-        label.accessibilityIdentifier = "countLabel"
-        
-        return label
-    }()
+//    private lazy var titleLabel: InsetLabel = {
+//        let label = InsetLabel()
+//        label.insets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+//        label.backgroundColor = color
+//        label.textColor = .black
+//        label.text = answer.description
+//        label.textAlignment = .center
+//        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+//        label.numberOfLines = 1
+//        label.accessibilityIdentifier = "titleLabel"
+//
+//        return label
+//    }()
+//    private lazy var countLabel: UILabel = {
+//        let label = UILabel()
+//        label.textColor = .label
+//        label.text = String(describing: answer.totalVotes)
+//        label.textAlignment = .center
+//        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)
+//        label.numberOfLines = 1
+//        label.accessibilityIdentifier = "countLabel"
+//
+//        return label
+//    }()
     private let padding: CGFloat = 8
     
     // MARK: - Overriden properties
@@ -78,17 +78,26 @@ class VotersController: UIViewController {
     
     // MARK: - Private methods
     private func setupUI() {
-//        title = "voted".localized + ": \(answer.totalVotes.roundedWithAbbreviations)"
+        title = "voted".localized + ": \(answer.totalVotes.roundedWithAbbreviations)"
         
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         
         let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = color
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle) as Any
+        ]
+        appearance.titleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3) as Any
+        ]
+        appearance.shadowColor = nil
         navigationBar.standardAppearance = appearance
         navigationBar.scrollEdgeAppearance = appearance
-//        navigationBar.tintColor = .black
-        //        navigationBar.backgroundColor = color
-        
+        navigationBar.tintColor = .white
+        navigationBar.barTintColor = .white
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         
 //        let stackView = UIStackView()//frame: CGRect(origin: .zero, size: CGSize(width: navigationBar.frame.width*0.75, height: 40)))
@@ -98,7 +107,7 @@ class VotersController: UIViewController {
 //        let test = UIView(frame: CGRect(origin: .zero, size: CGSize(width: navigationBar.frame.width*0.75, height: 40)))
 //        test.backgroundColor = .red
         
-        navigationItem.titleView = countLabel
+//        navigationItem.titleView = countLabel
         
 //        let countWidth = min(answer.totalVotes.roundedWithAbbreviations.width(withConstrainedHeight: UINavigationController.Constants.ImageSizeForLargeState, font: countLabel.font), navigationBar.frame.width - UINavigationController.Constants.ImageRightMargin*2)
 //        let titleWidth = min(answer.description.width(withConstrainedHeight: UINavigationController.Constants.ImageSizeForLargeState, font: titleLabel.font) + titleLabel.insets.left*4, navigationBar.frame.width - UINavigationController.Constants.ImageRightMargin*2 - padding) - countWidth
@@ -169,7 +178,7 @@ class VotersController: UIViewController {
         filterButton.contentMode = .center
         filterButton.image = UIImage(systemName: "slider.horizontal.3")
         filterButton.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .large)
-        filterButton.tintColor = .label
+        filterButton.tintColor = .white
         navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: filterButton)]
     }
     
@@ -206,13 +215,13 @@ class VotersController: UIViewController {
         setNeedsStatusBarAppearanceUpdate()
 //        UIApplication.shared.statusBarView?.overrideUserInterfaceStyle = .dark
 //        navigationController?.preferredStatusBarStyle = .lightContent
-//        navigationController?.navigationBar.prefersLargeTitles = true
-//                navigationItem.largeTitleDisplayMode = .always
-
-        navigationController?.navigationBar.prefersLargeTitles = false
-                navigationItem.largeTitleDisplayMode = .never
+        //        navigationController?.navigationBar.prefersLargeTitles = true
+        //                navigationItem.largeTitleDisplayMode = .always
         
-//        self.view = view as UIView
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .never
+        
+        //        self.view = view as UIView
         setFilterButton()
         loadData()
 //        setupUI()
@@ -223,12 +232,12 @@ class VotersController: UIViewController {
         super.viewWillAppear(animated)
         setupUI()
         
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0.1, options: .curveEaseInOut) {
-            self.countLabel.transform = .identity
-            self.titleLabel.transform = .identity
-            self.countLabel.alpha = 1
-            self.titleLabel.alpha = 1
-        }
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0.1, options: .curveEaseInOut) {
+//            self.countLabel.transform = .identity
+//            self.titleLabel.transform = .identity
+//            self.countLabel.alpha = 1
+//            self.titleLabel.alpha = 1
+//        }
     }
 
 //    override func willMove(toParent parent: UIViewController?) {

@@ -15,7 +15,7 @@ protocol SurveysViewInput: AnyObject {
     
     var controllerOutput: SurveysControllerOutput? { get set }
     var controllerInput: SurveysControllerInput? { get set }
-    
+    var topic: Topic { get }
     // View input methods here
 }
 

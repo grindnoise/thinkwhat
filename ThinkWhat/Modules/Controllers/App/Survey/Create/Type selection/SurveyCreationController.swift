@@ -47,11 +47,12 @@ class SurveyCreationController: UIViewController {
 
 extension SurveyCreationController: SurveyCreationViewInput {
     func onNext(_ mode: SurveyCreationController.Mode) {
-        if let nav = navigationController as? CustomNavigationController {
-            nav.transitionStyle = .Default
-            nav.duration = 0.5
-//            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
-        }
+//        if let nav = navigationController as? CustomNavigationController {
+//            nav.transitionStyle = .Default
+//            nav.duration = 0.5
+////            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
+//        }
+        
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem

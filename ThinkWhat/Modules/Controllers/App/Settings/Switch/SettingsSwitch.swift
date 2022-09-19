@@ -33,6 +33,8 @@ class SettingsSwitch: UIView {
     
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        
+        contentView.backgroundColor = .clear
         addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([

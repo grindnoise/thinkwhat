@@ -134,11 +134,11 @@ extension SubsciptionsController: SubsciptionsViewInput {
     }
     
     func onSurveyTapped(_ surveyReference: SurveyReference) {
-        if let nav = navigationController as? CustomNavigationController {
-            nav.transitionStyle = .Default
-            nav.duration = 0.5
-//            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
-        }
+//        if let nav = navigationController as? CustomNavigationController {
+//            nav.transitionStyle = .Default
+//            nav.duration = 0.5
+////            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
+//        }
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem

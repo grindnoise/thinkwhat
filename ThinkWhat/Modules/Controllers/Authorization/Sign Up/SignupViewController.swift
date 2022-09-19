@@ -61,10 +61,10 @@ class SignupViewController: UIViewController {
 // MARK: - View Input
 extension SignupViewController: SignupViewInput {
     func onLogin() {
-        if let nav = navigationController as? CustomNavigationController {
-            nav.transitionStyle = .Default
-//            nav.duration = 0.5
-        }
+//        if let nav = navigationController as? CustomNavigationController {
+//            nav.transitionStyle = .Default
+////            nav.duration = 0.5
+//        }
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem
@@ -74,10 +74,10 @@ extension SignupViewController: SignupViewInput {
     }
     
     func onSignupSuccess() {
-        if let nav = navigationController as? CustomNavigationController {
-            nav.transitionStyle = .Default
-//            nav.duration = 0.5
-        }
+//        if let nav = navigationController as? CustomNavigationController {
+//            nav.transitionStyle = .Default
+////            nav.duration = 0.5
+//        }
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem

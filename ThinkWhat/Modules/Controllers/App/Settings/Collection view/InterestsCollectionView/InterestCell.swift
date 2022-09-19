@@ -21,7 +21,7 @@ class InterestCell: UICollectionViewCell {
         }
     }
     //Publishers
-    public let interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
+    public var interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -36,7 +36,9 @@ class InterestCell: UICollectionViewCell {
         instance.textAlignment = .center
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
         instance.textColor = .white
-        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleTap))
+        recognizer.numberOfTapsRequired = 1
+        instance.addGestureRecognizer(recognizer)
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
                 instance.cornerRadius = rect.height/2.25
@@ -71,7 +73,7 @@ class InterestCell: UICollectionViewCell {
     
     // MARK: - Private methods
     private func setupUI() {
-        contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
+        contentView.backgroundColor = .clear
         clipsToBounds = true
         
         contentView.addSubview(label)
@@ -102,5 +104,11 @@ class InterestCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
     }
 }

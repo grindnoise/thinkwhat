@@ -123,11 +123,11 @@ class CategorySelectionViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        if let nc = navigationController as? NavigationControllerPreloaded {
-            nc.isShadowed = false
-            nc.duration = 0.3
-            nc.transitionStyle = .Icon
-        }
+//        if let nc = navigationController as? NavigationControllerPreloaded {
+//            nc.isShadowed = false
+//            nc.duration = 0.3
+//            nc.transitionStyle = .Icon
+//        }
         
         if !isViewSetupCompleted {
             view.setNeedsLayout()

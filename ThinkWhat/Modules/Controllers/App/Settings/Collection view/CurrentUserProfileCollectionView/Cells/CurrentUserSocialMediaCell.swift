@@ -57,6 +57,16 @@ class CurrentUserSocialMediaCell: UICollectionViewListCell {
         instance.addTarget(self, action: #selector(self.handleIO(_:)), for: .editingChanged)
         instance.delegate = self
         
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { [weak self] rect in
+                guard instance.getConstraint(identifier: "height").isNil else { return }
+                
+                let constraint = instance.heightAnchor.constraint(equalToConstant: rect.height)
+                constraint.identifier = "height"
+                constraint.isActive = true
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     private lazy var facebookButton: UIButton = {
@@ -72,23 +82,10 @@ class CurrentUserSocialMediaCell: UICollectionViewListCell {
         
         return instance
     }()
-    private lazy var facebookView: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        
-        let stack = UIStackView(arrangedSubviews: [facebookIcon, facebookTextField, facebookButton])
-        stack.axis = .horizontal
-        stack.spacing = 8
-        
-        instance.addSubview(stack)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 0),
-            stack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -0),
-            stack.topAnchor.constraint(equalTo: instance.topAnchor),
-            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-        ])
+    private lazy var facebookView: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [facebookIcon, facebookTextField, facebookButton])
+        instance.axis = .horizontal
+        instance.spacing = 8
         
         return instance
     }()
@@ -128,23 +125,10 @@ class CurrentUserSocialMediaCell: UICollectionViewListCell {
         
         return instance
     }()
-    private lazy var instagramView: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        
-        let stack = UIStackView(arrangedSubviews: [instagramIcon, instagramTextField, instagramButton])
-        stack.axis = .horizontal
-        stack.spacing = 8
-        
-        instance.addSubview(stack)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 0),
-            stack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -0),
-            stack.topAnchor.constraint(equalTo: instance.topAnchor),
-            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-        ])
+    private lazy var instagramView: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [instagramIcon, instagramTextField, instagramButton])
+        instance.axis = .horizontal
+        instance.spacing = 8
         
         return instance
     }()
@@ -184,23 +168,10 @@ class CurrentUserSocialMediaCell: UICollectionViewListCell {
         
         return instance
     }()
-    private lazy var tiktokView: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        
-        let stack = UIStackView(arrangedSubviews: [tiktokIcon, tiktokTextField, tiktokButton])
-        stack.axis = .horizontal
-        stack.spacing = 8
-        
-        instance.addSubview(stack)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 0),
-            stack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -0),
-            stack.topAnchor.constraint(equalTo: instance.topAnchor),
-            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-        ])
+    private lazy var tiktokView: UIStackView = {
+        let instance =  UIStackView(arrangedSubviews: [tiktokIcon, tiktokTextField, tiktokButton])
+        instance.axis = .horizontal
+        instance.spacing = 8
         
         return instance
     }()
@@ -373,16 +344,19 @@ class CurrentUserSocialMediaCell: UICollectionViewListCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        facebookButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        instagramButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        instagramButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        
         facebookTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         instagramTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         tiktokTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         
         tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
+        
+        guard let userprofile = userprofile else { return }
+        
+        facebookButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instagramButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instagramButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        
     }
 }
 

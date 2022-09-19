@@ -15,6 +15,7 @@ class SettingsCellHeader: UICollectionReusableView {
         case City = "cityTF"
         case SocialMedia = "social_media"
         case Interests = "interests"
+        case Stats = "stats"
     }
     
     // MARK: - Public properties
@@ -170,7 +171,7 @@ class SettingsCellHeader: UICollectionReusableView {
     
     // MARK: - Private methods
     private func setupUI() {
-        backgroundColor = .clear
+        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         clipsToBounds = true
         
         addSubview(horizontalStack)
@@ -256,6 +257,7 @@ class SettingsCellHeader: UICollectionReusableView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
+        backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         badge.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         help.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }

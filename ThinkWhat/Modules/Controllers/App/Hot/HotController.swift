@@ -125,11 +125,11 @@ class HotController: UIViewController {
     
     @objc
     private func onCreate() {
-        if let nav = navigationController as? CustomNavigationController {
-            nav.transitionStyle = .Default
-            nav.duration = 0.5
-//            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
-        }
+//        if let nav = navigationController as? CustomNavigationController {
+//            nav.transitionStyle = .Default
+//            nav.duration = 0.5
+////            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
+//        }
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem
@@ -184,11 +184,11 @@ extension HotController: HotViewInput {
     }
     
     func onVote(survey: Survey) {
-        if let nav = navigationController as? CustomNavigationController {
-            nav.transitionStyle = .Default
-            nav.duration = 0.5
-//            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
-        }
+//        if let nav = navigationController as? CustomNavigationController {
+//            nav.transitionStyle = .Default
+//            nav.duration = 0.5
+////            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
+//        }
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem

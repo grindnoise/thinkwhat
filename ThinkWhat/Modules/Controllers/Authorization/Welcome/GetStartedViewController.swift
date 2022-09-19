@@ -87,11 +87,12 @@ extension GetStartedViewController: WelcomeViewInput {
     }
     
     func onGetStartedTap() {
-        if let nav = navigationController as? CustomNavigationController {
-            nav.transitionStyle = .Auth
-            nav.duration = 0.5
-        }
-        navigationController?.pushViewController(SignupViewController(), animated: true)
+        guard let navigationController = navigationController else {return }
+//        if let nav = navigationController as? CustomNavigationController {
+//            nav.transitionStyle = .Auth
+//            nav.duration = 0.5
+//        }
+        navigationController.pushViewController(SignupViewController(), animated: true)
     }
 }
 

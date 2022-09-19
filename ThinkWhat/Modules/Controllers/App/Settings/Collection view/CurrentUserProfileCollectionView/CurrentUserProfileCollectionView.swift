@@ -11,8 +11,8 @@ import Combine
 
 class CurrentUserProfileCollectionView: UICollectionView {
     
-    enum Section: Int {
-        case Credentials, City, SocialMedia, Interests
+    enum Section: Int, CaseIterable {
+        case Credentials, City, SocialMedia, Interests, Stats
     }
     
     // MARK: - Public properties
@@ -63,7 +63,6 @@ class CurrentUserProfileCollectionView: UICollectionView {
     
     // MARK: - Private methods
     private func setupUI() {
-        delegate = self
         
         collectionViewLayout = UICollectionViewCompositionalLayout{ section, environment -> NSCollectionLayoutSection in
             var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
@@ -95,7 +94,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
             }
             
             let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: environment)
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? 30 : 0, trailing: 0)
             return sectionLayout
         }
         
@@ -280,6 +279,29 @@ class CurrentUserProfileCollectionView: UICollectionView {
             cell.userprofile = userprofile
         }
         
+        let statsCellRegistration = UICollectionView.CellRegistration<CurrentUserStatsCell, AnyHashable> { [unowned self] cell, indexPath, item in
+            
+//            //Topic tapped
+//            cell.interestPublisher
+//                .sink { [weak self] in
+//                    guard let self = self,
+//                          let topic = $0
+//                    else { return }
+//
+//                    self.interestPublisher.send(topic)
+//                }
+//                .store(in: &subscriptions)
+            
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+            backgroundConfig.backgroundColor = .clear
+            cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            cell.backgroundConfiguration = backgroundConfig
+                        
+            guard let userprofile = Userprofiles.shared.current else { return }
+            
+            cell.userprofile = userprofile
+        }
+        
         let headerRegistraition = UICollectionView.SupplementaryRegistration<SettingsCellHeader>(elementKind: UICollectionView.elementKindSectionHeader) { [unowned self] supplementaryView, elementKind, indexPath in
             
             guard let section = Section(rawValue: indexPath.section),
@@ -297,6 +319,9 @@ class CurrentUserProfileCollectionView: UICollectionView {
             case .Interests:
                 supplementaryView.mode = .Interests
                 supplementaryView.isHelpEnabled = true
+            case .Stats:
+                supplementaryView.mode = .Stats
+                supplementaryView.isHelpEnabled = false
             default:
                 print("")
             }
@@ -321,6 +346,10 @@ class CurrentUserProfileCollectionView: UICollectionView {
                 return collectionView.dequeueConfiguredReusableCell(using: interestsCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
+            } else if section == .Stats {
+                return collectionView.dequeueConfiguredReusableCell(using: statsCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
             }
 
             return UICollectionViewCell()
@@ -333,26 +362,12 @@ class CurrentUserProfileCollectionView: UICollectionView {
         }
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-        snapshot.appendSections([.Credentials, .City, .SocialMedia, .Interests])
+        snapshot.appendSections([.Credentials, .City, .SocialMedia, .Interests, .Stats])
         snapshot.appendItems([0], toSection: .Credentials)
         snapshot.appendItems([1], toSection: .City)
         snapshot.appendItems([2], toSection: .SocialMedia)
         snapshot.appendItems([3], toSection: .Interests)
+        snapshot.appendItems([4], toSection: .Stats)
         source.apply(snapshot, animatingDifferences: false)
     }
 }
-
-extension CurrentUserProfileCollectionView: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        if let cell = collectionView.cellForItem(at: indexPath) as? CurrentUserCityCell {
-//            cell.selectCity()
-//        }
-    }
-}
-
-//// MARK: - UICollectionViewDelegate
-//extension CurrentUserProfileCollectionView: UIScrollViewDelegate {
-//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        endEditing(true)
-//    }
-//}

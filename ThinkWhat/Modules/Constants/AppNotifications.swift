@@ -41,6 +41,7 @@ struct Notifications {
         static let InstagramURL                     = Notification.Name("NotificationUserprofilesInstagramURL")
         static let TikTokURL                        = Notification.Name("NotificationUserprofilesTikTokURL")
         static let NoSocialURL                      = Notification.Name("NotificationUserprofilesNoSocialURL")
+        static let CurrentUserImageUpdated          = Notification.Name("NotificationUserprofilesCurrentUserImageUpdated")
     }
     
     struct Cities {

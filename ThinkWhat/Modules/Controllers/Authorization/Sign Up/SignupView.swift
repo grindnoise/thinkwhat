@@ -99,8 +99,9 @@ class SignupView: UIView {
     @IBAction func signupTapped(_ sender: Any) {
         textFieldsStackView.arrangedSubviews.filter { $0.isKind(of: UnderlinedSignTextField.self)}.forEach { ($0 as! UnderlinedSignTextField).resignFirstResponder() }
         guard isCorrect, !isPerformingChecks, let username = usernameTF.text, let email = mailTF.text, let password = passwordTF.text else {
-            showAlert(type: .Warning, buttons: [[NSLocalizedString("ok", comment: ""): [CustomAlertView.ButtonType.Ok: nil]]], text: NSLocalizedString("check_fields", comment: ""))
-            return
+            fatalError()
+//            showAlert(type: .Warning, buttons: [[NSLocalizedString("ok", comment: ""): [CustomAlertView.ButtonType.Ok: nil]]], text: NSLocalizedString("check_fields", comment: ""))
+//            return
         }
         signupButton.setTitle("", for: .normal)
         let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
@@ -134,7 +135,8 @@ class SignupView: UIView {
                                 self.viewInput?.onSignupSuccess()
                             }
                         case .failure(let error):
-                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+//                            showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+                            fatalError()
                         }
                     }
                 }
@@ -539,7 +541,8 @@ extension SignupView: UITextFieldDelegate {
                             self.isMailFilled = false
                         }
                     case .failure(let error):
-                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
+                        fatalError()
+//                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
                     }
                     self.isPerformingChecks = false
                     textField.isShowingSpinner = false

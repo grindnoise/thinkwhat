@@ -22,7 +22,7 @@ let deviceType = UIDevice().type
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let transitionCoordinator   = TransitionCoordinator()
+//    let transitionCoordinator   = TransitionCoordinator()
 //    let container               = Container()
     let center                  = UNUserNotificationCenter.current()
     let notificationDelegate    = CustomNotificationDelegate()
@@ -36,7 +36,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             try UserDefaults.Profile.authorize()
             rootViewController = MainController()
         } catch {
-            rootViewController = CustomNavigationController(rootViewController: GetStartedViewController())
+            rootViewController = UINavigationController(rootViewController: GetStartedViewController())
+//            rootViewController = CustomNavigationController(rootViewController: GetStartedViewController())
         }
         window = UIWindow()
         window?.rootViewController = rootViewController

@@ -170,12 +170,12 @@ class BinarySelectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let nc = navigationController as? NavigationControllerPreloaded {
-            nc.isShadowed = false
-            nc.duration = 0.4
-            nc.transitionStyle = .Icon
+//        if let nc = navigationController as? NavigationControllerPreloaded {
+//            nc.isShadowed = false
+//            nc.duration = 0.4
+//            nc.transitionStyle = .Icon
             navigationItem.setHidesBackButton(true, animated: false)
-        }
+//        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

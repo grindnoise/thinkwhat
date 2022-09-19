@@ -88,18 +88,22 @@ extension SettingsModel: SettingsControllerInput {
                                                            DateFormatter.dateFormatter ]
                 Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: data)
                 Userprofiles.shared.current?.image = image
+                await MainActor.run {
+                    NotificationCenter.default.post(name: Notifications.Userprofiles.CurrentUserImageUpdated, object: nil)
+                    //                                    NotificationCenter.default.post(name: Notifications.Userprofiles.ImageDownloaded, object: Userprofiles.shared.current)
+                }
             } catch {
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-                await MainActor.run {
-                    guard !image.isNil, let userpofile = Userprofiles.shared.current else {
-                        modelOutput?.onError(error)
-                        return
-                    }
-                    
-                    NotificationCenter.default.post(name: Notifications.System.ImageUploadFailure, object: userpofile)
-                }
+                //                await MainActor.run {
+//                    guard !image.isNil, let userpofile = Userprofiles.shared.current else {
+//                        modelOutput?.onError(error)
+//                        return
+//                    }
+//
+                    NotificationCenter.default.post(name: Notifications.System.ImageUploadFailure, object: Userprofiles.shared.current)
+//                }
             }
         }
     }

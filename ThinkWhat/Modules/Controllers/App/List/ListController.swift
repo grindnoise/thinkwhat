@@ -154,11 +154,6 @@ extension ListController: ListViewInput {
     }
     
     func onSurveyTapped(_ instance: SurveyReference) {
-        if let nav = navigationController as? CustomNavigationController {
-            nav.transitionStyle = .Default
-            nav.duration = 0.5
-//            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
-        }
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem

@@ -7,8 +7,37 @@
 //
 
 import UIKit
+import Combine
 
 class SurveysView: UIView {
+    
+    // MARK: - Public properties
+    weak var viewInput: SurveysViewInput? {
+        didSet {
+            collectionView.topic = viewInput?.topic
+        }
+    }
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    private lazy var collectionView: SurveysCollectionView = {
+        let instance = SurveysCollectionView(delegate: self, topic: viewInput?.topic)
+        
+        return instance
+    }()
+    
+    // MARK: - Deinitialization
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -20,12 +49,17 @@ class SurveysView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
+    // MARK: - Public methods
+    
+    // MARK: - Overridden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
         
     }
     
-    // MARK: - Properties
-    weak var viewInput: SurveysViewInput?
+    override func layoutSubviews() {
+        
+    }
 }
 
 // MARK: - Controller Output
@@ -35,11 +69,16 @@ extension SurveysView: SurveysControllerOutput {
     
 }
 
-// MARK: - UI Setup
-extension SurveysView {
+private extension SurveysView {
+    
     private func setupUI() {
-        // Add subviews and set constraints here
+        backgroundColor = .systemGroupedBackground
+        collectionView.addEquallyTo(to: self)
     }
 }
 
-
+extension SurveysView: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        
+    }
+}

@@ -122,8 +122,6 @@ class SurveysCollectionView: UICollectionView {
     // MARK: - Private methods
     private func setupUI() {
         delegate = self
-        //        bounces = false
-        
         let layoutGuide = safeAreaLayoutGuide
         addSubview(loadingIndicator)
         

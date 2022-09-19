@@ -570,7 +570,7 @@ class Avatar: UIView {
     
     @objc
     private func handleTap() {
-        guard let image = imageView.image else { return }
+        guard !isUploading, let image = imageView.image else { return }
         
         previewPublisher.send(image)
     }

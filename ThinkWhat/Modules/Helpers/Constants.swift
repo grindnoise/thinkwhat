@@ -263,24 +263,6 @@ struct Storyboards {
     static let survey       = UIStoryboard(name: "Survey", bundle: nil)
 }
 
-
-//let segueBarberData                             = "segueBarberData"
-//let segueSignup                                 = "segueSignup"
-//let segueConfirm                                = "segueConfirm"
-//let segueCustomerOrder                          = "segueCustomerOrder"
-//let segueBarberProfileFromChat                  = "segueBarberProfileFromChat"
-//let segueAuth                                   = "segueAuth"
-//let segueChat                                   = "segueChat"
-//let segueTermsOfUse                             = "segueTermsOfUse"
-//let segueTermsFromAuth                          = "segueTermsFromAuth"
-//let segueSocialAuth                             = "segueSocialAuth"
-//let segueSignupViaSocialMedia                   = "segueSignupViaSocialMedia"
-//let segueRoleSelection                          = "segueRoleSelection"
-//let segueWelcomeClient                          = "segueWelcomeClient"
-//let segueWelcomeBarber                          = "segueWelcomeBarber"
-//let segueClientSettingsPicker                   = "segueClientSettingsPicker"
-let alert                                       = CustomAlertView(frame: (UIApplication.shared.keyWindow?.frame)!)
-
 let options: UNAuthorizationOptions             = [.alert, .sound, .badge]
 
 //HTTP request attempts before assertion
@@ -347,31 +329,6 @@ func saveTokenInKeychain(json: JSON) -> Result<Bool, Error> {//}, tokenState: in
     return success ? .success(true) : .failure("No keys found")
 }
 
-func showAlert(type: CustomAlertView.AlertType, buttons: [[String : [CustomAlertView.ButtonType : Closure?]]?], title: String?, body: String?) {
-    DispatchQueue.main.async() {
-        let singleLineAlert = body == ""
-        alert.setupView(singleLineAlert, type: type, buttons: buttons, title: title, body: body)
-        if (!alertIsActive()) {
-            alert.presentAlert()
-        }
-    }
-}
-
-func showAlert(type: CustomAlertView.AlertType, buttons: [[String : [CustomAlertView.ButtonType : Closure?]]?], text: String?) {
-    DispatchQueue.main.async() {
-        alert.setupView(true, type: type, buttons: buttons, title: text, body: "")
-        if (!alertIsActive()) {
-            alert.presentAlert()
-        }
-    }
-}
-
-func hideAlert() {
-    if alertIsActive() {
-        alert.dismissAlert()
-    }
-}
-
 //func fetchOrders(_ onlyActive: Bool = true) -> [Order] {
 //
 //    var orders: [Order]             = [Order]()
@@ -401,9 +358,6 @@ func hideAlert() {
 //    return orders
 //}
 
-func alertIsActive() -> Bool {
-    return alert.isActive
-}
 
 func yearsBetweenDate(startDate: Date, endDate: Date) -> Int {
     let calendar = Calendar.current

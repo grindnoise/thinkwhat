@@ -222,7 +222,7 @@ class Userprofile: Decodable {
                                                                             ofType: .Images,
                                                                             id: String(id),
                                                                             toDocumentNamed: "avatar.jpg").absoluteString
-//                guard !isCurrent else { return }
+                guard !isCurrent else { return }
                 NotificationCenter.default.post(name: Notifications.Userprofiles.ImageDownloaded, object: self)
             } catch {
 #if DEBUG
