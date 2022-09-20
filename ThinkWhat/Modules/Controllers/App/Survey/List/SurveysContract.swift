@@ -15,8 +15,15 @@ protocol SurveysViewInput: AnyObject {
     
     var controllerOutput: SurveysControllerOutput? { get set }
     var controllerInput: SurveysControllerInput? { get set }
-    var topic: Topic { get }
-    // View input methods here
+    var mode: Survey.SurveyCategory { get }
+    var topic: Topic? { get }
+    
+    func onSurveyTapped(_: SurveyReference)
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
+    func updateSurveyStats(_: [SurveyReference])
+    func addFavorite(_: SurveyReference)
+    func share(_: SurveyReference)
+    func claim(surveyReference: SurveyReference, claim: Claim)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -26,14 +33,17 @@ protocol SurveysControllerInput: AnyObject {
     
     var modelOutput: SurveysModelOutput? { get set }
     
-    // Controller input methods here
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
+    func updateSurveyStats(_: [SurveyReference])
+    func addFavorite(surveyReference: SurveyReference)
+    func claim(surveyReference: SurveyReference, claim: Claim)
 }
 
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
 protocol SurveysModelOutput: AnyObject {
-    // Model output methods here
+    func onRequestCompleted(_: Result<Bool, Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -42,5 +52,5 @@ protocol SurveysModelOutput: AnyObject {
 protocol SurveysControllerOutput: AnyObject {
     var viewInput: SurveysViewInput? { get set }
     
-    // Controller output methods here
+    func onRequestCompleted(_: Result<Bool, Error>)
 }

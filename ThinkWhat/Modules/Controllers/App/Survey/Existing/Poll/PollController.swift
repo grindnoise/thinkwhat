@@ -213,7 +213,7 @@ class PollController: UIViewController {
             indicator.oval.opacity = 0
             indicator.ovalBg.opacity = 0
         }
-        stackView.addArrangedSubview(indicator)
+//        stackView.addArrangedSubview(indicator)
        
         let titleContainer = UIView()
         titleContainer.backgroundColor = .clear
@@ -338,17 +338,28 @@ class PollController: UIViewController {
             
             if self.hidesLargeTitle, self.navigationItem.titleView.isNil {
                 self.navigationItem.titleView = self.titleView
-                self.navigationItem.titleView?.alpha = 0
+//                self.navigationItem.titleView?.alpha = 0
                 self.navigationItem.titleView?.clipsToBounds = false
                 self.titleView.oval.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
                 self.titleView.ovalBg.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
             }
             
             var largeAlpha: CGFloat = CGFloat(1) - max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
-            let smallAlpha: CGFloat = max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             
-            largeAlpha = largeAlpha < 0.35 ? 0 : largeAlpha
-            self.navigationItem.titleView?.alpha = smallAlpha
+//            if largeAlpha == CGFloat(1) {
+//                self.avatar.alpha = 1
+//                self.stackView.alpha = 1
+//                self.navigationItem.titleView?.alpha = 0
+//                return
+//            }
+            
+//            let smallAlpha: CGFloat = max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
+//
+//            print("small: \(smallAlpha)")
+//            print("large: \(largeAlpha)")
+            
+            largeAlpha = largeAlpha < 0.3 ? 0 : largeAlpha
+//            self.navigationItem.titleView?.alpha = largeAlpha > 0.75 ? 0 : smallAlpha
             self.avatar.alpha = largeAlpha
             self.stackView.alpha = largeAlpha
         })
@@ -676,14 +687,15 @@ class PollController: UIViewController {
         self.navigationController?.navigationBar.standardAppearance = appearance
         self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationController?.navigationBar.overrideUserInterfaceStyle = .unspecified
+        navigationController?.navigationBar.tintColor = .label
 //        setNeedsStatusBarAppearanceUpdate()
 
         navigationController?.navigationBar.prefersLargeTitles = hidesLargeTitle ? false : true
         navigationItem.largeTitleDisplayMode = hidesLargeTitle ? .never : .always
-        
+        self.navigationItem.titleView = self.titleView
         guard hidesLargeTitle, navigationItem.titleView.isNil else { return }
         
-        self.navigationItem.titleView = self.titleView
+//        self.navigationItem.titleView = self.titleView
         self.navigationItem.titleView?.clipsToBounds = false
         self.titleView.oval.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
         self.titleView.ovalBg.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
@@ -701,7 +713,7 @@ class PollController: UIViewController {
         }) { _ in }
 
         guard !hidesLargeTitle else { return }
-        self.titleView.alpha = 0
+//        self.titleView.alpha = 0
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -712,12 +724,12 @@ class PollController: UIViewController {
 //            self.titleView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             self.avatar.alpha = 0
             self.stackView.alpha = 0
-            self.titleView.alpha = 0
+//            self.titleView.alpha = 0
         }
         
         guard !hidesLargeTitle else { return }
 
-        self.titleView.alpha = 0
+//        self.titleView.alpha = 0
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -730,17 +742,9 @@ class PollController: UIViewController {
         super.willMove(toParent: parent)
         guard parent.isNil else { return }
         
-        if !hidesLargeTitle {
-            self.titleView.alpha = 0
-        }
-        
         clearNavigationBar(clear: true)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
-        
-        if let titleView = self.navigationItem.titleView, titleView.alpha < 0.5 {
-            self.navigationItem.titleView = nil
-        }
-        
+
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
             self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)

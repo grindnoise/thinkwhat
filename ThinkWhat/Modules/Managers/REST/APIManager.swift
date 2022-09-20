@@ -1230,6 +1230,22 @@ class API {
                 throw error
             }
         }
+        
+        public func updateStats(userprofile: Userprofile) async throws {
+            guard let url = API_URLS.Profiles.updateStatistics else { throw APIError.invalidURL }
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: parent.headers())
+                
+                let json = try JSON(data: data, options: .mutableContainers)
+            
+                userprofile.updateUserData(json)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
     }
     
     class Polls {

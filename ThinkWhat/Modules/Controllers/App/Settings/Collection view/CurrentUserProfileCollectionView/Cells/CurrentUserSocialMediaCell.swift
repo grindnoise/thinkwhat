@@ -172,6 +172,7 @@ class CurrentUserSocialMediaCell: UICollectionViewListCell {
         let instance =  UIStackView(arrangedSubviews: [tiktokIcon, tiktokTextField, tiktokButton])
         instance.axis = .horizontal
         instance.spacing = 8
+
         
         return instance
     }()

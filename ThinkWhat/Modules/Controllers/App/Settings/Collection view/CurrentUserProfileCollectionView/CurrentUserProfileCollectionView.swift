@@ -32,6 +32,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
     public let twitterPublisher = CurrentValueSubject<String?, Never>(nil)
     public let openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
     public let interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
+    public let myPublicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -63,6 +64,8 @@ class CurrentUserProfileCollectionView: UICollectionView {
     
     // MARK: - Private methods
     private func setupUI() {
+        
+        delegate = self
         
         collectionViewLayout = UICollectionViewCompositionalLayout{ section, environment -> NSCollectionLayoutSection in
             var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
@@ -281,16 +284,16 @@ class CurrentUserProfileCollectionView: UICollectionView {
         
         let statsCellRegistration = UICollectionView.CellRegistration<CurrentUserStatsCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
-//            //Topic tapped
-//            cell.interestPublisher
-//                .sink { [weak self] in
-//                    guard let self = self,
-//                          let topic = $0
-//                    else { return }
-//
-//                    self.interestPublisher.send(topic)
-//                }
-//                .store(in: &subscriptions)
+            //Publications
+            cell.myPublicationsPublisher
+                .sink { [weak self] in
+                    guard let self = self,
+                          !$0.isNil
+                    else { return }
+
+                    self.myPublicationsPublisher.send($0)
+                }
+                .store(in: &subscriptions)
             
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .clear
@@ -369,5 +372,11 @@ class CurrentUserProfileCollectionView: UICollectionView {
         snapshot.appendItems([3], toSection: .Interests)
         snapshot.appendItems([4], toSection: .Stats)
         source.apply(snapshot, animatingDifferences: false)
+    }
+}
+
+extension CurrentUserProfileCollectionView: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print(indexPath)
     }
 }

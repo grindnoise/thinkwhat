@@ -137,6 +137,16 @@ class SettingsView: UIView {
             }
             .store(in: &subscriptions)
         
+        instance.myPublicationsPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      !$0.isNil
+                else { return }
+                
+                self.viewInput?.onPublicationsSelected()
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     
@@ -236,7 +246,6 @@ extension SettingsView: SettingsControllerOutput {
     }
 }
 
-// MARK: - BannerObservable
 extension SettingsView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     

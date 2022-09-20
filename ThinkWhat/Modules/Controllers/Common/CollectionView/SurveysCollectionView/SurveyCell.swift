@@ -7,10 +7,9 @@
 //
 
 import UIKit
-//import UIView_Shimmer
 import Combine
 
-class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
+class SurveyCell: UICollectionViewListCell {
     
     // MARK: - Public properties
     public weak var item: SurveyReference! {
@@ -21,19 +20,19 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
             let events = eventEmitter.emit(every: 2)
             animTask = Task {@MainActor [weak self] in
                 for await _ in events {
+                    
                     guard let self = self,
                           let item = self.item,
                           item.isHot,
-                          let initialCategory = Icon.Category(rawValue: item.topic.id) as? Icon.Category,
-                          let destinationCategory = self.icon.category != .Hot ? .Hot : Icon.Category(rawValue: item.topic.id)! as? Icon.Category,
+//                          let topicCategory = Icon.Category(rawValue: item.topic.id),
+                          let destinationCategory = self.icon.category != .Hot ? .Hot : Icon.Category(rawValue: item.topic.id) ?? Icon.Category.Null as? Icon.Category,
                           let destinationColor = self.icon.category != .Hot ? UIColor.systemRed : UIColor.white as? UIColor,
-                          let destinationPath = (icon.getLayer(destinationCategory) as? CAShapeLayer)?.path,
-//                          let finalPath = self.icon.category != .Hot ? destinationPath.getScaledPath(size: destinationPath.boundingBox.size, scaleMultiplicator: 1) : destinationPath as? CGPath,
-                          let shapeLayer = icon.icon as? CAShapeLayer
+                          let destinationPath = (self.icon.getLayer(destinationCategory) as? CAShapeLayer)?.path,
+                          let shapeLayer = self.icon.icon as? CAShapeLayer
                     else { return }
-                    
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.75, delay: 0) {
-                        self.icon.backgroundColor = destinationCategory == .Hot ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
+
+                    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.75, delay: 0) {
+                        self.icon.backgroundColor = destinationCategory == .Hot ? .clear : self.item.topic.tagColor
                     }
 
                     let pathAnim = Animations.get(property: .Path,
@@ -53,9 +52,9 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                                                     }])
                     shapeLayer.add(pathAnim, forKey: nil)
                     shapeLayer.path = destinationPath
-                    
-                    
-                    
+
+
+
                     let colorAnim = Animations.get(property: .FillColor,
                                                    fromValue: self.icon.iconColor.cgColor as Any,
                                                    toValue: destinationColor.cgColor as Any,
@@ -70,12 +69,6 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                     self.icon.iconColor = destinationColor
                 }
             }
-            
-            
-//            verticalStack.removeArrangedSubview(descriptionLabel)
-//            verticalStack.removeArrangedSubview(imageView)
-//            descriptionLabel.removeFromSuperview()
-//            imageView.removeFromSuperview()
             menuButton.showsMenuAsPrimaryAction = true
             menuButton.menu = prepareMenu()
             
@@ -86,7 +79,9 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                 } else {
                     imageContainer.startShimmering()
                     Task { [weak self] in
+                        
                         guard let self = self else { return }
+                        
                         do {
                             let image = try await item.media?.downloadImageAsync()
                             await MainActor.run {
@@ -120,20 +115,11 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                 avatar.userprofile = Userprofile.anonymous
             } else {
                 avatar.userprofile = item.owner
-                if avatar.userprofile.image.isNil {
-//                    shimmeringAnimatedItems.append(avatar.imageView)
-//                } else {
-//                    shimmeringAnimatedItems.remove(object: avatar.imageView)
-                }
                 firstnameLabel.text = item.owner.firstNameSingleWord
                 lastnameLabel.text = item.owner.lastNameSingleWord
             }
             
-//            if !shimmeringAnimatedItems.isEmpty {
-//                setTemplateWithSubviews(true, viewBackgroundColor: .systemBackground)
-//            }
-            
-            icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+            icon.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
             icon.category = Icon.Category(rawValue: item.topic.id) ?? .Null
             
             if item.isComplete {
@@ -155,40 +141,18 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
             commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
             commentsView.alpha = item.commentsTotal == 0 ? 0 : 1
             commentsLabel.alpha = item.commentsTotal == 0 ? 0 : 1
-            //NSObject observation
-//            observers.append(item.observe(\SurveyReference.title, options: .new) { [weak self] _, change in
-//                guard let self = self,
-//                      let title = change.newValue,
-//                      let label = self.titleLabel as? InsetLabel,
-//                      let constraint = label.getAllConstraints().filter({$0.identifier == "height"}).first else{ return }
-//
-//                let height = title.height(withConstrainedWidth: label.bounds.width, font: label.font)
-//                guard height != constraint.constant else { return }
-//                self.setNeedsLayout()
-//                constraint.constant = height + label.insets.top + label.insets.bottom
-//                self.layoutIfNeeded()
-//            })
-            
-//            avatar.shadowColor = item.topic.tagColor
-//            descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
-            
-//            if shimmeringAnimatedItems.isEmpty {
-//                setTemplateWithSubviews(false)
-//            } else {
-//                setTemplateWithSubviews(true, viewBackgroundColor: .systemBackground)
-//            }
             
             if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
                 label.text = String(describing: item.progress) + "%"
             }
             if let progress = progressView.getSubview(type: UIView.self, identifier: "progress") {
-                progress.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+                progress.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
             }
             
-            topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+            topicLabel.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
 
             var marksStackView: UIStackView!
-            if let instance = topicHorizontalStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
+            if let instance = self.topicHorizontalStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
                 marksStackView = instance
             } else {
                 let stackView = UIStackView()
@@ -196,11 +160,14 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                 stackView.spacing = 2
                 stackView.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
                 stackView.accessibilityIdentifier = "marksStackView"
-                observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
-                    guard let newValue = change.newValue else { return }
-                    view.cornerRadius = newValue.height/2.25
-                })
-                topicHorizontalStackView.addArrangedSubview(stackView)
+                stackView.publisher(for: \.bounds, options: .new)
+                    .sink { rect in
+                        
+                        stackView.cornerRadius = rect.height/2.25
+                }
+                    .store(in: &self.subscriptions)
+                
+                self.topicHorizontalStackView.addArrangedSubview(stackView)
                 marksStackView = stackView
             }
             marksStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -212,7 +179,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                 container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
                 
                 let instance = UIImageView(image: UIImage(systemName: "figure.wave"))
-                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+                instance.tintColor = item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
                 instance.contentMode = .scaleAspectFit
                 instance.addEquallyTo(to: container)
                 marksStackView.addArrangedSubview(container)
@@ -237,24 +204,12 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                 container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
                 
                 let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+                instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
                 instance.contentMode = .scaleAspectFit
                 instance.addEquallyTo(to: container)
                 marksStackView.addArrangedSubview(container)
             }
-//            if item.isHot {
-//                let container = UIView()
-//                container.backgroundColor = .clear
-//                container.accessibilityIdentifier = "isHot"
-//                container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-//
-//                let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-//                instance.tintColor = .systemRed
-//                instance.contentMode = .scaleAspectFit
-//                instance.addEquallyTo(to: container)
-//                marksStackView.addArrangedSubview(container)
-//            }
-            
+
             if titleLabel.getConstraint(identifier: "height").isNil, descriptionLabel.getConstraint(identifier: "height").isNil, topicView.getConstraint(identifier: "height").isNil {
                 let constraint = titleLabel.heightAnchor.constraint(equalToConstant: 300)
                 constraint.identifier = "height"
@@ -294,17 +249,22 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
         instance.textColor = .label
-        observers.append(instance.observe(\UILabel.bounds, options: [.new]) { [weak self] view, _ in
-            guard let self = self,
-                  let item = self.item,
-                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first else{ return }
-            
-            let height = item.title.height(withConstrainedWidth: view.bounds.width, font: view.font)
-            guard height != constraint.constant else { return }
-            self.setNeedsLayout()
-            constraint.constant = height
-            self.layoutIfNeeded()
-        })
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { [weak self] rect in
+                
+                guard let self = self,
+                      let item = self.item,
+                      let constraint = instance.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+                
+                let height = self.item.title.height(withConstrainedWidth: rect.width, font: instance.font)
+                
+                guard height != constraint.constant else { return }
+                
+                self.setNeedsLayout()
+                constraint.constant = height
+                self.layoutIfNeeded()
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
@@ -315,27 +275,29 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         instance.numberOfLines = 0
         instance.lineBreakMode = .byTruncatingTail
         instance.textColor = .label
-        observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
-            guard let self = self,
-                  let item = self.item,
-                  let newValue = change.newValue,
-                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first else{ return }
-            
-            let height = item.truncatedDescription.height(withConstrainedWidth: view.bounds.width, font: view.font)
-            guard height != constraint.constant else { return }
-            self.setNeedsLayout()
-            constraint.constant = height
-            self.layoutIfNeeded()
-//            view.cornerRadius = newValue.width * 0.05
-        })
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { [weak self] rect in
+                
+                guard let self = self,
+                      let item = self.item,
+                      let constraint = instance.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+                
+                let height = self.item.title.height(withConstrainedWidth: rect.width, font: instance.font)
+                
+                guard height != constraint.constant else { return }
+                
+                self.setNeedsLayout()
+                constraint.constant = height
+                self.layoutIfNeeded()
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     private lazy var ratingView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "star.fill", withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.caption2, scale: .medium)))
-        instance.tintColor = Colors.Tags.HoneyYellow//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.tintColor = Colors.Tags.HoneyYellow
         instance.contentMode = .center
-//        instance.translatesAutoresizingMaskIntoConstraints = false
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
         return instance
     }()
     @MainActor private lazy var ratingLabel: UILabel = {
@@ -343,33 +305,37 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
-            guard let self = self,
-                  let text = view.text else { return }
-            //            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.8)
-            guard let constraint = self.statsView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { [weak self] rect in
+                
+                guard let self = self,
+                      let text = instance.text,
+                      let constraint = instance.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+            
             self.setNeedsLayout()
-            constraint.constant = text.height(withConstrainedWidth: view.bounds.width, font: view.font) * 1.5
+            constraint.constant = text.height(withConstrainedWidth: rect.width, font: instance.font) * 1.5
             self.layoutIfNeeded()
-        })
+        }
+            .store(in: &subscriptions)
+        
         return instance
     }()
+    
     private lazy var viewsView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "eye.fill", withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.caption2, scale: .medium)))
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.contentMode = .center
-//        instance.translatesAutoresizingMaskIntoConstraints = false
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
         return instance
     }()
+    
     private lazy var commentsView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "bubble.right.fill", withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.caption2, scale: .medium)))
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.contentMode = .center
-//        instance.translatesAutoresizingMaskIntoConstraints = false
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
+        
         return instance
     }()
+    
     @MainActor private lazy var commentsLabel: UILabel = {
         let instance = UILabel()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
@@ -388,28 +354,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         instance.textAlignment = .left
         instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-//        instance.backgroundColor = .systemGray
-//        observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
-//            guard let self = self,
-//                  let newValue = change.newValue else { return }
-//            
-//            let formatter = DateFormatter()
-//            formatter.dateFormat = "dd.MM.yyyy"
-//            let text = formatter.string(from: self.item.startDate)
-//            let height = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
-//            let width = text.width(withConstrainedHeight: height, font: view.font)
-//            
-//            self.setNeedsLayout()
-//            if let constraint = view.getAllConstraints().filter({ $0.identifier == "width"}).first {
-//                constraint.constant = width + 8
-//            } else {
-//                let constraint = view.widthAnchor.constraint(equalToConstant: width + 8)
-//                constraint.identifier = "width"
-//                constraint.isActive = true
-//            }
-//            self.layoutIfNeeded()
-//            view.cornerRadius = newValue.height/2.25
-//        })
+
         return instance
     }()
     private lazy var topicLabel: InsetLabel = {
@@ -418,50 +363,60 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         instance.textAlignment = .center
         instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
         instance.textColor = .white
-        observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { [weak self] rect in
+                
             guard let self = self,
-                  let newValue = change.newValue,
                   let constraint = self.topicView.getConstraint(identifier: "height") else { return }
             
-            let height = self.item.topic.title.height(withConstrainedWidth: view.bounds.width, font: view.font)
-            let width = self.item.topic.title.width(withConstrainedHeight: height, font: view.font)
+            let height = self.item.topic.title.height(withConstrainedWidth: rect.width, font: instance.font)
+            let width = self.item.topic.title.width(withConstrainedHeight: height, font: instance.font)
             
             self.setNeedsLayout()
-            if let constraint_2 = view.getAllConstraints().filter({ $0.identifier == "width"}).first {
-                constraint_2.constant = width + view.insets.right*2.5 + view.insets.left*2.5
+            if let constraint_2 = instance.getAllConstraints().filter({ $0.identifier == "width"}).first {
+                constraint_2.constant = width + instance.insets.right*2.5 + instance.insets.left*2.5
             } else {
-                let constraint_2 = view.widthAnchor.constraint(equalToConstant: width + view.insets.right*2.5 + view.insets.left*2.5)
+                let constraint_2 = instance.widthAnchor.constraint(equalToConstant: width + instance.insets.right*2.5 + instance.insets.left*2.5)
                 constraint_2.identifier = "width"
                 constraint_2.isActive = true
             }
 //            constraint_2.constant = newValue.width + 8
             constraint.constant = height// + 4
             self.layoutIfNeeded()
-            view.cornerRadius = newValue.height/2.25
-        })
+            instance.cornerRadius = rect.height/2.25
+        }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     private lazy var progressView: UIView = {
         let instance = UIView()
         instance.backgroundColor = .systemGray4
         instance.accessibilityIdentifier = "progressView"
+        
         let constraint = instance.widthAnchor.constraint(equalToConstant: 30)
         constraint.identifier = "width"
         constraint.priority = .defaultHigh
         constraint.isActive = true
-        observers.append(instance.observe(\UIView.bounds, options: [.new]) { view, change in
-            guard let newValue = change.newValue else { return }
-            view.cornerRadius = newValue.height/2.25
-        })
+        
+        instance.publisher(for: \.bounds, options: .new)
+            .sink {rect in
+            
+            instance.cornerRadius = rect.height/2.25
+        }
+            .store(in: &subscriptions)
+        
         let subview = UIView()
         instance.addSubview(subview)
         subview.accessibilityIdentifier = "progress"
         subview.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             subview.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
             subview.topAnchor.constraint(equalTo: instance.topAnchor),
             subview.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
+        
         let constraint_2 = subview.widthAnchor.constraint(equalToConstant: 30)
         constraint_2.identifier = "width"
         constraint_2.isActive = true
@@ -472,10 +427,11 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         label.textAlignment = .center
         label.textColor = .white
         label.insets = UIEdgeInsets(top: 0, left: 6, bottom: 0, right: 6)
-        observers.append(label.observe(\InsetLabel.bounds, options: [.new]) { [weak self] view, change in
+        label.publisher(for: \.bounds, options: .new)
+            .sink { [weak self] rect in
+                
             guard let self = self,
                   let item = self.item,
-                  let newValue = change.newValue,
                   let constraint = self.progressView.getAllConstraints().filter({ $0.identifier == "width" }).first,
                   let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
                   let constraint_2 = progressIndicator.getConstraint(identifier: "width") else { return }
@@ -483,12 +439,14 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
 //            guard view.bounds.size != newValue.size else { return }
             
             self.setNeedsLayout()
-            constraint.constant = "100%".width(withConstrainedHeight: newValue.height, font: view.font) + view.insets.left + view.insets.right
+            constraint.constant = "100%".width(withConstrainedHeight: rect.height, font: label.font) + label.insets.left + label.insets.right
             constraint_2.constant = constraint.constant * CGFloat(item.progress)/100
             self.layoutIfNeeded()
             
-            view.cornerRadius = newValue.height/2.25
-        })
+                label.cornerRadius = rect.height/2.25
+        }
+            .store(in: &subscriptions)
+        
         label.addEquallyTo(to: instance)
         
         return instance
@@ -500,11 +458,12 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         instance.scaleMultiplicator = 1.7
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         
-        observers.append(instance.observe(\Icon.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            
-            view.cornerRadius = newValue.width/3.25
-        })
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                
+                instance.cornerRadius = rect.width/3.25
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
@@ -519,16 +478,10 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
     private lazy var imageView: UIImageView = {
         let instance = UIImageView()
         instance.clipsToBounds = true
-//        instance.contentMode = .scaleAspectFill
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
         instance.contentMode = .scaleAspectFill
-//        observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
-//            guard let newValue = change.newValue else { return }
-//
-//            view.cornerRadius = newValue.width*0.05
-//        })
         
         return instance
     }()
@@ -553,32 +506,28 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
     private lazy var statsView: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "statsView"
+        instance.backgroundColor = .clear
+        instance.addSubview(statsStack)
+        
         let constraint = instance.heightAnchor.constraint(equalToConstant: 20)
         constraint.identifier = "height"
         constraint.isActive = true
-        instance.backgroundColor = .clear
-        instance.addSubview(statsStack)
-//        instance.addSubview(dateLabel)
+        
+
         statsStack.translatesAutoresizingMaskIntoConstraints = false
-//        dateLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             statsStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
             statsStack.topAnchor.constraint(equalTo: instance.topAnchor),
             statsStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-//            dateLabel.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
-//            dateLabel.topAnchor.constraint(equalTo: instance.topAnchor),
-//            dateLabel.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
         return instance
     }()
     private lazy var menuButton: UIButton = {
         let instance = UIButton()
         instance.setImage(UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(pointSize: instance.bounds.width, weight: UIImage.SymbolWeight.regular, scale: .large)), for: .normal)
-//        instance.imageView?.contentMode = .scaleAspectFit
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
-//        instance.menu = menu
         
         return instance
     }()
@@ -771,35 +720,6 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
     }
     
     private func setTasks() {
-        
-//        tasks.append(Task { [weak self] in
-//            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.ImageDownloaded) {
-//                guard let self = self,
-//                      let object = notification.object as? Userprofile,
-//                      let userprofile = self.avatar.userprofile,
-//                      object.id == userprofile.id
-//                else { return }
-//
-//                if self.shimmeringAnimatedItems.count == 1 {
-//                    self.shimmeringAnimatedItems.remove(object: self.avatar.imageView)
-//                    self.setTemplateWithSubviews(false)
-//                }
-//            }
-//        })
-//        if #available(iOS 15, *) {
-//            notifications.append(Task { [weak self] in
-//                guard !self.isNil else { return }
-//                for await _ in NotificationCenter.default.notifications(for: UIApplication.willResignActiveNotification) {
-//                    print("UIApplication.willResignActiveNotification")
-//                }
-//            })
-//            notifications.append(Task { [weak self] in
-//                guard !self.isNil else { return }
-//                for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-//                    print("UIApplication.didBecomeActiveNotification")
-//                }
-//            })
-        
 
             tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
@@ -813,6 +733,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                     }
                 }
             })
+        
             tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Rating) {
                     await MainActor.run {
@@ -825,6 +746,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                     }
                 }
             })
+        
             tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
                     await MainActor.run {
@@ -833,24 +755,27 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                               let object = notification.object as? SurveyReference,
                               item === object
                         else { return }
-                        
+
                         self.menuButton.menu = self.prepareMenu()
-                        
+
                         switch item.isFavorite {
                         case true:
                             var stackView: UIStackView!
-                            if let _stackView = topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
+                            if let _stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
                                 stackView = _stackView
                             } else {
                                 stackView = UIStackView()
                                 stackView.spacing = 2
                                 stackView.backgroundColor = .clear
                                 stackView.accessibilityIdentifier = "marksStackView"
-                                observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
-                                    guard let newValue = change.newValue else { return }
-                                    view.cornerRadius = newValue.height/2.25
-                                })
-                                topicHorizontalStackView.addArrangedSubview(stackView)
+                                stackView.publisher(for: \.bounds, options: .new)
+                                    .sink { rect in
+                                        
+                                        stackView.cornerRadius = rect.height/2.25
+                                    }
+                                    .store(in: &self.subscriptions)
+                                
+                                self.topicHorizontalStackView.addArrangedSubview(stackView)
                             }
                             guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isFavorite"}).isEmpty else { return }
                             let container = UIView()
@@ -859,13 +784,13 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                             container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
                             
                             let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
                             instance.contentMode = .scaleAspectFit
                             instance.addEquallyTo(to: container)
                             stackView.insertArrangedSubview(container,
                                                             at: stackView.arrangedSubviews.isEmpty ? 0 : stackView.arrangedSubviews.count > 1 ? stackView.arrangedSubviews.count-1 : stackView.arrangedSubviews.count)
                         case false:
-                            guard let stackView = topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
+                            guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
                                   let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isFavorite" }).first else { return }
                             stackView.removeArrangedSubview(mark)
                             mark.removeFromSuperview()
@@ -876,13 +801,13 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
             tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
                     await MainActor.run {
+                        
                         guard let self = self,
                               let item = self.item,
                               let object = notification.object as? SurveyReference,
                               item === object
                         else { return }
-//                        self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? .systemGreen : .systemGray
-//                        self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? item.isComplete ? .systemBlue : .systemGray : item.isComplete ? self.item.topic.tagColor : .systemGray
+
                         self.menuButton.menu = self.prepareMenu()
                         switch item.isComplete {
                         case true:
@@ -890,7 +815,6 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                             self.descriptionLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
                             self.topicHorizontalStackView.insertArrangedSubview(self.progressView, at: 1)
 
-//                            self.dateLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemGray : item.isComplete ? .systemGreen : .systemGray
                             var stackView: UIStackView!
                             if let _stackView = self.topicHorizontalStackView.getSubview(type: UIStackView.self, identifier: "marksStackView") {
                                 stackView = _stackView
@@ -899,10 +823,13 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                                 stackView.spacing = 2
                                 stackView.backgroundColor = .clear
                                 stackView.accessibilityIdentifier = "marksStackView"
-                                self.observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
-                                    guard let newValue = change.newValue else { return }
-                                    view.cornerRadius = newValue.height/2.25
-                                })
+                                stackView.publisher(for: \.bounds, options: .new)
+                                    .sink { rect in
+                                        
+                                        stackView.cornerRadius = rect.height/2.25
+                                }
+                                    .store(in: &self.subscriptions)
+                                
                                 self.topicHorizontalStackView.addArrangedSubview(stackView)
                             }
                             guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty else { return }
@@ -910,22 +837,26 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                             container.backgroundColor = .clear
                             container.accessibilityIdentifier = "isComplete"
                             container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                            
-                            
-                            
+
+
+
                             let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
                             instance.contentMode = .center
                             instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .white : self.item.topic.tagColor
                             instance.contentMode = .scaleAspectFit
                             instance.addEquallyTo(to: container)
                             stackView.insertArrangedSubview(container, at: 0)
-                            self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
-                                guard let newValue = change.newValue else { return }
-                                view.cornerRadius = newValue.size.height/2
-                                let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
-                                let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
-                                view.image = image
-                            })
+                            
+                            instance.publisher(for: \.bounds, options: .new)
+                                .sink { rect in
+                                    
+                                    instance.cornerRadius = rect.height/2
+                                    let largeConfig = UIImage.SymbolConfiguration(pointSize: rect.height * 1.9, weight: .semibold, scale: .medium)
+                                    let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
+                                    instance.image = image
+                                }
+                                .store(in: &self.subscriptions)
+                            
                         case false:
                             guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
                                   let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isComplete" }).first else { return }
@@ -935,50 +866,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                     }
                 }
             })
-//            tasks.append(Task { [weak self] in
-//                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
-//                    await MainActor.run {
-//                        guard let self = self,
-//                              let item = self.item,
-//                              let object = notification.object as? SurveyReference,
-//                              item === object
-//                        else { return }
-//                        switch item.isHot {
-//                        case true:
-//                            var stackView: UIStackView!
-//                            if let _stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
-//                                stackView = _stackView
-//                            } else {
-//                                stackView = UIStackView()
-//                                stackView.spacing = 0
-//                                stackView.backgroundColor = .clear
-//                                stackView.accessibilityIdentifier = "marksStackView"
-//                                self.observers.append(stackView.observe(\UIStackView.bounds, options: [.new]) { view, change in
-//                                    guard let newValue = change.newValue else { return }
-//                                    view.cornerRadius = newValue.height/2.25
-//                                })
-//                                self.topicHorizontalStackView.addArrangedSubview(stackView)
-//                            }
-//                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isHot"}).isEmpty else { return }
-//                            let container = UIView()
-//                            container.backgroundColor = .clear
-//                            container.accessibilityIdentifier = "isHot"
-//                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-//
-//                            let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-//                            instance.tintColor = .systemRed
-//                            instance.contentMode = .scaleAspectFit
-//                            instance.addEquallyTo(to: container)
-//                            stackView.insertArrangedSubview(container, at: stackView.arrangedSubviews.count == 0 ? 0 : stackView.arrangedSubviews.count)
-//                        case false:
-//                            guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
-//                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isHot" }).first else { return }
-//                            stackView.removeArrangedSubview(mark)
-//                            mark.removeFromSuperview()
-//                        }
-//                    }
-//                }
-//            })
+
             tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
                     await MainActor.run {
@@ -988,8 +876,9 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                               item === object,
                               let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
                               let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
-                              let constraint = progressIndicator.getConstraint(identifier: "width") else { return }
-                        
+                              let constraint = progressIndicator.getConstraint(identifier: "width")
+                        else { return }
+
                         progressLabel.text = String(describing: item.progress) + "%"
                         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
                             self.progressView.setNeedsLayout()
@@ -999,6 +888,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                     }
                 }
             })
+
         tasks.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {
                 await MainActor.run {
@@ -1007,36 +897,21 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                           let object = notification.object as? SurveyReference,
                           item === object
                     else { return }
+                    
                     self.commentsView.alpha = 1
                     self.commentsLabel.alpha = 1
                     self.commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
                 }
             }
         })
-//        } else {
-//            NotificationCenter.default.addObserver(self,
-//                                                   selector: #selector(self.updateViewsCount),
-//                                                   name: Notifications.Surveys.Views,
-//                                                   object: nil)
-//            NotificationCenter.default.addObserver(self,
-//                                                   selector: #selector(self.switchFavorite),
-//                                                   name: Notifications.Surveys.SwitchFavorite,
-//                                                   object: nil)
-//            NotificationCenter.default.addObserver(self,
-//                                                   selector: #selector(self.setCompleted),
-//                                                   name: Notifications.Surveys.Completed,
-//                                                   object: nil)
-//            NotificationCenter.default.addObserver(self,
-//                                                   selector: #selector(self.switchHot),
-//                                                   name: Notifications.Surveys.SwitchHot,
-//                                                   object: nil)
-//        }
     }
     
     private func setProgress() {
+        
         guard let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
               let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
-              let constraint = progressIndicator.getConstraint(identifier: "width") else { return }
+              let constraint = progressIndicator.getConstraint(identifier: "width")
+        else { return }
         
         progressLabel.text = String(describing: item.progress) + "%"
         self.progressView.setNeedsLayout()
@@ -1045,6 +920,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
     }
     
     private func setColors() {
+        
         guard let stackView = topicHorizontalStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView else { return }
         stackView.arrangedSubviews.forEach { [weak self] in
             guard let self = self,
@@ -1053,17 +929,18 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
 //                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed
             } else if identifier == "isComplete" {
                 //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
-                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
+                $0.get(all: UIImageView.self).first?.tintColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
             } else if identifier == "isFavorite" {
-                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
             } else if identifier == "isOwn" {
                 //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
-                $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
+                $0.get(all: UIImageView.self).first?.tintColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
             }
         }
     }
     
     private func refreshConstraints() {
+        
         guard let constraint = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
               let constraint_2 = descriptionLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
               let constraint_3 = topicLabel.getAllConstraints().filter({ $0.identifier == "width"}).first
@@ -1115,9 +992,11 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
     
     private func prepareMenu() -> UIMenu {
         let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
-                guard let self = self else { return }
+            guard let self = self,
+                  let instance = self.item
+            else { return }
 
-            self.shareSubject.send(self.item)
+            self.shareSubject.send(instance)
         })
         
         let watchAction : UIAction = .init(title: item.isFavorite ? "don't_watch".localized : "watch".localized, image: UIImage(systemName: "binoculars.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
@@ -1135,10 +1014,11 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
                   let instance = self.item
             else { return }
             
-            self.claimSubject.send(self.item)
+            self.claimSubject.send(instance)
         })
         
         var actions: [UIAction] = []//[claimAction, watchAction, shareAction]
+        
         if !item.isOwn {
             actions.append(claimAction)
             actions.append(watchAction)
@@ -1167,13 +1047,13 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         
         menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         if icon.category != .Hot {
-            icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+            icon.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         }
         progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         commentsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 //        commentsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        topicLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        topicLabel.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
 //        descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 //        descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
@@ -1199,12 +1079,12 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
 //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed
                 } else if identifier == "isComplete" {
 //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
-                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
+                    $0.get(all: UIImageView.self).first?.tintColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
                 } else if identifier == "isFavorite" {
-                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
                 } else if identifier == "isOwn" {
                     //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
-                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
+                    $0.get(all: UIImageView.self).first?.tintColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
                 }
             }
         }
@@ -1268,7 +1148,7 @@ class SurveyCell: UICollectionViewListCell {//}, ShimmeringViewProtocol {
         eventEmitter.task?.cancel()
         animTask?.cancel()
         
-        icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        icon.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         icon.setIconColor(.white)
         
         firstnameLabel.text = ""

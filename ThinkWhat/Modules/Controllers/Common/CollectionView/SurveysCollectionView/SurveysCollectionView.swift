@@ -35,11 +35,17 @@ class SurveysCollectionView: UICollectionView {
             setDataSource()
         }
     }
+    public var indicatorColor: UIColor? {
+        didSet {
+            refreshControl?.tintColor = !indicatorColor.isNil ? indicatorColor : traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
+        }
+    }
     //Publishers
     public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-    public var paginationPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public var paginationPublisher = CurrentValueSubject<Survey.SurveyCategory?, Never>(nil)
+    public var paginationByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
     public var rowPublisher = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var updateStatsPublisher = CurrentValueSubject<[SurveyReference]?, Never>(nil)
     
@@ -61,7 +67,6 @@ class SurveysCollectionView: UICollectionView {
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.translatesAutoresizingMaskIntoConstraints = false
-        
         indicator.hidesWhenStopped = true
         
         return indicator
@@ -89,7 +94,6 @@ class SurveysCollectionView: UICollectionView {
     // MARK: - Initialization
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         fatalError("init(frame:) has not been implemented")
-//        super.init(frame: .zero, collectionViewLayout: .init())
     }
     
     required init?(coder: NSCoder) {
@@ -121,6 +125,7 @@ class SurveysCollectionView: UICollectionView {
     
     // MARK: - Private methods
     private func setupUI() {
+        
         delegate = self
         let layoutGuide = safeAreaLayoutGuide
         addSubview(loadingIndicator)
@@ -131,58 +136,52 @@ class SurveysCollectionView: UICollectionView {
         ])
         
         refreshControl = UIRefreshControl()
-        refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
+        refreshControl?.tintColor = !indicatorColor.isNil ? indicatorColor : traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
         refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
         
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+            
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
-            //            layoutConfig.headerMode = .firstItemInSection
-            //            layoutConfig.backgroundColor = .red
             layoutConfig.backgroundColor = .clear
             layoutConfig.showsSeparators = false//true
-            //            if #available(iOS 14.5, *) {
-            //                var separatorConfig = UIListSeparatorConfiguration(listAppearance: UICollectionLayoutListConfiguration.Appearance.grouped)
-            //                separatorConfig.bottomSeparatorInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 5, trailing: .greatestFiniteMagnitude)
-            //                layoutConfig.separatorConfiguration = separatorConfig
-            //            }
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
             sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
             sectionLayout.interGroupSpacing = 16
+            
             return sectionLayout
         }
         
-        let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { cell, indexPath, item in
+        let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { [unowned self] cell, indexPath, item in
+            
+//            guard let self = self else { return }
+            
             cell.item = item
             
             //Add to watchlist
             cell.watchSubject.sink {
-                print($0)
-            } receiveValue: { [weak self] in
-                guard let self = self, !$0.isNil else { return }
+                
+                guard !$0.isNil else { return }
+                
                 guard $0!.isComplete else {
                     showBanner(bannerDelegate: self, text: "finish_poll".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
                     return
                 }
-                
+
                 self.watchSubject.send($0)
             }.store(in: &self.subscriptions)
-            
+
             //Share
             cell.shareSubject.sink {
-                print($0)
-            } receiveValue: { [weak self] in
-                guard let self = self, !$0.isNil else { return }
-                
+                guard !$0.isNil else { return }
+
                 self.shareSubject.send($0)
             }.store(in: &self.subscriptions)
-            
+
             //Claim
             cell.claimSubject.sink {
-                print($0)
-            } receiveValue: { [weak self] in
-                guard let self = self, !$0.isNil else { return }
-                
+                guard !$0.isNil else { return }
+
                 self.claimSubject.send($0)
             }.store(in: &self.subscriptions)
             
@@ -220,7 +219,7 @@ class SurveysCollectionView: UICollectionView {
         tasks.append(Task {@MainActor [weak self] in
             for await _ in events {
                 guard let self = self,
-                      let cells = visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell]
+                      let cells = self.visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell]
                 else { return }
                 
                 self.updateStatsPublisher.send((cells.compactMap({ $0.item })))
@@ -229,7 +228,7 @@ class SurveysCollectionView: UICollectionView {
         
         //Empty received
         tasks.append(Task {@MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.EmptyReceived) {
+            for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.EmptyReceived) {
                 guard let self = self else { return }
                 
                 self.loadingIndicator.stopAnimating()
@@ -417,7 +416,7 @@ class SurveysCollectionView: UICollectionView {
 //            sectionLayout.interGroupSpacing = 16
 //            return sectionLayout
 //        }
-        refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
+        refreshControl?.tintColor = !indicatorColor.isNil ? indicatorColor : traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
         searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
 }
@@ -442,16 +441,31 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         
         if dataItems.count < 10 {
             loadingIndicator.startAnimating()
-            paginationPublisher.send(true)
+            requestData()
+//            if category == .Topic {
+//                paginationByTopicPublisher.send(topic)
+//            } else {
+//                paginationPublisher.send(true)
+//            }
         } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
-            paginationPublisher.send(true)
+//            paginationPublisher.send(true)
+            requestData()
             loadingIndicator.startAnimating()
         }
     }
     
     @objc
     private func refresh() {
-        paginationPublisher.send(true)
+        requestData()
+//        paginationPublisher.send(true)
+    }
+    
+    private func requestData() {
+        if category == .Topic {
+            paginationByTopicPublisher.send(topic)
+        } else {
+            paginationPublisher.send(category)
+        }
     }
     
     @objc

@@ -20,7 +20,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
         }
     }
     //Publishers
-    public let interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
+    public var myPublicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -30,38 +30,34 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private let padding: CGFloat = 8
     private lazy var publicationsTitle: UILabel = {
         let instance = UILabel()
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .darkGray
-//        instance.insets = UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0)
+        instance.isUserInteractionEnabled = true
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "my_publications".localized
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
-        
-        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: 100, font: instance.font))
-        constraint.identifier = "height"
-        constraint.isActive = true
-        
         instance.publisher(for: \.bounds, options: .new)
             .sink { [weak self] rect in
                 guard let self = self,
-                      let constraint = instance.getConstraint(identifier: "height"),
+                      instance.getConstraint(identifier: "height").isNil,
                       let text = instance.text
                 else { return }
                 
-                self.setNeedsLayout()
-                constraint.constant = text.height(withConstrainedWidth: 300, font: instance.font) + 10
-                self.layoutIfNeeded()
+                let constraint = instance.heightAnchor.constraint(equalToConstant: text.height(withConstrainedWidth: 300, font: instance.font) + 10)
+                constraint.identifier = "height"
+                constraint.isActive = true
             }
             .store(in: &subscriptions)
+        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
         
         return instance
     }()
     private lazy var publicationsCount: UILabel = {
         let instance = UILabel()
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .darkGray
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "234"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
-        //        instance.addTarget(self, action: #selector(self.handleIO(_:)), for: .editingChanged)
+        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
         
         return instance
     }()
@@ -75,6 +71,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
                 instance.setImage(UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5)), for: .normal)
             }
             .store(in: &subscriptions)
+        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
         
         return instance
     }()
@@ -126,8 +123,14 @@ class CurrentUserStatsCell: UICollectionViewListCell {
         
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
         publicationsButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        publicationsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .darkGray
-        publicationsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .darkGray
+        publicationsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        publicationsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        myPublicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
     }
 }
 
@@ -171,7 +174,7 @@ private extension CurrentUserStatsCell {
     }
     
     @objc
-    private func handleTap(_ button: UIButton) {
-        print("Tap")
+    private func handleTap(_ sender: UIView) {
+        myPublicationsPublisher.send(true)
     }
 }

@@ -114,6 +114,14 @@ private extension SettingsController {
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
     
+    func onPublicationsSelected() {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(SurveysController(.Own), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
     func onTopicSelected(_ topic: Topic) {
         let backItem = UIBarButtonItem()
         backItem.title = ""
@@ -203,6 +211,7 @@ extension SettingsController: SettingsViewInput {
 
 // MARK: - Model Output
 extension SettingsController: SettingsModelOutput {
+    
     func onError(_ error: Error) {
         controllerOutput?.onError(error)
     }

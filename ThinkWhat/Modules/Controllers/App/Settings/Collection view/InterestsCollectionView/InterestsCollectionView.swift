@@ -129,7 +129,7 @@ class InterestsCollectionView: UICollectionView {
     // MARK: - Private methods
     private func reload(animated: Bool) {
         
-        guard let container = userprofile.sortedTopPublicationCategories,
+        guard let container = userprofile.preferencesSorted,
               let items = container.compactMap ({ dict in
                   return dict.keys.first
               }) as? [Topic]
@@ -151,7 +151,7 @@ class InterestsCollectionView: UICollectionView {
 extension InterestsCollectionView: TagCellLayoutDelegate {
     
     func tagCellLayoutTagSize(layout: TagCellLayout, atIndex index: Int) -> CGSize {
-        guard let container = userprofile.sortedTopPublicationCategories,
+        guard let container = userprofile.preferencesSorted,
               let items = container.compactMap ({ dict in
                   return dict.keys.first
               }) as? [Topic],

@@ -28,6 +28,7 @@ protocol SettingsViewInput: AnyObject {
     func openURL(_ : URL)
     func onCitySearch(_ : String)
     func onTopicSelected(_: Topic)
+    func onPublicationsSelected()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -46,6 +47,9 @@ protocol SettingsControllerInput: AnyObject {
 ///
 /// **Controller** conforms to this protocol
 protocol SettingsModelOutput: AnyObject {
+    
+//    var surveyCategory: Survey.SurveyCategory { get }
+    
     func onError(_: Error)
 }
 

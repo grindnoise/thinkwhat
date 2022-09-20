@@ -54,6 +54,28 @@ class Userprofiles {
 ////                                                                                                                                                                                             facebookURL: profile.facebookURL)
 //    }()
     
+    class func loadUserData(_ json: JSON) {
+        guard let userprofile = Userprofiles.shared.current,
+              let subscribersTotal = json["subscribers_count"].int,
+              let subscriptionsTotal = json["subscribed_at_count"].int,
+              let publicationsTotal = json["own_surveys_count"].int,
+              let favoritesTotal = json["favorite_surveys_count"].int,
+              let completeTotal = json["completed_surveys_count"].int,
+              let balance = json["balance"].int,
+              let top_preferences = json["top_preferences"] as? JSON,
+              let isBanned = json["is_banned"].bool
+        else { return }
+        
+        userprofile.subscribersTotal = subscribersTotal
+        userprofile.subscriptionsTotal = subscriptionsTotal
+        userprofile.publicationsTotal = publicationsTotal
+        userprofile.favoritesTotal = favoritesTotal
+        userprofile.completeTotal = completeTotal
+        userprofile.balance = balance
+        userprofile.isBanned = isBanned
+        userprofile.updatePreferences(top_preferences)
+    }
+    
     func loadSubscribedFor(_ data: Data) {
         let decoder                                 = JSONDecoder()
 //        var notifications: [NSNotification.Name]    = []
@@ -245,9 +267,9 @@ class Userprofile: Decodable {
     }
     var surveys:      [SurveyReference]   = []
     var favorites:    [Date: [SurveyReference]]   = [:]
-    var topPublicationCategories: [[Topic: Int]]?// = [[:]]
-    var sortedTopPublicationCategories: [[Topic: Int]]? {
-        return topPublicationCategories?.sorted { (first, second) in
+    var preferences: [[Topic: Int]]?// = [[:]]
+    var preferencesSorted: [[Topic: Int]]? {
+        return preferences?.sorted { (first, second) in
             first.first!.value > second.first!.value
         }
     }
@@ -372,10 +394,10 @@ class Userprofile: Decodable {
             }
 //            topPublicationCategories.removeAll()
             if let topics = try container.decodeIfPresent([String: Int].self, forKey: .topPublicationCategories), topics != nil, !topics.isEmpty {
-                topPublicationCategories = []
+                preferences = []
                 topics.forEach { dict in
                     if let topic = Topics.shared.all.filter({ $0.id == Int(dict.key) }).first {
-                        topPublicationCategories!.append([topic: dict.value])
+                        preferences!.append([topic: dict.value])
                     }
                 }
             }
@@ -407,7 +429,7 @@ class Userprofile: Decodable {
         }
     }
     
-    func updateStats(_ json: JSON) {
+    func updateUserData(_ json: JSON) {
         guard let _subscribersTotal = json["subscribers_count"].int,
               let _subscriptionsTotal = json["subscribed_at_count"].int,
               let _publicationsTotal = json["own_surveys_count"].int,
@@ -423,17 +445,17 @@ class Userprofile: Decodable {
         completeTotal = _completeTotal
         balance = _balance
         isBanned = _isBanned
-        updateTopCategories(_top_preferences)
+        updatePreferences(_top_preferences)
     }
     
-    func updateTopCategories(_ json: JSON) {
+    func updatePreferences(_ json: JSON) {
         guard !json.isEmpty, let container = json.dictionary else { return }
-        topPublicationCategories = []
+        preferences = []
         container.forEach {
             guard let key = Int($0.key),
                   let topic = Topics.shared.all.filter({ $0.id == key }).first,
                   let value = Int($0.key) else { return }
-            topPublicationCategories!.append([topic: value])
+            preferences!.append([topic: value])
         }
     }
     

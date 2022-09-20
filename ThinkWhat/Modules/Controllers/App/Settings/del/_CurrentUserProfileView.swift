@@ -297,11 +297,11 @@ class _CurrentUserProfileView: UIView {
 
 extension _CurrentUserProfileView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return Userprofiles.shared.current?.topPublicationCategories?.count ?? 0
+        return Userprofiles.shared.current?.preferences?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let currentUser = Userprofiles.shared.current, let categories = currentUser.sortedTopPublicationCategories, !categories.isEmpty  else { return UICollectionViewCell() }
+        guard let currentUser = Userprofiles.shared.current, let categories = currentUser.preferencesSorted, !categories.isEmpty  else { return UICollectionViewCell() }
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "category", for: indexPath) as? InterestCollectionCell {
             guard let dict = categories[indexPath.row] as? [Topic: Int], let category = dict.first?.key else { return UICollectionViewCell() }
             let attrString = NSMutableAttributedString()

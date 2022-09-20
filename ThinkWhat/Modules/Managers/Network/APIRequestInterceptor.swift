@@ -10,7 +10,7 @@ import Alamofire
 
 class APIRequestInterceptor: RequestInterceptor {
     //1
-    let retryLimit = 5
+    let retryLimit = 3
     let retryDelay: TimeInterval = 5
     //2
     func adapt(

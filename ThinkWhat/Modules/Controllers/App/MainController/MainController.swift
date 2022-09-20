@@ -168,14 +168,16 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 do {
                     let topics          = try json["categories"].rawData()
                     let claims          = try json["claim_categories"].rawData()
-                    let subscribedFor   = try json["subscribed_for"].rawData()
+//                    let subscribedFor   = try json["subscribed_for"].rawData()
                     let surveys         = json["surveys"]
-                    let topCategories   = json["top_preferences"]
+//                    let topCategories   = json["top_preferences"]
+                    let userData   = json["user_data"]
                     Topics.shared.load(topics)
                     Claims.shared.load(claims)
                     Surveys.shared.load(surveys)
-                    Userprofiles.shared.loadSubscribedFor(subscribedFor)
-                    Userprofiles.shared.current?.updateTopCategories(topCategories)
+                    Userprofiles.loadUserData(userData)
+//                    Userprofiles.shared.loadSubscribedFor(subscribedFor)
+//                    Userprofiles.shared.current?.updateTopCategories(topCategories)
 
                     UIView.animate(withDuration: 0.2, delay: 0.5, options: .curveEaseInOut) {
                         self.loadingIndicator?.alpha = 0

@@ -10,16 +10,17 @@ import UIKit
 import Combine
 
 class SurveysController: UIViewController {
-
+    
     // MARK: - Overridden properties
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+        return mode == .Topic ? .lightContent : .default
     }
     
     // MARK: - Public properties
     var controllerOutput: SurveysControllerOutput?
     var controllerInput: SurveysControllerInput?
-    public private(set) var topic: Topic
+    public private(set) var topic: Topic?
+    public private(set) var mode: Survey.SurveyCategory
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -39,7 +40,13 @@ class SurveysController: UIViewController {
     
     // MARK: - Initialization
     init(_ topic: Topic) {
+        self.mode = .Topic
         self.topic = topic
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(_ mode: Survey.SurveyCategory) {
+        self.mode = mode
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -77,7 +84,7 @@ class SurveysController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        setNavigationBarAppearance()
+        setNavigationBarAppearance(largeTitleColor: mode == .Topic ? .white : .label, smallTitleColor: mode == .Topic ? .white : .label)
         setRightBarButton()
     }
     
@@ -89,22 +96,105 @@ class SurveysController: UIViewController {
 }
 
 extension SurveysController: SurveysViewInput {
-    // Implement methods
+    func share(_ surveyReference: SurveyReference) {
+        // Setting description
+        let firstActivityItem = surveyReference.title
+        
+        // Setting url
+        let queryItems = [URLQueryItem(name: "hash", value: surveyReference.shareHash), URLQueryItem(name: "enc", value: surveyReference.shareEncryptedString)]
+        var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
+        urlComps.queryItems = queryItems
+        
+        let secondActivityItem: URL = urlComps.url!
+        
+        // If you want to use an image
+        let image : UIImage = UIImage(named: "anon")!
+        let activityViewController : UIActivityViewController = UIActivityViewController(
+            activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
+        
+        // This lines is for the popover you need to show in iPad
+        activityViewController.popoverPresentationController?.sourceView = self.view
+        
+        // This line remove the arrow of the popover to show in iPad
+        activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
+        activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
+        
+        // Pre-configuring activity items
+        activityViewController.activityItemsConfiguration = [
+            UIActivity.ActivityType.message
+        ] as? UIActivityItemsConfigurationReading
+        
+        // Anything you want to exclude
+        activityViewController.excludedActivityTypes = [
+            UIActivity.ActivityType.postToWeibo,
+            UIActivity.ActivityType.print,
+            UIActivity.ActivityType.assignToContact,
+            UIActivity.ActivityType.saveToCameraRoll,
+            UIActivity.ActivityType.addToReadingList,
+            UIActivity.ActivityType.postToFlickr,
+            UIActivity.ActivityType.postToVimeo,
+            UIActivity.ActivityType.postToTencentWeibo,
+            UIActivity.ActivityType.postToFacebook
+        ]
+        
+        activityViewController.isModalInPresentation = false
+        self.present(activityViewController,
+                     animated: true,
+                     completion: nil)
+    }
+    
+    func claim(surveyReference: SurveyReference, claim: Claim) {
+        controllerInput?.claim(surveyReference: surveyReference, claim: claim)
+    }
+    
+    func addFavorite(_ surveyReference: SurveyReference) {
+        controllerInput?.addFavorite(surveyReference: surveyReference)
+    }
+    
+    func updateSurveyStats(_ instances: [SurveyReference]) {
+        controllerInput?.updateSurveyStats(instances)
+    }
+    
+    func onSurveyTapped(_ instance: SurveyReference) {
+        let backItem = UIBarButtonItem()
+            backItem.title = ""
+            navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
+        controllerInput?.onDataSourceRequest(source: source, topic: topic)
+    }
 }
 
 extension SurveysController: SurveysModelOutput {
-    // Implement methods
+    func onRequestCompleted(_ result: Result<Bool, Error>) {
+        controllerOutput?.onRequestCompleted(result)
+    }
 }
 
 private extension SurveysController {
  
     func setupUI() {
         
-        title = topic.title
+        switch mode {
+        case .Topic:
+            guard let topic = topic else { return }
+            
+            title = topic.title
+        case .Own:
+            title = "my_publications".localized
+        default:
+#if DEBUG
+            print("")
+#endif
+        }
+            
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         
         //Setup nav bar
-        setNavigationBarAppearance(titleColor: .clear)
+        setNavigationBarAppearance(largeTitleColor: mode == .Topic ? .white : .label, smallTitleColor: .clear)
     }
     
     @objc
@@ -112,27 +202,40 @@ private extension SurveysController {
         print("Tap")
     }
     
-    private func setNavigationBarAppearance(titleColor: UIColor = .white) {
+    private func setNavigationBarAppearance(largeTitleColor: UIColor, smallTitleColor: UIColor) {
         guard let navigationBar = navigationController?.navigationBar else { return }
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = topic.tagColor
         appearance.largeTitleTextAttributes = [
-            .foregroundColor: UIColor.white,
+            .foregroundColor: largeTitleColor,
             .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle) as Any
         ]
         appearance.titleTextAttributes = [
-            .foregroundColor: titleColor,
+            .foregroundColor: smallTitleColor,
             .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3) as Any
         ]
         appearance.shadowColor = nil
+        
+        switch mode {
+        case .Topic:
+            guard let topic = topic else { return }
+            
+            appearance.backgroundColor = topic.tagColor
+            navigationBar.tintColor = .white
+            navigationBar.barTintColor = .white
+        case .Own:
+            navigationBar.tintColor = .label
+            navigationBar.barTintColor = .label
+        default:
+#if DEBUG
+            print("")
+#endif
+        }
+        
         navigationBar.standardAppearance = appearance
         navigationBar.scrollEdgeAppearance = appearance
-        navigationBar.tintColor = .white
         navigationBar.prefersLargeTitles = true
-        navigationBar.barTintColor = .white
-        
         
         if #available(iOS 15.0, *) {
             navigationBar.compactScrollEdgeAppearance = appearance

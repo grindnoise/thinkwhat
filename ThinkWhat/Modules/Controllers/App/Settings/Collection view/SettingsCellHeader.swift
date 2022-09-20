@@ -109,13 +109,13 @@ class SettingsCellHeader: UICollectionReusableView {
         instance.backgroundColor = .clear
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         instance.contentMode = .center
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instance.tintColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         instance.alpha = isHelpEnabled ? 1 : 0
         instance.isUserInteractionEnabled = true
         instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.helpTap)))
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
-                instance.setImage(UIImage(systemName: "questionmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height))!)
+                instance.setImage(UIImage(systemName: "questionmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.75, weight: .semibold))!)
             }
             .store(in: &subscriptions)
 
@@ -259,7 +259,7 @@ class SettingsCellHeader: UICollectionReusableView {
         
         backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         badge.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        help.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        help.tintColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
 }
 

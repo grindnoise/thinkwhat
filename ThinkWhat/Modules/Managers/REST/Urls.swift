@@ -15,10 +15,11 @@ struct API_URLS {
     }
     
     struct Profiles {
-        static let subscribe:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/subscribe/")}()
-        static let unsubscribe:     URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/unsubscribe/")}()
-        static let subscribedFor:   URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_subscribed_for/")}()
-        static let subscribers:     URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_subscribers/")}()
+        static let subscribe:           URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/subscribe/")}()
+        static let unsubscribe:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/unsubscribe/")}()
+        static let subscribedFor:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_subscribed_for/")}()
+        static let subscribers:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_subscribers/")}()
+        static let updateStatistics:    URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_survey_stats/")}()
     }
     
     struct Surveys {

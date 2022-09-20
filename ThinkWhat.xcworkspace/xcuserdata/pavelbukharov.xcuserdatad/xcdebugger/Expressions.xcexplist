@@ -1408,6 +1408,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "NavigationController.preferredStatusBarStyle.getter:NavigationController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "children.last as? SurveysController">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in closure #1 in APIManager.rejectSurvey(survey:completion:):APIManager.swift">
          <PersistentStrings>
             <PersistentString
@@ -3597,14 +3605,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in closure #1 in CurrentUserStatsCell.publicationsTitle.getter:CurrentUserStatsCell.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "constraint.constant">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "SurveysViewController.handleIconTap(gesture:):SurveysViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -4034,6 +4034,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "SurveysView.setupUI():SurveysView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "viewInput">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "VotersFilterController.viewWillAppear(_:):VotersFilterController.swift">
          <PersistentStrings>
             <PersistentString
@@ -4263,7 +4271,7 @@
          contextName = "closure #1 in PollController.setObservers():PollController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self!.titleView.oval.opacity">
+               value = "CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -6394,6 +6402,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "MainController.childForStatusBarStyle.getter:MainController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "selectedViewController as? UINavigationController">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "UserViewController.tableView(_:cellForRowAt:):UserViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -6475,6 +6491,14 @@
             </PersistentString>
             <PersistentString
                value = "stackSet.symmetricDifference(hotSet)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "SurveysCollectionView.traitCollectionDidChange(_:):SurveysCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "indicatorColor.isNil">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
