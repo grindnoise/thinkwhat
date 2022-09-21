@@ -7,15 +7,43 @@
 //
 
 import UIKit
+import Combine
 
 class SubscribersController: UIViewController {
 
-    deinit {
-        print("SubscribersController deinit")
+    enum Mode {
+        case Subscriptions, Subscribers
     }
     
-    init(mode __mode: Mode) {
-        self._mode = __mode
+    // MARK: - Overridden properties
+    
+    // MARK: - Public properties
+    public private(set) var mode: Mode
+    public private(set) var userprofile: Userprofile
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    
+    private let barButton = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
+    private var isEditingEnabled = false
+    
+    // MARK: - Deinitialization
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
+    // MARK: - Initialization
+    init(mode: Mode, userprofile: Userprofile) {
+        self.mode = mode
+        self.userprofile = userprofile
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -23,8 +51,25 @@ class SubscribersController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    enum Mode {
-        case Subscriptions, Subscribers
+    // MARK: - Public methods
+    
+    // MARK: - Private methods
+    
+    // MARK: - Overridden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        barButton.tintColor = navigationController?.isToolbarHidden == true ? .systemGray : .systemBlue
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setToolbarHidden(true, animated: true)
     }
     
     override func viewDidLoad() {
@@ -48,7 +93,19 @@ class SubscribersController: UIViewController {
         loadData()
     }
     
-    private func setObservers() {
+    
+
+    // MARK: - Properties
+    var controllerOutput: SubscribersControllerOutput?
+    var controllerInput: SubscribersControllerInput?
+    
+}
+
+// MARK: - View Input
+extension SubscribersController: SubscribersViewInput {}
+
+private extension SubscribersController {
+    func setObservers() {
         switch mode {
         case .Subscriptions:
             NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscribedForUpdated), name: Notifications.Userprofiles.SubscribedForUpdated, object: nil)
@@ -60,16 +117,16 @@ class SubscribersController: UIViewController {
         }
     }
     
-    private func setupUI() {
+    func setupUI() {
         navigationItem.largeTitleDisplayMode = .never
     }
     
     @objc
-    private func updateStats() {
+    func updateStats() {
         
     }
     
-    private func loadData() {
+    func loadData() {
         switch mode {
         case .Subscriptions:
             controllerInput?.loadSubscriptions()
@@ -78,17 +135,7 @@ class SubscribersController: UIViewController {
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        tabBarController?.setTabBarVisible(visible: false, animated: true)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setToolbarHidden(true, animated: true)
-    }
-    
-    private func setToolBar() {
+    func setToolBar() {
         guard mode == .Subscriptions else { return }
         self.navigationController?.isToolbarHidden = true
         var items = [UIBarButtonItem]()
@@ -104,8 +151,8 @@ class SubscribersController: UIViewController {
         toolbarItems = items
     }
     
-    private func setBarButton() {
-        guard _mode == .Subscriptions else { return }
+    func setBarButton() {
+        guard mode == .Subscriptions else { return }
         let gesture = UITapGestureRecognizer(target: self, action: #selector(SubscribersController.switchEditing))
         barButton.addGestureRecognizer(gesture)
         barButton.contentMode = .scaleAspectFit
@@ -114,23 +161,19 @@ class SubscribersController: UIViewController {
         navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: barButton)]
     }
     
-    private func setTitle() {
-        let label = UILabel()
-        label.numberOfLines = 2
-        label.textAlignment = .center
-        let text = _mode == .Subscribers ? "subscribers" : "subscribed_for"
-        let attrString = NSMutableAttributedString()
-        attrString.append(NSAttributedString(string: text.localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        attrString.append(NSAttributedString(string: "\n\(controllerInput!.userprofiles.count)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        label.attributedText = attrString
-        navigationItem.titleView = label
+    func setTitle() {
+//        let label = UILabel()
+//        label.numberOfLines = 2
+//        label.textAlignment = .center
+//        let text = mode == .Subscribers ? "subscribers" : "subscribed_for"
+//        let attrString = NSMutableAttributedString()
+//        attrString.append(NSAttributedString(string: text.localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 19), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//        attrString.append(NSAttributedString(string: "\n\(userprofile.count)", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .secondaryLabel, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//        label.attributedText = attrString
+//        navigationItem.titleView = label
     }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        barButton.tintColor = navigationController?.isToolbarHidden == true ? .systemGray : .systemBlue
-    }
-    
-    private func unsubscribe() {
+
+    func unsubscribe() {
         guard let list = controllerOutput?.unsubscribeList else { return }
         controllerInput?.unsubscribe(list)
         navigationController?.setToolbarHidden(true, animated: true)
@@ -143,7 +186,7 @@ class SubscribersController: UIViewController {
     }
     
     @objc
-    private func onSubscribedForUpdated() {
+    func onSubscribedForUpdated() {
         setTitle()
         controllerOutput?.onSubscribedForUpdated()
     }
@@ -160,7 +203,7 @@ class SubscribersController: UIViewController {
     }
     
     @objc
-    private func unsubscribeTapped() {
+    func unsubscribeTapped() {
         showPopup(callbackDelegate: self,
                   bannerDelegate: self,
                   subview: Confirm(imageContent: ImageSigns.questionmarkDiamondFilled,
@@ -171,7 +214,7 @@ class SubscribersController: UIViewController {
     }
     
     @objc
-    private func switchEditing() {
+    func switchEditing() {
         isEditingEnabled = !isEditingEnabled
         UIView.transition(with: barButton, duration: 0.3, options: [.transitionCrossDissolve]) {
             self.barButton.image = self.isEditingEnabled ? ImageSigns.pencilCircleFilled.image : ImageSigns.pencilCircle.image
@@ -184,27 +227,8 @@ class SubscribersController: UIViewController {
         }
         controllerOutput?.enableEditing()
     }
-
-    // MARK: - Properties
-    var controllerOutput: SubscribersControllerOutput?
-    var controllerInput: SubscribersControllerInput?
-    private let _mode: Mode
-    private let barButton = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
-    private var isEditingEnabled = false
 }
 
-// MARK: - View Input
-extension SubscribersController: SubscribersViewInput {
-    var userprofiles: [Userprofile] {
-        return controllerInput?.userprofiles ?? []
-    }
-    
-    var mode: Mode {
-        return _mode
-    }
-}
-
-// MARK: - Model Output
 extension SubscribersController: SubscribersModelOutput {
     func onAPIError() {
         controllerOutput?.onAPIError()
@@ -235,5 +259,4 @@ extension SubscribersController: BannerObservable {
             popup.removeFromSuperview()
         }
     }
-
 }

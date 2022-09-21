@@ -8,6 +8,7 @@
 
 import UIKit
 import SafariServices
+import Combine
 
 class SettingsController: UIViewController, UINavigationControllerDelegate {
     
@@ -21,6 +22,9 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     var mode: SettingsController.Mode = .Profile
     
     // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
     private lazy var settingsSwitch: SettingsSwitch = {
         return SettingsSwitch(callbackDelegate: self)
     }()
@@ -32,6 +36,18 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         return instance
     }()
     
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
+    // MARK: - Overridden properties
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -113,6 +129,34 @@ private extension SettingsController {
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+    
+    func onSubscriptionsSelected() {
+        guard let userprofile = Userprofiles.shared.current,
+            userprofile.subscriptionsTotal != 0
+        else { return }
+        
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        
+        navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(SubscribersController(mode: .Subscriptions, userprofile: userprofile), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    
+    func onSubscribersSelected() {
+        guard let userprofile = Userprofiles.shared.current,
+            userprofile.subscribersTotal != 0
+        else { return }
+        
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        
+        navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(SubscribersController(mode: .Subscribers, userprofile: userprofile), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
     
     func onPublicationsSelected() {
         let backItem = UIBarButtonItem()

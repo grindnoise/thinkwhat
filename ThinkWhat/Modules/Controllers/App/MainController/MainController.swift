@@ -11,9 +11,11 @@ import Foundation
 import UIKit
 import UserNotifications
 import SwiftyJSON
+import Combine
 
 class MainController: UITabBarController {//}, StorageProtocol {
     
+    // MARK: - Overridden properties
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return selectedViewController?.preferredStatusBarStyle ?? .lightContent
     }
@@ -21,15 +23,44 @@ class MainController: UITabBarController {//}, StorageProtocol {
         return selectedViewController
     }
     
-    // MARK: - Lifecycle Methods
+    // MARK: - Public properties
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    
+    private let profileUpdater = PassthroughSubject<Date, Never>()
+    private var loadingIndicator: LoadingIndicator?
+    private var apiUnavailableView: APIUnavailableView?
+    
+    // MARK: - Deinitialization
     deinit {
-        print("MainController deinit()")
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
         NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
+    // MARK: - Initialization
+    
+    // MARK: - Public methods
+    
+    // MARK: - Private methods
+    
+    // MARK: - Overridden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setSubscriptions()
         setViewControllers()
         setupUI()
         loadData()
@@ -45,21 +76,67 @@ class MainController: UITabBarController {//}, StorageProtocol {
             }
         }
     }
+}
+
+private extension MainController {
     
-    private func setViewControllers() {
+    func updateUserData() {
+        Task {
+            do {
+                try await API.shared.profiles.updateCurrentUserStatistics()
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
+    
+    func setSubscriptions() {
+
+        subscriptions.insert(
+            Timer
+            .publish(every: 60, on: .main, in: .common)
+            .autoconnect()
+            .subscribe(profileUpdater)
+        )
+        
+        profileUpdater
+            .sink { [unowned self] _ in
+                
+                self.updateUserData()
+            }
+            .store(in: &subscriptions)
+        
+    }
+    
+    func loadData() {
+        if loadingIndicator.isNil || loadingIndicator?.alpha != 1 {
+            loadingIndicator!.alpha = 1
+            loadingIndicator!.layoutCentered(in: view, multiplier: 0.6)
+            loadingIndicator!.addEnableAnimation()
+        }
+
+        Task {
+            do {
+                try await appLaunch()
+            } catch {
+                await MainActor.run {
+                    onServerUnavailable()
+                }
+            }
+        }
+    }
+    
+    func setViewControllers() {
         func createNavigationController(for rootViewController: UIViewController,
                                         title: String,
                                         image: UIImage?,
                                         selectedImage: UIImage?)-> UIViewController {
             let navigationController = NavigationController(rootViewController: rootViewController)
-//            let navigationController = CustomNavigationController(rootViewController: rootViewController)
             navigationController.title = title.localized
             navigationController.tabBarItem.title = title.localized
             navigationController.modalPresentationCapturesStatusBarAppearance = true
-//            let attributedText = NSMutableAttributedString()
-//            attributedText.append(NSAttributedString(string: title.localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 10), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-//            navigationController.tabBarItem.setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 10)] as [NSAttributedString.Key : Any], for: .normal)
-
             navigationController.tabBarItem.image = image
             navigationController.tabBarItem.selectedImage = selectedImage
             navigationController.navigationBar.prefersLargeTitles = true
@@ -67,6 +144,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
             rootViewController.navigationItem.title = title.localized
             return navigationController
         }
+        
         viewControllers = [
             createNavigationController(for: HotController(), title: "hot", image: UIImage(systemName: "flame"), selectedImage: UIImage(systemName: "flame.fill")),
             createNavigationController(for: SubsciptionsController(), title: "subscriptions", image: UIImage(systemName: "bell"), selectedImage: UIImage(systemName: "bell.fill")),
@@ -76,7 +154,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
         ]
     }
     
-    private func setupUI() {
+    func setupUI() {
         view.isUserInteractionEnabled = false
         tabBar.backgroundColor = .systemBackground
         tabBar.tintColor = UIColor { traitCollection in
@@ -98,26 +176,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
         loadingIndicator!.alpha = 0
         setTabBarVisible(visible: false, animated: false)
     }
-        
-    public func loadData() {
-        if loadingIndicator.isNil || loadingIndicator?.alpha != 1 {
-            loadingIndicator!.alpha = 1
-            loadingIndicator!.layoutCentered(in: view, multiplier: 0.6)
-            loadingIndicator!.addEnableAnimation()
-        }
-
-        Task {
-            do {
-                try await appLaunch()
-            } catch {
-                await MainActor.run {
-                    onServerUnavailable()
-                }
-            }
-        }
-    }
     
-    private func onServerUnavailable() {
+    func onServerUnavailable() {
         apiUnavailableView = APIUnavailableView(frame: view.frame, delegate: self)
         apiUnavailableView?.alpha = 0
         apiUnavailableView?.addEquallyTo(to: view)
@@ -132,26 +192,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 self.loadingIndicator?.removeFromSuperview()
             }
         }
-//        requestAttempt = 0
     }
-    
-//    @objc private func updateStats() {
-//        Task {
-//            do {
-//                let data = try await API.shared.surveys.updateStats()
-//                let json = try JSON(data: data, options: .mutableContainers)
-//                await MainActor.run {
-//                    Topics.shared.updateCount(json["count_by_categories"])
-//                    Userprofiles.shared.current?.updateStats(json["userprofile"])
-//                    Notification.send(names: [Notifications.System.UpdateStats])
-//                }
-//            } catch {
-//#if DEBUG
-//                error.printLocalized(class: type(of: self), functionName: #function)
-//#endif
-//            }
-//        }
-//    }
     
     func appLaunch() async throws {
         
@@ -204,18 +245,6 @@ class MainController: UITabBarController {//}, StorageProtocol {
             throw error
         }
     }
-    
-    
-    // MARK: - Properties
-//    private var requestAttempt = 0
-    private var loadingIndicator: LoadingIndicator?
-    private var apiUnavailableView: APIUnavailableView?
-//    private lazy var timers: [Timer] = {
-//        var array: [Timer] = []
-//        let t = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(MainController.updateStats), userInfo: nil, repeats: true)
-//        array.append(t)
-//        return array
-//    }()
 }
 
 //MARK: -  UITabBarControllerDelegate

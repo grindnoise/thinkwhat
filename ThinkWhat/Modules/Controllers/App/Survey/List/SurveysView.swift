@@ -37,21 +37,43 @@ class SurveysView: UIView {
     private lazy var collectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(delegate: self, topic: viewInput?.topic)
         
-        //Pagination
-        instance.paginationPublisher
+        //Pagination #1
+        let paginationPublisher = instance.paginationPublisher
+            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+        
+        paginationPublisher
             .sink { [unowned self] in
-            guard let category = $0
-            else { return }
-                  
-            self.viewInput?.onDataSourceRequest(source: category, topic: nil)
-        }
+                guard let category = $0 else { return }
+                
+                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+            }
             .store(in: &subscriptions)
         
-        //Pagination by topic
-        instance.paginationByTopicPublisher
+        //Pagination #2
+        let paginationByTopicPublisher = instance.paginationByTopicPublisher
+            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+        
+        paginationByTopicPublisher
             .sink { [unowned self] in
-            guard let topic = $0
-                else { return }
+                guard let topic = $0 else { return }
+
+                self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+            }
+            .store(in: &subscriptions)
+        
+        //Refresh #1
+        instance.refreshPublisher
+            .sink { [unowned self] in
+                guard let category = $0 else { return }
+                
+                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+            }
+            .store(in: &subscriptions)
+        
+        //Refresh #2
+        instance.refreshByTopicPublisher
+            .sink { [unowned self] in
+                guard let topic = $0 else { return }
                 
                 self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
             }
@@ -59,9 +81,8 @@ class SurveysView: UIView {
         
         //Row selected
         instance.rowPublisher
-            .sink { [weak self] in
-            guard let self = self,
-                  let instance = $0
+            .sink { [unowned self] in
+                guard let instance = $0
             else { return }
                   
             self.viewInput?.onSurveyTapped(instance)

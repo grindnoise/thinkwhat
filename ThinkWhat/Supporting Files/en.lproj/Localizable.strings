@@ -298,6 +298,8 @@
 "interests_help" = "Top your interests by most visited publications";
 "stats" = "Statistics";
 "my_publications" = "My publications";
+"my_subscribers" = "My subscribers";
+"balance" = "Balance";
 
 //Tutorials
 "poll_vote_edu_1" = "The poll will end and disappear from the lists after the required number of participants has been reached.";

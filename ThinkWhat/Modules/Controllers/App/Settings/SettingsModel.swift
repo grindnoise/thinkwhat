@@ -16,6 +16,7 @@ class SettingsModel {
 
 // MARK: - Controller Input
 extension SettingsModel: SettingsControllerInput {
+    
     func fetchCity(_ name: String) {
         Task {
             var cities = [City]()

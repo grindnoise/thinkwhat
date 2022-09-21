@@ -38,112 +38,135 @@ class SettingsView: UIView {
     private lazy var profileView: CurrentUserProfileCollectionView = {
         let instance = CurrentUserProfileCollectionView()
         
-        instance.namePublisher.sink { [unowned self] in
-            guard let dict = $0 else { return }
-            
-            self.viewInput?.updateUsername(dict)
-        }.store(in: &subscriptions)
+        instance.namePublisher
+            .sink { [unowned self] in
+                guard let dict = $0 else { return }
+                
+                self.viewInput?.updateUsername(dict)
+            }
+            .store(in: &subscriptions)
         
-        instance.datePublisher.sink { [unowned self] in
-            guard let date = $0 else { return }
-            
-            self.viewInput?.updateBirthDate(date)
-        }.store(in: &subscriptions)
+        instance.datePublisher
+            .sink { [unowned self] in
+                guard let date = $0 else { return }
+                
+                self.viewInput?.updateBirthDate(date)
+            }
+            .store(in: &subscriptions)
         
-        instance.genderPublisher.sink { [unowned self] in
-            guard let gender = $0 else { return }
-            
-            self.viewInput?.updateGender(gender)
-        }.store(in: &subscriptions)
+        instance.genderPublisher
+            .sink { [unowned self] in
+                guard let gender = $0 else { return }
+                
+                self.viewInput?.updateGender(gender)
+            }
+            .store(in: &subscriptions)
         
-        instance.cameraPublisher.sink { [unowned self] in
-            guard !$0.isNil else { return }
-            
-            self.viewInput?.openCamera()
-        }.store(in: &subscriptions)
+        instance.cameraPublisher
+            .sink { [unowned self] in
+                guard !$0.isNil else { return }
+                
+                self.viewInput?.openCamera()
+            }
+            .store(in: &subscriptions)
         
-        instance.galleryPublisher.sink { [unowned self] in
-            guard !$0.isNil else { return }
-            
-            self.viewInput?.openGallery()
-        }.store(in: &subscriptions)
+        instance.galleryPublisher
+            .sink { [unowned self] in
+                guard !$0.isNil else { return }
+                
+                self.viewInput?.openGallery()
+            }
+            .store(in: &subscriptions)
         
-        instance.previewPublisher.sink { [weak self] in
-            guard let self = self,
-                  let image = $0,
-                  let controller = self.viewInput
-            else { return }
-            
-            let agrume = Agrume(images: [image], startIndex: 0, background: .colored(.black))
-            agrume.show(from: controller)
-            
-        }.store(in: &subscriptions)
+        instance.previewPublisher
+            .sink { [unowned self] in
+                guard let image = $0,
+                      let controller = self.viewInput
+                else { return }
+                
+                let agrume = Agrume(images: [image], startIndex: 0, background: .colored(.black))
+                agrume.show(from: controller)
+                
+            }
+            .store(in: &subscriptions)
         
-        instance.cityFetchPublisher.sink { [weak self] in
-            guard let self = self,
-                  let string = $0
-            else { return }
-            
-            self.viewInput?.onCitySearch(string)
-        }.store(in: &self.subscriptions)
-
-        instance.citySelectionPublisher.sink { [weak self] in
-            guard let self = self,
-                  let city = $0
-            else { return }
-            
-            self.viewInput?.updateCity(city)
-        }.store(in: &self.subscriptions)
+        instance.cityFetchPublisher
+            .sink { [unowned self] in
+                guard let string = $0 else { return }
+                
+                self.viewInput?.onCitySearch(string)
+            }
+            .store(in: &self.subscriptions)
         
-        instance.facebookPublisher.sink { [weak self] in
-            guard let self = self,
-                  let url = $0
-            else { return }
-            
-            self.viewInput?.updateFacebook(url)
-        }.store(in: &self.subscriptions)
+        instance.citySelectionPublisher
+            .sink { [unowned self] in
+                guard let city = $0 else { return }
+                
+                self.viewInput?.updateCity(city)
+            }
+            .store(in: &self.subscriptions)
         
-        instance.instagramPublisher.sink { [weak self] in
-            guard let self = self,
-                  let url = $0
-            else { return }
-            
-            self.viewInput?.updateInstagram(url)
-        }.store(in: &self.subscriptions)
+        instance.facebookPublisher
+            .sink { [unowned self] in
+                guard let url = $0 else { return }
+                
+                self.viewInput?.updateFacebook(url)
+            }
+            .store(in: &self.subscriptions)
         
-        instance.tiktokPublisher.sink { [weak self] in
-            guard let self = self,
-                  let url = $0
-            else { return }
-            
-            self.viewInput?.updateTiktok(url)
-        }.store(in: &self.subscriptions)
+        instance.instagramPublisher
+            .sink { [unowned self] in
+                guard let url = $0 else { return }
+                
+                self.viewInput?.updateInstagram(url)
+            }
+            .store(in: &self.subscriptions)
         
-        instance.openURLPublisher.sink { [weak self] in
-            guard let self = self,
-                  let url = $0
-            else { return }
-            
-            self.viewInput?.openURL(url)
-        }.store(in: &self.subscriptions)
+        instance.tiktokPublisher
+            .sink { [unowned self] in
+                guard let url = $0 else { return }
+                
+                self.viewInput?.updateTiktok(url)
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.openURLPublisher
+            .sink { [unowned self] in
+                guard let url = $0 else { return }
+                
+                self.viewInput?.openURL(url)
+            }
+            .store(in: &self.subscriptions)
         
         instance.interestPublisher
-            .sink { [weak self] in
-                guard let self = self,
-                      let topic = $0
-                else { return }
+            .sink { [unowned self] in
+                guard let topic = $0 else { return }
                 
                 self.viewInput?.onTopicSelected(topic)
             }
             .store(in: &subscriptions)
         
-        instance.myPublicationsPublisher
-            .sink { [weak self] in
-                guard let self = self,
-                      !$0.isNil
-                else { return }
+        instance.publicationsPublisher
+            .sink { [unowned self] in
+                guard !$0.isNil else { return }
                 
                 self.viewInput?.onPublicationsSelected()
+            }
+            .store(in: &subscriptions)
+        
+        instance.subscribersPublisher
+            .sink { [unowned self] in
+                guard !$0.isNil else { return }
+                
+                self.viewInput?.onSubscribersSelected()
+            }
+            .store(in: &subscriptions)
+        
+        instance.subscriptionsPublisher
+            .sink { [unowned self] in
+                guard !$0.isNil else { return }
+                
+                self.viewInput?.onSubscriptionsSelected()
             }
             .store(in: &subscriptions)
         

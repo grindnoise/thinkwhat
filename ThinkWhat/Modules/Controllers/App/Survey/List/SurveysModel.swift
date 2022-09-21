@@ -66,9 +66,7 @@ extension SurveysModel: SurveysControllerInput {
     }
     
     func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
-#if DEBUG
-        print("onDataSourceRequest")
-#endif
+
         Task {
             do {
                 try await API.shared.surveys.loadSurveyReferences(source, topic)

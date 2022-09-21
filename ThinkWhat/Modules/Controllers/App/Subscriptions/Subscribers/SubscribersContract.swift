@@ -11,11 +11,11 @@ import UIKit
 /// *View* sends user actions to the *Controller*.
 ///
 /// **Controller** conforms to this protocol
-protocol SubscribersViewInput: class {
+protocol SubscribersViewInput: AnyObject {
     
     var controllerOutput: SubscribersControllerOutput? { get set }
     var controllerInput: SubscribersControllerInput? { get set }
-    var userprofiles: [Userprofile] { get }
+    var userprofile: Userprofile { get }
     var mode: SubscribersController.Mode { get }
     // View input methods here
 }
@@ -23,10 +23,9 @@ protocol SubscribersViewInput: class {
 /// *Controller* tells the *Model* what to do based on the input
 ///
 /// **Model** conforms to this protocol
-protocol SubscribersControllerInput: class {
+protocol SubscribersControllerInput: AnyObject {
     
     var modelOutput: SubscribersModelOutput? { get set }
-    var userprofiles: [Userprofile] { get }
     
     func unsubscribe(_: [Userprofile])
     func loadSubscribers()
@@ -36,8 +35,8 @@ protocol SubscribersControllerInput: class {
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
-protocol SubscribersModelOutput: class {
-    var userprofiles: [Userprofile] { get }
+protocol SubscribersModelOutput: AnyObject {
+    var userprofile: Userprofile { get }
     var mode: SubscribersController.Mode { get }
     
     func onAPIError()
@@ -46,7 +45,7 @@ protocol SubscribersModelOutput: class {
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
-protocol SubscribersControllerOutput: class {
+protocol SubscribersControllerOutput: AnyObject {
     var viewInput: SubscribersViewInput? { get set }
     var unsubscribeList: [Userprofile] { get }
     

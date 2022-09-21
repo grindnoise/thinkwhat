@@ -46,8 +46,11 @@ class SurveysCollectionView: UICollectionView {
     public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var paginationPublisher = CurrentValueSubject<Survey.SurveyCategory?, Never>(nil)
     public var paginationByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
+    public var refreshPublisher = CurrentValueSubject<Survey.SurveyCategory?, Never>(nil)
+    public var refreshByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
     public var rowPublisher = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var updateStatsPublisher = CurrentValueSubject<[SurveyReference]?, Never>(nil)
+    public var testSubject = PassthroughSubject<String, Never>()
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -125,6 +128,16 @@ class SurveysCollectionView: UICollectionView {
     
     // MARK: - Private methods
     private func setupUI() {
+        
+//        let publisher = testSubject
+////          .collect(.byTimeOrCount(DispatchQueue.main, .seconds(2), 1))
+//            .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+//        
+//        publisher
+//            .sink {
+//                print($0)
+//            }
+//            .store(in: &subscriptions)
         
         delegate = self
         let layoutGuide = safeAreaLayoutGuide
@@ -442,13 +455,7 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         if dataItems.count < 10 {
             loadingIndicator.startAnimating()
             requestData()
-//            if category == .Topic {
-//                paginationByTopicPublisher.send(topic)
-//            } else {
-//                paginationPublisher.send(true)
-//            }
         } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
-//            paginationPublisher.send(true)
             requestData()
             loadingIndicator.startAnimating()
         }
@@ -456,8 +463,11 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     
     @objc
     private func refresh() {
-        requestData()
-//        paginationPublisher.send(true)
+        if category == .Topic {
+            refreshByTopicPublisher.send(topic)
+        } else {
+            refreshPublisher.send(category)
+        }
     }
     
     private func requestData() {

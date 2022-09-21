@@ -156,17 +156,22 @@ extension SubsciptionsController: SubsciptionsViewInput {
     }
     
     func onSubscribersTapped() {
+        
+        guard let userprofile = Userprofiles.shared.current,
+            userprofile.subscribersTotal != 0
+        else { return }
+        
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(SubscribersController(mode: .Subscribers), animated: true)
+        navigationController?.pushViewController(SubscribersController(mode: .Subscribers, userprofile: userprofile), animated: true)
     }
     
     func onSubscpitionsTapped() {
-        let backItem = UIBarButtonItem()
-            backItem.title = ""
-            navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(SubscribersController(mode: .Subscriptions), animated: true)
+//        let backItem = UIBarButtonItem()
+//            backItem.title = ""
+//            navigationItem.backBarButtonItem = backItem
+//        navigationController?.pushViewController(SubscribersController(mode: .Subscriptions), animated: true)
     }
 }
 

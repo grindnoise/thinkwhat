@@ -260,7 +260,12 @@ class Userprofile: Decodable {
     var subscriptionsTotal: Int = 0
     var lastVisit:          Date
     var wasEdited:          Bool?
-    var isBanned:           Bool
+    var isBanned:           Bool {
+        didSet {
+            guard isBanned else { return }
+            
+        }
+    }
     var balance:            Int = 0
     var hashValue: Int {
         return ObjectIdentifier(self).hashValue

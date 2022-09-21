@@ -32,7 +32,9 @@ class CurrentUserProfileCollectionView: UICollectionView {
     public let twitterPublisher = CurrentValueSubject<String?, Never>(nil)
     public let openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
     public let interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
-    public let myPublicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public let publicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public var subscribersPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -285,13 +287,35 @@ class CurrentUserProfileCollectionView: UICollectionView {
         let statsCellRegistration = UICollectionView.CellRegistration<CurrentUserStatsCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
             //Publications
-            cell.myPublicationsPublisher
+            cell.publicationsPublisher
                 .sink { [weak self] in
                     guard let self = self,
                           !$0.isNil
                     else { return }
 
-                    self.myPublicationsPublisher.send($0)
+                    self.publicationsPublisher.send($0)
+                }
+                .store(in: &subscriptions)
+            
+            //Subscribers
+            cell.subscribersPublisher
+                .sink { [weak self] in
+                    guard let self = self,
+                          !$0.isNil
+                    else { return }
+
+                    self.subscribersPublisher.send($0)
+                }
+                .store(in: &subscriptions)
+            
+            //Subscriptions
+            cell.subscriptionsPublisher
+                .sink { [weak self] in
+                    guard let self = self,
+                          !$0.isNil
+                    else { return }
+
+                    self.subscriptionsPublisher.send($0)
                 }
                 .store(in: &subscriptions)
             

@@ -29,6 +29,8 @@ protocol SettingsViewInput: AnyObject {
     func onCitySearch(_ : String)
     func onTopicSelected(_: Topic)
     func onPublicationsSelected()
+    func onSubscribersSelected()
+    func onSubscriptionsSelected()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -41,6 +43,7 @@ protocol SettingsControllerInput: AnyObject {
     func updateUserprofile(parameters: [String: Any], image: UIImage?)
     func fetchCity(_: String)
     func saveCity(_: City)
+//    func updateUserData()
 }
 
 /// *Model* returns the result to the *Controller*
