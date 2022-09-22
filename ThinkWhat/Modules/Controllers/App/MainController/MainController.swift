@@ -199,27 +199,20 @@ private extension MainController {
         do {
             let json = try await API.shared.appLaunch()
 //            API.shared.setWaitsForConnectivity()
-            UserDefaults.App.minAPIVersion = json["api_version"].double
-            ModelProperties.shared.importJson(json["field_properties"])
-            PriceList.shared.importJson(json["pricelist"])
-            if let balance = json[DjangoVariables.UserProfile.balance].int {
-                Userprofiles.shared.current!.balance = balance
-            }
+//            if let balance = json[DjangoVariables.UserProfile.balance].int {
+//                Userprofiles.shared.current!.balance = balance
+//            }
             await MainActor.run {
                 do {
-                    let topics          = try json["categories"].rawData()
-                    let claims          = try json["claim_categories"].rawData()
-//                    let subscribedFor   = try json["subscribed_for"].rawData()
-                    let surveys         = json["surveys"]
-//                    let topCategories   = json["top_preferences"]
-                    let userData   = json["user_data"]
-                    Topics.shared.load(topics)
-                    Claims.shared.load(claims)
+                    guard let appData = json["app_data"] as? JSON,
+                          let surveys = json["surveys"] as? JSON,
+                          let userData = json["user_data"] as? JSON
+                    else { throw AppError.server }
+                    
+                    try AppData.loadData(appData)
+                    try Userprofiles.loadUserData(userData)
                     Surveys.shared.load(surveys)
-                    Userprofiles.loadUserData(userData)
-//                    Userprofiles.shared.loadSubscribedFor(subscribedFor)
-//                    Userprofiles.shared.current?.updateTopCategories(topCategories)
-
+                    
                     UIView.animate(withDuration: 0.2, delay: 0.5, options: .curveEaseInOut) {
                         self.loadingIndicator?.alpha = 0
                     } completion: { _ in

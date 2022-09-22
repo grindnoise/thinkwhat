@@ -161,8 +161,8 @@ extension ListController: ListViewInput {
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
-    func onDataSourceRequest() {
-        controllerInput?.onDataSourceRequest()
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
+        controllerInput?.onDataSourceRequest(source: source, topic: topic)
     }
 }
 

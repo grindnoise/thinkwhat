@@ -130,6 +130,20 @@ private extension SettingsController {
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
     
+    func onWatchingSelected() {
+        guard let userprofile = Userprofiles.shared.current,
+            userprofile.favoritesTotal != 0
+        else { return }
+        
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        
+        navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(SurveysController(.Favorite), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    
     func onSubscriptionsSelected() {
         guard let userprofile = Userprofiles.shared.current,
             userprofile.subscriptionsTotal != 0
@@ -139,7 +153,7 @@ extension SettingsController: SettingsViewInput {
         backItem.title = ""
         
         navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(SubscribersController(mode: .Subscriptions, userprofile: userprofile), animated: true)
+        navigationController?.pushViewController(UserprofilesController(mode: .Subscriptions, userprofile: userprofile), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
@@ -153,7 +167,7 @@ extension SettingsController: SettingsViewInput {
         backItem.title = ""
         
         navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(SubscribersController(mode: .Subscribers, userprofile: userprofile), animated: true)
+        navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     

@@ -16,7 +16,8 @@ class Userprofiles {
     private init() {
         shouldImportUserDefaults = true
     }
-    var all: [Userprofile] = [] {
+    
+    open var all: [Userprofile] = [] {
         didSet {
             //Check for duplicates
             guard let lastInstance = all.last else { return }
@@ -25,36 +26,15 @@ class Userprofiles {
             }
         }
     }
-    var subscribedFor: [Userprofile] = [] {
-        didSet {
-            Notification.send(names: [Notifications.Userprofiles.SubscribedForUpdated])
-        }
-    }
-    var subscribers: [Userprofile] = [] {
-        didSet {
-            Notification.send(names: [Notifications.Userprofiles.SubscribersUpdated])
-        }
-    }
+
     var current: Userprofile? {
         didSet {
             guard shouldImportUserDefaults, !current.isNil else { return }
             UserDefaults.Profile.importData(from: current!)
         }
     }
-//    lazy var current: Userprofile {
-////        return shared.all.filter({ $0.id == UserDefaults.Profile.id && $0.name == "\(User)) \(String(describing: profile.lastName))" }).first ?? Userprofile(id: profile.id!,
-////                                                                                                                                                                                             name: "\(String(describing: profile.firstName)) \(String(describing: profile.lastName))",
-////                                                                                                                                                                                             age: profile.birthDate?.age ?? 0,
-////                                                                                                                                                                                             image: UIImage(contentsOfFile: profile.imagePath ?? ""),
-////                                                                                                                                                                                             gender: profile.gender ?? .Unassigned,
-////                                                                                                                                                                                             imageURL: profile.imageURL,
-////                                                                                                                                                                                             instagramURL: profile.instagramURL,
-////                                                                                                                                                                                             tiktokURL: profile.tiktokURL,
-////                                                                                                                                                                                             vkURL: profile.vkURL,
-////                                                                                                                                                                                             facebookURL: profile.facebookURL)
-//    }()
     
-    class func loadUserData(_ json: JSON) {
+    class func loadUserData(_ json: JSON) throws {
         guard let userprofile = Userprofiles.shared.current,
               let subscribersTotal = json["subscribers_count"].int,
               let subscriptionsTotal = json["subscribed_at_count"].int,
@@ -66,6 +46,7 @@ class Userprofiles {
               let isBanned = json["is_banned"].bool
         else { return }
         
+        
         userprofile.subscribersTotal = subscribersTotal
         userprofile.subscriptionsTotal = subscriptionsTotal
         userprofile.publicationsTotal = publicationsTotal
@@ -74,39 +55,55 @@ class Userprofiles {
         userprofile.balance = balance
         userprofile.isBanned = isBanned
         userprofile.updatePreferences(top_preferences)
-    }
-    
-    func loadSubscribedFor(_ data: Data) {
-        let decoder                                 = JSONDecoder()
-//        var notifications: [NSNotification.Name]    = []
-        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                   DateFormatter.dateTimeFormatter,
-                                                   DateFormatter.dateFormatter ]
+        
+        guard let subscriptionsData = try? json["subscriptions"].rawData(),
+              let subscribersData = try? json["subscribers"].rawData()
+        else { return }
+        
         do {
-            let instances = try decoder.decode([Userprofile].self, from: data)
-            for instance in instances {
-                if subscribedFor.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-                    subscribedFor.append(Userprofiles.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
-//                    notifications.append(Notifications.Userprofiles.SubscribedForUpdated)
-                }
-            }
-//            Notification.send(names: notifications.uniqued())
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                       DateFormatter.dateTimeFormatter,
+                                                       DateFormatter.dateFormatter ]
+            
+            userprofile.subscriptions = try decoder.decode([Userprofile].self, from: subscriptionsData)
+            userprofile.subscribers = try decoder.decode([Userprofile].self, from: subscribersData)
         } catch {
-            fatalError(error.localizedDescription)
+            throw AppError.server
         }
     }
     
-    public func addSubscriber(_ userprofile: Userprofile) {
-        if subscribers.filter({ $0.hashValue == userprofile.hashValue }).isEmpty {
-            subscribers.append(userprofile)
-        }
-    }
+    //    func loadSubscribedFor(_ data: Data) {
+    //        let decoder                                 = JSONDecoder()
+    ////        var notifications: [NSNotification.Name]    = []
+//        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+//                                                   DateFormatter.dateTimeFormatter,
+//                                                   DateFormatter.dateFormatter ]
+//        do {
+//            let instances = try decoder.decode([Userprofile].self, from: data)
+//            for instance in instances {
+//                if subscribedFor.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+//                    subscribedFor.append(Userprofiles.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance)
+////                    notifications.append(Notifications.Userprofiles.SubscribedForUpdated)
+//                }
+//            }
+////            Notification.send(names: notifications.uniqued())
+//        } catch {
+//            fatalError(error.localizedDescription)
+//        }
+//    }
+//
+//    public func addSubscriber(_ userprofile: Userprofile) {
+//        if subscribers.filter({ $0.hashValue == userprofile.hashValue }).isEmpty {
+//            subscribers.append(userprofile)
+//        }
+//    }
     
     public func eraseData() {
         current = nil
         all.removeAll()
-        subscribers.removeAll()
-        subscribedFor.removeAll()
+//        subscribers.removeAll()
+//        subscribedFor.removeAll()
     }
 }
 
@@ -169,8 +166,8 @@ class Userprofile: Decodable {
     var name: String {
         return "\(firstName) \(lastName)"
     }
-    var email:              String
-    var birthDate:          Date? {
+    var email: String
+    var birthDate: Date? {
         didSet {
             guard let birthDate = birthDate,
                   oldValue != birthDate,
@@ -183,7 +180,7 @@ class Userprofile: Decodable {
     var age: Int {
         return birthDate?.age ?? 18
     }
-    var gender:             Gender {
+    var gender: Gender {
         didSet {
             guard oldValue != gender,
                   isCurrent
@@ -192,8 +189,8 @@ class Userprofile: Decodable {
             NotificationCenter.default.post(name: Notifications.Userprofiles.GenderChanged, object: self)
         }
     }
-    var imageURL:           URL?
-    var facebookURL:        URL? {
+    var imageURL: URL?
+    var facebookURL: URL? {
         didSet {
             guard !facebookURL.isNil else {
                 if instagramURL.isNil && tiktokURL.isNil {
@@ -204,7 +201,7 @@ class Userprofile: Decodable {
             NotificationCenter.default.post(name: Notifications.Userprofiles.FacebookURL, object: self)
         }
     }
-    var instagramURL:       URL? {
+    var instagramURL: URL? {
         didSet {
             guard !instagramURL.isNil else {
                 if facebookURL.isNil && tiktokURL.isNil {
@@ -215,7 +212,7 @@ class Userprofile: Decodable {
             NotificationCenter.default.post(name: Notifications.Userprofiles.InstagramURL, object: self)
         }
     }
-    var tiktokURL:          URL? {
+    var tiktokURL: URL? {
         didSet {
             guard !tiktokURL.isNil else {
                 if instagramURL.isNil && facebookURL.isNil {
@@ -226,16 +223,16 @@ class Userprofile: Decodable {
             NotificationCenter.default.post(name: Notifications.Userprofiles.TikTokURL, object: self)
         }
     }
-    var vkURL:              URL?
-    var city:               City? {
+    var vkURL: URL?
+    var city: City? {
         didSet {
             if !city.isNil {
                 cityTitle = city!.localized ?? city!.name
             }
         }
     }
-    var cityTitle:          String = ""
-    var image:              UIImage? {
+    var cityTitle: String = ""
+    var image: UIImage? {
         didSet {
             guard let imageData = image?.jpeg else { return }
             do {
@@ -253,28 +250,80 @@ class Userprofile: Decodable {
             }
         }
     }
-    var completeTotal:      Int = 0
-    var favoritesTotal:     Int = 0
-    var publicationsTotal:  Int = 0
-    var subscribersTotal:   Int = 0
-    var subscriptionsTotal: Int = 0
-    var lastVisit:          Date
-    var wasEdited:          Bool?
-    var isBanned:           Bool {
+    var completeTotal: Int = 0 {
+        didSet {
+            guard oldValue != completeTotal else { return }
+            
+            NotificationCenter.default.post(name: Notifications.Userprofiles.CompleteTotal, object: self)
+        }
+    }
+    var favoritesTotal: Int = 0 {
+        didSet {
+            guard oldValue != favoritesTotal else { return }
+        
+            NotificationCenter.default.post(name: Notifications.Userprofiles.FavoritesTotal, object: self)
+        }
+    }
+    var publicationsTotal: Int = 0 {
+        didSet {
+            guard oldValue != publicationsTotal else { return }
+            
+            NotificationCenter.default.post(name: Notifications.Userprofiles.PublicationsTotal, object: self)
+        }
+    }
+    var subscribersTotal: Int = 0 {
+        didSet {
+            guard oldValue != subscribersTotal else { return }
+            
+            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersTotal, object: self)
+        }
+    }
+    var subscriptionsTotal: Int = 0 {
+        didSet {
+            guard oldValue != subscriptionsTotal else { return }
+            
+            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsTotal, object: self)
+        }
+    }
+    var lastVisit: Date
+    var wasEdited: Bool?
+    var isBanned: Bool {
         didSet {
             guard isBanned else { return }
             
         }
     }
-    var balance:            Int = 0
+    var balance: Int = 0 {
+        didSet {
+            guard oldValue != balance else { return }
+            
+            NotificationCenter.default.post(name: Notifications.Userprofiles.Balance, object: self)
+        }
+    }
     var hashValue: Int {
         return ObjectIdentifier(self).hashValue
     }
-    var surveys:      [SurveyReference]   = []
-    var favorites:    [Date: [SurveyReference]]   = [:]
-    var preferences: [[Topic: Int]]?// = [[:]]
+    var surveys: [SurveyReference]   = []
+    var subscriptions: [Userprofile] = [] {
+        didSet {
+            Notification.send(names: [Notifications.Userprofiles.SubscribedForUpdated])
+        }
+    }
+    var subscribers: [Userprofile] = [] {
+        didSet {
+            Notification.send(names: [Notifications.Userprofiles.SubscribersUpdated])
+        }
+    }
+    var favorites: [Date: [SurveyReference]]   = [:]
+    var preferences: [[Topic: Int]] = [[:]] {
+        didSet {
+            guard oldValue != preferences else { return }
+            
+            NotificationCenter.default.post(name: Notifications.Userprofiles.Preferences, object: self)
+        }
+    }
     var preferencesSorted: [[Topic: Int]]? {
-        return preferences?.sorted { (first, second) in
+        return preferences.sorted { (first, second) in
             first.first!.value > second.first!.value
         }
     }
@@ -402,7 +451,7 @@ class Userprofile: Decodable {
                 preferences = []
                 topics.forEach { dict in
                     if let topic = Topics.shared.all.filter({ $0.id == Int(dict.key) }).first {
-                        preferences!.append([topic: dict.value])
+                        preferences.append([topic: dict.value])
                     }
                 }
             }
@@ -460,7 +509,7 @@ class Userprofile: Decodable {
             guard let key = Int($0.key),
                   let topic = Topics.shared.all.filter({ $0.id == key }).first,
                   let value = Int($0.key) else { return }
-            preferences!.append([topic: value])
+            preferences.append([topic: value])
         }
     }
     

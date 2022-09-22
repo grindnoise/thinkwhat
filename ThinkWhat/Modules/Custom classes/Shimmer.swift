@@ -37,8 +37,15 @@ class Shimmer: UIView {
                 animation.repeatCount = 100//.greatestFiniteMagnitude
                 gradient.add(animation, forKey: "shimmering")
             } else {
-                gradient.removeAllAnimations()
-                gradient.removeFromSuperlayer()
+                gradient.add(Animations.get(property: .Opacity, fromValue: 1, toValue: 0, duration: 0.35, delegate: self, completionBlocks: [
+                    { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.gradient.removeAnimation(forKey: "shimmering")
+//                        self.gradient.removeFromSuperlayer()
+                    }
+                ]), forKey: nil)
+                gradient.opacity = 0
             }
         }
     }
@@ -77,5 +84,20 @@ class Shimmer: UIView {
         super.traitCollectionDidChange(previousTraitCollection)
         
         
+    }
+}
+
+extension Shimmer: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
+            completionBlocks.forEach{ $0() }
+        } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
+            completionBlocks.forEach{ $0() }
+        } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
+            initialLayer.path = path as! CGPath
+            if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
+                completionBlock()
+            }
+        }
     }
 }

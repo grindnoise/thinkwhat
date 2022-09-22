@@ -1049,7 +1049,7 @@ class SurveyCell: UICollectionViewListCell {
         if icon.category != .Hot {
             icon.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         }
-        progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         commentsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 //        commentsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray

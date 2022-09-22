@@ -12,7 +12,7 @@ import Combine
 class CurrentUserProfileCollectionView: UICollectionView {
     
     enum Section: Int, CaseIterable {
-        case Credentials, City, SocialMedia, Interests, Stats
+        case Credentials, City, Interests, SocialMedia, Stats
     }
     
     // MARK: - Public properties
@@ -35,6 +35,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
     public let publicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var subscribersPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public var watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -67,7 +68,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
     // MARK: - Private methods
     private func setupUI() {
         
-        delegate = self
+//        delegate = self
         
         collectionViewLayout = UICollectionViewCompositionalLayout{ section, environment -> NSCollectionLayoutSection in
             var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
@@ -319,6 +320,17 @@ class CurrentUserProfileCollectionView: UICollectionView {
                 }
                 .store(in: &subscriptions)
             
+            //Watching
+            cell.watchingPublisher
+                .sink { [weak self] in
+                    guard let self = self,
+                          !$0.isNil
+                    else { return }
+
+                    self.watchingPublisher.send($0)
+                }
+                .store(in: &subscriptions)
+            
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .clear
             cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
@@ -389,18 +401,18 @@ class CurrentUserProfileCollectionView: UICollectionView {
         }
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-        snapshot.appendSections([.Credentials, .City, .SocialMedia, .Interests, .Stats])
+        snapshot.appendSections([.Credentials, .City, .Interests, .SocialMedia, .Stats])
         snapshot.appendItems([0], toSection: .Credentials)
         snapshot.appendItems([1], toSection: .City)
-        snapshot.appendItems([2], toSection: .SocialMedia)
-        snapshot.appendItems([3], toSection: .Interests)
+        snapshot.appendItems([2], toSection: .Interests)
+        snapshot.appendItems([3], toSection: .SocialMedia)
         snapshot.appendItems([4], toSection: .Stats)
         source.apply(snapshot, animatingDifferences: false)
     }
 }
 
-extension CurrentUserProfileCollectionView: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(indexPath)
-    }
-}
+//extension CurrentUserProfileCollectionView: UICollectionViewDelegate {
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        print(indexPath)
+//    }
+//}

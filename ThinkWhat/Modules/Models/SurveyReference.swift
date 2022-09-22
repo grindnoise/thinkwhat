@@ -90,12 +90,20 @@ class SurveyReference: Decodable {// NSObject,
     var isFavorite: Bool {
         didSet {
             guard oldValue != isFavorite else { return }
+            
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: self)
+            NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: self)
+            
+            guard let userprofile = Userprofiles.shared.current else { return }
+            
             if isFavorite {
                 NotificationCenter.default.post(name: Notifications.Surveys.FavoriteAppend, object: self)
+                userprofile.favoritesTotal += 1
             } else {
                 NotificationCenter.default.post(name: Notifications.Surveys.FavoriteRemove, object: self)
+                userprofile.favoritesTotal -= 1
             }
+            
             guard let survey = survey else { return }
             survey.isFavorite = isFavorite
         }

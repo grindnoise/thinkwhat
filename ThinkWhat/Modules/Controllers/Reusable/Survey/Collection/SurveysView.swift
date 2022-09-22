@@ -22,6 +22,8 @@ class SurveysView: UIView {
                 collectionView.indicatorColor = .white
             case .Own:
                 collectionView.category = .Own
+            case .Favorite:
+                collectionView.category = .Favorite
             default:
 #if DEBUG
                 print("")
@@ -34,6 +36,7 @@ class SurveysView: UIView {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    //UI
     private lazy var collectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(delegate: self, topic: viewInput?.topic)
         

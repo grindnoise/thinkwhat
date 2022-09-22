@@ -819,6 +819,7 @@ class API {
         }
     }
     
+    @discardableResult
     func requestAsync(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, headers: HTTPHeaders? = nil, accessControl: Bool = true) async throws -> Data {
         
         func request() async throws -> Data {
@@ -1139,9 +1140,11 @@ class API {
             }
         }
         
-        public func subscribedFor() async throws {
+        public func getSubscriptions(for userprofile: Userprofile) async throws {
             guard let url = API_URLS.Profiles.subscribedFor else { throw APIError.invalidURL }
-            let parameters: Parameters = ["ids": Userprofiles.shared.subscribedFor.map{ return $0.id}]
+            //Exclude
+            let parameters: Parameters = ["ids": userprofile.subscriptions.map{ return $0.id}]
+            
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
                 let decoder = JSONDecoder()
@@ -1151,11 +1154,11 @@ class API {
                 let instances = try decoder.decode([Userprofile].self, from: data)
                 await MainActor.run {
                     instances.forEach { instance in
-                        if Userprofiles.shared.subscribedFor.filter({ $0 == instance }).isEmpty {
+                        if userprofile.subscriptions.filter({ $0 == instance }).isEmpty {
                             if let existing = Userprofiles.shared.all.filter({ $0 == instance }).first {
-                                Userprofiles.shared.subscribedFor.append(existing)
+                                userprofile.subscriptions.append(existing)
                             } else {
-                                Userprofiles.shared.subscribedFor.append(instance)
+                                userprofile.subscriptions.append(instance)
                             }
                         }
                     }
@@ -1168,9 +1171,11 @@ class API {
             }
         }
         
-        public func subscribers() async throws {
+        public func getSubscribers(for userprofile: Userprofile) async throws {
             guard let url = API_URLS.Profiles.subscribers else { throw APIError.invalidURL }
-            let parameters: Parameters = ["ids": Userprofiles.shared.subscribers.map{ return $0.id}]
+            //Exclude
+            let parameters: Parameters = ["ids": userprofile.subscribers.map{ return $0.id}]
+            
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
                 let decoder = JSONDecoder()
@@ -1180,11 +1185,11 @@ class API {
                 let instances = try decoder.decode([Userprofile].self, from: data)
                 await MainActor.run {
                     instances.forEach { instance in
-                        if Userprofiles.shared.subscribers.filter({ $0 == instance }).isEmpty {
+                        if userprofile.subscribers.filter({ $0 == instance }).isEmpty {
                             if let existing = Userprofiles.shared.all.filter({ $0 == instance }).first {
-                                Userprofiles.shared.subscribers.append(existing)
+                                userprofile.subscribers.append(existing)
                             } else {
-                                Userprofiles.shared.subscribers.append(instance)
+                                userprofile.subscribers.append(instance)
                             }
                         }
                     }
@@ -1197,36 +1202,44 @@ class API {
             }
         }
         
-        public func subscribe(_ userprofile: Userprofile) async throws {
-            guard let url = API_URLS.Profiles.subscribe else { throw APIError.invalidURL }
-            let parameters: Parameters = ["userprofile_id": userprofile.id]
+        public func subscribe(_ subscribeFor: Userprofile) async throws {
+            guard let url = API_URLS.Profiles.subscribe,
+                  let userprofile = Userprofiles.shared.current
+            else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["userprofile_id": subscribeFor.id]
+            
             do {
                 let _ = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default, headers: parent.headers())
                 await MainActor.run {
-                    Userprofiles.shared.subscribedFor.append(userprofile)
+                    userprofile.subscriptions.append(subscribeFor)
                 }
             } catch let error {
-    #if DEBUG
-                print(error)
-    #endif
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
                 throw error
             }
         }
         
-        public func unsubscribe(_ userprofiles: [Userprofile]) async throws {
-            guard let url = API_URLS.Profiles.unsubscribe else { throw APIError.invalidURL }
-            let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
+        public func unsubscribe(_ unsubscribeFrom: [Userprofile]) async throws {
+            guard let url = API_URLS.Profiles.unsubscribe,
+                  let userprofile = Userprofiles.shared.current
+            else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["ids": unsubscribeFrom.map{$0.id}]
+            
             do {
-                let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
                 await MainActor.run {
-                    userprofiles.forEach {
-                        Userprofiles.shared.subscribedFor.remove(object: $0)
+                    unsubscribeFrom.forEach {
+                        userprofile.subscribers.remove(object: $0)
                     }
                 }
             } catch let error {
-    #if DEBUG
-                print(error)
-    #endif
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
                 throw error
             }
         }
@@ -1239,7 +1252,7 @@ class API {
                 
                 let json = try JSON(data: data, options: .mutableContainers)
             
-                Userprofiles.loadUserData(json)
+                try Userprofiles.loadUserData(json)
             } catch {
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)

@@ -185,6 +185,8 @@ private extension SurveysController {
             title = topic.title
         case .Own:
             title = "my_publications".localized
+        case .Favorite:
+            title = "watching".localized
         default:
 #if DEBUG
             print("")
@@ -199,10 +201,10 @@ private extension SurveysController {
     
     @objc
     private func handleTap() {
-        print("Tap")
+        fatalError()
     }
     
-    private func setNavigationBarAppearance(largeTitleColor: UIColor, smallTitleColor: UIColor) {
+    func setNavigationBarAppearance(largeTitleColor: UIColor, smallTitleColor: UIColor) {
         guard let navigationBar = navigationController?.navigationBar else { return }
         
         let appearance = UINavigationBarAppearance()

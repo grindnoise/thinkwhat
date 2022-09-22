@@ -68,9 +68,10 @@ class SurveysCollectionView: UICollectionView {
     
     private var loadingInProgress = false
     private lazy var loadingIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .medium)
+        let indicator = UIActivityIndicatorView(style: .large)
         indicator.translatesAutoresizingMaskIntoConstraints = false
         indicator.hidesWhenStopped = true
+        indicator.color = .label
         
         return indicator
     }()
@@ -149,6 +150,10 @@ class SurveysCollectionView: UICollectionView {
         ])
         
         refreshControl = UIRefreshControl()
+        refreshControl?.attributedTitle = NSAttributedString(string: "updating_data".localized, attributes: [
+            .foregroundColor: category == .Topic ?  .white : UIColor.label,
+            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
+        ])
         refreshControl?.tintColor = !indicatorColor.isNil ? indicatorColor : traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
         refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
         

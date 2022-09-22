@@ -102,8 +102,8 @@ extension SubscribersView: SubscribersControllerOutput {
         case .success(let instances):
             instances.enumerated().forEach { (index, instance) in
                 ///Add voter for an answer
-                Userprofiles.shared.addSubscriber(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
-                self.collectionView.insertItems(at: [IndexPath(row: Userprofiles.shared.subscribers.count - 1, section: 0)])
+//                Userprofiles.shared.addSubscriber(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
+//                self.collectionView.insertItems(at: [IndexPath(row: Userprofiles.shared.subscribers.count - 1, section: 0)])
             }
         case .failure:
             showBanner(callbackDelegate: nil,

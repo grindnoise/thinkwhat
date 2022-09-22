@@ -312,6 +312,7 @@ class Avatar: UIView {
     public let galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
+    public let tapPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -570,9 +571,14 @@ class Avatar: UIView {
     
     @objc
     private func handleTap() {
-        guard !isUploading, let image = imageView.image else { return }
-        
-        previewPublisher.send(image)
+        switch mode {
+        case .Editing:
+            guard !isUploading, let image = imageView.image else { return }
+            
+            previewPublisher.send(image)
+        default:
+            tapPublisher.send(userprofile)
+        }
     }
     
     // MARK: - Public methods

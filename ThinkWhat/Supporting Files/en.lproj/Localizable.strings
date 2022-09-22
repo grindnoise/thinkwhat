@@ -149,7 +149,7 @@
 "own" = "Own";
 "top" = "Popular";
 "new" = "New";
-"watching" = "Watching";
+"watching" = "Watchlist";
 
 //Topics VC
 "topics" = "Topics";
@@ -304,3 +304,6 @@
 //Tutorials
 "poll_vote_edu_1" = "The poll will end and disappear from the lists after the required number of participants has been reached.";
 "poll_vote_edu_2" = "Add a poll to your watch list to see the result of the vote";
+
+//Collection
+"updating_data" = "Updating...";

@@ -170,6 +170,14 @@ class SettingsView: UIView {
             }
             .store(in: &subscriptions)
         
+        instance.watchingPublisher
+            .sink { [unowned self] in
+                guard !$0.isNil else { return }
+                
+                self.viewInput?.onWatchingSelected()
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     

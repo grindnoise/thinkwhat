@@ -18,7 +18,7 @@ extension SubscribersModel: SubscribersControllerInput {
     func loadSubscriptions() {
         Task {
             do {
-                try await API.shared.profiles.subscribedFor()
+                try await API.shared.profiles.getSubscriptions(for: Userprofiles.shared.current!)
             } catch {
 #if DEBUG
                     print(error)
@@ -33,7 +33,7 @@ extension SubscribersModel: SubscribersControllerInput {
     func loadSubscribers() {
         Task {
             do {
-                try await API.shared.profiles.subscribers()
+                try await API.shared.profiles.getSubscribers(for: Userprofiles.shared.current!)
             } catch {
 #if DEBUG
                     print(error)
@@ -61,6 +61,6 @@ extension SubscribersModel: SubscribersControllerInput {
     }
     
     var userprofiles: [Userprofile] {
-        return modelOutput?.mode == .Subscriptions ? Userprofiles.shared.subscribedFor : Userprofiles.shared.subscribers
+        return []//modelOutput?.mode == .Subscriptions ? Userprofiles.shared.subscribedFor : Userprofiles.shared.subscribers
     }
 }

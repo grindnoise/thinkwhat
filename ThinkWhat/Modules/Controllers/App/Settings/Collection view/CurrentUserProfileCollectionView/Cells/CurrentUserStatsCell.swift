@@ -14,7 +14,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {
         didSet {
-            guard let userprofile = userprofile else { return }
+            guard !userprofile.isNil else { return }
             
             setText()
             setColors()
@@ -24,6 +24,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     public var publicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var subscribersPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public var watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -62,7 +63,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        instance.text = "234"
+        instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
         instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
@@ -109,7 +110,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var completeCount: UILabel = {
         let instance = UILabel()
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        instance.text = "234"
+        instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
         
@@ -160,7 +161,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        instance.text = "234"
+        instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
         instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
@@ -206,7 +207,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        instance.text = "234"
+        instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
         instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
@@ -237,6 +238,54 @@ class CurrentUserStatsCell: UICollectionViewListCell {
         return instance
     }()
     
+    //Watching
+    private lazy var watchingTitle: UILabel = {
+        let instance = UILabel()
+        instance.isUserInteractionEnabled = true
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.text = "watching".localized.capitalized
+        instance.textAlignment = .left
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
+        
+        return instance
+    }()
+    
+    private lazy var watchingCount: UILabel = {
+        let instance = UILabel()
+        instance.isUserInteractionEnabled = true
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.text = "0"
+        instance.textAlignment = .right
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
+        
+        return instance
+    }()
+    
+    private lazy var watchingButton: UIButton = {
+        let instance = UIButton()
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+        instance.imageView?.contentMode = .center
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.setImage(UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5)), for: .normal)
+            }
+            .store(in: &subscriptions)
+        instance.addTarget(self, action: #selector(self.handleButtonTap(_:)), for: .touchUpInside)
+        
+        return instance
+    }()
+    
+    private lazy var watchingView: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [watchingTitle, watchingCount, watchingButton])
+        instance.axis = .horizontal
+        instance.spacing = 0
+        
+        return instance
+    }()
+    
     //My subscriptions
     private lazy var subscriptionsTitle: UILabel = {
         let instance = UILabel()
@@ -254,7 +303,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        instance.text = "234"
+        instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
         instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
@@ -290,12 +339,13 @@ class CurrentUserStatsCell: UICollectionViewListCell {
             balanceView,
             publicationsView,
             completeView,
+            watchingView,
             subscribersView,
             subscriptionsView,
         ])
         
         instance.axis = .vertical
-        instance.spacing = 8
+        instance.spacing = 10
         instance.distribution = .fillEqually
         
         return instance
@@ -342,6 +392,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
         publicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
         subscribersPublisher = CurrentValueSubject<Bool?, Never>(nil)
         subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
+        watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
     }
 }
 
@@ -349,19 +400,76 @@ private extension CurrentUserStatsCell {
     
     func setTasks() {
         //Balance
-//        tasks.append( Task {@MainActor [weak self] in
-//            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.FacebookURL) {
-//                guard let self = self,
-//                      let userprofile = notification.object as? Userprofile,
-//                      userprofile.isCurrent
-//                else { return }
-//
-//                self.isBadgeEnabled = false
-//            }
-//        })
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.Balance) {
+                guard let self = self,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.setText()
+            }
+        })
+        
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.PublicationsTotal) {
+                guard let self = self,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.setText()
+            }
+        })
+        
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.CompleteTotal) {
+                guard let self = self,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.setText()
+            }
+        })
+        
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersTotal) {
+                guard let self = self,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.setText()
+            }
+        })
+        
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.FavoritesTotal) {
+                guard let self = self,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.setText()
+            }
+        })
+        
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsTotal) {
+                guard let self = self,
+                      let userprofile = notification.object as? Userprofile,
+                      userprofile.isCurrent
+                else { return }
+                
+                self.setText()
+            }
+        })
     }
     
     func setColors() {
+        guard let userprofile = userprofile else { return }
+        
         balanceTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         balanceCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         balanceButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
@@ -380,6 +488,10 @@ private extension CurrentUserStatsCell {
         subscriptionsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         subscriptionsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         subscriptionsButton.tintColor = userprofile.subscriptionsTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        
+        watchingTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        watchingCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        watchingButton.tintColor = userprofile.favoritesTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
     func setupUI() {
@@ -412,6 +524,7 @@ private extension CurrentUserStatsCell {
         publicationsCount.text = String(describing: userprofile.publicationsTotal)
         subscribersCount.text = String(describing: userprofile.subscribersTotal)
         subscriptionsCount.text = String(describing: userprofile.subscriptionsTotal)
+        watchingCount.text = String(describing: userprofile.favoritesTotal)
     }
     
     @objc
@@ -441,6 +554,8 @@ private extension CurrentUserStatsCell {
             subscriptionsPublisher.send(true)
         } else if sender === balanceView {
             print("balanceView")
+        } else if sender === watchingView {
+            watchingPublisher.send(true)
         }
     }
 }

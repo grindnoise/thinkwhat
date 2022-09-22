@@ -11,14 +11,14 @@ import UIKit
 /// *View* sends user actions to the *Controller*.
 ///
 /// **Controller** conforms to this protocol
-protocol ListViewInput: class {
+protocol ListViewInput: AnyObject {
     
     var controllerOutput: ListControllerOutput? { get set }
     var controllerInput: ListControllerInput? { get set }
     var surveyCategory: Survey.SurveyCategory { get }
     
     func onSurveyTapped(_: SurveyReference)
-    func onDataSourceRequest()
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(_: SurveyReference)
     func share(_: SurveyReference)
@@ -28,11 +28,11 @@ protocol ListViewInput: class {
 /// *Controller* tells the *Model* what to do based on the input
 ///
 /// **Model** conforms to this protocol
-protocol ListControllerInput: class {
+protocol ListControllerInput: AnyObject {
     
     var modelOutput: ListModelOutput? { get set }
     
-    func onDataSourceRequest()
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(surveyReference: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
@@ -41,7 +41,7 @@ protocol ListControllerInput: class {
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
-protocol ListModelOutput: class {
+protocol ListModelOutput: AnyObject {
     // Model output methods here
     var surveyCategory: Survey.SurveyCategory { get }
     
@@ -52,7 +52,7 @@ protocol ListModelOutput: class {
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
-protocol ListControllerOutput: class {
+protocol ListControllerOutput: AnyObject {
     var viewInput: ListViewInput? { get set }
     
     func onDidLayout()

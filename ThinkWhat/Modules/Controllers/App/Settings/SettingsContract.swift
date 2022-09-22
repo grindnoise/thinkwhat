@@ -31,6 +31,7 @@ protocol SettingsViewInput: AnyObject {
     func onPublicationsSelected()
     func onSubscribersSelected()
     func onSubscriptionsSelected()
+    func onWatchingSelected()
 }
 
 /// *Controller* tells the *Model* what to do based on the input

@@ -40,6 +40,6 @@ extension SubsciptionsModel: SubsciptionsControllerInput {
     }
     
     var userprofiles: [Userprofile] {
-        return Array(Userprofiles.shared.subscribedFor.prefix(upTo: min(Userprofiles.shared.subscribedFor.count, 10)))
+        return []//Array(Userprofiles.shared.subscribedFor.prefix(upTo: min(Userprofiles.shared.subscribedFor.count, 10)))
     }
 }
