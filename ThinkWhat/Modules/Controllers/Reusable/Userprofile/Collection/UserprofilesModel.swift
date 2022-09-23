@@ -15,5 +15,23 @@ class UserprofilesModel {
 
 // MARK: - Controller Input
 extension UserprofilesModel: UserprofilesControllerInput {
-    // Implement methods
+    
+    func loadUsers(for userprofile: Userprofile, mode: UserprofilesController.Mode) {
+        Task {
+            do {
+                switch mode {
+                case .Subscribers:
+                    try await API.shared.profiles.getSubscribers(for: userprofile)
+                case .Subscriptions:
+                    try await API.shared.profiles.getSubscriptions(for: userprofile)
+                case .Voters:
+                    print("")
+                }
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
 }

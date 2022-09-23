@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 /// *View* sends user actions to the *Controller*.
 ///
@@ -19,6 +20,7 @@ protocol UserprofilesViewInput: AnyObject {
     var userprofile: Userprofile? { get }
     
     func onUserprofileTap(_: Userprofile)
+    func loadUsers(for: Userprofile, mode: UserprofilesController.Mode)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -28,7 +30,7 @@ protocol UserprofilesControllerInput: AnyObject {
     
     var modelOutput: UserprofilesModelOutput? { get set }
     
-    // Controller input methods here
+    func loadUsers(for: Userprofile, mode: UserprofilesController.Mode)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -43,6 +45,6 @@ protocol UserprofilesModelOutput: AnyObject {
 /// **View** conforms to this protocol
 protocol UserprofilesControllerOutput: AnyObject {
     var viewInput: UserprofilesViewInput? { get set }
-    
+    var gridItemSizePublisher: CurrentValueSubject<UserprofilesController.GridItemSize?, Never> { get }
     // Controller output methods here
 }

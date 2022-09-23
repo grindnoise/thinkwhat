@@ -15,6 +15,12 @@ class UserprofilesController: UIViewController {
         case Subscribers, Subscriptions, Voters
     }
     
+    enum GridItemSize: CGFloat {
+        case half = 0.5
+        case third = 0.33333
+        case quarter = 0.25
+    }
+    
     // MARK: - Overridden properties
     
     
@@ -22,6 +28,7 @@ class UserprofilesController: UIViewController {
     // MARK: - Public properties
     var controllerOutput: UserprofilesControllerOutput?
     var controllerInput: UserprofilesControllerInput?
+    
     //Logic
     public private(set) var mode: Mode
     public private(set) var userprofile: Userprofile?
@@ -34,7 +41,17 @@ class UserprofilesController: UIViewController {
     
     //UI
     private let color: UIColor
-    
+    private var gridItemSize: UserprofilesController.GridItemSize = .third {
+        didSet {
+            guard oldValue != gridItemSize else { return }
+            
+            self.controllerOutput?.gridItemSizePublisher.send(gridItemSize)
+            
+            guard let button = navigationItem.rightBarButtonItem else { return }
+            
+            button.menu = prepareMenu()
+        }
+    }
     
     // MARK: - Deinitialization
     deinit {
@@ -143,8 +160,75 @@ private extension UserprofilesController {
         }
     }
     
+    func prepareMenu() -> UIMenu {
+        let filter: UIAction = .init(title: "filter".localized.capitalized,
+                                     image: UIImage(systemName: "slider.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                     identifier: nil,
+                                     discoverabilityTitle: nil,
+                                     attributes: .init(),
+                                     state: .off,
+                                     handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.filter()
+        })
+        
+        let half: UIAction = .init(title: "half".localized.capitalized,
+                                     image: UIImage(systemName: "circle.grid.2x2.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                     identifier: nil,
+                                     discoverabilityTitle: nil,
+                                     attributes: .init(),
+                                     state: gridItemSize == .half ? .on : .off,
+                                     handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.gridItemSize = .half
+//            self.controllerOutput?.gridItemSizePublisher.send(.half)
+        })
+        
+        let third: UIAction = .init(title: "third".localized.capitalized,
+                                     image: UIImage(systemName: "circle.grid.3x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                     identifier: nil,
+                                     discoverabilityTitle: nil,
+                                     attributes: .init(),
+                                     state: gridItemSize == .third ? .on : .off,
+                                     handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.gridItemSize = .third
+//            self.controllerOutput?.gridItemSizePublisher.send(.third)
+        })
+        
+//            let quarter: UIAction = .init(title: "filter".localized.capitalized,
+//                                         image: UIImage(systemName: "slider.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+//                                         identifier: nil,
+//                                         discoverabilityTitle: nil,
+//                                         attributes: .init(),
+//                                         state: .off,
+//                                         handler: { [weak self] _ in
+//                guard let self = self else { return }
+//
+//                self.filter()
+//            })
+        
+        let inlineMenu = UIMenu(title: "appearance".localized,
+                                image: UIImage(systemName: gridItemSize == .third ? "circle.grid.3x3.fill" : "circle.grid.2x2.fill",
+                                               withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                identifier: nil,
+                                options: .init(),
+                                children: [half, third])
+        
+        return UIMenu(title: "", children: [filter, inlineMenu])
+    }
+    
     func setRightBarButton() {
-        let button = UIBarButtonItem(image: UIImage(systemName: "slider.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(self.handleTap))
+        
+//        let button = UIBarButtonItem(image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(self.handleTap), m)
+        
+        let button = UIBarButtonItem(title: "actions".localized.capitalized,
+                        image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                        primaryAction: nil,
+                        menu: prepareMenu())
         
         navigationItem.setRightBarButton(button, animated: true)
     }
@@ -161,11 +245,20 @@ private extension UserprofilesController {
     
     @objc
     func handleTap() {
-        fatalError()
+//        fatalError()
+    }
+    
+    func filter() {
+        
     }
 }
 
 extension UserprofilesController: UserprofilesViewInput {
+    
+    func loadUsers(for userprofile: Userprofile, mode: UserprofilesController.Mode) {
+        controllerInput?.loadUsers(for: userprofile, mode: mode)
+    }
+    
     func onUserprofileTap(_ userprofile: Userprofile) {
         let backItem = UIBarButtonItem()
         backItem.title = ""

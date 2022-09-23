@@ -1151,8 +1151,15 @@ class API {
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
                                                            DateFormatter.dateTimeFormatter,
                                                            DateFormatter.dateFormatter ]
+                
                 let instances = try decoder.decode([Userprofile].self, from: data)
+                
                 await MainActor.run {
+                    guard !instances.isEmpty else {
+                        NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsEmpty, object: userprofile)
+                        return
+                    }
+                    
                     instances.forEach { instance in
                         if userprofile.subscriptions.filter({ $0 == instance }).isEmpty {
                             if let existing = Userprofiles.shared.all.filter({ $0 == instance }).first {
@@ -1182,8 +1189,15 @@ class API {
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
                                                            DateFormatter.dateTimeFormatter,
                                                            DateFormatter.dateFormatter ]
+                
                 let instances = try decoder.decode([Userprofile].self, from: data)
+                
                 await MainActor.run {
+                    guard !instances.isEmpty else {
+                        NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersEmpty, object: userprofile)
+                        return
+                    }
+                    
                     instances.forEach { instance in
                         if userprofile.subscribers.filter({ $0 == instance }).isEmpty {
                             if let existing = Userprofiles.shared.all.filter({ $0 == instance }).first {

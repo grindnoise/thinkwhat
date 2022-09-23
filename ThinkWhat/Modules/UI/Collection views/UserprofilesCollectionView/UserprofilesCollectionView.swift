@@ -15,13 +15,8 @@ class UserprofilesCollectionView: UICollectionView {
         case Main
     }
     
-    enum GridItemSize: CGFloat {
-        case half = 0.5
-        case third = 0.33333
-        case quarter = 0.25
-    }
-    
     typealias Source = UICollectionViewDiffableDataSource<Section, Userprofile>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Userprofile>
     
     
     
@@ -42,6 +37,9 @@ class UserprofilesCollectionView: UICollectionView {
     
     //Publishers
     public let userPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public let refreshPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public let gridItemSizePublisher = PassthroughSubject<UserprofilesController.GridItemSize?, Never>()
+    
     
     
     // MARK: - Private properties
@@ -50,11 +48,21 @@ class UserprofilesCollectionView: UICollectionView {
     private var tasks: [Task<Void, Never>?] = []
     
     //UI
-    private var gridItemSize: GridItemSize = .third {
+    private var gridItemSize: UserprofilesController.GridItemSize = .third {
         didSet {
+            guard oldValue != gridItemSize else { return }
+            
             setCollectionViewLayout(createLayout(), animated: true)
         }
     }
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.hidesWhenStopped = true
+        indicator.color = .label
+        
+        return indicator
+    }()
     
     //Collection view
     private var source: Source!
@@ -111,7 +119,10 @@ class UserprofilesCollectionView: UICollectionView {
     
     
     // MARK: - Public methods
-    
+    @MainActor @objc
+    public func endRefreshing() {
+        refreshControl?.endRefreshing()
+    }
     
     
     // MARK: - Overridden methods
@@ -123,6 +134,7 @@ class UserprofilesCollectionView: UICollectionView {
 
 private extension UserprofilesCollectionView {
     
+    @MainActor
     func createLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(gridItemSize.rawValue),
                                               heightDimension: .fractionalHeight(1.0))
@@ -140,7 +152,34 @@ private extension UserprofilesCollectionView {
         return layout
     }
     
+    @MainActor
     func setupUI() {
+        
+        gridItemSizePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let size = $0
+                else { return }
+                
+                self.gridItemSize = size
+            }
+            .store(in: &subscriptions)
+        
+        refreshControl = UIRefreshControl()
+        refreshControl?.attributedTitle = NSAttributedString(string: "updating_data".localized, attributes: [
+            .foregroundColor: UIColor.secondaryLabel,
+            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
+        ])
+        refreshControl?.tintColor = .secondaryLabel
+        refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
+        
+        addSubview(loadingIndicator)
+        
+        NSLayoutConstraint.activate([
+            safeAreaLayoutGuide.centerXAnchor.constraint(equalTo: loadingIndicator.centerXAnchor),
+            safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 10)
+        ])
+        
         collectionViewLayout = createLayout()
         
         let cellRegistration = UICollectionView.CellRegistration<UserprofileCell, Userprofile> { [unowned self] cell, indexPath, userprofile in
@@ -165,14 +204,64 @@ private extension UserprofilesCollectionView {
     }
     
     func setTasks() {
+        //Subscriber append
         tasks.append( Task {@MainActor [weak self] in
-            for await _ in NotificationCenter.default.notifications(for: UIApplication.keyboardDidShowNotification) {
-                guard let self = self else { return }
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersAppend) {
+                guard let self = self,
+                      self.mode == .Subscribers,
+                      let dict = notification.object as? [Userprofile: Userprofile],
+                      let owner = dict.keys.first,
+                      owner == self.userprofile,
+                      let subscriber = dict.values.first,
+                      let source = self.source.snapshot() as? Snapshot,
+                      !source.itemIdentifiers.contains(subscriber)
+                else { return }
                 
+                self.appendToDataSource(item: subscriber)
+            }
+        })
+        //Subscriber remove
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersRemove) {
+                guard let self = self,
+                      self.mode == .Subscribers,
+                      let dict = notification.object as? [Userprofile: Userprofile],
+                      let owner = dict.keys.first,
+                      owner == self.userprofile,
+                      let subscriber = dict.values.first,
+                      let source = self.source.snapshot() as? Snapshot,
+                      source.itemIdentifiers.contains(subscriber)
+                else { return }
+                
+                self.removeFromDataSource(item: subscriber)
+            }
+        })
+        //End refreshing
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersEmpty) {
+                guard let self = self,
+                      self.mode == .Subscribers,
+                      let instance = notification.object as? Userprofile,
+                      instance == self.userprofile
+                else { return }
+                
+                self.endRefreshing()
+            }
+        })
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsEmpty) {
+                guard let self = self,
+                      self.mode == .Subscriptions,
+                      let instance = notification.object as? Userprofile,
+                      instance == self.userprofile
+                else { return }
+                
+                self.endRefreshing()
             }
         })
     }
     
+    @MainActor
     func reloadDataSource(animated: Bool = true) {
         guard !source.isNil else { return }
         
@@ -180,5 +269,28 @@ private extension UserprofilesCollectionView {
         snapshot.appendSections([.Main])
         snapshot.appendItems(dataItems)
         source.apply(snapshot, animatingDifferences: animated)
+    }
+    
+    @MainActor
+    func appendToDataSource(item: Userprofile, animated: Bool = true) {
+        guard !source.isNil else { return }
+        
+        var snapshot = source.snapshot()
+        snapshot.appendItems([item])
+        source.apply(snapshot, animatingDifferences: animated)
+    }
+    
+    @MainActor
+    func removeFromDataSource(item: Userprofile, animated: Bool = true) {
+        guard !source.isNil else { return }
+        
+        var snapshot = source.snapshot()
+        snapshot.deleteItems([item])
+        source.apply(snapshot, animatingDifferences: animated)
+    }
+    
+    @MainActor @objc
+    func refresh() {
+        refreshPublisher.send(true)
     }
 }

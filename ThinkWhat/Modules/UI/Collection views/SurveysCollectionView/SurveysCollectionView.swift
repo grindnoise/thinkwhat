@@ -19,11 +19,13 @@ class SurveysCollectionView: UICollectionView {
         didSet {
             guard !topic.isNil else { return }
             category = .Topic
-//            setDataSource()
         }
     }
     public var category: Survey.SurveyCategory {
         didSet {
+            defer {
+                setColors()
+            }
 //            guard oldValue != category else { return }
             setDataSource(animatingDifferences: (category == .Topic || category == .Search) ? false : true)
             guard !dataItems.isEmpty else { return }
@@ -35,11 +37,10 @@ class SurveysCollectionView: UICollectionView {
             setDataSource()
         }
     }
-    public var indicatorColor: UIColor? {
-        didSet {
-            refreshControl?.tintColor = !indicatorColor.isNil ? indicatorColor : traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
-        }
+    public var refreshColor: UIColor {
+        return category == .Topic ? .white : traitCollection.userInterfaceStyle == .dark ? .white : .secondaryLabel
     }
+    
     //Publishers
     public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
@@ -68,10 +69,10 @@ class SurveysCollectionView: UICollectionView {
     
     private var loadingInProgress = false
     private lazy var loadingIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .large)
+        let indicator = UIActivityIndicatorView(style: .medium)
         indicator.translatesAutoresizingMaskIntoConstraints = false
         indicator.hidesWhenStopped = true
-        indicator.color = .label
+        indicator.color = .secondaryLabel
         
         return indicator
     }()
@@ -127,34 +128,160 @@ class SurveysCollectionView: UICollectionView {
         setTasks()
     }
     
-    // MARK: - Private methods
-    private func setupUI() {
+    
+    
+    // MARK: - Public methods
+    @MainActor @objc
+    public func endRefreshing() {
+        refreshControl?.endRefreshing()
+    }
+    
+    @MainActor @objc
+    public func beginSearchRefreshing() {
+        searchSpinner.startAnimating()
         
-//        let publisher = testSubject
-////          .collect(.byTimeOrCount(DispatchQueue.main, .seconds(2), 1))
-//            .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
-//        
-//        publisher
-//            .sink {
-//                print($0)
-//            }
-//            .store(in: &subscriptions)
+        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0) {
+            self.searchSpinner.alpha = 1
+        }
+    }
+    
+    @MainActor @objc
+    public func endSearchRefreshing() {
+        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
+            self.searchSpinner.alpha = 1
+        } completion: { _ in self.searchSpinner.stopAnimating() }
+    }
+    
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+//            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
+//            layoutConfig.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.5)//self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+//            layoutConfig.showsSeparators = false//true
+//
+//            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+//            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+//            sectionLayout.interGroupSpacing = 16
+//            return sectionLayout
+//        }
+        refreshControl?.tintColor = refreshColor
+        searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    }
+}
+
+extension SurveysCollectionView: UICollectionViewDelegate {
+    
+    func deselect() {
+        guard let indexPath = indexPathsForSelectedItems?.first else { return }
+        deselectItem(at: indexPath, animated: false)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell {
+            rowPublisher.send(cell.item)
+        }
+        deselect()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        cell.setNeedsLayout()
+        cell.layoutIfNeeded()
         
+        if dataItems.count < 10 {
+            requestData()
+            
+            guard !loadingIndicator.isAnimating else { return }
+            
+            loadingIndicator.startAnimating()
+        } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
+            requestData()
+            
+            guard !loadingIndicator.isAnimating else { return }
+            
+            loadingIndicator.startAnimating()
+        }
+    }
+    
+    @objc
+    private func refresh() {
+        if category == .Topic {
+            refreshByTopicPublisher.send(topic)
+        } else {
+            refreshPublisher.send(category)
+        }
+    }
+    
+    private func requestData() {
+        if category == .Topic {
+            paginationByTopicPublisher.send(topic)
+        } else {
+            paginationPublisher.send(category)
+        }
+    }
+    
+    @objc
+    private func onRemove(_ notification: Notification) {
+////        setDataSource()
+//        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
+//        var snapshot = source.snapshot()
+//        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
+//        snapshot.deleteItems([instance!])
+//        source.apply(snapshot, animatingDifferences: true)
+    }
+    
+//    @objc
+//    private func onPagination() {
+//        endRefreshing()
+//        appendToDataSource()
+//    }
+
+    private func appendToDataSource() {
+        var snapshot = source.snapshot()
+        guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }
+        snapshot.appendItems([newInstance], toSection: .main)
+        source.apply(snapshot, animatingDifferences: true)
+    }
+    
+    private func setDataSource(animatingDifferences: Bool = true) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(dataItems, toSection: .main)
+        source.apply(snapshot, animatingDifferences: animatingDifferences)
+    }
+}
+
+extension SurveysCollectionView: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
+    }
+}
+
+private extension SurveysCollectionView {
+    
+    func setupUI() {
         delegate = self
-        let layoutGuide = safeAreaLayoutGuide
+        
         addSubview(loadingIndicator)
         
         NSLayoutConstraint.activate([
-            layoutGuide.centerXAnchor.constraint(equalTo: loadingIndicator.centerXAnchor),
-            layoutGuide.bottomAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 10)
+            loadingIndicator.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
+            loadingIndicator.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8)
+//            layoutGuide.centerXAnchor.constraint(equalTo: loadingIndicator.centerXAnchor),
+//            layoutGuide.bottomAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 10)
         ])
         
         refreshControl = UIRefreshControl()
-        refreshControl?.attributedTitle = NSAttributedString(string: "updating_data".localized, attributes: [
-            .foregroundColor: category == .Topic ?  .white : UIColor.label,
-            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
-        ])
-        refreshControl?.tintColor = !indicatorColor.isNil ? indicatorColor : traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
+        setColors()
         refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
         
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
@@ -169,6 +296,8 @@ class SurveysCollectionView: UICollectionView {
             
             return sectionLayout
         }
+        
+        contentInset.bottom = category == .Topic ? 80 : 0
         
         let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { [unowned self] cell, indexPath, item in
             
@@ -230,7 +359,7 @@ class SurveysCollectionView: UICollectionView {
         source.apply(snapshot, animatingDifferences: false)
     }
     
-    private func setTasks() {
+    func setTasks() {
         
         //Update survey stats every n seconds
         let events = EventEmitter().emit(every: 5)
@@ -401,131 +530,11 @@ class SurveysCollectionView: UICollectionView {
         })
     }
     
-    // MARK: - Public methods
-    @MainActor @objc
-    public func endRefreshing() {
-        refreshControl?.endRefreshing()
-    }
-    
-    @MainActor @objc
-    public func beginSearchRefreshing() {
-        searchSpinner.startAnimating()
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0) {
-            self.searchSpinner.alpha = 1
-        }
-    }
-    
-    @MainActor @objc
-    public func endSearchRefreshing() {
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
-            self.searchSpinner.alpha = 1
-        } completion: { _ in self.searchSpinner.stopAnimating() }
-    }
-    
-    // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-//            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
-//            layoutConfig.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.5)//self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
-//            layoutConfig.showsSeparators = false//true
-//
-//            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-//            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//            sectionLayout.interGroupSpacing = 16
-//            return sectionLayout
-//        }
-        refreshControl?.tintColor = !indicatorColor.isNil ? indicatorColor : traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
-        searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-    }
-}
-
-extension SurveysCollectionView: UICollectionViewDelegate {
-    
-    func deselect() {
-        guard let indexPath = indexPathsForSelectedItems?.first else { return }
-        deselectItem(at: indexPath, animated: false)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell {
-            rowPublisher.send(cell.item)
-        }
-        deselect()
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        cell.setNeedsLayout()
-        cell.layoutIfNeeded()
-        
-        if dataItems.count < 10 {
-            loadingIndicator.startAnimating()
-            requestData()
-        } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
-            requestData()
-            loadingIndicator.startAnimating()
-        }
-    }
-    
-    @objc
-    private func refresh() {
-        if category == .Topic {
-            refreshByTopicPublisher.send(topic)
-        } else {
-            refreshPublisher.send(category)
-        }
-    }
-    
-    private func requestData() {
-        if category == .Topic {
-            paginationByTopicPublisher.send(topic)
-        } else {
-            paginationPublisher.send(category)
-        }
-    }
-    
-    @objc
-    private func onRemove(_ notification: Notification) {
-////        setDataSource()
-//        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
-//        var snapshot = source.snapshot()
-//        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
-//        snapshot.deleteItems([instance!])
-//        source.apply(snapshot, animatingDifferences: true)
-    }
-    
-//    @objc
-//    private func onPagination() {
-//        endRefreshing()
-//        appendToDataSource()
-//    }
-
-    private func appendToDataSource() {
-        var snapshot = source.snapshot()
-        guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }
-        snapshot.appendItems([newInstance], toSection: .main)
-        source.apply(snapshot, animatingDifferences: true)
-    }
-    
-    private func setDataSource(animatingDifferences: Bool = true) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(dataItems, toSection: .main)
-        source.apply(snapshot, animatingDifferences: animatingDifferences)
-    }
-}
-
-extension SurveysCollectionView: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let popup = sender as? Popup {
-            popup.removeFromSuperview()
-        }
+    func setColors() {
+        refreshControl?.attributedTitle = NSAttributedString(string: "updating_data".localized, attributes: [
+            .foregroundColor: refreshColor as Any,
+            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
+        ])
+        refreshControl?.tintColor = refreshColor
     }
 }

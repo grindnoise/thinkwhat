@@ -19,7 +19,6 @@ class SurveysView: UIView {
             switch viewInput.mode {
             case .Topic:
                 collectionView.topic = viewInput.topic
-                collectionView.indicatorColor = .white
             case .Own:
                 collectionView.category = .Own
             case .Favorite:

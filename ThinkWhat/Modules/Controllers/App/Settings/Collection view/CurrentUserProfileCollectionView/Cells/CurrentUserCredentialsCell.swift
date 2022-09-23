@@ -630,13 +630,13 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
     private func prepareMenu() -> UIMenu {
         var actions: [UIAction]!
         
-        let male: UIAction = .init(title: Gender.Male.rawValue.localized.capitalized, image: UIImage(named: "male", in: .main, with: UIImage.SymbolConfiguration(scale: .small)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+        let male: UIAction = .init(title: Gender.Male.rawValue.localized.capitalized, image: UIImage(systemName: "mustache.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
             guard let self = self else { return }
             
             self.genderPublisher.send(Gender.Male)
         })
         
-        let female: UIAction = .init(title: Gender.Female.rawValue.localized.capitalized, image: UIImage(named: "female", in: .main, with: UIImage.SymbolConfiguration(scale: .small)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+        let female: UIAction = .init(title: Gender.Female.rawValue.localized.capitalized, image: UIImage(systemName: "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
             guard let self = self else { return }
             
             self.genderPublisher.send(Gender.Female)

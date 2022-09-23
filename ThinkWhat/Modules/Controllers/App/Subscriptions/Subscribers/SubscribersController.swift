@@ -108,12 +108,13 @@ private extension SubscribersController {
     func setObservers() {
         switch mode {
         case .Subscriptions:
-            NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscribedForUpdated), name: Notifications.Userprofiles.SubscribedForUpdated, object: nil)
+//            NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscribedForUpdated), name: Notifications.Userprofiles.SubscribedForUpdated, object: nil)
+            print("")
         case.Subscribers:
-            let names = [Notifications.System.UpdateStats,
-                         Notifications.Userprofiles.SubscribersUpdated]
+            let names = [Notifications.System.UpdateStats,]
+//                         Notifications.Userprofiles.SubscribersUpdated]
             names.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.updateStats), name: $0, object: nil) }
-            NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscribedForUpdated), name: Notifications.Userprofiles.SubscribersUpdated, object: nil)
+//            NotificationCenter.default.addObserver(self, selector: #selector(self.onSubscribedForUpdated), name: Notifications.Userprofiles.SubscribersUpdated, object: nil)
         }
     }
     

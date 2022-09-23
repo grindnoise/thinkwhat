@@ -83,6 +83,12 @@
 "choose_claim_reason" = "Причина жалобы:";
 "age" = "Возраст";
 "image_uploaded" = "Изображение успешно загружено";
+"actions" = "Действия";
+"change_avatar" = "Cменить изображение";
+"filter" = "Отбор";
+"appearance" = "Вид";
+"half" = "Половина";
+"third" = "Треть";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";

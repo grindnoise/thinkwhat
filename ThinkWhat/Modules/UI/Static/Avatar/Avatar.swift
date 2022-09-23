@@ -39,16 +39,7 @@ class delAvatar: UIView {
         imageView.isUserInteractionEnabled = true
         imageView.backgroundColor = .tertiarySystemBackground
         imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-//        imageView.addEquallyTo(to: container)
-//        let icon = self.container.get(all: Icon.self).first
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) { [weak self] in guard !self.isNil else { return }
-//            imageView.alpha = 1
-//            imageView.transform = .identity
-//            icon?.alpha = 0
-//        } completion: { _ in
-//            guard !icon.isNil else { return }
-//            icon!.removeFromSuperview()
-//        }
+
         return imageView
     }()
 
@@ -342,44 +333,8 @@ class Avatar: UIView {
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-//        instance.addTarget(self, action: #selector(self.handleButtonTap), for: .touchUpInside)
-//        if #available(iOS 15, *) {
-//            var config = UIButton.Configuration.plain()
-//            config.baseBackgroundColor = .systemBackground
-//            config.image = UIImage(systemName: "pencil", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
-//            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
-//                guard let self = self else { return .systemGray }
-//
-//                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//            }
-////            config.buttonSize = .large
-//
-//            instance.configuration = config
-//        } else {
-//            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
-//                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
-//                NSAttributedString.Key.foregroundColor: UIColor.label,
-//            ])
-//            instance.setAttributedTitle(attrString, for: .normal)
-//            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//            instance.titleEdgeInsets.left = 2
-////            instance.titleEdgeInsets.right = 8
-//            instance.titleEdgeInsets.top = 2
-//            instance.titleEdgeInsets.bottom = 2
-//            instance.setImage(UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-//            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//            instance.imageView?.contentMode = .scaleAspectFit
-//            instance.imageEdgeInsets.left = 10
-//            instance.imageEdgeInsets.top = 2
-//            instance.imageEdgeInsets.bottom = 2
-//            instance.imageEdgeInsets.right = 2
-//            instance.semanticContentAttribute = .forceRightToLeft
-//            instance.backgroundColor = .secondarySystemBackground
-//
-//            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
-//            constraint.identifier = "width"
-//            constraint.isActive = true
-//        }
+//        instance.isContextMenuInteractionEnabled = true
+//        instance.addInteraction(UIContextMenuInteraction(delegate: self))
 
         instance.publisher(for: \.bounds, options: .new).sink { [weak self] rect in
             guard let self = self,
@@ -547,7 +502,13 @@ class Avatar: UIView {
         
         switch mode {
         case .Editing:
-            let camera: UIAction = .init(title: "camera".localized.capitalized, image: UIImage(systemName: "camera.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+            let camera: UIAction = .init(title: "camera".localized.capitalized,
+                                         image: UIImage(systemName: "camera.fill"),
+                                         identifier: nil,
+                                         discoverabilityTitle: nil,
+                                         attributes: .init(),
+                                         state: .off,
+                                         handler: { [weak self] _ in
                 guard let self = self else { return }
                 
                 self.cameraPublisher.send(true)
@@ -566,7 +527,7 @@ class Avatar: UIView {
             print("")
         }
         
-        return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+        return UIMenu(title: "change_avatar".localized, image: nil, identifier: nil, options: .init(), children: actions)
     }
     
     @objc
@@ -651,3 +612,34 @@ class Avatar: UIView {
         button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
     }
 }
+
+//extension Avatar: UIContextMenuInteractionDelegate {
+//
+//    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+//
+//        return UIContextMenuConfiguration(
+//            identifier: nil,
+//            previewProvider: makeRatePreview) { [weak self] _ in
+//                guard let self = self else { return nil }
+//
+//                return self.prepareMenu()
+//            }
+//    }
+//
+//    func makeRatePreview() -> UIViewController {
+//      let viewController = UIViewController()
+//
+//      // 1
+//      let imageView = UIImageView(image: UIImage(named: "rating_star"))
+//      viewController.view = imageView
+//
+//      // 2
+//      imageView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+//      imageView.translatesAutoresizingMaskIntoConstraints = false
+//
+//      // 3
+//      viewController.preferredContentSize = imageView.frame.size
+//
+//      return viewController
+//    }
+//}

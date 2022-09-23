@@ -83,6 +83,12 @@
 "choose_claim_reason" = "Complaint reason:";
 "age" = "Age";
 "image_uploaded" = "Image uploaded successfully";
+"actions" = "Actions";
+"change_avatar" = "Change image";
+"filter" = "Filter";
+"appearance" = "Appearance";
+"half" = "Half";
+"third" = "Third";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";

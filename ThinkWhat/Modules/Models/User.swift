@@ -306,12 +306,66 @@ class Userprofile: Decodable {
     var surveys: [SurveyReference]   = []
     var subscriptions: [Userprofile] = [] {
         didSet {
-            Notification.send(names: [Notifications.Userprofiles.SubscribedForUpdated])
+            //Remove
+            if oldValue.count > subscriptions.count {
+                let oldSet = Set(oldValue)
+                let newSet = Set(subscriptions)
+                
+                let difference = oldSet.symmetricDifference(newSet)
+                difference.forEach {
+                    NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsRemove, object: [self: $0])
+                    subscriptionsTotal -= 1
+                }
+            } else {
+            //Append
+                let oldSet = Set(oldValue)
+                let newSet = Set(subscriptions)
+                
+                let difference = newSet.symmetricDifference(oldSet)
+                difference.forEach {
+                    guard oldValue.contains($0), let index = subscriptions.lastIndex(of: $0) else {
+                        //Notify
+                        NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsAppend, object: [self: $0])
+                        subscriptionsTotal += 1
+                        return
+                    }
+                    //Duplicate removal
+                    subscriptions.remove(at: index)
+                    NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsEmpty, object: self)
+                }
+            }
         }
     }
     var subscribers: [Userprofile] = [] {
         didSet {
-            Notification.send(names: [Notifications.Userprofiles.SubscribersUpdated])
+            //Remove
+            if oldValue.count > subscribers.count {
+                let oldSet = Set(oldValue)
+                let newSet = Set(subscribers)
+                
+                let difference = oldSet.symmetricDifference(newSet)
+                difference.forEach {
+                    NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersRemove, object: [self: $0])
+                    subscribersTotal -= 1
+                }
+            } else {
+            //Append
+                let oldSet = Set(oldValue)
+                let newSet = Set(subscribers)
+                
+                let difference = newSet.symmetricDifference(oldSet)
+                difference.forEach {
+                    guard oldValue.contains($0), let index = subscribers.lastIndex(of: $0) else {
+                        //Notify
+                        NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersAppend, object: [self: $0])
+                        subscribersTotal += 1
+                        return
+                    }
+                    //Duplicate removal
+                    subscribers.remove(at: index)
+                    NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersEmpty, object: self)
+                }
+            }
         }
     }
     var favorites: [Date: [SurveyReference]]   = [:]

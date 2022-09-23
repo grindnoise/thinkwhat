@@ -30,8 +30,6 @@ struct Notifications {
     }
 
     struct Userprofiles {
-        static let SubscribedForUpdated             = Notification.Name("NotificationUpdateSubscribedFor")
-        static let SubscribersUpdated               = Notification.Name("NotificationSubscribersUpdated")
         static let FirstNameChanged                 = Notification.Name("NotificationUserprofilesFirstNameChanged")
         static let LastNameChanged                  = Notification.Name("NotificationUserprofilesLastNameChanged")
         static let BirthDateChanged                 = Notification.Name("NotificationUserprofilesBirthDateChanged")
@@ -49,6 +47,12 @@ struct Notifications {
         static let FavoritesTotal                   = Notification.Name("NotificationUserprofilesFavoritesTotal")
         static let SubscribersTotal                 = Notification.Name("NotificationUserprofilesSubscribersTotal")
         static let SubscriptionsTotal               = Notification.Name("NotificationUserprofilesSubscriptionsTotal")
+        static let SubscribersAppend                = Notification.Name("NotificationUserprofilesSubscribersAppend")
+        static let SubscribersRemove                = Notification.Name("NotificationUserprofilesSubscribersRemove")
+        static let SubscriptionsAppend              = Notification.Name("NotificationUserprofilesSubscriptionsAppend")
+        static let SubscriptionsRemove              = Notification.Name("NotificationUserprofilesSubscriptionsAppend")
+        static let SubscribersEmpty                 = Notification.Name("NotificationUserprofilesSubscribersEmpty")
+        static let SubscriptionsEmpty               = Notification.Name("NotificationUserprofilesSubscriptionsEmpty")
     }
     
     struct Cities {

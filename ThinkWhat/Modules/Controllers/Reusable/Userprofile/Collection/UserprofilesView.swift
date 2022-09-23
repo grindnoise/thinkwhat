@@ -25,7 +25,7 @@ class UserprofilesView: UIView {
             collectionView.mode = viewInput.mode
         }
     }
-    
+    var gridItemSizePublisher = CurrentValueSubject<UserprofilesController.GridItemSize?, Never>(nil)
     
     
     // MARK: - Private properties
@@ -36,6 +36,20 @@ class UserprofilesView: UIView {
     //UI
     private lazy var collectionView: UserprofilesCollectionView = {
         let instance = UserprofilesCollectionView()
+        
+//        gridItemSizePublisher
+//            .sink { [weak self] in
+//                guard let self = self,
+//                      let size = $0
+//                else { return }
+//
+//                print(size)
+//                instance.gridItemSizePublisher.su
+//            }
+//            .store(in: &subscriptions)
+        
+        gridItemSizePublisher.subscribe(instance.gridItemSizePublisher).store(in: &subscriptions)
+        
         instance.userPublisher
             .sink { [unowned self] in
                 guard let instance = $0 else { return }
@@ -44,7 +58,18 @@ class UserprofilesView: UIView {
             }
             .store(in: &subscriptions)
         
-            return instance
+        instance.refreshPublisher
+            .sink { [unowned self] in
+                guard !$0.isNil,
+                      let viewInput = self.viewInput,
+                      let userprofile = viewInput.userprofile
+                else { return }
+                
+                self.viewInput?.loadUsers(for: userprofile, mode: viewInput.mode)
+            }
+            .store(in: &subscriptions)
+        
+        return instance
     }()
     
     
