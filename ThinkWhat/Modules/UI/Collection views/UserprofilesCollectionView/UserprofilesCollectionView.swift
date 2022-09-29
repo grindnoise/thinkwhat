@@ -36,6 +36,7 @@ class UserprofilesCollectionView: UICollectionView {
     public weak var userprofile: Userprofile!
     
     //Publishers
+    public var paginationPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let userPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public let refreshPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let gridItemSizePublisher = PassthroughSubject<UserprofilesController.GridItemSize?, Never>()
@@ -78,6 +79,9 @@ class UserprofilesCollectionView: UICollectionView {
             fatalError()
         }
     }
+    private var selectedMinAge: Int = 18
+    private var selectedMaxAge: Int = 99
+
     
     
     
@@ -124,6 +128,15 @@ class UserprofilesCollectionView: UICollectionView {
         refreshControl?.endRefreshing()
     }
     
+    public func filter() {
+        let banner = Popup(callbackDelegate: nil, bannerDelegate: self)
+        banner.present(content: PopupContent(parent: banner,
+                                             systemImage: "slider.horizontal.3",
+                                             content: UsersFilterCollectionView(userprofiles: dataItems),
+                                             buttonTitle: "show",
+                                             fixedSize: false))
+    }
+    
     
     // MARK: - Overridden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -154,6 +167,8 @@ private extension UserprofilesCollectionView {
     
     @MainActor
     func setupUI() {
+        
+        delegate = self
         
         gridItemSizePublisher
             .sink { [weak self] in
@@ -264,6 +279,10 @@ private extension UserprofilesCollectionView {
     @MainActor
     func reloadDataSource(animated: Bool = true) {
         guard !source.isNil else { return }
+        guard !dataItems.isEmpty else {
+            refreshPublisher.send(true)
+            return
+        }
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Userprofile>()
         snapshot.appendSections([.Main])
@@ -292,5 +311,40 @@ private extension UserprofilesCollectionView {
     @MainActor @objc
     func refresh() {
         refreshPublisher.send(true)
+    }
+}
+
+extension UserprofilesCollectionView: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if dataItems.count < 10 {
+            paginationPublisher.send(true)
+            
+            guard !loadingIndicator.isAnimating else { return }
+            
+            loadingIndicator.startAnimating()
+        } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
+            paginationPublisher.send(true)
+            
+            guard !loadingIndicator.isAnimating else { return }
+            
+            loadingIndicator.startAnimating()
+        }
+    }
+}
+
+
+extension UserprofilesCollectionView: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let banner = sender as? Popup {
+            banner.removeFromSuperview()
+        }
     }
 }

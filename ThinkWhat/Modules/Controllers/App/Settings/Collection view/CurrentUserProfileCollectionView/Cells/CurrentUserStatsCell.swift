@@ -38,7 +38,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var balanceTitle: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "balance".localized.capitalized
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -62,7 +62,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var balanceCount: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -98,7 +98,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var completeTitle: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "completed".localized.capitalized
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -109,7 +109,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     
     private lazy var completeCount: UILabel = {
         let instance = UILabel()
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -137,7 +137,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var publicationsTitle: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "publications".localized.capitalized
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -160,7 +160,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var publicationsCount: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -194,7 +194,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var subscribersTitle: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "subscribers".localized.capitalized
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -206,7 +206,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var subscribersCount: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -242,7 +242,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var watchingTitle: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "watching".localized.capitalized
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -254,7 +254,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var watchingCount: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -290,7 +290,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var subscriptionsTitle: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "subscriptions".localized.capitalized
         instance.textAlignment = .left
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -302,7 +302,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     private lazy var subscriptionsCount: UILabel = {
         let instance = UILabel()
         instance.isUserInteractionEnabled = true
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "0"
         instance.textAlignment = .right
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -408,6 +408,7 @@ private extension CurrentUserStatsCell {
                 else { return }
                 
                 self.setText()
+                self.setColors()
             }
         })
         
@@ -419,6 +420,7 @@ private extension CurrentUserStatsCell {
                 else { return }
                 
                 self.setText()
+                self.setColors()
             }
         })
         
@@ -430,6 +432,7 @@ private extension CurrentUserStatsCell {
                 else { return }
                 
                 self.setText()
+                self.setColors()
             }
         })
         
@@ -441,6 +444,7 @@ private extension CurrentUserStatsCell {
                 else { return }
                 
                 self.setText()
+                self.setColors()
             }
         })
         
@@ -452,6 +456,7 @@ private extension CurrentUserStatsCell {
                 else { return }
                 
                 self.setText()
+                self.setColors()
             }
         })
         
@@ -463,6 +468,7 @@ private extension CurrentUserStatsCell {
                 else { return }
                 
                 self.setText()
+                self.setColors()
             }
         })
     }
@@ -470,27 +476,27 @@ private extension CurrentUserStatsCell {
     func setColors() {
         guard let userprofile = userprofile else { return }
         
-        balanceTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        balanceCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        balanceButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        balanceTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        balanceCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        balanceButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .label : K_COLOR_RED
         
-        publicationsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        publicationsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        publicationsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        publicationsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         publicationsButton.tintColor = userprofile.publicationsTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         
-        completeTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        completeCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        completeTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        completeCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         
-        subscribersTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        subscribersCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        subscribersTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        subscribersCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         subscribersButton.tintColor = userprofile.subscribersTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         
-        subscriptionsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        subscriptionsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        subscriptionsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        subscriptionsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         subscriptionsButton.tintColor = userprofile.subscriptionsTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         
-        watchingTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        watchingCount.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        watchingTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        watchingCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         watchingButton.tintColor = userprofile.favoritesTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     

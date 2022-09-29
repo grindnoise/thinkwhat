@@ -111,7 +111,7 @@ class ListView: UIView {
                 let surveyReference = $0
             else { return }
             
-            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
+            let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
             banner.accessibilityIdentifier = "claim"
             let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
             

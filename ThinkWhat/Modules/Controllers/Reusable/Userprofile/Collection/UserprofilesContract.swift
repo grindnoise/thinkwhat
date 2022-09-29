@@ -18,9 +18,11 @@ protocol UserprofilesViewInput: AnyObject {
     var controllerInput: UserprofilesControllerInput? { get set }
     var mode: UserprofilesController.Mode { get }
     var userprofile: Userprofile? { get }
+    var answer: Answer? { get }
     
     func onUserprofileTap(_: Userprofile)
     func loadUsers(for: Userprofile, mode: UserprofilesController.Mode)
+    func loadVoters(for: Answer)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -31,6 +33,7 @@ protocol UserprofilesControllerInput: AnyObject {
     var modelOutput: UserprofilesModelOutput? { get set }
     
     func loadUsers(for: Userprofile, mode: UserprofilesController.Mode)
+    func loadVoters(for: Answer)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -46,5 +49,6 @@ protocol UserprofilesModelOutput: AnyObject {
 protocol UserprofilesControllerOutput: AnyObject {
     var viewInput: UserprofilesViewInput? { get set }
     var gridItemSizePublisher: CurrentValueSubject<UserprofilesController.GridItemSize?, Never> { get }
-    // Controller output methods here
+    
+    func filter()
 }

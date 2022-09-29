@@ -32,6 +32,7 @@ class UserprofilesController: UIViewController {
     //Logic
     public private(set) var mode: Mode
     public private(set) var userprofile: Userprofile?
+    public private(set) var answer: Answer?
     
     
     // MARK: - Private properties
@@ -40,7 +41,7 @@ class UserprofilesController: UIViewController {
     private var tasks: [Task<Void, Never>?] = []
     
     //UI
-    private let color: UIColor
+    private var color: UIColor = .clear
     private var gridItemSize: UserprofilesController.GridItemSize = .third {
         didSet {
             guard oldValue != gridItemSize else { return }
@@ -67,10 +68,20 @@ class UserprofilesController: UIViewController {
     
     
     // MARK: - Initialization
-    init(mode: Mode, userprofile: Userprofile, color: UIColor = .clear) {
-        self.color = color
+    init(mode: Mode, userprofile: Userprofile) {
         self.mode = mode
         self.userprofile = userprofile
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        setupUI()
+        setTasks()
+    }
+    
+    init(mode: Mode, answer: Answer, color: UIColor) {
+        self.color = color
+        self.mode = .Voters
+        self.answer = answer
         
         super.init(nibName: nil, bundle: nil)
         
@@ -170,11 +181,11 @@ private extension UserprofilesController {
                                      handler: { [weak self] _ in
             guard let self = self else { return }
             
-            self.filter()
+            self.controllerOutput?.filter()
         })
         
-        let half: UIAction = .init(title: "half".localized.capitalized,
-                                     image: UIImage(systemName: "circle.grid.2x2.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+        let half: UIAction = .init(title: "1/2",
+                                     image: UIImage(systemName: "square.grid.2x2.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                      identifier: nil,
                                      discoverabilityTitle: nil,
                                      attributes: .init(),
@@ -183,11 +194,10 @@ private extension UserprofilesController {
             guard let self = self else { return }
             
             self.gridItemSize = .half
-//            self.controllerOutput?.gridItemSizePublisher.send(.half)
         })
         
-        let third: UIAction = .init(title: "third".localized.capitalized,
-                                     image: UIImage(systemName: "circle.grid.3x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+        let third: UIAction = .init(title: "1/3",
+                                     image: UIImage(systemName: "square.grid.3x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                      identifier: nil,
                                      discoverabilityTitle: nil,
                                      attributes: .init(),
@@ -196,27 +206,37 @@ private extension UserprofilesController {
             guard let self = self else { return }
             
             self.gridItemSize = .third
-//            self.controllerOutput?.gridItemSizePublisher.send(.third)
         })
         
-//            let quarter: UIAction = .init(title: "filter".localized.capitalized,
-//                                         image: UIImage(systemName: "slider.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-//                                         identifier: nil,
-//                                         discoverabilityTitle: nil,
-//                                         attributes: .init(),
-//                                         state: .off,
-//                                         handler: { [weak self] _ in
-//                guard let self = self else { return }
-//
-//                self.filter()
-//            })
+            let quarter: UIAction = .init(title: "1/4",
+                                         image: UIImage(systemName: "square.grid.4x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                         identifier: nil,
+                                         discoverabilityTitle: nil,
+                                         attributes: .init(),
+                                         state: gridItemSize == .quarter ? .on : .off,
+                                         handler: { [weak self] _ in
+                guard let self = self else { return }
+
+                self.gridItemSize = .quarter
+            })
+        
+        var imageName: String = ""
+        
+        switch gridItemSize {
+        case.half:
+            imageName = "square.grid.2x2.fill"
+        case.third:
+            imageName = "square.grid.3x3.fill"
+        case.quarter:
+            imageName = "square.grid.4x3.fill"
+        }
         
         let inlineMenu = UIMenu(title: "appearance".localized,
-                                image: UIImage(systemName: gridItemSize == .third ? "circle.grid.3x3.fill" : "circle.grid.2x2.fill",
+                                image: UIImage(systemName: imageName,
                                                withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                 identifier: nil,
                                 options: .init(),
-                                children: [half, third])
+                                children: [half, third, quarter])
         
         return UIMenu(title: "", children: [filter, inlineMenu])
     }
@@ -248,12 +268,14 @@ private extension UserprofilesController {
 //        fatalError()
     }
     
-    func filter() {
-        
-    }
+    
 }
 
 extension UserprofilesController: UserprofilesViewInput {
+    func loadVoters(for answer: Answer) {
+        controllerInput?.loadVoters(for: answer)
+    }
+    
     
     func loadUsers(for userprofile: Userprofile, mode: UserprofilesController.Mode) {
         controllerInput?.loadUsers(for: userprofile, mode: mode)
@@ -272,4 +294,3 @@ extension UserprofilesController: UserprofilesViewInput {
 extension UserprofilesController: UserprofilesModelOutput {
     // Implement methods
 }
-

@@ -46,6 +46,7 @@ struct API_URLS {
         static let deleteComment:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/delete_comment/")}()
         static let getRootComments:     URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_root_comments/")}()
         static let getChildComments:    URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_child_comments/")}()
+        static let voters:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/voters/")}()
     }
     
     struct System {
@@ -102,7 +103,7 @@ struct API_URLS {
     static let SURVEYS_ADD_VIEW_COUNT   = "api/surveys/add_view_count/"
     
     static let VOTE                     = "api/vote/"
-    static let VOTERS                   = "api/surveys/voters/"
+    
     
     static let CATEGORIES               = "api/categories/"
     static let BALANCE                  = "api/current_balance_price/"

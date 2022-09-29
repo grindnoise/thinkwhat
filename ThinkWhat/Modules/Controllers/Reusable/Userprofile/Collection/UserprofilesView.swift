@@ -37,16 +37,20 @@ class UserprofilesView: UIView {
     private lazy var collectionView: UserprofilesCollectionView = {
         let instance = UserprofilesCollectionView()
         
-//        gridItemSizePublisher
-//            .sink { [weak self] in
-//                guard let self = self,
-//                      let size = $0
-//                else { return }
-//
-//                print(size)
-//                instance.gridItemSizePublisher.su
-//            }
-//            .store(in: &subscriptions)
+        //Pagination #1
+        let paginationPublisher = instance.paginationPublisher
+            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+        
+        paginationPublisher
+            .sink { [unowned self] in
+                guard !$0.isNil,
+                      let viewInput = self.viewInput,
+                      let userprofile = viewInput.userprofile
+                else { return }
+                
+                self.viewInput?.loadUsers(for: userprofile, mode: viewInput.mode)
+            }
+            .store(in: &subscriptions)
         
         gridItemSizePublisher.subscribe(instance.gridItemSizePublisher).store(in: &subscriptions)
         
@@ -129,5 +133,7 @@ private extension UserprofilesView {
 }
 
 extension UserprofilesView: UserprofilesControllerOutput {
-    
+    func filter() {
+        collectionView.filter()
+    }
 }

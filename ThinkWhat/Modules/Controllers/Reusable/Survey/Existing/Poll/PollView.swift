@@ -32,7 +32,7 @@ class PollView: UIView {
             guard let item = $0 else { return }
             
             //Show popup
-            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
+            let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
             banner.accessibilityIdentifier = "claim"
             let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
             

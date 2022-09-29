@@ -416,7 +416,7 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
             }
         })
         
-        //Birth date change
+        //Gender change
         tasks.append( Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.GenderChanged) {
                 guard let self = self,

@@ -43,6 +43,10 @@
 "cancel" = "Отмена";
 "Male" = "Мужчина";
 "Female" = "Женщина";
+"gender" = "Пол";
+"men" = "Мужчины";
+"women" = "Женщины";
+"all_genders" = "Все";
 "paste_link" = "Вставьте ссылку";
 "continueButton" = "Продолжить";
 "save" = "Сохранить";

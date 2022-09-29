@@ -30,7 +30,7 @@ class CommentsView: UIView {
                   let surveyReference = comment.survey?.reference
             else { return }
             
-            let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
+            let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
             banner.accessibilityIdentifier = "claim"
             let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
             

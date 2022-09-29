@@ -315,11 +315,11 @@ extension SubsciptionsView: UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? VoterCell,
-           let userprofile = viewInput?.userprofiles[indexPath.row] as? Userprofile {
-            cell.setupUI(callbackDelegate: self, userprofile: userprofile, mode: .FirstnameLastname, lightColor: K_COLOR_RED)
-            return cell
-        }
+//        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? VoterCell,
+//           let userprofile = viewInput?.userprofiles[indexPath.row] as? Userprofile {
+//            cell.setupUI(callbackDelegate: self, userprofile: userprofile, mode: .FirstnameLastname, lightColor: K_COLOR_RED)
+//            return cell
+//        }
         return UICollectionViewCell()
     }
     

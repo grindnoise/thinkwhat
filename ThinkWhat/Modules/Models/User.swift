@@ -314,7 +314,7 @@ class Userprofile: Decodable {
                 let difference = oldSet.symmetricDifference(newSet)
                 difference.forEach {
                     NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsRemove, object: [self: $0])
-                    subscriptionsTotal -= 1
+//                    subscriptionsTotal -= 1
                 }
             } else {
             //Append
@@ -326,7 +326,7 @@ class Userprofile: Decodable {
                     guard oldValue.contains($0), let index = subscriptions.lastIndex(of: $0) else {
                         //Notify
                         NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsAppend, object: [self: $0])
-                        subscriptionsTotal += 1
+//                        subscriptionsTotal += 1
                         return
                     }
                     //Duplicate removal
@@ -346,7 +346,7 @@ class Userprofile: Decodable {
                 let difference = oldSet.symmetricDifference(newSet)
                 difference.forEach {
                     NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersRemove, object: [self: $0])
-                    subscribersTotal -= 1
+//                    subscribersTotal -= 1
                 }
             } else {
             //Append
@@ -358,7 +358,7 @@ class Userprofile: Decodable {
                     guard oldValue.contains($0), let index = subscribers.lastIndex(of: $0) else {
                         //Notify
                         NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersAppend, object: [self: $0])
-                        subscribersTotal += 1
+//                        subscribersTotal += 1
                         return
                     }
                     //Duplicate removal

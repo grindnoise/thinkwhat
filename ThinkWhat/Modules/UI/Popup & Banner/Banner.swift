@@ -320,7 +320,7 @@ func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: Ban
 
 
 func showPopup<C: UIView>(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: C, isModal: Bool = true, shouldDismissAfter: TimeInterval = .infinity, accessibilityIdentifier: String = "") where C:CallbackCallable {
-    let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
+    let banner = Popup(callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
     banner.accessibilityIdentifier = accessibilityIdentifier
     subview.callbackDelegate = banner
     banner.present(content: subview)

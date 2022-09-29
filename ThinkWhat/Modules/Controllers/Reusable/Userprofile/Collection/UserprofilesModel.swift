@@ -15,6 +15,18 @@ class UserprofilesModel {
 
 // MARK: - Controller Input
 extension UserprofilesModel: UserprofilesControllerInput {
+    func loadVoters(for answer: Answer) {
+        Task {
+            do {
+                try await API.shared.surveys.getVoters(for: answer)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
+    
     
     func loadUsers(for userprofile: Userprofile, mode: UserprofilesController.Mode) {
         Task {

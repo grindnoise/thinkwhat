@@ -11,49 +11,9 @@ import UIKit
 
 class Popup: UIView {
     
-//    // MARK: - Public properties
-//    public var claimSubject = CurrentValueSubject<Claim?, Never>(nil)
+    // MARK: - Public properties
+
     
-    // MARK: - Destructor
-    deinit {
-#if DEBUG
-        print("\(String(describing: type(of: self))).\(#function)")
-#endif
-    }
-    
-    // MARK: - Initialization
-    
-    init(frame: CGRect = UIScreen.main.bounds, callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightScaleFactor _heightMultiplictator: CGFloat = 0.7) {
-        self.heightScaleFactor = _heightMultiplictator
-        super.init(frame: frame)
-        self.callbackDelegate = callbackDelegate
-        self.bannerDelegate = bannerDelegate
-        commonInit()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func commonInit() {
-        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-        backgroundColor             = .clear
-        bounds                      = UIScreen.main.bounds
-        contentView.frame               = bounds
-        contentView.autoresizingMask    = [.flexibleHeight, .flexibleWidth]
-        appDelegate.window?.addSubview(self)
-        addSubview(contentView)
-        
-        //Set default height
-        setNeedsLayout()
-        height                      = UIScreen.main.bounds.height * heightScaleFactor//body.frame.width * heightScaleFactor
-        heightConstraint.constant   = height
-        centerYConstraint.constant  = yOrigin
-        layoutIfNeeded()
-        body.cornerRadius = body.frame.width * 0.07
-//        guard let constraint = container.getAllConstraints().filter({ $0.identifier == "height" }).first else { return }
-        originalContainerHeight     = container.bounds.height//constraint.constant
-    }
     
     // MARK: - IB Outlets
     @IBOutlet var contentView: UIView!
@@ -78,11 +38,8 @@ class Popup: UIView {
     @IBOutlet weak var container: UIView!
     @IBOutlet weak var heightConstraint: NSLayoutConstraint!
     @IBOutlet weak var centerYConstraint: NSLayoutConstraint!
-//    @IBOutlet weak var centerYConstraint: NSLayoutConstraint! {
-//        didSet {
-//            centerYConstraint.constant = topMargin
-//        }
-//    }
+
+    
     
     // MARK: - Private properties
     private let heightScaleFactor: CGFloat
@@ -110,11 +67,47 @@ class Popup: UIView {
             }
         }
     }
-    
     private weak var callbackDelegate : CallbackObservable?
     private weak var bannerDelegate: BannerObservable?
     
-    func present(content: UIView, isModal _isModal: Bool = false, dismissAfter seconds: TimeInterval = 0) {
+    
+    
+    // MARK: - Destructor
+    deinit {
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+    
+    
+    
+    // MARK: - Initialization
+    init(callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightScaleFactor: CGFloat = 0.7) {
+        self.heightScaleFactor = heightScaleFactor
+        
+        super.init(frame: UIScreen.main.bounds)
+        
+        self.callbackDelegate = callbackDelegate
+        self.bannerDelegate = bannerDelegate
+        
+        commonInit()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+    }
+    
+    
+    
+    // MARK: - Public methods
+    public func present(content: UIView, isModal _isModal: Bool = false, dismissAfter seconds: TimeInterval = 0) {
         content.frame = container.frame
         content.addEquallyTo(to: container)
         content.setNeedsLayout()
@@ -152,7 +145,7 @@ class Popup: UIView {
         })
     }
     
-    func dismiss(_ sender: Optional<Any> = nil) {
+    public func dismiss(_ sender: Optional<Any> = nil) {
         isDismissing = true
         bannerDelegate?.onBannerWillDisappear(self)
         UIView.animate(withDuration: 0.35, delay: 0, options: [.curveLinear], animations: {
@@ -169,28 +162,6 @@ class Popup: UIView {
             self.background.alpha = 0
             self.body.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
         }) { _ in }
-    }
-    
-    private func startTimer() {
-        guard timer == nil else { return }
-        timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
-        timer?.fire()
-    }
-    
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-    }
-    
-    @objc private func updateTimer() {
-        timeElapsed -= 0.5
-        if timeElapsed <= 0 {
-            dismiss()
-        }
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
     }
     
     public func onContainerHeightChange(_ height: CGFloat) {
@@ -213,6 +184,48 @@ class Popup: UIView {
         }
     }
     
+}
+
+private extension Popup {
+    func commonInit() {
+        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        
+        backgroundColor             = .clear
+        bounds                      = UIScreen.main.bounds
+        contentView.frame               = bounds
+        contentView.autoresizingMask    = [.flexibleHeight, .flexibleWidth]
+        appDelegate.window?.addSubview(self)
+        addSubview(contentView)
+        
+        //Set default height
+        setNeedsLayout()
+        height                      = UIScreen.main.bounds.height * heightScaleFactor//body.frame.width * heightScaleFactor
+        heightConstraint.constant   = height
+        centerYConstraint.constant  = yOrigin
+        layoutIfNeeded()
+        body.cornerRadius = body.frame.width * 0.07
+//        guard let constraint = container.getAllConstraints().filter({ $0.identifier == "height" }).first else { return }
+        originalContainerHeight     = container.bounds.height//constraint.constant
+    }
+    
+    func startTimer() {
+        guard timer == nil else { return }
+        timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
+        timer?.fire()
+    }
+    
+    func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    @objc
+    func updateTimer() {
+        timeElapsed -= 0.5
+        if timeElapsed <= 0 {
+            dismiss()
+        }
+    }
 }
 
 extension Popup: CallbackObservable {

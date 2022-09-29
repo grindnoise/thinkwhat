@@ -846,8 +846,7 @@ extension PollController: PollViewInput {
             navigationItem.titleView = nil
         }
         
-        navigationController?.pushViewController(VotersController(answer: answer, color: color), animated: true)
-        //        navigationController?.pushViewController(VotersController(answer: answer, indexPath: indexPath, color: color), animated: true)
+        navigationController?.pushViewController(UserprofilesController(mode: .Voters, answer: answer, color: color), animated: true)
     }
     
     var showNext: Bool {
@@ -921,7 +920,7 @@ extension PollController: PollModelOutput {
             //Show edu info
 #if DEBUG
             delayAsync(delay: 1) {
-                let popup = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.4)
+                let popup = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.4)
                 popup.present(content: VoteEducation(topic: .Bankruptcy, color: .systemRed, callbackDelegate: popup))
             }
 #else

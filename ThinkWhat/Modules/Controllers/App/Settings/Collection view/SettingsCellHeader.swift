@@ -249,8 +249,11 @@ class SettingsCellHeader: UICollectionReusableView {
             print("")
         }
         
-        let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
-        banner.present(content: HelpPopupContent(callbackDelegate: self, parent: banner, text: text.localized))
+        let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
+        banner.present(content: PopupContent(parent: banner,
+                                             systemImage: "lightbulb.fill",
+                                             text: text.localized,
+                                             buttonTitle: "ok"))
     }
     
     // MARK: - Overridden methods
@@ -276,11 +279,5 @@ extension SettingsCellHeader: BannerObservable {
         } else if let banner = sender as? Popup {
             banner.removeFromSuperview()
         }
-    }
-}
-
-extension SettingsCellHeader: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-        
     }
 }

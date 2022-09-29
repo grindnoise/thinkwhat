@@ -1494,10 +1494,11 @@ class API {
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
                 
-                guard let json = try JSON(data: data, options: .mutableContainers) as? JSON,
-                      let status = json["status"].string,
+                let json = try JSON(data: data, options: .mutableContainers)
+                
+                guard let status = json["status"].string,
                       status == "ok"
-                else { return }
+                else { throw APIError.badData }
                 
                 comment.isClaimed = true
             } catch let error {
@@ -1580,6 +1581,18 @@ class API {
                 await MainActor.run {
                     let instances = try? decoder.decode([Comment].self, from: data)
                 }
+            } catch let error {
+                throw error
+            }
+        }
+        
+        public func getVoters(for answer: Answer) async throws -> Data {
+            guard let url = API_URLS.Surveys.voters else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["survey": answer.surveyID, "answer": answer.id, "voters": answer.voters.map({ return $0.id })]
+            
+            do {
+                return try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
             } catch let error {
                 throw error
             }
@@ -1714,27 +1727,14 @@ class API {
         request(url: url, httpMethod: .get, encoding: URLEncoding.default) { completion($0) }
     }
     
-    public func getVoters(answer: Answer, users: [Userprofile], completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTERS) else { completion(.failure(APIError.invalidURL)); return }
-        guard let survey = answer.survey else { fatalError("answer.survey is nil") }
-        let parameters: Parameters = ["survey": survey.id, "answer": answer.id, "voters": users.map { $0.id }]
-        request(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding()) { completion($0) }
-    }
+//    public func getVoters(answer: Answer, users: [Userprofile], completion: @escaping(Result<JSON, Error>)->()) {
+//        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTERS) else { completion(.failure(APIError.invalidURL)); return }
+//        guard let survey = answer.survey else { fatalError("answer.survey is nil") }
+//        let parameters: Parameters = ["survey": survey.id, "answer": answer.id, "voters": users.map { $0.id }]
+//        request(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding()) { completion($0) }
+//    }
     
-    public func getVotersAsync(answer: Answer) async throws -> Data {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTERS) else {
-            throw APIError.notFound
-        }
-        let parameters: Parameters = ["survey": answer.surveyID, "answer": answer.id, "voters": answer.voters.map({ return $0.id })]
-        do {
-            return try await requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: headers())
-        } catch let error {
-#if DEBUG
-            print(error)
-#endif
-            throw error
-        }
-    }
+    
     
     public func request(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, useHeaders: Bool = true, accessControl useAccessControl: Bool = true, completion: @escaping(Result<JSON, Error>)->()) {
         if useAccessControl {

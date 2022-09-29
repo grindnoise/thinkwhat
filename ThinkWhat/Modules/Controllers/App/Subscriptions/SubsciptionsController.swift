@@ -165,7 +165,7 @@ extension SubsciptionsController: SubsciptionsViewInput {
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(SubscribersController(mode: .Subscribers, userprofile: userprofile), animated: true)
+        navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile), animated: true)
     }
     
     func onSubscpitionsTapped() {

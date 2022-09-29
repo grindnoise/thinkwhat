@@ -43,6 +43,10 @@
 "cancel" = "Cancel";
 "Male" = "Male";
 "Female" = "Female";
+"gender" = "Gender";
+"men" = "Men";
+"women" = "Women";
+"all_genders" = "All";
 "paste_link" = "Paste link";
 "continueButton" = "Continue";
 "save" = "Save";
