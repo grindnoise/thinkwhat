@@ -7,7 +7,7 @@
 //
 
 import UIKit
-//import Combine
+import Combine
 
 class Popup: UIView {
     
@@ -42,6 +42,9 @@ class Popup: UIView {
     
     
     // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    public var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
     private let heightScaleFactor: CGFloat
     private var yOrigin:    CGFloat = 0
     private var height:     CGFloat = 0 {
@@ -146,6 +149,7 @@ class Popup: UIView {
     }
     
     public func dismiss(_ sender: Optional<Any> = nil) {
+        subscriptions.forEach { $0.cancel() }
         isDismissing = true
         bannerDelegate?.onBannerWillDisappear(self)
         UIView.animate(withDuration: 0.35, delay: 0, options: [.curveLinear], animations: {

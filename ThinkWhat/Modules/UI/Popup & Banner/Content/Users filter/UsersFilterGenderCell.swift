@@ -58,9 +58,14 @@ class UsersFilterGenderCell: UICollectionViewCell {
         return instance
     }()
     private lazy var genderControl: UISegmentedControl = {
-        let instance = UISegmentedControl(items: [UIImage(systemName: "mustache.fill"), UIImage(systemName: "mouth.fill"), "all_genders".localized.lowercased()])
+        let instance = UISegmentedControl(items: [
+            UIImage(systemName: "mustache.fill") as Any,
+            UIImage(systemName: "mouth.fill") as Any,
+            "all_genders".localized.lowercased()
+        ])
         instance.selectedSegmentIndex = 2
         instance.selectedSegmentTintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instance.addTarget(self, action: #selector(self.onGenderSelected(_:)), for: .valueChanged)
         
         let normalAttribute: [NSAttributedString.Key: Any] = [
             .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline) as Any,
@@ -163,6 +168,18 @@ private extension UsersFilterGenderCell {
         //
         //            }
         //        })
+    }
+    
+    @objc
+    func onGenderSelected(_ value: UISegmentedControl) {
+        switch value.selectedSegmentIndex {
+        case 0:
+            genderPublisher.send(.Male)
+        case 1:
+            genderPublisher.send(.Female)
+        default:
+            genderPublisher.send(.Unassigned)
+        }
     }
 }
 

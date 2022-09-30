@@ -26,22 +26,10 @@ class UsersFilterCollectionView: UICollectionView {
     //Publishers
     public var minAgePublisher = CurrentValueSubject<Int?, Never>(nil)
     public var maxAgePublisher = CurrentValueSubject<Int?, Never>(nil)
+    public var buttonTitlePublisher = CurrentValueSubject<String?, Never>(nil)
     
-    
-    public var selectedMinAge: Int = 18
-    public var selectedMaxAge: Int = 99
-    public var selectedGender: Gender = .Unassigned
+    //Logic
 //    public var filters: [String: AnyObject]? = [:]
-    public private(set) var userprofiles: [Userprofile]? = []
-    public var filtered: [Userprofile]? = []
-    public var gender: Gender = .Unassigned {
-        didSet {
-            if oldValue != gender {
-                
-                fetchData()
-            }
-        }
-    }
     
     
     // MARK: - Private properties
@@ -53,10 +41,13 @@ class UsersFilterCollectionView: UICollectionView {
     private var source: UICollectionViewDiffableDataSource<Section, Int>!
     
     //Logic
-    private weak var callbackDelegate: CallbackObservable?
+    private var userprofiles: [Userprofile] = []
+    private var filtered: [Userprofile] = []
+    private var selectedMinAge: Int = 18
+    private var selectedMaxAge: Int = 99
+    private var selectedGender: Gender = .Unassigned
     private let minAge = 18
     private let maxAge = 99
-    
     
     // MARK: - Deinitialization
     deinit {
@@ -72,11 +63,10 @@ class UsersFilterCollectionView: UICollectionView {
     
     
     // MARK: - Initialization
-    init(userprofiles: [Userprofile]) {//?, filters: [String : AnyObject]?) {
+    init(userprofiles: [Userprofile], filtered: [Userprofile] = [], selectedMinAge: Int, selectedMaxAge: Int, selectedGender: Gender) {//?, filters: [String : AnyObject]?) {
         self.userprofiles = userprofiles
         
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
-        
         
         setupUI()
         setTasks()
@@ -179,30 +169,16 @@ private extension UsersFilterCollectionView {
         source.apply(snapshot, animatingDifferences: false)
     }
     
-    func setTasks() {
-//        tasks.append( Task {@MainActor [weak self] in
-//            for await notification in NotificationCenter.default.notifications(for: <# notification #>) {
-//                guard let self = self else { return }
-//
-//
-//            }
-//        })
-    }
+    func setTasks() {}
     
     func fetchData() {
-//        guard voters != nil, rangeSlider != nil else { return }
-//        var _filtered: [Userprofile] = []
-//        if gender != .Unassigned {
-//            _filtered = voters!.filter({ $0.age >= Int(rangeSlider.selectedMinimum)}).filter({$0.age <= Int(rangeSlider.selectedMaximum)}).filter({$0.gender == gender})
-//        } else {
-//            _filtered = voters!.filter({Int(rangeSlider.selectedMinimum)...Int(rangeSlider.selectedMaximum) ~= $0.age})
-//        }
-//        filtered = _filtered
-//        guard let count = filtered?.count else { return }
-//        UIView.performWithoutAnimation {
-//            self.btn.setTitle( "show".localized.uppercased() + " \(count)", for: .normal)
-//            self.btn.layoutIfNeeded()
-//        }
+        if selectedGender != .Unassigned {
+            filtered = userprofiles.filter({ $0.age >= Int(selectedMinAge)}).filter({$0.age <= Int(selectedMaxAge)}).filter({$0.gender == selectedGender})
+        } else {
+            filtered = userprofiles.filter({Int(selectedMinAge)...Int(selectedMaxAge) ~= $0.age})
+        }
+
+        buttonTitlePublisher.send("show".localized.uppercased() + " (\(String(describing: filtered.count)))")
     }
 }
 

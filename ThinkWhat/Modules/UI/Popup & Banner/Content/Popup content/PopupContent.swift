@@ -21,12 +21,17 @@ class PopupContent: UIView {
             
         }
     }
+    public var buttonTitle: String {
+        didSet {
+            actionButton.setTitle(buttonTitle, for: .normal)
+        }
+    }
     
     
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
-    private var subscriptions = Set<AnyCancellable>()
+    public var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     
     //UI
@@ -232,7 +237,7 @@ class PopupContent: UIView {
     private var iconCategory: Icon.Category?
     private var image: UIImage?
     private var systemImage: String?
-    private let buttonTitle: String
+    
     private let fixedSize: Bool
     
     
@@ -325,6 +330,9 @@ class PopupContent: UIView {
     }
     
     // MARK: - Public methods
+//    func setButtonTitle(title: String) {
+//        butt
+//    }
 
     // MARK: - Overridden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

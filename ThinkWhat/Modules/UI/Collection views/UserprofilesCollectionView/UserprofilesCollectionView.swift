@@ -81,7 +81,8 @@ class UserprofilesCollectionView: UICollectionView {
     }
     private var selectedMinAge: Int = 18
     private var selectedMaxAge: Int = 99
-
+    private var selectedGender: Gender = .Unassigned
+    private var filtered: [Userprofile] = []
     
     
     
@@ -130,12 +131,29 @@ class UserprofilesCollectionView: UICollectionView {
     
     public func filter() {
         let banner = Popup(callbackDelegate: nil, bannerDelegate: self)
-        banner.present(content: PopupContent(parent: banner,
-                                             systemImage: "slider.horizontal.3",
-                                             content: UsersFilterCollectionView(userprofiles: dataItems),
-                                             buttonTitle: "show",
-                                             fixedSize: false))
+        let filterCollection = UsersFilterCollectionView(userprofiles: dataItems,
+                                                         filtered: filtered,
+                                                         selectedMinAge: selectedMinAge,
+                                                         selectedMaxAge: selectedMaxAge,
+                                                         selectedGender: selectedGender)
+        
+        let content = PopupContent(parent: banner,
+                                   systemImage: "slider.horizontal.3",
+                                   content: filterCollection,
+                                   buttonTitle: "show",
+                                   fixedSize: false)
+        
+        filterCollection.buttonTitlePublisher
+            .sink {
+                guard let text = $0 else { return }
+
+                content.buttonTitle = text
+            }
+            .store(in: &banner.subscriptions)
+        
+        banner.present(content: content)
     }
+    
     
     
     // MARK: - Overridden methods
