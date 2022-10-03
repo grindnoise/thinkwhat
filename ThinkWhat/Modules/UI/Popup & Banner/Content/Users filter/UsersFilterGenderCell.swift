@@ -16,7 +16,14 @@ class UsersFilterGenderCell: UICollectionViewCell {
         didSet {
             guard oldValue != selectedGender else { return }
             
-            
+            switch selectedGender {
+            case .Unassigned:
+                genderControl.selectedSegmentIndex = 2
+            case .Female:
+                genderControl.selectedSegmentIndex = 1
+            case .Male:
+                genderControl.selectedSegmentIndex = 0
+            }
         }
     }
 

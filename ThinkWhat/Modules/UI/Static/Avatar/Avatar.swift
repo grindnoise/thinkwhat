@@ -172,10 +172,38 @@ class delAvatar: UIView {
 class Avatar: UIView {
     
     enum Mode {
-        case Default, Editing, Choice
+        case Default, Editing, Choice, Selection
     }
     
     // MARK: - Public properties
+    public var mode: Mode = .Default {
+        didSet {
+            guard oldValue != mode else { return }
+                
+            if mode == .Selection {
+                button.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0) { [unowned self] in
+                    self.button.alpha = 1
+                    self.button.transform = .identity
+                }
+            } else if mode == .Default, oldValue == .Selection {
+                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, animations: { [unowned self] in
+                    self.button.alpha = 0
+                    self.button.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                }) { _ in
+                    self.button.transform = .identity
+                }
+            } else if mode == .Editing {
+                button.menu = prepareMenu()
+                button.alpha = 1
+                button.setImage(UIImage(systemName: "pencil",
+                                        withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5,
+                                                                                         weight: .heavy)),
+                                  for: .normal)
+                button.imageView?.contentMode = .center
+            }
+        }
+    }
     public weak var userprofile: Userprofile! {
         didSet {
             guard !userprofile.isNil else { return }
@@ -304,12 +332,21 @@ class Avatar: UIView {
     public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
     public let tapPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public let selectionPublisher = CurrentValueSubject<[Userprofile: Bool]?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
+    private var isSelected: Bool = false {
+        didSet {
+            button.setImage(UIImage(systemName: isSelected ? "pencil" : "",
+                                    withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5,
+                                                                                     weight: .heavy)),
+                              for: .normal)
+        }
+    }
     private lazy var shadowView: UIView = {
         let instance = UIView()
         instance.layer.masksToBounds = false
@@ -329,6 +366,7 @@ class Avatar: UIView {
     }()
     private lazy var button: UIButton = {
         let instance = UIButton()
+        instance.alpha = 0
         instance.showsMenuAsPrimaryAction = true
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
@@ -337,18 +375,32 @@ class Avatar: UIView {
 //        instance.addInteraction(UIContextMenuInteraction(delegate: self))
 
         instance.publisher(for: \.bounds, options: .new).sink { [weak self] rect in
-            guard let self = self,
-                  self.mode != .Default
-            else { return }
+            guard let self = self else { return }
+            
+            var systemImage = ""
+            
+            switch self.mode {
+            case .Selection:
+                systemImage = self.isSelected ? "xmark" : ""
+            case .Editing:
+                systemImage = "pencil"
+            case .Choice:
+                systemImage = "circlebadge.fill"
+            default:
+                systemImage = ""
+            }
             
             instance.cornerRadius = rect.height/2
-            instance.setImage(UIImage(systemName: self.mode == .Editing ? "pencil" : "circlebadge.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5, weight: .heavy)), for: .normal)
+            instance.setImage(UIImage(systemName: systemImage,
+                                      withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5,
+                                                                                     weight: .heavy)),
+                              for: .normal)
             instance.imageView?.contentMode = .center
         }.store(in: &subscriptions)
         
         return instance
     }()
-    private var mode: Mode = .Default
+    
     
     // MARK: - Destructor
     deinit {
@@ -398,9 +450,8 @@ class Avatar: UIView {
             shadowView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
         
-        guard mode != .Default else { return }
+//        guard mode != .Default else { return }
         
-        button.menu = prepareMenu()
         addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
         
@@ -419,7 +470,7 @@ class Avatar: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        if mode == .Editing || mode == .Choice {
+//        if mode == .Editing || mode == .Choice {
             guard let constraintY = button.getConstraint(identifier: "constraintY"),
                   let constraintX = button.getConstraint(identifier: "constraintX")
             else { return }
@@ -427,7 +478,7 @@ class Avatar: UIView {
             let point = pointOnCircle(center: CGPoint(x: bounds.midX, y: bounds.midY), radius: bounds.height/2, angleInDegrees: 135)
             constraintY.constant = point.y
             constraintX.constant = point.x
-        }
+//        }
     }
     
     private func setObservers() {
@@ -537,6 +588,13 @@ class Avatar: UIView {
             guard !isUploading, let image = imageView.image else { return }
             
             previewPublisher.send(image)
+        case .Selection:
+            isSelected = !isSelected
+            button.setImage(UIImage(systemName: isSelected ? "xmark" : "",
+                                    withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5,
+                                                                                     weight: .heavy)),
+                              for: .normal)
+            selectionPublisher.send([userprofile: isSelected])
         default:
             tapPublisher.send(userprofile)
         }
@@ -549,6 +607,16 @@ class Avatar: UIView {
 //        imageView.tintColor = .white
 //        imageView.contentMode = .center
         imageView.image = nil
+    }
+    
+//    public func setSelectionMode(_ on: Bool) {
+//        mode = on ? .Selection : .Default
+//    }
+    
+    public func setSelected(_ isSelected: Bool) {
+        guard mode == .Selection else { return }
+        
+        button.isSelected = isSelected
     }
     
     public func imageUploadStarted(_ image: UIImage) {

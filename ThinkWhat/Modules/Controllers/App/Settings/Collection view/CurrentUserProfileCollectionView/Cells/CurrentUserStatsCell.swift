@@ -525,6 +525,8 @@ private extension CurrentUserStatsCell {
     }
     
     func setText() {
+        guard let userprofile = Userprofiles.shared.current else { return }
+        
         balanceCount.text = String(describing: userprofile.balance)
         completeCount.text = String(describing: userprofile.completeTotal)
         publicationsCount.text = String(describing: userprofile.publicationsTotal)

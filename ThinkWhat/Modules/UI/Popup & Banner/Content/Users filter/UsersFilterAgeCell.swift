@@ -19,15 +19,11 @@ class UsersFilterAgeCell: UICollectionViewCell {
     // MARK: - Public properties
     public var selectedMinAge: Int = 18 {
         didSet {
-            guard oldValue != selectedMinAge else { return }
-            
             setupSlider()
         }
     }
     public var selectedMaxAge: Int = 99 {
         didSet {
-            guard oldValue != selectedMaxAge else { return }
-            
             setupSlider()
         }
     }
@@ -194,7 +190,8 @@ private extension UsersFilterAgeCell {
     }
     
     func setupSlider() {
-        
+        rangeSlider.selectedMinimum = Float(selectedMinAge)
+        rangeSlider.selectedMaximum = Float(selectedMaxAge)
     }
 }
 

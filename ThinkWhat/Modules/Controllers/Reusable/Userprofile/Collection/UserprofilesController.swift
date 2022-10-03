@@ -114,6 +114,20 @@ class UserprofilesController: UIViewController {
             .modelOutput = self
         
         self.view = view as UIView
+        let cancel = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelSelection))
+        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let delete = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteItems))
+        self.toolbarItems = [cancel, spacer, delete]
+        
+        
+        let appearance = UIToolbarAppearance()
+        appearance.configureWithOpaqueBackground()
+           
+        navigationController?.toolbar.tintColor = .black
+        navigationController?.toolbar.standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            navigationController?.toolbar.scrollEdgeAppearance = appearance
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -184,6 +198,32 @@ private extension UserprofilesController {
             self.controllerOutput?.filter()
         })
         
+        let delete: UIAction = .init(title: "delete".localized.capitalized,
+                                     image: UIImage(systemName: "person.fill.badge.minus", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                     identifier: nil,
+                                     discoverabilityTitle: nil,
+                                     attributes: .init(),
+                                     state: .off,
+                                     handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.controllerOutput?.editingMode()
+            self.navigationController?.setToolbarHidden(false, animated: true)
+        })
+        
+//        let removeSubscribers: UIAction = .init(title: "remove_subscribers".localized.capitalized,
+//                                     image: UIImage(systemName: "person.fill.badge.plus", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+//                                     identifier: nil,
+//                                     discoverabilityTitle: nil,
+//                                     attributes: .init(),
+//                                     state: .off,
+//                                     handler: { [weak self] _ in
+//            guard let self = self else { return }
+//
+//            self.controllerOutput?.editingMode()
+//        })
+
+        
         let half: UIAction = .init(title: "1/2",
                                      image: UIImage(systemName: "square.grid.2x2.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                      identifier: nil,
@@ -197,28 +237,28 @@ private extension UserprofilesController {
         })
         
         let third: UIAction = .init(title: "1/3",
-                                     image: UIImage(systemName: "square.grid.3x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                     identifier: nil,
-                                     discoverabilityTitle: nil,
-                                     attributes: .init(),
-                                     state: gridItemSize == .third ? .on : .off,
-                                     handler: { [weak self] _ in
+                                    image: UIImage(systemName: "square.grid.3x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                    identifier: nil,
+                                    discoverabilityTitle: nil,
+                                    attributes: .init(),
+                                    state: gridItemSize == .third ? .on : .off,
+                                    handler: { [weak self] _ in
             guard let self = self else { return }
             
             self.gridItemSize = .third
         })
         
-            let quarter: UIAction = .init(title: "1/4",
-                                         image: UIImage(systemName: "square.grid.4x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                         identifier: nil,
-                                         discoverabilityTitle: nil,
-                                         attributes: .init(),
-                                         state: gridItemSize == .quarter ? .on : .off,
-                                         handler: { [weak self] _ in
-                guard let self = self else { return }
-
-                self.gridItemSize = .quarter
-            })
+        let quarter: UIAction = .init(title: "1/4",
+                                      image: UIImage(systemName: "square.grid.4x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                      identifier: nil,
+                                      discoverabilityTitle: nil,
+                                      attributes: .init(),
+                                      state: gridItemSize == .quarter ? .on : .off,
+                                      handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.gridItemSize = .quarter
+        })
         
         var imageName: String = ""
         
@@ -237,8 +277,14 @@ private extension UserprofilesController {
                                 identifier: nil,
                                 options: .init(),
                                 children: [half, third, quarter])
+    var children: [UIMenuElement] = []
+        children.append(filter)
+        if mode == .Subscriptions || mode == .Subscribers {
+            children.append(delete)
+        }
+        children.append(inlineMenu)
         
-        return UIMenu(title: "", children: [filter, inlineMenu])
+        return UIMenu(title: "", children: children)
     }
     
     func setRightBarButton() {
@@ -264,14 +310,25 @@ private extension UserprofilesController {
     }
     
     @objc
-    func handleTap() {
-//        fatalError()
+    func cancelSelection() {
+        navigationController?.setToolbarHidden(true, animated: true)
     }
     
-    
+    @objc
+    func deleteItems() {
+//        navigationController?.setToolbarHidden(true, animated: true)
+    }
 }
 
 extension UserprofilesController: UserprofilesViewInput {
+    func subscribe(at: [Userprofile]) {
+        controllerInput?.subscribe(at: at)
+    }
+    
+    func unsubscribe(from: [Userprofile]) {
+        controllerInput?.unsubscribe(from: from)
+    }
+    
     func loadVoters(for answer: Answer) {
         controllerInput?.loadVoters(for: answer)
     }

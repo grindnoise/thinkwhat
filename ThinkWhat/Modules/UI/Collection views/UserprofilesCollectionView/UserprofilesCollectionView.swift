@@ -10,7 +10,7 @@ import UIKit
 import Combine
 
 class UserprofilesCollectionView: UICollectionView {
-    
+
     enum Section {
         case Main
     }
@@ -30,7 +30,7 @@ class UserprofilesCollectionView: UICollectionView {
         didSet {
             guard !userprofile.isNil else { return }
             
-            reloadDataSource()
+            reloadDataSource(items: dataItems)
         }
     }
     public weak var userprofile: Userprofile!
@@ -38,8 +38,11 @@ class UserprofilesCollectionView: UICollectionView {
     //Publishers
     public var paginationPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let userPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public let selectionPublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
     public let refreshPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let gridItemSizePublisher = PassthroughSubject<UserprofilesController.GridItemSize?, Never>()
+    public let subscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
+    public let unsubscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
     
     
     
@@ -49,6 +52,8 @@ class UserprofilesCollectionView: UICollectionView {
     private var tasks: [Task<Void, Never>?] = []
     
     //UI
+//    private var isEditing = false
+    private var selectedItems: [Userprofile] = []
     private var gridItemSize: UserprofilesController.GridItemSize = .third {
         didSet {
             guard oldValue != gridItemSize else { return }
@@ -82,7 +87,11 @@ class UserprofilesCollectionView: UICollectionView {
     private var selectedMinAge: Int = 18
     private var selectedMaxAge: Int = 99
     private var selectedGender: Gender = .Unassigned
-    private var filtered: [Userprofile] = []
+    private var filtered: [Userprofile] = [] {
+        didSet {
+            reloadDataSource(items: filtered, animated: true)
+        }
+    }
     
     
     
@@ -129,6 +138,18 @@ class UserprofilesCollectionView: UICollectionView {
         refreshControl?.endRefreshing()
     }
     
+    public func editingMode(_ on: Bool) {
+        allowsMultipleSelection = true
+        
+        isEditing = on
+        
+        visibleCells.forEach {
+            guard let cell = $0 as? UserprofileCell else { return }
+            
+            cell.avatar.mode = on ? .Selection : .Default
+        }
+    }
+    
     public func filter() {
         let banner = Popup(callbackDelegate: nil, bannerDelegate: self)
         let filterCollection = UsersFilterCollectionView(userprofiles: dataItems,
@@ -148,6 +169,19 @@ class UserprofilesCollectionView: UICollectionView {
                 guard let text = $0 else { return }
 
                 content.buttonTitle = text
+            }
+            .store(in: &banner.subscriptions)
+        
+        content.exitPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      !$0.isNil
+                else { return }
+                
+                self.selectedMinAge = filterCollection.selectedMinAge
+                self.selectedMaxAge = filterCollection.selectedMaxAge
+                self.selectedGender = filterCollection.selectedGender
+                self.filtered = filterCollection.filtered
             }
             .store(in: &banner.subscriptions)
         
@@ -217,12 +251,29 @@ private extension UserprofilesCollectionView {
         
         let cellRegistration = UICollectionView.CellRegistration<UserprofileCell, Userprofile> { [unowned self] cell, indexPath, userprofile in
             cell.userprofile = userprofile
-            
+            cell.avatar.mode = self.isEditing ? .Selection : .Default
             cell.userPublisher
                 .sink { [unowned self] in
                     guard let instance = $0 else { return }
                     
                     self.userPublisher.send(instance)
+                }
+                .store(in: &self.subscriptions)
+            
+            cell.selectionPublisher
+                .sink { [unowned self] in
+                    guard let instance = $0,
+                          let userprofile = instance.keys.first,
+                          let isSelected = instance.values.first
+                    else { return }
+                    
+                    if isSelected, !selectedItems.contains(userprofile) {
+                        selectedItems.append(userprofile)
+                    } else if !isSelected, selectedItems.contains(userprofile) {
+                        selectedItems.remove(object: userprofile)
+                    }
+                    
+                    self.selectionPublisher.send(selectedItems)
                 }
                 .store(in: &self.subscriptions)
         }
@@ -233,7 +284,7 @@ private extension UserprofilesCollectionView {
                                                  item: userprofile)
         }
         
-        reloadDataSource()
+        reloadDataSource(items: dataItems)
     }
     
     func setTasks() {
@@ -269,6 +320,38 @@ private extension UserprofilesCollectionView {
                 self.removeFromDataSource(item: subscriber)
             }
         })
+        //Subscription append
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
+                guard let self = self,
+                      self.mode == .Subscriptions,
+                      let dict = notification.object as? [Userprofile: Userprofile],
+                      let owner = dict.keys.first,
+                      owner == self.userprofile,
+                      let userprofile = dict.values.first,
+                      let source = self.source.snapshot() as? Snapshot,
+                      !source.itemIdentifiers.contains(userprofile)
+                else { return }
+                
+                self.appendToDataSource(item: userprofile)
+            }
+        })
+        //Subscription remove
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+                guard let self = self,
+                      self.mode == .Subscriptions,
+                      let dict = notification.object as? [Userprofile: Userprofile],
+                      let owner = dict.keys.first,
+                      owner == self.userprofile,
+                      let userprofile = dict.values.first,
+                      let source = self.source.snapshot() as? Snapshot,
+                      source.itemIdentifiers.contains(userprofile)
+                else { return }
+                
+                self.removeFromDataSource(item: userprofile)
+            }
+        })
         //End refreshing
         tasks.append( Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersEmpty) {
@@ -295,7 +378,7 @@ private extension UserprofilesCollectionView {
     }
     
     @MainActor
-    func reloadDataSource(animated: Bool = true) {
+    func reloadDataSource(items: [Userprofile], animated: Bool = true) {
         guard !source.isNil else { return }
         guard !dataItems.isEmpty else {
             refreshPublisher.send(true)
@@ -304,7 +387,7 @@ private extension UserprofilesCollectionView {
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Userprofile>()
         snapshot.appendSections([.Main])
-        snapshot.appendItems(dataItems)
+        snapshot.appendItems(items)
         source.apply(snapshot, animatingDifferences: animated)
     }
     
@@ -347,6 +430,54 @@ extension UserprofilesCollectionView: UICollectionViewDelegate {
             
             loadingIndicator.startAnimating()
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? UserprofileCell
+          else { return nil }
+        
+        return UITargetedPreview(view: cell.avatar.getSubview(type: UIView.self, identifier: "bg") ?? cell.avatar)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        
+        guard let indexPath = indexPaths.first,
+              let cell = collectionView.cellForItem(at: indexPath) as? UserprofileCell
+        else { return nil }
+        
+        return UIContextMenuConfiguration(
+            identifier: "\(indexPath.row)" as NSString, previewProvider: nil) { _ in
+                var actions: [UIAction]!
+                
+                let profile: UIAction = .init(title: "profile".localized.capitalized,
+                                             image: UIImage(systemName: "person.fill"),
+                                             identifier: nil,
+                                             discoverabilityTitle: nil,
+                                              attributes: .init(),
+                                              state: .off,
+                                              handler: { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    self.subscribePublisher.send([cell.userprofile])
+                })
+                
+                let subscription: UIAction = .init(title: cell.userprofile.subscribedAt ? "unsubscribe".localized.capitalized : "subscribe_for_user".localized,
+                                                   image: UIImage(systemName: cell.userprofile.subscribedAt ? "person.fill.badge.minus" : "person.fill.badge.plus"),
+                                                   identifier: nil,
+                                                   discoverabilityTitle: nil,
+                                                   attributes: .init(),
+                                                   state: .off,
+                                                   handler: { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    self.unsubscribePublisher.send([cell.userprofile])
+                })
+                
+                actions = [profile, subscription]
+                
+                
+                return UIMenu(title: cell.userprofile.name, image: nil, identifier: nil, options: .init(), children: actions)
+            }
     }
 }
 

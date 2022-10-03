@@ -62,6 +62,15 @@ class UserprofilesView: UIView {
             }
             .store(in: &subscriptions)
         
+        instance.selectionPublisher
+            .sink { [unowned self] in
+                guard let instances = $0 else { return }
+
+                print(instances)
+            }
+            .store(in: &subscriptions)
+
+        
         instance.refreshPublisher
             .sink { [unowned self] in
                 guard !$0.isNil,
@@ -70,6 +79,23 @@ class UserprofilesView: UIView {
                 else { return }
                 
                 self.viewInput?.loadUsers(for: userprofile, mode: viewInput.mode)
+            }
+            .store(in: &subscriptions)
+        //Subscribe
+        instance.subscribePublisher
+            .sink { [unowned self] in
+                guard let userprofiles = $0 else { return }
+                
+                self.viewInput?.subscribe(at: userprofiles)
+            }
+            .store(in: &subscriptions)
+        
+        //Unsubscribe
+        instance.unsubscribePublisher
+            .sink { [unowned self] in
+                guard let userprofiles = $0 else { return }
+                
+                self.viewInput?.unsubscribe(from: userprofiles)
             }
             .store(in: &subscriptions)
         
@@ -133,6 +159,10 @@ private extension UserprofilesView {
 }
 
 extension UserprofilesView: UserprofilesControllerOutput {
+    func editingMode() {
+        collectionView.editingMode(true)
+    }
+    
     func filter() {
         collectionView.filter()
     }

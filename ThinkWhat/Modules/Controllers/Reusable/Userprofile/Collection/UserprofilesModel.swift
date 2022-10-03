@@ -15,6 +15,30 @@ class UserprofilesModel {
 
 // MARK: - Controller Input
 extension UserprofilesModel: UserprofilesControllerInput {
+    func subscribe(at userprofiles: [Userprofile]) {
+        Task {
+            do {
+                try await API.shared.profiles.subscribe(at: userprofiles)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
+    
+    func unsubscribe(from userprofiles: [Userprofile]) {
+        Task {
+            do {
+                        try await API.shared.profiles.unsubscribe(from: userprofiles)
+                    } catch {
+#if DEBUG
+                        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                }
+        }
+    }
+    
     func loadVoters(for answer: Answer) {
         Task {
             do {

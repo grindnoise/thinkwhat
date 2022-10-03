@@ -22,12 +22,12 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
         }
     }
     //Publishers
-    public let namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
-    public let datePublisher = CurrentValueSubject<Date?, Never>(nil)
-    public let genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
-    public let galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
-    public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
-    public let previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
+    public var namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
+    public var datePublisher = CurrentValueSubject<Date?, Never>(nil)
+    public var genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
+    public var galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public var cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public var previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -186,7 +186,8 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
         return instance
     }()
     private lazy var avatar: Avatar = {
-        let instance = Avatar(isShadowed: true, mode: .Editing)
+        let instance = Avatar(isShadowed: true)
+        instance.mode = .Editing
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.clipsToBounds = false
         instance.buttonBgDarkColor = .secondarySystemBackground
@@ -688,6 +689,17 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
     
         separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
+        datePublisher = CurrentValueSubject<Date?, Never>(nil)
+        genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
+        galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
+        cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
+        previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
     }
 }
 

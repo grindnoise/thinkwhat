@@ -23,6 +23,8 @@ protocol UserprofilesViewInput: AnyObject {
     func onUserprofileTap(_: Userprofile)
     func loadUsers(for: Userprofile, mode: UserprofilesController.Mode)
     func loadVoters(for: Answer)
+    func subscribe(at: [Userprofile])
+    func unsubscribe(from: [Userprofile])
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -34,6 +36,8 @@ protocol UserprofilesControllerInput: AnyObject {
     
     func loadUsers(for: Userprofile, mode: UserprofilesController.Mode)
     func loadVoters(for: Answer)
+    func subscribe(at: [Userprofile])
+    func unsubscribe(from: [Userprofile])
 }
 
 /// *Model* returns the result to the *Controller*
@@ -51,4 +55,5 @@ protocol UserprofilesControllerOutput: AnyObject {
     var gridItemSizePublisher: CurrentValueSubject<UserprofilesController.GridItemSize?, Never> { get }
     
     func filter()
+    func editingMode()
 }

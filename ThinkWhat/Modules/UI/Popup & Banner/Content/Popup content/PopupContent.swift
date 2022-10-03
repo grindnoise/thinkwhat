@@ -23,9 +23,25 @@ class PopupContent: UIView {
     }
     public var buttonTitle: String {
         didSet {
-            actionButton.setTitle(buttonTitle, for: .normal)
+            if #available(iOS 15, *) {
+                guard !actionButton.configuration.isNil else { return }
+                let attrString = AttributedString(buttonTitle.localized.uppercased(), attributes: AttributeContainer([
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.white
+                ]))
+                actionButton.configuration!.attributedTitle = attrString
+            } else {
+                let attrString = NSMutableAttributedString(string: buttonTitle.localized.uppercased(), attributes: [
+                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+                    NSAttributedString.Key.foregroundColor: UIColor.white
+                ])
+                actionButton.setAttributedTitle(attrString, for: .normal)
+            }
         }
     }
+    
+    //Publishers
+    public let exitPublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     
     
@@ -326,6 +342,7 @@ class PopupContent: UIView {
     
     @objc
     private func close() {
+        exitPublisher.send(true)
         parent?.dismiss()
     }
     

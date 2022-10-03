@@ -21,12 +21,12 @@ class CurrentUserSocialMediaCell: UICollectionViewListCell {
         }
     }
     //Publishers
-    public let facebookPublisher = CurrentValueSubject<String?, Never>(nil)
-    public let instagramPublisher = CurrentValueSubject<String?, Never>(nil)
-    public let tiktokPublisher = CurrentValueSubject<String?, Never>(nil)
-    public let googlePublisher = CurrentValueSubject<String?, Never>(nil)
-    public let twitterPublisher = CurrentValueSubject<String?, Never>(nil)
-    public let openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
+    public var facebookPublisher = CurrentValueSubject<String?, Never>(nil)
+    public var instagramPublisher = CurrentValueSubject<String?, Never>(nil)
+    public var tiktokPublisher = CurrentValueSubject<String?, Never>(nil)
+    public var googlePublisher = CurrentValueSubject<String?, Never>(nil)
+    public var twitterPublisher = CurrentValueSubject<String?, Never>(nil)
+    public var openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -358,6 +358,17 @@ class CurrentUserSocialMediaCell: UICollectionViewListCell {
         instagramButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         instagramButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        facebookPublisher = CurrentValueSubject<String?, Never>(nil)
+        instagramPublisher = CurrentValueSubject<String?, Never>(nil)
+        tiktokPublisher = CurrentValueSubject<String?, Never>(nil)
+        googlePublisher = CurrentValueSubject<String?, Never>(nil)
+        twitterPublisher = CurrentValueSubject<String?, Never>(nil)
+        openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
     }
 }
 

@@ -310,6 +310,9 @@
 "my_publications" = "My publications";
 "my_subscribers" = "My subscribers";
 "balance" = "Balance";
+"account_management" = "Account management";
+"logout" = "Log out";
+"delete_account" = "Delete account";
 
 //Tutorials
 "poll_vote_edu_1" = "The poll will end and disappear from the lists after the required number of participants has been reached.";
@@ -317,3 +320,7 @@
 
 //Collection
 "updating_data" = "Updating...";
+"open_userprofile" = "Open profile";
+"subscribe_for_user" = "Subscribe";
+"remove_subscribers" = "Unsubscribe";
+"manage_subscriptions" = "Manage";

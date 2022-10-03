@@ -352,6 +352,7 @@
 		AB913F8228086E1A00609D51 /* StatisticsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB913F8028086E1A00609D51 /* StatisticsCell.swift */; };
 		AB913F8328086E1A00609D51 /* StatisticsCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB913F8128086E1A00609D51 /* StatisticsCell.xib */; };
 		AB913F8B28097D9C00609D51 /* ProgressCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB913F8A28097D9C00609D51 /* ProgressCircle.swift */; };
+		AB92112428E993C000BA12CA /* CurrentUserAccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB92112328E993C000BA12CA /* CurrentUserAccountCell.swift */; };
 		AB92237424F3EB4900F38936 /* SubcategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB92237324F3EB4900F38936 /* SubcategoryViewController.swift */; };
 		AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */; };
 		AB93FD78247EA245009546DD /* EmptyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD77247EA245009546DD /* EmptyCard.swift */; };
@@ -928,6 +929,7 @@
 		AB913F8028086E1A00609D51 /* StatisticsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsCell.swift; sourceTree = "<group>"; };
 		AB913F8128086E1A00609D51 /* StatisticsCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatisticsCell.xib; sourceTree = "<group>"; };
 		AB913F8A28097D9C00609D51 /* ProgressCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCircle.swift; sourceTree = "<group>"; };
+		AB92112328E993C000BA12CA /* CurrentUserAccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentUserAccountCell.swift; sourceTree = "<group>"; };
 		AB92237324F3EB4900F38936 /* SubcategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubcategoryViewController.swift; sourceTree = "<group>"; };
 		AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayEncoding.swift; sourceTree = "<group>"; };
 		AB93FD77247EA245009546DD /* EmptyCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyCard.swift; sourceTree = "<group>"; };
@@ -2620,6 +2622,7 @@
 				AB90FAF428D36E990096B147 /* CurrentUserSocialMediaCell.swift */,
 				AB90FAF928D4B0390096B147 /* CurrentUserInterestsCell.swift */,
 				AB7830B028D89EEB00D7C883 /* CurrentUserStatsCell.swift */,
+				AB92112328E993C000BA12CA /* CurrentUserAccountCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -3479,6 +3482,7 @@
 				AB0AB63D27B5001F006FD33F /* AgreementView.swift in Sources */,
 				AB90FAFF28D4C6EF0096B147 /* InterestCell.swift in Sources */,
 				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
+				AB92112428E993C000BA12CA /* CurrentUserAccountCell.swift in Sources */,
 				ABEDC4E52450608700FA9128 /* SurveyInfoCell.swift in Sources */,
 				AB7599ED245B29FE008B0569 /* SurveyPreview.swift in Sources */,
 				AB2C03CE24407C5D001BFD75 /* LostConnectionAnimation.swift in Sources */,

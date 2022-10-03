@@ -310,6 +310,9 @@
 "my_publications" = "Мои публикации";
 "my_subscribers" = "Мои подписчики";
 "balance" = "Баланс";
+"account_management" = "Управление аккаунтом";
+"logout" = "Выйти";
+"delete_account" = "Удалить аккаунт";
 
 //Tutorials
 "poll_vote_edu_1" = "Опрос завершится и исчезнет из списков после того, как наберется необходимое количество участников.";
@@ -317,3 +320,7 @@
 
 //Collection
 "updating_data" = "Обновление...";
+"open_userprofile" = "Открыть профиль";
+"subscribe_for_user" = "Подписаться";
+"remove_subscribers" = "Отписаться";
+"manage_subscriptions" = "Управлять";

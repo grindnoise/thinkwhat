@@ -143,7 +143,8 @@ class Userprofile: Decodable {
              lastVisit = "last_visit",
              topPublicationCategories = "top_pub_categories",
              wasEdited = "is_edited",
-             balance = "credit"
+             balance = "credit",
+             subscribedAt = "subscribed_at"
     }
     enum UserSurveyType {
         case Own, Favorite
@@ -406,35 +407,12 @@ class Userprofile: Decodable {
         }
         return true
     }
-//    init(id _id: Int,
-//         firstName _firstName: String,
-//         lastName _lastName: String,
-//         birthDate _birthDate: Date?,
-////         age _age: Int,
-//         email _email: String,
-//         image _image: UIImage?,
-//         gender _gender: Gender,
-//         imageURL _imageURL: URL?,
-//         instagramURL _instagramURL: URL?,
-//         tiktokURL _tiktokURL: URL?,
-//         vkURL _vkURL: URL?,
-//         facebookURL _facebookURL: URL?) {
-//        username = ""
-//        id = _id
-//        firstName = _firstName
-//        lastName = _lastName
-//        email = _email
-//        birthDate = _birthDate
-////        age = _age
-//        gender = _gender
-//        image = _image
-//        imageURL = _imageURL
-//        instagramURL = _instagramURL
-//        tiktokURL = _tiktokURL
-//        facebookURL = _facebookURL
-//        vkURL = _vkURL
-    //        lastVisit = Date()
-    //    }
+    var subscribedAt: Bool {
+        didSet {
+            
+        }
+    }
+    
     init?() {
         guard let _id = UserDefaults.Profile.id,
         let _firstName = UserDefaults.Profile.firstName,
@@ -451,6 +429,7 @@ class Userprofile: Decodable {
         email       = _email
         gender      = _gender
         isBanned    = _isBanned
+        subscribedAt = false
         imageURL    = UserDefaults.Profile.imageURL
         if let path = UserDefaults.Profile.imagePath, let _image = UIImage(contentsOfFile: path) {
             image = _image
@@ -494,6 +473,7 @@ class Userprofile: Decodable {
             vkURL               = URL(string: try container.decodeIfPresent(String.self, forKey: .vkURL) ?? "")
             wasEdited           = try container.decodeIfPresent(Bool.self, forKey: .wasEdited)
             isBanned            = try container.decode(Bool.self, forKey: .isBanned)
+            subscribedAt        = try container.decode(Bool.self, forKey: .subscribedAt)
             gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
             ///City decoding
             if let cityInstance = try? container.decodeIfPresent(City.self, forKey: .city) {

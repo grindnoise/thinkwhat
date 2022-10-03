@@ -1216,17 +1216,20 @@ class API {
             }
         }
         
-        public func subscribe(_ subscribeFor: Userprofile) async throws {
+        public func subscribe(at userprofiles: [Userprofile]) async throws {
             guard let url = API_URLS.Profiles.subscribe,
                   let userprofile = Userprofiles.shared.current
             else { throw APIError.invalidURL }
             
-            let parameters: Parameters = ["userprofile_id": subscribeFor.id]
+            let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
             
             do {
-                let _ = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default, headers: parent.headers())
+                let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding.default, headers: parent.headers())
                 await MainActor.run {
-                    userprofile.subscriptions.append(subscribeFor)
+                    userprofiles.forEach {
+                        userprofile.subscriptions.append($0)
+                        userprofile.subscribedAt = true
+                    }
                 }
             } catch let error {
 #if DEBUG
@@ -1236,18 +1239,19 @@ class API {
             }
         }
         
-        public func unsubscribe(_ unsubscribeFrom: [Userprofile]) async throws {
+        public func unsubscribe(from userprofiles: [Userprofile]) async throws {
             guard let url = API_URLS.Profiles.unsubscribe,
                   let userprofile = Userprofiles.shared.current
             else { throw APIError.invalidURL }
             
-            let parameters: Parameters = ["ids": unsubscribeFrom.map{$0.id}]
+            let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
             
             do {
                 try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
                 await MainActor.run {
-                    unsubscribeFrom.forEach {
-                        userprofile.subscribers.remove(object: $0)
+                    userprofiles.forEach {
+                        userprofile.subscriptions.remove(object: $0)
+                        $0.subscribedAt = false
                     }
                 }
             } catch let error {

@@ -16,6 +16,7 @@ class SettingsCellHeader: UICollectionReusableView {
         case SocialMedia = "social_media"
         case Interests = "interests"
         case Stats = "stats"
+        case Management = "account_management"
     }
     
     // MARK: - Public properties
@@ -68,8 +69,9 @@ class SettingsCellHeader: UICollectionReusableView {
         widthConstraint.identifier = "width"
         widthConstraint.isActive = true
         
-        let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 300, font: instance.font))
+        let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
         heightConstraint.identifier = "height"
+        heightConstraint.priority = .defaultHigh
         heightConstraint.isActive = true
         
         instance.publisher(for: \.bounds, options: .new)
@@ -79,7 +81,7 @@ class SettingsCellHeader: UICollectionReusableView {
                 else { return }
                 
                 self.setNeedsLayout()
-                constraint.constant = instance.text!.height(withConstrainedWidth: 300, font: instance.font)
+                constraint.constant = instance.text!.height(withConstrainedWidth: 1000, font: instance.font)
                 self.layoutIfNeeded()
             }
             .store(in: &subscriptions)

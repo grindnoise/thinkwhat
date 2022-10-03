@@ -29,7 +29,11 @@ class UsersFilterCollectionView: UICollectionView {
     public var buttonTitlePublisher = CurrentValueSubject<String?, Never>(nil)
     
     //Logic
-//    public var filters: [String: AnyObject]? = [:]
+    public private(set) var filtered: [Userprofile] = []
+    public private(set) var selectedMinAge: Int
+    public private(set) var selectedMaxAge: Int
+    public private(set) var selectedGender: Gender
+    
     
     
     // MARK: - Private properties
@@ -42,10 +46,6 @@ class UsersFilterCollectionView: UICollectionView {
     
     //Logic
     private var userprofiles: [Userprofile] = []
-    private var filtered: [Userprofile] = []
-    private var selectedMinAge: Int = 18
-    private var selectedMaxAge: Int = 99
-    private var selectedGender: Gender = .Unassigned
     private let minAge = 18
     private let maxAge = 99
     
@@ -65,6 +65,9 @@ class UsersFilterCollectionView: UICollectionView {
     // MARK: - Initialization
     init(userprofiles: [Userprofile], filtered: [Userprofile] = [], selectedMinAge: Int, selectedMaxAge: Int, selectedGender: Gender) {//?, filters: [String : AnyObject]?) {
         self.userprofiles = userprofiles
+        self.selectedMinAge = selectedMinAge
+        self.selectedMaxAge = selectedMaxAge
+        self.selectedGender = selectedGender
         
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         
@@ -109,7 +112,7 @@ private extension UsersFilterCollectionView {
             case .Age:
                 sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 8, trailing: 0)
             case .Gender:
-                sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 16, trailing: 0)
+                sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 32, trailing: 0)
             }
             
             return sectionLayout
@@ -167,18 +170,20 @@ private extension UsersFilterCollectionView {
         snapshot.appendItems([0], toSection: .Age)
         snapshot.appendItems([1], toSection: .Gender)
         source.apply(snapshot, animatingDifferences: false)
+        fetchData()
     }
     
     func setTasks() {}
     
     func fetchData() {
         if selectedGender != .Unassigned {
-            filtered = userprofiles.filter({ $0.age >= Int(selectedMinAge)}).filter({$0.age <= Int(selectedMaxAge)}).filter({$0.gender == selectedGender})
+            filtered = userprofiles.filter({Int(selectedMinAge)...Int(selectedMaxAge) ~= $0.age}).filter({$0.gender == selectedGender})
+//            filter({ $0.age >= Int(selectedMinAge)}).filter({$0.age <= Int(selectedMaxAge)}).filter({$0.gender == selectedGender})
         } else {
             filtered = userprofiles.filter({Int(selectedMinAge)...Int(selectedMaxAge) ~= $0.age})
         }
 
-        buttonTitlePublisher.send("show".localized.uppercased() + " (\(String(describing: filtered.count)))")
+        buttonTitlePublisher.send("show".localized.uppercased() + " \(String(describing: filtered.count))")
     }
 }
 

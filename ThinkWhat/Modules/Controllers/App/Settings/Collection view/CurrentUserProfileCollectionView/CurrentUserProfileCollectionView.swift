@@ -12,7 +12,7 @@ import Combine
 class CurrentUserProfileCollectionView: UICollectionView {
     
     enum Section: Int, CaseIterable {
-        case Credentials, City, Interests, SocialMedia, Stats
+        case Credentials, City, Interests, SocialMedia, Stats, Management
     }
     
     // MARK: - Public properties
@@ -341,6 +341,39 @@ class CurrentUserProfileCollectionView: UICollectionView {
             cell.userprofile = userprofile
         }
         
+        let accountCellRegistration = UICollectionView.CellRegistration<CurrentUserAccountCell, AnyHashable> { [unowned self] cell, indexPath, item in
+            
+            //Logout
+            cell.logoutPublisher
+                .sink { [weak self] in
+                    guard let self = self,
+                          !$0.isNil
+                    else { return }
+                    
+//                    self.interestPublisher.send(topic)
+                }
+                .store(in: &subscriptions)
+            
+            //Delete
+            cell.deletePublisher
+                .sink { [weak self] in
+                    guard let self = self,
+                          !$0.isNil
+                    else { return }
+                    
+//                    self.interestPublisher.send(topic)
+                }
+                .store(in: &subscriptions)
+            
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+            backgroundConfig.backgroundColor = .clear
+            cell.backgroundConfiguration = backgroundConfig
+                        
+            guard let userprofile = Userprofiles.shared.current else { return }
+            
+            cell.userprofile = userprofile
+        }
+        
         let headerRegistraition = UICollectionView.SupplementaryRegistration<SettingsCellHeader>(elementKind: UICollectionView.elementKindSectionHeader) { [unowned self] supplementaryView, elementKind, indexPath in
             
             guard let section = Section(rawValue: indexPath.section),
@@ -360,6 +393,9 @@ class CurrentUserProfileCollectionView: UICollectionView {
                 supplementaryView.isHelpEnabled = true
             case .Stats:
                 supplementaryView.mode = .Stats
+                supplementaryView.isHelpEnabled = false
+            case .Management:
+                supplementaryView.mode = .Management
                 supplementaryView.isHelpEnabled = false
             default:
                 print("")
@@ -389,6 +425,10 @@ class CurrentUserProfileCollectionView: UICollectionView {
                 return collectionView.dequeueConfiguredReusableCell(using: statsCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
+            } else if section == .Management {
+                return collectionView.dequeueConfiguredReusableCell(using: accountCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
             }
 
             return UICollectionViewCell()
@@ -401,12 +441,13 @@ class CurrentUserProfileCollectionView: UICollectionView {
         }
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-        snapshot.appendSections([.Credentials, .City, .Interests, .SocialMedia, .Stats])
+        snapshot.appendSections([.Credentials, .City, .Interests, .SocialMedia, .Stats, .Management])
         snapshot.appendItems([0], toSection: .Credentials)
         snapshot.appendItems([1], toSection: .City)
         snapshot.appendItems([2], toSection: .Interests)
         snapshot.appendItems([3], toSection: .SocialMedia)
         snapshot.appendItems([4], toSection: .Stats)
+        snapshot.appendItems([5], toSection: .Management)
         source.apply(snapshot, animatingDifferences: false)
     }
 }
