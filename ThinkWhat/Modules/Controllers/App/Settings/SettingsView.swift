@@ -12,8 +12,12 @@ import Agrume
 
 class SettingsView: UIView {
     
+    
+    
     // MARK: - Public properties
     weak var viewInput: (SettingsViewInput & UIViewController)?
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -26,17 +30,19 @@ class SettingsView: UIView {
         instance.layer.masksToBounds = true
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         
-        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-            guard let value = change.newValue else { return }
-            view.cornerRadius = value.width * 0.05
-        })
+        userSettingsView.addEquallyTo(to: instance)
+        appSettingsView.addEquallyTo(to: instance)
         
-        profileView.addEquallyTo(to: instance)
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.cornerRadius = rect.width * 0.05
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
-    private lazy var profileView: CurrentUserProfileCollectionView = {
-        let instance = CurrentUserProfileCollectionView()
+    private lazy var userSettingsView: UserSettingsCollectionView = {
+        let instance = UserSettingsCollectionView()
         
         instance.namePublisher
             .sink { [unowned self] in
@@ -180,6 +186,13 @@ class SettingsView: UIView {
         
         return instance
     }()
+    private lazy var appSettingsView: AppSettingsCollectionView = {
+        let instance = AppSettingsCollectionView()
+     
+        return instance
+    }()
+    
+    
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -193,13 +206,20 @@ class SettingsView: UIView {
             shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
             shadowView.layer.shadowRadius = 5
             shadowView.layer.shadowOffset = .zero
-            observers.append(shadowView.observe(\UIView.bounds, options: .new) { view, change in
-                guard let newValue = change.newValue else { return }
-                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
-            })
+            
+            shadowView.publisher(for: \.bounds, options: .new)
+                .sink { [weak self] rect in
+                    guard let self = self else { return }
+                    
+                    self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+                }
+                .store(in: &subscriptions)
+            
             background.addEquallyTo(to: shadowView)
         }
     }
+    
+    
     
     // MARK: - Destructor
     deinit {
@@ -211,6 +231,8 @@ class SettingsView: UIView {
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
+    
+    
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -225,7 +247,23 @@ class SettingsView: UIView {
         setupUI()
     }
     
-    private func setupUI() {
+    
+    
+    // MARK: - Overrriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        userSettingsView.backgroundColor = .clear
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        print(touches)
+    }
+}
+
+private extension SettingsView {
+    func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -240,7 +278,7 @@ class SettingsView: UIView {
         addGestureRecognizer(touch)
     }
     
-    private func setTasks() {
+    func setTasks() {
 //        //Hide keyboard
 //        tasks.append( Task {@MainActor [weak self] in
 //            for await _ in NotificationCenter.default.notifications(for: UIApplication.keyboardDidShowNotification) {
@@ -253,24 +291,11 @@ class SettingsView: UIView {
     }
     
     @objc
-    private func hideKeyboard() {
+    func hideKeyboard() {
         endEditing(true)
-    }
-    
-    // MARK: - Overrriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        profileView.backgroundColor = .clear
-        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        print(touches)
     }
 }
 
-// MARK: - Controller Output
 extension SettingsView: SettingsControllerOutput {
     func onError(_ error: Error) {
         showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1), shadowed: false)

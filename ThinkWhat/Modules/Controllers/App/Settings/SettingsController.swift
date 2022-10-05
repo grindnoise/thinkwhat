@@ -12,8 +12,9 @@ import Combine
 
 class SettingsController: UIViewController, UINavigationControllerDelegate {
     
-    enum Mode {
-        case Profile, Settings
+    enum Mode: String {
+        case Profile = "profile"
+        case Settings = "settings"
     }
     
     // MARK: - Public properties
@@ -26,7 +27,19 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     private lazy var settingsSwitch: SettingsSwitch = {
-        return SettingsSwitch(callbackDelegate: self)
+        let instance = SettingsSwitch()
+        instance.statePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let state = $0
+                else { return }
+                
+                self.mode = state
+                self.navigationItem.title = state.rawValue.localized
+            }
+            .store(in: &subscriptions)
+        
+        return instance
     }()
     private lazy var imagePicker: UIImagePickerController = {
         let instance = UIImagePickerController()
@@ -278,21 +291,6 @@ extension SettingsController: SettingsModelOutput {
 extension SettingsController: DataObservable {
     func onDataLoaded() {
         navigationController?.setNavigationBarHidden(false, animated: true)
-    }
-}
-
-extension SettingsController: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-        if let state = sender as? SettingsSwitch.State {
-            switch state {
-            case .Profile:
-                mode = .Profile
-                navigationItem.title = "profile".localized
-            case .Settings:
-                mode = .Settings
-                navigationItem.title = "settings".localized
-            }
-        }
     }
 }
 

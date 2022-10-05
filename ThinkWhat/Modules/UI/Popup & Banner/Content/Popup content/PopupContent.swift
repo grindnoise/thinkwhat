@@ -60,6 +60,19 @@ class PopupContent: UIView {
         instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title2)
         instance.translatesAutoresizingMaskIntoConstraints = false
         
+        if !fixedSize, content.isNil {
+            instance.publisher(for: \.bounds, options: .new)
+                .sink { [weak self] rect in
+                    guard let self = self else { return }
+                    
+                    self.parent?.onContainerHeightChange(self.topContainer.bounds.height +
+                                                         instance.text!.height(withConstrainedWidth: rect.width, font: instance.font) +
+                                                         self.bottomContainer.bounds.height +
+                                                         self.verticalStackView.spacing * CGFloat(self.verticalStackView.arrangedSubviews.count - 1))
+                }
+                .store(in: &subscriptions)
+        }
+        
         return instance
     }()
     private lazy var verticalStackView: UIStackView = {
@@ -118,7 +131,7 @@ class PopupContent: UIView {
                           let systemImage = self.systemImage
                     else { return }
                     
-                    instance.setImage(UIImage(systemName: systemImage, withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.75))!)
+                    instance.setImage(UIImage(systemName: systemImage, withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*1.0))!)
                 }
                 .store(in: &subscriptions)
         }
@@ -253,7 +266,7 @@ class PopupContent: UIView {
     private var iconCategory: Icon.Category?
     private var image: UIImage?
     private var systemImage: String?
-    
+    private let spacing: CGFloat
     private let fixedSize: Bool
     
     
@@ -285,10 +298,11 @@ class PopupContent: UIView {
 //        setupUI()
 //    }
 //
-    init(parent: Popup, systemImage: String, content: UIView? = nil, text: String? = nil, buttonTitle: String, fixedSize: Bool = true) {
+    init(parent: Popup, systemImage: String, content: UIView? = nil, text: String? = nil, buttonTitle: String, fixedSize: Bool = true, spacing: CGFloat = 16) {
         self.parent = parent
         self.fixedSize = fixedSize
         self.buttonTitle = buttonTitle
+        self.spacing = spacing
         
         super.init(frame: .zero)
         
@@ -299,10 +313,11 @@ class PopupContent: UIView {
         setupUI()
     }
     
-    init(parent: Popup, iconCategory: Icon.Category, content: UIView? = nil, text: String? = nil, buttonTitle: String, fixedSize: Bool = true) {
+    init(parent: Popup, iconCategory: Icon.Category, content: UIView? = nil, text: String? = nil, buttonTitle: String, fixedSize: Bool = true, spacing: CGFloat = 16) {
         self.parent = parent
         self.fixedSize = fixedSize
         self.buttonTitle = buttonTitle
+        self.spacing = spacing
         
         super.init(frame: .zero)
         
@@ -313,10 +328,11 @@ class PopupContent: UIView {
         setupUI()
     }
     
-    init(parent: Popup, image: UIImage, content: UIView? = nil, text: String? = nil, buttonTitle: String, fixedSize: Bool = true) {
+    init(parent: Popup, image: UIImage, content: UIView? = nil, text: String? = nil, buttonTitle: String, fixedSize: Bool = true, spacing: CGFloat = 16) {
         self.parent = parent
         self.fixedSize = fixedSize
         self.buttonTitle = buttonTitle
+        self.spacing = spacing
         
         super.init(frame: .zero)
         
@@ -345,6 +361,8 @@ class PopupContent: UIView {
         exitPublisher.send(true)
         parent?.dismiss()
     }
+    
+    
     
     // MARK: - Public methods
 //    func setButtonTitle(title: String) {

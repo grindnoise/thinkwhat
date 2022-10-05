@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class CurrentUserSocialMediaCell: UICollectionViewListCell {
+class UserSettingsSocialMediaCell: UICollectionViewListCell {
     
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {
@@ -372,7 +372,7 @@ class CurrentUserSocialMediaCell: UICollectionViewListCell {
     }
 }
 
-extension CurrentUserSocialMediaCell: UITextFieldDelegate {
+extension UserSettingsSocialMediaCell: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         return true
     }
@@ -467,7 +467,7 @@ extension CurrentUserSocialMediaCell: UITextFieldDelegate {
     }
 }
 
-extension CurrentUserSocialMediaCell: BannerObservable {
+extension UserSettingsSocialMediaCell: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     
     func onBannerWillDisappear(_ sender: Any) {}

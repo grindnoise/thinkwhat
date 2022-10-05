@@ -39,7 +39,8 @@ class UserprofilesController: UIViewController {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    
+    //Logic
+    private var selectedItems: [Userprofile] = []
     //UI
     private var color: UIColor = .clear
     private var gridItemSize: UserprofilesController.GridItemSize = .third {
@@ -114,20 +115,9 @@ class UserprofilesController: UIViewController {
             .modelOutput = self
         
         self.view = view as UIView
-        let cancel = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelSelection))
-        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        let delete = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteItems))
-        self.toolbarItems = [cancel, spacer, delete]
         
         
-        let appearance = UIToolbarAppearance()
-        appearance.configureWithOpaqueBackground()
-           
-        navigationController?.toolbar.tintColor = .black
-        navigationController?.toolbar.standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            navigationController?.toolbar.scrollEdgeAppearance = appearance
-        }
+        setToolBar()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -137,6 +127,12 @@ class UserprofilesController: UIViewController {
         setRightBarButton()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        navigationController?.setToolbarHidden(true, animated: true)
+    }
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
@@ -144,6 +140,35 @@ class UserprofilesController: UIViewController {
 }
 
 private extension UserprofilesController {
+    func setToolBar() {
+        navigationController?.isToolbarHidden = true
+        
+//        navigationController?.toolbar.isTranslucent = true
+//        navigationController?.toolbar.backgroundColor = .tertiarySystemBackground
+//        navigationController?.toolbar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
+//        navigationController?.toolbar.superview?.backgroundColor = .tertiarySystemBackground
+////        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: nil, action: #selector(self.dateSelected))
+////        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+////        toolBar.items = [space, doneButton]
+//        navigationController?.toolbar.barStyle = .default
+        
+        let cancel = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelSelection))
+        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let delete = UIBarButtonItem(title: "delete".localized, style: .plain, target: self, action: #selector(deleteItems))
+        delete.accessibilityIdentifier = "delete"
+        delete.tintColor = .secondaryLabel
+        toolbarItems = [cancel, spacer, delete]
+        edgesForExtendedLayout = []
+        
+        let appearance = UIToolbarAppearance()
+        appearance.configureWithOpaqueBackground()
+
+//        navigationController?.toolbar.tintColor = .black
+        navigationController?.toolbar.standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            navigationController?.toolbar.scrollEdgeAppearance = appearance
+        }
+    }
     
     func setupUI() {
         title = mode.rawValue.lowercased().localized
@@ -187,7 +212,7 @@ private extension UserprofilesController {
     
     func prepareMenu() -> UIMenu {
         let filter: UIAction = .init(title: "filter".localized.capitalized,
-                                     image: UIImage(systemName: "slider.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                     image: UIImage(systemName: "slider.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
                                      identifier: nil,
                                      discoverabilityTitle: nil,
                                      attributes: .init(),
@@ -198,8 +223,8 @@ private extension UserprofilesController {
             self.controllerOutput?.filter()
         })
         
-        let delete: UIAction = .init(title: "delete".localized.capitalized,
-                                     image: UIImage(systemName: "person.fill.badge.minus", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+        let delete: UIAction = .init(title: "select".localized.capitalized,
+                                     image: UIImage(systemName: "person.fill.checkmark", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
                                      identifier: nil,
                                      discoverabilityTitle: nil,
                                      attributes: .init(),
@@ -207,7 +232,7 @@ private extension UserprofilesController {
                                      handler: { [weak self] _ in
             guard let self = self else { return }
             
-            self.controllerOutput?.editingMode()
+            self.controllerOutput?.setEditingMode(true)
             self.navigationController?.setToolbarHidden(false, animated: true)
         })
         
@@ -225,7 +250,7 @@ private extension UserprofilesController {
 
         
         let half: UIAction = .init(title: "1/2",
-                                     image: UIImage(systemName: "square.grid.2x2.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                     image: UIImage(systemName: "square.grid.2x2.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
                                      identifier: nil,
                                      discoverabilityTitle: nil,
                                      attributes: .init(),
@@ -237,7 +262,7 @@ private extension UserprofilesController {
         })
         
         let third: UIAction = .init(title: "1/3",
-                                    image: UIImage(systemName: "square.grid.3x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                    image: UIImage(systemName: "square.grid.3x3.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
                                     identifier: nil,
                                     discoverabilityTitle: nil,
                                     attributes: .init(),
@@ -249,7 +274,7 @@ private extension UserprofilesController {
         })
         
         let quarter: UIAction = .init(title: "1/4",
-                                      image: UIImage(systemName: "square.grid.4x3.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                      image: UIImage(systemName: "square.grid.4x3.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
                                       identifier: nil,
                                       discoverabilityTitle: nil,
                                       attributes: .init(),
@@ -311,16 +336,53 @@ private extension UserprofilesController {
     
     @objc
     func cancelSelection() {
+        guard let toolbar = navigationController?.toolbar,
+              let items = toolbar.items,
+              let delete = items.filter { $0.accessibilityIdentifier == "delete" }.first
+        else { return }
+        
         navigationController?.setToolbarHidden(true, animated: true)
+        controllerOutput?.setEditingMode(false)
+        selectedItems.removeAll()
+        delete.title = "delete".localized
+        delete.tintColor = .secondaryLabel
     }
     
     @objc
     func deleteItems() {
-//        navigationController?.setToolbarHidden(true, animated: true)
+        navigationController?.setToolbarHidden(true, animated: true)
+        controllerOutput?.setEditingMode(false)
+        if mode == .Subscriptions {
+            controllerInput?.unsubscribe(from: selectedItems)
+        } else if mode == .Subscribers {
+            controllerInput?.removeSubscribers(selectedItems)
+        }
+        selectedItems.removeAll()
     }
 }
 
 extension UserprofilesController: UserprofilesViewInput {
+    func removeSubscribers(_ userprofiles: [Userprofile]) {
+        controllerInput?.removeSubscribers(userprofiles)
+    }
+    
+    func onSelection(_ userprofiles: [Userprofile]) {
+        guard let toolbar = navigationController?.toolbar,
+              let items = toolbar.items,
+              let delete = items.filter { $0.accessibilityIdentifier == "delete" }.first
+        else { return }
+        
+        selectedItems = userprofiles
+        
+        if userprofiles.isEmpty {
+            delete.title = "delete".localized
+            delete.tintColor = .secondaryLabel
+        } else {
+            delete.title = "delete".localized + " (\(userprofiles.count))"
+            delete.tintColor = .systemRed
+        }
+    }
+    
     func subscribe(at: [Userprofile]) {
         controllerInput?.subscribe(at: at)
     }
@@ -332,7 +394,6 @@ extension UserprofilesController: UserprofilesViewInput {
     func loadVoters(for answer: Answer) {
         controllerInput?.loadVoters(for: answer)
     }
-    
     
     func loadUsers(for userprofile: Userprofile, mode: UserprofilesController.Mode) {
         controllerInput?.loadUsers(for: userprofile, mode: mode)

@@ -25,6 +25,8 @@ protocol UserprofilesViewInput: AnyObject {
     func loadVoters(for: Answer)
     func subscribe(at: [Userprofile])
     func unsubscribe(from: [Userprofile])
+    func removeSubscribers(_: [Userprofile])
+    func onSelection(_: [Userprofile])
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -38,6 +40,7 @@ protocol UserprofilesControllerInput: AnyObject {
     func loadVoters(for: Answer)
     func subscribe(at: [Userprofile])
     func unsubscribe(from: [Userprofile])
+    func removeSubscribers(_: [Userprofile])
 }
 
 /// *Model* returns the result to the *Controller*
@@ -55,5 +58,5 @@ protocol UserprofilesControllerOutput: AnyObject {
     var gridItemSizePublisher: CurrentValueSubject<UserprofilesController.GridItemSize?, Never> { get }
     
     func filter()
-    func editingMode()
+    func setEditingMode(_: Bool)
 }

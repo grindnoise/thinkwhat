@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class CurrentUserProfileCollectionView: UICollectionView {
+class UserSettingsCollectionView: UICollectionView {
     
     enum Section: Int, CaseIterable {
         case Credentials, City, Interests, SocialMedia, Stats, Management
@@ -104,7 +104,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
             return sectionLayout
         }
         
-        let credentialsCellRegistration = UICollectionView.CellRegistration<CurrentUserCredentialsCell, AnyHashable> { [unowned self] cell, indexPath, item in
+        let credentialsCellRegistration = UICollectionView.CellRegistration<UserSettingsCredentialsCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
             var config = UIBackgroundConfiguration.listPlainCell()
             config.backgroundColor = .clear
@@ -167,7 +167,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
             cell.userprofile = userprofile
         }
         
-        let cityCellRegistration = UICollectionView.CellRegistration<CurrentUserCityCell, AnyHashable> { [unowned self] cell, indexPath, item in
+        let cityCellRegistration = UICollectionView.CellRegistration<UserSettingsCityCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
             //Fetch
             cell.cityFetchPublisher.sink { [weak self] in
@@ -199,7 +199,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
             cell.cityTitle = userprofile.cityTitle
         }
         
-        let socialCellRegistration = UICollectionView.CellRegistration<CurrentUserSocialMediaCell, AnyHashable> { [unowned self] cell, indexPath, item in
+        let socialCellRegistration = UICollectionView.CellRegistration<UserSettingsSocialMediaCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
             //Facebook
             cell.facebookPublisher.sink { [weak self] in
@@ -262,7 +262,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
             cell.userprofile = userprofile
         }
         
-        let interestsCellRegistration = UICollectionView.CellRegistration<CurrentUserInterestsCell, AnyHashable> { [unowned self] cell, indexPath, item in
+        let interestsCellRegistration = UICollectionView.CellRegistration<UserSettingsInterestsCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
             //Topic tapped
             cell.interestPublisher
@@ -285,7 +285,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
             cell.userprofile = userprofile
         }
         
-        let statsCellRegistration = UICollectionView.CellRegistration<CurrentUserStatsCell, AnyHashable> { [unowned self] cell, indexPath, item in
+        let statsCellRegistration = UICollectionView.CellRegistration<UserSettingsStatsCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
             //Publications
             cell.publicationsPublisher
@@ -341,7 +341,7 @@ class CurrentUserProfileCollectionView: UICollectionView {
             cell.userprofile = userprofile
         }
         
-        let accountCellRegistration = UICollectionView.CellRegistration<CurrentUserAccountCell, AnyHashable> { [unowned self] cell, indexPath, item in
+        let accountCellRegistration = UICollectionView.CellRegistration<UserSettingsAccountCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
             //Logout
             cell.logoutPublisher

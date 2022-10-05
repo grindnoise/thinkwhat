@@ -15,6 +15,18 @@ class UserprofilesModel {
 
 // MARK: - Controller Input
 extension UserprofilesModel: UserprofilesControllerInput {
+    func removeSubscribers(_ userprofiles: [Userprofile]) {
+        Task {
+            do {
+                try await API.shared.profiles.removeSubscribers(userprofiles)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
+    
     func subscribe(at userprofiles: [Userprofile]) {
         Task {
             do {

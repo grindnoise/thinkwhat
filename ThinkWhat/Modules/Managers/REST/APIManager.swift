@@ -1224,11 +1224,33 @@ class API {
             let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
             
             do {
-                let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding.default, headers: parent.headers())
+                let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
                 await MainActor.run {
                     userprofiles.forEach {
                         userprofile.subscriptions.append($0)
                         userprofile.subscribedAt = true
+                    }
+                }
+            } catch let error {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                throw error
+            }
+        }
+        
+        public func removeSubscribers(_ userprofiles: [Userprofile]) async throws {
+            guard let url = API_URLS.Profiles.removeSubscribers,
+                  let userprofile = Userprofiles.shared.current
+            else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
+            
+            do {
+                let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                await MainActor.run {
+                    userprofiles.forEach {
+                        userprofile.subscribers.remove(object: ($0))
                     }
                 }
             } catch let error {
@@ -1590,6 +1612,7 @@ class API {
             }
         }
         
+        @discardableResult
         public func getVoters(for answer: Answer) async throws -> Data {
             guard let url = API_URLS.Surveys.voters else { throw APIError.invalidURL }
             

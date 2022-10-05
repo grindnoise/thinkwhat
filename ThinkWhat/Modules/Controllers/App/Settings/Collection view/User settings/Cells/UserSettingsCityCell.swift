@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class CurrentUserCityCell: UICollectionViewListCell {
+class UserSettingsCityCell: UICollectionViewListCell {
     
     // MARK: - Public properties
     public var cityTitle: String = "" {
@@ -179,7 +179,7 @@ class CurrentUserCityCell: UICollectionViewListCell {
     }
 }
 
-extension CurrentUserCityCell: UITextFieldDelegate {
+extension UserSettingsCityCell: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard !self.textField.isSpinning else { return false }
         return true
@@ -203,7 +203,7 @@ extension CurrentUserCityCell: UITextFieldDelegate {
     }
 }
 
-extension CurrentUserCityCell: BannerObservable {
+extension UserSettingsCityCell: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     
     func onBannerWillDisappear(_ sender: Any) {}

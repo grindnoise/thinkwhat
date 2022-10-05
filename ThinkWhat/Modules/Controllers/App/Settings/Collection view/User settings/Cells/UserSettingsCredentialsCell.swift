@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class CurrentUserCredentialsCell: UICollectionViewListCell {
+class UserSettingsCredentialsCell: UICollectionViewListCell {
  
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {
@@ -235,7 +235,7 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [userView, username, horizontalStack])// genderButton, ageButton])
+        let instance = UIStackView(arrangedSubviews: [userView, username, nestedVerticalStack])// genderButton, ageButton])
         instance.axis = .vertical
         instance.alignment = .center
         instance.clipsToBounds = false
@@ -252,13 +252,13 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
         
         return instance
     }()
-    private lazy var horizontalStack: UIStackView = {
+    private lazy var nestedVerticalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [genderButton, ageButton])
-        instance.axis = .horizontal
+        instance.axis = .vertical
 //        instance.alignment = .center
         instance.clipsToBounds = false
-        instance.spacing = 4
-        instance.distribution = .fillProportionally
+        instance.spacing = 8
+        instance.distribution = .fillEqually
         
 //        userView.translatesAutoresizingMaskIntoConstraints = false
 //        username.translatesAutoresizingMaskIntoConstraints = false
@@ -361,7 +361,7 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
             verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
         ])
         
-        let constraint = genderButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
+        let constraint = verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
         constraint.priority = .defaultLow
         constraint.identifier = "bottomAnchor"
         constraint.isActive = true
@@ -562,6 +562,8 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
         
         if #available(iOS 15, *) {
             if !genderButton.configuration.isNil {
+                genderButton.configuration!.image = UIImage(systemName: userprofile.gender == .Male ? "mustache.fill" : "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+                
                 let attrString = AttributedString(userprofile.gender.rawValue.localized.capitalized, attributes: AttributeContainer([
                     NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
                     NSAttributedString.Key.foregroundColor: UIColor.label
@@ -575,10 +577,11 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
                 }
             }
         } else {
-        let attrString = NSMutableAttributedString(string: userprofile.gender.rawValue.localized.capitalized, attributes: [
-            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
-            NSAttributedString.Key.foregroundColor: UIColor.label,
-        ])
+            genderButton.setImage(UIImage(systemName: userprofile.gender == .Male ? "mustache.fill" : "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+            let attrString = NSMutableAttributedString(string: userprofile.gender.rawValue.localized.capitalized, attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.label,
+            ])
             genderButton.setAttributedTitle(attrString, for: .normal)
             
             guard let constraint = genderButton.getConstraint(identifier: "width"),
@@ -704,7 +707,7 @@ class CurrentUserCredentialsCell: UICollectionViewListCell {
 }
 
 // MARK: - UsernameInputTextFieldDelegate
-extension CurrentUserCredentialsCell: UsernameInputTextFieldDelegate {
+extension UserSettingsCredentialsCell: UsernameInputTextFieldDelegate {
     func onSendEvent(_ credentials: [String: String]) {
         let _ = credentialsTextField.resignFirstResponder()
         Fade.shared.dismiss()
@@ -714,7 +717,7 @@ extension CurrentUserCredentialsCell: UsernameInputTextFieldDelegate {
     }
 }
 
-extension CurrentUserCredentialsCell: BannerObservable {
+extension UserSettingsCredentialsCell: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     
     func onBannerWillDisappear(_ sender: Any) {}

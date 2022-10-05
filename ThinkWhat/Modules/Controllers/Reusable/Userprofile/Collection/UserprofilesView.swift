@@ -66,7 +66,7 @@ class UserprofilesView: UIView {
             .sink { [unowned self] in
                 guard let instances = $0 else { return }
 
-                print(instances)
+                self.viewInput?.onSelection(instances)
             }
             .store(in: &subscriptions)
 
@@ -95,7 +95,14 @@ class UserprofilesView: UIView {
             .sink { [unowned self] in
                 guard let userprofiles = $0 else { return }
                 
-                self.viewInput?.unsubscribe(from: userprofiles)
+                switch viewInput?.mode {
+                case .Subscriptions:
+                    self.viewInput?.unsubscribe(from: userprofiles)
+                case .Subscribers:
+                    self.viewInput?.removeSubscribers(userprofiles)
+                default:
+                    print("")
+                }
             }
             .store(in: &subscriptions)
         
@@ -156,11 +163,15 @@ private extension UserprofilesView {
 //            }
 //        })
     }
+    
 }
 
 extension UserprofilesView: UserprofilesControllerOutput {
-    func editingMode() {
-        collectionView.editingMode(true)
+    func setEditingMode(_ on: Bool) {
+        collectionView.editingMode(on)
+        if !on {
+            collectionView.cancelSelection()
+        }
     }
     
     func filter() {

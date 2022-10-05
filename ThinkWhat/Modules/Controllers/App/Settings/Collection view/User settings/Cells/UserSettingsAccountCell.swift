@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class CurrentUserAccountCell: UICollectionViewListCell {
+class UserSettingsAccountCell: UICollectionViewListCell {
     
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {
@@ -41,6 +41,13 @@ class CurrentUserAccountCell: UICollectionViewListCell {
                                                 .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : .label
                                               ]))
             var config = UIButton.Configuration.plain()
+            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [weak self] incoming in
+                guard let self = self else { return incoming }
+                
+                var outgoing = incoming
+                    outgoing.foregroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+                    return outgoing
+            }
             config.baseBackgroundColor = .clear
             config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
                 guard let self = self else { return .label }
@@ -167,7 +174,7 @@ class CurrentUserAccountCell: UICollectionViewListCell {
     }
 }
 
-private extension CurrentUserAccountCell {
+private extension UserSettingsAccountCell {
     
     func setTasks() {
         
@@ -199,9 +206,11 @@ private extension CurrentUserAccountCell {
     
     @objc
     func handleButtonTap(_ sender: UIButton) {
-        guard let superview = sender.superview else { return }
-        
-        
+        if sender === logoutButton {
+            logoutPublisher.send(true)
+        } else if sender === deleteButton {
+            deletePublisher.send(true)
+        }
     }
 }
 

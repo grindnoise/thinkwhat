@@ -17,7 +17,10 @@ class SettingsCellHeader: UICollectionReusableView {
         case Interests = "interests"
         case Stats = "stats"
         case Management = "account_management"
+        case Notifications = "notifications"
     }
+    
+    
     
     // MARK: - Public properties
     public var mode: Mode! {
@@ -52,6 +55,8 @@ class SettingsCellHeader: UICollectionReusableView {
             self.help.alpha = isHelpEnabled ? 1 : 0
         }
     }
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -149,6 +154,8 @@ class SettingsCellHeader: UICollectionReusableView {
         return instance
     }()
     
+    
+    
     // MARK: - Destructor
     deinit {
         observers.forEach { $0.invalidate() }
@@ -160,6 +167,8 @@ class SettingsCellHeader: UICollectionReusableView {
 #endif
     }
     
+    
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -170,6 +179,8 @@ class SettingsCellHeader: UICollectionReusableView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    
     
     // MARK: - Private methods
     private func setupUI() {
@@ -253,10 +264,14 @@ class SettingsCellHeader: UICollectionReusableView {
         
         let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
         banner.present(content: PopupContent(parent: banner,
-                                             systemImage: "lightbulb.fill",
+                                             systemImage: "lightbulb.circle.fill",
                                              text: text.localized,
-                                             buttonTitle: "ok"))
+                                             buttonTitle: "ok",
+                                             fixedSize: false,
+                                             spacing: 24))
     }
+    
+    
     
     // MARK: - Overridden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

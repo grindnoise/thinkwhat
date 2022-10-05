@@ -85,7 +85,7 @@ class SurveysController: UIViewController {
         super.viewDidAppear(animated)
         
         setNavigationBarAppearance(largeTitleColor: mode == .Topic ? .white : .label, smallTitleColor: mode == .Topic ? .white : .label)
-        setRightBarButton()
+//        setRightBarButton()
     }
     
     override func viewWillAppear(_ animated: Bool) {

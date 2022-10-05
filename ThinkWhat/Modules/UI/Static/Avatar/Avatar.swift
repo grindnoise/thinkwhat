@@ -197,7 +197,7 @@ class Avatar: UIView {
                 button.menu = prepareMenu()
                 button.alpha = 1
                 button.setImage(UIImage(systemName: "pencil",
-                                        withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5,
+                                        withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
                                                                                          weight: .heavy)),
                                   for: .normal)
                 button.imageView?.contentMode = .center
@@ -208,6 +208,14 @@ class Avatar: UIView {
         didSet {
             guard !userprofile.isNil else { return }
             setImage()
+        }
+    }
+    public var isSelected: Bool = false {
+        didSet {
+            button.setImage(UIImage(systemName: isSelected ? "pencil" : "",
+                                    withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
+                                                                                     weight: .heavy)),
+                              for: .normal)
         }
     }
     public var isShadowed: Bool {
@@ -339,14 +347,6 @@ class Avatar: UIView {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
-    private var isSelected: Bool = false {
-        didSet {
-            button.setImage(UIImage(systemName: isSelected ? "pencil" : "",
-                                    withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5,
-                                                                                     weight: .heavy)),
-                              for: .normal)
-        }
-    }
     private lazy var shadowView: UIView = {
         let instance = UIView()
         instance.layer.masksToBounds = false
@@ -381,7 +381,7 @@ class Avatar: UIView {
             
             switch self.mode {
             case .Selection:
-                systemImage = self.isSelected ? "xmark" : ""
+                systemImage = self.isSelected ? "checkmark" : ""
             case .Editing:
                 systemImage = "pencil"
             case .Choice:
@@ -392,7 +392,7 @@ class Avatar: UIView {
             
             instance.cornerRadius = rect.height/2
             instance.setImage(UIImage(systemName: systemImage,
-                                      withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5,
+                                      withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.6,
                                                                                      weight: .heavy)),
                               for: .normal)
             instance.imageView?.contentMode = .center
@@ -456,7 +456,7 @@ class Avatar: UIView {
         button.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            button.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.25),
+            button.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.275),
         ])
         
         let constraintX = button.centerXAnchor.constraint(equalTo: leadingAnchor)
@@ -470,7 +470,7 @@ class Avatar: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-//        if mode == .Editing || mode == .Choice {
+
             guard let constraintY = button.getConstraint(identifier: "constraintY"),
                   let constraintX = button.getConstraint(identifier: "constraintX")
             else { return }
@@ -478,7 +478,6 @@ class Avatar: UIView {
             let point = pointOnCircle(center: CGPoint(x: bounds.midX, y: bounds.midY), radius: bounds.height/2, angleInDegrees: 135)
             constraintY.constant = point.y
             constraintX.constant = point.x
-//        }
     }
     
     private func setObservers() {
@@ -489,7 +488,7 @@ class Avatar: UIView {
                       object === self.userprofile,
                       let image = self.userprofile.image
                 else { return }
-//                Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
+
                 self.coloredBackground.stopShimmering()
                 self.imageView.image = image
             }
@@ -497,7 +496,6 @@ class Avatar: UIView {
     }
     
     private func setImage() {
-//        guard !userprofile.isNil else { return }
         guard userprofile != Userprofile.anonymous else {
             self.imageView.contentMode = .scaleAspectFit
             self.imageView.image = UIImage(named: "anon")
@@ -513,7 +511,7 @@ class Avatar: UIView {
                     await MainActor.run {
                         self.imageView.contentMode = .scaleAspectFit
                     }
-//                    Animations.changeImageCrossDissolve(imageView: self.imageView, image: image)
+
                     self.coloredBackground.stopShimmering()
                     self.imageView.image = image
                 } catch {
@@ -590,8 +588,8 @@ class Avatar: UIView {
             previewPublisher.send(image)
         case .Selection:
             isSelected = !isSelected
-            button.setImage(UIImage(systemName: isSelected ? "xmark" : "",
-                                    withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5,
+            button.setImage(UIImage(systemName: isSelected ? "checkmark" : "",
+                                    withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
                                                                                      weight: .heavy)),
                               for: .normal)
             selectionPublisher.send([userprofile: isSelected])

@@ -608,6 +608,13 @@ extension UITabBarController {
     }
     
     func setTabBarVisible(visible:Bool, animated:Bool) {
+        
+        var bottomSafeArea = CGFloat.zero
+        if let window = UIApplication.shared.windows.first,
+              let bottom = window.safeAreaInsets.bottom as? CGFloat
+         { bottomSafeArea = bottom }
+        
+                
 //                view.backgroundColor =  self.tabBar.barTintColor
 //        if (tabBarIsVisible() == visible) { return }
 //                let frame = self.tabBar.frame
@@ -628,16 +635,21 @@ extension UITabBarController {
 
         //we should show it
         if visible {
+            self.tabBar.alpha = 0
+            let offsetY = self.tabBar.frame.size.height
+            movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY + bottomSafeArea)
+            self.view.frame = self.movedFrameView!
             tabBar.isHidden = false
             UIView.animate(withDuration: animated ? 0.2 : 0.0) {
                 //restore form or frames
                 self.view.frame = self.orgFrameView!
                 //errase the stored locations so that...
+                self.tabBar.alpha = 1
                 self.orgFrameView = nil
                 self.movedFrameView = nil
                 //...the layoutIfNeeded() does not move them again!
                 self.view.setNeedsDisplay()
-                            self.view.layoutIfNeeded()
+                self.view.layoutIfNeeded()
             }
         }
             //we should hide it
@@ -646,15 +658,19 @@ extension UITabBarController {
             orgFrameView   = view.frame
             // get a frame calculation ready
             let offsetY = self.tabBar.frame.size.height
-            movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY)
+            movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY - bottomSafeArea)
             //animate
             UIView.animate(withDuration: animated ? 0.2 : 0.0, animations: {
+                self.tabBar.alpha = 0
                 self.view.frame = self.movedFrameView!
                 self.view.setNeedsDisplay()
                 self.view.layoutIfNeeded()
             }) {
                 (_) in
                 self.tabBar.isHidden = true
+                self.tabBar.alpha = 1
+//                self.movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY + 30)
+//                self.view.frame = self.movedFrameView!
 //                self.edgesForExtendedLayout = UIRectEdge.bottom
 //                self.extendedLayoutIncludesOpaqueBars = true
             }

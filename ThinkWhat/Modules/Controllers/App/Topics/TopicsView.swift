@@ -51,9 +51,9 @@ class TopicsView: UIView {
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = true
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-//        instance.addEquallyTo(to: shadowView)
-                collectionView.addEquallyTo(to: instance)
-                surveysCollectionView.addEquallyTo(to: instance)
+        //        instance.addEquallyTo(to: shadowView)
+        collectionView.addEquallyTo(to: instance)
+        surveysCollectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05

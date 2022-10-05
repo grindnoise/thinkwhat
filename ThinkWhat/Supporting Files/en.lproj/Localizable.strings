@@ -306,6 +306,7 @@
 "interests" = "Interests";
 "social_media_help" = "Attach a profile on a social network so that other users can communicate with you (optional)";
 "interests_help" = "Top your interests by most visited publications";
+"balance_help" = "For each participation in the publication, points are awarded. Points are deducted for posting";
 "stats" = "Statistics";
 "my_publications" = "My publications";
 "my_subscribers" = "My subscribers";
@@ -313,6 +314,10 @@
 "account_management" = "Account management";
 "logout" = "Log out";
 "delete_account" = "Delete account";
+"allow_push_notifications" = "Allow notifications";
+"subscriptions_notifications" = "Subscriptions";
+"watchlist_notifications" = "Watchlist";
+"notifications" = "Notifications";
 
 //Tutorials
 "poll_vote_edu_1" = "The poll will end and disappear from the lists after the required number of participants has been reached.";

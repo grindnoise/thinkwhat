@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class CurrentUserInterestsCell: UICollectionViewListCell {
+class UserSettingsInterestsCell: UICollectionViewListCell {
     
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {

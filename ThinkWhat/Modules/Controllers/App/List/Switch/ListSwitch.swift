@@ -86,19 +86,10 @@ class ListSwitch: UIView {
         didSet {
             guard state != oldValue else { return }
             callbackDelegate?.callbackReceived(state)
-            var oldView: UIView!
+            
             var imageName: String!
-            switch oldValue {
-            case .Top:
-                oldView = top
-            case .New:
-                oldView = new
-            case .Watching:
-                oldView = watching
-            case .Own:
-                oldView = own
-            }
             var newView: UIView!
+            
             switch state {
             case .Top:
                 imageName = "capslock.fill"

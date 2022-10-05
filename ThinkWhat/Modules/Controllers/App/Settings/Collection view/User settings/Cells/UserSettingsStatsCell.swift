@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class CurrentUserStatsCell: UICollectionViewListCell {
+class UserSettingsStatsCell: UICollectionViewListCell {
     
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {
@@ -78,7 +78,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
-                instance.setImage(UIImage(systemName: "questionmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5)), for: .normal)
+                instance.setImage(UIImage(systemName: "dollarsign", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5)), for: .normal)
             }
             .store(in: &subscriptions)
         instance.addTarget(self, action: #selector(self.handleButtonTap(_:)), for: .touchUpInside)
@@ -396,7 +396,7 @@ class CurrentUserStatsCell: UICollectionViewListCell {
     }
 }
 
-private extension CurrentUserStatsCell {
+private extension UserSettingsStatsCell {
     
     func setTasks() {
         //Balance
@@ -561,9 +561,31 @@ private extension CurrentUserStatsCell {
         } else if sender === subscriptionsView {
             subscriptionsPublisher.send(true)
         } else if sender === balanceView {
-            print("balanceView")
+            let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
+            banner.present(content: PopupContent(parent: banner,
+                                                 systemImage: "lightbulb.circle.fill",
+                                                 text: "balance_help".localized,
+                                                 buttonTitle: "ok",
+                                                 fixedSize: false,
+                                                 spacing: 24))
         } else if sender === watchingView {
             watchingPublisher.send(true)
+        }
+    }
+}
+
+extension UserSettingsStatsCell: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let banner = sender as? Popup {
+            banner.removeFromSuperview()
         }
     }
 }

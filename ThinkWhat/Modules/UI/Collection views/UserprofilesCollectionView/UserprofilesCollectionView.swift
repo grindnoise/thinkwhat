@@ -139,12 +139,15 @@ class UserprofilesCollectionView: UICollectionView {
     }
     
     public func editingMode(_ on: Bool) {
-        allowsMultipleSelection = true
+        allowsMultipleSelection = on ? true : false
         
         isEditing = on
         
         visibleCells.forEach {
             guard let cell = $0 as? UserprofileCell else { return }
+            
+            cell.isSelected = false
+            cell.avatar.isSelected = false
             
             cell.avatar.mode = on ? .Selection : .Default
         }
@@ -188,7 +191,9 @@ class UserprofilesCollectionView: UICollectionView {
         banner.present(content: content)
     }
     
-    
+    public func cancelSelection() {
+        selectedItems.removeAll()
+    }
     
     // MARK: - Overridden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -302,6 +307,7 @@ private extension UserprofilesCollectionView {
                 else { return }
                 
                 self.appendToDataSource(item: subscriber)
+                self.loadingIndicator.stopAnimating()
             }
         })
         //Subscriber remove
@@ -318,6 +324,7 @@ private extension UserprofilesCollectionView {
                 else { return }
                 
                 self.removeFromDataSource(item: subscriber)
+                self.loadingIndicator.stopAnimating()
             }
         })
         //Subscription append
@@ -326,7 +333,8 @@ private extension UserprofilesCollectionView {
                 guard let self = self,
                       self.mode == .Subscriptions,
                       let dict = notification.object as? [Userprofile: Userprofile],
-                      let owner = dict.keys.first,
+                      let owner = dict
+.keys.first,
                       owner == self.userprofile,
                       let userprofile = dict.values.first,
                       let source = self.source.snapshot() as? Snapshot,
@@ -334,6 +342,7 @@ private extension UserprofilesCollectionView {
                 else { return }
                 
                 self.appendToDataSource(item: userprofile)
+                self.loadingIndicator.stopAnimating()
             }
         })
         //Subscription remove
@@ -362,6 +371,7 @@ private extension UserprofilesCollectionView {
                 else { return }
                 
                 self.endRefreshing()
+                self.loadingIndicator.stopAnimating()
             }
         })
         tasks.append( Task {@MainActor [weak self] in
@@ -373,6 +383,7 @@ private extension UserprofilesCollectionView {
                 else { return }
                 
                 self.endRefreshing()
+                self.loadingIndicator.stopAnimating()
             }
         })
     }
@@ -433,15 +444,16 @@ extension UserprofilesCollectionView: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? UserprofileCell
+        guard !allowsMultipleSelection,
+              let cell = collectionView.cellForItem(at: indexPath) as? UserprofileCell
           else { return nil }
         
         return UITargetedPreview(view: cell.avatar.getSubview(type: UIView.self, identifier: "bg") ?? cell.avatar)
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        
-        guard let indexPath = indexPaths.first,
+        guard !allowsMultipleSelection,
+              let indexPath = indexPaths.first,
               let cell = collectionView.cellForItem(at: indexPath) as? UserprofileCell
         else { return nil }
         
@@ -450,7 +462,7 @@ extension UserprofilesCollectionView: UICollectionViewDelegate {
                 var actions: [UIAction]!
                 
                 let profile: UIAction = .init(title: "profile".localized.capitalized,
-                                             image: UIImage(systemName: "person.fill"),
+                                             image: UIImage(systemName: "person.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
                                              identifier: nil,
                                              discoverabilityTitle: nil,
                                               attributes: .init(),
@@ -461,11 +473,11 @@ extension UserprofilesCollectionView: UICollectionViewDelegate {
                     self.subscribePublisher.send([cell.userprofile])
                 })
                 
-                let subscription: UIAction = .init(title: cell.userprofile.subscribedAt ? "unsubscribe".localized.capitalized : "subscribe_for_user".localized,
-                                                   image: UIImage(systemName: cell.userprofile.subscribedAt ? "person.fill.badge.minus" : "person.fill.badge.plus"),
+                let subscription: UIAction = .init(title: "delete".localized,
+                                                   image: UIImage(systemName: "person.fill.badge.minus", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
                                                    identifier: nil,
                                                    discoverabilityTitle: nil,
-                                                   attributes: .init(),
+                                                   attributes: [.destructive],
                                                    state: .off,
                                                    handler: { [weak self] _ in
                     guard let self = self else { return }
