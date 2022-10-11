@@ -16,6 +16,56 @@ class SettingsModel {
 
 // MARK: - Controller Input
 extension SettingsModel: SettingsControllerInput {
+    func updateAppSettings(_ settings: [AppSettings : Any]) {
+        Task {
+            do {
+                guard let setting = settings.keys.first else { return }
+                
+                var parameters: [String: Any] = [:]
+                
+                switch setting {
+                case .languages(.App):
+                    guard let value = settings.values.first as? String else { return }
+                    
+                    parameters = [setting.identifier: value]
+                case .languages(.Content):
+                    fatalError()
+                default:
+                    var dict: [String: Any] = [:]
+                    settings.forEach { key, value in
+                        dict[key.identifier] = value
+                    }
+                    
+                    parameters = ["notifications": dict]
+                }
+                
+                try await API.shared.profiles.updateAppSettings(parameters)
+                
+                settings.forEach { key, value in
+                    switch key {
+                    case .notifications(.Completed):
+                        UserDefaults.App.notifyOnOwnCompleted = value as? Bool
+                    case .notifications(.Watchlist):
+                        UserDefaults.App.notifyOnWatchlistCompleted = value as? Bool
+                    case .notifications(.Subscriptions):
+                        UserDefaults.App.notifyOnNewSubscription = value as? Bool
+                    case .languages(.App):
+                        guard let languageCode = value as? String else { return }
+                        
+                        Bundle.setLanguageAndPublish(languageCode, in: Bundle(for: Self.self))
+                        NotificationCenter.default.post(name: Notifications.System.AppLanguage, object: nil)
+                    case .languages(.Content):
+                        NotificationCenter.default.post(name: Notifications.System.ContentLanguage, object: nil)
+                    }
+                }
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
+    
     
     func fetchCity(_ name: String) {
         Task {

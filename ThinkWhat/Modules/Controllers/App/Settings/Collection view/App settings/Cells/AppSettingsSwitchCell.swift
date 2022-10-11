@@ -11,26 +11,23 @@ import Combine
 
 class AppSettingsSwitchCell: UICollectionViewListCell {
     
-    enum Mode: Hashable {
-        case notifications(Notifications)
-        
-        enum Notifications: String {
-            case Allow = "allow_push_notifications"
-            case Subscriptions = "subscriptions_notifications"
-            case Watchlist = "watchlist_notifications"
-        }
-    }
+    
     
     // MARK: - Public properties
-    public var mode: Mode! {
+    public var mode: AppSettings! {
         didSet {
             guard !mode.isNil else { return }
             
             updateUI()
         }
     }
+    public var isOn: Bool = true {
+        didSet {
+            toggleSwitch.isOn = isOn
+        }
+    }
     //Publishers
-    public var valuePublisher = CurrentValueSubject<[Mode: Bool]?, Never>(nil)
+    public var valuePublisher = CurrentValueSubject<[AppSettings: Bool]?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -45,6 +42,8 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
         instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.text = "balance".localized.capitalized
         instance.textAlignment = .left
+        instance.numberOfLines = 1
+        instance.lineBreakMode = .byTruncatingTail
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
         instance.publisher(for: \.bounds, options: .new)
             .sink { [weak self] rect in
@@ -63,18 +62,24 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
     }()
     private lazy var toggleSwitch: UISwitch = {
         let instance = UISwitch()
+        instance.onTintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instance.addTarget(self, action: #selector(self.toggleSwitch(_:)), for: .valueChanged)
         
         return instance
     }()
     private lazy var horizontalStack: UIStackView = {
+        let opaque = UILabel()
+        opaque.backgroundColor = .clear
+        
         let instance = UIStackView(arrangedSubviews: [
             titleLabel,
+            opaque,
             toggleSwitch
         ])
         
         instance.axis = .horizontal
         instance.spacing = 4
-        instance.distribution = .fillProportionally
+//        instance.distribution = .fillProportionally
         
         return instance
     }()
@@ -115,14 +120,14 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
         super.traitCollectionDidChange(previousTraitCollection)
         
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
-        
+        toggleSwitch.onTintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
         
         //Reset publishers
-        valuePublisher = CurrentValueSubject<[Mode: Bool]?, Never>(nil)
+        valuePublisher = CurrentValueSubject<[AppSettings: Bool]?, Never>(nil)
     }
 }
 
@@ -147,7 +152,7 @@ private extension AppSettingsSwitchCell {
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
             horizontalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
             horizontalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding*2),
-            horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+            horizontalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding*2),
             //            verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         ])
         
@@ -158,20 +163,20 @@ private extension AppSettingsSwitchCell {
     
     func updateUI() {
         switch mode {
-        case .notifications(.Allow):
-            titleLabel.text = Mode.Notifications.Allow.rawValue.localized
+        case .notifications(.Completed):
+            titleLabel.text = AppSettings.Notifications.Completed.rawValue.localized
         case .notifications(.Subscriptions):
-            titleLabel.text = Mode.Notifications.Subscriptions.rawValue.localized
+            titleLabel.text = AppSettings.Notifications.Subscriptions.rawValue.localized
         case .notifications(.Watchlist):
-            titleLabel.text = Mode.Notifications.Watchlist.rawValue.localized
-        case .none:
-            fatalError()
+            titleLabel.text = AppSettings.Notifications.Watchlist.rawValue.localized
+        default:
+            print("")
         }
     }
     
     @objc
     func toggleSwitch(_ sender: UISwitch) {
-        
+        valuePublisher.send([mode: sender.isOn])
     }
 }
 

@@ -11,47 +11,47 @@ import UIKit
 /// *View* sends user actions to the *Controller*.
 ///
 /// **Controller** conforms to this protocol
-protocol SubsciptionsViewInput: class {
-    
+protocol SubsciptionsViewInput: AnyObject {
     var controllerOutput: SubsciptionsControllerOutput? { get set }
     var controllerInput: SubsciptionsControllerInput? { get set }
-    var userprofiles: [Userprofile] { get }
     
     func onSubscribersTapped()
     func onSubscpitionsTapped()
-    func onDataSourceRequest()
     func toggleBarButton()
     func onSurveyTapped(_: SurveyReference)
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
     func updateSurveyStats(_: [SurveyReference])
+    func addFavorite(_: SurveyReference)
+    func share(_: SurveyReference)
+    func claim(surveyReference: SurveyReference, claim: Claim)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
 ///
 /// **Model** conforms to this protocol
-protocol SubsciptionsControllerInput: class {
-    
+protocol SubsciptionsControllerInput: AnyObject {
     var modelOutput: SubsciptionsModelOutput? { get set }
-    var userprofiles: [Userprofile] { get }
     
-    func loadSubscriptions()
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
     func updateSurveyStats(_: [SurveyReference])
+    func addFavorite(surveyReference: SurveyReference)
+    func claim(surveyReference: SurveyReference, claim: Claim)
 }
 
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
-protocol SubsciptionsModelOutput: class {
-    func onError(_: Error)
+protocol SubsciptionsModelOutput: AnyObject {
+    func onRequestCompleted(_: Result<Bool, Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
-protocol SubsciptionsControllerOutput: class {
+protocol SubsciptionsControllerOutput: AnyObject {
     var viewInput: SubsciptionsViewInput? { get set }
     
     func onUpperContainerShown(_: Bool)
-    func onSubscribedForUpdated()
-    func onError()
     func onWillAppear()
+    func onRequestCompleted(_: Result<Bool, Error>)
 }

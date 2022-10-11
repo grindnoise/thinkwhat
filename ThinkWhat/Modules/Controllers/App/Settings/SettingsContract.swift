@@ -32,6 +32,8 @@ protocol SettingsViewInput: AnyObject {
     func onSubscribersSelected()
     func onSubscriptionsSelected()
     func onWatchingSelected()
+    func updateAppSettings(_: [AppSettings: Any])
+    func onContentLanguageTap()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -44,6 +46,7 @@ protocol SettingsControllerInput: AnyObject {
     func updateUserprofile(parameters: [String: Any], image: UIImage?)
     func fetchCity(_: String)
     func saveCity(_: City)
+    func updateAppSettings(_: [AppSettings: Any])
 //    func updateUserData()
 }
 

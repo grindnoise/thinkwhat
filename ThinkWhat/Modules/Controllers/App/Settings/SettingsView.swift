@@ -39,10 +39,34 @@ class SettingsView: UIView {
             }
             .store(in: &subscriptions)
         
+        traitCollection.publisher(for: \.userInterfaceStyle)
+            .sink { style in
+                instance.backgroundColor = style == .dark ? .secondarySystemBackground : .systemBackground
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     private lazy var userSettingsView: UserSettingsCollectionView = {
         let instance = UserSettingsCollectionView()
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.cornerRadius = rect.width * 0.05
+            }
+            .store(in: &subscriptions)
+        
+        
+        //            .sink { style in
+        //                instance.backgroundColor = style == .dark ? .secondarySystemBackground : .systemBackground
+        //            }
+        //            .store(in: &subscriptions)
+//        traitCollection.publisher(for: \.userInterfaceStyle)
+//            .sink { style in
+//                instance.backgroundColor = style == .dark ? .secondarySystemBackground : .systemBackground
+//            }
+//            .store(in: &subscriptions)
         
         instance.namePublisher
             .sink { [unowned self] in
@@ -188,7 +212,51 @@ class SettingsView: UIView {
     }()
     private lazy var appSettingsView: AppSettingsCollectionView = {
         let instance = AppSettingsCollectionView()
-     
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.cornerRadius = rect.width * 0.05
+            }
+            .store(in: &subscriptions)
+        
+        instance.notificationSettingsPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let settings = $0
+                else { return }
+                
+                self.viewInput?.updateAppSettings(settings)
+            }
+            .store(in: &subscriptions)
+        
+        instance.appLanguagePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let settings = $0
+                else { return }
+                
+                self.viewInput?.updateAppSettings(settings)
+                
+                let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
+                banner.present(content: PopupContent(parent: banner,
+                                                     systemImage: "lightbulb.circle.fill",
+                                                     text: "restart",
+                                                     buttonTitle: "ok",
+                                                     fixedSize: false,
+                                                     spacing: 24))
+                
+            }
+            .store(in: &subscriptions)
+        
+        instance.contentLanguagePublisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                
+                self.viewInput?.onContentLanguageTap()
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     
@@ -206,6 +274,12 @@ class SettingsView: UIView {
             shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
             shadowView.layer.shadowRadius = 5
             shadowView.layer.shadowOffset = .zero
+            
+            traitCollection.publisher(for: \.userInterfaceStyle)
+                .sink { [unowned self] style in
+                    self.shadowView.layer.shadowOpacity = style == .dark ? 0 : 1
+                }
+                .store(in: &subscriptions)
             
             shadowView.publisher(for: \.bounds, options: .new)
                 .sink { [weak self] rect in
@@ -251,9 +325,12 @@ class SettingsView: UIView {
     
     // MARK: - Overrriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        userSettingsView.backgroundColor = .clear
+        super.traitCollectionDidChange(previousTraitCollection)
+
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        userSettingsView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        appSettingsView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

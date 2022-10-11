@@ -118,6 +118,7 @@ class PollController: UIViewController {
     private var tasks: [Task<Void, Never>?] = []
     private var subscriptions = Set<AnyCancellable>()
     private var hidesLargeTitle: Bool = false
+    private var isDisappearing = false
     
     // MARK: - Overriden properties
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -343,6 +344,8 @@ class PollController: UIViewController {
                 self.titleView.oval.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
                 self.titleView.ovalBg.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
             }
+            
+            guard !self.isDisappearing else { return }
             
             var largeAlpha: CGFloat = CGFloat(1) - max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
             
@@ -681,6 +684,9 @@ class PollController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        isDisappearing = false
+        
 //        setupUI()
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -718,6 +724,9 @@ class PollController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        isDisappearing = true
+        
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
             self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
             self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)

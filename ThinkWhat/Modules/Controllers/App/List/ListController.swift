@@ -7,9 +7,39 @@
 //
 
 import UIKit
+import Combine
 
 class ListController: UIViewController {
+    
+    
+    
+    // MARK: - Public properties
+    var controllerOutput: ListControllerOutput?
+    var controllerInput: ListControllerInput?
+    var surveyCategory: Survey.SurveyCategory {
+        return category
+    }
+    public private(set) var category: Survey.SurveyCategory = .New {
+        didSet {
+            controllerOutput?.onDataSourceChanged()
+        }
+    }
+    
+    
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //UI
+    private var isOnScreen = true
+    private lazy var listSwitch: ListSwitch = {
+        return ListSwitch(callbackDelegate: self)
+    }()
+    
 
+    
+    // MARK: - Overridden methods
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -25,7 +55,7 @@ class ListController: UIViewController {
         ProtocolSubscriptions.subscribe(self)
         navigationItem.title = "new".localized
         setupUI()
-        setObservers()
+        setTasks()
         controllerOutput?.onDidLoad()
     }
     
@@ -48,45 +78,9 @@ class ListController: UIViewController {
         super.viewWillDisappear(animated)
         listSwitch.alpha = 0
     }
-    
-    private func setObservers() {
-//        let names = [Notifications.System.UpdateStats]
-//        names.forEach { NotificationCenter.default.addObserver(view, selector: #selector(ListView.updateStats), name: $0, object: nil) }
-    }
-
-    private func setupUI() {
-//        listSwitch = ListSwitch(callbackDelegate: self)
-        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
-        guard let navigationBar = self.navigationController?.navigationBar else { return }
-        navigationBar.addSubview(listSwitch)
-        listSwitch.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            listSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            listSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-            listSwitch.heightAnchor.constraint(equalToConstant: 40),
-            listSwitch.widthAnchor.constraint(equalTo: listSwitch.heightAnchor, multiplier: 4)
-            ])
-    }
-    
-//    @objc
-//    func updateStats() {
-//        controllerOutput?.updateStats()
-//    }
-
-    
-    // MARK: - Properties
-    var controllerOutput: ListControllerOutput?
-    var controllerInput: ListControllerInput?
-    
-    private lazy var listSwitch: ListSwitch = {
-        return ListSwitch(callbackDelegate: self)
-    }()
-    var category: Survey.SurveyCategory = .New {
-        didSet {
-            controllerOutput?.onDataSourceChanged()
-        }
-    }
 }
+
+
 
 // MARK: - View Input
 extension ListController: ListViewInput {
@@ -146,11 +140,9 @@ extension ListController: ListViewInput {
     }
     
     func updateSurveyStats(_ instances: [SurveyReference]) {
+        guard isOnScreen else { return }
+        
         controllerInput?.updateSurveyStats(instances)
-    }
-    
-    var surveyCategory: Survey.SurveyCategory {
-        return category
     }
     
     func onSurveyTapped(_ instance: SurveyReference) {
@@ -162,11 +154,40 @@ extension ListController: ListViewInput {
     }
     
     func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
+        guard isOnScreen else { return }
+        
         controllerInput?.onDataSourceRequest(source: source, topic: topic)
     }
 }
 
-// MARK: - Model Output
+private extension ListController {
+    func setTasks() {
+        tasks.append(Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
+                guard let self = self,
+                      let tab = notification.object as? Tab
+                else { return }
+                
+                self.isOnScreen = tab == .Feed
+            }
+        })
+    }
+    
+    func setupUI() {
+//        listSwitch = ListSwitch(callbackDelegate: self)
+        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
+        guard let navigationBar = self.navigationController?.navigationBar else { return }
+        navigationBar.addSubview(listSwitch)
+        listSwitch.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            listSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
+            listSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
+            listSwitch.heightAnchor.constraint(equalToConstant: 40),
+            listSwitch.widthAnchor.constraint(equalTo: listSwitch.heightAnchor, multiplier: 4)
+        ])
+    }
+}
+
 extension ListController: ListModelOutput {
     func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
         controllerOutput?.onAddFavoriteCallback(result)

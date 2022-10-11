@@ -15,6 +15,8 @@ import Combine
 
 class MainController: UITabBarController {//}, StorageProtocol {
     
+    
+    
     // MARK: - Overridden properties
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return selectedViewController?.preferredStatusBarStyle ?? .lightContent
@@ -24,6 +26,13 @@ class MainController: UITabBarController {//}, StorageProtocol {
     }
     
     // MARK: - Public properties
+    public private(set) var currentTab: Tab = .Hot {
+        didSet {
+            guard oldValue != currentTab else { return }
+            
+            NotificationCenter.default.post(name: Notifications.System.Tab, object: currentTab)
+        }
+    }
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -247,8 +256,29 @@ extension MainController: UITabBarControllerDelegate {
     }
     
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        if let nav = viewController as? NavigationController,
+           let controller = nav.viewControllers.first {
+            switch controller.self {
+            case is HotController:
+                currentTab = .Hot
+            case is SubsciptionsController:
+                currentTab = .Subscriptions
+            case is ListController:
+                currentTab = .Feed
+            case is TopicsController:
+                currentTab = .Topics
+            case is SettingsController:
+                currentTab = .Settings
+            default:
+                print("")
+#if DEBUG
+                fatalError()
+#endif
+            }
+        }
+        
         guard let vc = navigationController?.viewControllers.first else { return }
-        if vc.isKind(of: HotController.self) {
+        if viewController.isKind(of: HotController.self) {
             navigationController?.title = "hot".localized
             vc.navigationItem.title = "hot".localized
         } else if vc.isKind(of: SubsciptionsController.self) {

@@ -15,6 +15,21 @@ class SurveyCell: UICollectionViewListCell {
     public weak var item: SurveyReference! {
         didSet {
             guard let item = item else { return }
+            
+//            self.updatePublisher.send(self.item)
+            
+//            Timer
+//                .publish(every: 1, on: .main, in: .common)
+//                .autoconnect()
+//                .sink { [weak self] seconds in
+//                    guard let self = self else { return }
+//
+//                    self.updatePublisher.send(self.item)
+//                }
+//                .store(in: &subscriptions)
+
+            
+//            sourcePublisher.send(Date())
 
             //Update survey stats every n seconds
             let events = eventEmitter.emit(every: 2)
@@ -226,6 +241,7 @@ class SurveyCell: UICollectionViewListCell {
             }
         }
     }
+//    public var updatePublisher = PassthroughSubject<SurveyReference, Never>()
     public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
@@ -236,7 +252,7 @@ class SurveyCell: UICollectionViewListCell {
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
-    private var subscriptions = Set<AnyCancellable>()
+    public var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     private lazy var eventEmitter: EventEmitter = {
         return EventEmitter()
@@ -671,6 +687,7 @@ class SurveyCell: UICollectionViewListCell {
     deinit {
         observers.forEach { $0.invalidate() }
         tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
@@ -1137,13 +1154,19 @@ class SurveyCell: UICollectionViewListCell {
         topicLabel.frame.origin = .zero
     }
     
+    
+    
     override func prepareForReuse() {
         super.prepareForReuse()
+        
+//        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
 
         //Reset publishers
         watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
         claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
         shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+//        sourcePublisher = PassthroughSubject<Date, Never>()
         
         eventEmitter.task?.cancel()
         animTask?.cancel()

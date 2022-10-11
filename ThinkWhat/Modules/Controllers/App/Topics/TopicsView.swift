@@ -61,6 +61,8 @@ class TopicsView: UIView {
         return instance
     }()
     
+    
+    
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var shadowView: UIView! {

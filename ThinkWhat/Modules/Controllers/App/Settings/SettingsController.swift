@@ -17,15 +17,21 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         case Settings = "settings"
     }
     
+    
+    
     // MARK: - Public properties
     var controllerOutput: SettingsControllerOutput?
     var controllerInput: SettingsControllerInput?
     var mode: SettingsController.Mode = .Profile
     
+    
+    
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    //UI
+    private var isOnScreen = true
     private lazy var settingsSwitch: SettingsSwitch = {
         let instance = SettingsSwitch()
         instance.statePublisher
@@ -49,6 +55,8 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         return instance
     }()
     
+    
+    
     // MARK: - Destructor
     deinit {
         observers.forEach { $0.invalidate() }
@@ -59,6 +67,8 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
+    
+    
     
     // MARK: - Overridden properties
     override func viewDidLoad() {
@@ -75,6 +85,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         
         navigationItem.title = "profile".localized
         setupUI()
+        setTasks()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -126,7 +137,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
 }
 
 private extension SettingsController {
-    private func setupUI() {
+    func setupUI() {
         navigationController?.navigationBar.prefersLargeTitles = true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(settingsSwitch)
@@ -138,10 +149,34 @@ private extension SettingsController {
             settingsSwitch.widthAnchor.constraint(equalTo: settingsSwitch.heightAnchor, multiplier: 2.1)
         ])
     }
+    
+    func setTasks() {
+        tasks.append(Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
+                guard let self = self,
+                      let tab = notification.object as? Tab
+                else { return }
+                
+                self.isOnScreen = tab == .Settings
+            }
+        })
+    }
 }
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+    func onContentLanguageTap() {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        
+        navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(LanguageListViewController(), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    func updateAppSettings(_ settings: [AppSettings : Any]) {
+        controllerInput?.updateAppSettings(settings)
+    }
     
     func onWatchingSelected() {
         guard let userprofile = Userprofiles.shared.current,
@@ -156,7 +191,6 @@ extension SettingsController: SettingsViewInput {
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
-    
     func onSubscriptionsSelected() {
         guard let userprofile = Userprofiles.shared.current,
             userprofile.subscriptionsTotal != 0
@@ -170,7 +204,6 @@ extension SettingsController: SettingsViewInput {
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
-    
     func onSubscribersSelected() {
         guard let userprofile = Userprofiles.shared.current,
             userprofile.subscribersTotal != 0
@@ -183,7 +216,6 @@ extension SettingsController: SettingsViewInput {
         navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
-    
     
     func onPublicationsSelected() {
         let backItem = UIBarButtonItem()

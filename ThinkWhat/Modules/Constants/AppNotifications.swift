@@ -65,6 +65,9 @@ struct Notifications {
         static let HideKeyboard                     = Notification.Name("NotificationHideKeyboard")
         static let ImageUploadStart                 = Notification.Name("NotificationImageUploadStart")
         static let ImageUploadFailure               = Notification.Name("NotificationImageUploadFailure")
+        static let AppLanguage                      = Notification.Name("Notifications.System.AppLanguage")
+        static let ContentLanguage                  = Notification.Name("Notifications.System.ContentLanguage")
+        static let Tab                              = Notification.Name("Notifications.System.Tab")
     }
     
     struct SurveyAnswers {

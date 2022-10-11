@@ -269,6 +269,23 @@ extension SurveysCollectionView: BannerObservable {
 private extension SurveysCollectionView {
     
     func setupUI() {
+        
+        Timer
+            .publish(every: 3, on: .current, in: .common)
+            .autoconnect()
+//            .delay(for: .seconds(2), scheduler: DispatchQueue.main)
+            .sink { [weak self] seconds in
+                guard let self = self,
+                      let cells = self.visibleCells as? [SurveyCell]
+                else { return }
+                
+                let items = cells.compactMap { cell in
+                    return cell.item
+                }
+                self.updateStatsPublisher.send(cells.compactMap { return $0.item })
+            }
+            .store(in: &subscriptions)
+        
         delegate = self
         
         addSubview(loadingIndicator)
@@ -300,10 +317,29 @@ private extension SurveysCollectionView {
         contentInset.bottom = category == .Topic ? 80 : 0
         
         let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { [unowned self] cell, indexPath, item in
-            
-//            guard let self = self else { return }
-            
             cell.item = item
+            
+            
+            
+//            let publisher = Publishers.MergeMany(cell.updatePublisher)
+//                .compactMap { $0 as? SurveyReference }
+//                .collect(.byTime(DispatchQueue.main, 3))
+////                .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+//                .sink { print($0) }
+//                .store(in: &self.subscriptions)
+            
+//            let paginationPublisher = publisher
+//                .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+            
+//            Publishers.MergeMany(cell.updatePublisher)
+//                .collect(.byTime(DispatchQueue.main, 5))
+////                .collect(.byTimeOrCount(DispatchQueue.main, .seconds(2), 8))
+//                .sink { val in
+//                    print(val)
+//                    print("")
+////                    print(val.first?.id)
+//                }
+//                .store(in: &self.subscriptions)
             
             //Add to watchlist
             cell.watchSubject.sink {
@@ -362,16 +398,18 @@ private extension SurveysCollectionView {
     func setTasks() {
         
         //Update survey stats every n seconds
-        let events = EventEmitter().emit(every: 5)
-        tasks.append(Task {@MainActor [weak self] in
-            for await _ in events {
-                guard let self = self,
-                      let cells = self.visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell]
-                else { return }
-                
-                self.updateStatsPublisher.send((cells.compactMap({ $0.item })))
-            }
-        })
+//        let events = EventEmitter().emit(every: 5)
+//        let emitter = EventEmitter()
+//        emitter.task.
+//        tasks.append(Task {@MainActor [weak self] in
+//            for await _ in events {
+//                guard let self = self,
+//                      let cells = self.visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell]
+//                else { return }
+//
+//                self.updateStatsPublisher.send((cells.compactMap({ $0.item })))
+//            }
+//        })
         
         //Empty received
         tasks.append(Task {@MainActor [weak self] in

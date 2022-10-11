@@ -7,32 +7,136 @@
 //
 
 import UIKit
+import Combine
 
 class SubsciptionsView: UIView {
     
     weak var viewInput: SubsciptionsViewInput?
     
     // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    
     private var isCollectionViewSetupCompleted = false
     private let reuseIdentifier = "voter"
     private var needsAnimation = true
     private var isRevealed = false
     private lazy var collectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(category: .Subscriptions)
+        
+        //Pagination #1
+        let paginationPublisher = instance.paginationPublisher
+            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+        
+        paginationPublisher
+            .sink { [unowned self] in
+                guard let category = $0 else { return }
+                
+                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+            }
+            .store(in: &subscriptions)
+        
+        //Pagination #2
+        let paginationByTopicPublisher = instance.paginationByTopicPublisher
+            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+        
+        paginationByTopicPublisher
+            .sink { [unowned self] in
+                guard let topic = $0 else { return }
+
+                self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+            }
+            .store(in: &subscriptions)
+        
+        //Refresh #1
+        instance.refreshPublisher
+            .sink { [unowned self] in
+                guard let category = $0 else { return }
+                
+                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+            }
+            .store(in: &subscriptions)
+        
+        //Refresh #2
+        instance.refreshByTopicPublisher
+            .sink { [unowned self] in
+                guard let topic = $0 else { return }
+                
+                self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+            }
+            .store(in: &subscriptions)
+        
+        //Row selected
+        instance.rowPublisher
+            .sink { [unowned self] in
+                guard let instance = $0
+            else { return }
+                  
+            self.viewInput?.onSurveyTapped(instance)
+        }
+            .store(in: &subscriptions)
+        
+        //Update stats (exclude refs)
+        instance.updateStatsPublisher
+            .sink { [weak self] in
+            guard let self = self,
+                  let instances = $0
+            else { return }
+                  
+            self.viewInput?.updateSurveyStats(instances)
+        }
+            .store(in: &subscriptions)
+        
+        //Add to watch list
+        instance.watchSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                let value = $0
+            else { return }
+            
+            self.viewInput?.addFavorite(value)
+        }.store(in: &self.subscriptions)
+        
+        instance.shareSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                let value = $0
+            else { return }
+            
+            self.viewInput?.share(value)
+        }.store(in: &self.subscriptions)
+        
+        instance.claimSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                let surveyReference = $0
+            else { return }
+            
+            let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
+            banner.accessibilityIdentifier = "claim"
+            let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
+            
+            claimContent.claimSubject.sink {
+                print($0)
+            } receiveValue: { [weak self] in
+                guard let self = self,
+                    let claim = $0
+                else { return }
+                
+                self.viewInput?.claim(surveyReference: surveyReference, claim: claim)
+            }.store(in: &self.subscriptions)
+            
+            banner.present(content: claimContent)
+            
+//            self.viewInput?.addFavorite(surveyReference: value)
+        }.store(in: &self.subscriptions)
+        
         return instance
     }()
-//    private lazy var featheredLayer: CAGradientLayer = {
-//        let instance = CAGradientLayer()
-//        let outerColor = UIColor.clear.cgColor
-//        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
-////        instance.startPoint = CGPoint(x: 0, y: 0.5);
-////        instance.endPoint = CGPoint(x: 1.0, y: 0.5);
-//        // without specifying startPoint and endPoint, we get a vertical gradient
-//        instance.colors = [outerColor, innerColor, innerColor, outerColor]
-//        instance.locations = [0.0, 0.025, 0.975, 1.0]
-//        instance.frame = frame
-//        return instance
-//    }()
     private lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
@@ -46,21 +150,6 @@ class SubsciptionsView: UIView {
         })
         return instance
     }()
-//    private lazy var featheredView: UIView = {
-//        let instance = UIView()
-//        instance.accessibilityIdentifier = "feathered"
-//        instance.layer.masksToBounds = true
-//        instance.backgroundColor = .clear
-//        instance.addEquallyTo(to: background)
-//        observers.append(instance.observe(\UIView.bounds, options: .new) { [weak self] view, change in
-//            guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
-//            self.featheredLayer.frame = newValue
-//        })
-//        collectionView.addEquallyTo(to: instance)
-//        return instance
-//    }()
-    private var observers: [NSKeyValueObservation] = []
-    private var notifications: [Task<Void, Never>?] = []
     private var shadowObserver: NSKeyValueObservation!
     
     // MARK: - IB outlets
@@ -192,16 +281,12 @@ class SubsciptionsView: UIView {
 
 // MARK: - Controller Output
 extension SubsciptionsView: SubsciptionsControllerOutput {
+    func onRequestCompleted(_ result: Result<Bool, Error>) {
+        collectionView.endRefreshing()
+    }
+    
     func onWillAppear() {
         collectionView.deselect()
-    }
-    
-    func onError() {
-//        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark, dismissAfter: 1)
-    }
-    
-    func onSubscribedForUpdated() {
-        subscriptionsCollectionView.reloadData()
     }
     
     func onUpperContainerShown(_ reveal: Bool) {
@@ -311,7 +396,7 @@ extension SubsciptionsView: SubsciptionsControllerOutput {
 // MARK: - UI Setup
 extension SubsciptionsView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewInput?.userprofiles.count ?? 0
+        return 0//viewInput?.userprofiles.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -335,17 +420,17 @@ extension SubsciptionsView: UICollectionViewDelegate, UICollectionViewDataSource
     }
 }
 
-extension SubsciptionsView: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-        if let instance = sender as? SurveyReference {
-            viewInput?.onSurveyTapped(instance)
-        } else if sender is SurveysCollectionView {
-            viewInput?.onDataSourceRequest()
-        } else if let instances = sender as? [SurveyReference] {
-            viewInput?.updateSurveyStats(instances)
-        }
-    }
-}
+//extension SubsciptionsView: CallbackObservable {
+//    func callbackReceived(_ sender: Any) {
+//        if let instance = sender as? SurveyReference {
+//            viewInput?.onSurveyTapped(instance)
+//        } else if sender is SurveysCollectionView {
+//            viewInput?.onDataSourceRequest()
+//        } else if let instances = sender as? [SurveyReference] {
+//            viewInput?.updateSurveyStats(instances)
+//        }
+//    }
+//}
 
 extension SubsciptionsView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
@@ -363,3 +448,8 @@ extension SubsciptionsView: BannerObservable {
     }
 }
 
+extension SubsciptionsView: CallbackObservable {
+    func callbackReceived(_ sender: Any) {
+        
+    }
+}

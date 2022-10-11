@@ -18,6 +18,7 @@ class SettingsCellHeader: UICollectionReusableView {
         case Stats = "stats"
         case Management = "account_management"
         case Notifications = "notifications"
+        case Languages = "languages"
     }
     
     

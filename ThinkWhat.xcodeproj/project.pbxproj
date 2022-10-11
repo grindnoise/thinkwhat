@@ -75,7 +75,6 @@
 		AB234F5628D774C000204EC8 /* Controllers.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB234F5128D774C000204EC8 /* Controllers.storyboard */; };
 		AB234F5728D774C000204EC8 /* Auth.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB234F5228D774C000204EC8 /* Auth.storyboard */; };
 		AB234F5828D774C000204EC8 /* Root.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB234F5328D774C000204EC8 /* Root.storyboard */; };
-		AB238D1C27905859009E49C2 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB238D1B27905859009E49C2 /* AppSettings.swift */; };
 		AB238D1E279058A0009E49C2 /* AppData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB238D1D279058A0009E49C2 /* AppData.swift */; };
 		AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */; };
 		AB25AC33282BBFE700050907 /* SurveyTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB25AC32282BBFE700050907 /* SurveyTable.swift */; };
@@ -207,6 +206,8 @@
 		AB4BD892244DE52100D9A3F0 /* TopIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4BD891244DE52100D9A3F0 /* TopIcon.swift */; };
 		AB4EE75528CE49AF0016EEC8 /* UsernameInputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4EE75428CE49AF0016EEC8 /* UsernameInputTextField.swift */; };
 		AB4EE75828CE4AC40016EEC8 /* FlexibleTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4EE75728CE4AC40016EEC8 /* FlexibleTextField.swift */; };
+		AB51075628F02E6E00CA0BFC /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51075528F02E6E00CA0BFC /* Enums.swift */; };
+		AB51075828F1CDD000CA0BFC /* AppSettingsLanguageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51075728F1CDD000CA0BFC /* AppSettingsLanguageCell.swift */; };
 		AB51605C24EFEC79006A07B7 /* CategoryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51605B24EFEC79006A07B7 /* CategoryCollectionViewController.swift */; };
 		AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51605D24EFF610006A07B7 /* CategoryCollectionViewCell.swift */; };
 		AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */; };
@@ -441,6 +442,12 @@
 		ABADF5A827F73CCB00A26474 /* PlainBannerContent.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABADF5A727F73CCB00A26474 /* PlainBannerContent.xib */; };
 		ABAEEE5A27A5D4A100E4EF29 /* VKDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABAEEE5927A5D4A100E4EF29 /* VKDelegate.swift */; };
 		ABAEEE5C27A5D7ED00E4EF29 /* VKWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABAEEE5B27A5D7ED00E4EF29 /* VKWorker.swift */; };
+		ABB0F6C528F5A4550068FDDF /* LanguageListContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6C128F5A4550068FDDF /* LanguageListContract.swift */; };
+		ABB0F6C628F5A4550068FDDF /* LanguageListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6C228F5A4550068FDDF /* LanguageListViewController.swift */; };
+		ABB0F6C728F5A4550068FDDF /* LanguageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6C328F5A4550068FDDF /* LanguageListView.swift */; };
+		ABB0F6C828F5A4550068FDDF /* LanguageListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6C428F5A4550068FDDF /* LanguageListModel.swift */; };
+		ABB0F6CA28F5B19D0068FDDF /* LanguagesCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6C928F5B19D0068FDDF /* LanguagesCollectionView.swift */; };
+		ABB0F6CC28F5B5E40068FDDF /* LanguageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6CB28F5B5E40068FDDF /* LanguageCell.swift */; };
 		ABB1595D28B10C4A003ED9F5 /* Shimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB1595C28B10C4A003ED9F5 /* Shimmer.swift */; };
 		ABB19148286C526200C89142 /* ProcessInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB19147286C526200C89142 /* ProcessInfo.swift */; };
 		ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */; };
@@ -640,7 +647,6 @@
 		AB234F5128D774C000204EC8 /* Controllers.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Controllers.storyboard; sourceTree = "<group>"; };
 		AB234F5228D774C000204EC8 /* Auth.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Auth.storyboard; sourceTree = "<group>"; };
 		AB234F5328D774C000204EC8 /* Root.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Root.storyboard; sourceTree = "<group>"; };
-		AB238D1B27905859009E49C2 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		AB238D1D279058A0009E49C2 /* AppData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppData.swift; sourceTree = "<group>"; };
 		AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNet.mlmodel; sourceTree = "<group>"; };
 		AB25AC32282BBFE700050907 /* SurveyTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyTable.swift; sourceTree = "<group>"; };
@@ -781,6 +787,8 @@
 		AB4BD891244DE52100D9A3F0 /* TopIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopIcon.swift; sourceTree = "<group>"; };
 		AB4EE75428CE49AF0016EEC8 /* UsernameInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameInputTextField.swift; sourceTree = "<group>"; };
 		AB4EE75728CE4AC40016EEC8 /* FlexibleTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlexibleTextField.swift; sourceTree = "<group>"; };
+		AB51075528F02E6E00CA0BFC /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		AB51075728F1CDD000CA0BFC /* AppSettingsLanguageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsLanguageCell.swift; sourceTree = "<group>"; };
 		AB51605B24EFEC79006A07B7 /* CategoryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewController.swift; sourceTree = "<group>"; };
 		AB51605D24EFF610006A07B7 /* CategoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategoryCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -1018,6 +1026,12 @@
 		ABADF5A727F73CCB00A26474 /* PlainBannerContent.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PlainBannerContent.xib; sourceTree = "<group>"; };
 		ABAEEE5927A5D4A100E4EF29 /* VKDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKDelegate.swift; sourceTree = "<group>"; };
 		ABAEEE5B27A5D7ED00E4EF29 /* VKWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKWorker.swift; sourceTree = "<group>"; };
+		ABB0F6C128F5A4550068FDDF /* LanguageListContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageListContract.swift; sourceTree = "<group>"; };
+		ABB0F6C228F5A4550068FDDF /* LanguageListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageListViewController.swift; sourceTree = "<group>"; };
+		ABB0F6C328F5A4550068FDDF /* LanguageListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageListView.swift; sourceTree = "<group>"; };
+		ABB0F6C428F5A4550068FDDF /* LanguageListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageListModel.swift; sourceTree = "<group>"; };
+		ABB0F6C928F5B19D0068FDDF /* LanguagesCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagesCollectionView.swift; sourceTree = "<group>"; };
+		ABB0F6CB28F5B5E40068FDDF /* LanguageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageCell.swift; sourceTree = "<group>"; };
 		ABB1595C28B10C4A003ED9F5 /* Shimmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shimmer.swift; sourceTree = "<group>"; };
 		ABB19147286C526200C89142 /* ProcessInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfo.swift; sourceTree = "<group>"; };
 		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -1204,6 +1218,7 @@
 			isa = PBXGroup;
 			children = (
 				AB0A711828EC7DC8005F7C70 /* AppSettingsSwitchCell.swift */,
+				AB51075728F1CDD000CA0BFC /* AppSettingsLanguageCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -1692,7 +1707,6 @@
 				AB3C6810223FC6F500B57580 /* Algorithms */,
 				AB238D1D279058A0009E49C2 /* AppData.swift */,
 				AB3C67DE223FBB6400B57580 /* AppDelegate.swift */,
-				AB238D1B27905859009E49C2 /* AppSettings.swift */,
 				AB3C680F223FC6D700B57580 /* Controllers */,
 				ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */,
 				AB3C67E5223FBB6400B57580 /* ThinkWhat.xcdatamodeld */,
@@ -1894,6 +1908,14 @@
 				AB4EE75728CE4AC40016EEC8 /* FlexibleTextField.swift */,
 			);
 			path = "Text fields";
+			sourceTree = "<group>";
+		};
+		AB51075428F02E5900CA0BFC /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+				AB51075528F02E6E00CA0BFC /* Enums.swift */,
+			);
+			path = Enums;
 			sourceTree = "<group>";
 		};
 		AB51605924EFEBA4006A07B7 /* CategoryCollectionController */ = {
@@ -2352,6 +2374,7 @@
 		AB90FAF128D31E2B0096B147 /* Collection view */ = {
 			isa = PBXGroup;
 			children = (
+				ABB0F6B828F5A3F20068FDDF /* Languages */,
 				AB0A711428EC6D87005F7C70 /* App settings */,
 				ABAB76B128C51A40001F2449 /* User settings */,
 				AB90FAF228D31E6C0096B147 /* SettingsCellHeader.swift */,
@@ -2752,6 +2775,19 @@
 			path = VK;
 			sourceTree = "<group>";
 		};
+		ABB0F6B828F5A3F20068FDDF /* Languages */ = {
+			isa = PBXGroup;
+			children = (
+				ABB0F6C128F5A4550068FDDF /* LanguageListContract.swift */,
+				ABB0F6C228F5A4550068FDDF /* LanguageListViewController.swift */,
+				ABB0F6C328F5A4550068FDDF /* LanguageListView.swift */,
+				ABB0F6C428F5A4550068FDDF /* LanguageListModel.swift */,
+				ABB0F6C928F5B19D0068FDDF /* LanguagesCollectionView.swift */,
+				ABB0F6CB28F5B5E40068FDDF /* LanguageCell.swift */,
+			);
+			path = Languages;
+			sourceTree = "<group>";
+		};
 		ABB46F3C2345DDA000AF212B /* Managers */ = {
 			isa = PBXGroup;
 			children = (
@@ -2768,6 +2804,7 @@
 		ABB9E86B279E9E420018BB2E /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				AB51075428F02E5900CA0BFC /* Enums */,
 				ABD2A2B928841C0C00591568 /* Trash */,
 				AB10030B27BF760400338EE4 /* Extensions */,
 				AB38DD692819410700FFEB3F /* Constants */,
@@ -3500,6 +3537,7 @@
 				AB879052286E02CD00C069BA /* PollTitleCell.swift in Sources */,
 				AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */,
 				AB3C681E223FD04500B57580 /* Extensions.swift in Sources */,
+				ABB0F6CA28F5B19D0068FDDF /* LanguagesCollectionView.swift in Sources */,
 				AB00FFD32583A4A50071C7DE /* TextViewController.swift in Sources */,
 				ABE065072844B57100877D92 /* OptionSelection.swift in Sources */,
 				AB791D7D243B1BF00085E00E /* VoteAnimationView.swift in Sources */,
@@ -3579,6 +3617,7 @@
 				ABF73549270DC1F700F7C308 /* ClaimView.swift in Sources */,
 				AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */,
 				ABBA73F82383F74E00540ECF /* HeartButton.swift in Sources */,
+				ABB0F6CC28F5B5E40068FDDF /* LanguageCell.swift in Sources */,
 				AB72964C27DB612000D45B54 /* SettingsModel.swift in Sources */,
 				AB6083BE2240FF15002C0D7E /* UnderlinedTextField.swift in Sources */,
 				AB3211AA288E7D0800C736DE /* TopicsCollectionView.swift in Sources */,
@@ -3662,6 +3701,7 @@
 				AB0A711928EC7DC8005F7C70 /* AppSettingsSwitchCell.swift in Sources */,
 				AB39F41428478B5C00DEE0ED /* ImageSelectionCellContent.swift in Sources */,
 				AB7830AF28D86A7400D7C883 /* NavigationController.swift in Sources */,
+				AB51075628F02E6E00CA0BFC /* Enums.swift in Sources */,
 				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
 				ABB6397628816B9000E4B4EF /* LinkPreviewCell.swift in Sources */,
 				ABDAA38E248E7D3600569F68 /* ClaimViewController.swift in Sources */,
@@ -3698,9 +3738,11 @@
 				AB1D845224EA91D200B75929 /* Topic.swift in Sources */,
 				AB4428B2282BCBD500D5628E /* _SurveyCell.swift in Sources */,
 				AB4054F628783156000F7768 /* UIPropertyListener.swift in Sources */,
+				ABB0F6C528F5A4550068FDDF /* LanguageListContract.swift in Sources */,
 				AB913F8B28097D9C00609D51 /* ProgressCircle.swift in Sources */,
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
 				AB72964327DB60C800D45B54 /* SettingsController.swift in Sources */,
+				ABB0F6C828F5A4550068FDDF /* LanguageListModel.swift in Sources */,
 				AB52719E28EC1B1D0000F095 /* UserprofilesController.swift in Sources */,
 				ABFB42242873443A0066CFA0 /* WebViewCell.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */,
@@ -3724,6 +3766,7 @@
 				AB72963C27DB5F0B00D45B54 /* TopicsView.swift in Sources */,
 				AB72960F27DA2F0F00D45B54 /* HotView.swift in Sources */,
 				ABB8B18F2423C9DE00E8DFF3 /* SurveyImageCell.swift in Sources */,
+				ABB0F6C728F5A4550068FDDF /* LanguageListView.swift in Sources */,
 				AB51605C24EFEC79006A07B7 /* CategoryCollectionViewController.swift in Sources */,
 				ABAB76B628C8A1DC001F2449 /* UserSettingsCredentialsCell.swift in Sources */,
 				ABBF8B0A28A3C6AE0071443C /* AccessoryInputTextField.swift in Sources */,
@@ -3759,6 +3802,7 @@
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
 				AB91195526C3AB1D007ED54A /* VotesFormula.swift in Sources */,
 				AB879049286D9FBB00C069BA /* NavbarContentView.swift in Sources */,
+				ABB0F6C628F5A4550068FDDF /* LanguageListViewController.swift in Sources */,
 				AB72961E27DA3F2C00D45B54 /* SubsciptionsView.swift in Sources */,
 				AB99A95424C6CCE800814F96 /* UserLogoHeader.swift in Sources */,
 				ABEDC4E32450168D00FA9128 /* User.swift in Sources */,
@@ -3773,7 +3817,6 @@
 				ABADF56F27F1BC7500A26474 /* TitleCell.swift in Sources */,
 				AB10030A27BEB83E00338EE4 /* Localizable.swift in Sources */,
 				AB63D7D6283FC03A00173116 /* TopicSelection.swift in Sources */,
-				AB238D1C27905859009E49C2 /* AppSettings.swift in Sources */,
 				AB39F40F2847457200DEE0ED /* InsetTextField.swift in Sources */,
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				AB4727A9268C6444002A9563 /* UI.swift in Sources */,
@@ -3849,6 +3892,7 @@
 				ABDE82C128B38F18004E07BD /* CommentsController.swift in Sources */,
 				ABEB5F7F285E1E0600C75C31 /* LimitsSelectionView.swift in Sources */,
 				AB234F4028D653B600204EC8 /* NSDirectionalEdgeInsets.swift in Sources */,
+				AB51075828F1CDD000CA0BFC /* AppSettingsLanguageCell.swift in Sources */,
 				AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */,
 				ABF20FB824C994250092B223 /* UserSurveysCell.swift in Sources */,
 				ABEBC5EA263AD58100CE3F7A /* ImageEditingListTableViewController.swift in Sources */,

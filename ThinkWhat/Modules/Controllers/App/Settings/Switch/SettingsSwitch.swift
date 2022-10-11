@@ -221,8 +221,8 @@ class SettingsSwitch: UIView {
 //    }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        profile.tintColor = state == .Profile ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
-        settings.tintColor = state == .Settings ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
+//        profile.tintColor = traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
+//        settings.tintColor = state == .Settings ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         mark.getSubview(type: UIView.self, identifier: "innerView")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED

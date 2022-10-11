@@ -12,17 +12,16 @@ import Combine
 class AppSettingsCollectionView: UICollectionView {
     
     enum Section: Int, CaseIterable {
-        case Notifications
+        case Notifications, Languages
     }
     
     
     
     // MARK: - Public properties
     //Publishers
-    public let namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
-    public let datePublisher = CurrentValueSubject<Date?, Never>(nil)
-    
-    
+    public var notificationSettingsPublisher = CurrentValueSubject<[AppSettings: Bool]?, Never>(nil)
+    public var appLanguagePublisher = CurrentValueSubject<[AppSettings: String]?, Never>(nil)
+    public var contentLanguagePublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -56,7 +55,7 @@ class AppSettingsCollectionView: UICollectionView {
     
     // MARK: - Private methods
     private func setupUI() {
-        collectionViewLayout = UICollectionViewCompositionalLayout{ section, environment -> NSCollectionLayoutSection in
+        collectionViewLayout = UICollectionViewCompositionalLayout{ [unowned self] section, environment -> NSCollectionLayoutSection in
             var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
             configuration.backgroundColor = .clear
             configuration.showsSeparators = true
@@ -69,6 +68,28 @@ class AppSettingsCollectionView: UICollectionView {
                     config.topSeparatorVisibility = .visible
                     config.bottomSeparatorInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 1.2, trailing: 0)
                     config.bottomSeparatorVisibility = .visible
+                    
+                    if let section = Section(rawValue: indexPath.section) {
+                        switch section {
+                            
+                        case .Notifications:
+                            
+                            guard let itemsCount = self.numberOfItems(inSection: indexPath.section) as? Int,
+                                  itemsCount > 1
+                            else { return config }
+                            
+                            if itemsCount == 2 {
+                                config.topSeparatorVisibility = indexPath.row == 0 ? .visible : .hidden
+                                config.bottomSeparatorVisibility = indexPath.row == 0 ? .hidden : .visible
+                            } else {
+                                config.topSeparatorVisibility = indexPath.row == 0 ? .visible : .hidden
+                                config.bottomSeparatorVisibility = indexPath.row == itemsCount-1 ? .visible : .hidden
+                            }
+                        case .Languages:
+                            config.topSeparatorVisibility = indexPath.row == 0 ? .visible : .hidden
+                            config.bottomSeparatorVisibility = indexPath.row == 0 ? .hidden : .visible
+                        }
+                    }
                     
                     return config
                 }
@@ -87,14 +108,10 @@ class AppSettingsCollectionView: UICollectionView {
             cell.valuePublisher
                 .sink { [weak self] in
                     guard let self = self,
-                          let dict = $0,
-                          let key = dict.keys.first,
-                          let value = dict.values.first
+                          let dict = $0
                     else { return }
                     
-                    print(key)
-                    print(value)
-//                    self.interestPublisher.send(topic)
+                    self.notificationSettingsPublisher.send(dict)
                 }
                 .store(in: &subscriptions)
             
@@ -105,11 +122,14 @@ class AppSettingsCollectionView: UICollectionView {
             
             switch indexPath.row {
             case 0:
-                cell.mode = .notifications(.Allow)
+                cell.mode = .notifications(.Completed)
+                cell.isOn = UserDefaults.App.notifyOnOwnCompleted ?? false
             case 1:
                 cell.mode = .notifications(.Subscriptions)
+                cell.isOn = UserDefaults.App.notifyOnNewSubscription ?? false
             case 2:
                 cell.mode = .notifications(.Watchlist)
+                cell.isOn = UserDefaults.App.notifyOnWatchlistCompleted ?? false
             default:
 #if DEBUG
       fatalError()
@@ -117,18 +137,44 @@ class AppSettingsCollectionView: UICollectionView {
             }
         }
         
+        let languageCellRegistration = UICollectionView.CellRegistration<AppSettingsLanguageCell, AnyHashable> { [unowned self] cell, indexPath, item in
+            
+            cell.appLanguagePublisher
+                .sink { [weak self] in
+                    guard let self = self,
+                          let dict = $0
+                    else { return }
+                    
+                    self.appLanguagePublisher.send(dict)
+                }
+                .store(in: &subscriptions)
+            
+            cell.contentLanguagePublisher
+                .sink { [weak self] in
+                    guard let self = self, !$0.isNil else { return }
+                    
+                    self.contentLanguagePublisher.send($0)
+                }
+                .store(in: &subscriptions)
+            
+            var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+            backgroundConfig.backgroundColor = .clear
+            cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            cell.backgroundConfiguration = backgroundConfig
+            cell.mode = indexPath.row == 0 ? .languages(.App) : .languages(.Content)
+        }
+        
         let headerRegistration = UICollectionView.SupplementaryRegistration<SettingsCellHeader>(elementKind: UICollectionView.elementKindSectionHeader) { [unowned self] supplementaryView, elementKind, indexPath in
             
-            guard let section = Section(rawValue: indexPath.section),
-                  let userprofile = Userprofiles.shared.current
-            else { return }
+            guard let section = Section(rawValue: indexPath.section) else { return }
             
             switch section {
             case .Notifications:
                 supplementaryView.mode = .Notifications
                 supplementaryView.isHelpEnabled = false
-            default:
-                print("")
+            case .Languages:
+                supplementaryView.mode = .Languages
+                supplementaryView.isHelpEnabled = false
             }
         }
         
@@ -138,6 +184,10 @@ class AppSettingsCollectionView: UICollectionView {
             
             if section == .Notifications {
                 return collectionView.dequeueConfiguredReusableCell(using: switchCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            } else if section == .Languages {
+                return collectionView.dequeueConfiguredReusableCell(using: languageCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
             }
@@ -152,8 +202,9 @@ class AppSettingsCollectionView: UICollectionView {
         }
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-        snapshot.appendSections([.Notifications, ])
+        snapshot.appendSections([.Notifications, .Languages])
         snapshot.appendItems(Array(0...2), toSection: .Notifications)
+        snapshot.appendItems([3, 4], toSection: .Languages)
         source.apply(snapshot, animatingDifferences: false)
     }
 }

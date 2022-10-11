@@ -7,16 +7,25 @@
 //
 
 import UIKit
+import Combine
 
 class HotController: UIViewController {
 
     
-    // MARK: - Properties
+    
+    // MARK: - Public properties
     var controllerOutput: HotControllerOutput?
     var controllerInput: HotControllerInput?
     var shouldSkipCurrentCard = false
     
+    
+    
+    // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //UI
+    private var isOnScreen = true
     private var isViewLayedOut = false
     private lazy var barButton: UIView = {
         let instance = UIView()
@@ -66,7 +75,7 @@ class HotController: UIViewController {
         self.controllerInput = model
         self.controllerInput?
             .modelOutput = self
-        setObservers()
+        setTasks()
         setupUI()
     }
 
@@ -137,19 +146,16 @@ class HotController: UIViewController {
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
-    private func setObservers() {
-//        let remove      = [Notifications.Surveys.Claimed,
-//                           Notifications.Surveys.Completed,
-//                           Notifications.Surveys.Rejected]
-//        remove.forEach { NotificationCenter.default.addObserver(self, selector: #selector(self.onRemove), name: $0, object: nil) }
-//        NotificationCenter.default.addObserver(self,
-//                                               selector: #selector(HotController.makePreviewStack),
-//                                               name: Notifications.Surveys.UpdateHotSurveys,
-//                                               object: nil)
-//        NotificationCenter.default.addObserver(self,
-//                                               selector: #selector(SurveyStackViewController.didBecomeActive),
-//                                               name: UIApplication.didBecomeActiveNotification,
-//                                               object: nil)
+    private func setTasks() {
+        tasks.append(Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
+                guard let self = self,
+                      let tab = notification.object as? Tab
+                else { return }
+                
+                self.isOnScreen = tab == .Hot
+            }
+        })
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -249,7 +255,8 @@ extension HotController {
     
     @objc
     private func requestSurveys() {
-        guard !isNetworking else { return }
+        guard isOnScreen, !isNetworking else { return }
+        
         isNetworking = true
         controllerInput?.loadSurveys()
     }

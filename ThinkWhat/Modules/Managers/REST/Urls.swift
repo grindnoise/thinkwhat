@@ -21,6 +21,7 @@ struct API_URLS {
         static let subscribedFor:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_subscribed_for/")}()
         static let subscribers:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_subscribers/")}()
         static let updateCurrentStats:  URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_current_user_data/")}()
+        static let updateAppSettings:   URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/set_app_settings/")}()
     }
     
     struct Surveys {

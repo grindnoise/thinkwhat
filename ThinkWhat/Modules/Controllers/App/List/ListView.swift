@@ -265,16 +265,12 @@ extension ListView {
     }
 }
 
-// MARK: - CallbackObservable
 extension ListView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
-        if let instances = sender as? [SurveyReference] {
-            
-        }
+
     }
 }
 
-// MARK: - BannerObservable
 extension ListView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     

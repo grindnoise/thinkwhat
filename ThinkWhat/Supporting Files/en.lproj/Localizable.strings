@@ -315,9 +315,14 @@
 "logout" = "Log out";
 "delete_account" = "Delete account";
 "allow_push_notifications" = "Allow notifications";
-"subscriptions_notifications" = "Subscriptions";
-"watchlist_notifications" = "Watchlist";
+"NOTIFICATIONS_OWN_COMPLETED" = "My completed posts";
+"NOTIFICATIONS_NEW_SUBSCRIPTIONS" = "New posts by subscription";
+"NOTIFICATIONS_WATCHLIST_COMPLETED" = "Completed in watchlist";
 "notifications" = "Notifications";
+"languages" = "Languages";
+"default_locale" = "Interface";
+"locales" = "Content";
+"content_language" = "Content language";
 
 //Tutorials
 "poll_vote_edu_1" = "The poll will end and disappear from the lists after the required number of participants has been reached.";

@@ -28,12 +28,7 @@ extension UserDefaults {
         static var email: String?
         
         @UserDefault(key: "city", defaultValue: "")
-        static var city: String {
-            didSet {
-                print(oldValue)
-                print(city)
-            }
-        }
+        static var city: String
         
         @UserDefault(key: "image_path", defaultValue: nil)
         static var imagePath: String?
@@ -159,6 +154,24 @@ extension UserDefaults {
     }
     
     struct App {
+        @UserDefault(key: "content_languages", defaultValue: [])
+        static var contentLanguages: [String] {
+            didSet {
+                guard oldValue != contentLanguages else { return }
+                
+                NotificationCenter.default.post(name: Notifications.System.ContentLanguage, object: contentLanguages)
+            }
+        }
+        
+        @UserDefault(key: "NOTIFICATIONS_OWN_COMPLETED", defaultValue: false)
+        static var notifyOnOwnCompleted: Bool?
+        
+        @UserDefault(key: "NOTIFICATIONS_WATCHLIST_COMPLETED", defaultValue: false)
+        static var notifyOnWatchlistCompleted: Bool?
+
+        @UserDefault(key: "NOTIFICATIONS_NEW_SUBSCRIPTIONS", defaultValue: false)
+        static var notifyOnNewSubscription: Bool?
+        
         @UserDefault(key: "has_seen_app_introduction", defaultValue: false)
         static var hasSeenAppIntroduction: Bool?
         
@@ -200,6 +213,10 @@ extension UserDefaults {
             UserDefaults.App.youtubePlay                        = nil
             UserDefaults.App.tiktokPlay                         = nil
             UserDefaults.App.hasSeenPollCreationIntroduction    = false
+            UserDefaults.App.notifyOnOwnCompleted               = nil
+            UserDefaults.App.notifyOnWatchlistCompleted         = nil
+            UserDefaults.App.notifyOnNewSubscription            = nil
+            UserDefaults.App.contentLanguages                   = []
         }
     }
     

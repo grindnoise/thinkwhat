@@ -1102,6 +1102,20 @@ class API {
     class Profiles {
         weak var parent: API! = nil
         
+        public func updateAppSettings(_ parameters: Parameters) async throws {
+            guard let url = API_URLS.Profiles.updateAppSettings else { throw APIError.invalidURL }
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                
+            } catch let error {
+    #if DEBUG
+                print(error)
+    #endif
+                throw error
+            }
+        }
+        
         public func updateUserprofileAsync(data: [String: Any], uploadProgress: @escaping(Double) -> ()) async throws -> Data {
             guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/") else { throw APIError.invalidURL
             }

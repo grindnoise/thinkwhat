@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 class SubsciptionsModel {
     
@@ -15,31 +16,42 @@ class SubsciptionsModel {
 
 // MARK: - Controller Input
 extension SubsciptionsModel: SubsciptionsControllerInput {
+    func claim(surveyReference: SurveyReference, claim: Claim) {
+        Task {
+            try await API.shared.surveys.claim(surveyReference: surveyReference, reason: claim)
+        }
+    }
+    
+    func addFavorite(surveyReference: SurveyReference) {
+        Task {
+            try await API.shared.surveys.markFavoriteAsync(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
+        }
+    }
+    
     func updateSurveyStats(_ instances: [SurveyReference]) {
         Task {
             do {
                 try await API.shared.surveys.updateSurveyStats(instances)
             } catch {
-                await MainActor.run {
-                    modelOutput?.onError(error)
-                }
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
             }
         }
     }
     
-    func loadSubscriptions() {
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
         Task {
             do {
-                try await API.shared.surveys.loadSurveyReferences(Survey.SurveyCategory.Subscriptions)
+                try await API.shared.surveys.loadSurveyReferences(source, topic)
+                await MainActor.run {
+                    modelOutput?.onRequestCompleted(.success(true))
+                }
             } catch {
                 await MainActor.run {
-                    modelOutput?.onError(error)
+                    modelOutput?.onRequestCompleted(.failure(error))
                 }
             }
         }
-    }
-    
-    var userprofiles: [Userprofile] {
-        return []//Array(Userprofiles.shared.subscribedFor.prefix(upTo: min(Userprofiles.shared.subscribedFor.count, 10)))
     }
 }

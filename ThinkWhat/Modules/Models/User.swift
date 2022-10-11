@@ -43,7 +43,8 @@ class Userprofiles {
               let completeTotal = json["completed_surveys_count"].int,
               let balance = json["balance"].int,
               let top_preferences = json["top_preferences"] as? JSON,
-              let isBanned = json["is_banned"].bool
+              let isBanned = json["is_banned"].bool,
+              let locales = json["locales"].arrayObject as? [String]
         else { return }
         
         
@@ -55,6 +56,10 @@ class Userprofiles {
         userprofile.balance = balance
         userprofile.isBanned = isBanned
         userprofile.updatePreferences(top_preferences)
+        UserDefaults.App.contentLanguages = locales
+//        locales.forEach {
+//            userprofile.contentLocales.append($0)
+//        }
         
         guard let subscriptionsData = try? json["subscriptions"].rawData(),
               let subscribersData = try? json["subscribers"].rawData()
@@ -412,6 +417,7 @@ class Userprofile: Decodable {
             
         }
     }
+//    var contentLocales: [String] = []
     
     init?() {
         guard let _id = UserDefaults.Profile.id,
