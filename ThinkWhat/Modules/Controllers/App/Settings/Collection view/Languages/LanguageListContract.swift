@@ -8,39 +8,26 @@
 
 import UIKit
 
-/// *View* sends user actions to the *Controller*.
-///
-/// **Controller** conforms to this protocol
-protocol LanguageListViewInput: class {
+protocol LanguageListViewInput: AnyObject {
     
     var controllerOutput: LanguageListControllerOutput? { get set }
     var controllerInput: LanguageListControllerInput? { get set }
     
-    // View input methods here
+    func updateContentLanguage(language: LanguageItem, use: Bool)
 }
 
-/// *Controller* tells the *Model* what to do based on the input
-///
-/// **Model** conforms to this protocol
-protocol LanguageListControllerInput: class {
+protocol LanguageListControllerInput: AnyObject {
     
     var modelOutput: LanguageListModelOutput? { get set }
     
-    // Controller input methods here
+    func updateContentLanguage(language: LanguageItem, use: Bool)
 }
 
-/// *Model* returns the result to the *Controller*
-///
-/// **Controller** conforms to this protocol
-protocol LanguageListModelOutput: class {
-    // Model output methods here
-}
-
-/// *Controller* returns a UI-representable result to the *View*
-///
-/// **View** conforms to this protocol
-protocol LanguageListControllerOutput: class {
-    var viewInput: LanguageListViewInput? { get set }
+protocol LanguageListModelOutput: AnyObject {
     
-    // Controller output methods here
+}
+
+protocol LanguageListControllerOutput: AnyObject {
+    var viewInput: LanguageListViewInput? { get set }
+
 }

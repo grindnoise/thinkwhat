@@ -72,16 +72,15 @@ class SettingsSwitch: UIView {
     public var statePublisher = CurrentValueSubject<SettingsController.Mode?, Never>(nil)
     
     
-    
     //MARK: - Overridden properties
-    override var bounds: CGRect {
-        didSet {
-            guard oldValue != bounds, !backgroundView.isNil else { return }
-            backgroundView.cornerRadius = bounds.height / 2
-            mark.frame = CGRect(origin: .zero, size: CGSize(width: bounds.height, height: bounds.height))
-            mark.cornerRadius = bounds.height / 2
-        }
-    }
+//    override var bounds: CGRect {
+//        didSet {
+//            guard oldValue != bounds, !backgroundView.isNil else { return }
+//            backgroundView.cornerRadius = bounds.height / 2
+//            mark.frame = CGRect(origin: .zero, size: CGSize(width: bounds.height, height: bounds.height))
+//            mark.cornerRadius = bounds.height / 2
+//        }
+//    }
     
     
     
@@ -112,8 +111,14 @@ class SettingsSwitch: UIView {
             
             guard let imageView = mark.getSubview(type: UIImageView.self, identifier: "innerView") else { return }
             UIView.transition(with: imageView, duration: 0.175, options: .transitionCrossDissolve) { [weak self] in
-                guard let self = self else { return }
-                self.mark.center.x  = newView.center.x
+                guard let self = self,
+                      let constraint = self.mark.getConstraint(identifier: "leading")
+                else { return }
+                
+//                self.mark.center.x  = newView.center.x
+                self.setNeedsLayout()
+                constraint.constant = newView.frame.origin.x
+                self.layoutIfNeeded()
                 imageView.image = image
             } completion: { _ in }
         }
@@ -130,6 +135,11 @@ class SettingsSwitch: UIView {
         instance.layer.shadowRadius = 7
         instance.layer.shadowOffset = .zero
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.cornerRadius = rect.height/2
+            }
+            .store(in: &subscriptions)
         
         let innerView = UIImageView()
         innerView.clipsToBounds = false
@@ -171,15 +181,43 @@ class SettingsSwitch: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
+        
+        setupUI()
+        setTasks()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        commonInit()
+        
+        setupUI()
+        setTasks()
     }
     
-    private func commonInit() {
+    
+    
+//    private func setupUI() {
+//        profile.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+//        profile.tintColor = .white
+//        backgroundView.insertSubview(mark, at: 0)
+//        backgroundView.clipsToBounds = false
+//        mark.clipsToBounds = false
+//        mark.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        profile.tintColor = traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
+//        settings.tintColor = state == .Settings ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        mark.getSubview(type: UIView.self, identifier: "innerView")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        mark.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    }
+    
+    
+}
+
+private extension SettingsSwitch {
+    func setupUI() {
 //        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
 //
 //        contentView.backgroundColor = .clear
@@ -211,26 +249,17 @@ class SettingsSwitch: UIView {
 //        setupUI()
     }
     
-//    private func setupUI() {
-//        profile.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-//        profile.tintColor = .white
-//        backgroundView.insertSubview(mark, at: 0)
-//        backgroundView.clipsToBounds = false
-//        mark.clipsToBounds = false
-//        mark.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        profile.tintColor = traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
-//        settings.tintColor = state == .Settings ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
-        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        mark.getSubview(type: UIView.self, identifier: "innerView")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        mark.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    func setTasks() {
+//        tasks.append(Task { [weak self] in
+//            guard !self.isNil else { return }
+//            for await _ in await NotificationCenter.default.notifications(for: UIApplication.willResignActiveNotification) {
+//                print("UIApplication.willResignActiveNotification")
+//            }
+//        })
     }
     
     @objc
-    private func handleTap(recognizer: UITapGestureRecognizer) {
+    func handleTap(recognizer: UITapGestureRecognizer) {
         guard let v = recognizer.view else { return }
         if v === profile {
             state = .Profile
@@ -239,4 +268,3 @@ class SettingsSwitch: UIView {
         }
     }
 }
-

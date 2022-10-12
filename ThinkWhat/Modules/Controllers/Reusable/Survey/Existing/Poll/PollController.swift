@@ -44,7 +44,8 @@ class PollController: UIViewController {
     private var isAddedToFavorite = false {
         didSet {
             if isAddedToFavorite {
-                watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+//                watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+                watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .black
             } else {
                 watchButton.tintColor = .systemGray
             }
@@ -70,7 +71,8 @@ class PollController: UIViewController {
         let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: true)
         customTitle.accessibilityIdentifier = "progressIndicator"
         customTitle.color = .clear
-        customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+//        customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        customTitle.icon.iconColor = surveyReference.topic.tagColor
         customTitle.icon.backgroundColor = .clear
         customTitle.layer.masksToBounds = false
         customTitle.icon.layer.masksToBounds = false
@@ -79,7 +81,8 @@ class PollController: UIViewController {
         customTitle.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
         customTitle.state = .Off
         customTitle.contentView.backgroundColor = .clear
-        customTitle.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : surveyReference.topic.tagColor.cgColor
+//        customTitle.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : surveyReference.topic.tagColor.cgColor
+        customTitle.oval.strokeColor = surveyReference.topic.tagColor.cgColor
         customTitle.oval.lineCap = .round
         customTitle.oval.strokeStart = survey.isNil ? 0 : CGFloat(survey!.progress)
         return customTitle
@@ -88,7 +91,8 @@ class PollController: UIViewController {
         let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: false)
         customTitle.accessibilityIdentifier = "titleView"
         customTitle.color = .clear
-        customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+//        customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        customTitle.icon.iconColor = surveyReference.topic.tagColor
         customTitle.icon.backgroundColor = .clear
         customTitle.layer.masksToBounds = false
         customTitle.icon.layer.masksToBounds = false
@@ -99,7 +103,8 @@ class PollController: UIViewController {
         customTitle.contentView.backgroundColor = .clear
 //        customTitle.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
         customTitle.ovalBg.strokeStart = 0
-        customTitle.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : surveyReference.topic.tagColor.cgColor
+//        customTitle.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : surveyReference.topic.tagColor.cgColor
+        customTitle.oval.strokeColor = surveyReference.topic.tagColor.cgColor
         customTitle.oval.lineCap = .round
         customTitle.oval.strokeStart = survey.isNil ? 0 : CGFloat(survey!.progress)
         return customTitle
@@ -201,7 +206,8 @@ class PollController: UIViewController {
         indicator.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
         indicator.oval.lineCap = .round
         indicator.ovalBg.strokeStart = 0
-        indicator.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+//        indicator.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        indicator.icon.iconColor = surveyReference.topic.tagColor
         indicator.icon.backgroundColor = .clear
         indicator.backgroundColor = .clear
         indicator.icon.scaleMultiplicator = 1.5
@@ -221,7 +227,8 @@ class PollController: UIViewController {
         stackView.addArrangedSubview(titleContainer)
         
         let label = InsetLabel()
-        label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+//        label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+        label.backgroundColor = surveyReference.topic.tagColor
         label.textColor = .white
         label.text = surveyReference.topic.title.uppercased()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -267,7 +274,8 @@ class PollController: UIViewController {
             container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
             
             let instance = UIImageView(image: UIImage(systemName: "figure.wave"))
-            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+//            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+            instance.tintColor = surveyReference.topic.tagColor
             instance.contentMode = .scaleAspectFit
             instance.addEquallyTo(to: container)
             marksStackView.addArrangedSubview(container)
@@ -280,7 +288,8 @@ class PollController: UIViewController {
             let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill",
                                                       withConfiguration: UIImage.SymbolConfiguration(pointSize: marksStackView.frame.height, weight: .semibold, scale: .medium)))
             instance.contentMode = .center
-            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+//            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+            instance.tintColor = surveyReference.topic.tagColor
             instance.contentMode = .scaleAspectFit
             instance.addEquallyTo(to: container)
             marksStackView.addArrangedSubview(container)
@@ -292,7 +301,8 @@ class PollController: UIViewController {
             container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
             
             let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+//            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .darkGray
             instance.contentMode = .scaleAspectFit
             instance.addEquallyTo(to: container)
             marksStackView.addArrangedSubview(container)
@@ -418,7 +428,8 @@ class PollController: UIViewController {
                         container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
 
                         let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+//                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .darkGray
                         instance.contentMode = .scaleAspectFit
                         instance.addEquallyTo(to: container)
                         marksStackView.insertArrangedSubview(container,
@@ -470,7 +481,8 @@ class PollController: UIViewController {
 
                         let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
                         instance.contentMode = .center
-                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
+//                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
+                        instance.tintColor = self._surveyReference.topic.tagColor
                         instance.contentMode = .scaleAspectFit
                         instance.addEquallyTo(to: container)
 
@@ -775,32 +787,39 @@ class PollController: UIViewController {
         //        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
         
         if let indicator = stackView.get(all: CircleButton.self).first {
-            indicator.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+//            indicator.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+            indicator.icon.setIconColor(surveyReference.topic.tagColor)
         }
         
         if let label = stackView.getSubview(type: InsetLabel.self, identifier: "label") {
-            label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+//            label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+            label.backgroundColor = surveyReference.topic.tagColor
         }
         
         if let isComplete = stackView.getSubview(type: UIView.self, identifier: "isComplete"), let imageView = isComplete.getSubview(type: UIImageView.self, identifier: nil) {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+            imageView.tintColor = surveyReference.topic.tagColor
         }
         
         if let isOwn = stackView.getSubview(type: UIView.self, identifier: "isOwn"), let imageView = isOwn.getSubview(type: UIImageView.self, identifier: nil) {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
+            imageView.tintColor = surveyReference.topic.tagColor
         }
         
         if let isFavorite = stackView.getSubview(type: UIView.self, identifier: "isFavorite"), let imageView = isFavorite.getSubview(type: UIImageView.self, identifier: nil) {
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .darkGray
         }
 
         
         if let icon = navigationItem.titleView as? CircleButton {
-            icon.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+//            icon.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+            icon.icon.setIconColor(self.surveyReference.topic.tagColor)
         }
         
         if isAddedToFavorite {
-            watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+//            watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
+            watchButton.tintColor = self.surveyReference.topic.tagColor
         } else {
             watchButton.tintColor = .systemGray
         }

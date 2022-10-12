@@ -22,7 +22,18 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     // MARK: - Public properties
     var controllerOutput: SettingsControllerOutput?
     var controllerInput: SettingsControllerInput?
-    var mode: SettingsController.Mode = .Profile
+    var mode: SettingsController.Mode = .Profile {
+        didSet {
+            guard oldValue != mode else { return }
+            
+            switch mode {
+            case .Settings:
+                controllerOutput?.onAppSettings()
+            case .Profile:
+                controllerOutput?.onUserSettings()
+            }
+        }
+    }
     
     
     
@@ -91,6 +102,9 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        navigationController?.navigationBar.overrideUserInterfaceStyle = .unspecified
+        navigationController?.navigationBar.tintColor = .label
+        
         tabBarController?.setTabBarVisible(visible: true, animated: true)
         
         settingsSwitch.alpha = 1
@@ -145,7 +159,8 @@ private extension SettingsController {
         NSLayoutConstraint.activate([
             settingsSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             settingsSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-            settingsSwitch.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState * 0.97),
+//            settingsSwitch.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState * 0.97),
+            settingsSwitch.heightAnchor.constraint(equalToConstant: 40),
             settingsSwitch.widthAnchor.constraint(equalTo: settingsSwitch.heightAnchor, multiplier: 2.1)
         ])
     }
@@ -165,6 +180,31 @@ private extension SettingsController {
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+    func showLicense() {
+        var vc: SFSafariViewController!
+        let config = SFSafariViewController.Configuration()
+        config.entersReaderIfAvailable = false
+        vc = SFSafariViewController(url: API_URLS.System.licenses!, configuration: config)
+        present(vc, animated: true)
+    }
+    
+    func showTerms() {
+        var vc: SFSafariViewController!
+        let config = SFSafariViewController.Configuration()
+        config.entersReaderIfAvailable = false
+        vc = SFSafariViewController(url: API_URLS.System.termsOfUse!, configuration: config)
+        present(vc, animated: true)
+    }
+    
+    func feedback() {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        
+        navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(FeedbackViewController(), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
     func onContentLanguageTap() {
         let backItem = UIBarButtonItem()
         backItem.title = ""

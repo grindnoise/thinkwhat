@@ -52,7 +52,8 @@ class CircleButton: UIView, CAAnimationDelegate {
     var color: UIColor = K_COLOR_RED {
         didSet {
 //            icon.backgroundColor = color
-            oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor 
+//            oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor
+            oval.strokeColor = color.cgColor
         }
     }
     
@@ -164,7 +165,8 @@ class CircleButton: UIView, CAAnimationDelegate {
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor
+//        oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor
+        oval.strokeColor = color.cgColor
         oval.fillColor   = UIColor.clear.cgColor
 //        icon.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : color
     }
@@ -189,7 +191,6 @@ class CircleButton: UIView, CAAnimationDelegate {
             oval.strokeStart = 1
         }
 
-        
         CATransaction.commit()
     }
     

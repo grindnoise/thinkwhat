@@ -118,6 +118,8 @@ class UserprofilesController: UIViewController {
         
         
         setToolBar()
+        setNavigationBarAppearance(largeTitleColor: mode == .Voters ? .white : .label, smallTitleColor: mode == .Voters ? .white : .label)
+//        setNavigationBarAppearance(largeTitleColor: <#UIColor#>, smallTitleColor: <#UIColor#>)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -140,6 +142,42 @@ class UserprofilesController: UIViewController {
 }
 
 private extension UserprofilesController {
+//    func setNavigationBarAppearance(largeTitleColor: UIColor, smallTitleColor: UIColor) {
+//        guard let navigationBar = navigationController?.navigationBar else { return }
+//
+//        let appearance = UINavigationBarAppearance()
+//        appearance.configureWithOpaqueBackground()
+//        appearance.largeTitleTextAttributes = [
+//            .foregroundColor: largeTitleColor,
+//            .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle) as Any
+//        ]
+//        appearance.titleTextAttributes = [
+//            .foregroundColor: smallTitleColor,
+//            .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3) as Any
+//        ]
+//        appearance.shadowColor = nil
+//
+//        switch mode {
+//        case .Voters:
+//            guard let topic = topic else { return }
+//
+//            appearance.backgroundColor = topic.tagColor
+//            navigationBar.tintColor = .white
+//            navigationBar.barTintColor = .white
+//        default:
+//            navigationBar.tintColor = .label
+//            navigationBar.barTintColor = .label
+//        }
+//
+//        navigationBar.standardAppearance = appearance
+//        navigationBar.scrollEdgeAppearance = appearance
+//        navigationBar.prefersLargeTitles = true
+//
+//        if #available(iOS 15.0, *) {
+//            navigationBar.compactScrollEdgeAppearance = appearance
+//        }
+//    }
+    
     func setToolBar() {
         navigationController?.isToolbarHidden = true
         
@@ -160,14 +198,14 @@ private extension UserprofilesController {
         toolbarItems = [cancel, spacer, delete]
         edgesForExtendedLayout = []
         
-        let appearance = UIToolbarAppearance()
-        appearance.configureWithOpaqueBackground()
-
-//        navigationController?.toolbar.tintColor = .black
-        navigationController?.toolbar.standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            navigationController?.toolbar.scrollEdgeAppearance = appearance
-        }
+//        let appearance = UIToolbarAppearance()
+//        appearance.configureWithOpaqueBackground()
+//
+////        navigationController?.toolbar.tintColor = .black
+//        navigationController?.toolbar.standardAppearance = appearance
+//        if #available(iOS 15.0, *) {
+//            navigationController?.toolbar.scrollEdgeAppearance = appearance
+//        }
     }
     
     func setupUI() {

@@ -22,6 +22,7 @@ struct API_URLS {
         static let subscribers:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_subscribers/")}()
         static let updateCurrentStats:  URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_current_user_data/")}()
         static let updateAppSettings:   URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/set_app_settings/")}()
+        static let feedback:            URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/feedback/")}()
     }
     
     struct Surveys {
@@ -52,13 +53,15 @@ struct API_URLS {
     }
     
     struct System {
+        static let termsOfUse:          URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("terms_of_use/")}()
+        static let licenses:            URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("licenses_ios/")}()
 //        static let updateStats:     URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/get_updates/")}()
     }
     
     static let BASE                     = localhost ? "http://127.0.0.1:8000/" : "https://damp-oasis-64585.herokuapp.com/"////
     static let CLIENT_ID                = localhost ? "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS" : "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
     static let CLIENT_SECRET            = localhost ? "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH" : "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
-    static let termsOfUse = "terms_of_use/"
+    
     
     static let SIGNUP                   = "api/sign_up/"
     static let CURRENT_TIME             = "api/current_time/"

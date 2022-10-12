@@ -12,12 +12,6 @@ import CoreData
 
 class ClaimPopupContent: UIView {
     
-    private enum ButtonState: String {
-        case Send = "sendButton"
-        case Sending = "sending"
-        case Close = "continueButton"
-    }
-    
     // MARK: - Public properties
     public var claimSubject = CurrentValueSubject<Claim?, Never>(nil)
     

@@ -78,7 +78,7 @@ class PopupContent: UIView {
     private lazy var verticalStackView: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [topContainer, middleContainer, bottomContainer])
         instance.axis = .vertical
-        instance.spacing = 16
+        instance.spacing = spacing
         
         topContainer.translatesAutoresizingMaskIntoConstraints = false
         bottomContainer.translatesAutoresizingMaskIntoConstraints = false
@@ -369,6 +369,8 @@ class PopupContent: UIView {
 //        butt
 //    }
 
+    
+    
     // MARK: - Overridden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)

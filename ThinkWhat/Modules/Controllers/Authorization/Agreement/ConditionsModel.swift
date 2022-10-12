@@ -17,7 +17,7 @@ class ConditionsModel {
 extension ConditionsModel: ConditionsControllerInput {
     func getTermsConditionsURL() {
         do {
-            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.termsOfUse) else { return }
+            guard let url = API_URLS.System.termsOfUse else { return }
 //            let url = try ContentLoader.urlForResource(fromFileNamed: "terms_conditions", withExtension: "html", in: Bundle(for: Self.self))
             modelOutput?.onTermsConditionsURLReceived(url)
         } catch {

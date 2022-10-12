@@ -68,6 +68,8 @@ struct Notifications {
         static let AppLanguage                      = Notification.Name("Notifications.System.AppLanguage")
         static let ContentLanguage                  = Notification.Name("Notifications.System.ContentLanguage")
         static let Tab                              = Notification.Name("Notifications.System.Tab")
+        static let FeedbackSent                     = Notification.Name("Notifications.System.FeedbackSent")
+        static let FeedbackFailure                  = Notification.Name("Notifications.System.FeedbackFailure")
     }
     
     struct SurveyAnswers {

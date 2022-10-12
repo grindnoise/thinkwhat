@@ -124,6 +124,8 @@ class AppSettingsLanguageCell: UICollectionViewListCell {
         return instance
     }()
     
+    
+    
     // MARK: - Destructor
     deinit {
         observers.forEach { $0.invalidate() }
@@ -182,6 +184,16 @@ private extension AppSettingsLanguageCell {
                 self.disclosureButton.menu = self.prepareMenu()
             }
         })
+        
+        tasks.append(Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: Notifications.System.ContentLanguage) {
+                guard let self = self,
+                      self.mode == .languages(.Content)
+                else { return }
+                
+                self.updateUI()
+            }
+        })
     }
     
     func setupUI() {
@@ -231,7 +243,7 @@ private extension AppSettingsLanguageCell {
             disclosureButton.showsMenuAsPrimaryAction = false
             var languages = ""
             for (row, languageCode) in UserDefaults.App.contentLanguages.enumerated() {
-                guard let text = Locale.current.localizedString(forIdentifier: languageCode) else { return }
+                guard let text = Locale(identifier: languageCode).localizedString(forIdentifier: languageCode) else { return }
                 
                 languages += (row == 0 ? text.capitalized : text) + ", "
             }

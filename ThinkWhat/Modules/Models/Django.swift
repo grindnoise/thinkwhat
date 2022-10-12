@@ -104,88 +104,81 @@ struct DjangoVariables {
 }
 
 class ModelProperties {
-    static let shared = ModelProperties()
-    private init() {}
-    private var _surveyTitleMinLength:       Int = 0
-    private var _surveyTitleMaxLength:       Int = 0
-    private var _surveyDescriptionMinLength: Int = 0
-    private var _surveyDescriptionMaxLength: Int = 0
-    private var _surveyQuestionMinLength:    Int = 0
-    private var _surveyQuestionMaxLength:    Int = 0
-    private var _surveyAnswerTitleMinLength: Int = 0
-    private var _surveyAnswerTitleMaxLength: Int = 0
-    private var _surveyAnswerTextMinLength:  Int = 0
-    private var _surveyAnswerTextMaxLength:  Int = 0
-    private var _surveyAnswerMaxFreeCount:   Int = 0
-    private var _surveyMediaTitleMinLength:  Int = 0
-    private var _surveyMediaTitleMaxLength:  Int = 0
-    private var _commentMinLength:           Int = 0
-    private var _commentMaxLength:           Int = 0
-    private var _anonMinLength:           Int = 0
-    private var _anonMaxLength:           Int = 0
     
+    static let shared = ModelProperties()
+    
+    private init() {}
 
-    var surveyTitleMinLength:       Int { return { _surveyTitleMinLength }()}
-    var surveyTitleMaxLength:       Int { return { _surveyTitleMaxLength }()}
-    var surveyDescriptionMinLength: Int { return { _surveyDescriptionMinLength }()}
-    var surveyDescriptionMaxLength: Int { return { _surveyDescriptionMaxLength }()}
-    var surveyAnswerTitleMinLength: Int { return { _surveyAnswerTitleMinLength }()}
-    var surveyAnswerTitleMaxLength: Int { return { _surveyAnswerTitleMaxLength }()}
-    var surveyAnswerTextMinLength:  Int { return { _surveyAnswerTextMinLength }()}
-    var surveyAnswerTextMaxLength:  Int { return { _surveyAnswerTextMaxLength }()}
-    var surveyAnswerMaxFreeCount:   Int { return { _surveyAnswerMaxFreeCount }()}
-    var surveyQuestionMinLength:    Int { return { _surveyQuestionMinLength }()}
-    var surveyQuestionMaxLength:    Int { return { _surveyQuestionMaxLength }()}
-    var surveyMediaTitleMinLength:  Int { return { _surveyMediaTitleMinLength }()}
-    var surveyMediaTitleMaxLength:  Int { return { _surveyMediaTitleMaxLength }()}
-    var commentMinLength:           Int { return { _commentMinLength }()}
-    var commentMaxLength:           Int { return { _commentMaxLength }()}
-    var anonMinLength:              Int { return { _anonMinLength }()}
-    var anonMaxLength:              Int { return { _anonMaxLength }()}
-
+    public private(set) var surveyTitleMinLength:           Int!
+    public private(set) var surveyTitleMaxLength:           Int!
+    public private(set) var surveyDescriptionMinLength:     Int!
+    public private(set) var surveyDescriptionMaxLength:     Int!
+    public private(set) var surveyAnswerTitleMinLength:     Int!
+    public private(set) var surveyAnswerTitleMaxLength:     Int!
+    public private(set) var surveyAnswerTextMinLength:      Int!
+    public private(set) var surveyAnswerTextMaxLength:      Int!
+    public private(set) var surveyAnswerMaxFreeCount:       Int!
+    public private(set) var surveyQuestionMinLength:        Int!
+    public private(set) var surveyQuestionMaxLength:        Int!
+    public private(set) var surveyMediaTitleMinLength:      Int!
+    public private(set) var surveyMediaTitleMaxLength:      Int!
+    public private(set) var commentMinLength:               Int!
+    public private(set) var commentMaxLength:               Int!
+    public private(set) var anonMinLength:                  Int!
+    public private(set) var anonMaxLength:                  Int!
+    public private(set) var feedbackDescriptionMinLength:   Int!
+    public private(set) var feedbackDescriptionMaxLength:   Int!
+    
     
     func importJson(_ json: JSON) {
         for i in json {
             if i.0 == "survey" {
                 for j in i.1 {
                     if j.0 == "title", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
-                        _surveyTitleMinLength = dict["min_length"]!
-                        _surveyTitleMaxLength = dict["max_length"]!
+                        surveyTitleMinLength = dict["min_length"]!
+                        surveyTitleMaxLength = dict["max_length"]!
                     } else if j.0 == "description", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
-                        _surveyDescriptionMinLength = dict["min_length"]!
-                        _surveyDescriptionMaxLength = dict["max_length"]!
+                        surveyDescriptionMinLength = dict["min_length"]!
+                        surveyDescriptionMaxLength = dict["max_length"]!
                     } else if j.0 == "question", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
-                        _surveyQuestionMinLength = dict["min_length"]!
-                        _surveyQuestionMaxLength = dict["max_length"]!
+                        surveyQuestionMinLength = dict["min_length"]!
+                        surveyQuestionMaxLength = dict["max_length"]!
                     }
                 }
             } else if i.0 == "survey_answer" {
                 for j in i.1 {
                     if j.0 == "title", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
-                        _surveyAnswerTitleMinLength = dict["min_length"]!
-                        _surveyAnswerTitleMaxLength = dict["max_length"]!
+                        surveyAnswerTitleMinLength = dict["min_length"]!
+                        surveyAnswerTitleMaxLength = dict["max_length"]!
                     } else if j.0 == "description", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
-                        _surveyAnswerTextMinLength = dict["min_length"]!
-                        _surveyAnswerTextMaxLength = dict["max_length"]!
+                        surveyAnswerTextMinLength = dict["min_length"]!
+                        surveyAnswerTextMaxLength = dict["max_length"]!
                     } else if j.0 == "free_count", let value = j.1.int {
-                        _surveyAnswerMaxFreeCount = value
+                        surveyAnswerMaxFreeCount = value
                     }
                 }
             } else if i.0 == "survey_media" {
                 for j in i.1 {
                     if j.0 == "title", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
-                        _surveyMediaTitleMinLength = dict["min_length"]!
-                        _surveyMediaTitleMaxLength = dict["max_length"]!
+                        surveyMediaTitleMinLength = dict["min_length"]!
+                        surveyMediaTitleMaxLength = dict["max_length"]!
                     }
                 }
             } else if i.0 == "comment" {
                 for j in i.1 {
                     if j.0 == "body", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
-                        _commentMinLength = dict["min_length"]!
-                        _commentMaxLength = dict["max_length"]!
+                        commentMinLength = dict["min_length"]!
+                        commentMaxLength = dict["max_length"]!
                     } else if j.0 == "anon", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
-                        _anonMinLength = dict["min_length"]!
-                        _anonMaxLength = dict["max_length"]!
+                        anonMinLength = dict["min_length"]!
+                        anonMaxLength = dict["max_length"]!
+                    }
+                }
+            } else if i.0 == "feedback" {
+                for j in i.1 {
+                    if j.0 == "description", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
+                        feedbackDescriptionMinLength = dict["min_length"]!
+                        feedbackDescriptionMaxLength = dict["max_length"]!
                     }
                 }
             }
@@ -194,33 +187,31 @@ class ModelProperties {
 }
 
 class PriceList {
+   
     static let shared = PriceList()
-    private init() {}
-    private var _like:              Int = 0
-    private var _vote:              Int = 0
-//    private var _anonPost:          Int = 0
-    private var _hotPost:           Int = 0
-    private var _extraAnswers:  Int = 0
     
-    var like:       Int { return { _like }()}
-    var vote:       Int { return { _vote }()}
-//    var anonPost:       Int { return { _anonPost }()}
-    var hotPost:       Int { return { _hotPost }()}
-    var extraAnswers:       Int { return { _extraAnswers }()}
+    private init() {}
+
+    
+    public private(set) var like:           Int!
+    public private(set) var vote:           Int!
+//    public private(set) var anonPost:       Int { return { _anonPost }()}
+    public private(set) var hotPost:        Int!
+    public private(set) var extraAnswers:   Int!
     
     func importJson(_ json: JSON) {
         for i in json {
             if let dict = i.1.dictionaryObject, let key = dict["type"] as? String, let value = dict["cost"] as? Int {
                 if key == DjangoVariables.PriceList.like {
-                    _like = value
+                    like = value
 //                } else if key == DjangoVariables.PriceList.anonPost {
 //                    _anonPost = value
                 } else if key == DjangoVariables.PriceList.vote {
-                    _vote = value
+                    vote = value
                 } else if key == DjangoVariables.PriceList.hotPost {
-                    _hotPost = value
+                    hotPost = value
                 } else if key == DjangoVariables.PriceList.extraAnswers {
-                    _extraAnswers = value
+                    extraAnswers = value
                 }
             }
         }

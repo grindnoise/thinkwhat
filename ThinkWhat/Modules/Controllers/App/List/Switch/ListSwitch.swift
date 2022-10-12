@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class ListSwitch: UIView {
 
@@ -14,16 +15,18 @@ class ListSwitch: UIView {
         case Top, New, Watching, Own
     }
     
-    private var observers: [NSKeyValueObservation] = []
     @IBOutlet weak var backgroundView: UIView! {
         didSet {
             backgroundView.accessibilityIdentifier = "backgroundView"
             backgroundView.layer.masksToBounds = false
             backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-            observers.append(backgroundView.observe(\UIView.bounds, options: .new) { view, change in
-                guard let value = change.newValue else { return }
-                view.cornerRadius = value.height/2
-            })
+            backgroundView.publisher(for: \.bounds, options: .new)
+                .sink { [weak self] rect in
+                    guard let self = self else { return }
+                    
+                    self.backgroundView.cornerRadius = rect.height/2
+                }
+                .store(in: &subscriptions)
         }
     }
     
@@ -37,10 +40,13 @@ class ListSwitch: UIView {
             shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
             shadowView.layer.shadowRadius = 5
             shadowView.layer.shadowOffset = .zero
-            observers.append(shadowView.observe(\UIView.bounds, options: .new) { view, change in
-                guard let newValue = change.newValue else { return }
-                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.height/2).cgPath
-            })
+            shadowView.publisher(for: \.bounds, options: .new)
+                .sink { [weak self] rect in
+                    guard let self = self else { return }
+                    
+                    self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width/2).cgPath
+                }
+                .store(in: &subscriptions)
         }
     }
     @IBOutlet weak var stackView: UIStackView!
@@ -82,7 +88,12 @@ class ListSwitch: UIView {
         }
     }
     
-    var state: ListSwitch.State = .New {
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //UI
+    private var state: ListSwitch.State = .New {
         didSet {
             guard state != oldValue else { return }
             callbackDelegate?.callbackReceived(state)
@@ -110,8 +121,14 @@ class ListSwitch: UIView {
             
             guard let imageView = mark.getSubview(type: UIImageView.self, identifier: "innerView") else { return }
             UIView.transition(with: imageView, duration: 0.175, options: .transitionCrossDissolve) { [weak self] in
-                guard let self = self else { return }
-                self.mark.center.x  = newView.center.x
+                guard let self = self,
+                      let constraint = self.mark.getConstraint(identifier: "leading")
+                else { return }
+                
+//                self.mark.center.x  = newView.center.x
+                self.setNeedsLayout()
+                constraint.constant = newView.frame.origin.x
+                self.layoutIfNeeded()
                 imageView.image = image
             } completion: { _ in }
         }
@@ -119,6 +136,7 @@ class ListSwitch: UIView {
     
     private lazy var mark: UIView = {
         let instance = UIView()
+        instance.layer.zPosition = 10
         instance.clipsToBounds = false
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "mark"
@@ -127,23 +145,25 @@ class ListSwitch: UIView {
         instance.layer.shadowRadius = 7
         instance.layer.shadowOffset = .zero
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-//        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-//            guard let newValue = change.newValue else { return }
-//            view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.height/2).cgPath
-//        })
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.cornerRadius = rect.height/2
+            }
+            .store(in: &subscriptions)
+        
         let innerView = UIImageView()
+        innerView.clipsToBounds = false
         innerView.accessibilityIdentifier = "innerView"
         innerView.contentMode = .center
+        innerView.image = UIImage(systemName: "binoculars.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: innerView.bounds.height * 0.45, weight: .semibold, scale: .medium))
         innerView.addEquallyTo(to: instance)
         innerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         innerView.tintColor = .white
-        observers.append(innerView.observe(\UIImageView.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 0.45, weight: .semibold, scale: .medium)
-            let image = UIImage(systemName: "tag.fill", withConfiguration: largeConfig)
-            view.image = image
-            view.cornerRadius = view.bounds.height/2
-        })
+        innerView.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                innerView.cornerRadius = rect.height/2
+            }
+            .store(in: &subscriptions)
 
         return instance
     }()
@@ -153,20 +173,23 @@ class ListSwitch: UIView {
     init(callbackDelegate: CallbackObservable) {
         self.callbackDelegate = callbackDelegate
         super.init(frame: .zero)
-        commonInit()
+        
+        setupUI()
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
+        
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        commonInit()
+        
+        setupUI()
     }
     
-    private func commonInit() {
+    func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
         shadowView.addSubview(mark)

@@ -1,18 +1,18 @@
 //
-//  LanguageListViewController.swift
+//  FeedbackViewController.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 11.10.2022.
+//  Created by Pavel Bukharov on 12.10.2022.
 //  Copyright © 2022 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 
-class LanguageListViewController: UIViewController {
+class FeedbackViewController: UIViewController {
 
     // MARK: - Properties
-    var controllerOutput: LanguageListControllerOutput?
-    var controllerInput: LanguageListControllerInput?
+    var controllerOutput: FeedbackControllerOutput?
+    var controllerInput: FeedbackControllerInput?
     
     
     
@@ -29,8 +29,8 @@ class LanguageListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
        
-        let view = LanguageListView()
-        let model = LanguageListModel()
+        let view = FeedbackView()
+        let model = FeedbackModel()
                
         self.controllerOutput = view
         self.controllerOutput?
@@ -40,13 +40,15 @@ class LanguageListViewController: UIViewController {
             .modelOutput = self
         
         self.view = view as UIView
-        title = "content_language".localized
-        
+        title = "feedback".localized
+
         setRightBarButton()
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
     }
 }
 
-private extension LanguageListViewController {
+private extension FeedbackViewController {
     func setRightBarButton() {
         
         let button = UIBarButtonItem(image: UIImage(systemName: "questionmark", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(self.handleTap))
@@ -56,25 +58,26 @@ private extension LanguageListViewController {
     
     @objc
     func handleTap() {
+        view.endEditing(true)
         let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
         banner.present(content: PopupContent(parent: banner,
-                                             systemImage: "globe",
-                                             text: "content_language_hint".localized,
+                                             systemImage: "envelope.fill",
+                                             text: "feedback_hint".localized,
                                              buttonTitle: "ok",
                                              fixedSize: false,
                                              spacing: 24))
     }
 }
 
-extension LanguageListViewController: LanguageListViewInput {
-    func updateContentLanguage(language: LanguageItem, use: Bool) {
-        controllerInput?.updateContentLanguage(language: language, use: use)
+extension FeedbackViewController: FeedbackViewInput {
+    func sendFeedback(_ description: String) {
+        controllerInput?.sendFeedback(description)
     }
 }
 
-extension LanguageListViewController: LanguageListModelOutput {}
+extension FeedbackViewController: FeedbackModelOutput {}
 
-extension LanguageListViewController: BannerObservable {
+extension FeedbackViewController: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     
     func onBannerWillDisappear(_ sender: Any) {}

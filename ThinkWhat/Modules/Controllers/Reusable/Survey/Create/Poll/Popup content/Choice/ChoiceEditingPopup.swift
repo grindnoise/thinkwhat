@@ -277,7 +277,7 @@ extension ChoiceEditingPopup: UITextViewDelegate {
     }
     
     func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
-        let minCharacters = ModelProperties.shared.surveyAnswerTitleMinLength
+        guard let minCharacters = ModelProperties.shared.surveyAnswerTitleMinLength else { return true }
         
         if textView.text.count < minCharacters {
             showBanner(bannerDelegate: self,

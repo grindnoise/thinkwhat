@@ -24,8 +24,8 @@ class API {
     
     public var sessionManager: Session = {
         let configuration = URLSessionConfiguration.af.default
-        configuration.timeoutIntervalForRequest = 21
-        configuration.waitsForConnectivity = true
+        configuration.timeoutIntervalForRequest = 20
+//        configuration.waitsForConnectivity = true
 //        configuration.requestCachePolicy = .returnCacheDataElseLoad
         
         let responseCacher = ResponseCacher(behavior: .modify { _, response in
@@ -39,7 +39,7 @@ class API {
         
         let interceptor = APIRequestInterceptor()
         
-        return Session(configuration: configuration, interceptor: interceptor, eventMonitors: [NetworkLogger()])
+        return Session(configuration: configuration, interceptor: interceptor, eventMonitors: [])//[NetworkLogger()])
 //        return Session(configuration: configuration, interceptor: interceptor, cachedResponseHandler: responseCacher, eventMonitors: [NetworkLogger()])
     }()
     
@@ -1311,6 +1311,23 @@ class API {
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)
 #endif
+            }
+        }
+        
+        public func feedback(description: String) async throws {
+            guard let url = API_URLS.Profiles.feedback else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["description": description]
+            
+            do {
+                try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                NotificationCenter.default.post(name: Notifications.System.FeedbackSent, object: nil)
+            } catch let error {
+                NotificationCenter.default.post(name: Notifications.System.FeedbackFailure, object: nil)
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                throw error
             }
         }
     }

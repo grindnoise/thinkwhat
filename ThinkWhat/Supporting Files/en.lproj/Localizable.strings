@@ -93,6 +93,7 @@
 "appearance" = "Appearance";
 "half" = "Half";
 "third" = "Third";
+"back" = "Back";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";
@@ -323,6 +324,14 @@
 "default_locale" = "Interface";
 "locales" = "Content";
 "content_language" = "Content language";
+"content_language_hint" = "Content will be provided in selected languages";
+"about_app" = "About app";
+"terms_privacy_policy" = "Terms, privacy policy";
+"licenses" = "Licenses";
+"app_version" = "App version";
+"feedback" = "Feedback";
+"feedback_hint" = "Send wishes or complaints to the moderators of the service";
+"feedback_sent" = "Feedback sent";
 
 //Tutorials
 "poll_vote_edu_1" = "The poll will end and disappear from the lists after the required number of participants has been reached.";

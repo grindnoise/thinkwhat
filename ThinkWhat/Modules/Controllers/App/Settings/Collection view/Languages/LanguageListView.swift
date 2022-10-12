@@ -27,6 +27,17 @@ class LanguageListView: UIView {
     //UI
     private lazy var collectionView: LanguagesCollectionView = {
         let instance = LanguagesCollectionView()
+        instance.contentLanguagePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let dict = $0,
+                      let language = dict.keys.first,
+                      let value = dict.values.first
+                else { return }
+                
+                self.viewInput?.updateContentLanguage(language: language, use: value)
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()

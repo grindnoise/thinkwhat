@@ -52,3 +52,9 @@ enum AppSettings: Hashable {
 //        static let Watchlist = "NOTIFICATIONS_NEW_SUBSCRIPTIONS"
 //    }
 //}
+enum ButtonState: String {
+    case Send = "sendButton"
+    case Sending = "sending"
+    case Close = "continueButton"
+    case Back = "back"
+}

@@ -30,7 +30,7 @@ class LanguagesCollectionView: UICollectionView {
     
     
     // MARK: - Public properties
-    
+    public let contentLanguagePublisher = CurrentValueSubject<[LanguageItem: Bool]?, Never>(nil)
     
     
     // MARK: - Private properties
@@ -92,7 +92,6 @@ class LanguagesCollectionView: UICollectionView {
 private extension LanguagesCollectionView {
     
     func setupUI() {
-        delegate = self
         allowsMultipleSelection = true
         collectionViewLayout = UICollectionViewCompositionalLayout.list(using: {
             var configuration = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
@@ -112,28 +111,44 @@ private extension LanguagesCollectionView {
             return configuration
             }())
         
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, LanguageItem> { [unowned self] (cell, indexPath, item) in
-            var contentConfig = cell.defaultContentConfiguration()
-            contentConfig.text = item.code
-            contentConfig.attributedText = NSAttributedString(string: item.code,
-                                                              attributes: [
-                                                                .foregroundColor: UIColor.label as Any,
-                                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
-                                                              ])
-            
+        let cellRegistration = UICollectionView.CellRegistration<LanguageCell, LanguageItem> { [unowned self] cell, indexPath, item in
             var backgroundConfig = UIBackgroundConfiguration.listPlainCell()
             backgroundConfig.backgroundColor = .clear
-
-            cell.contentConfiguration = contentConfig
+            
+            cell.setting = [item: !UserDefaults.App.contentLanguages.filter({ $0 == item.code }).isEmpty]
             cell.backgroundConfiguration = backgroundConfig
-            cell.automaticallyUpdatesBackgroundConfiguration = true
-            cell.automaticallyUpdatesContentConfiguration = true
-            cell.isSelected = UserDefaults.App.contentLanguages.filter({ $0 == item.code }).isEmpty
-//            print(cell.isSelected)
-            cell.accessories = [UICellAccessory.checkmark(displayed: .always,
-                                                          options: .init(isHidden: cell.isSelected,
-                                                                         tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED))]
+            cell.automaticallyUpdatesBackgroundConfiguration = false
+            cell.contentLanguagePublisher
+                .sink {
+                    guard let dict = $0 else { return }
+                    
+                    self.contentLanguagePublisher.send(dict)
+                }
+                .store(in: &subscriptions)
         }
+        
+//        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, LanguageItem> { [unowned self] (cell, indexPath, item) in
+//            var contentConfig = cell.defaultContentConfiguration()
+//            contentConfig.text = item.code
+//            contentConfig.attributedText = NSAttributedString(string: item.code,
+//                                                              attributes: [
+//                                                                .foregroundColor: UIColor.label as Any,
+//                                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+//                                                              ])
+//
+//            var backgroundConfig = UIBackgroundConfiguration.listPlainCell()
+//            backgroundConfig.backgroundColor = .clear
+////
+//            cell.contentConfiguration = contentConfig
+//            cell.backgroundConfiguration = backgroundConfig
+//            cell.automaticallyUpdatesBackgroundConfiguration = false
+//            cell.automaticallyUpdatesContentConfiguration = false
+//            cell.isSelected = UserDefaults.App.contentLanguages.filter({ $0 == item.code }).isEmpty
+////            print(cell.isSelected)
+//            cell.accessories = [UICellAccessory.checkmark(displayed: .always,
+//                                                          options: .init(isHidden: cell.isSelected,
+//                                                                         tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED))]
+//        }
         
         source = UICollectionViewDiffableDataSource<Section, LanguageItem>(collectionView: self) { collectionView, indexPath, itemIdentifier -> UICollectionViewCell? in
             
@@ -160,43 +175,43 @@ private extension LanguagesCollectionView {
     }
 }
 
-extension LanguagesCollectionView: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell else { return }
-        
-        cell.isSelected = true//UserDefaults.App.contentLanguages.filter({ $0 == item.code }).isEmpty
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell else { return true }
-        
-        guard !cell.isSelected else {
-            collectionView.deselectItem(at: indexPath, animated: true)
-            
-            return false
-        }
-        return true
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell else { return }
-        
-        cell.accessories = [UICellAccessory.checkmark(displayed: .always,
-                                                      options: .init(isHidden: false,
-                                                                     tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED))]
-        print(dataItems[indexPath.row])
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
-        collectionView.deselectItem(at: indexPath, animated: true)
-        
-        guard let cell = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell else { return false }
-        
-        cell.accessories = [UICellAccessory.checkmark(displayed: .always,
-                                                      options: .init(isHidden: true,
-                                                                     tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED))]
-        print(dataItems[indexPath.row])
-        
-        return true
-    }
-}
+//extension LanguagesCollectionView: UICollectionViewDelegate {
+////    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+////        guard let cell = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell else { return }
+////
+////        cell.isSelected = true//UserDefaults.App.contentLanguages.filter({ $0 == item.code }).isEmpty
+////    }
+//
+//    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+//        guard let cell = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell else { return true }
+//
+//        guard !cell.isSelected else {
+//            collectionView.deselectItem(at: indexPath, animated: true)
+//
+//            return false
+//        }
+//        return true
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        guard let cell = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell else { return }
+//
+//        cell.accessories = [UICellAccessory.checkmark(displayed: .always,
+//                                                      options: .init(isHidden: false,
+//                                                                     tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED))]
+//        print(dataItems[indexPath.row])
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
+//        collectionView.deselectItem(at: indexPath, animated: true)
+//
+//        guard let cell = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell else { return false }
+//
+//        cell.accessories = [UICellAccessory.checkmark(displayed: .always,
+//                                                      options: .init(isHidden: true,
+//                                                                     tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED))]
+//        print(dataItems[indexPath.row])
+//
+//        return true
+//    }
+//}

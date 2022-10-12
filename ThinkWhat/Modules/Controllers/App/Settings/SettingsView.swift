@@ -213,7 +213,7 @@ class SettingsView: UIView {
     private lazy var appSettingsView: AppSettingsCollectionView = {
         let instance = AppSettingsCollectionView()
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        
+        instance.alpha = 0
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
                 instance.cornerRadius = rect.width * 0.05
@@ -249,9 +249,30 @@ class SettingsView: UIView {
             }
             .store(in: &subscriptions)
         
+        instance.aboutPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let mode = $0
+                else { return }
+                
+                switch mode {
+                case .Feedback:
+                    self.viewInput?.feedback()
+                case .Licenses:
+                    self.viewInput?.showLicense()
+                case .TermsOfUse:
+                    self.viewInput?.showTerms()
+                default:
+                    print("")
+                }
+            }
+            .store(in: &subscriptions)
+        
         instance.contentLanguagePublisher
-            .sink { [weak self] _ in
-                guard let self = self else { return }
+            .sink { [weak self] in
+                guard let self = self,
+                      !$0.isNil
+                else { return }
                 
                 self.viewInput?.onContentLanguageTap()
             }
@@ -377,6 +398,73 @@ extension SettingsView: SettingsControllerOutput {
     func onError(_ error: Error) {
         showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1), shadowed: false)
     }
+    
+    func onAppSettings() {
+        appSettingsView.alpha = 1
+//        touchLocation = CGPoint(x: bounds.maxX, y: bounds.minY)
+        reveal(present: true, location: CGPoint(x: bounds.maxX, y: bounds.minY), view: appSettingsView, fadeView: userSettingsView, duration: 0.4)
+    }
+    
+    func onUserSettings() {
+        userSettingsView.alpha = 1
+//        collectionView.backgroundColor = background.backgroundColor
+        reveal(present: false, location: CGPoint(x: bounds.maxX, y: bounds.minY), view: appSettingsView, fadeView: userSettingsView, duration: 0.35)
+    }
+    
+    func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, fadeView: UIView, duration: TimeInterval, animateOpacity: Bool = true) {
+
+        let circlePathLayer = CAShapeLayer()
+
+        var circleFrameTouchPosition: CGRect {
+            return CGRect(origin: location, size: .zero)
+        }
+
+        var circleFrameTopLeft: CGRect {
+            return CGRect.zero
+        }
+
+        func circlePath(_ rect: CGRect) -> UIBezierPath {
+            return UIBezierPath(ovalIn: rect)
+        }
+
+        circlePathLayer.frame = revealView.bounds
+        circlePathLayer.path = circlePath(location == .zero ? circleFrameTopLeft : circleFrameTouchPosition).cgPath
+        revealView.layer.mask = circlePathLayer
+
+        let radiusInset =  sqrt(revealView.bounds.height*revealView.bounds.height + revealView.bounds.width*revealView.bounds.width + location.x*location.x + location.y*location.y)
+
+        let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
+
+        let toPath = UIBezierPath(ovalIn: outerRect).cgPath
+
+        let fromPath = circlePathLayer.path
+
+        let anim = Animations.get(property: .Path, fromValue: present ? fromPath as Any : toPath, toValue: !present ? fromPath as Any : toPath, duration: duration, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: present ? .easeInEaseOut : .easeOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [{
+            revealView.layer.mask = nil
+            if !present {
+//                circlePathLayer.path = CGPath(rect: .zero, transform: nil)
+                revealView.layer.opacity = 0
+//////                animatedView.alpha = 0
+////                            animatedView.layer.mask = nil
+            }
+        }])
+
+        circlePathLayer.add(anim, forKey: "path")
+        circlePathLayer.path = !present ? fromPath : toPath
+        
+        let grayLayer = CALayer()
+        grayLayer.frame = fadeView.layer.bounds
+        grayLayer.backgroundColor = UIColor.systemGray.cgColor
+        grayLayer.opacity = present ? 0 : 1
+        
+        fadeView.layer.addSublayer(grayLayer)
+        
+        let opacityAnim = Animations.get(property: .Opacity, fromValue: present ? 0 : 1, toValue: present ? 1 : 0, duration: duration, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, completionBlocks: [{
+            grayLayer.removeFromSuperlayer()
+        }])
+        grayLayer.add(opacityAnim, forKey: nil)
+        grayLayer.opacity = !present ? 0 : 1
+    }
 }
 
 extension SettingsView: BannerObservable {
@@ -395,4 +483,17 @@ extension SettingsView: BannerObservable {
     }
 }
 
-
+extension SettingsView: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
+            completionBlocks.forEach{ $0() }
+        } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
+            completionBlocks.forEach{ $0() }
+        } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
+            initialLayer.path = path as! CGPath
+            if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
+                completionBlock()
+            }
+        }
+    }
+}

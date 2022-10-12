@@ -34,6 +34,9 @@ protocol SettingsViewInput: AnyObject {
     func onWatchingSelected()
     func updateAppSettings(_: [AppSettings: Any])
     func onContentLanguageTap()
+    func showLicense()
+    func showTerms()
+    func feedback()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -67,4 +70,6 @@ protocol SettingsControllerOutput: AnyObject {
     var viewInput: (SettingsViewInput & UIViewController)? { get set }
 
     func onError(_: Error)
+    func onAppSettings()
+    func onUserSettings()
 }
