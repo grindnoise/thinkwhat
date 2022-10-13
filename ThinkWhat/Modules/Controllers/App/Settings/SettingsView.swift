@@ -454,7 +454,7 @@ extension SettingsView: SettingsControllerOutput {
         
         let grayLayer = CALayer()
         grayLayer.frame = fadeView.layer.bounds
-        grayLayer.backgroundColor = UIColor.systemGray.cgColor
+        grayLayer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.systemGray.cgColor
         grayLayer.opacity = present ? 0 : 1
         
         fadeView.layer.addSublayer(grayLayer)

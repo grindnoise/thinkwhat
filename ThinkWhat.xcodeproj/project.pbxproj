@@ -453,6 +453,7 @@
 		ABB0F6D528F6D6B80068FDDF /* FeedbackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6D128F6D6B80068FDDF /* FeedbackViewController.swift */; };
 		ABB0F6D628F6D6B80068FDDF /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6D228F6D6B80068FDDF /* FeedbackView.swift */; };
 		ABB0F6D728F6D6B80068FDDF /* FeedbackModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6D328F6D6B80068FDDF /* FeedbackModel.swift */; };
+		ABB0F6D928F80E140068FDDF /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6D828F80E140068FDDF /* CALayer.swift */; };
 		ABB1595D28B10C4A003ED9F5 /* Shimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB1595C28B10C4A003ED9F5 /* Shimmer.swift */; };
 		ABB19148286C526200C89142 /* ProcessInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB19147286C526200C89142 /* ProcessInfo.swift */; };
 		ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */; };
@@ -1042,6 +1043,7 @@
 		ABB0F6D128F6D6B80068FDDF /* FeedbackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackViewController.swift; sourceTree = "<group>"; };
 		ABB0F6D228F6D6B80068FDDF /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
 		ABB0F6D328F6D6B80068FDDF /* FeedbackModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackModel.swift; sourceTree = "<group>"; };
+		ABB0F6D828F80E140068FDDF /* CALayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CALayer.swift; sourceTree = "<group>"; };
 		ABB1595C28B10C4A003ED9F5 /* Shimmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shimmer.swift; sourceTree = "<group>"; };
 		ABB19147286C526200C89142 /* ProcessInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfo.swift; sourceTree = "<group>"; };
 		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -1292,6 +1294,7 @@
 			isa = PBXGroup;
 			children = (
 				AB10030E27BF772600338EE4 /* Bundle.swift */,
+				ABB0F6D828F80E140068FDDF /* CALayer.swift */,
 				AB6AFFCE289D514B00D260F4 /* Combine.swift */,
 				AB0A41E428A28942002FA7B7 /* Date.swift */,
 				AB9998BD28058FA5009D0E4F /* Double.swift */,
@@ -1299,18 +1302,18 @@
 				AB3C681A223FD04500B57580 /* Extensions.swift */,
 				ABF3DF16283BA4A200309AA9 /* Int.swift */,
 				AB38DD6C2819420000FFEB3F /* Notification.swift */,
+				AB234F3F28D653B600204EC8 /* NSDirectionalEdgeInsets.swift */,
 				AB8F28AF27C0DEEB008E4ED0 /* NSLayoutConstraint.swift */,
 				ABB19147286C526200C89142 /* ProcessInfo.swift */,
 				AB10030C27BF762400338EE4 /* String.swift */,
 				AB48E2B7287DD7D60020F81B /* UICollectionView+.swift */,
+				AB7830B228D8B09900D7C883 /* UIEdgeInsets.swift */,
 				ABCBDA0F28759F2500888F23 /* UIFont+.swift */,
 				AB9998BB280585B9009D0E4F /* UILabel.swift */,
 				ABF2758E28151EE50023CD1F /* UINavigationController.swift */,
 				ABF2756B280D62710023CD1F /* UITableView.swift */,
 				ABA448D327E331B000F8E00D /* UIView.swift */,
 				AB913F782806FADF00609D51 /* UIViewController.swift */,
-				AB234F3F28D653B600204EC8 /* NSDirectionalEdgeInsets.swift */,
-				AB7830B228D8B09900D7C883 /* UIEdgeInsets.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3874,6 +3877,7 @@
 				AB18499D2755FEE400BEE23D /* UserViewController.swift in Sources */,
 				AB869F2526C3C69B008353B3 /* Warning.swift in Sources */,
 				AB041451244EFD0300336857 /* CategoriesViewController.swift in Sources */,
+				ABB0F6D928F80E140068FDDF /* CALayer.swift in Sources */,
 				AB72962B27DB5A6D00D45B54 /* ListContract.swift in Sources */,
 				AB43A56025E63BB800BF8749 /* PaddingLabel.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,

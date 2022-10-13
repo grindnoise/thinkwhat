@@ -352,12 +352,9 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
         
-        guard let userprofile = userprofile else { return }
+        guard !userprofile.isNil else { return }
         
-        facebookButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        instagramButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        instagramButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        
+        setupButtons()
     }
     
     override func prepareForReuse() {

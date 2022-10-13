@@ -233,18 +233,18 @@ class SubsciptionsView: UIView {
     
     private func setText() {
         guard !more.isNil, !subscribers.isNil else { return }
-        more.setAttributedText(text: "more".localized.uppercased(),
-                               font: Fonts.Semibold,
-                               width: bounds.width,
-                               widthDivisor: 0.0325,
-                               lightColor: K_COLOR_RED,
-                               style: traitCollection.userInterfaceStyle)
-        subscribers.setAttributedText(text: "subscribers".localized.uppercased(),
-                                      font: Fonts.Semibold,
-                                      width: bounds.width,
-                                      widthDivisor: 0.0325,
-                                      lightColor: K_COLOR_RED,
-                                      style: traitCollection.userInterfaceStyle)
+//        more.setAttributedText(text: "more".localized.uppercased(),
+//                               font: Fonts.Semibold,
+//                               width: bounds.width,
+//                               widthDivisor: 0.0325,
+//                               lightColor: K_COLOR_RED,
+//                               style: traitCollection.userInterfaceStyle)
+//        subscribers.setAttributedText(text: "subscribers".localized.uppercased(),
+//                                      font: Fonts.Semibold,
+//                                      width: bounds.width,
+//                                      widthDivisor: 0.0325,
+//                                      lightColor: K_COLOR_RED,
+//                                      style: traitCollection.userInterfaceStyle)
     }
     
     private func setFlowLayout() {

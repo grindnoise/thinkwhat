@@ -134,29 +134,65 @@ class SettingsSwitch: UIView {
         instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
         instance.layer.shadowRadius = 7
         instance.layer.shadowOffset = .zero
+        instance.layer.addSublayer(gradient)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.publisher(for: \.bounds, options: .new)
-            .sink { rect in
+            .sink { [weak self] rect in
+                guard let self = self else { return }
+                
                 instance.cornerRadius = rect.height/2
+                
+                                guard rect != .zero,
+                                      let layer = instance.layer.getSublayer(identifier: "radialGradient"),
+                                      layer.bounds != rect
+                                else { return }
+                
+                                layer.frame = rect
+
+//                guard rect != .zero,
+//                      let layer = instance.layer.getSublayer(identifier: "radialGradient") as? CAGradientLayer,
+//                      layer.bounds != rect
+//                else { return }
+//
+//                layer.frame = rect
+//                layer.endPoint = CGPoint(x: 1,
+//                                         y: 0.5 + rect.width / rect.height / 2)
             }
             .store(in: &subscriptions)
-        
+
         let innerView = UIImageView()
         innerView.clipsToBounds = false
         innerView.accessibilityIdentifier = "innerView"
         innerView.contentMode = .center
         innerView.image = UIImage(systemName: "person.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: innerView.bounds.height * 0.45, weight: .semibold, scale: .medium))
         innerView.addEquallyTo(to: instance)
-        innerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        innerView.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         innerView.tintColor = .white
         innerView.publisher(for: \.bounds, options: .new)
             .sink { rect in
                 innerView.cornerRadius = rect.height/2
             }
             .store(in: &subscriptions)
-
+        
         return instance
     }()
+    private lazy var gradient: CAGradientLayer = {
+        let instance = CAGradientLayer()
+        instance.type = .radial
+        instance.colors = getGradientColors()
+        instance.locations = [0, 0.5, 1.15]
+        instance.setIdentifier("radialGradient")
+        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+        instance.endPoint = CGPoint(x: 1, y: 1)
+        instance.publisher(for: \.bounds)
+            .sink { rect in
+                instance.cornerRadius = rect.height/2
+            }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
+    
     
     
     // MARK: - Destructor
@@ -209,11 +245,9 @@ class SettingsSwitch: UIView {
 //        settings.tintColor = state == .Settings ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        mark.getSubview(type: UIView.self, identifier: "innerView")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         mark.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        gradient.colors = getGradientColors()
     }
-    
-    
 }
 
 private extension SettingsSwitch {
@@ -245,8 +279,6 @@ private extension SettingsSwitch {
         let constraint = mark.leadingAnchor.constraint(equalTo: shadowView.leadingAnchor, constant: 0)
         constraint.identifier = "leading"
         constraint.isActive = true
-        
-//        setupUI()
     }
     
     func setTasks() {
@@ -266,5 +298,13 @@ private extension SettingsSwitch {
         } else if v === settings {
             state = .Settings
         }
+    }
+    
+    func getGradientColors() -> [CGColor] {
+        return [
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+        ]
     }
 }

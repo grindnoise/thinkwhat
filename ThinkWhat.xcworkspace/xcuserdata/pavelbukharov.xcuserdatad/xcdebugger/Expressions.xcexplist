@@ -575,6 +575,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "LanguagesCollectionView.collectionView(_:shouldSelectItemAt:):LanguagesCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "cell.isSelected">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "TopicsController.onSearchCompleted(_:):TopicsController.swift">
          <PersistentStrings>
             <PersistentString
@@ -1113,9 +1121,6 @@
                value = "tableView.cellForRow(at: indexPath) as? SurveyQuestionCell">
             </PersistentString>
          </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in SettingsModel.updateAppSettings(_:):SettingsModel.swift">
       </ContextState>
       <ContextState
          contextName = "TopicsCollectionView.collectionView(_:didSelectItemAt:):TopicsCollectionView.swift">
@@ -2156,6 +2161,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #2 in LanguagesCollectionView.setupUI():LanguagesCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "!UserDefaults.App.contentLanguages.filter({ $0 == item.code }).isEmpty">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in closure #1 in SubscriptionCell.dateLabel.getter:SubscriptionCell.swift">
          <PersistentStrings>
             <PersistentString
@@ -2685,12 +2698,23 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "MainController.currentTab.didset:MainController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "currentTab">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "CreateNewSurveyViewController.category.didset:CreateNewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
                value = "categoryIcon.alpha">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in LanguageListModel.updateContentLanguage(language:use:):LanguageListModel.swift">
       </ContextState>
       <ContextState
          contextName = "closure #2 in CreateNewSurveyViewController.viewWillAppear(_:):CreateNewSurveyViewController.swift">
@@ -3498,14 +3522,6 @@
          <PersistentStrings>
             <PersistentString
                value = "keyboardHeight">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "static NSUserDefaults.App.contentLanguages.didset:UserDefaults.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "contentLanguages">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -4417,6 +4433,14 @@
       </ContextState>
       <ContextState
          contextName = "performRequest #1 () in APIManager.getEmailConfirmationCode(completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #4 in LanguagesCollectionView.setupUI():LanguagesCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.visibleCells">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "CreateNewSurveyViewController.viewDidLayoutSubviews():CreateNewSurveyViewController.swift">
@@ -5506,14 +5530,6 @@
          <PersistentStrings>
             <PersistentString
                value = "userprofile.isCurrent">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "SettingsController.feedback():SettingsController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "navigationController">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -6618,6 +6634,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in closure #1 in PopupContent.label.getter:PopupContent.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.!verticalStackView.spacing">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "PollController.viewDidLoad():PollController.swift">
          <PersistentStrings>
             <PersistentString
@@ -7556,7 +7580,7 @@
          contextName = "MainController.tabBarController(_:didSelect:):MainController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "viewController.title!">
+               value = "viewController is NavigationController">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -8190,6 +8214,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #4 in LanguagesCollectionView.setupUI():LanguagesCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.visibleCells">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "animateIconStyleTransition #1 (initialIcon:destinationIcon:origin:text:iconChange:animationBlocks:completionBlocks:useIncomingEffect:) in IconCircularTransition.animateTransition(using:):IconCircularTransition.swift">
          <PersistentStrings>
             <PersistentString
@@ -8382,6 +8414,14 @@
          <PersistentStrings>
             <PersistentString
                value = "category.parent?.favorite">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #2 in LanguagesCollectionView.setupUI():LanguagesCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "!UserDefaults.App.contentLanguages.filter({ $0 == item.code }).isEmpty">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -8880,6 +8920,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "SettingsSwitch.setupUI():SettingsSwitch.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "mark.bounds">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in closure #1 in APIManager.getVoters(surveyID:answerID:userprofiles:completion:):APIManager.swift">
       </ContextState>
       <ContextState
@@ -9167,6 +9215,14 @@
          <PersistentStrings>
             <PersistentString
                value = "AppData.shared.userProfile.imagePath">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "LanguagesCollectionView.collectionView(_:didSelectItemAt:):LanguagesCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "cell.isSelected">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

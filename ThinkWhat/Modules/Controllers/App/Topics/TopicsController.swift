@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class TopicsController: UIViewController {
     
@@ -14,7 +15,7 @@ class TopicsController: UIViewController {
         case Search, Default, Topic//Parent, Child, List, Search
     }
 
-    // MARK: - Properties
+    // MARK: - Public properties
     var controllerOutput: TopicsControllerOutput?
     var controllerInput: TopicsControllerInput?
     var mode: Mode = .Default {
@@ -57,13 +58,36 @@ class TopicsController: UIViewController {
         }
     }
             
+    
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //Logic
     private var topic: Topic? {
         didSet {
             guard !topic.isNil else { return }
             mode = .Topic
         }
     }
-    private var observers: [NSKeyValueObservation] = []
+    //UI
+    private lazy var gradient: CAGradientLayer = {
+        let instance = CAGradientLayer()
+        instance.type = .radial
+        instance.colors = getGradientColors()
+        instance.locations = [0, 0.5, 1.15]
+        instance.setIdentifier("radialGradient")
+        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+        instance.endPoint = CGPoint(x: 1, y: 1)
+        instance.publisher(for: \.bounds)
+            .sink { rect in
+                instance.cornerRadius = rect.height/2
+            }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
     private lazy var barButton: UIView = {
         let instance = UIView()
         instance.layer.masksToBounds = false
@@ -71,37 +95,47 @@ class TopicsController: UIViewController {
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "shadow"
         instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
         instance.layer.shadowRadius = 7
         instance.layer.shadowOffset = .zero
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            view.layer.shadowPath = UIBezierPath(ovalIn: newValue).cgPath
-        })
+        instance.layer.addSublayer(gradient)
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.layer.shadowPath = UIBezierPath(ovalIn: rect).cgPath
+                
+                guard rect != .zero,
+                      let layer = instance.layer.getSublayer(identifier: "radialGradient"),
+                      layer.bounds != rect
+                else { return }
+
+                layer.frame = rect
+            }
+            .store(in: &subscriptions)
         
         let button = UIButton()
-        observers.append(button.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
-            guard let self = self,
-                  let newValue = change.newValue
-            else { return }
-            
-            var imageName = ""
-            switch self.mode {
-            case .Search:
-                imageName = "arrow.backward"
-            default:
-                imageName = "magnifyingglass"
+        button.publisher(for: \.bounds, options: .new)
+            .sink { [weak self] rect in
+                guard let self = self else { return }
+                
+                var imageName = ""
+                switch self.mode {
+                case .Search:
+                    imageName = "arrow.backward"
+                default:
+                    imageName = "magnifyingglass"
+                }
+                
+                button.cornerRadius = rect.height/2
+                let largeConfig = UIImage.SymbolConfiguration(pointSize: rect.height * 0.45, weight: .semibold, scale: .medium)
+                let image = UIImage(systemName: imageName, withConfiguration: largeConfig)
+                button.setImage(image, for: .normal)
             }
-            
-            view.cornerRadius = newValue.size.height/2
-            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 0.55, weight: .semibold, scale: .medium)
-            let image = UIImage(systemName: imageName, withConfiguration: largeConfig)
-            view.setImage(image, for: .normal)
-        })
+            .store(in: &subscriptions)
+        
         button.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
         button.accessibilityIdentifier = "button"
-        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        button.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //        button.imageView?.contentMode = .center
         button.imageView?.tintColor = .white
         button.addEquallyTo(to: instance)
@@ -117,16 +151,19 @@ class TopicsController: UIViewController {
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
         instance.addTarget(self, action: #selector(TopicsController.textFieldDidChange(_:)), for: .editingChanged)
         instance.returnKeyType = .done
-        observers.append(instance.observe(\InsetTextField.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            
-            view.cornerRadius = newValue.size.height/2.25
-            guard view.insets == .zero else { return }
-            view.insets = UIEdgeInsets(top: view.insets.top,
-                                       left: newValue.size.height/2.25,
-                                       bottom: view.insets.top,
-                                       right: newValue.size.height/2.25)
-        })
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.cornerRadius = rect.height/2.25
+                
+                guard instance.insets == .zero else { return }
+                
+                instance.insets = UIEdgeInsets(top: instance.insets.top,
+                                               left: rect.height/2.25,
+                                               bottom: instance.insets.top,
+                                               right: rect.height/2.25)
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     private var textFieldIsSetup = false
@@ -150,7 +187,6 @@ class TopicsController: UIViewController {
         
         title = "topics".localized
         ProtocolSubscriptions.subscribe(self)
-        setObservers()
         setupUI()
     }
     
@@ -172,13 +208,26 @@ class TopicsController: UIViewController {
             searchField.resignFirstResponder()
         }
     }
-
-    private func setObservers() {
-//        let names = [Notifications.System.UpdateStats]
-//        names.forEach { NotificationCenter.default.addObserver(view, selector: #selector(TopicsView.updateStats), name: $0, object: nil) }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        searchField.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
+        searchField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        gradient.colors = getGradientColors()
     }
     
-    private func setupUI() {
+    func getGradientColors() -> [CGColor] {
+        return [
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+        ]
+    }
+}
+
+private extension TopicsController {
+    func setupUI() {
         navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(barButton)
@@ -193,13 +242,14 @@ class TopicsController: UIViewController {
             searchField.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageRightMargin),
             barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
             barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-            barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
+            barButton.heightAnchor.constraint(equalToConstant: 40),
             barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
         ])
     }
     
     
-    @objc private func handleTap() {
+    @objc
+    func handleTap() {
         switch mode {
         case .Topic:
             mode = .Default
@@ -208,37 +258,8 @@ class TopicsController: UIViewController {
         case .Default:
             mode = .Search
         }
-        
-        
-//        guard mode == .Search else {
-//            mode = .Search
-//            return
-//        }
-//        mode = .Default
-//        if mode == .Child {
-//            mode = .Parent
-//        } else if mode == .List {
-//            mode = .Child
-//        } else if mode == .Parent {
-//            mode = .Search
-//        } else if mode == .Search {
-//            mode = .Parent
-//        } else {
-//            mode = .List
-//        }
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        searchField.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
-        searchField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
-        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
 }
-
-// MARK: - View Input
 extension TopicsController: TopicsViewInput {
     func onDataSourceRequest() {
         guard let topic = topic else { return }

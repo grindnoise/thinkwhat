@@ -198,7 +198,7 @@ class Avatar: UIView {
                 button.alpha = 1
                 button.setImage(UIImage(systemName: "pencil",
                                         withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
-                                                                                         weight: .heavy)),
+                                                                                         weight: .semibold)),
                                   for: .normal)
                 button.imageView?.contentMode = .center
             }
@@ -214,7 +214,7 @@ class Avatar: UIView {
         didSet {
             button.setImage(UIImage(systemName: isSelected ? "pencil" : "",
                                     withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
-                                                                                     weight: .heavy)),
+                                                                                     weight: .semibold)),
                               for: .normal)
         }
     }
@@ -393,7 +393,7 @@ class Avatar: UIView {
             instance.cornerRadius = rect.height/2
             instance.setImage(UIImage(systemName: systemImage,
                                       withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.6,
-                                                                                     weight: .heavy)),
+                                                                                     weight: .semibold)),
                               for: .normal)
             instance.imageView?.contentMode = .center
         }.store(in: &subscriptions)

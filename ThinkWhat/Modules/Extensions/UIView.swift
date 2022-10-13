@@ -36,21 +36,21 @@ extension UIView {
 //              }
 //        return statusBarManager.
 //    }
-    func setAttributedText(text: String, font: String, width: CGFloat, widthDivisor: CGFloat, lightColor: UIColor, style: UIUserInterfaceStyle) {
-        if let btn = self as? UIButton {
-            btn.setAttributedTitle(NSAttributedString(string: text.localized,
-                                                      attributes: StringAttributes.getAttributes(font: UIFont(name: font, size: width * widthDivisor)!, foregroundColor: style == .dark ? .systemBlue : lightColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]),
-                                   for: .normal)
-        }
-    }
-
-    func setAttributedText(text: String, font: String, height: CGFloat, heightDivisor: CGFloat, lightColor: UIColor, style: UIUserInterfaceStyle) {
-        if let btn = self as? UIButton {
-            btn.setAttributedTitle(NSAttributedString(string: text.localized,
-                                                      attributes: StringAttributes.getAttributes(font: UIFont(name: font, size: height * heightDivisor)!, foregroundColor: style == .dark ? .systemBlue : lightColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]),
-                                   for: .normal)
-        }
-    }
+//    func setAttributedText(text: String, font: String, width: CGFloat, widthDivisor: CGFloat, lightColor: UIColor, style: UIUserInterfaceStyle) {
+//        if let btn = self as? UIButton {
+//            btn.setAttributedTitle(NSAttributedString(string: text.localized,
+//                                                      attributes: StringAttributes.getAttributes(font: UIFont(name: font, size: width * widthDivisor)!, foregroundColor: style == .dark ? .systemBlue : lightColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]),
+//                                   for: .normal)
+//        }
+//    }
+//
+//    func setAttributedText(text: String, font: String, height: CGFloat, heightDivisor: CGFloat, lightColor: UIColor, style: UIUserInterfaceStyle) {
+//        if let btn = self as? UIButton {
+//            btn.setAttributedTitle(NSAttributedString(string: text.localized,
+//                                                      attributes: StringAttributes.getAttributes(font: UIFont(name: font, size: height * heightDivisor)!, foregroundColor: style == .dark ? .systemBlue : lightColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]),
+//                                   for: .normal)
+//        }
+//    }
 
 }
 

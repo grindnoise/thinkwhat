@@ -10,7 +10,7 @@ import UIKit
 import Combine
 
 class ListSwitch: UIView {
-
+    
     enum State {
         case Top, New, Watching, Own
     }
@@ -125,7 +125,7 @@ class ListSwitch: UIView {
                       let constraint = self.mark.getConstraint(identifier: "leading")
                 else { return }
                 
-//                self.mark.center.x  = newView.center.x
+                //                self.mark.center.x  = newView.center.x
                 self.setNeedsLayout()
                 constraint.constant = newView.frame.origin.x
                 self.layoutIfNeeded()
@@ -144,10 +144,19 @@ class ListSwitch: UIView {
         instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
         instance.layer.shadowRadius = 7
         instance.layer.shadowOffset = .zero
+        instance.layer.addSublayer(gradient)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
                 instance.cornerRadius = rect.height/2
+                
+                guard rect != .zero,
+                      let layer = instance.layer.getSublayer(identifier: "radialGradient"),
+                      layer.bounds != rect
+                else { return }
+                
+                layer.frame = rect
+                
             }
             .store(in: &subscriptions)
         
@@ -157,17 +166,36 @@ class ListSwitch: UIView {
         innerView.contentMode = .center
         innerView.image = UIImage(systemName: "binoculars.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: innerView.bounds.height * 0.45, weight: .semibold, scale: .medium))
         innerView.addEquallyTo(to: instance)
-        innerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        innerView.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         innerView.tintColor = .white
         innerView.publisher(for: \.bounds, options: .new)
             .sink { rect in
                 innerView.cornerRadius = rect.height/2
             }
             .store(in: &subscriptions)
-
+        
+        return instance
+    }()
+    private lazy var gradient: CAGradientLayer = {
+        let instance = CAGradientLayer()
+        instance.type = .radial
+        instance.colors = getGradientColors()
+        instance.locations = [0, 0.5, 1.15]
+        instance.setIdentifier("radialGradient")
+        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+        instance.endPoint = CGPoint(x: 1, y: 1)
+        instance.publisher(for: \.bounds)
+            .sink { rect in
+                instance.cornerRadius = rect.height/2
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
     private weak var callbackDelegate: CallbackObservable?
+    
+    
+    
     
     // MARK: - Initialization
     init(callbackDelegate: CallbackObservable) {
@@ -189,12 +217,26 @@ class ListSwitch: UIView {
         setupUI()
     }
     
+    
+    
+    //MARK: - Overridden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        mark.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        gradient.colors = getGradientColors()
+    }
+}
+ 
+private extension ListSwitch {
     func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        
         addSubview(contentView)
         shadowView.addSubview(mark)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         mark.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -208,19 +250,16 @@ class ListSwitch: UIView {
         constraint.isActive = true
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        mark.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-//        top.tintColor = state == .Top ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//        new.tintColor = state == .New ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//        watching.tintColor = state == .Watching ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//        own.tintColor = state == .Own ? traitCollection.userInterfaceStyle == .dark ? .black : .white : .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        mark.getSubview(type: UIView.self, identifier: "innerView")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    func getGradientColors() -> [CGColor] {
+        return [
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+        ]
     }
     
     @objc
-    private func handleTap(recognizer: UITapGestureRecognizer) {
+    func handleTap(recognizer: UITapGestureRecognizer) {
         guard let v = recognizer.view else { return }
         if v === top {
             state = .Top
