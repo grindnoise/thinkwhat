@@ -27,9 +27,9 @@ class TagLabel: UILabel {
         self.surveyCategory = surveyCategory
         super.init(frame: frame)
         if surveyCategory?.parent == nil {
-            self.text = surveyCategory?.title.uppercased()
+            self.text = surveyCategory?.localized.uppercased()
         } else {
-            self.text = surveyCategory?.title.lowercased()
+            self.text = surveyCategory?.localized.lowercased()
         }
         self.commonInit()
     }

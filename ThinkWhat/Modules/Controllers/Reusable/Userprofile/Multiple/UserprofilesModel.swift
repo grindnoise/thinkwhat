@@ -64,7 +64,7 @@ extension UserprofilesModel: UserprofilesControllerInput {
     }
     
     
-    func loadUsers(for userprofile: Userprofile, mode: UserprofilesController.Mode) {
+    func loadUsers(for userprofile: Userprofile, mode: UserprofilesController.UserprofilesViewMode) {
         Task {
             do {
                 switch mode {

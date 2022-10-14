@@ -158,8 +158,8 @@ extension InterestsCollectionView: TagCellLayoutDelegate {
               items.count > index
         else { return .zero }
         
-        return CGSize(width: items[index].title.width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!) + 18 + 4,
-                      height: items[index].title.height(withConstrainedWidth: 300, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!) + 2 + 8)
+        return CGSize(width: items[index].localized.width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!) + 18 + 4,
+                      height: items[index].localized.height(withConstrainedWidth: 300, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!) + 2 + 8)
         //        if index == longTagIndex || index == (longTagIndex + 3) {
 //            var s = textSize(text: longString, font: UIFont.systemFont(ofSize: 17.0), collectionView: self)
 //            s.height += 8.0

@@ -230,15 +230,15 @@ class PollController: UIViewController {
 //        label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
         label.backgroundColor = surveyReference.topic.tagColor
         label.textColor = .white
-        label.text = surveyReference.topic.title.uppercased()
+        label.text = surveyReference.topic.localized.uppercased()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .headline)
         label.numberOfLines = 1
         label.accessibilityIdentifier = "label"
         
-        let width = surveyReference.topic.title.width(withConstrainedHeight: 100, font: label.font)
-        let height = surveyReference.topic.title.height(withConstrainedWidth: width, font: label.font)
+        let width = surveyReference.topic.localized.width(withConstrainedHeight: 100, font: label.font)
+        let height = surveyReference.topic.localized.height(withConstrainedWidth: width, font: label.font)
         
         label.insets = UIEdgeInsets(top: 0, left: height/3, bottom: 0, right: height/3)
         
@@ -834,8 +834,8 @@ class PollController: UIViewController {
         label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
                                        forTextStyle: .headline)
         
-        let width = surveyReference.topic.title.width(withConstrainedHeight: 100, font: label.font)
-        let height = surveyReference.topic.title.height(withConstrainedWidth: width, font: label.font)
+        let width = surveyReference.topic.localized.width(withConstrainedHeight: 100, font: label.font)
+        let height = surveyReference.topic.localized.height(withConstrainedWidth: width, font: label.font)
         label.insets = UIEdgeInsets(top: 0, left: height/3, bottom: 0, right: height/3)
         widthConstraint.constant =  width + height/2.25*3
         heightConstraint.constant = height

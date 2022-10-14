@@ -99,7 +99,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         
         ///Topic
         let titleString = NSMutableAttributedString()
-        titleString.append(NSAttributedString(string: category.title.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : category.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        titleString.append(NSAttributedString(string: category.localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : category.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         title.attributedText = titleString
         
         let countString = NSMutableAttributedString()

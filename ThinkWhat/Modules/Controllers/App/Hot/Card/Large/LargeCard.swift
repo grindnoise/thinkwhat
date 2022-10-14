@@ -115,11 +115,11 @@ class LargeCard: UIView, HotCard {
         guard !survey.isNil else { return }
         let fontSize: CGFloat = topicTitle.bounds.width * 0.1
         let topicTitleString = NSMutableAttributedString()
-        topicTitleString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicTitleString.append(NSAttributedString(string: "\(survey.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topicTitle.attributedText = topicTitleString
         
         let topicSubtitleString = NSMutableAttributedString()
-        topicSubtitleString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicSubtitleString.append(NSAttributedString(string: "\(survey.topic.parent!.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topicSubtitle.attributedText = topicSubtitleString
         
         let firstNameString = NSMutableAttributedString()

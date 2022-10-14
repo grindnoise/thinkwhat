@@ -87,9 +87,9 @@ class CardView: UIView, HotCard {
         favoriteLabel.text = "\(survey.likes)"
         viewsLabel.text = "\(survey.views)"
         let categoryString = NSMutableAttributedString()
-        categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        categoryString.append(NSAttributedString(string: "\(survey.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.localized.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topic.attributedText = categoryString
         icon.iconColor = traitCollection.userInterfaceStyle == .light ? survey.topic.tagColor : .systemBlue
         icon.category = Icon.Category(rawValue: survey.topic.id) ?? .Null
@@ -125,9 +125,9 @@ class CardView: UIView, HotCard {
             self.background.backgroundColor = .secondarySystemBackground
             self.voteButton.backgroundColor = .systemBlue
             let categoryString = NSMutableAttributedString()
-            categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            categoryString.append(NSAttributedString(string: "\(survey.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.localized.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
             self.icon.setIconColor(.systemBlue)
             self.viewsIcon.setIconColor(.systemBlue)
@@ -137,9 +137,9 @@ class CardView: UIView, HotCard {
             self.background.backgroundColor = .systemBackground
             self.voteButton.backgroundColor = self.survey.topic.tagColor
             let categoryString = NSMutableAttributedString()
-            categoryString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            categoryString.append(NSAttributedString(string: "\(survey.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+            categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.localized.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
             self.icon.setIconColor(survey.topic.tagColor)
             self.viewsIcon.setIconColor(.black)

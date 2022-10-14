@@ -124,7 +124,7 @@ class SurveyCell: UICollectionViewListCell {
             ratingLabel.text = String(describing: item.rating)
             viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
             dateLabel.text = item.startDate.timeAgoDisplay()
-            topicLabel.text = item.topic.title.uppercased()
+            topicLabel.text = item.topic.localized.uppercased()
             
             if item.isAnonymous {
                 avatar.userprofile = Userprofile.anonymous
@@ -385,8 +385,8 @@ class SurveyCell: UICollectionViewListCell {
             guard let self = self,
                   let constraint = self.topicView.getConstraint(identifier: "height") else { return }
             
-            let height = self.item.topic.title.height(withConstrainedWidth: rect.width, font: instance.font)
-            let width = self.item.topic.title.width(withConstrainedHeight: height, font: instance.font)
+            let height = self.item.topic.localized.height(withConstrainedWidth: rect.width, font: instance.font)
+            let width = self.item.topic.localized.width(withConstrainedHeight: height, font: instance.font)
             
             self.setNeedsLayout()
             if let constraint_2 = instance.getAllConstraints().filter({ $0.identifier == "width"}).first {
@@ -965,7 +965,7 @@ class SurveyCell: UICollectionViewListCell {
         
         let height = item.title.height(withConstrainedWidth: titleLabel.bounds.width, font: titleLabel.font)
         let height_2 = item.truncatedDescription.height(withConstrainedWidth: descriptionLabel.bounds.width, font: descriptionLabel.font)
-        let width = item.topic.title.width(withConstrainedHeight: topicLabel.bounds.height, font: topicLabel.font)
+        let width = item.topic.localized.width(withConstrainedHeight: topicLabel.bounds.height, font: topicLabel.font)
 //        guard height != constraint.constant else { return }
         setNeedsLayout()
         constraint.constant = height
@@ -1148,7 +1148,7 @@ class SurveyCell: UICollectionViewListCell {
                                                                        font: ratingLabel.font)
         constraint_3.constant = item.truncatedDescription.height(withConstrainedWidth: ratingLabel.bounds.width,
                                                                        font: ratingLabel.font)
-        constraint_4.constant = item.topic.title.height(withConstrainedWidth: ratingLabel.bounds.width,
+        constraint_4.constant = item.topic.localized.height(withConstrainedWidth: ratingLabel.bounds.width,
                                                                        font: ratingLabel.font)
         layoutIfNeeded()
         topicLabel.frame.origin = .zero

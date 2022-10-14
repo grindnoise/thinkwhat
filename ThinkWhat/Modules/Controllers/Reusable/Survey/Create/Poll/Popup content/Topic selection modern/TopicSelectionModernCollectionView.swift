@@ -15,7 +15,7 @@ struct TopicHeaderItem: Hashable {
     
     init(topic: Topic) {
         self.topic = topic
-        self.title = topic.title
+        self.title = topic.localized
         self.topics = topic.children.map {
             return TopicItem(topic: $0)
         }
@@ -28,7 +28,7 @@ struct TopicItem: Hashable {
     
     init(topic: Topic) {
         self.topic = topic
-        self.title = topic.title
+        self.title = topic.localized
     }
 }
 

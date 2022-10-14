@@ -9,9 +9,9 @@
 import UIKit
 import Combine
 
-class SubsciptionsView: UIView {
+class SubscriptionsView: UIView {
     
-    weak var viewInput: SubsciptionsViewInput?
+    weak var viewInput: SubscriptionsViewInput?
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -280,7 +280,7 @@ class SubsciptionsView: UIView {
 }
 
 // MARK: - Controller Output
-extension SubsciptionsView: SubsciptionsControllerOutput {
+extension SubscriptionsView: SubsciptionsControllerOutput {
     func onRequestCompleted(_ result: Result<Bool, Error>) {
         collectionView.endRefreshing()
     }
@@ -394,7 +394,7 @@ extension SubsciptionsView: SubsciptionsControllerOutput {
 }
 
 // MARK: - UI Setup
-extension SubsciptionsView: UICollectionViewDelegate, UICollectionViewDataSource {
+extension SubscriptionsView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 0//viewInput?.userprofiles.count ?? 0
     }
@@ -432,7 +432,7 @@ extension SubsciptionsView: UICollectionViewDelegate, UICollectionViewDataSource
 //    }
 //}
 
-extension SubsciptionsView: BannerObservable {
+extension SubscriptionsView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}
     
     func onBannerWillDisappear(_ sender: Any) {}
@@ -448,7 +448,7 @@ extension SubsciptionsView: BannerObservable {
     }
 }
 
-extension SubsciptionsView: CallbackObservable {
+extension SubscriptionsView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         
     }

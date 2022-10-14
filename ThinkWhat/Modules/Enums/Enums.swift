@@ -58,3 +58,7 @@ enum ButtonState: String {
     case Close = "continueButton"
     case Back = "back"
 }
+
+enum UserprofilesViewMode: String {
+    case Subscribers, Subscriptions, Voters
+}

@@ -9,13 +9,13 @@
 import Foundation
 import SwiftyJSON
 
-class SubsciptionsModel {
+class SubscriptionsModel {
     
     weak var modelOutput: SubsciptionsModelOutput?
 }
 
 // MARK: - Controller Input
-extension SubsciptionsModel: SubsciptionsControllerInput {
+extension SubscriptionsModel: SubsciptionsControllerInput {
     func claim(surveyReference: SurveyReference, claim: Claim) {
         Task {
             try await API.shared.surveys.claim(surveyReference: surveyReference, reason: claim)

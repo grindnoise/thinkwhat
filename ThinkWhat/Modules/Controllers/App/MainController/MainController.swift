@@ -156,7 +156,7 @@ private extension MainController {
         
         viewControllers = [
             createNavigationController(for: HotController(), title: "hot", image: UIImage(systemName: "flame"), selectedImage: UIImage(systemName: "flame.fill")),
-            createNavigationController(for: SubsciptionsController(), title: "subscriptions", image: UIImage(systemName: "bell"), selectedImage: UIImage(systemName: "bell.fill")),
+            createNavigationController(for: SubscriptionsController(), title: "subscriptions", image: UIImage(systemName: "bell"), selectedImage: UIImage(systemName: "bell.fill")),
             createNavigationController(for: ListController(), title: "list", image: UIImage(systemName: "square.stack.3d.up"), selectedImage: UIImage(systemName: "square.stack.3d.up.fill")),
             createNavigationController(for: TopicsController(), title: "topics", image: UIImage(systemName: "circle.grid.3x3"), selectedImage: UIImage(systemName: "circle.grid.3x3.fill")),
             createNavigationController(for: SettingsController(), title: "settings", image: UIImage(systemName: "gearshape"), selectedImage: UIImage(systemName: "gearshape.fill"))
@@ -261,7 +261,7 @@ extension MainController: UITabBarControllerDelegate {
             switch controller.self {
             case is HotController:
                 currentTab = .Hot
-            case is SubsciptionsController:
+            case is SubscriptionsController:
                 currentTab = .Subscriptions
             case is ListController:
                 currentTab = .Feed
@@ -281,7 +281,7 @@ extension MainController: UITabBarControllerDelegate {
         if viewController.isKind(of: HotController.self) {
             navigationController?.title = "hot".localized
             vc.navigationItem.title = "hot".localized
-        } else if vc.isKind(of: SubsciptionsController.self) {
+        } else if vc.isKind(of: SubscriptionsController.self) {
             navigationController?.title = "subscriptions".localized
             vc.navigationItem.title = "subscriptions".localized
         }

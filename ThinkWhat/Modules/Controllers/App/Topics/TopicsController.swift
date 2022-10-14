@@ -38,7 +38,7 @@ class TopicsController: UIViewController {
                 guard let topic = topic else { return }
 //                controllerOutput?.onTopicMode(topic)
                 imageName = "arrow.backward"
-                navigationItem.title = topic.title
+                navigationItem.title = topic.localized
             default:
                 if let recognizer = view.gestureRecognizers?.first {
                     view.removeGestureRecognizer(recognizer)
@@ -216,14 +216,6 @@ class TopicsController: UIViewController {
         barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         gradient.colors = getGradientColors()
     }
-    
-    func getGradientColors() -> [CGColor] {
-        return [
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
-        ]
-    }
 }
 
 private extension TopicsController {
@@ -259,7 +251,16 @@ private extension TopicsController {
             mode = .Search
         }
     }
+    
+    func getGradientColors() -> [CGColor] {
+        return [
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+        ]
+    }
 }
+
 extension TopicsController: TopicsViewInput {
     func onDataSourceRequest() {
         guard let topic = topic else { return }

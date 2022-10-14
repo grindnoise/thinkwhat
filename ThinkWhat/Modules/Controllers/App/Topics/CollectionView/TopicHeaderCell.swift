@@ -334,7 +334,7 @@ class TopicCellHeaderContent: UIView, UIContentView {
         guard let constraint = titleLabel.getConstraint(identifier: "width") else { return }
         
         titleLabel.insets = UIEdgeInsets(top: 0, left: titleLabel.bounds.height/3, bottom: 0, right: titleLabel.bounds.height/3)
-        let width = currentConfiguration.topicItem.topic.title.width(withConstrainedHeight: titleLabel.bounds.height, font: titleLabel.font)
+        let width = currentConfiguration.topicItem.topic.localized.width(withConstrainedHeight: titleLabel.bounds.height, font: titleLabel.font)
         
         self.setNeedsLayout()
         constraint.constant = width + titleLabel.cornerRadius*3

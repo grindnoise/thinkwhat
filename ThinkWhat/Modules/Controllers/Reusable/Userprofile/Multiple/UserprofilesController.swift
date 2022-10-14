@@ -10,11 +10,6 @@ import UIKit
 import Combine
 
 class UserprofilesController: UIViewController {
-    
-    enum Mode: String {
-        case Subscribers, Subscriptions, Voters
-    }
-    
     enum GridItemSize: CGFloat {
         case half = 0.5
         case third = 0.33333
@@ -30,7 +25,7 @@ class UserprofilesController: UIViewController {
     var controllerInput: UserprofilesControllerInput?
     
     //Logic
-    public private(set) var mode: Mode
+    public private(set) var mode: UserprofilesViewMode
     public private(set) var userprofile: Userprofile?
     public private(set) var answer: Answer?
     
@@ -69,7 +64,7 @@ class UserprofilesController: UIViewController {
     
     
     // MARK: - Initialization
-    init(mode: Mode, userprofile: Userprofile) {
+    init(mode: UserprofilesViewMode, userprofile: Userprofile) {
         self.mode = mode
         self.userprofile = userprofile
         
@@ -79,7 +74,7 @@ class UserprofilesController: UIViewController {
         setTasks()
     }
     
-    init(mode: Mode, answer: Answer, color: UIColor) {
+    init(mode: UserprofilesViewMode, answer: Answer, color: UIColor) {
         self.color = color
         self.mode = .Voters
         self.answer = answer
@@ -433,7 +428,7 @@ extension UserprofilesController: UserprofilesViewInput {
         controllerInput?.loadVoters(for: answer)
     }
     
-    func loadUsers(for userprofile: Userprofile, mode: UserprofilesController.Mode) {
+    func loadUsers(for userprofile: Userprofile, mode: UserprofilesViewMode) {
         controllerInput?.loadUsers(for: userprofile, mode: mode)
     }
     

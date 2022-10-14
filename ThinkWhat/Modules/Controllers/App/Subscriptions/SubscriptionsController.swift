@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class SubsciptionsController: UIViewController {
+class SubscriptionsController: UIViewController {
 
     // MARK: - Public properties
     var controllerOutput: SubsciptionsControllerOutput?
@@ -22,6 +22,22 @@ class SubsciptionsController: UIViewController {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
+    private lazy var gradient: CAGradientLayer = {
+        let instance = CAGradientLayer()
+        instance.type = .radial
+        instance.colors = getGradientColors()
+        instance.locations = [0, 0.5, 1.15]
+        instance.setIdentifier("radialGradient")
+        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+        instance.endPoint = CGPoint(x: 1, y: 1)
+        instance.publisher(for: \.bounds)
+            .sink { rect in
+                instance.cornerRadius = rect.height/2
+            }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
     private lazy var barButton: UIView = {
         let instance = UIView()
         instance.layer.masksToBounds = false
@@ -29,26 +45,37 @@ class SubsciptionsController: UIViewController {
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "shadow"
         instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
         instance.layer.shadowRadius = 7
         instance.layer.shadowOffset = .zero
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            view.layer.shadowPath = UIBezierPath(ovalIn: newValue).cgPath
-        })
+        instance.layer.addSublayer(gradient)
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                instance.layer.shadowPath = UIBezierPath(ovalIn: rect).cgPath
+                
+                guard rect != .zero,
+                      let layer = instance.layer.getSublayer(identifier: "radialGradient"),
+                      layer.bounds != rect
+                else { return }
+
+                layer.frame = rect
+            }
+            .store(in: &subscriptions)
         
         let button = UIButton()
-        observers.append(button.observe(\UIButton.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
-            view.cornerRadius = newValue.size.height/2
-            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 0.55, weight: .semibold, scale: .medium)
-            let image = UIImage(systemName: "chevron.down", withConfiguration: largeConfig)
-            view.setImage(image, for: .normal)
-        })
+        button.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                button.cornerRadius = rect.height/2
+                let largeConfig = UIImage.SymbolConfiguration(pointSize: rect.height * 0.45, weight: .semibold, scale: .medium)
+                let image = UIImage(systemName: "chevron.down", withConfiguration: largeConfig)
+                button.setImage(image, for: .normal)
+            }
+            .store(in: &subscriptions)
+        
         button.addTarget(self, action: #selector(self.toggleBarButton), for: .touchUpInside)
         button.accessibilityIdentifier = "button"
-        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        button.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //        button.imageView?.contentMode = .center
         button.imageView?.tintColor = .white
         button.addEquallyTo(to: instance)
@@ -63,9 +90,9 @@ class SubsciptionsController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let model = SubsciptionsModel()
+        let model = SubscriptionsModel()
                
-        self.controllerOutput = view as? SubsciptionsView
+        self.controllerOutput = view as? SubscriptionsView
         self.controllerOutput?
             .viewInput = self
         self.controllerInput = model
@@ -89,7 +116,14 @@ class SubsciptionsController: UIViewController {
         barButton.alpha = 0
     }
     
-    private func setTasks() {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        gradient.colors = getGradientColors()
+    }
+}
+
+private extension SubscriptionsController {
+    func setTasks() {
         tasks.append(Task { @MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
                 guard let self = self,
@@ -101,7 +135,7 @@ class SubsciptionsController: UIViewController {
         })
     }
 
-    private func setupUI() {
+    func setupUI() {
         navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         
         guard let navigationBar = self.navigationController?.navigationBar else { return }
@@ -116,29 +150,17 @@ class SubsciptionsController: UIViewController {
             barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
         ])
     }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
-        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-    }
-    
-    @objc
-    func toggleBarButton() {
-        controllerOutput?.onUpperContainerShown(isBarButtonOn)
-        UIView.animate(withDuration: 0.3,
-                       delay: 0,
-                       options: .curveEaseOut) {
-            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
-            self.barButton.transform = self.isBarButtonOn ? upsideDown :.identity
-        } completion: { _ in
-            self.isBarButtonOn = !self.isBarButtonOn
-        }
+        
+    func getGradientColors() -> [CGColor] {
+        return [
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+        ]
     }
 }
 
-// MARK: - View Input
-extension SubsciptionsController: SubsciptionsViewInput {
+extension SubscriptionsController: SubscriptionsViewInput {
     func share(_ surveyReference: SurveyReference) {
         // Setting description
         let firstActivityItem = surveyReference.title
@@ -229,15 +251,28 @@ extension SubsciptionsController: SubsciptionsViewInput {
 //            navigationItem.backBarButtonItem = backItem
 //        navigationController?.pushViewController(SubscribersController(mode: .Subscriptions), animated: true)
     }
+    
+    @objc
+    func toggleBarButton() {
+        controllerOutput?.onUpperContainerShown(isBarButtonOn)
+        UIView.animate(withDuration: 0.3,
+                       delay: 0,
+                       options: .curveEaseOut) {
+            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
+            self.barButton.transform = self.isBarButtonOn ? upsideDown :.identity
+        } completion: { _ in
+            self.isBarButtonOn = !self.isBarButtonOn
+        }
+    }
 }
 
-extension SubsciptionsController: SubsciptionsModelOutput {
+extension SubscriptionsController: SubsciptionsModelOutput {
     func onRequestCompleted(_ result: Result<Bool, Error>) {
         controllerOutput?.onRequestCompleted(result)
     }
 }
 
-extension SubsciptionsController: DataObservable {
+extension SubscriptionsController: DataObservable {
     func onDataLoaded() {
         navigationController?.setNavigationBarHidden(false, animated: true)
     }

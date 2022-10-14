@@ -26,14 +26,14 @@ class UserprofilesCollectionView: UICollectionView {
     
     // MARK: - Public properties
     //Logic
-    public var mode: UserprofilesController.Mode = .Subscribers {
+    public private(set) var mode: UserprofilesViewMode = .Subscribers {
         didSet {
             guard !userprofile.isNil else { return }
             
             reloadDataSource(items: dataItems)
         }
     }
-    public weak var userprofile: Userprofile!
+    public private(set) weak var userprofile: Userprofile!
     
     //Publishers
     public var paginationPublisher = CurrentValueSubject<Bool?, Never>(nil)
@@ -116,7 +116,7 @@ class UserprofilesCollectionView: UICollectionView {
         setTasks()
     }
     
-    init(userprofile: Userprofile, mode: UserprofilesController.Mode) {
+    init(userprofile: Userprofile, mode: UserprofilesViewMode) {
         super.init(frame: .zero, collectionViewLayout: .init())
         
         self.userprofile = userprofile

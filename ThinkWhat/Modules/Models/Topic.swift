@@ -98,7 +98,7 @@ class Topics {
 
 class Topic: Decodable {
     private enum CodingKeys: String, CodingKey {
-        case id, title, parent, children
+        case id, title, parent, children, localized
         case createdAt          = "created_at"
         case ageRestriction     = "age_restriction"
         case tagColor           = "tag_color"
@@ -133,6 +133,12 @@ class Topic: Decodable {
     var isParentNode: Bool {
         return !children.isEmpty
     }
+    var localizedTitle: String?
+    var localized: String {
+        guard let localizedTitle = localizedTitle, !localizedTitle.isEmpty else { return title }
+        
+        return localizedTitle
+    }
     
     required init(from decoder: Decoder) throws {
         do {
@@ -148,6 +154,7 @@ class Topic: Decodable {
             active          = try container.decode(Int.self, forKey: .active)
             viewsTotal      = try container.decodeIfPresent(Int.self, forKey: .viewsTotal) ?? 0
             hotTotal        = try container.decode(Int.self, forKey: .hotTotal)
+            localizedTitle  = try container.decodeIfPresent(String.self, forKey: .localized)
             if Topics.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 Topics.shared.all.append(self)
             }

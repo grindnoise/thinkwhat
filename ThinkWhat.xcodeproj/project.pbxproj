@@ -258,12 +258,12 @@
 		AB72960F27DA2F0F00D45B54 /* HotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72960B27DA2F0F00D45B54 /* HotView.swift */; };
 		AB72961027DA2F0F00D45B54 /* HotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72960C27DA2F0F00D45B54 /* HotModel.swift */; };
 		AB72961227DA311000D45B54 /* HotView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB72961127DA311000D45B54 /* HotView.xib */; };
-		AB72961627DA3F2300D45B54 /* SubsciptionsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961427DA3F2300D45B54 /* SubsciptionsController.swift */; };
-		AB72961727DA3F2300D45B54 /* SubsciptionsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB72961527DA3F2300D45B54 /* SubsciptionsController.xib */; };
-		AB72961C27DA3F2C00D45B54 /* SubsciptionsContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961827DA3F2C00D45B54 /* SubsciptionsContract.swift */; };
-		AB72961E27DA3F2C00D45B54 /* SubsciptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961A27DA3F2C00D45B54 /* SubsciptionsView.swift */; };
-		AB72961F27DA3F2C00D45B54 /* SubsciptionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961B27DA3F2C00D45B54 /* SubsciptionsModel.swift */; };
-		AB72962127DA418700D45B54 /* SubsciptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB72962027DA418700D45B54 /* SubsciptionsView.xib */; };
+		AB72961627DA3F2300D45B54 /* SubscriptionsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961427DA3F2300D45B54 /* SubscriptionsController.swift */; };
+		AB72961727DA3F2300D45B54 /* SubscriptionsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB72961527DA3F2300D45B54 /* SubscriptionsController.xib */; };
+		AB72961C27DA3F2C00D45B54 /* SubscriptionsContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961827DA3F2C00D45B54 /* SubscriptionsContract.swift */; };
+		AB72961E27DA3F2C00D45B54 /* SubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961A27DA3F2C00D45B54 /* SubscriptionsView.swift */; };
+		AB72961F27DA3F2C00D45B54 /* SubscriptionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72961B27DA3F2C00D45B54 /* SubscriptionsModel.swift */; };
+		AB72962127DA418700D45B54 /* SubscriptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB72962027DA418700D45B54 /* SubscriptionsView.xib */; };
 		AB72962527DB5A6100D45B54 /* ListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72962327DB5A6100D45B54 /* ListController.swift */; };
 		AB72962627DB5A6100D45B54 /* ListController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB72962427DB5A6100D45B54 /* ListController.xib */; };
 		AB72962B27DB5A6D00D45B54 /* ListContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72962727DB5A6D00D45B54 /* ListContract.swift */; };
@@ -302,6 +302,7 @@
 		AB791D85243B70D00085E00E /* VoteCompletionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB791D83243B4EBE0085E00E /* VoteCompletionView.xib */; };
 		AB7C6FB42865AE3000000429 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7C6FB32865AE3000000429 /* Error.swift */; };
 		AB7F4B8A25B5D7230017573D /* 5_ImagesSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */; };
+		AB7FD68828F96764003F38E4 /* UserprofilesFeedCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7FD68728F96764003F38E4 /* UserprofilesFeedCollectionView.swift */; };
 		AB8238F927A914100061F7C6 /* URLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8238F827A914100061F7C6 /* URLs.swift */; };
 		AB82C368259C826100888C74 /* TrashIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB82C367259C826100888C74 /* TrashIcon.swift */; };
 		AB868A6A23EB04A3008DEB84 /* 1_CategorySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB868A6923EB04A3008DEB84 /* 1_CategorySelectionViewController.swift */; };
@@ -845,12 +846,12 @@
 		AB72960B27DA2F0F00D45B54 /* HotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotView.swift; sourceTree = "<group>"; };
 		AB72960C27DA2F0F00D45B54 /* HotModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotModel.swift; sourceTree = "<group>"; };
 		AB72961127DA311000D45B54 /* HotView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HotView.xib; sourceTree = "<group>"; };
-		AB72961427DA3F2300D45B54 /* SubsciptionsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsciptionsController.swift; sourceTree = "<group>"; };
-		AB72961527DA3F2300D45B54 /* SubsciptionsController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SubsciptionsController.xib; sourceTree = "<group>"; };
-		AB72961827DA3F2C00D45B54 /* SubsciptionsContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsciptionsContract.swift; sourceTree = "<group>"; };
-		AB72961A27DA3F2C00D45B54 /* SubsciptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsciptionsView.swift; sourceTree = "<group>"; };
-		AB72961B27DA3F2C00D45B54 /* SubsciptionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsciptionsModel.swift; sourceTree = "<group>"; };
-		AB72962027DA418700D45B54 /* SubsciptionsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SubsciptionsView.xib; sourceTree = "<group>"; };
+		AB72961427DA3F2300D45B54 /* SubscriptionsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsController.swift; sourceTree = "<group>"; };
+		AB72961527DA3F2300D45B54 /* SubscriptionsController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SubscriptionsController.xib; sourceTree = "<group>"; };
+		AB72961827DA3F2C00D45B54 /* SubscriptionsContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsContract.swift; sourceTree = "<group>"; };
+		AB72961A27DA3F2C00D45B54 /* SubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsView.swift; sourceTree = "<group>"; };
+		AB72961B27DA3F2C00D45B54 /* SubscriptionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsModel.swift; sourceTree = "<group>"; };
+		AB72962027DA418700D45B54 /* SubscriptionsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SubscriptionsView.xib; sourceTree = "<group>"; };
 		AB72962327DB5A6100D45B54 /* ListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListController.swift; sourceTree = "<group>"; };
 		AB72962427DB5A6100D45B54 /* ListController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListController.xib; sourceTree = "<group>"; };
 		AB72962727DB5A6D00D45B54 /* ListContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListContract.swift; sourceTree = "<group>"; };
@@ -889,6 +890,7 @@
 		AB791D83243B4EBE0085E00E /* VoteCompletionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VoteCompletionView.xib; sourceTree = "<group>"; };
 		AB7C6FB32865AE3000000429 /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 5_ImagesSelectionViewController.swift; sourceTree = "<group>"; };
+		AB7FD68728F96764003F38E4 /* UserprofilesFeedCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserprofilesFeedCollectionView.swift; sourceTree = "<group>"; };
 		AB8238F827A914100061F7C6 /* URLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLs.swift; sourceTree = "<group>"; };
 		AB82C367259C826100888C74 /* TrashIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashIcon.swift; sourceTree = "<group>"; };
 		AB868A6923EB04A3008DEB84 /* 1_CategorySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 1_CategorySelectionViewController.swift; sourceTree = "<group>"; };
@@ -2084,12 +2086,12 @@
 		AB72961327DA3EE500D45B54 /* Subscriptions */ = {
 			isa = PBXGroup;
 			children = (
-				AB72961427DA3F2300D45B54 /* SubsciptionsController.swift */,
-				AB72961527DA3F2300D45B54 /* SubsciptionsController.xib */,
-				AB72961827DA3F2C00D45B54 /* SubsciptionsContract.swift */,
-				AB72961A27DA3F2C00D45B54 /* SubsciptionsView.swift */,
-				AB72961B27DA3F2C00D45B54 /* SubsciptionsModel.swift */,
-				AB72962027DA418700D45B54 /* SubsciptionsView.xib */,
+				AB72961427DA3F2300D45B54 /* SubscriptionsController.swift */,
+				AB72961527DA3F2300D45B54 /* SubscriptionsController.xib */,
+				AB72961827DA3F2C00D45B54 /* SubscriptionsContract.swift */,
+				AB72961A27DA3F2C00D45B54 /* SubscriptionsView.swift */,
+				AB72961B27DA3F2C00D45B54 /* SubscriptionsModel.swift */,
+				AB72962027DA418700D45B54 /* SubscriptionsView.xib */,
 			);
 			path = Subscriptions;
 			sourceTree = "<group>";
@@ -2240,6 +2242,14 @@
 				AB791D7E243B30D90085E00E /* VoteCompletionView */,
 			);
 			path = Existing;
+			sourceTree = "<group>";
+		};
+		AB7FD68528F9672F003F38E4 /* Feed */ = {
+			isa = PBXGroup;
+			children = (
+				AB7FD68728F96764003F38E4 /* UserprofilesFeedCollectionView.swift */,
+			);
+			path = Feed;
 			sourceTree = "<group>";
 		};
 		AB8238F727A913F70061F7C6 /* REST */ = {
@@ -2917,13 +2927,14 @@
 		ABCDC72328DC7787003B24F2 /* Userprofile */ = {
 			isa = PBXGroup;
 			children = (
+				AB7FD68528F9672F003F38E4 /* Feed */,
 				ABCDC72D28DC77DF003B24F2 /* Single */,
-				ABCDC72428DC77A7003B24F2 /* Collection */,
+				ABCDC72428DC77A7003B24F2 /* Multiple */,
 			);
 			path = Userprofile;
 			sourceTree = "<group>";
 		};
-		ABCDC72428DC77A7003B24F2 /* Collection */ = {
+		ABCDC72428DC77A7003B24F2 /* Multiple */ = {
 			isa = PBXGroup;
 			children = (
 				ABCDC72528DC77BE003B24F2 /* UserprofilesContract.swift */,
@@ -2931,7 +2942,7 @@
 				ABCDC72828DC77BE003B24F2 /* UserprofilesModel.swift */,
 				AB52719C28EC1B1D0000F095 /* UserprofilesController.swift */,
 			);
-			path = Collection;
+			path = Multiple;
 			sourceTree = "<group>";
 		};
 		ABCDC72D28DC77DF003B24F2 /* Single */ = {
@@ -3344,7 +3355,7 @@
 				AB3C684D223FD3EE00B57580 /* OpenSans-ExtraBold.ttf in Resources */,
 				AB10031427BFAF2F00338EE4 /* FillProfileViewController.xib in Resources */,
 				AB543FF9284B52D300CCB7F1 /* TopicSelectionHeaderModernContent.xib in Resources */,
-				AB72961727DA3F2300D45B54 /* SubsciptionsController.xib in Resources */,
+				AB72961727DA3F2300D45B54 /* SubscriptionsController.xib in Resources */,
 				ABC18339284E52A3005D1C31 /* ImageSelectionHeaderContent.xib in Resources */,
 				ABADB08C283E12AA00A7F726 /* SurveyCreationView.xib in Resources */,
 				ABA448E527EC62DC00F8E00D /* APIUnavailableView.xib in Resources */,
@@ -3398,7 +3409,7 @@
 				AB72960827DA2EE600D45B54 /* HotController.xib in Resources */,
 				AB72963F27DB5F7B00D45B54 /* TopicsView.xib in Resources */,
 				AB3C6852223FD3EF00B57580 /* OpenSans-Regular.ttf in Resources */,
-				AB72962127DA418700D45B54 /* SubsciptionsView.xib in Resources */,
+				AB72962127DA418700D45B54 /* SubscriptionsView.xib in Resources */,
 				AB8DA34627A1836900F92C18 /* SignupViewController.xib in Resources */,
 				ABADF59827F4A8D500A26474 /* delVoteCell.xib in Resources */,
 				AB543FFD284D05EE00CCB7F1 /* TopicSelectionModernContainer.xib in Resources */,
@@ -3573,7 +3584,7 @@
 				ABF1F19F22C253A6008913C3 /* FBWorker.swift in Sources */,
 				ABAEEE5C27A5D7ED00E4EF29 /* VKWorker.swift in Sources */,
 				AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */,
-				AB72961627DA3F2300D45B54 /* SubsciptionsController.swift in Sources */,
+				AB72961627DA3F2300D45B54 /* SubscriptionsController.swift in Sources */,
 				ABA448EA27EE030B00F8E00D /* PollController.swift in Sources */,
 				ABA7829928589D3600964FDE /* AddChoiceContentView.swift in Sources */,
 				AB8DA34227A182D300F92C18 /* SignupModel.swift in Sources */,
@@ -3696,7 +3707,7 @@
 				ABA6B3B223FD1A8D00335074 /* LoadingTextIndicator.swift in Sources */,
 				ABF20FB424C98AC00092B223 /* UserFavoriteCell.swift in Sources */,
 				ABD2A2B32883DE1E00591568 /* SurveysCollectionView.swift in Sources */,
-				AB72961F27DA3F2C00D45B54 /* SubsciptionsModel.swift in Sources */,
+				AB72961F27DA3F2C00D45B54 /* SubscriptionsModel.swift in Sources */,
 				AB54BBFA252220C500B73766 /* ThumbUp.swift in Sources */,
 				AB3C682D223FD3C300B57580 /* QC.swift in Sources */,
 				AB3C682B223FD38E00B57580 /* LoadingIndicator.swift in Sources */,
@@ -3712,12 +3723,13 @@
 				AB8DAB5423BA2A790089E25F /* PlainIcons.swift in Sources */,
 				AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */,
 				AB3C6848223FD3EE00B57580 /* Buttons.swift in Sources */,
-				AB72961C27DA3F2C00D45B54 /* SubsciptionsContract.swift in Sources */,
+				AB72961C27DA3F2C00D45B54 /* SubscriptionsContract.swift in Sources */,
 				AB21970E26C11ACA005A7BA8 /* BannerContent.swift in Sources */,
 				ABCDC71F28DC633E003B24F2 /* UserprofilesCollectionView.swift in Sources */,
 				AB0AB63B27B5001F006FD33F /* ConditionsContract.swift in Sources */,
 				AB219CA22420D0400074CF9F /* SurveyYoutubeCell.swift in Sources */,
 				AB30A4F9272AAD5300A7DCC0 /* Claim.swift in Sources */,
+				AB7FD68828F96764003F38E4 /* UserprofilesFeedCollectionView.swift in Sources */,
 				AB2C29F5289C116900D409B7 /* VoteEducation.swift in Sources */,
 				AB9998BC280585B9009D0E4F /* UILabel.swift in Sources */,
 				AB52B734240E5D4B006DBDA8 /* ReadySign.swift in Sources */,
@@ -3831,7 +3843,7 @@
 				AB91195526C3AB1D007ED54A /* VotesFormula.swift in Sources */,
 				AB879049286D9FBB00C069BA /* NavbarContentView.swift in Sources */,
 				ABB0F6C628F5A4550068FDDF /* LanguageListViewController.swift in Sources */,
-				AB72961E27DA3F2C00D45B54 /* SubsciptionsView.swift in Sources */,
+				AB72961E27DA3F2C00D45B54 /* SubscriptionsView.swift in Sources */,
 				AB99A95424C6CCE800814F96 /* UserLogoHeader.swift in Sources */,
 				ABEDC4E32450168D00FA9128 /* User.swift in Sources */,
 				AB10030D27BF762400338EE4 /* String.swift in Sources */,
