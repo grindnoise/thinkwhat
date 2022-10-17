@@ -153,7 +153,11 @@
 
 //Subscriptions VC
 "subscriptions" = "Subscriptions";
-"subscribers" = "subscribers";
+"publications_per" = "Publications per:";
+"per_day" = "day";
+"per_week" = "week";
+"per_month" = "month";
+"all_time" = "all time";
 
 //List VC
 "list" = "Feed";

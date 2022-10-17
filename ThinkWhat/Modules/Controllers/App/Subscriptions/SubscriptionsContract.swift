@@ -17,13 +17,15 @@ protocol SubscriptionsViewInput: AnyObject {
     
     func onSubscribersTapped()
     func onSubscpitionsTapped()
-    func toggleBarButton()
+//    func toggleBarButton()
     func onSurveyTapped(_: SurveyReference)
     func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
+    func onDataSourceRequest(userprofile: Userprofile)
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(_: SurveyReference)
     func share(_: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
+    func setUserprofileFilter(_: Userprofile)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -32,7 +34,7 @@ protocol SubscriptionsViewInput: AnyObject {
 protocol SubsciptionsControllerInput: AnyObject {
     var modelOutput: SubsciptionsModelOutput? { get set }
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?, userprofile: Userprofile?)
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(surveyReference: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
@@ -54,4 +56,6 @@ protocol SubsciptionsControllerOutput: AnyObject {
     func onUpperContainerShown(_: Bool)
     func onWillAppear()
     func onRequestCompleted(_: Result<Bool, Error>)
+    func setPeriod(_: Period)
+    func setDefaultFilter()
 }

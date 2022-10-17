@@ -11,6 +11,11 @@ import Combine
 
 class SubscriptionsController: UIViewController {
 
+    
+    private enum Mode {
+        case Default, Userprofile
+    }
+    
     // MARK: - Public properties
     var controllerOutput: SubsciptionsControllerOutput?
     var controllerInput: SubsciptionsControllerInput?
@@ -21,6 +26,29 @@ class SubscriptionsController: UIViewController {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    //Logic
+    private var mode: Mode = .Default {
+        didSet {
+            guard oldValue != mode else { return }
+            
+            onModeChanged()
+        }
+    }
+    private var period: Period = .AllTime {
+        didSet {
+            guard oldValue != period else { return }
+            
+            controllerOutput?.setPeriod(period)
+            navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
+            
+            guard let button = barButton.getSubview(type: UIButton.self,
+                                                    identifier: "button")
+            else { return }
+            
+            button.menu = prepareMenu()
+            
+        }
+    }
     //UI
     private lazy var gradient: CAGradientLayer = {
         let instance = CAGradientLayer()
@@ -49,6 +77,7 @@ class SubscriptionsController: UIViewController {
         instance.layer.shadowRadius = 7
         instance.layer.shadowOffset = .zero
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState).isActive = true
         instance.layer.addSublayer(gradient)
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
@@ -64,16 +93,23 @@ class SubscriptionsController: UIViewController {
             .store(in: &subscriptions)
         
         let button = UIButton()
+        button.menu = prepareMenu()
+        button.showsMenuAsPrimaryAction = true
         button.publisher(for: \.bounds, options: .new)
-            .sink { rect in
+            .sink { [weak self] rect in
+                guard let self = self,
+                    self .mode == .Default
+                else { return }
+                
+                
                 button.cornerRadius = rect.height/2
                 let largeConfig = UIImage.SymbolConfiguration(pointSize: rect.height * 0.45, weight: .semibold, scale: .medium)
-                let image = UIImage(systemName: "chevron.down", withConfiguration: largeConfig)
+                let image = UIImage(systemName: "ellipsis", withConfiguration: largeConfig)
                 button.setImage(image, for: .normal)
             }
             .store(in: &subscriptions)
         
-        button.addTarget(self, action: #selector(self.toggleBarButton), for: .touchUpInside)
+        button.addTarget(self, action: #selector(self.onBarButtonTap), for: .touchUpInside)
         button.accessibilityIdentifier = "button"
         button.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //        button.imageView?.contentMode = .center
@@ -99,13 +135,15 @@ class SubscriptionsController: UIViewController {
         self.controllerInput?
             .modelOutput = self
         ProtocolSubscriptions.subscribe(self)
-        title = "subscriptions".localized
+        
         setupUI()
         setTasks()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.prefersLargeTitles = false
         barButton.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
         controllerOutput?.onWillAppear()
@@ -136,19 +174,22 @@ private extension SubscriptionsController {
     }
 
     func setupUI() {
-        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
+//        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         
-        guard let navigationBar = self.navigationController?.navigationBar else { return }
+        navigationItem.setRightBarButton(UIBarButtonItem(customView: barButton), animated: true)
         
-        navigationBar.addSubview(barButton)
-        barButton.translatesAutoresizingMaskIntoConstraints = false
+        navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
+//        guard let navigationBar = self.navigationController?.navigationBar else { return }
         
-        NSLayoutConstraint.activate([
-            barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-            barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
-            barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
-        ])
+//        navigationBar.addSubview(barButton)
+//        barButton.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            barButton.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
+//            barButton.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
+//            barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
+//            barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
+//        ])
     }
         
     func getGradientColors() -> [CGColor] {
@@ -158,9 +199,130 @@ private extension SubscriptionsController {
             traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
         ]
     }
+    
+    func prepareMenu() -> UIMenu {
+        let perDay: UIAction = .init(title: Period.PerDay.rawValue.localized,
+                                     image: nil,
+                                     identifier: nil,
+                                     discoverabilityTitle: nil,
+                                     attributes: .init(),
+                                     state: period == .PerDay ? .on : .off,
+                                     handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.period = .PerDay
+        })
+        
+        let perWeek: UIAction = .init(title: Period.PerWeek.rawValue.localized,
+                                      image: nil,
+                                      identifier: nil,
+                                      discoverabilityTitle: nil,
+                                      attributes: .init(),
+                                      state: period == .PerWeek ? .on : .off,
+                                      handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.period = .PerWeek
+        })
+        
+        let perMonth: UIAction = .init(title: Period.PerMonth.rawValue.localized,
+                                       image: nil,
+                                       identifier: nil,
+                                       discoverabilityTitle: nil,
+                                       attributes: .init(),
+                                       state: period == .PerMonth ? .on : .off,
+                                       handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.period = .PerMonth
+        })
+        
+        let allTime: UIAction = .init(title: Period.AllTime.rawValue.localized,
+                                      image: nil,
+                                      identifier: nil,
+                                      discoverabilityTitle: nil,
+                                      attributes: .init(),
+                                      state: period == .AllTime ? .on : .off,
+                                      handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.period = .AllTime
+        })
+        
+        let inlineMenu = UIMenu(title: "publications_per".localized,
+                                image: nil,
+                                identifier: nil,
+                                options: .displayInline,
+                                children: [
+                                    perDay,
+                                    perWeek,
+                                    perMonth,
+                                    allTime
+                                ])
+        
+        var subscribersCount = ""
+        if let userprofile = Userprofiles.shared.current {
+            subscribersCount  = " (\(userprofile.subscribers.count))"
+        }
+        
+        let filter: UIAction = .init(title: "my_subscribers".localized + subscribersCount,
+                                     image: UIImage(systemName: "person.crop.circle.fill.badge.checkmark", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+                                     identifier: nil,
+                                     discoverabilityTitle: nil,
+                                     attributes: .init(),
+                                     state: .off,
+                                     handler: { [weak self] _ in
+            guard let self = self,
+                  let userprofile = Userprofiles.shared.current
+            else { return }
+            
+            let backItem = UIBarButtonItem()
+                backItem.title = ""
+            self.navigationItem.backBarButtonItem = backItem
+            self.navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile), animated: true)
+            self.tabBarController?.setTabBarVisible(visible: false, animated: true)
+        })
+        
+        let children: [UIMenuElement] = [inlineMenu, filter]
+        
+        return UIMenu(title: "", children: children)
+    }
+    
+    @objc
+    func onBarButtonTap() {
+        if mode == .Userprofile {
+            mode = .Default
+        }
+    }
+    
+    func onModeChanged() {
+        if mode == .Default {
+            controllerOutput?.setDefaultFilter()
+        }
+        
+        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
+        
+        let largeConfig = UIImage.SymbolConfiguration(pointSize: button.bounds.height * 0.45,
+                                                      weight: .semibold, scale: .medium)
+        let image = UIImage(systemName: mode == .Userprofile ? "arrow.left" : "ellipsis",
+                            withConfiguration: largeConfig)
+        button.setImage(image, for: .normal)
+        button.showsMenuAsPrimaryAction = mode == .Default
+        
+        navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
+    }
 }
 
 extension SubscriptionsController: SubscriptionsViewInput {
+    func onDataSourceRequest(userprofile: Userprofile) {
+        controllerInput?.onDataSourceRequest(source: .Userprofile, topic: nil, userprofile: userprofile)
+    }
+    
+    func setUserprofileFilter(_ userprofile: Userprofile) {
+        mode = .Userprofile
+        navigationItem.title = userprofile.name
+    }
+    
     func share(_ surveyReference: SurveyReference) {
         // Setting description
         let firstActivityItem = surveyReference.title
@@ -230,7 +392,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
     }
     
     func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
-        controllerInput?.onDataSourceRequest(source: source, topic: topic)
+        controllerInput?.onDataSourceRequest(source: source, topic: topic, userprofile: nil)
     }
     
     func onSubscribersTapped() {
@@ -252,18 +414,19 @@ extension SubscriptionsController: SubscriptionsViewInput {
 //        navigationController?.pushViewController(SubscribersController(mode: .Subscriptions), animated: true)
     }
     
-    @objc
-    func toggleBarButton() {
-        controllerOutput?.onUpperContainerShown(isBarButtonOn)
-        UIView.animate(withDuration: 0.3,
-                       delay: 0,
-                       options: .curveEaseOut) {
-            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
-            self.barButton.transform = self.isBarButtonOn ? upsideDown :.identity
-        } completion: { _ in
-            self.isBarButtonOn = !self.isBarButtonOn
-        }
-    }
+//    @objc
+//    func toggleBarButton() {
+//        controllerOutput?.onUpperContainerShown(isBarButtonOn)
+//        UIView.animate(withDuration: 0.3,
+//                       delay: 0,
+//                       options: .curveEaseOut) {
+//            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
+//            self.barButton.transform = self.isBarButtonOn ? upsideDown :.identity
+//        } completion: { _ in
+//            self.isBarButtonOn = !self.isBarButtonOn
+//        }
+//    }
+    
 }
 
 extension SubscriptionsController: SubsciptionsModelOutput {

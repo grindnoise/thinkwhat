@@ -24,6 +24,7 @@ class UserprofilesFeedCollectionView: UICollectionView {
     
     
     // MARK: - Public properties
+    public let userPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     
     
     
@@ -95,27 +96,74 @@ class UserprofilesFeedCollectionView: UICollectionView {
 private extension UserprofilesFeedCollectionView {
     
     func setupUI() {
+        alwaysBounceVertical = false
+//        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+//
+//            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
+//            layoutConfig.backgroundColor = .clear
+//            layoutConfig.showsSeparators = false
+//
+//            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+//            sectionLayout.orthogonalScrollingBehavior = .continuous
+//                sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+//
+//
+//            return sectionLayout
+//        }
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-            let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.2), heightDimension: .fractionalWidth(0.22)))
-            item.contentInsets = .init(horizontal: 5, vertical: 0)
+//            let item = NSCollectionLayoutItem(
+//                layoutSize: NSCollectionLayoutSize(
+//                    widthDimension: .fractionalWidth(1/5),
+//                    heightDimension: .fractionalWidth(1/5)))
+////            item.contentInsets = .init(horizontal: 0, vertical: 0)
+//
+//            let group = NSCollectionLayoutGroup.horizontal(
+//                layoutSize: NSCollectionLayoutSize(
+//                    widthDimension: .fractionalWidth(1),
+//                    heightDimension: .fractionalHeight(1)),
+//                subitem: item,
+//                count: 5)
+//
+//            let section = NSCollectionLayoutSection(group: group)
+//            section.contentInsets = .init(top: 10,
+//                                          leading: 0,
+//                                          bottom: 0,
+//                                          trailing: 0)
+//            section.orthogonalScrollingBehavior = .continuous
+//            return section
             
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(100)), subitem: item, count: 4)
-            
+            let item = NSCollectionLayoutItem(
+                layoutSize: NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .fractionalHeight(1)))
+//                    heightDimension: .absolute(90)))
+            item.contentInsets = .init(horizontal: 10, vertical: 5)
+
+            let group = NSCollectionLayoutGroup.horizontal(
+                layoutSize: NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(0.9),
+                    heightDimension: .fractionalHeight(1)),
+                subitem: item,
+                count: 5)
+
             let section = NSCollectionLayoutSection(group: group)
-            section.contentInsets = .init(top: 0, leading: 10, bottom: 20, trailing: 0)
+            section.contentInsets = .init(top: 5,
+                                          leading: 10,
+                                          bottom: 5,
+                                          trailing: 10)
             section.orthogonalScrollingBehavior = .continuous
-            
             return section
         }
         
         let cellRegistration = UICollectionView.CellRegistration<UserprofileCell, Userprofile> { [unowned self] cell, indexPath, userprofile in
             cell.userprofile = userprofile
             cell.avatar.mode = self.isEditing ? .Selection : .Default
+            cell.textStyle = .footnote
             cell.userPublisher
                 .sink { [unowned self] in
                     guard let instance = $0 else { return }
                     
-//                    self.userPublisher.send(instance)
+                    self.userPublisher.send(instance)
                 }
                 .store(in: &self.subscriptions)
         }
@@ -143,3 +191,10 @@ private extension UserprofilesFeedCollectionView {
     }
 }
 
+extension UserprofilesFeedCollectionView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y > 0 || scrollView.contentOffset.y < 0 {
+            scrollView.contentOffset.y = 0
+        }
+    }
+}

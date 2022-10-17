@@ -34,6 +34,7 @@ struct API_URLS {
         static let own:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/own/")}()
         static let hot:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/hot/")}()
         static let topic:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_category/")}()
+        static let userprofile:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_owner/")}()
         static let search:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_substring/")}()
         static let root:                URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/")}()
         static let media:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/media/")}()

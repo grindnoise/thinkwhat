@@ -26,14 +26,14 @@ class UserprofilesCollectionView: UICollectionView {
     
     // MARK: - Public properties
     //Logic
-    public private(set) var mode: UserprofilesViewMode = .Subscribers {
+    public var mode: UserprofilesViewMode = .Subscribers {
         didSet {
             guard !userprofile.isNil else { return }
             
             reloadDataSource(items: dataItems)
         }
     }
-    public private(set) weak var userprofile: Userprofile!
+    public weak var userprofile: Userprofile!
     
     //Publishers
     public var paginationPublisher = CurrentValueSubject<Bool?, Never>(nil)

@@ -11,9 +11,9 @@ import SwiftyJSON
 
 class Survey: Decodable {
     enum SurveyCategory: String, CaseIterable {
-        case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic, Search
+        case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic, Search, Userprofile
         
-        func dataItems(_ topic: Topic? = nil) -> [SurveyReference] {
+        func dataItems(_ topic: Topic? = nil, _ userprofile: Userprofile? = nil) -> [SurveyReference] {
             switch self {
             case .Hot:
                 return Surveys.shared.hot.map { return $0.reference }.filter { !$0.isClaimed && !$0.isBanned }
@@ -44,6 +44,10 @@ class Survey: Decodable {
 //                }
 //                return all
                 return SurveyReferences.shared.all.filter({ $0.topic == topic! }).uniqued().filter { !$0.isClaimed && !$0.isBanned }
+            case .Userprofile:
+                guard let userprofile = userprofile else { return [] }
+                
+                return SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned }
             case .Search:
                 fatalError()
             }
@@ -91,6 +95,8 @@ class Survey: Decodable {
                 return API_URLS.Surveys.topic
             case .Search:
                 return API_URLS.Surveys.search
+            case .Userprofile:
+                return API_URLS.Surveys.userprofile
             }
         }
     }

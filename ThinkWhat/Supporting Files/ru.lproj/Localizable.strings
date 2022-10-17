@@ -153,7 +153,11 @@
 
 //Subscriptions VC
 "subscriptions" = "Подписки";
-"subscribers" = "подписчики";
+"publications_per" = "Публикации за:";
+"per_day" = "день";
+"per_week" = "неделю";
+"per_month" = "месяц";
+"all_time" = "все время";
 
 //List VC
 "list" = "Лента";

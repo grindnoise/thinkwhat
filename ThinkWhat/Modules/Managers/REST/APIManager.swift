@@ -1400,12 +1400,41 @@ class API {
             return try await parent.requestAsync(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
         }
         
-        public func loadSurveyReferences(_ category: Survey.SurveyCategory, _ topic: Topic? = nil) async throws {
+        public func surveyReferences(category: Survey.SurveyCategory, topic: Topic? = nil, userprofile: Userprofile? = nil) async throws {
             guard let url = category.url else { throw APIError.invalidURL }
             var parameters: Parameters!
             if category == .Topic, !topic.isNil {
                 parameters = ["ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
                 parameters["category_id"] = topic?.id
+            } else if category == .Userprofile, let userprofile = userprofile {
+                parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
+                parameters["userprofile_id"] = userprofile.id
+            } else {
+                parameters  = ["ids": category.dataItems().map { $0.id }]
+            }
+            
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                try await MainActor.run {
+                    Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
+                }
+            } catch let error {
+    #if DEBUG
+                print(error)
+    #endif
+                throw error
+            }
+        }
+        
+        public func loadSurveyReferences(_ category: Survey.SurveyCategory, _ topic: Topic? = nil, _ userprofile: Userprofile? = nil) async throws {
+            guard let url = category.url else { throw APIError.invalidURL }
+            var parameters: Parameters!
+            if category == .Topic, !topic.isNil {
+                parameters = ["ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
+                parameters["category_id"] = topic?.id
+            } else if category == .Userprofile, let userprofile = userprofile {
+                parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
+                parameters["userprofile_id"] = userprofile.id
             } else {
                 parameters  = ["ids": category.dataItems().map { $0.id }]
             }

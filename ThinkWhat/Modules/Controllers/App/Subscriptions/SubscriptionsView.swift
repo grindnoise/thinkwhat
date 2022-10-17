@@ -11,18 +11,20 @@ import Combine
 
 class SubscriptionsView: UIView {
     
+    // MARK: - Public properties
     weak var viewInput: SubscriptionsViewInput?
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    
+    //UI
     private var isCollectionViewSetupCompleted = false
-    private let reuseIdentifier = "voter"
     private var needsAnimation = true
     private var isRevealed = false
-    private lazy var collectionView: SurveysCollectionView = {
+    private lazy var surveysCollectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(category: .Subscriptions)
         
         //Pagination #1
@@ -64,6 +66,15 @@ class SubscriptionsView: UIView {
                 guard let topic = $0 else { return }
                 
                 self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+            }
+            .store(in: &subscriptions)
+        
+        //Refresh #3
+        instance.refreshByUserprofilePublisher
+            .sink { [unowned self] in
+                guard let userprofile = $0 else { return }
+                
+                self.viewInput?.onDataSourceRequest(userprofile: userprofile)
             }
             .store(in: &subscriptions)
         
@@ -137,20 +148,76 @@ class SubscriptionsView: UIView {
         
         return instance
     }()
+    private lazy var feedCollectionView: UserprofilesFeedCollectionView = {
+        let instance = UserprofilesFeedCollectionView(userprofile: Userprofiles.shared.current!, mode: .Subscriptions)
+        instance.alwaysBounceHorizontal = true
+        instance.isDirectionalLockEnabled = true
+        instance.userPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.setUserprofileFilter(userprofile)
+                self.surveysCollectionView.userprofile = userprofile
+            }
+            .store(in: &subscriptions)
+//        instance.contentSize.height = 1.0
+//        instance.publisher(for: \.contentSize, options: .new)
+//            .sink { [weak self] rect in
+//                guard let self = self else { return }
+//
+//                print(rect.height)
+//            }
+//            .store(in: &subscriptions)
+//        //Pagination #1
+//        let paginationPublisher = instance.paginationPublisher
+//            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+//
+//        paginationPublisher
+//            .sink { [unowned self] in
+//                guard let category = $0 else { return }
+//
+//                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+//            }
+//            .store(in: &subscriptions)
+//
+//        instance.shareSubject.sink {
+//            print($0)
+//        } receiveValue: { [weak self] in
+//            guard let self = self,
+//                let value = $0
+//            else { return }
+//
+//            self.viewInput?.share(value)
+//        }.store(in: &self.subscriptions)
+        
+        return instance
+    }()
     private lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = true
         instance.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.75)
         instance.addEquallyTo(to: shadowView)
-        collectionView.addEquallyTo(to: instance)
+        surveysCollectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
         })
         return instance
     }()
+    private lazy var verticalStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [
+            feedCollectionView
+        ])
+        instance.axis = .vertical
+        
+        return instance
+    }()
     private var shadowObserver: NSKeyValueObservation!
+    
+    
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
@@ -158,9 +225,22 @@ class SubscriptionsView: UIView {
         didSet {
             upperContainer.backgroundColor = .systemBackground
 //            upperContainer.alpha = 0
+//            verticalStack.addEquallyTo(to: upperContainer)
+            feedCollectionView.addEquallyTo(to: upperContainer)
+//            feedCollectionView.translatesAutoresizingMaskIntoConstraints = false
+//            upperContainer.addSubview(feedCollectionView)
+//            NSLayoutConstraint.activate([
+//                feedCollectionView.topAnchor.constraint(equalTo: upperContainer.topAnchor, constant: 11),
+//                feedCollectionView.leadingAnchor.constraint(equalTo: upperContainer.leadingAnchor, constant: 1),
+//                feedCollectionView.trailingAnchor.constraint(equalTo: upperContainer.trailingAnchor, constant: 1),
+//                feedCollectionView.bottomAnchor.constraint(equalTo: upperContainer.bottomAnchor, constant: -11),
+//
+//            ])
+//            let constraint = feedCollectionView.bottomAnchor.constraint(equalTo: upperContainer.bottomAnchor)
+//            constraint.priority = .defaultLow
+//            constraint.isActive = true
         }
     }
-    @IBOutlet weak var subscriptionsCollectionView: UICollectionView!
     @IBOutlet weak var shadowView: UIView! {
         didSet {
             shadowView.layer.masksToBounds = false
@@ -175,95 +255,56 @@ class SubscriptionsView: UIView {
                 guard let newValue = change.newValue else { return }
                 view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
             }
+            //            shadowView.publisher(for: \.bounds, options: .new)
+            //                .sink { [weak self] rect in
+//                    guard let self = self else { return }
+//
+//                    self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+//                }
+//                .store(in: &subscriptions)
+            
             background.addEquallyTo(to: shadowView)
         }
     }
     @IBOutlet weak var upperContainerHeightConstraint: NSLayoutConstraint! {
         didSet {
-            upperContainerHeightConstraint.constant = 0
+//            upperContainerHeightConstraint.constant = 0
         }
     }
-    @IBOutlet weak var subscribers: UIButton! {
-        didSet {
-            subscribers.setTitle("subscribers".localized.uppercased(), for: .normal)
-        }
-    }
-    @IBAction func subscribersTapped(_ sender: UIButton) {
-        viewInput?.onSubscribersTapped()
-    }
-    @IBOutlet weak var more: UIButton! {
-        didSet {
-            more.setAttributedTitle(NSAttributedString(string: "more".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: frame.width * 0.08), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]), for: .normal)
-        }
-    }
-    @IBAction func moreTapped(_ sender: UIButton) {
-        viewInput?.onSubscpitionsTapped()
-    }
+    
+    
     
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
+        
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        commonInit()
+        
+        setupUI()
     }
     
+    
+    
     // MARK: - Private properties
-    private func commonInit() {
+    private func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        
         addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
-        setupUI()
-    }
-        
-    private func setupUI() {
-        subscriptionsCollectionView.register(UINib(nibName: "VoterCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
-        setText()
-//        featheredView.layer.mask = featheredLayer
     }
     
-    private func setText() {
-        guard !more.isNil, !subscribers.isNil else { return }
-//        more.setAttributedText(text: "more".localized.uppercased(),
-//                               font: Fonts.Semibold,
-//                               width: bounds.width,
-//                               widthDivisor: 0.0325,
-//                               lightColor: K_COLOR_RED,
-//                               style: traitCollection.userInterfaceStyle)
-//        subscribers.setAttributedText(text: "subscribers".localized.uppercased(),
-//                                      font: Fonts.Semibold,
-//                                      width: bounds.width,
-//                                      widthDivisor: 0.0325,
-//                                      lightColor: K_COLOR_RED,
-//                                      style: traitCollection.userInterfaceStyle)
-    }
     
-    private func setFlowLayout() {
-        guard !isCollectionViewSetupCompleted else { return }
-        isCollectionViewSetupCompleted = true
-        let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.itemSize = CGSize(width: subscriptionsCollectionView.bounds.height, height: subscriptionsCollectionView.bounds.height)
-        flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        flowLayout.scrollDirection = .horizontal
-        flowLayout.minimumInteritemSpacing = 0.0
-        subscriptionsCollectionView.collectionViewLayout = flowLayout
-        subscriptionsCollectionView.delegate = self
-        subscriptionsCollectionView.dataSource = self
-    }
-    
-    @objc
-    private func hideMenu() {
-        viewInput?.toggleBarButton()
-    }
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -273,7 +314,6 @@ class SubscriptionsView: UIView {
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         
-        setText()
 //        guard let v = self.card.subviews.filter({ $0.accessibilityIdentifier == "cardBlur" }).first as? UIVisualEffectView, isRevealed else { return }
 //                v.effect = UIBlurEffect(style: self.traitCollection.userInterfaceStyle == .dark ? .dark : .light)
     }
@@ -281,142 +321,61 @@ class SubscriptionsView: UIView {
 
 // MARK: - Controller Output
 extension SubscriptionsView: SubsciptionsControllerOutput {
+    func setDefaultFilter() {
+        surveysCollectionView.category = .Subscriptions
+    }
+    
+    func setPeriod(_ period: Period) {
+        surveysCollectionView.period = period
+    }
+    
     func onRequestCompleted(_ result: Result<Bool, Error>) {
-        collectionView.endRefreshing()
+        surveysCollectionView.endRefreshing()
     }
     
     func onWillAppear() {
-        collectionView.deselect()
+        surveysCollectionView.deselect()
     }
     
     func onUpperContainerShown(_ reveal: Bool) {
         isRevealed = reveal
-//        let cardBlur: UIView = {
-//            guard let v = self.card.subviews.filter({ $0.accessibilityIdentifier == "cardBlur" }).first else {
-//                let v = UIView(frame: card.bounds)
-//                v.backgroundColor = .black.withAlphaComponent(0.5)
-//                v.alpha = 0
-//                card.addSubview(v)
-//                v.accessibilityIdentifier = "cardBlur"
-//                v.isUserInteractionEnabled = true
-//                v.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.hideMenu)))
-//                return v
-//            }
-//            return v
-//        }()
-//        let menuBlur: UIVisualEffectView =  {
-//            guard let v = self.upperContainer.subviews.filter({ $0.accessibilityIdentifier == "menuBlur" }).first as? UIVisualEffectView else {
-//                let blur = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
-//                blur.frame = upperContainer.bounds
-////                upperContainer.addSubview(blur)
-//                blur.addEquallyTo(to: upperContainer)
-//                blur.setNeedsLayout()
-//                blur.layoutIfNeeded()
-//                blur.accessibilityIdentifier = "menuBlur"
-//                blur.isUserInteractionEnabled = false
-//                return blur
-//            }
-//            return v
-//        }()
-//
-//        cardBlur.alpha = reveal ? 0 : 1
-//        menuBlur.effect = !reveal ? nil : UIBlurEffect(style: .prominent)
-//        if !reveal {
-//            menuBlur.setNeedsLayout()
-//            menuBlur.layoutIfNeeded()
-//        }
-        //        observers.forEach({ $0.invalidate()})
-//        if !reveal {
-            shadowObserver.invalidate()
-        let initialPath = UIBezierPath(roundedRect: CGRect(origin: .zero, size: CGSize(width: shadowView.bounds.width, height: reveal ? background.bounds.height  : background.bounds.height - self.frame.height * 0.2)),
-                                               cornerRadius: self.shadowView.bounds.width * 0.05).cgPath
         
-        let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero, size: CGSize(width: shadowView.bounds.width, height: shadowView.bounds.height + (reveal ? -self.frame.height * 0.2 : self.frame.height * 0.2))),
-                                               cornerRadius: self.shadowView.bounds.width * 0.05).cgPath
-            let anim = Animations.get(property: .ShadowPath,
-                                      fromValue: initialPath,
-                                      toValue: destinationPath,
-                                      duration: 0.25,
-                                      delay: 0,
-                                      repeatCount: 0,
-                                      autoreverses: false,
-                                      timingFunction: .easeInEaseOut,
-                                      delegate: nil,
-                                      isRemovedOnCompletion: true,
-                                      completionBlocks: nil)
-            self.shadowView.layer.add(anim, forKey: nil)
-            self.shadowView.layer.shadowPath = destinationPath
-//            shadowObserver = shadowView.observe(\UIView.bounds, options: .new) { view, change in
-//                guard let newValue = change.newValue else { return }
-//                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
-//            }
-//        }
+        shadowObserver.invalidate()
+        let initialPath = UIBezierPath(roundedRect: CGRect(origin: .zero, size: CGSize(width: shadowView.bounds.width, height: reveal ? background.bounds.height  : background.bounds.height - self.frame.height * 0.125)),
+                                       cornerRadius: self.shadowView.bounds.width * 0.05).cgPath
+        
+        let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero, size: CGSize(width: shadowView.bounds.width, height: shadowView.bounds.height + (reveal ? -self.frame.height * 0.125 : self.frame.height * 0.125))),
+                                           cornerRadius: self.shadowView.bounds.width * 0.05).cgPath
+        let anim = Animations.get(property: .ShadowPath,
+                                  fromValue: initialPath,
+                                  toValue: destinationPath,
+                                  duration: 0.25,
+                                  delay: 0,
+                                  repeatCount: 0,
+                                  autoreverses: false,
+                                  timingFunction: .easeInEaseOut,
+                                  delegate: nil,
+                                  isRemovedOnCompletion: true,
+                                  completionBlocks: nil)
+        self.shadowView.layer.add(anim, forKey: nil)
+        self.shadowView.layer.shadowPath = destinationPath
+        //            shadowObserver = shadowView.observe(\UIView.bounds, options: .new) { view, change in
+        //                guard let newValue = change.newValue else { return }
+        //                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
+        //            }
+        //        }
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0,
                                                        options: [.curveEaseInOut],
-                                                       animations: {
-//            cardBlur.alpha = !reveal ? 0 : 1
-//            menuBlur.effect = reveal ? nil : UIBlurEffect(style: .prominent)
+                                                       animations: { [weak self] in
+            guard let self = self else { return }
+            
             self.setNeedsLayout()
-            self.upperContainerHeightConstraint.constant += reveal ? self.frame.height * 0.2 : -self.upperContainerHeightConstraint.constant
+            self.upperContainerHeightConstraint.constant += reveal ? self.frame.height * 0.125 : -self.upperContainerHeightConstraint.constant
             self.layoutIfNeeded()
             self.upperContainer.subviews.forEach {
                 $0.alpha = reveal ? 1 : 0
             }
-//            self.shadowView.layer.shadowOpacity = 0
-//            self.upperContainer.alpha = reveal ? 1 : 0
-        })
-        {
-            [weak self] _ in
-//            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.1, delay: 0) {
-//                self?.shadowView.layer.shadowOpacity = 1
-//            }
-            guard !self.isNil else { return }
-            self!.setFlowLayout()
-            guard !reveal else { return }
-        }
-        
-//        let destinationPath = UIBezierPath(roundedRect: CGRect(origin: .zero, size: CGSize(width: shadowView.bounds.width, height: shadowView.bounds.height)),
-//                                                       cornerRadius: self.shadowView.bounds.width * 0.05).cgPath
-//                    let anim = Animations.get(property: .ShadowPath,
-//                                              fromValue: self.shadowView.layer.shadowPath as Any,
-//                                              toValue: destinationPath,
-//                                              duration: 0.1,
-//                                              delay: 0,
-//                                              repeatCount: 0,
-//                                              autoreverses: false,
-//                                              timingFunction: .linear,
-//                                              delegate: nil,
-//                                              isRemovedOnCompletion: true,
-//                                              completionBlocks: nil)
-//                    self.shadowView.layer.add(anim, forKey: nil)
-//                    self.shadowView.layer.shadowPath = destinationPath
-    }
-}
-
-// MARK: - UI Setup
-extension SubscriptionsView: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 0//viewInput?.userprofiles.count ?? 0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? VoterCell,
-//           let userprofile = viewInput?.userprofiles[indexPath.row] as? Userprofile {
-//            cell.setupUI(callbackDelegate: self, userprofile: userprofile, mode: .FirstnameLastname, lightColor: K_COLOR_RED)
-//            return cell
-//        }
-        return UICollectionViewCell()
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard needsAnimation else { return }
-        cell.alpha = 0
-        cell.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-        UIView.animate(withDuration: 0.15, delay: 0.04 * Double(indexPath.row)) {
-            cell.alpha = 1
-            cell.transform = .identity
-        }
-        needsAnimation = (collectionView.visibleCells.count < (indexPath.row + 1))
+        }) { _ in }
     }
 }
 

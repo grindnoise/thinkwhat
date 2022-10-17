@@ -337,8 +337,12 @@ private extension UserprofilesController {
                                 children: [half, third, quarter])
     var children: [UIMenuElement] = []
         children.append(filter)
-        if mode == .Subscriptions || mode == .Subscribers {
-            children.append(delete)
+        if let userprofile = userprofile {
+            if mode == .Subscriptions, !userprofile.subscriptions.isEmpty {
+                children.append(delete)
+            } else if mode == .Subscribers, !userprofile.subscribers.isEmpty {
+                children.append(delete)
+            }
         }
         children.append(inlineMenu)
         

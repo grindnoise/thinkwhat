@@ -24,6 +24,11 @@ class UserprofileCell: UICollectionViewCell {
             label.text = userprofile.firstNameSingleWord
         }
     }
+    public var textStyle: UIFont.TextStyle = .subheadline {
+        didSet {
+            updateUI()
+        }
+    }
     //UI
     public private(set) lazy var avatar: Avatar = {
         let instance = Avatar(isShadowed: true)
@@ -59,7 +64,7 @@ class UserprofileCell: UICollectionViewCell {
     //UI
     private lazy var label: UILabel = {
        let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline)
+        instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: textStyle)
         instance.numberOfLines = 2
         instance.textAlignment = .center
         
@@ -161,6 +166,10 @@ private extension UserprofileCell {
         
 //        contentView.isContextMenuInteractionEnabled = true
 //                addInteraction(UIContextMenuInteraction(delegate: self))
+    }
+    
+    func updateUI() {
+        label.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: textStyle)
     }
     
     func setTasks() {

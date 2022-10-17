@@ -40,10 +40,10 @@ extension SubscriptionsModel: SubsciptionsControllerInput {
         }
     }
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
+    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?, userprofile: Userprofile?) {
         Task {
             do {
-                try await API.shared.surveys.loadSurveyReferences(source, topic)
+                try await API.shared.surveys.loadSurveyReferences(source, topic, userprofile)
                 await MainActor.run {
                     modelOutput?.onRequestCompleted(.success(true))
                 }

@@ -32,6 +32,18 @@ class SurveysCollectionView: UICollectionView {
             scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         }
     }
+    public var period: Period = .AllTime {
+        didSet {
+            setDataSource()
+        }
+    }
+    public var userprofile: Userprofile? {
+        didSet {
+            guard !userprofile.isNil else { return }
+            
+            category = .Userprofile
+        }
+    }
     public var fetchResult: [SurveyReference] = [] {
         didSet {
             setDataSource()
@@ -49,6 +61,7 @@ class SurveysCollectionView: UICollectionView {
     public var paginationByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
     public var refreshPublisher = CurrentValueSubject<Survey.SurveyCategory?, Never>(nil)
     public var refreshByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
+    public var refreshByUserprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public var rowPublisher = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var updateStatsPublisher = CurrentValueSubject<[SurveyReference]?, Never>(nil)
     public var testSubject = PassthroughSubject<String, Never>()
@@ -59,7 +72,9 @@ class SurveysCollectionView: UICollectionView {
     private var tasks: [Task<Void, Never>?] = []
     private var source: UICollectionViewDiffableDataSource<Section, SurveyReference>!
     private var dataItems: [SurveyReference] {
-        if category == .Topic, !topic.isNil {
+        if category == .Userprofile, let userprofile = userprofile {
+            return category.dataItems(nil, userprofile)
+        } else if category == .Topic, !topic.isNil {
             return category.dataItems(topic)
         } else if category == .Search {
             return fetchResult
@@ -85,6 +100,8 @@ class SurveysCollectionView: UICollectionView {
         return instance
     }()
     
+    
+    
     // MARK: - Destructor
     deinit {
         observers.forEach { $0.invalidate() }
@@ -95,6 +112,8 @@ class SurveysCollectionView: UICollectionView {
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
+    
+    
     
     // MARK: - Initialization
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
@@ -152,6 +171,8 @@ class SurveysCollectionView: UICollectionView {
         } completion: { _ in self.searchSpinner.stopAnimating() }
     }
     
+    
+    
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 //        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
@@ -204,8 +225,10 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     
     @objc
     private func refresh() {
-        if category == .Topic {
+        if category == .Topic, let topic = topic {
             refreshByTopicPublisher.send(topic)
+        } else if category == .Userprofile, let userprofile = userprofile {
+            refreshByUserprofilePublisher.send(userprofile)
         } else {
             refreshPublisher.send(category)
         }
@@ -243,9 +266,18 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     }
     
     private func setDataSource(animatingDifferences: Bool = true) {
+        func filterByPeriod(_ items: [SurveyReference]) -> [SurveyReference] {
+            guard let date = period.date() else { return items }
+     
+            return items.filter {
+                $0.startDate >= date
+            }
+        }
+        
+        //TODO: Add filtering
         var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
         snapshot.appendSections([.main])
-        snapshot.appendItems(dataItems, toSection: .main)
+        snapshot.appendItems(filterByPeriod(dataItems), toSection: .main)
         source.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 }

@@ -16,12 +16,12 @@ protocol UserprofilesViewInput: AnyObject {
     
     var controllerOutput: UserprofilesControllerOutput? { get set }
     var controllerInput: UserprofilesControllerInput? { get set }
-    var mode: UserprofilesController.UserprofilesViewMode { get }
+    var mode: UserprofilesViewMode { get }
     var userprofile: Userprofile? { get }
     var answer: Answer? { get }
     
     func onUserprofileTap(_: Userprofile)
-    func loadUsers(for: Userprofile, mode: UserprofilesController.UserprofilesViewMode)
+    func loadUsers(for: Userprofile, mode: UserprofilesViewMode)
     func loadVoters(for: Answer)
     func subscribe(at: [Userprofile])
     func unsubscribe(from: [Userprofile])
@@ -36,7 +36,7 @@ protocol UserprofilesControllerInput: AnyObject {
     
     var modelOutput: UserprofilesModelOutput? { get set }
     
-    func loadUsers(for: Userprofile, mode: UserprofilesController.UserprofilesViewMode)
+    func loadUsers(for: Userprofile, mode: UserprofilesViewMode)
     func loadVoters(for: Answer)
     func subscribe(at: [Userprofile])
     func unsubscribe(from: [Userprofile])

@@ -62,3 +62,23 @@ enum ButtonState: String {
 enum UserprofilesViewMode: String {
     case Subscribers, Subscriptions, Voters
 }
+
+enum Period: String {
+    case PerDay     = "per_day"
+    case PerWeek    = "per_week"
+    case PerMonth   = "per_month"
+    case AllTime    = "all_time"
+    
+    func date() -> Date? {
+        switch self {
+        case .PerDay:
+            return Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        case .PerWeek:
+            return Calendar.current.date(byAdding: .day, value: -7, to: Date())
+        case .PerMonth:
+            return Calendar.current.date(byAdding: .month, value: -1, to: Date())
+        case .AllTime:
+            return nil
+        }
+    }
+}
