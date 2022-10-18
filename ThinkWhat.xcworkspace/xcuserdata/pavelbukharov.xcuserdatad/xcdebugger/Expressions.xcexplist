@@ -2346,6 +2346,9 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "SurveyReferences.all.didset:SurveyReference.swift">
+      </ContextState>
+      <ContextState
          contextName = "CreateNewSurveyViewController.moveToNextStage(completionBlock:):CreateNewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -2544,6 +2547,17 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "Survey.getReference():Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.id">
+            </PersistentString>
+            <PersistentString
+               value = "SurveyReferences.shared.all">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "AppSettingsLanguageCell.prepareMenu():AppSettingsLanguageCell.swift">
          <PersistentStrings>
             <PersistentString
@@ -2555,7 +2569,7 @@
          contextName = "SurveysCollectionView.setDataSource(animatingDifferences:):SurveysCollectionView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "period">
+               value = "filterByPeriod(dataItems)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -3159,6 +3173,14 @@
             </PersistentString>
             <PersistentString
                value = "constraint.constant">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Survey.SurveyCategory.dataItems(_:_:):Survey.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "SurveyReferences.shared.all">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -4597,6 +4619,9 @@
                value = "lowerTextFieldTopConstant">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in SurveyReference.init(id:title:description:startDate:topic:type:likes:views:isOwn:isComplete:isFavorite:isHot:survey:owner:votesTotal:votesLimit:isAnonymous:progress:rating:commentsTotal:):SurveyReference.swift">
       </ContextState>
       <ContextState
          contextName = "closure #2 in closure #8 in PollCreationView.setObservers():PollCreationView.swift">
@@ -8008,6 +8033,14 @@
       </ContextState>
       <ContextState
          contextName = "closure #1 in mediaLogin #1 (token:) in APIManager.login(_:username:password:token:completion:):APIServer.swift">
+      </ContextState>
+      <ContextState
+         contextName = "SurveyReference.init(id:title:description:startDate:topic:type:likes:views:isOwn:isComplete:isFavorite:isHot:survey:owner:votesTotal:votesLimit:isAnonymous:progress:rating:commentsTotal:):SurveyReference.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "SurveyReferences.shared.all">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "SurveysCollection.appendToDataSource():SurveysCollection.swift">

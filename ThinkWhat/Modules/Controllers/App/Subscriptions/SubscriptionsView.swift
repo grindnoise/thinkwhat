@@ -21,6 +21,14 @@ class SubscriptionsView: UIView {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
+    private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
+    private var userprofile: Userprofile! {
+        didSet {
+            viewInput?.setUserprofileFilter(userprofile)
+            surveysCollectionView.userprofile = userprofile
+            onUserSelected(userprofile: userprofile)
+        }
+    }
     private var isCollectionViewSetupCompleted = false
     private var needsAnimation = true
     private var isRevealed = false
@@ -155,11 +163,13 @@ class SubscriptionsView: UIView {
         instance.userPublisher
             .sink { [weak self] in
                 guard let self = self,
-                      let userprofile = $0
+                      let dict = $0,
+                      let userprofile = dict.keys.first,
+                      let indexPath = dict.values.first
                 else { return }
                 
-                self.viewInput?.setUserprofileFilter(userprofile)
-                self.surveysCollectionView.userprofile = userprofile
+                self.indexPath = indexPath
+                self.userprofile = userprofile
             }
             .store(in: &subscriptions)
 //        instance.contentSize.height = 1.0
@@ -191,6 +201,39 @@ class SubscriptionsView: UIView {
 //
 //            self.viewInput?.share(value)
 //        }.store(in: &self.subscriptions)
+        
+        return instance
+    }()
+    //User view on selection
+    private lazy var avatar: Avatar = {
+        guard let userprofile = userprofile else { return Avatar() }
+        let instance = Avatar(userprofile: userprofile, isShadowed: true)
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+        instance.alpha = 0
+        instance.tapPublisher
+            .sink { [unowned self] in
+                guard let instance = $0 else { return }
+                
+//                self.userPublisher.send(instance)
+            }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
+    private lazy var userView: UIView = {
+       let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.alpha = 0
+        instance.addEquallyTo(to: upperContainer)
+        
+        instance.addSubview(avatar)
+        avatar.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
+            avatar.topAnchor.constraint(equalTo: instance.topAnchor),
+            avatar.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+        ])
         
         return instance
     }()
@@ -289,8 +332,21 @@ class SubscriptionsView: UIView {
     
     
     
-    // MARK: - Private properties
-    private func setupUI() {
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        let outerColor = UIColor.clear.cgColor
+//        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
+//        featheredLayer.colors = [outerColor, innerColor,innerColor,outerColor]
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        
+//        guard let v = self.card.subviews.filter({ $0.accessibilityIdentifier == "cardBlur" }).first as? UIVisualEffectView, isRevealed else { return }
+//                v.effect = UIBlurEffect(style: self.traitCollection.userInterfaceStyle == .dark ? .dark : .light)
+    }
+}
+
+private extension SubscriptionsView {
+    func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         
         addSubview(contentView)
@@ -304,18 +360,17 @@ class SubscriptionsView: UIView {
         ])
     }
     
-    
-    
-    // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        let outerColor = UIColor.clear.cgColor
-//        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
-//        featheredLayer.colors = [outerColor, innerColor,innerColor,outerColor]
-        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        
-//        guard let v = self.card.subviews.filter({ $0.accessibilityIdentifier == "cardBlur" }).first as? UIVisualEffectView, isRevealed else { return }
-//                v.effect = UIBlurEffect(style: self.traitCollection.userInterfaceStyle == .dark ? .dark : .light)
+    func onUserSelected(userprofile: Userprofile) {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+            guard let self = self else { return }
+            
+            self.userView.alpha = 1
+            self.avatar.alpha = 1
+            self.feedCollectionView.alpha = 0
+            self.setNeedsLayout()
+            self.upperContainerHeightConstraint.constant += 20
+            self.layoutIfNeeded()
+        }
     }
 }
 

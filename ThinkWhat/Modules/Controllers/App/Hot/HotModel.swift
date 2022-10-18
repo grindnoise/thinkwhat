@@ -37,10 +37,10 @@ extension HotModel: HotControllerInput {
                 let rejectedList = Surveys.shared.rejected.map { $0.id }
                 let list = Array(Set(stackList + rejectedList))
                 if !list.isEmpty {
-                    parameters["ids"] = list
+                    parameters["exclude_ids"] = list
                 }
-//                let data = try await API.shared.downloadSurveysAsync(type: .Hot, parameters: parameters)
-                let data = try await API.shared.surveys.loadSurveys(type: .Hot, parameters: parameters)
+
+                let data = try await API.shared.surveys.getSurveys(type: .Hot, parameters: parameters)
                 let json = try JSON(data: data, options: .mutableContainers)
 #if DEBUG
                 print(json)

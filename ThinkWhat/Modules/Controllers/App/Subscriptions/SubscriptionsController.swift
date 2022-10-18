@@ -41,12 +41,12 @@ class SubscriptionsController: UIViewController {
             controllerOutput?.setPeriod(period)
             navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
             
-            guard let button = barButton.getSubview(type: UIButton.self,
-                                                    identifier: "button")
-            else { return }
-            
-            button.menu = prepareMenu()
-            
+//            guard let button = barButton.getSubview(type: UIButton.self,
+//                                                    identifier: "button")
+//            else { return }
+//
+//            button.menu = prepareMenu()
+            setRightBarButton()
         }
     }
     //UI
@@ -174,9 +174,11 @@ private extension SubscriptionsController {
     }
 
     func setupUI() {
+        setRightBarButton()
+        
 //        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         
-        navigationItem.setRightBarButton(UIBarButtonItem(customView: barButton), animated: true)
+//        navigationItem.setRightBarButton(UIBarButtonItem(customView: barButton), animated: true)
         
         navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
 //        guard let navigationBar = self.navigationController?.navigationBar else { return }
@@ -190,6 +192,30 @@ private extension SubscriptionsController {
 //            barButton.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
 //            barButton.widthAnchor.constraint(equalTo: barButton.heightAnchor)
 //        ])
+    }
+    
+    func setRightBarButton() {
+        var button: UIBarButtonItem!
+        switch mode {
+        case .Default:
+            button = UIBarButtonItem(title: "actions".localized.capitalized,
+                                     image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                     primaryAction: nil,
+                                     menu: prepareMenu())
+        case .Userprofile:
+            let action = UIAction { [weak self] _ in
+                guard let self = self else { return }
+                
+                self.mode = .Default
+            }
+            
+            button = UIBarButtonItem(title: "actions".localized.capitalized,
+                                     image: UIImage(systemName: "arrow.left", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                     primaryAction: action,
+                                     menu: nil)
+        }
+        
+        navigationItem.setRightBarButton(button, animated: true)
     }
         
     func getGradientColors() -> [CGColor] {
@@ -300,14 +326,15 @@ private extension SubscriptionsController {
             controllerOutput?.setDefaultFilter()
         }
         
-        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
-        
-        let largeConfig = UIImage.SymbolConfiguration(pointSize: button.bounds.height * 0.45,
-                                                      weight: .semibold, scale: .medium)
-        let image = UIImage(systemName: mode == .Userprofile ? "arrow.left" : "ellipsis",
-                            withConfiguration: largeConfig)
-        button.setImage(image, for: .normal)
-        button.showsMenuAsPrimaryAction = mode == .Default
+        setRightBarButton()
+//        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
+//
+//        let largeConfig = UIImage.SymbolConfiguration(pointSize: button.bounds.height * 0.45,
+//                                                      weight: .semibold, scale: .medium)
+//        let image = UIImage(systemName: mode == .Userprofile ? "arrow.left" : "ellipsis",
+//                            withConfiguration: largeConfig)
+//        button.setImage(image, for: .normal)
+//        button.showsMenuAsPrimaryAction = mode == .Default
         
         navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
     }

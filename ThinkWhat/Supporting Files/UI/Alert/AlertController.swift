@@ -82,7 +82,7 @@ class AlertController: UIViewController {
     @IBAction func buttonTapped(_ sender: Any) {
         if contentType == .Claim, survey != nil, let claimVC = currentController as? ClaimViewController {
             if claimCategory != nil {
-                API.shared.postClaim(survey: survey!, reason: claimCategory!) { _ in }
+//                API.shared.postClaim(survey: survey!, reason: claimCategory!) { _ in }
                 if icon != nil {
                     let pathAnim = Animations.get(property: .Path, fromValue: (icon.icon as! CAShapeLayer).path!, toValue: (icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: icon, isRemovedOnCompletion: false)
                     icon.icon.add(pathAnim, forKey: nil)

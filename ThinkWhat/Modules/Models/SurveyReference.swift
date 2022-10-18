@@ -340,14 +340,44 @@ class SurveyReferences {
     private init() {}
     var all: [SurveyReference] = [] {
         didSet {
-//            Check for duplicates
             guard let lastInstance = all.last else { return }
-            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
-                all.remove(object: lastInstance)
+            
+//            lastInstance.id == 58
+            //Remove
+            if oldValue.count > all.count {
+                let oldSet = Set(oldValue)
+                let newSet = Set(all)
+                
+                let difference = oldSet.symmetricDifference(newSet)
+                difference.forEach {
+                    NotificationCenter.default.post(name: Notifications.Surveys.Remove, object: $0)
+                }
+            } else {
+            //Append
+                let oldSet = Set(oldValue)
+                let newSet = Set(all)
+                
+                let difference = newSet.symmetricDifference(oldSet)
+                difference.forEach {
+                    guard oldValue.contains($0), let index = all.lastIndex(of: $0) else {
+                        //Notify
+                        NotificationCenter.default.post(name: Notifications.Surveys.Append, object: $0)
+                        return
+                    }
+                    //Duplicate removal
+                    all.remove(at: index)
+                    NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
+                }
             }
             
-//            guard oldValue.count != all.count else { return }
-            Notification.send(names: [Notifications.Surveys.UpdateAll])
+////            Check for duplicates
+//            guard let lastInstance = all.last else { return }
+//            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
+//                all.remove(object: lastInstance)
+//            }
+//            NotificationCenter.default.post(name: Notifications.Surveys.Append, object: instance)
+////            guard oldValue.count != all.count else { return }
+//            Notification.send(names: [Notifications.Surveys.UpdateAll])
         }
     }
     

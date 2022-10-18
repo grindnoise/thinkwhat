@@ -18,6 +18,7 @@ class TopicsView: UIView {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    //Logic
     private lazy var surveysCollectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(category: .Search)
         instance.alpha = 0

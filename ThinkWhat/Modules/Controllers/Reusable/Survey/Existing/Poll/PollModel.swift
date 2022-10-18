@@ -83,7 +83,7 @@ extension PollModel: PollControllerInput {
         
         Task {
             do {
-                try await API.shared.incrementViewCounterAsync(surveyReference: survey!.reference)
+                try await API.shared.surveys.incrementViewCounter(surveyReference: survey!.reference)
             } catch {
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)
@@ -183,7 +183,7 @@ extension PollModel: PollControllerInput {
     func loadPoll(_ reference: SurveyReference, incrementViewCounter: Bool = true) {
         Task {
             do {
-                try await API.shared.downloadSurveyAsync(reference: reference, incrementCounter: incrementViewCounter)
+                try await API.shared.surveys.getSurvey(byReference: reference, incrementCounter: incrementViewCounter)
                 await MainActor.run {
                     modelOutput?.onLoadCallback(.success(true))
                 }

@@ -24,7 +24,7 @@ class UserprofilesFeedCollectionView: UICollectionView {
     
     
     // MARK: - Public properties
-    public let userPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public let userPublisher = CurrentValueSubject<[Userprofile: IndexPath]?, Never>(nil)
     
     
     
@@ -163,7 +163,7 @@ private extension UserprofilesFeedCollectionView {
                 .sink { [unowned self] in
                     guard let instance = $0 else { return }
                     
-                    self.userPublisher.send(instance)
+                    self.userPublisher.send([userprofile: indexPath])
                 }
                 .store(in: &self.subscriptions)
         }

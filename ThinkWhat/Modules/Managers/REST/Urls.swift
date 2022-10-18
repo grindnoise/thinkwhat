@@ -26,6 +26,7 @@ struct API_URLS {
     }
     
     struct Surveys {
+        static let surveyById:          URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_id/")}()
         static let subscriptions:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/subscriptions/")}()
         static let new:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/new/")}()
         static let top:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/top/")}()
@@ -33,9 +34,9 @@ struct API_URLS {
         static let all:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/all/")}()
         static let own:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/own/")}()
         static let hot:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/hot/")}()
-        static let topic:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_category/")}()
-        static let userprofile:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_owner/")}()
-        static let search:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_substring/")}()
+        static let byTopic:             URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_category/")}()
+        static let byUserprofile:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_owner/")}()
+        static let searchBySubstring:   URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_substring/")}()
         static let root:                URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/")}()
         static let media:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/media/")}()
         static let share:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/share/")}()
@@ -51,6 +52,8 @@ struct API_URLS {
         static let getRootComments:     URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_root_comments/")}()
         static let getChildComments:    URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_child_comments/")}()
         static let voters:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/voters/")}()
+        static let incrementViews:      URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/add_view_count/")}()
+        
     }
     
     struct System {
@@ -92,21 +95,13 @@ struct API_URLS {
     static let SURVEYS_MEDIA            = "api/media/"
     static let SURVEYS_TOP              = "api/surveys/top/"
     static let SURVEYS_NEW              = "api/surveys/new/"
-    static let SURVEYS_ALL              = "api/surveys/all/"
+    
     static let SURVEYS_OWN              = "api/surveys/own/"
     static let SURVEYS_HOT              = "api/surveys/hot/"
 //    static let SURVEYS_HOT_EXCEPT       = "api/surveys/hot_except/"
     static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
     static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
-    static let SURVEYS_BY_CATEGORY      = "api/surveys/by_category/"
-    static let SURVEYS_BY_OWNER         = "api/surveys/by_owner/"
-    static let SURVEYS_FAVORITE_LIST_BY_OWNER = "api/surveys/favorite_surveys_list_by_user/"
-    static let SURVEYS_ADD_FAVORITE     = "api/surveys/add_favorite/"
-    static let SURVEYS_REMOVE_FAVORITE  = "api/surveys/remove_favorite/"
     static let SURVEYS_REJECT           = "api/surveys/reject/"
-    static let SURVEYS_CLAIM            = "api/surveys/claim/"
-//    static let SURVEYS_UPDATE_STATS     = "api/surveys/result_updates/"
-    static let SURVEYS_ADD_VIEW_COUNT   = "api/surveys/add_view_count/"
     
     static let VOTE                     = "api/vote/"
     

@@ -92,11 +92,11 @@ class Survey: Decodable {
             case .All:
                 return API_URLS.Surveys.all
             case .Topic:
-                return API_URLS.Surveys.topic
+                return API_URLS.Surveys.byTopic
             case .Search:
-                return API_URLS.Surveys.search
+                return API_URLS.Surveys.searchBySubstring
             case .Userprofile:
-                return API_URLS.Surveys.userprofile
+                return API_URLS.Surveys.byUserprofile
             }
         }
     }
@@ -427,10 +427,11 @@ class Survey: Decodable {
     
     //Creates SurveyReference
     private func getReference() -> SurveyReference {
-        guard let existing = SurveyReferences.shared.all.filter({ $0.id == self.id && $0.topic == $0.topic && $0.title == self.title }).first
+//        guard let existing = SurveyReferences.shared.all.filter({ $0.id == self.id && $0.topic == $0.topic && $0.title == self.title }).first
+        guard let existing = SurveyReferences.shared.all.filter({ $0.id == self.id }).first
         else {
             let instance = SurveyReference(id: id, title: title, description: description, startDate: startDate, topic: topic, type: type, likes: likes, views: views, isOwn: isOwn, isComplete: isComplete, isFavorite: isFavorite, isHot: isHot, survey: self, owner: owner, isAnonymous: isAnonymous, progress: progress, rating: rating)
-            SurveyReferences.shared.all.append(instance)
+//            SurveyReferences.shared.all.append(instance)
             return instance
         }
         
@@ -473,7 +474,14 @@ class Surveys {
         case TopLinks, NewLinks, Categorized, OwnLinks, Favorite, Downloaded, Completed, Stack, Claim, AllLinks
     }
     private enum Category: String {
-        case Top = "top", Own = "own", New = "new", Favorite = "favorite", Hot = "hot", Subscriptions = "subscriptions", Topic = "by_category"
+        case Top            = "top"
+        case Own            = "own"
+        case New            = "new"
+        case Favorite       = "favorite"
+        case Hot            = "hot"
+        case Subscriptions  = "subscriptions"
+        case Topic          = "by_category"
+        case Userprofile    = "by_owner"
     }
     static let shared = Surveys()
     private init() {}
@@ -658,23 +666,11 @@ class Surveys {
                     }
                 } else {
                     let instances = try decoder.decode([SurveyReference].self, from: value.rawData())
+                    
                     if instances.isEmpty {
-//                        var notification: Notification.Name!
-//                        if key == Category.Top.rawValue {
-//                            notification = Notifications.Surveys.ZeroTop
-//                        } else if key == Category.New.rawValue {
-//                            notification = Notifications.Surveys.ZeroNew
-//                        } else if key == Category.Own.rawValue {
-//                            notification = Notifications.Surveys.ZeroOwn
-//                        } else if key == Category.Subscriptions.rawValue {
-//                            notification = Notifications.Surveys.ZeroSubscriptions
-//                        } else if key == Category.Favorite.rawValue {
-//                            notification = Notifications.Surveys.ZeroFavorites
-//                        }
-//                        notifications.append(notification)
-//                        Notification.send(names: notifications.uniqued())
-                        notifications.append(Notifications.Surveys.EmptyReceived)
+                        NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
                     }
+                    
                     for instance in instances {
                         let instance = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance
                         
@@ -704,10 +700,10 @@ class Surveys {
                                 favoriteReferences.append(instance)
                             }
                         } else if key == Category.Topic.rawValue {
-//                            if SurveyReferences.shared.all.filter({ $0 == instance }).isEmpty {
-                                NotificationCenter.default.post(name: Notifications.Surveys.TopicAppend, object: instance)
-                                SurveyReferences.shared.all.append(instance)
-//                            }
+                            NotificationCenter.default.post(name: Notifications.Surveys.TopicAppend, object: instance)
+                            SurveyReferences.shared.all.append(instance)
+                        } else if key == Category.Userprofile.rawValue {
+                            SurveyReferences.shared.all.append(instance)
                         }
                     }
                 }

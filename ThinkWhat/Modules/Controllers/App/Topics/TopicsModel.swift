@@ -33,7 +33,7 @@ extension TopicsModel: TopicsControllerInput {
     func onDataSourceRequest(_ topic: Topic) {
         Task {
             do {
-                try await API.shared.surveys.loadSurveyReferences(.Topic, topic)
+                try await API.shared.surveys.surveyReferences(category: .Topic, topic: topic)
                 await MainActor.run {
                     modelOutput?.onRequestCompleted(.success(true))
                 }

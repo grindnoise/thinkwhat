@@ -96,6 +96,8 @@ struct Notifications {
         static let FavoriteAppend                   = Notification.Name("SurveysFavoriteAppend")
         static let FavoriteRemove                   = Notification.Name("SurveysFavoriteRemove")
         static let TopicAppend                      = Notification.Name("SurveysTopicAppend")
+        static let Append                           = Notification.Name("Notifications.Surveys.Append")
+        static let Remove                           = Notification.Name("Notifications.Surveys.Remove")
         static let Claim                            = Notification.Name("SurveyClaim")
         static let ClaimFailure                     = Notification.Name("SurveyClaimFailure")
         static let Ban                              = Notification.Name("SurveyBan")
@@ -110,7 +112,7 @@ struct Notifications {
         static let SwitchHot                        = Notification.Name("NotificationSwitchHot")
         static let UpdateSubscriptions              = Notification.Name("NotificationSubscriptionsReceived")
         static let UpdateOwn                        = Notification.Name("NotificationOwnSurveysUpdated")
-        static let UpdateAll                        = Notification.Name("NotificationAllSurveysUpdated")
+//        static let UpdateAll                        = Notification.Name("NotificationAllSurveysUpdated")
         static let EmptyReceived                    = Notification.Name("NotificationEmptyReceived")
 //        static let Empty                            = Notification.Name("NotificationZeroSubscriptionsReceived")
         

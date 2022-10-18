@@ -62,7 +62,7 @@ extension ListModel: ListControllerInput {
 
         Task {
             do {
-                try await API.shared.surveys.loadSurveyReferences(source, topic)
+                try await API.shared.surveys.surveyReferences(category: source, topic: topic)
                 await MainActor.run {
                     modelOutput?.onRequestCompleted(.success(true))
                 }

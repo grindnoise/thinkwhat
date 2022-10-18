@@ -162,34 +162,33 @@ class API {
     }
     
     public enum SurveyType: String {
-        case Top,New,All,Own,Favorite, Hot, HotExcept, User, UserFavorite
-        
-        func getURL() -> URL {
+        case Top,New,All,Own,Favorite, Hot, HotExcept, User, Topic
+
+        func getURL() -> URL? {
             let url = URL(string: API_URLS.BASE)!//.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE)
             switch self {
             case .Top:
-                return url.appendingPathComponent(API_URLS.SURVEYS_TOP)
+                return API_URLS.Surveys.top
             case .New:
-                return url.appendingPathComponent(API_URLS.SURVEYS_NEW)
+                return API_URLS.Surveys.new
             case .All:
-                return url.appendingPathComponent(API_URLS.SURVEYS_ALL)
+                return API_URLS.Surveys.all
             case .Own:
-                return url.appendingPathComponent(API_URLS.SURVEYS_OWN)
+                return API_URLS.Surveys.own
             case .Favorite:
-                return url.appendingPathComponent(API_URLS.SURVEYS_FAVORITE)
+                return API_URLS.Surveys.favorite
             case .Hot:
-                return url.appendingPathComponent(API_URLS.SURVEYS_HOT)
-                //            case .HotExcept:
-                //                return url.appendingPathComponent(SERVER_URLS.SURVEYS_HOT_EXCEPT)
+                return API_URLS.Surveys.hot
             case .User:
-                return url.appendingPathComponent(API_URLS.SURVEYS_BY_OWNER)
-            case .UserFavorite:
-                return url.appendingPathComponent(API_URLS.SURVEYS_FAVORITE_LIST_BY_OWNER)
+                return API_URLS.Surveys.byUserprofile
+            case .Topic:
+                return API_URLS.Surveys.byTopic
             default:
-                return url.appendingPathComponent(API_URLS.SURVEYS_ALL)
+                return nil
             }
         }
     }
+    
     private var isProxyEnabled: Bool? {
         didSet {
             if isProxyEnabled != nil && isProxyEnabled != oldValue {
@@ -788,20 +787,7 @@ class API {
             completion(result)
         }
     }
-    
-    
-    func downloadSurveys(type: SurveyType, completion: @escaping(Result<JSON, Error>)->()) {
-        //TODO: - Add survey type
-//        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else { completion(.failure(APIError.invalidURL)); return }
-        self.request(url: type.getURL(), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { result in
-            completion(result)
-        }
-    }
-    
-    func downloadSurveysAsync(type: SurveyType, parameters: Parameters? = nil) async throws -> Data{
-        return try await requestAsync(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: headers())
-    }
-    
+        
     func appLaunch() async throws -> JSON {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else {
             throw APIError.notFound
@@ -860,82 +846,11 @@ class API {
         }
     }
     
-    func downloadTopics(completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CATEGORIES) else { completion(.failure(APIError.invalidURL)); return }
-        self.request(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { result in
-            completion(result)
-        }
-    }
+    
+    
 
-
-    func downloadTotalSurveysCount(completion: @escaping(Result<JSON, Error>)->()) {
-                guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_TOTAL_COUNT) else { completion(.failure(APIError.invalidURL)); return }
-                self.request(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { result in
-                    completion(result)
-                }
-    }
-    
-    func downloadSurveys(topic: Topic, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_BY_CATEGORY) else { completion(.failure(APIError.invalidURL)); return }
-        self.request(url: url, httpMethod: .get, parameters: ["category_id": topic.id], encoding: URLEncoding.default) { result in
-            completion(result)
-        }
-    }
-    
-    func downloadSurvey(surveyReference: SurveyReference, incrementCounter: Bool = false, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS + "\(surveyReference.id)/") else { completion(.failure(APIError.invalidURL)); return }
-        self.request(url: url, httpMethod: .get, parameters: incrementCounter ? ["add_view_count": true] : nil, encoding: URLEncoding.default) { result in
-            completion(result)
-        }
-    }
-    
-    func downloadSurveyAsync(reference: SurveyReference, incrementCounter: Bool = false) async throws {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS + "\(reference.id)/") else { throw APIError.invalidURL }
-        
-        do {
-            let data = try await requestAsync(url: url, httpMethod: .get, parameters: incrementCounter ? ["add_view_count": true] : nil, encoding: URLEncoding.default, headers: headers())
-            let json = try JSON(data: data, options: .mutableContainers)
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                       DateFormatter.dateTimeFormatter,
-                                                       DateFormatter.dateFormatter ]
-            try decoder.decode(Survey.self, from: json.rawData())
-        } catch let error {
-            throw error
-        }
-    }
-    
-    func markFavorite(mark: Bool, surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(mark ? API_URLS.SURVEYS_ADD_FAVORITE : API_URLS.SURVEYS_REMOVE_FAVORITE) else { completion(.failure(APIError.invalidURL)); return }
-        self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { result in
-            completion(result)
-        }
-    }
     
     
-    
-    func incrementViewCounter(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_ADD_VIEW_COUNT) else { completion(.failure(APIError.invalidURL)); return }
-        self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { result in
-            completion(result)
-        }
-    }
-    
-    func incrementViewCounterAsync(surveyReference: SurveyReference) async throws {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_ADD_VIEW_COUNT) else { throw APIError.invalidURL }
-        
-        let data = try await requestAsync(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default, headers: headers())
-        let json = try JSON(data: data, options: .mutableContainers)
-        if let value = json["views"].int {
-            await MainActor.run {
-                surveyReference.survey?.views = value
-            }
-        } else if let error = json["views"].string {
-            throw error
-        } else {
-            throw "Unknown error"
-        }
-    }
     
 //    func getSurveyStats(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
 //        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_UPDATE_STATS) else { completion(.failure(APIError.invalidURL)); return }
@@ -1057,40 +972,11 @@ class API {
 //        }
 //    }
 //
-    public func rejectSurvey(survey: Survey, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_REJECT) else { completion(.failure(APIError.invalidURL)); return }
-        var parameters: Parameters = ["survey": survey.id]
-        if Surveys.shared.hot.count <= MIN_STACK_SIZE {
-            let stackList = Surveys.shared.hot.map { $0.id }
-            let rejectedList = Surveys.shared.rejected.map { $0.id }
-            let list = Array(Set(stackList + rejectedList))//Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
-            if !list.isEmpty {
-                let dict = list.asParameters(arrayParametersKey: "ids")
-                parameters.merge(dict) {(current, _) in current}
-            }
-        }
-        request(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default) { completion($0) }
-    }
-    
-    public func postClaim(survey: Survey, reason: Claim, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_CLAIM) else { completion(.failure(APIError.invalidURL)); return }
-        let parameters: Parameters = ["survey": survey.id, "claim": reason.id]
-        Surveys.shared.banSurvey(object: survey)
-        request(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default) { completion($0) }
-    }
-    
-    
-    
     
     public func getUserStats(user: Userprofile, completion: @escaping(Result<JSON, Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.USER_PROFILE_STATS) else { completion(.failure(APIError.invalidURL)); return }
         let parameters = ["userprofile_id": user.id]
         request(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
-    }
-    
-    public func loadSurveysByOwner(user: Userprofile, type: SurveyType, completion: @escaping(Result<JSON, Error>)->()) {
-        let parameters = ["userprofile_id": user.id]
-        request(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
     }
     
     public func subsribeToUser(subscribe: Bool, user: Userprofile, completion: @escaping(Result<JSON, Error>)->()) {
@@ -1157,10 +1043,10 @@ class API {
         public func getSubscriptions(for userprofile: Userprofile) async throws {
             guard let url = API_URLS.Profiles.subscribedFor else { throw APIError.invalidURL }
             //Exclude
-            let parameters: Parameters = ["ids": userprofile.subscriptions.map{ return $0.id}]
+            let parameters: Parameters = ["exclude_ids": userprofile.subscriptions.map{ return $0.id}]
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
                                                            DateFormatter.dateTimeFormatter,
@@ -1338,6 +1224,45 @@ class API {
             return parent.headers()
         }
         
+        //Get fullbody surveys
+        func getSurveys(type: SurveyType, parameters: Parameters? = nil) async throws -> Data {
+            guard let url = type.getURL() else { throw APIError.invalidURL }
+            
+            return try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+        }
+        
+        //Get fullbody by reference ID
+        @discardableResult
+        func getSurvey(byReference surveyReference: SurveyReference, incrementCounter: Bool = false) async throws -> Survey {
+            guard let url = API_URLS.Surveys.surveyById else { throw APIError.invalidURL }
+            
+            var parameters: Parameters = ["survey_id": surveyReference.id]
+            if incrementCounter {
+                parameters["add_view_count"] = true
+            }
+            
+            do {
+                let data = try await parent.requestAsync(url: url,
+                                                  httpMethod: .post,
+                                                  parameters: parameters,
+                                                  encoding: JSONEncoding.default,
+                                                  headers: parent.headers())
+                
+                let json = try JSON(data: data, options: .mutableContainers)
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                let instance = try decoder.decode(Survey.self, from: json.rawData())
+                guard let existing = Surveys.shared.all.filter({ $0 == instance }).first else {
+                    return instance
+                }
+                return existing
+            } catch let error {
+                throw error
+            }
+        }
+        
         public func reject(survey: Survey) async throws {
             guard let url = API_URLS.Surveys.reject else { throw APIError.invalidURL }
             var parameters: Parameters = ["survey": survey.id]
@@ -1346,7 +1271,7 @@ class API {
                 let rejectedList = Surveys.shared.rejected.map { $0.id }
                 let list = Array(Set(stackList + rejectedList))//Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
                 if !list.isEmpty {
-                    let dict = list.asParameters(arrayParametersKey: "ids")
+                    let dict = list.asParameters(arrayParametersKey: "exclude_ids")
                     parameters.merge(dict) {(current, _) in current}
                 }
             }
@@ -1374,8 +1299,9 @@ class API {
         }
         
         public func claim(surveyReference: SurveyReference, reason: Claim) async throws  {
-            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_CLAIM) else { throw APIError.notFound }
-            let parameters: Parameters = ["survey": surveyReference.id, "claim": reason.id]
+            guard let url = API_URLS.Surveys.claim else { throw APIError.invalidURL }
+            
+            let parameters: Parameters = ["survey_id": surveyReference.id, "claim_id": reason.id]
             
             do {
                 let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
@@ -1390,27 +1316,33 @@ class API {
             }
         }
         
-//        public func updateStats() async throws -> Data {
-//            guard let url = API_URLS.System.updateStats else { throw APIError.invalidURL }
-//            
-//            return try await parent.requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: parent.headers())
-//        }
-        
-        public func loadSurveys(type: SurveyType, parameters: Parameters? = nil) async throws -> Data{
-            return try await parent.requestAsync(url: type.getURL(), httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+        public func incrementViewCounter(surveyReference: SurveyReference) async throws {
+            guard let url = API_URLS.Surveys.incrementViews else { throw APIError.invalidURL }
+            
+            let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: ["survey_id": surveyReference.id], encoding: JSONEncoding.default, headers: parent.headers())
+            let json = try JSON(data: data, options: .mutableContainers)
+            if let value = json["views"].int {
+                await MainActor.run {
+                    surveyReference.survey?.views = value
+                }
+            } else if let error = json["views"].string {
+                throw error
+            } else {
+                throw "Unknown error"
+            }
         }
         
         public func surveyReferences(category: Survey.SurveyCategory, topic: Topic? = nil, userprofile: Userprofile? = nil) async throws {
             guard let url = category.url else { throw APIError.invalidURL }
             var parameters: Parameters!
             if category == .Topic, !topic.isNil {
-                parameters = ["ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
+                parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
                 parameters["category_id"] = topic?.id
             } else if category == .Userprofile, let userprofile = userprofile {
                 parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
                 parameters["userprofile_id"] = userprofile.id
             } else {
-                parameters  = ["ids": category.dataItems().map { $0.id }]
+                parameters  = ["exclude_ids": category.dataItems().map { $0.id }]
             }
             
             do {
@@ -1426,31 +1358,31 @@ class API {
             }
         }
         
-        public func loadSurveyReferences(_ category: Survey.SurveyCategory, _ topic: Topic? = nil, _ userprofile: Userprofile? = nil) async throws {
-            guard let url = category.url else { throw APIError.invalidURL }
-            var parameters: Parameters!
-            if category == .Topic, !topic.isNil {
-                parameters = ["ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
-                parameters["category_id"] = topic?.id
-            } else if category == .Userprofile, let userprofile = userprofile {
-                parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
-                parameters["userprofile_id"] = userprofile.id
-            } else {
-                parameters  = ["ids": category.dataItems().map { $0.id }]
-            }
-            
-            do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
-                try await MainActor.run {
-                    Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
-                }
-            } catch let error {
-    #if DEBUG
-                print(error)
-    #endif
-                throw error
-            }
-        }
+//        public func loadSurveyReferences(_ category: Survey.SurveyCategory, _ topic: Topic? = nil, _ userprofile: Userprofile? = nil) async throws {
+//            guard let url = category.url else { throw APIError.invalidURL }
+//            var parameters: Parameters!
+//            if category == .Topic, !topic.isNil {
+//                parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
+//                parameters["category_id"] = topic?.id
+//            } else if category == .Userprofile, let userprofile = userprofile {
+//                parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
+//                parameters["userprofile_id"] = userprofile.id
+//            } else {
+//                parameters  = ["exclude_ids": category.dataItems().map { $0.id }]
+//            }
+//            
+//            do {
+//                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+//                try await MainActor.run {
+//                    Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
+//                }
+//            } catch let error {
+//    #if DEBUG
+//                print(error)
+//    #endif
+//                throw error
+//            }
+//        }
         
         
         public func updateSurveyStats(_ instances: [SurveyReference]) async throws {
@@ -1488,22 +1420,20 @@ class API {
         func markFavoriteAsync(mark: Bool, surveyReference: SurveyReference) async throws -> Data {
             guard let url = mark ? API_URLS.Surveys.addFavorite : API_URLS.Surveys.removeFavorite else { throw APIError.invalidURL }
             
-            let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default, headers: parent.headers())
+            let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: ["survey_id": surveyReference.id], encoding: JSONEncoding.default, headers: parent.headers())
+            
             await MainActor.run {
                 surveyReference.isFavorite = mark
-//                if let survey = surveyReference.survey {
-//                    survey.isFavorite = mark
-//                }
             }
             return data
         }
         
         func search(substring: String, excludedIds: [Int]) async throws -> [SurveyReference] {
-            guard let url = API_URLS.Surveys.search else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.searchBySubstring else { throw APIError.invalidURL }
             var parameters: Parameters = ["substring": substring]
-            if !excludedIds.isEmpty { parameters["ids"] = excludedIds }
+            if !excludedIds.isEmpty { parameters["exclude_ids"] = excludedIds }
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
                                                            DateFormatter.dateTimeFormatter,
@@ -1676,10 +1606,10 @@ class API {
         public func getVoters(for answer: Answer) async throws -> Data {
             guard let url = API_URLS.Surveys.voters else { throw APIError.invalidURL }
             
-            let parameters: Parameters = ["survey": answer.surveyID, "answer": answer.id, "voters": answer.voters.map({ return $0.id })]
+            let parameters: Parameters = ["survey_id": answer.surveyID, "answer_id": answer.id, "exclude_ids": answer.voters.map({ return $0.id })]
             
             do {
-                return try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+                return try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
             } catch let error {
                 throw error
             }
