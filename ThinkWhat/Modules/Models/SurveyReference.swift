@@ -340,9 +340,6 @@ class SurveyReferences {
     private init() {}
     var all: [SurveyReference] = [] {
         didSet {
-            guard let lastInstance = all.last else { return }
-            
-//            lastInstance.id == 58
             //Remove
             if oldValue.count > all.count {
                 let oldSet = Set(oldValue)
@@ -358,10 +355,10 @@ class SurveyReferences {
                 let newSet = Set(all)
                 
                 let difference = newSet.symmetricDifference(oldSet)
-                difference.forEach {
-                    guard oldValue.contains($0), let index = all.lastIndex(of: $0) else {
+                difference.forEach { item in
+                    guard !oldValue.filter({ $0 == item }).isEmpty, let index = all.lastIndex(of: item) else {
                         //Notify
-                        NotificationCenter.default.post(name: Notifications.Surveys.Append, object: $0)
+                        NotificationCenter.default.post(name: Notifications.Surveys.Append, object: item)
                         return
                     }
                     //Duplicate removal

@@ -54,6 +54,7 @@ extension UIView {
 
 }
 
+//Get subview(s)
 extension UIView {
 
     class func getAllSubviews<T: UIView>(from parenView: UIView) -> [T] {
@@ -78,16 +79,83 @@ extension UIView {
     }
 
     func getAllSubviews<T: UIView>() -> [T] { return UIView.getAllSubviews(from: self) as [T] }
+    
     func get<T: UIView>(all type: T.Type) -> [T] { return UIView.getAllSubviews(from: self) as [T] }
+    
     func get(all types: [UIView.Type]) -> [UIView] { return UIView.getAllSubviews(from: self, types: types) }
+    
     func getSubview<T: UIView>(type: T.Type, identifier: String?) -> T? {
         return self.get(all: type).filter({ $0.accessibilityIdentifier == identifier }).first
     }
 }
 
-import Combine
-
+//UI
 extension UIView {
+    func blur(on: Bool, duration: TimeInterval, effectStyle: UIBlurEffect.Style, withAlphaComponent: Bool, animations: Closure?, completion: Closure?) {
+        switch on {
+        case true:
+            var effectView: UIVisualEffectView!
+            if let _effectView = self.getSubview(type: UIVisualEffectView.self, identifier: "blurView") {
+                effectView = _effectView
+            } else {
+                effectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
+                effectView.addEquallyTo(to: self)
+            }
+            effectView.effect = nil
+            effectView.accessibilityIdentifier = "blurView"
+            
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration,
+                                                           delay: 0,
+                                                           options: [.curveEaseInOut],
+                                                           animations: { [weak self] in
+                guard let self = self else { return }
+                
+                effectView.effect = UIBlurEffect(style: effectStyle)
+                if withAlphaComponent {
+                    self.alpha = 0
+                }
+                
+                guard let animations = animations else { return }
+                
+                animations()
+            }) {
+                _ in
+                
+                guard let completion = completion else { return }
+                
+                completion()
+            }
+        case false:
+            guard let effectView = self.getSubview(type: UIVisualEffectView.self, identifier: "blurView") else { return }
+            
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: duration,
+                                                           delay: 0,
+                                                           options: [.curveEaseInOut],
+                                                           animations: { [weak self] in
+                guard let self = self else { return }
+                
+                effectView.effect = nil
+                if withAlphaComponent {
+                    self.alpha = 1
+                }
+                
+                guard let animations = animations else { return }
+                
+                animations()
+            }) {
+                _ in
+                
+                effectView.removeFromSuperview()
+                
+                guard let completion = completion else { return }
+                
+                completion()
+            }
+        }
+    }
+}
+
+//extension UIView {
 //    func startShimmering() {
 //        
 //        var subscriptions = Set<AnyCancellable>()
@@ -126,4 +194,4 @@ extension UIView {
 //    func stopShimmeringEffect() {
 //            self.layer.mask = nil
 //    }
-}
+//}

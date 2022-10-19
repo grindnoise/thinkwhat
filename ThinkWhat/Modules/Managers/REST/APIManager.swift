@@ -13,12 +13,14 @@ import simd
 import CoreAudio
 
 class API {
-    static let shared = API()
+    static let shared   = API()
+    public let auth     = Auth()
     public let profiles = Profiles()
-    public let surveys = Polls()
+    public let surveys  = Polls()
     private init() {
         profiles.parent = self
         surveys.parent = self
+        auth.parent = self
 //        self.sessionManager.session.configuration.timeoutIntervalForRequest = 10
     }
     
@@ -983,6 +985,11 @@ class API {
         guard let url = API_URLS.Profiles.subscribe else { completion(.failure(APIError.invalidURL)); return }
         let parameters: Parameters = ["userprofile_id": user.id]
         request(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
+    }
+    
+    class Auth {
+        weak var parent: API! = nil
+        
     }
     
     class Profiles {

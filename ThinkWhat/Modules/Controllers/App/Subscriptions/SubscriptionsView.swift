@@ -159,6 +159,7 @@ class SubscriptionsView: UIView {
     private lazy var feedCollectionView: UserprofilesFeedCollectionView = {
         let instance = UserprofilesFeedCollectionView(userprofile: Userprofiles.shared.current!, mode: .Subscriptions)
         instance.alwaysBounceHorizontal = true
+//        instance.clipsToBounds = false
         instance.isDirectionalLockEnabled = true
         instance.userPublisher
             .sink { [weak self] in
@@ -207,6 +208,7 @@ class SubscriptionsView: UIView {
     //User view on selection
     private lazy var avatar: Avatar = {
         guard let userprofile = userprofile else { return Avatar() }
+        
         let instance = Avatar(userprofile: userprofile, isShadowed: true)
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         instance.alpha = 0
@@ -220,19 +222,74 @@ class SubscriptionsView: UIView {
         
         return instance
     }()
+    //Username
+    private lazy var usernameView: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "usernameView"
+        instance.addSubview(usernameStack)
+        
+        return instance
+    }()
+    private lazy var usernameStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [usernameLabel, notifyButton])
+        instance.axis = .horizontal
+        instance.spacing = 8
+        instance.accessibilityIdentifier = "usernameStack"
+        instance.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            instance.heightAnchor.constraint(equalTo: usernameLabel.heightAnchor)
+        ])
+        
+        return instance
+    }()
+    private lazy var usernameLabel: UILabel = {
+        let instance = UILabel()
+        instance.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title3)
+        instance.textAlignment = .center
+        
+        return instance
+    }()
+    private lazy var notifyButton: UIButton = {
+       let instance = UIButton()
+        instance.backgroundColor = .clear
+        instance.tintColor = K_COLOR_RED
+        
+        return instance
+    }()
+    private lazy var userStack: UIStackView = {
+        let opaque = UIView()
+        opaque.backgroundColor = .clear
+        
+        let instance = UIStackView(arrangedSubviews: [
+            usernameView,
+            opaque
+        ])
+        instance.axis = .vertical
+        instance.accessibilityIdentifier = "userStack"
+        
+        return instance
+    }()
     private lazy var userView: UIView = {
        let instance = UIView()
         instance.backgroundColor = .clear
         instance.alpha = 0
         instance.addEquallyTo(to: upperContainer)
+        instance.accessibilityIdentifier = "userView"
         
         instance.addSubview(avatar)
+        instance.addSubview(userStack)
         avatar.translatesAutoresizingMaskIntoConstraints = false
+        userStack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
+            avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 16),
             avatar.topAnchor.constraint(equalTo: instance.topAnchor),
             avatar.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            userStack.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 8),
+            userStack.topAnchor.constraint(equalTo: instance.topAnchor),
+            userStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            userStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
         ])
         
         return instance
@@ -267,8 +324,6 @@ class SubscriptionsView: UIView {
     @IBOutlet weak var upperContainer: UIView! {
         didSet {
             upperContainer.backgroundColor = .systemBackground
-//            upperContainer.alpha = 0
-//            verticalStack.addEquallyTo(to: upperContainer)
             feedCollectionView.addEquallyTo(to: upperContainer)
 //            feedCollectionView.translatesAutoresizingMaskIntoConstraints = false
 //            upperContainer.addSubview(feedCollectionView)
@@ -361,23 +416,120 @@ private extension SubscriptionsView {
     }
     
     func onUserSelected(userprofile: Userprofile) {
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+        guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell else { return }
+        
+        userView.setNeedsLayout()
+        avatar.userprofile = userprofile
+        usernameLabel.text = userprofile.name
+        usernameLabel.setConstraints()
+        notifyButton.setImage(UIImage(systemName: "bell.and.waves.left.and.right.fill",
+                                      withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),
+                              for: .normal)
+        userView.layoutIfNeeded()
+        
+        let temp = UIImageView(image: userprofile.image)
+        temp.contentMode = .scaleAspectFit
+        temp.frame = CGRect(origin: cell.convert(cell.avatar.frame.origin, to: upperContainer), size: cell.avatar.bounds.size)
+        temp.cornerRadius = cell.avatar.bounds.height/2
+        upperContainer.addSubview(temp)
+        cell.avatar.alpha = 0
+        
+        let destinationFrame = avatar.frame
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2,
+                                                       delay: 0,
+                                                       options: .curveEaseInOut,
+                                                       animations: { [weak self] in
             guard let self = self else { return }
             
-            self.userView.alpha = 1
-            self.avatar.alpha = 1
+            temp.frame = destinationFrame
+            temp.cornerRadius = destinationFrame.height/2
             self.feedCollectionView.alpha = 0
-            self.setNeedsLayout()
-            self.upperContainerHeightConstraint.constant += 20
-            self.layoutIfNeeded()
+            self.userView.alpha = 1
+        }) { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.avatar.alpha = 1
+            temp.removeFromSuperview()
         }
+        
+//        feedCollectionView.blur(on: true,
+//                                duration: 0.3,
+//                                effectStyle: .systemThickMaterial,
+//                                withAlphaComponent: true,
+//                                animations: { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.userView.alpha = 1
+//            self.feedCollectionView.alpha = 0
+//            self.setNeedsLayout()
+//            self.upperContainerHeightConstraint.constant += 20
+//            self.layoutIfNeeded()
+//        }) { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.avatar.alpha = 1
+//        }
+        
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.userView.alpha = 1
+//            self.avatar.alpha = 1
+//            self.feedCollectionView.alpha = 0
+//            self.setNeedsLayout()
+//            self.upperContainerHeightConstraint.constant += 20
+//            self.layoutIfNeeded()
+//        }
     }
 }
 
-// MARK: - Controller Output
 extension SubscriptionsView: SubsciptionsControllerOutput {
     func setDefaultFilter() {
+        guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell else { return }
+        
         surveysCollectionView.category = .Subscriptions
+        
+        let temp = UIImageView(image: userprofile.image)
+        temp.contentMode = .scaleAspectFit
+        temp.frame = avatar.frame
+        temp.cornerRadius = temp.bounds.height/2
+        upperContainer.addSubview(temp)
+        cell.avatar.alpha = 0
+        
+        let destinationFrame = CGRect(origin: cell.convert(cell.avatar.frame.origin, to: upperContainer),
+                                      size: cell.avatar.bounds.size)
+        avatar.alpha = 0
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
+                                                       delay: 0,
+                                                       options: .curveEaseInOut,
+                                                       animations: { [weak self] in
+            guard let self = self else { return }
+            
+            temp.frame = destinationFrame
+            temp.cornerRadius = cell.avatar.bounds.height/2
+            self.feedCollectionView.alpha = 1
+            self.userView.alpha = 0
+        }) { _ in
+            temp.removeFromSuperview()
+            cell.avatar.alpha = 1
+        }
+        
+//        feedCollectionView.blur(on: false,
+//                                duration: 0.3,
+//                                effectStyle: .systemChromeMaterial,
+//                                withAlphaComponent: true,
+//                                animations: { [weak self] in
+//            guard let self = self else { return }
+//
+//
+//            self.userView.alpha = 0
+//            self.feedCollectionView.alpha = 1
+//            self.setNeedsLayout()
+//            self.upperContainerHeightConstraint.constant -= 20
+//            self.layoutIfNeeded()
+//        }) {}
     }
     
     func setPeriod(_ period: Period) {

@@ -41,84 +41,12 @@ class SubscriptionsController: UIViewController {
             controllerOutput?.setPeriod(period)
             navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
             
-//            guard let button = barButton.getSubview(type: UIButton.self,
-//                                                    identifier: "button")
-//            else { return }
-//
-//            button.menu = prepareMenu()
-            setRightBarButton()
+            guard let button = navigationItem.rightBarButtonItem else { return }
+            
+            button.menu = prepareMenu()
         }
     }
     //UI
-    private lazy var gradient: CAGradientLayer = {
-        let instance = CAGradientLayer()
-        instance.type = .radial
-        instance.colors = getGradientColors()
-        instance.locations = [0, 0.5, 1.15]
-        instance.setIdentifier("radialGradient")
-        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
-        instance.endPoint = CGPoint(x: 1, y: 1)
-        instance.publisher(for: \.bounds)
-            .sink { rect in
-                instance.cornerRadius = rect.height/2
-            }
-            .store(in: &subscriptions)
-        
-        return instance
-    }()
-    private lazy var barButton: UIView = {
-        let instance = UIView()
-        instance.layer.masksToBounds = false
-        instance.clipsToBounds = false
-        instance.backgroundColor = .clear
-        instance.accessibilityIdentifier = "shadow"
-        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-        instance.layer.shadowRadius = 7
-        instance.layer.shadowOffset = .zero
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState).isActive = true
-        instance.layer.addSublayer(gradient)
-        instance.publisher(for: \.bounds, options: .new)
-            .sink { rect in
-                instance.layer.shadowPath = UIBezierPath(ovalIn: rect).cgPath
-                
-                guard rect != .zero,
-                      let layer = instance.layer.getSublayer(identifier: "radialGradient"),
-                      layer.bounds != rect
-                else { return }
-
-                layer.frame = rect
-            }
-            .store(in: &subscriptions)
-        
-        let button = UIButton()
-        button.menu = prepareMenu()
-        button.showsMenuAsPrimaryAction = true
-        button.publisher(for: \.bounds, options: .new)
-            .sink { [weak self] rect in
-                guard let self = self,
-                    self .mode == .Default
-                else { return }
-                
-                
-                button.cornerRadius = rect.height/2
-                let largeConfig = UIImage.SymbolConfiguration(pointSize: rect.height * 0.45, weight: .semibold, scale: .medium)
-                let image = UIImage(systemName: "ellipsis", withConfiguration: largeConfig)
-                button.setImage(image, for: .normal)
-            }
-            .store(in: &subscriptions)
-        
-        button.addTarget(self, action: #selector(self.onBarButtonTap), for: .touchUpInside)
-        button.accessibilityIdentifier = "button"
-        button.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//        button.imageView?.contentMode = .center
-        button.imageView?.tintColor = .white
-        button.addEquallyTo(to: instance)
-
-        return instance
-    }()
-    private var isBarButtonOn = true
     private var isOnScreen = true
     
     
@@ -144,19 +72,8 @@ class SubscriptionsController: UIViewController {
         super.viewWillAppear(animated)
         
         navigationController?.navigationBar.prefersLargeTitles = false
-        barButton.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
         controllerOutput?.onWillAppear()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        barButton.alpha = 0
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        gradient.colors = getGradientColors()
     }
 }
 
@@ -174,7 +91,11 @@ private extension SubscriptionsController {
     }
 
     func setupUI() {
-        setRightBarButton()
+        let rightButton = UIBarButtonItem(title: "actions".localized.capitalized,
+                                 image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                 primaryAction: nil,
+                                 menu: prepareMenu())
+        navigationItem.setRightBarButton(rightButton, animated: true)
         
 //        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         
@@ -194,14 +115,11 @@ private extension SubscriptionsController {
 //        ])
     }
     
-    func setRightBarButton() {
-        var button: UIBarButtonItem!
+    func setBarItems() {
+        
         switch mode {
         case .Default:
-            button = UIBarButtonItem(title: "actions".localized.capitalized,
-                                     image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                     primaryAction: nil,
-                                     menu: prepareMenu())
+            navigationItem.setLeftBarButton(nil, animated: true)
         case .Userprofile:
             let action = UIAction { [weak self] _ in
                 guard let self = self else { return }
@@ -209,21 +127,12 @@ private extension SubscriptionsController {
                 self.mode = .Default
             }
             
-            button = UIBarButtonItem(title: "actions".localized.capitalized,
+            let leftButton = UIBarButtonItem(title: "actions".localized.capitalized,
                                      image: UIImage(systemName: "arrow.left", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                      primaryAction: action,
                                      menu: nil)
+            navigationItem.setLeftBarButton(leftButton, animated: true)
         }
-        
-        navigationItem.setRightBarButton(button, animated: true)
-    }
-        
-    func getGradientColors() -> [CGColor] {
-        return [
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
-        ]
     }
     
     func prepareMenu() -> UIMenu {
@@ -326,15 +235,7 @@ private extension SubscriptionsController {
             controllerOutput?.setDefaultFilter()
         }
         
-        setRightBarButton()
-//        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
-//
-//        let largeConfig = UIImage.SymbolConfiguration(pointSize: button.bounds.height * 0.45,
-//                                                      weight: .semibold, scale: .medium)
-//        let image = UIImage(systemName: mode == .Userprofile ? "arrow.left" : "ellipsis",
-//                            withConfiguration: largeConfig)
-//        button.setImage(image, for: .normal)
-//        button.showsMenuAsPrimaryAction = mode == .Default
+        setBarItems()
         
         navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
     }

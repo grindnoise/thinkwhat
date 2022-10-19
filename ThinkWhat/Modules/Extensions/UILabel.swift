@@ -43,5 +43,44 @@ extension UILabel {
         let lineHeight = font.lineHeight
         return Int(ceil(textHeight / lineHeight))
     }
+    
+    func updateWidthConstraint(priority: UILayoutPriority = .required, height: CGFloat = CGFloat.greatestFiniteMagnitude) {
+        guard let text = self.text,
+              let font = self.font
+        else { return }
+        
+        let constraint = self.getConstraint(identifier: "width") ?? {
+            let instance = self.widthAnchor.constraint(equalToConstant: 0)
+            instance.identifier = "width"
+            instance.priority = priority
+            instance.isActive = true
+            
+            return instance
+        }()
+        
+        constraint.constant = text.width(withConstrainedHeight: height, font: font)
+    }
+    
+    func updateHeightConstraint(priority: UILayoutPriority = .required, width: CGFloat = CGFloat.greatestFiniteMagnitude) {
+        guard let text = self.text,
+              let font = self.font
+        else { return }
+        
+        let constraint = self.getConstraint(identifier: "height") ?? {
+            let instance = self.heightAnchor.constraint(equalToConstant: 0)
+            instance.identifier = "height"
+            instance.priority = priority
+            instance.isActive = true
+            
+            return instance
+        }()
+        
+        constraint.constant = text.height(withConstrainedWidth: width, font: font)
+    }
+    
+    func setConstraints(priority: UILayoutPriority = .required) {
+        self.updateHeightConstraint(priority: priority)
+        self.updateHeightConstraint(priority: priority)
+    }
 }
 
