@@ -55,4 +55,16 @@ extension SubscriptionsModel: SubsciptionsControllerInput {
             }
         }
     }
+    
+    func switchNotifications(userprofile: Userprofile, notify: Bool) {
+        Task {
+            do {
+                try await API.shared.profiles.switchNotifications(userprofile: userprofile, notify: notify)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
 }

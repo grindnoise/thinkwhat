@@ -1223,6 +1223,25 @@ class API {
                 throw error
             }
         }
+        
+        public func switchNotifications(userprofile: Userprofile, notify: Bool) async throws {
+            guard let url = API_URLS.Profiles.switchNotifications else { throw APIError.invalidURL }
+            
+            do {
+                try await parent.requestAsync(url: url,
+                                              httpMethod: .post,
+                                              parameters: [
+                                                "userprofile_id": userprofile.id,
+                                                "notify": notify
+                                              ],
+                                              encoding: JSONEncoding.default,
+                                              headers: parent.headers())
+                userprofile.notifyOnPublication = notify
+            } catch {
+                NotificationCenter.default.post(name: Notifications.Userprofiles.NotifyOnPublicationsFailure, object: userprofile)
+                throw error
+            }
+        }
     }
     
     class Polls {

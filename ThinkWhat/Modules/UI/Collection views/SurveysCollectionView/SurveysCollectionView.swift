@@ -72,14 +72,17 @@ class SurveysCollectionView: UICollectionView {
     private var tasks: [Task<Void, Never>?] = []
     private var source: UICollectionViewDiffableDataSource<Section, SurveyReference>!
     private var dataItems: [SurveyReference] {
+        var items: [SurveyReference] = []
         if category == .Userprofile, let userprofile = userprofile {
-            return category.dataItems(nil, userprofile)
+            items = category.dataItems(nil, userprofile)
         } else if category == .Topic, !topic.isNil {
-            return category.dataItems(topic)
+            items = category.dataItems(topic)
         } else if category == .Search {
-            return fetchResult
+            items = fetchResult
+        } else {
+            items = category.dataItems()
         }
-        return category.dataItems()
+        return items.uniqued().sorted { $0.startDate > $1.startDate }
     }
     
     private var loadingInProgress = false

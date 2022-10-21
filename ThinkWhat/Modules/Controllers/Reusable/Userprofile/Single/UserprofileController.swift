@@ -19,14 +19,14 @@ class UserprofileController: UIViewController {
     var controllerOutput: UserprofileControllerOutput?
     var controllerInput: UserprofileControllerInput?
     
-    //Logic
-    public let userprofile: Userprofile
     
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    //Logic
+    public let userprofile: Userprofile
     
     
     
@@ -44,8 +44,8 @@ class UserprofileController: UIViewController {
     
     
     // MARK: - Initialization
-    init(userpofile: Userprofile) {
-        self.userprofile = userpofile
+    init(userprofile: Userprofile) {
+        self.userprofile = userprofile
         
         super.init(nibName: nil, bundle: nil)
         

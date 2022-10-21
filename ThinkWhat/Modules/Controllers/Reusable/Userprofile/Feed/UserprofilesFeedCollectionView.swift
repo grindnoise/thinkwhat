@@ -25,6 +25,7 @@ class UserprofilesFeedCollectionView: UICollectionView {
     
     // MARK: - Public properties
     public let userPublisher = CurrentValueSubject<[Userprofile: IndexPath]?, Never>(nil)
+    public let footerPublisher = CurrentValueSubject<UserprofilesViewMode?, Never>(nil)
     
     
     
@@ -37,9 +38,13 @@ class UserprofilesFeedCollectionView: UICollectionView {
     private var dataItems: [Userprofile] {
         switch mode {
         case .Subscribers:
-            return userprofile.subscribers
+            var items = userprofile.subscribers
+            items.append(Userprofile.anonymous)
+            return items
         case .Subscriptions:
-            return userprofile.subscriptions
+            var items = userprofile.subscriptions
+            items.append(Userprofile.anonymous)
+            return items
         default:
             return []
         }
@@ -97,46 +102,12 @@ private extension UserprofilesFeedCollectionView {
     
     func setupUI() {
         alwaysBounceVertical = false
-//        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-//
-//            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
-//            layoutConfig.backgroundColor = .clear
-//            layoutConfig.showsSeparators = false
-//
-//            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-//            sectionLayout.orthogonalScrollingBehavior = .continuous
-//                sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//
-//
-//            return sectionLayout
-//        }
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-//            let item = NSCollectionLayoutItem(
-//                layoutSize: NSCollectionLayoutSize(
-//                    widthDimension: .fractionalWidth(1/5),
-//                    heightDimension: .fractionalWidth(1/5)))
-////            item.contentInsets = .init(horizontal: 0, vertical: 0)
-//
-//            let group = NSCollectionLayoutGroup.horizontal(
-//                layoutSize: NSCollectionLayoutSize(
-//                    widthDimension: .fractionalWidth(1),
-//                    heightDimension: .fractionalHeight(1)),
-//                subitem: item,
-//                count: 5)
-//
-//            let section = NSCollectionLayoutSection(group: group)
-//            section.contentInsets = .init(top: 10,
-//                                          leading: 0,
-//                                          bottom: 0,
-//                                          trailing: 0)
-//            section.orthogonalScrollingBehavior = .continuous
-//            return section
             
             let item = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
                     heightDimension: .fractionalHeight(1)))
-//                    heightDimension: .absolute(90)))
             item.contentInsets = .init(horizontal: 10, vertical: 5)
 
             let group = NSCollectionLayoutGroup.horizontal(
@@ -152,8 +123,33 @@ private extension UserprofilesFeedCollectionView {
                                           bottom: 5,
                                           trailing: 10)
             section.orthogonalScrollingBehavior = .continuous
+            
+//            let footerHeaderSize = NSCollectionLayoutSize(widthDimension: .absolute(90),
+//                                                          heightDimension: .absolute(90))
+//            let footer = NSCollectionLayoutBoundarySupplementaryItem(
+//                layoutSize: footerHeaderSize,
+//                elementKind: UICollectionView.elementKindSectionFooter,
+//                alignment: .trailing)
+//            section.boundarySupplementaryItems = [footer]
+            
             return section
         }
+        
+//        let footerRegistraition = UICollectionView.SupplementaryRegistration<UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionFooter) { supplementaryView, elementKind, indexPath in
+//
+//            var configuration = supplementaryView.defaultContentConfiguration()
+//            configuration.text = "All"
+//            configuration.textProperties.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline)!
+//            configuration.textProperties.color = .white
+//            configuration.textProperties.alignment = .center
+//            configuration.directionalLayoutMargins = .init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0)
+//
+//            var config = UIBackgroundConfiguration.listPlainCell()
+//            config.backgroundColor = .systemRed
+//            supplementaryView.backgroundConfiguration = config
+//            supplementaryView.contentConfiguration = configuration
+//            supplementaryView.automaticallyUpdatesContentConfiguration = false
+//        }
         
         let cellRegistration = UICollectionView.CellRegistration<UserprofileCell, Userprofile> { [unowned self] cell, indexPath, userprofile in
             cell.userprofile = userprofile
@@ -163,7 +159,15 @@ private extension UserprofilesFeedCollectionView {
                 .sink { [unowned self] in
                     guard let instance = $0 else { return }
                     
-                    self.userPublisher.send([userprofile: indexPath])
+                    self.userPublisher.send([instance: indexPath])
+                }
+                .store(in: &self.subscriptions)
+            
+            cell.footerPublisher
+                .sink { [unowned self] in
+                    guard !$0.isNil else { return }
+                    
+                    self.footerPublisher.send(self.mode)
                 }
                 .store(in: &self.subscriptions)
         }
@@ -173,6 +177,12 @@ private extension UserprofilesFeedCollectionView {
                                                  for: indexPath,
                                                  item: userprofile)
         }
+        
+//        source.supplementaryViewProvider = {
+//            collectionView, elementKind, indexPath -> UICollectionReusableView? in
+//
+//            return collectionView.dequeueConfiguredReusableSupplementary(using: footerRegistraition, for: indexPath)
+//        }
         
         var snap = Snapshot()
         snap.appendSections([.Main])

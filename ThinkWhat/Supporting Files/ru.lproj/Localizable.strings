@@ -158,6 +158,7 @@
 "per_week" = "неделю";
 "per_month" = "месяц";
 "all_time" = "все время";
+"cancel_subscription" = "Отказаться от подписки";
 
 //List VC
 "list" = "Лента";

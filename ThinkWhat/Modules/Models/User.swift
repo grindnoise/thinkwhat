@@ -149,7 +149,8 @@ class Userprofile: Decodable {
              topPublicationCategories = "top_pub_categories",
              wasEdited = "is_edited",
              balance = "credit",
-             subscribedAt = "subscribed_at"
+             subscribedAt = "subscribed_at",
+             notifyOnPublication = "notify_on_publication"
     }
     enum UserSurveyType {
         case Own, Favorite
@@ -417,6 +418,13 @@ class Userprofile: Decodable {
             
         }
     }
+    var notifyOnPublication: Bool? {
+        didSet {
+            guard oldValue != notifyOnPublication else { return }
+            
+            NotificationCenter.default.post(name: Notifications.Userprofiles.NotifyOnPublications, object: self)
+        }
+    }
 //    var contentLocales: [String] = []
     
     init?() {
@@ -480,6 +488,7 @@ class Userprofile: Decodable {
             wasEdited           = try container.decodeIfPresent(Bool.self, forKey: .wasEdited)
             isBanned            = try container.decode(Bool.self, forKey: .isBanned)
             subscribedAt        = try container.decode(Bool.self, forKey: .subscribedAt)
+            notifyOnPublication = try container.decodeIfPresent(Bool.self, forKey: .notifyOnPublication)
             gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
             ///City decoding
             if let cityInstance = try? container.decodeIfPresent(City.self, forKey: .city) {

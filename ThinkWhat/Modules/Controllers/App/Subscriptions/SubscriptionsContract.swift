@@ -26,6 +26,9 @@ protocol SubscriptionsViewInput: AnyObject {
     func share(_: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
     func setUserprofileFilter(_: Userprofile)
+    func onProfileButtonTapped(_: Userprofile)
+    func onUnsubscribeButtonTapped(_: Userprofile)
+    func onAllUsersTapped(mode: UserprofilesViewMode)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -38,6 +41,7 @@ protocol SubsciptionsControllerInput: AnyObject {
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(surveyReference: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
+    func switchNotifications(userprofile: Userprofile, notify: Bool)
 }
 
 /// *Model* returns the result to the *Controller*

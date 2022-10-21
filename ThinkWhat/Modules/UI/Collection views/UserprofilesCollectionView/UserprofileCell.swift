@@ -20,6 +20,9 @@ class UserprofileCell: UICollectionViewCell {
         didSet {
             guard let userprofile = userprofile else { return }
             
+            isFooter = userprofile == Userprofile.anonymous
+            guard !isFooter else { return }
+            
             avatar.userprofile = userprofile
             label.text = userprofile.firstNameSingleWord
         }
@@ -54,6 +57,7 @@ class UserprofileCell: UICollectionViewCell {
     //Publishers
     public var userPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public var selectionPublisher = CurrentValueSubject<[Userprofile: Bool]?, Never>(nil)
+    public var footerPublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     
     // MARK: - Private properties
@@ -62,6 +66,14 @@ class UserprofileCell: UICollectionViewCell {
     private var tasks: [Task<Void, Never>?] = []
     
     //UI
+    private var isFooter = false {
+        didSet {
+            guard isFooter else { return }
+            
+            footer.addEquallyTo(to: avatar)
+            label.text = ""
+        }
+    }
     private lazy var label: UILabel = {
        let instance = UILabel()
         instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: textStyle)
@@ -95,7 +107,56 @@ class UserprofileCell: UICollectionViewCell {
         
         return instance
     }()
-    
+//    private lazy var footer: UIView = {
+//        let instance = UIView()
+//        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_TABBAR
+//        instance.contentMode = .center
+//        instance.publisher(for: \.bounds)
+//            .sink { rect in
+//                instance.cornerRadius = rect.height / 2
+//            }
+//            .store(in: &subscriptions)
+//        let imageView = UIButton()
+//        imageView.tintColor = .white
+//        imageView.contentMode = .center
+//        imageView.publisher(for: \.bounds)
+//            .sink { rect in
+//                imageView.image = UIImage(systemName: "chevron.right",
+//                                         withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5,
+//                                                                                        weight: .semibold))
+//            }
+//            .store(in: &subscriptions)
+//        imageView.addEquallyTo(to: instance)
+//
+//        return instance
+//    }()
+    private lazy var footer: UIButton = {
+        let instance = UIButton()
+        instance.addTarget(self, action: #selector(self.onFooterTapped), for: .touchUpInside)
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_TABBAR
+        instance.contentMode = .center
+        instance.publisher(for: \.bounds)
+            .sink { rect in
+                instance.cornerRadius = rect.height / 2
+                instance.setImage(UIImage(systemName: "chevron.right",
+                                          withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5,
+                                                                                         weight: .semibold)),
+                                  for: .normal)
+            }
+            .store(in: &subscriptions)
+        instance.tintColor = .white
+//        instance.setImage(UIImage(systemName: "chevron.right"), for: .normal)
+//        instance.imageView?.contentMode = .center
+//        instance.imageView?.publisher(for: \.bounds)
+//            .sink { rect in
+//                instance.imageView?.image = UIImage(systemName: "chevron.right",
+//                                         withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.75,
+//                                                                                        weight: .semibold))
+//            }
+//            .store(in: &subscriptions)
+        
+        return instance
+    }()
     
     
     // MARK: - Deinitialization
@@ -133,6 +194,9 @@ class UserprofileCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
+        guard isFooter else { return }
+        
+        footer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_TABBAR
     }
     
     override func prepareForReuse() {
@@ -140,6 +204,7 @@ class UserprofileCell: UICollectionViewCell {
         
         userPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
         selectionPublisher = CurrentValueSubject<[Userprofile: Bool]?, Never>(nil)
+        footerPublisher = CurrentValueSubject<Bool?, Never>(nil)
     }
 }
 
@@ -170,6 +235,11 @@ private extension UserprofileCell {
     
     func updateUI() {
         label.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: textStyle)
+    }
+    
+    @objc
+    func onFooterTapped() {
+        footerPublisher.send(true)
     }
     
     func setTasks() {

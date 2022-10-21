@@ -27,6 +27,14 @@ class SubscriptionsController: UIViewController {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //Logic
+    private var userprofile: Userprofile? {
+        didSet {
+            guard !userprofile.isNil else { return }
+            
+            mode = .Userprofile
+            navigationItem.title = ""//userprofile.name
+        }
+    }
     private var mode: Mode = .Default {
         didSet {
             guard oldValue != mode else { return }
@@ -48,6 +56,16 @@ class SubscriptionsController: UIViewController {
     }
     //UI
     private var isOnScreen = true
+    private var isRightButtonSpinning = false {
+        didSet {
+            let spinner = UIActivityIndicatorView()
+            spinner.color = .label
+            spinner.style = .medium
+            spinner.startAnimating()
+            navigationItem.setRightBarButton(isRightButtonSpinning ? UIBarButtonItem(customView: spinner) : nil,
+                                             animated: true)
+        }
+    }
     
     
     // MARK: - Overridden properties
@@ -88,14 +106,41 @@ private extension SubscriptionsController {
                 self.isOnScreen = tab == .Subscriptions
             }
         })
+        
+        //On notifications switch server callback
+        tasks.append(Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
+                guard let self = self,
+                      self.mode == .Userprofile
+                else { return }
+                
+                self.isRightButtonSpinning = false
+                self.setBarItems()
+            }
+        })
+        
+        //On notifications switch server failure callback
+        tasks.append(Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublicationsFailure) {
+                guard let self = self else { return }
+                
+                showBanner(bannerDelegate: self,
+                           text: AppError.server.localizedDescription,
+                           content: UIImageView(
+                            image: UIImage(systemName: "exclamationmark.triangle.fill",
+                                           withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
+                           color: UIColor.white,
+                           textColor: .white,
+                           dismissAfter: 0.75,
+                           backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
+                self.isRightButtonSpinning = false
+                self.setBarItems()
+            }
+        })
     }
 
     func setupUI() {
-        let rightButton = UIBarButtonItem(title: "actions".localized.capitalized,
-                                 image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                 primaryAction: nil,
-                                 menu: prepareMenu())
-        navigationItem.setRightBarButton(rightButton, animated: true)
+        setBarItems()
         
 //        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         
@@ -116,11 +161,36 @@ private extension SubscriptionsController {
     }
     
     func setBarItems() {
+        guard !isRightButtonSpinning else { return }
+        
+        var rightButton: UIBarButtonItem!
         
         switch mode {
         case .Default:
+            rightButton = UIBarButtonItem(title: "actions".localized.capitalized,
+                                     image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                     primaryAction: nil,
+                                     menu: prepareMenu())
+            navigationItem.setRightBarButton(rightButton, animated: true)
             navigationItem.setLeftBarButton(nil, animated: true)
         case .Userprofile:
+            guard let userprofile = userprofile,
+                  let notify = userprofile.notifyOnPublication
+            else { return }
+            
+            let notifyAction = UIAction { [weak self] _ in
+                guard let self = self else { return }
+                
+                self.isRightButtonSpinning = true
+                self.controllerInput?.switchNotifications(userprofile: userprofile,
+                                                          notify: !notify)
+            }
+            
+            rightButton = UIBarButtonItem(title: nil,
+                                          image: UIImage(systemName: notify ? "bell.and.waves.left.and.right.fill" : "bell.slash.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .regular)),
+                                          primaryAction: notifyAction,
+                                          menu: nil)
+            
             let action = UIAction { [weak self] _ in
                 guard let self = self else { return }
                 
@@ -131,7 +201,9 @@ private extension SubscriptionsController {
                                      image: UIImage(systemName: "arrow.left", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                      primaryAction: action,
                                      menu: nil)
+            
             navigationItem.setLeftBarButton(leftButton, animated: true)
+            navigationItem.setRightBarButton(rightButton, animated: true)
         }
     }
     
@@ -242,13 +314,24 @@ private extension SubscriptionsController {
 }
 
 extension SubscriptionsController: SubscriptionsViewInput {
+    func onUnsubscribeButtonTapped(_: Userprofile) {
+        fatalError()
+    }
+    
+    func onProfileButtonTapped(_ userprofile: Userprofile) {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        
+        navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
+    }
+    
     func onDataSourceRequest(userprofile: Userprofile) {
         controllerInput?.onDataSourceRequest(source: .Userprofile, topic: nil, userprofile: userprofile)
     }
     
     func setUserprofileFilter(_ userprofile: Userprofile) {
-        mode = .Userprofile
-        navigationItem.title = userprofile.name
+        self.userprofile = userprofile
     }
     
     func share(_ surveyReference: SurveyReference) {
@@ -354,7 +437,14 @@ extension SubscriptionsController: SubscriptionsViewInput {
 //            self.isBarButtonOn = !self.isBarButtonOn
 //        }
 //    }
-    
+    func onAllUsersTapped(mode: UserprofilesViewMode) {
+        guard let userprofile = Userprofiles.shared.current else { return }
+        
+        let backItem = UIBarButtonItem()
+            backItem.title = ""
+            navigationItem.backBarButtonItem = backItem
+        navigationController?.pushViewController(UserprofilesController(mode:  mode, userprofile: userprofile), animated: true)
+    }
 }
 
 extension SubscriptionsController: SubsciptionsModelOutput {
@@ -366,5 +456,21 @@ extension SubscriptionsController: SubsciptionsModelOutput {
 extension SubscriptionsController: DataObservable {
     func onDataLoaded() {
         navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+}
+
+extension SubscriptionsController: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
     }
 }
