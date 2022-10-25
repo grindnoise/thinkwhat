@@ -1088,7 +1088,7 @@ class API {
         public func getSubscribers(for userprofile: Userprofile) async throws {
             guard let url = API_URLS.Profiles.subscribers else { throw APIError.invalidURL }
             //Exclude
-            let parameters: Parameters = ["ids": userprofile.subscribers.map{ return $0.id}]
+            let parameters: Parameters = ["exclude_ids": userprofile.subscribers.map{ return $0.id}]
             
             do {
                 let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())

@@ -181,11 +181,11 @@ class Avatar: UIView {
             guard oldValue != mode else { return }
                 
             if mode == .Selection {
-                button.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0) { [unowned self] in
-                    self.button.alpha = 1
-                    self.button.transform = .identity
-                }
+//                button.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+//                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0) { [unowned self] in
+//                    self.button.alpha = 1
+//                    self.button.transform = .identity
+//                }
             } else if mode == .Default, oldValue == .Selection {
                 UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, animations: { [unowned self] in
                     self.button.alpha = 0
@@ -275,10 +275,11 @@ class Avatar: UIView {
                 imageView.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
                 imageView.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
                 imageView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.85),
-                imageView.heightAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.85),
+//                imageView.heightAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.85),
             ])
         } else {
-            imageView.addEquallyTo(to: instance)
+//            imageView.addEquallyTo(to: instance)
+            imageView.layoutCentered(in: instance)
         }
         
         instance.publisher(for: \.bounds, options: .new)
@@ -291,12 +292,13 @@ class Avatar: UIView {
     }()
     public lazy var imageView: UIImageView = {
         let instance = UIImageView()
-        instance.contentMode = .scaleAspectFit
+        instance.contentMode = .scaleAspectFill
         instance.accessibilityIdentifier = "imageView"
         instance.layer.masksToBounds = true
         instance.backgroundColor = .clear//.systemGray2
         instance.isUserInteractionEnabled = true
         instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         
         if let userprofile = userprofile, let image = userprofile.image {
             instance.image = image
@@ -311,11 +313,11 @@ class Avatar: UIView {
             instance.cornerRadius = rect.height/2
             
             guard let self = self, self.userprofile == Userprofile.anonymous else {
-                instance.contentMode = .scaleAspectFit
+                instance.contentMode = .scaleAspectFill
                 return
             }
             
-            instance.contentMode = .scaleAspectFit
+            instance.contentMode = .scaleAspectFill
             instance.image = UIImage(named: "anon")
         }.store(in: &subscriptions)
         
@@ -497,7 +499,7 @@ class Avatar: UIView {
     
     private func setImage() {
         guard userprofile != Userprofile.anonymous else {
-            self.imageView.contentMode = .scaleAspectFit
+            self.imageView.contentMode = .scaleAspectFill
             self.imageView.image = UIImage(named: "anon")
             return
         }
@@ -509,7 +511,7 @@ class Avatar: UIView {
                 do {
                     let image = try await self.userprofile.downloadImageAsync()
                     await MainActor.run {
-                        self.imageView.contentMode = .scaleAspectFit
+                        self.imageView.contentMode = .scaleAspectFill
                     }
 
                     self.coloredBackground.stopShimmering()
@@ -531,7 +533,7 @@ class Avatar: UIView {
             guard let self = self else { return }
             self.coloredBackground.stopShimmering()
             self.imageView.image = image
-            self.imageView.contentMode = .scaleAspectFit
+            self.imageView.contentMode = .scaleAspectFill
         }
     }
     
@@ -592,6 +594,23 @@ class Avatar: UIView {
                                     withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
                                                                                      weight: .heavy)),
                               for: .normal)
+            
+            switch isSelected {
+            case true:
+                button.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                button.alpha = 0
+                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.1, delay: 0) { [unowned self] in
+                    self.button.alpha = 1
+                    self.button.transform = .identity
+                }
+            case false:
+                UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.1, delay: 0) { [unowned self] in
+                    self.button.alpha = 0
+                    self.button.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                }
+            }
+            
+
             selectionPublisher.send([userprofile: isSelected])
         default:
             tapPublisher.send(userprofile)

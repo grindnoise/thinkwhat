@@ -16,7 +16,13 @@ class UserprofileView: UIView {
     
     
     // MARK: - Public properties
-    weak var viewInput: UserprofileViewInput?
+    weak var viewInput: UserprofileViewInput? {
+        didSet {
+            guard let viewInput = viewInput else { return }
+            
+            collectionView.userprofile = viewInput.userprofile
+        }
+    }
     
     
     
@@ -24,6 +30,12 @@ class UserprofileView: UIView {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    //UI
+    private lazy var collectionView: UserprofileCollectionView = {
+        let instance = UserprofileCollectionView()
+        
+        return instance
+    }()
     
     
     
@@ -69,6 +81,7 @@ private extension UserprofileView {
     
     func setupUI() {
         backgroundColor = .systemBackground
+        collectionView.addEquallyTo(to: self)
     }
     
     func setTasks() {

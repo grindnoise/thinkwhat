@@ -15,6 +15,8 @@ class UserSettingsCollectionView: UICollectionView {
         case Credentials, City, Interests, SocialMedia, Stats, Management
     }
     
+    
+    
     // MARK: - Public properties
     //Publishers
     public let namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
@@ -37,12 +39,15 @@ class UserSettingsCollectionView: UICollectionView {
     public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
     
+    
+    
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    
     private var source: UICollectionViewDiffableDataSource<Section, Int>!
+    
+    
     
     // MARK: - Destructor
     deinit {
@@ -55,6 +60,8 @@ class UserSettingsCollectionView: UICollectionView {
 #endif
     }
     
+    
+    
     // MARK: - Initialization
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
@@ -64,6 +71,8 @@ class UserSettingsCollectionView: UICollectionView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    
     
     // MARK: - Private methods
     private func setupUI() {

@@ -28,7 +28,7 @@ class SurveysCollectionView: UICollectionView {
             }
 //            guard oldValue != category else { return }
             setDataSource(animatingDifferences: (category == .Topic || category == .Search) ? false : true)
-            guard !dataItems.isEmpty else { return }
+            guard !dataItems.isEmpty, !visibleCells.isEmpty else { return }
             scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         }
     }
@@ -59,12 +59,15 @@ class SurveysCollectionView: UICollectionView {
     public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var paginationPublisher = CurrentValueSubject<Survey.SurveyCategory?, Never>(nil)
     public var paginationByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
+    public var paginationByUserprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public var refreshPublisher = CurrentValueSubject<Survey.SurveyCategory?, Never>(nil)
     public var refreshByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
     public var refreshByUserprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public var rowPublisher = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var updateStatsPublisher = CurrentValueSubject<[SurveyReference]?, Never>(nil)
-    public var testSubject = PassthroughSubject<String, Never>()
+    public let subscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
+    public let unsubscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
+    public let userprofilePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -226,62 +229,76 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         }
     }
     
-    @objc
-    private func refresh() {
-        if category == .Topic, let topic = topic {
-            refreshByTopicPublisher.send(topic)
-        } else if category == .Userprofile, let userprofile = userprofile {
-            refreshByUserprofilePublisher.send(userprofile)
-        } else {
-            refreshPublisher.send(category)
-        }
-    }
-    
-    private func requestData() {
-        if category == .Topic {
-            paginationByTopicPublisher.send(topic)
-        } else {
-            paginationPublisher.send(category)
-        }
-    }
-    
-    @objc
-    private func onRemove(_ notification: Notification) {
-////        setDataSource()
-//        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
-//        var snapshot = source.snapshot()
-//        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
-//        snapshot.deleteItems([instance!])
-//        source.apply(snapshot, animatingDifferences: true)
-    }
-    
-//    @objc
-//    private func onPagination() {
-//        endRefreshing()
-//        appendToDataSource()
-//    }
-
-    private func appendToDataSource() {
-        var snapshot = source.snapshot()
-        guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }
-        snapshot.appendItems([newInstance], toSection: .main)
-        source.apply(snapshot, animatingDifferences: true)
-    }
-    
-    private func setDataSource(animatingDifferences: Bool = true) {
-        func filterByPeriod(_ items: [SurveyReference]) -> [SurveyReference] {
-            guard let date = period.date() else { return items }
-     
-            return items.filter {
-                $0.startDate >= date
-            }
-        }
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        guard !allowsMultipleSelection,
+              let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
+          else { return nil }
         
-        //TODO: Add filtering
-        var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(filterByPeriod(dataItems), toSection: .main)
-        source.apply(snapshot, animatingDifferences: animatingDifferences)
+        return UITargetedPreview(view: cell.avatar.imageView)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard !allowsMultipleSelection,
+              let indexPath = indexPaths.first,
+              let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
+        else { return nil }
+        
+        return UIContextMenuConfiguration(
+            identifier: "\(indexPath.row)" as NSString,
+            previewProvider: { self.makePreview(cell.avatar.userprofile) }) { _ in
+                
+                var actions: [UIAction]!
+                
+                let subscribe: UIAction = .init(title: "subscribe".localized.capitalized,
+                                             image: UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+                                             identifier: nil,
+                                             discoverabilityTitle: nil,
+                                              attributes: .init(),
+                                              state: .off,
+                                              handler: { [weak self] _ in
+                    guard let self = self,
+                          let userprofile = cell.avatar.userprofile
+                    else { return }
+                    
+                    self.subscribePublisher.send([userprofile])
+                })
+                
+                let unsubscribe: UIAction = .init(title: "unsubscribe".localized,
+                                                   image: UIImage(systemName: "hand.raised.slash.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+                                                   identifier: nil,
+                                                   discoverabilityTitle: nil,
+                                                   attributes: .destructive,
+                                                   state: .off,
+                                                   handler: { [weak self] _ in
+                    guard let self = self,
+                          let userprofile = cell.avatar.userprofile
+                    else { return }
+                    
+                    self.unsubscribePublisher.send([userprofile])
+                })
+                
+                let profile: UIAction = .init(title: "profile".localized,
+                                                   image: UIImage(systemName: "person.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+                                                   identifier: nil,
+                                                   discoverabilityTitle: nil,
+                                                   attributes: .init(),
+                                                   state: .off,
+                                                   handler: { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    self.userprofilePublisher.send([cell.avatar.userprofile])
+                })
+                
+                actions = [profile]
+                if cell.avatar.userprofile.subscribedAt {
+                    actions.append(unsubscribe)
+                } else {
+                    actions.append(subscribe)
+                }
+                
+                
+                return UIMenu(title: "", image: nil, identifier: nil, options: .init(), children: actions)
+            }
     }
 }
 
@@ -302,7 +319,6 @@ extension SurveysCollectionView: BannerObservable {
 }
 
 private extension SurveysCollectionView {
-    
     func setupUI() {
         
         Timer
@@ -499,7 +515,41 @@ private extension SurveysCollectionView {
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
                 self.loadingIndicator.stopAnimating()
-                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
+            }
+        })
+        
+        //By userprofile added
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.AppendReference) {
+                guard let self = self,
+                      self.category == .Userprofile,
+                      let userprofile = self.userprofile,
+                      let instance = notification.object as? SurveyReference,
+                      instance.owner == userprofile,
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.appendItems([instance], toSection: .main)
+                self.source.apply(snap, animatingDifferences: true)
+                self.loadingIndicator.stopAnimating()
+            }
+        })
+        
+        //By userprofile removed
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.RemoveReference) {
+                guard let self = self,
+                      self.category == .Userprofile,
+                      let userprofile = self.userprofile,
+                      let instance = notification.object as? SurveyReference,
+                      instance.owner == userprofile,
+                      self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.deleteItems([instance])
+                self.source.apply(snap, animatingDifferences: true)
             }
         })
         
@@ -565,7 +615,6 @@ private extension SurveysCollectionView {
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
                 self.loadingIndicator.stopAnimating()
-                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
         
@@ -580,8 +629,6 @@ private extension SurveysCollectionView {
                 var snap = self.source.snapshot()
                 snap.deleteItems([instance])
                 self.source.apply(snap, animatingDifferences: true)
-                
-                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
         
@@ -609,5 +656,79 @@ private extension SurveysCollectionView {
             .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
         ])
         refreshControl?.tintColor = refreshColor
+    }
+    
+    @objc
+    func refresh() {
+        if category == .Topic, let topic = topic {
+            refreshByTopicPublisher.send(topic)
+        } else if category == .Userprofile, let userprofile = userprofile {
+            refreshByUserprofilePublisher.send(userprofile)
+        } else {
+            refreshPublisher.send(category)
+        }
+    }
+    
+    func requestData() {
+        if category == .Topic, let topic = topic {
+            paginationByTopicPublisher.send(topic)
+        } else if category == .Userprofile, let userprofile = userprofile {
+            paginationByUserprofilePublisher.send(userprofile)
+        } else {
+            paginationPublisher.send(category)
+        }
+    }
+    
+    @objc
+    func onRemove(_ notification: Notification) {
+////        setDataSource()
+//        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
+//        var snapshot = source.snapshot()
+//        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
+//        snapshot.deleteItems([instance!])
+//        source.apply(snapshot, animatingDifferences: true)
+    }
+    
+//    @objc
+//    private func onPagination() {
+//        endRefreshing()
+//        appendToDataSource()
+//    }
+
+    func appendToDataSource() {
+        var snapshot = source.snapshot()
+        guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }
+        snapshot.appendItems([newInstance], toSection: .main)
+        source.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func setDataSource(animatingDifferences: Bool = true) {
+        func filterByPeriod(_ items: [SurveyReference]) -> [SurveyReference] {
+            guard category != .Userprofile else { return items }
+            guard let date = period.date() else { return items }
+     
+            return items.filter {
+                $0.startDate >= date
+            }
+        }
+        
+        //TODO: Add filtering
+        var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(filterByPeriod(dataItems), toSection: .main)
+        source.apply(snapshot, animatingDifferences: animatingDifferences)
+    }
+    
+    func makePreview(_ userprofile: Userprofile) -> UIViewController {
+        let viewController = UIViewController()
+        let imageView = UIImageView(image: userprofile.image)
+        imageView.contentMode = .scaleAspectFit
+        viewController.view = imageView
+        imageView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+//        imageView.translatesAutoresizingMaskIntoConstraints = false
+        viewController.preferredContentSize = imageView.frame.size
+//        viewController.view.cornerRadius = 50
+        
+        return viewController
     }
 }

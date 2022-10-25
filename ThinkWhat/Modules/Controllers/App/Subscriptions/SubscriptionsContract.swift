@@ -27,7 +27,7 @@ protocol SubscriptionsViewInput: AnyObject {
     func claim(surveyReference: SurveyReference, claim: Claim)
     func setUserprofileFilter(_: Userprofile)
     func onProfileButtonTapped(_: Userprofile)
-    func onUnsubscribeButtonTapped(_: Userprofile)
+    func unsubscribe(from: Userprofile)
     func onAllUsersTapped(mode: UserprofilesViewMode)
 }
 
@@ -42,6 +42,7 @@ protocol SubsciptionsControllerInput: AnyObject {
     func addFavorite(surveyReference: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
     func switchNotifications(userprofile: Userprofile, notify: Bool)
+    func unsubscribe(from: Userprofile)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -61,5 +62,5 @@ protocol SubsciptionsControllerOutput: AnyObject {
     func onWillAppear()
     func onRequestCompleted(_: Result<Bool, Error>)
     func setPeriod(_: Period)
-    func setDefaultFilter()
+    func setDefaultFilter(_: Closure?)
 }

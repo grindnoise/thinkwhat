@@ -15,7 +15,7 @@ protocol UserprofileViewInput: class {
     
     var controllerOutput: UserprofileControllerOutput? { get set }
     var controllerInput: UserprofileControllerInput? { get set }
-    
+    var userprofile: Userprofile { get }
     // View input methods here
 }
 

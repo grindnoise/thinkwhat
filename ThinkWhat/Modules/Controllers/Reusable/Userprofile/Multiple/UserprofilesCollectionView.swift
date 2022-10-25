@@ -363,11 +363,9 @@ private extension UserprofilesCollectionView {
         })
         //End refreshing
         tasks.append( Task {@MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersEmpty) {
+            for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersEmpty) {
                 guard let self = self,
-                      self.mode == .Subscribers,
-                      let instance = notification.object as? Userprofile,
-                      instance == self.userprofile
+                      self.mode == .Subscribers
                 else { return }
                 
                 self.endRefreshing()
@@ -375,11 +373,9 @@ private extension UserprofilesCollectionView {
             }
         })
         tasks.append( Task {@MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsEmpty) {
+            for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsEmpty) {
                 guard let self = self,
-                      self.mode == .Subscriptions,
-                      let instance = notification.object as? Userprofile,
-                      instance == self.userprofile
+                      self.mode == .Subscriptions
                 else { return }
                 
                 self.endRefreshing()

@@ -18,15 +18,14 @@ class UserprofileController: UIViewController {
     // MARK: - Public properties
     var controllerOutput: UserprofileControllerOutput?
     var controllerInput: UserprofileControllerInput?
-    
+    //Logic
+    public private(set) var userprofile: Userprofile
     
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    //Logic
-    public let userprofile: Userprofile
     
     
     

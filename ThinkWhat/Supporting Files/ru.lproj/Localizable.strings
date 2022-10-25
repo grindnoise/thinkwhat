@@ -94,6 +94,7 @@
 "half" = "Половина";
 "third" = "Треть";
 "back" = "Назад";
+"per" = "За";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";
@@ -159,6 +160,7 @@
 "per_month" = "месяц";
 "all_time" = "все время";
 "cancel_subscription" = "Отказаться от подписки";
+"zero_subscriptions" = "Вы ни на кого не подписаны";
 
 //List VC
 "list" = "Лента";
@@ -193,6 +195,7 @@
 //Subscribers VC
 "subscribers" = "Подписчики";
 "subscribed_for" = "Подписки";
+"subscribe" = "Подписаться";
 "unsubscribe" = "Отписаться";
 "unsubscribe_question" = "Вы уверены, что хотите отписаться?";
 

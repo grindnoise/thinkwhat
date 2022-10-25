@@ -94,6 +94,7 @@
 "half" = "Half";
 "third" = "Third";
 "back" = "Back";
+"per" = "Per";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";
@@ -159,6 +160,7 @@
 "per_month" = "month";
 "all_time" = "all time";
 "cancel_subscription" = "Cancel subscription";
+"zero_subscriptions" = "You haven't subscribed to anybody";
 
 //List VC
 "list" = "Feed";
@@ -193,6 +195,7 @@
 //Subscribers VC
 "subscribers" = "Subscribers";
 "subscribed_for" = "Subscribed for";
+"subscribe" = "subscribe";
 "unsubscribe" = "Unsubscribe";
 "unsubscribe_question" = "Are you sure to unsubscribe?";
 

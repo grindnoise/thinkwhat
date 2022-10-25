@@ -415,7 +415,11 @@ class Userprofile: Decodable {
     }
     var subscribedAt: Bool {
         didSet {
-            
+            guard oldValue != subscribedAt else { return }
+//
+//            ///Event emitted when user taps 'Subscribe/unsubscribe'
+//            NotificationCenter.default.post(name: subscribedAt ? Notifications.Userprofiles.Subscribed : Notifications.Userprofiles.Unsubscribed,
+//                                            object: self)
         }
     }
     var notifyOnPublication: Bool? {
@@ -429,13 +433,15 @@ class Userprofile: Decodable {
     
     init?() {
         guard let _id = UserDefaults.Profile.id,
-        let _firstName = UserDefaults.Profile.firstName,
-            let _lastName = UserDefaults.Profile.lastName,
-            let _email = UserDefaults.Profile.email,
-            let _gender = UserDefaults.Profile.gender,
-            let _isBanned = UserDefaults.Profile.isBanned else {
-                return nil
-            }
+              let _firstName = UserDefaults.Profile.firstName,
+              let _lastName = UserDefaults.Profile.lastName,
+              let _email = UserDefaults.Profile.email,
+              let _gender = UserDefaults.Profile.gender,
+              let _isBanned = UserDefaults.Profile.isBanned
+        else {
+            return nil
+        }
+        
         lastVisit   = Date()
         id          = _id
         firstName   = _firstName

@@ -32,7 +32,7 @@ class SubscriptionsController: UIViewController {
             guard !userprofile.isNil else { return }
             
             mode = .Userprofile
-            navigationItem.title = ""//userprofile.name
+//            navigationItem.title = ""//userprofile.name
         }
     }
     private var mode: Mode = .Default {
@@ -47,7 +47,7 @@ class SubscriptionsController: UIViewController {
             guard oldValue != period else { return }
             
             controllerOutput?.setPeriod(period)
-            navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
+            navigationItem.title = "subscriptions".localized + (period == .AllTime ? "" : " " + "per".localized.lowercased() + " \(period.rawValue.localized.lowercased())")
             
             guard let button = navigationItem.rightBarButtonItem else { return }
             
@@ -146,7 +146,7 @@ private extension SubscriptionsController {
         
 //        navigationItem.setRightBarButton(UIBarButtonItem(customView: barButton), animated: true)
         
-        navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
+        navigationItem.title = "subscriptions".localized + (period == .AllTime ? "" : "per".localized.lowercased() + " \(period.rawValue.localized.lowercased())")
 //        guard let navigationBar = self.navigationController?.navigationBar else { return }
         
 //        navigationBar.addSubview(barButton)
@@ -304,18 +304,24 @@ private extension SubscriptionsController {
     
     func onModeChanged() {
         if mode == .Default {
-            controllerOutput?.setDefaultFilter()
+            controllerOutput?.setDefaultFilter(nil)
         }
         
         setBarItems()
         
-        navigationItem.title = "subscriptions".localized + " (\(period.rawValue.localized.lowercased()))"
+        switch mode {
+        case .Userprofile:
+            guard let userprofile = userprofile else { return }
+            navigationItem.title = userprofile.name
+        case .Default:
+            navigationItem.title = "subscriptions".localized + (period == .AllTime ? "" : " " + "per".localized.lowercased() + " \(period.rawValue.localized.lowercased())")
+        }
     }
 }
 
 extension SubscriptionsController: SubscriptionsViewInput {
-    func onUnsubscribeButtonTapped(_: Userprofile) {
-        fatalError()
+    func unsubscribe(from userprofile: Userprofile) {
+        controllerInput?.unsubscribe(from: userprofile)
     }
     
     func onProfileButtonTapped(_ userprofile: Userprofile) {
@@ -324,6 +330,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
         
         navigationItem.backBarButtonItem = backItem
         navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
     func onDataSourceRequest(userprofile: Userprofile) {
@@ -416,6 +423,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem
         navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
     func onSubscpitionsTapped() {
@@ -444,6 +452,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem
         navigationController?.pushViewController(UserprofilesController(mode:  mode, userprofile: userprofile), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
 }
 

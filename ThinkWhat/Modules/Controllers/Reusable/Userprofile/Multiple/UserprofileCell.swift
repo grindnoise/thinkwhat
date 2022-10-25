@@ -91,14 +91,17 @@ class UserprofileCell: UICollectionViewCell {
         
         NSLayoutConstraint.activate([
             avatar.topAnchor.constraint(equalTo: instance.topAnchor),
-            avatar.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            avatar.widthAnchor.constraint(equalTo: instance.widthAnchor),
             avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor)
         ])
         
         return instance
     }()
     private lazy var stack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [avatarContainer, label])
+        let instance = UIStackView(arrangedSubviews: [
+            avatarContainer,
+            label
+        ])
         instance.axis = .vertical
         instance.spacing = 4
         
@@ -139,7 +142,7 @@ class UserprofileCell: UICollectionViewCell {
             .sink { rect in
                 instance.cornerRadius = rect.height / 2
                 instance.setImage(UIImage(systemName: "chevron.right",
-                                          withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5,
+                                          withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.4,
                                                                                          weight: .semibold)),
                                   for: .normal)
             }

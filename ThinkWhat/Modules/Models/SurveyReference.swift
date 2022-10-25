@@ -347,7 +347,7 @@ class SurveyReferences {
                 
                 let difference = oldSet.symmetricDifference(newSet)
                 difference.forEach {
-                    NotificationCenter.default.post(name: Notifications.Surveys.Remove, object: $0)
+                    NotificationCenter.default.post(name: Notifications.Surveys.RemoveReference, object: $0)
                 }
             } else {
             //Append
@@ -358,7 +358,7 @@ class SurveyReferences {
                 difference.forEach { item in
                     guard !oldValue.filter({ $0 == item }).isEmpty, let index = all.lastIndex(of: item) else {
                         //Notify
-                        NotificationCenter.default.post(name: Notifications.Surveys.Append, object: item)
+                        NotificationCenter.default.post(name: Notifications.Surveys.AppendReference, object: item)
                         return
                     }
                     //Duplicate removal

@@ -245,10 +245,14 @@ class SurveyCell: UICollectionViewListCell {
     public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-//    override var separatorLayoutGuide: UILayoutGuide = {
-//        return UILayoutGuide()
-//    }()
-    var shimmeringAnimatedItems: [UIView] = []
+    //UI
+    public private(set) lazy var avatar: Avatar = {
+        let instance = Avatar(isShadowed: true)
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        return instance
+    }()
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -357,11 +361,6 @@ class SurveyCell: UICollectionViewListCell {
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
         instance.textAlignment = .center
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        return instance
-    }()
-    private lazy var avatar: Avatar = {
-        let instance = Avatar(isShadowed: true)
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()
     private lazy var dateLabel: InsetLabel = {

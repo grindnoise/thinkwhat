@@ -26,6 +26,7 @@ class UserprofilesFeedCollectionView: UICollectionView {
     // MARK: - Public properties
     public let userPublisher = CurrentValueSubject<[Userprofile: IndexPath]?, Never>(nil)
     public let footerPublisher = CurrentValueSubject<UserprofilesViewMode?, Never>(nil)
+    public let dataItemsCountPublisher = CurrentValueSubject<Bool?, Never>(nil)
     
     
     
@@ -39,11 +40,15 @@ class UserprofilesFeedCollectionView: UICollectionView {
         switch mode {
         case .Subscribers:
             var items = userprofile.subscribers
-            items.append(Userprofile.anonymous)
+            if !items.isEmpty {
+                items.append(Userprofile.anonymous)
+            }
             return items
         case .Subscriptions:
             var items = userprofile.subscriptions
-            items.append(Userprofile.anonymous)
+            if !items.isEmpty {
+                items.append(Userprofile.anonymous)
+            }
             return items
         default:
             return []
@@ -88,7 +93,20 @@ class UserprofilesFeedCollectionView: UICollectionView {
     
     
     // MARK: - Public methods
-    
+    public func removeItem(_ userprofile: Userprofile) {
+        var snap = source.snapshot()
+        guard !snap.itemIdentifiers.filter({ $0 == userprofile }).isEmpty else { return }
+        
+        snap.deleteItems([userprofile])
+        if snap.itemIdentifiers.count == 1, let anon = snap.itemIdentifiers.filter({ $0 == Userprofile.anonymous }).first {
+            snap.deleteItems([anon])
+        }
+        source.apply(snap, animatingDifferences: true) { [weak self] in
+            guard let self = self else { return }
+
+            self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+        }
+    }
     
     
     // MARK: - Overridden methods
@@ -187,24 +205,32 @@ private extension UserprofilesFeedCollectionView {
         var snap = Snapshot()
         snap.appendSections([.Main])
         snap.appendItems(dataItems)
-        source.apply(snap)
+        source.apply(snap) { [weak self] in
+            guard let self = self else { return }
+
+            self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+        }
     }
     
     func setTasks() {
-//        tasks.append( Task {@MainActor [weak self] in
-//            for await notification in NotificationCenter.default.notifications(for: <# notification #>) {
-//                guard let self = self else { return }
-//
-//
-//            }
-//        })
-    }
-}
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
+                guard let self = self,
+                      let dict = notification.object as? [Userprofile: Userprofile],
+                      let owner = dict.keys.first,
+                      owner == self.userprofile,
+                      let userprofile = dict.values.first
+                else { return }
 
-extension UserprofilesFeedCollectionView: UIScrollViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView.contentOffset.y > 0 || scrollView.contentOffset.y < 0 {
-            scrollView.contentOffset.y = 0
-        }
+                var snap = self.source.snapshot()
+                guard snap.itemIdentifiers.filter({ $0 == userprofile }).isEmpty else { return }
+                snap.appendItems([userprofile])
+                self.source.apply(snap) { [weak self] in
+                    guard let self = self else { return }
+
+                    self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+                }
+            }
+        })
     }
 }
