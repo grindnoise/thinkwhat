@@ -175,9 +175,11 @@ private extension UserprofilesFeedCollectionView {
             cell.textStyle = .footnote
             cell.userPublisher
                 .sink { [unowned self] in
-                    guard let instance = $0 else { return }
+                    guard let instance = $0,
+                          let index = self.indexPath(for: cell)
+                    else { return }
                     
-                    self.userPublisher.send([instance: indexPath])
+                    self.userPublisher.send([instance: index])
                 }
                 .store(in: &self.subscriptions)
             

@@ -29,6 +29,8 @@ protocol SubscriptionsViewInput: AnyObject {
     func onProfileButtonTapped(_: Userprofile)
     func unsubscribe(from: Userprofile)
     func onAllUsersTapped(mode: UserprofilesViewMode)
+    func onSubcriptionsCountEvent(zeroSubscriptions: Bool)
+    func setDefaultMode()
 }
 
 /// *Controller* tells the *Model* what to do based on the input

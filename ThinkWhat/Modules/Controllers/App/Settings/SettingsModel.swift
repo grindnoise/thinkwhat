@@ -77,16 +77,12 @@ extension SettingsModel: SettingsControllerInput {
                 guard let array = json["geonames"].array,
                       !array.isEmpty
                 else {
-//                    await MainActor.run {
-                        NotificationCenter.default.post(name: Notifications.Cities.FetchResult, object: cities)
-//                    }
+                    NotificationCenter.default.post(name: Notifications.Cities.FetchResult, object: cities)
                     return
                 }
                 
                 guard let data = try json["geonames"].rawData() as? Data else {
-//                    await MainActor.run {
-                        NotificationCenter.default.post(name: Notifications.Cities.FetchError, object: nil)
-//                    }
+                    NotificationCenter.default.post(name: Notifications.Cities.FetchError, object: nil)
                     return
                 }
                 
@@ -98,25 +94,30 @@ extension SettingsModel: SettingsControllerInput {
                 instances.forEach { instance in
                     cities.append(Cities.shared.all.filter({ $0 == instance }).first ?? instance)
                 }
-//                await MainActor.run {
                     NotificationCenter.default.post(name: Notifications.Cities.FetchResult, object: cities)
-//                }
             } catch {
-//                await MainActor.run {
                     NotificationCenter.default.post(name: Notifications.Cities.FetchError, object: nil)
-//                }
             }
         }
     }
     
-    func saveCity(_ city: City) {
+    func saveCity(_ city: City, completion: @escaping (Bool) -> ()) {
         Task {
             do {
                 let data = try await GeoNamesWorker.getByGeonameId(city.geonameID)
                 
                 guard let dict = JSON(data).dictionaryObject else { return }
                 
-                city.id = try await API.shared.saveCity(dict)
+                let instance = try await API.shared.saveCity(dict)
+                city.id = instance.id
+                city.localized = instance.localized
+                city.countryID = instance.countryID
+                city.geonameID = instance.geonameID
+                city.countryName = instance.countryName
+                city.regionID = instance.regionID
+                city.regionName = instance.regionName
+                
+                completion(true)
             } catch {
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)

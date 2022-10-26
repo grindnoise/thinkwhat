@@ -233,12 +233,24 @@ class Userprofile: Decodable {
     var vkURL: URL?
     var city: City? {
         didSet {
-            if !city.isNil {
-                cityTitle = city!.localized ?? city!.name
+            guard let city = city else { return }
+            
+            guard let localized = city.localized else { return }
+            
+            guard !(localized.isEmpty ? city.name : localized).isEmpty else { return }
+            cityTitle = localized.isEmpty ? city.name : localized
+        }
+    }
+    var cityTitle: String = "" {
+        didSet {
+            guard oldValue != cityTitle else { return }
+            if self == Userprofiles.shared.current,
+               !cityTitle.isEmpty,
+               UserDefaults.Profile.city != cityTitle {
+                UserDefaults.Profile.city = cityTitle
             }
         }
     }
-    var cityTitle: String = ""
     var image: UIImage? {
         didSet {
             guard let imageData = image?.jpeg else { return }

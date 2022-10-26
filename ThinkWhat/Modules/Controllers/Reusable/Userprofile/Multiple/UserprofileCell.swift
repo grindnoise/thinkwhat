@@ -71,7 +71,7 @@ class UserprofileCell: UICollectionViewCell {
             guard isFooter else { return }
             
             footer.addEquallyTo(to: avatar)
-            label.text = ""
+            label.text = "all".localized
         }
     }
     private lazy var label: UILabel = {

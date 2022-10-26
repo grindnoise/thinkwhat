@@ -203,9 +203,11 @@ class UserSettingsCollectionView: UICollectionView {
             cell.backgroundConfiguration = backgroundConfig
 //            cell.accessories = [.outlineDisclosure(options:headerDisclosureOption)]
                         
-            guard let userprofile = Userprofiles.shared.current else { return }
+            guard let userprofile = Userprofiles.shared.current,
+                  let city = userprofile.city
+            else { return }
             
-            cell.cityTitle = userprofile.cityTitle
+            cell.city = city
         }
         
         let socialCellRegistration = UICollectionView.CellRegistration<UserSettingsSocialMediaCell, AnyHashable> { [unowned self] cell, indexPath, item in

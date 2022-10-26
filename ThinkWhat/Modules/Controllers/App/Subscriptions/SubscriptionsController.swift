@@ -160,7 +160,7 @@ private extension SubscriptionsController {
 //        ])
     }
     
-    func setBarItems() {
+    func setBarItems(zeroSubscriptions: Bool = false) {
         guard !isRightButtonSpinning else { return }
         
         var rightButton: UIBarButtonItem!
@@ -170,9 +170,10 @@ private extension SubscriptionsController {
             rightButton = UIBarButtonItem(title: "actions".localized.capitalized,
                                      image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                      primaryAction: nil,
-                                     menu: prepareMenu())
+                                          menu: prepareMenu(zeroSubscriptions: zeroSubscriptions))
             navigationItem.setRightBarButton(rightButton, animated: true)
             navigationItem.setLeftBarButton(nil, animated: true)
+            
         case .Userprofile:
             guard let userprofile = userprofile,
                   let notify = userprofile.notifyOnPublication
@@ -202,12 +203,16 @@ private extension SubscriptionsController {
                                      primaryAction: action,
                                      menu: nil)
             
-            navigationItem.setLeftBarButton(leftButton, animated: true)
-            navigationItem.setRightBarButton(rightButton, animated: true)
+            delayAsync(delay: 0.1) { [weak self] in
+                guard let self = self else { return }
+                
+                self.navigationItem.setLeftBarButton(leftButton, animated: true)
+                self.navigationItem.setRightBarButton(rightButton, animated: true)
+            }
         }
     }
     
-    func prepareMenu() -> UIMenu {
+    func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
         let perDay: UIAction = .init(title: Period.PerDay.rawValue.localized,
                                      image: nil,
                                      identifier: nil,
@@ -290,7 +295,12 @@ private extension SubscriptionsController {
             self.tabBarController?.setTabBarVisible(visible: false, animated: true)
         })
         
-        let children: [UIMenuElement] = [inlineMenu, filter]
+        var children: [UIMenuElement] = []
+        
+        if !zeroSubscriptions {
+            children.append(inlineMenu)
+        }
+        children.append(filter)
         
         return UIMenu(title: "", children: children)
     }
@@ -320,8 +330,17 @@ private extension SubscriptionsController {
 }
 
 extension SubscriptionsController: SubscriptionsViewInput {
+    func setDefaultMode() {
+        mode = .Default
+    }
+    
+    func onSubcriptionsCountEvent(zeroSubscriptions: Bool) {
+        setBarItems(zeroSubscriptions: zeroSubscriptions)
+    }
+    
     func unsubscribe(from userprofile: Userprofile) {
         controllerInput?.unsubscribe(from: userprofile)
+//        mode = .Default
     }
     
     func onProfileButtonTapped(_ userprofile: Userprofile) {

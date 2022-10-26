@@ -249,6 +249,9 @@ class SurveyCell: UICollectionViewListCell {
     public private(set) lazy var avatar: Avatar = {
         let instance = Avatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.isUserInteractionEnabled = true
+        instance.addInteraction(UIContextMenuInteraction(delegate: self))
+        
         return instance
     }()
     
@@ -340,14 +343,12 @@ class SurveyCell: UICollectionViewListCell {
         
         return instance
     }()
-    
     private lazy var viewsView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "eye.fill", withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.caption2, scale: .medium)))
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
         instance.contentMode = .center
         return instance
     }()
-    
     private lazy var commentsView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "bubble.right.fill", withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.caption2, scale: .medium)))
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
@@ -355,7 +356,6 @@ class SurveyCell: UICollectionViewListCell {
         
         return instance
     }()
-    
     @MainActor private lazy var commentsLabel: UILabel = {
         let instance = UILabel()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
@@ -552,9 +552,9 @@ class SurveyCell: UICollectionViewListCell {
         instance.backgroundColor = .clear
         instance.accessibilityIdentifier = "userView"
         instance.translatesAutoresizingMaskIntoConstraints = false
-        avatar.addEquallyTo(to: instance)
         instance.addSubview(firstnameLabel)
         instance.addSubview(lastnameLabel)
+        avatar.addEquallyTo(to: instance)
 
         firstnameLabel.translatesAutoresizingMaskIntoConstraints = false
         lastnameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -591,6 +591,7 @@ class SurveyCell: UICollectionViewListCell {
         instance.text = ""
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
         instance.accessibilityIdentifier = "lastnameLabel"
+        
         return instance
     }()
     private lazy var topicView: UIView = {
@@ -896,7 +897,7 @@ class SurveyCell: UICollectionViewListCell {
                         else { return }
 
                         progressLabel.text = String(describing: item.progress) + "%"
-                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
+                        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
                             self.progressView.setNeedsLayout()
                             constraint.constant = constraint.constant * CGFloat(item.progress)/100
                             self.progressView.layoutIfNeeded()
@@ -1200,3 +1201,151 @@ extension SurveyCell: CAAnimationDelegate {
         }
     }
 }
+
+extension SurveyCell: UIContextMenuInteractionDelegate {
+    
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        
+        if let sender = interaction.view as? Avatar {
+            
+            return UIContextMenuConfiguration(
+                identifier: nil,
+                previewProvider: { self.makePreview(sender.userprofile) } ) { [weak self] _ in
+                    guard let self = self else { return nil }
+                    
+                    return self.prepareMenu()
+                }
+        }
+        return nil
+    }
+    
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willDisplayMenuFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
+        
+        guard let window = UIApplication.shared.delegate?.window,
+              let instance = window!.viewByClassName(className: "_UIPlatterSoftShadowView")
+        else { return }
+        
+        instance.isHidden = true
+    }
+    
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configuration: UIContextMenuConfiguration, highlightPreviewForItemWithIdentifier identifier: NSCopying) -> UITargetedPreview? {
+        
+        if let sender = interaction.view as? Avatar {
+//            let previewTarget = UIPreviewTarget(container: self, center: sender.center)
+//            let previewParams = UIPreviewParameters()
+//            previewParams.backgroundColor = .clear
+//
+//            return UITargetedPreview(view: sender, parameters: previewParams, target: previewTarget)
+            let parameters = UIPreviewParameters()
+            parameters.backgroundColor = .clear
+//            parameters.shadowPath = .none
+//            parameters.visiblePath = .none
+            
+            let instance = UITargetedPreview(view: sender, parameters: parameters)
+//            instance.view.backgroundColor = .clear
+//            instance.target.container.backgroundColor = .clear
+            return instance
+        }
+        
+        return nil
+    }
+
+    func makePreview(_ userprofile: Userprofile) -> UIViewController {
+        let viewController = UIViewController()
+        let imageView = UIImageView(image: userprofile.image)
+        imageView.contentMode = .scaleAspectFit
+        viewController.view = imageView
+        imageView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    //        imageView.translatesAutoresizingMaskIntoConstraints = false
+        viewController.preferredContentSize = imageView.frame.size
+            viewController.view.cornerRadius = 50
+    
+        return viewController
+    }
+}
+
+//func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+//    guard !allowsMultipleSelection,
+//          let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
+//      else { return nil }
+//    
+//    return UITargetedPreview(view: cell.avatar.imageView)
+//}
+//
+//func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+//    guard !allowsMultipleSelection,
+//          let indexPath = indexPaths.first,
+//          let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
+//    else { return nil }
+//    
+//    return UIContextMenuConfiguration(
+//        identifier: "\(indexPath.row)" as NSString,
+//        previewProvider: { self.makePreview(cell.avatar.userprofile) }) { _ in
+//            
+//            var actions: [UIAction]!
+//            
+//            let subscribe: UIAction = .init(title: "subscribe".localized.capitalized,
+//                                         image: UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+//                                         identifier: nil,
+//                                         discoverabilityTitle: nil,
+//                                          attributes: .init(),
+//                                          state: .off,
+//                                          handler: { [weak self] _ in
+//                guard let self = self,
+//                      let userprofile = cell.avatar.userprofile
+//                else { return }
+//                
+//                self.subscribePublisher.send([userprofile])
+//            })
+//            
+//            let unsubscribe: UIAction = .init(title: "unsubscribe".localized,
+//                                               image: UIImage(systemName: "hand.raised.slash.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+//                                               identifier: nil,
+//                                               discoverabilityTitle: nil,
+//                                               attributes: .destructive,
+//                                               state: .off,
+//                                               handler: { [weak self] _ in
+//                guard let self = self,
+//                      let userprofile = cell.avatar.userprofile
+//                else { return }
+//                
+//                self.unsubscribePublisher.send([userprofile])
+//            })
+//            
+//            let profile: UIAction = .init(title: "profile".localized,
+//                                               image: UIImage(systemName: "person.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+//                                               identifier: nil,
+//                                               discoverabilityTitle: nil,
+//                                               attributes: .init(),
+//                                               state: .off,
+//                                               handler: { [weak self] _ in
+//                guard let self = self else { return }
+//                
+//                self.userprofilePublisher.send([cell.avatar.userprofile])
+//            })
+//            
+//            actions = [profile]
+//            if cell.avatar.userprofile.subscribedAt {
+//                actions.append(unsubscribe)
+//            } else {
+//                actions.append(subscribe)
+//            }
+//            
+//            
+//            return UIMenu(title: "", image: nil, identifier: nil, options: .init(), children: actions)
+//        }
+//}
+
+//func makePreview(_ userprofile: Userprofile) -> UIViewController {
+//    let viewController = UIViewController()
+//    let imageView = UIImageView(image: userprofile.image)
+//    imageView.contentMode = .scaleAspectFit
+//    viewController.view = imageView
+//    imageView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+////        imageView.translatesAutoresizingMaskIntoConstraints = false
+//    viewController.preferredContentSize = imageView.frame.size
+////        viewController.view.cornerRadius = 50
+//
+//    return viewController
+//}
+

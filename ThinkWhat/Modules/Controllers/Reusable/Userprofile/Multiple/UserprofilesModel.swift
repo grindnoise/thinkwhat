@@ -42,12 +42,12 @@ extension UserprofilesModel: UserprofilesControllerInput {
     func unsubscribe(from userprofiles: [Userprofile]) {
         Task {
             do {
-                        try await API.shared.profiles.unsubscribe(from: userprofiles)
-                    } catch {
+                try await API.shared.profiles.unsubscribe(from: userprofiles)
+            } catch {
 #if DEBUG
-                        error.printLocalized(class: type(of: self), functionName: #function)
+                error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-                }
+            }
         }
     }
     

@@ -45,6 +45,7 @@
                                             </constraints>
                                         </imageView>
                                     </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </stackView>
                             </subviews>
                             <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
@@ -56,7 +57,7 @@
                             </constraints>
                         </view>
                     </subviews>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstItem="iwD-jd-JYK" firstAttribute="leading" secondItem="Meq-Zj-G0I" secondAttribute="leading" id="DYk-af-CFF"/>
                         <constraint firstItem="iwD-jd-JYK" firstAttribute="top" secondItem="Meq-Zj-G0I" secondAttribute="top" id="Zzp-iY-QNp"/>

@@ -69,13 +69,8 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
         instance.menu = prepareMenu()
         
         if #available(iOS 15, *) {
-            let attrString = AttributedString("TEST", attributes: AttributeContainer([
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.label
-            ]))
             var config = UIButton.Configuration.filled()
             config.cornerStyle = .medium
-            config.attributedTitle = attrString
             config.image = UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
             config.imagePlacement = .trailing
             config.imagePadding = 6
@@ -83,6 +78,12 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
             config.contentInsets.trailing = 4
             config.contentInsets.top = 2
             config.contentInsets.bottom = 2
+            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                var outcoming = incoming
+                outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline)
+                outcoming.foregroundColor = UIColor.label
+                return outcoming
+            }
             config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
                 guard let self = self else { return .systemGray }
 
@@ -563,18 +564,18 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
         if #available(iOS 15, *) {
             if !genderButton.configuration.isNil {
                 genderButton.configuration!.image = UIImage(systemName: userprofile.gender == .Male ? "mustache.fill" : "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
-                
-                let attrString = AttributedString(userprofile.gender.rawValue.localized.capitalized, attributes: AttributeContainer([
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.label
-                ]))
-                if animated {
-                    UIView.transition(with: genderButton, duration: 0.1, options: .transitionCrossDissolve) {
-                        self.genderButton.configuration!.attributedTitle = attrString
-                    }
-                }else {
-                    genderButton.configuration!.attributedTitle = attrString
-                }
+                genderButton.configuration!.title = "gender".localized.capitalized + ": " + userprofile.gender.rawValue.localized.lowercased()
+//                let attrString = AttributedString(userprofile.gender.rawValue.localized.capitalized, attributes: AttributeContainer([
+//                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+//                    NSAttributedString.Key.foregroundColor: UIColor.label
+//                ]))
+//                if animated {
+//                    UIView.transition(with: genderButton, duration: 0.1, options: .transitionCrossDissolve) {
+//                        self.genderButton.configuration!.attributedTitle = attrString
+//                    }
+//                }else {
+//                    genderButton.configuration!.attributedTitle = attrString
+//                }
             }
         } else {
             genderButton.setImage(UIImage(systemName: userprofile.gender == .Male ? "mustache.fill" : "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)

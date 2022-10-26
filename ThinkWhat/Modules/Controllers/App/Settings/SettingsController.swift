@@ -330,9 +330,13 @@ extension SettingsController: SettingsViewInput {
     }
     
     func updateCity(_ instance: City) {
-        controllerInput?.saveCity(instance)
-        let parameters = API.prepareUserData(city: instance)
-        controllerInput?.updateUserprofile(parameters: parameters, image: nil)
+        controllerInput?.saveCity(instance) { [weak self] _ in
+            Userprofiles.shared.current?.city = instance
+//            guard let self = self else { return }
+//
+//            let parameters = API.prepareUserData(city: instance)
+//            self.controllerInput?.updateUserprofile(parameters: parameters, image: nil)
+        }
     }
     
     func onSocialTapped(_ url: URL) {

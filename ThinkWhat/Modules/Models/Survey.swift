@@ -28,7 +28,8 @@ class Survey: Decodable {
             case .Favorite:
                 return SurveyReferences.shared.all.filter { $0.isFavorite && !$0.isClaimed && !$0.isBanned }
             case .Subscriptions:
-                return Surveys.shared.subscriptions.filter { !$0.isClaimed && !$0.isBanned }
+                return SurveyReferences.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned }
+//                return Surveys.shared.subscriptions.filter { !$0.isClaimed && !$0.isBanned }
             case .All:
                 return SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned }
             case .Topic:

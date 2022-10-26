@@ -28,7 +28,11 @@ extension UserDefaults {
         static var email: String?
         
         @UserDefault(key: "city", defaultValue: "")
-        static var city: String
+        static var city: String {
+            didSet {
+                print(city)
+            }
+        }
         
         @UserDefault(key: "image_path", defaultValue: nil)
         static var imagePath: String?

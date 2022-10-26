@@ -29,6 +29,7 @@
 "add_pseudonym" = "Enter pseudonym";
 
 //Common
+"all" = "All";
 "title" = "Title";
 "caption" = "Caption";
 "ok" = "Ok";

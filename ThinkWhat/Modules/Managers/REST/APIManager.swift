@@ -2194,14 +2194,19 @@ class API {
 
 extension API {
     ///Return city `id`
-    public func saveCity(_ parameters: Parameters) async throws -> Int {
+    public func saveCity(_ parameters: Parameters) async throws -> City {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CREATE_CITY) else {
             throw APIError.notFound
         }
         do {
             let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers())
-            guard let id = try JSON(data: data, options: .mutableContainers)["id"].int else { throw "City id error" }
-            return id
+            
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                       DateFormatter.dateTimeFormatter,
+                                                       DateFormatter.dateFormatter ]
+            return try decoder.decode(City.self, from: data)
+//            guard let id = try JSON(data: data, options: .mutableContainers)["id"].int else { throw "City id error" }
         } catch let error {
             throw error
         }

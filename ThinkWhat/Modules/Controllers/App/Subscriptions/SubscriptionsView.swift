@@ -192,6 +192,7 @@ class SubscriptionsView: UIView {
                       let indexPath = dict.values.first
                 else { return }
                 
+                
                 self.indexPath = indexPath
                 self.userprofile = userprofile
             }
@@ -213,6 +214,7 @@ class SubscriptionsView: UIView {
                       let isEmpty = $0
                 else { return }
                 
+                self.viewInput?.onSubcriptionsCountEvent(zeroSubscriptions: isEmpty)
                 switch isEmpty {
                 case true:
                     self.subscriptionsLabel.addEquallyTo(to: self.upperContainer)
@@ -277,41 +279,6 @@ class SubscriptionsView: UIView {
         
         return instance
     }()
-//    //Username
-//    private lazy var usernameView: UIView = {
-//        let instance = UIView()
-//        instance.backgroundColor = .clear
-//        instance.accessibilityIdentifier = "usernameView"
-//        instance.addSubview(usernameStack)
-//
-//        return instance
-//    }()
-//    private lazy var usernameStack: UIStackView = {
-//        let instance = UIStackView(arrangedSubviews: [usernameLabel])//, notifyButton])
-//        instance.axis = .horizontal
-//        instance.spacing = 8
-//        instance.accessibilityIdentifier = "usernameStack"
-//        instance.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            instance.heightAnchor.constraint(equalTo: usernameLabel.heightAnchor)
-//        ])
-//
-//        return instance
-//    }()
-//    private lazy var usernameLabel: UILabel = {
-//        let instance = UILabel()
-//        instance.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title1)
-//        instance.textAlignment = .center
-//
-//        return instance
-//    }()
-//    private lazy var notifyButton: UIButton = {
-//       let instance = UIButton()
-//        instance.backgroundColor = .clear
-//        instance.tintColor = K_COLOR_TABBAR
-//
-//        return instance
-//    }()
     private lazy var profileButton: UIButton = {
         let instance = UIButton()
         instance.addTarget(self, action: #selector(self.onProfileButtonTapped), for: .touchUpInside)
@@ -580,6 +547,7 @@ private extension SubscriptionsView {
                     guard let self = self else { return }
                     
                     self.subscriptionButton.isUserInteractionEnabled = true
+                    self.viewInput?.setDefaultMode()
                     if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
                         self.subscriptionButton.configuration!.showsActivityIndicator = false
                     } else {
@@ -635,7 +603,7 @@ private extension SubscriptionsView {
         
         let destinationFrame = avatar.frame
         
-        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2,
+        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
                                                        delay: 0,
                                                        options: .curveEaseInOut,
                                                        animations: { [weak self] in
@@ -647,7 +615,7 @@ private extension SubscriptionsView {
             self.userView.alpha = 1
         }) { [weak self] _ in
             guard let self = self else { return }
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, animations: {
+            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
                 self.avatar.alpha = 1
             }) { _ in
                 temp.removeFromSuperview()
@@ -700,14 +668,15 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
         temp.contentMode = .scaleAspectFill
         temp.frame = avatar.frame
         temp.cornerRadius = temp.bounds.height/2
+        avatar.alpha = 0
         upperContainer.addSubview(temp)
         cell.avatar.alpha = 0
         
         let destinationFrame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: upperContainer),
                                       size: cell.avatar.imageView.bounds.size)
-        avatar.alpha = 0
         
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2,
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
                                                        delay: 0,
                                                        options: .curveEaseInOut,
                                                        animations: { [weak self] in
@@ -718,7 +687,7 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
             self.feedCollectionView.alpha = 1
             self.userView.alpha = 0
         }) { _ in
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, animations: {
+            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
                 cell.avatar.alpha = 1
             }) { _ in
                 temp.removeFromSuperview()

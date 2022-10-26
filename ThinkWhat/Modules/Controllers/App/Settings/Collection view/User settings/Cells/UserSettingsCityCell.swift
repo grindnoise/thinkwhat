@@ -12,27 +12,33 @@ import Combine
 class UserSettingsCityCell: UICollectionViewListCell {
     
     // MARK: - Public properties
-    public var cityTitle: String = "" {
+    public weak var city: City! {
         didSet {
-            guard cityTitle != oldValue else { return }
-
-            textField.text = cityTitle
+            guard let city = city else { return }
+            
+            guard let localized = city.localized,
+                  !localized.isEmpty
+            else {
+                textField.text = city.name
+                return
+            }
+            textField.text = localized
         }
     }
     //Publishers
-    public let citySelectionPublisher = CurrentValueSubject<City?, Never>(nil)
-    public let cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
+    public var citySelectionPublisher = CurrentValueSubject<City?, Never>(nil)
+    public var cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
     
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    private var city: City? = nil {
+    private var selectedCity: City? = nil {
         didSet {
-            guard let city = city else { return }
+            guard let selectedCity = selectedCity else { return }
             
-            citySelectionPublisher.send(city)
+            citySelectionPublisher.send(selectedCity)
             endEditing(true)
         }
     }
@@ -40,7 +46,6 @@ class UserSettingsCityCell: UICollectionViewListCell {
     private let padding: CGFloat = 8
     private lazy var textField: UnderlinedSearchTextField = {
         let instance = UnderlinedSearchTextField()
-        instance.text = cityTitle
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
         instance.indicator.color = UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
@@ -67,9 +72,9 @@ class UserSettingsCityCell: UICollectionViewListCell {
             
             instance.text = item[itemPosition].title
             
-            guard let city = item[itemPosition].attachment as? City else { return }
+            guard let selectedCity = item[itemPosition].attachment as? City else { return }
             
-            self.city = city
+            self.selectedCity = selectedCity
         }
         instance.addTarget(self, action: #selector(self.handleIO(_:)), for: .editingChanged)
         instance.delegate = self
@@ -161,7 +166,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
     
     private func processResults(_ cities: [City]) {
         let items: [SearchTextFieldItem] = cities.map { return SearchTextFieldItem(title: $0.name,
-                                                                                   subtitle: "\(String(describing: $0.regionName)), \(String(describing: $0.countryName))",
+                                                                                   subtitle: (!$0.regionName.isNil && !$0.countryName.isNil) ?  "\(String(describing: $0.regionName!)), \(String(describing: $0.countryName!))" : "",
                                                                                    image: nil,
                                                                                    attachment: $0)}
         textField.filterItems(items)
@@ -176,6 +181,13 @@ class UserSettingsCityCell: UICollectionViewListCell {
         super.traitCollectionDidChange(previousTraitCollection)
         tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        citySelectionPublisher = CurrentValueSubject<City?, Never>(nil)
+        cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
     }
 }
 
@@ -194,12 +206,12 @@ extension UserSettingsCityCell: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        guard let city = city else {
-            textField.text = cityTitle
+        guard let selectedCity = selectedCity else {
+            textField.text = city.localized ?? city.name
             return
         }
 
-        textField.text = city.name
+        textField.text = selectedCity.name
     }
 }
 

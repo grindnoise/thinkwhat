@@ -32,8 +32,8 @@ class City: Decodable {
     var geonameID: Int
     var countryID: Int?
     var regionID: Int?
-    var countryName: String
-    var regionName: String
+    var countryName: String?
+    var regionName: String?
     
     required init(from decoder: Decoder) throws {
         do {
@@ -50,8 +50,8 @@ class City: Decodable {
             localized       = try container.decodeIfPresent(String.self, forKey: .localized)
             countryID       = try container.decodeIfPresent(Int.self, forKey: .countryID)
             regionID        = try container.decodeIfPresent(Int.self, forKey: .regionID)
-            countryName     = try container.decode(String.self, forKey: .countryName)
-            regionName      = try container.decode(String.self, forKey: .regionName)
+            countryName     = try container.decodeIfPresent(String.self, forKey: .countryName)
+            regionName      = try container.decodeIfPresent(String.self, forKey: .regionName)
             if Cities.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 Cities.shared.all.append(self)
             }

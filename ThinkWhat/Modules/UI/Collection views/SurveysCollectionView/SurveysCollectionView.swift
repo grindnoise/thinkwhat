@@ -229,77 +229,77 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
-        guard !allowsMultipleSelection,
-              let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
-          else { return nil }
-        
-        return UITargetedPreview(view: cell.avatar.imageView)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        guard !allowsMultipleSelection,
-              let indexPath = indexPaths.first,
-              let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
-        else { return nil }
-        
-        return UIContextMenuConfiguration(
-            identifier: "\(indexPath.row)" as NSString,
-            previewProvider: { self.makePreview(cell.avatar.userprofile) }) { _ in
-                
-                var actions: [UIAction]!
-                
-                let subscribe: UIAction = .init(title: "subscribe".localized.capitalized,
-                                             image: UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-                                             identifier: nil,
-                                             discoverabilityTitle: nil,
-                                              attributes: .init(),
-                                              state: .off,
-                                              handler: { [weak self] _ in
-                    guard let self = self,
-                          let userprofile = cell.avatar.userprofile
-                    else { return }
-                    
-                    self.subscribePublisher.send([userprofile])
-                })
-                
-                let unsubscribe: UIAction = .init(title: "unsubscribe".localized,
-                                                   image: UIImage(systemName: "hand.raised.slash.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-                                                   identifier: nil,
-                                                   discoverabilityTitle: nil,
-                                                   attributes: .destructive,
-                                                   state: .off,
-                                                   handler: { [weak self] _ in
-                    guard let self = self,
-                          let userprofile = cell.avatar.userprofile
-                    else { return }
-                    
-                    self.unsubscribePublisher.send([userprofile])
-                })
-                
-                let profile: UIAction = .init(title: "profile".localized,
-                                                   image: UIImage(systemName: "person.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-                                                   identifier: nil,
-                                                   discoverabilityTitle: nil,
-                                                   attributes: .init(),
-                                                   state: .off,
-                                                   handler: { [weak self] _ in
-                    guard let self = self else { return }
-                    
-                    self.userprofilePublisher.send([cell.avatar.userprofile])
-                })
-                
-                actions = [profile]
-                if cell.avatar.userprofile.subscribedAt {
-                    actions.append(unsubscribe)
-                } else {
-                    actions.append(subscribe)
-                }
-                
-                
-                return UIMenu(title: "", image: nil, identifier: nil, options: .init(), children: actions)
-            }
-    }
+//    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+//        guard !allowsMultipleSelection,
+//              let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
+//          else { return nil }
+//
+//        return UITargetedPreview(view: cell.avatar.imageView)
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+//        guard !allowsMultipleSelection,
+//              let indexPath = indexPaths.first,
+//              let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
+//        else { return nil }
+//
+//        return UIContextMenuConfiguration(
+//            identifier: "\(indexPath.row)" as NSString,
+//            previewProvider: { self.makePreview(cell.avatar.userprofile) }) { _ in
+//
+//                var actions: [UIAction]!
+//
+//                let subscribe: UIAction = .init(title: "subscribe".localized.capitalized,
+//                                             image: UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+//                                             identifier: nil,
+//                                             discoverabilityTitle: nil,
+//                                              attributes: .init(),
+//                                              state: .off,
+//                                              handler: { [weak self] _ in
+//                    guard let self = self,
+//                          let userprofile = cell.avatar.userprofile
+//                    else { return }
+//
+//                    self.subscribePublisher.send([userprofile])
+//                })
+//
+//                let unsubscribe: UIAction = .init(title: "unsubscribe".localized,
+//                                                   image: UIImage(systemName: "hand.raised.slash.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+//                                                   identifier: nil,
+//                                                   discoverabilityTitle: nil,
+//                                                   attributes: .destructive,
+//                                                   state: .off,
+//                                                   handler: { [weak self] _ in
+//                    guard let self = self,
+//                          let userprofile = cell.avatar.userprofile
+//                    else { return }
+//
+//                    self.unsubscribePublisher.send([userprofile])
+//                })
+//
+//                let profile: UIAction = .init(title: "profile".localized,
+//                                                   image: UIImage(systemName: "person.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+//                                                   identifier: nil,
+//                                                   discoverabilityTitle: nil,
+//                                                   attributes: .init(),
+//                                                   state: .off,
+//                                                   handler: { [weak self] _ in
+//                    guard let self = self else { return }
+//
+//                    self.userprofilePublisher.send([cell.avatar.userprofile])
+//                })
+//
+//                actions = [profile]
+//                if cell.avatar.userprofile.subscribedAt {
+//                    actions.append(unsubscribe)
+//                } else {
+//                    actions.append(subscribe)
+//                }
+//
+//
+//                return UIMenu(title: "", image: nil, identifier: nil, options: .init(), children: actions)
+//            }
+//    }
 }
 
 extension SurveysCollectionView: BannerObservable {
@@ -440,10 +440,11 @@ private extension SurveysCollectionView {
             return cell
         }
         
-        var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(dataItems, toSection: .main)
-        source.apply(snapshot, animatingDifferences: false)
+        setDataSource(animatingDifferences: true)
+//        var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
+//        snapshot.appendSections([.main])
+//        snapshot.appendItems(dataItems, toSection: .main)
+//        source.apply(snapshot, animatingDifferences: false)
     }
     
     func setTasks() {
@@ -651,10 +652,10 @@ private extension SurveysCollectionView {
     }
     
     func setColors() {
-        refreshControl?.attributedTitle = NSAttributedString(string: "updating_data".localized, attributes: [
-            .foregroundColor: refreshColor as Any,
-            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
-        ])
+//        refreshControl?.attributedTitle = NSAttributedString(string: "updating_data".localized, attributes: [
+//            .foregroundColor: refreshColor as Any,
+//            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
+//        ])
         refreshControl?.tintColor = refreshColor
     }
     
@@ -719,16 +720,16 @@ private extension SurveysCollectionView {
         source.apply(snapshot, animatingDifferences: animatingDifferences)
     }
     
-    func makePreview(_ userprofile: Userprofile) -> UIViewController {
-        let viewController = UIViewController()
-        let imageView = UIImageView(image: userprofile.image)
-        imageView.contentMode = .scaleAspectFit
-        viewController.view = imageView
-        imageView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
-//        imageView.translatesAutoresizingMaskIntoConstraints = false
-        viewController.preferredContentSize = imageView.frame.size
-//        viewController.view.cornerRadius = 50
-        
-        return viewController
-    }
+//    func makePreview(_ userprofile: Userprofile) -> UIViewController {
+//        let viewController = UIViewController()
+//        let imageView = UIImageView(image: userprofile.image)
+//        imageView.contentMode = .scaleAspectFit
+//        viewController.view = imageView
+//        imageView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+////        imageView.translatesAutoresizingMaskIntoConstraints = false
+//        viewController.preferredContentSize = imageView.frame.size
+////        viewController.view.cornerRadius = 50
+//        
+//        return viewController
+//    }
 }

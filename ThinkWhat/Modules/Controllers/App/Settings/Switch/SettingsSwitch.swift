@@ -266,6 +266,7 @@ private extension SettingsSwitch {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         addSubview(contentView)
         shadowView.addSubview(mark)
+        contentView.backgroundColor = .clear
         contentView.translatesAutoresizingMaskIntoConstraints = false
         mark.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([

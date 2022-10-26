@@ -153,6 +153,12 @@ extension UIView {
             }
         }
     }
+    
+    func viewByClassName(className: String) -> UIView? {
+        guard className != NSStringFromClass(type(of: self)) else { return self }
+        
+        return getAllSubviews().filter({ className == NSStringFromClass(type(of: $0)) }).first
+    }
 }
 
 //extension UIView {
@@ -195,3 +201,4 @@ extension UIView {
 //            self.layer.mask = nil
 //    }
 //}
+

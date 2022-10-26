@@ -48,7 +48,7 @@ protocol SettingsControllerInput: AnyObject {
     
     func updateUserprofile(parameters: [String: Any], image: UIImage?)
     func fetchCity(_: String)
-    func saveCity(_: City)
+    func saveCity(_: City, completion: @escaping (Bool) -> ())
     func updateAppSettings(_: [AppSettings: Any])
 //    func updateUserData()
 }
