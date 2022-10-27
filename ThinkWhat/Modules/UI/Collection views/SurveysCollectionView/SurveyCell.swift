@@ -16,30 +16,29 @@ class SurveyCell: UICollectionViewListCell {
         didSet {
             guard let item = item else { return }
             
-//            self.updatePublisher.send(self.item)
+            //            self.updatePublisher.send(self.item)
             
-//            Timer
-//                .publish(every: 1, on: .main, in: .common)
-//                .autoconnect()
-//                .sink { [weak self] seconds in
-//                    guard let self = self else { return }
-//
-//                    self.updatePublisher.send(self.item)
-//                }
-//                .store(in: &subscriptions)
-
+            //            Timer
+            //                .publish(every: 1, on: .main, in: .common)
+            //                .autoconnect()
+            //                .sink { [weak self] seconds in
+            //                    guard let self = self else { return }
+            //
+            //                    self.updatePublisher.send(self.item)
+            //                }
+            //                .store(in: &subscriptions)
             
-//            sourcePublisher.send(Date())
-
-            //Update survey stats every n seconds
-            let events = eventEmitter.emit(every: 2)
-            animTask = Task {@MainActor [weak self] in
-                for await _ in events {
-                    
+            
+            //            sourcePublisher.send(Date())
+            
+            Timer
+                .publish(every: 3, on: .current, in: .common)
+                .autoconnect()
+    //            .delay(for: .seconds(2), scheduler: DispatchQueue.main)
+                .sink { [weak self] seconds in
                     guard let self = self,
                           let item = self.item,
                           item.isHot,
-//                          let topicCategory = Icon.Category(rawValue: item.topic.id),
                           let destinationCategory = self.icon.category != .Hot ? .Hot : Icon.Category(rawValue: item.topic.id) ?? Icon.Category.Null as? Icon.Category,
                           let destinationColor = self.icon.category != .Hot ? UIColor.systemRed : UIColor.white as? UIColor,
                           let destinationPath = (self.icon.getLayer(destinationCategory) as? CAShapeLayer)?.path,
@@ -62,9 +61,9 @@ class SurveyCell: UICollectionViewListCell {
                                                   isRemovedOnCompletion: false,
                                                   completionBlocks:
                                                     [{ [weak self] in
-                                                        guard let self = self else { return }
-                                                        self.icon.category = destinationCategory
-                                                    }])
+                        guard let self = self else { return }
+                        self.icon.category = destinationCategory
+                    }])
                     shapeLayer.add(pathAnim, forKey: nil)
                     shapeLayer.path = destinationPath
 
@@ -73,17 +72,70 @@ class SurveyCell: UICollectionViewListCell {
                     let colorAnim = Animations.get(property: .FillColor,
                                                    fromValue: self.icon.iconColor.cgColor as Any,
                                                    toValue: destinationColor.cgColor as Any,
-                                                         duration: 0.35,
-                                                         delay: 0,
-                                                         repeatCount: 0,
-                                                         autoreverses: false,
-                                                         timingFunction: CAMediaTimingFunctionName.easeIn,
-                                                         delegate: nil,
-                                                         isRemovedOnCompletion: false)
+                                                   duration: 0.35,
+                                                   delay: 0,
+                                                   repeatCount: 0,
+                                                   autoreverses: false,
+                                                   timingFunction: CAMediaTimingFunctionName.easeIn,
+                                                   delegate: nil,
+                                                   isRemovedOnCompletion: false)
                     self.icon.icon.add(colorAnim, forKey: nil)
                     self.icon.iconColor = destinationColor
                 }
-            }
+                .store(in: &subscriptions)
+            //Update survey stats every n seconds
+//            let events = eventEmitter.emit(every: 2)
+//            animTask = Task {@MainActor [weak self] in
+//                for await _ in events {
+//
+//                    guard let self = self,
+//                          let item = self.item,
+//                          item.isHot,
+//                          //                          let topicCategory = Icon.Category(rawValue: item.topic.id),
+//                          let destinationCategory = self.icon.category != .Hot ? .Hot : Icon.Category(rawValue: item.topic.id) ?? Icon.Category.Null as? Icon.Category,
+//                          let destinationColor = self.icon.category != .Hot ? UIColor.systemRed : UIColor.white as? UIColor,
+//                          let destinationPath = (self.icon.getLayer(destinationCategory) as? CAShapeLayer)?.path,
+//                          let shapeLayer = self.icon.icon as? CAShapeLayer
+//                    else { return }
+//
+//                    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.75, delay: 0) {
+//                        self.icon.backgroundColor = destinationCategory == .Hot ? .clear : self.item.topic.tagColor
+//                    }
+//
+//                    let pathAnim = Animations.get(property: .Path,
+//                                                  fromValue: shapeLayer.path as Any,
+//                                                  toValue: destinationPath,
+//                                                  duration: 0.35,
+//                                                  delay: 0,
+//                                                  repeatCount: 0,
+//                                                  autoreverses: false,
+//                                                  timingFunction: CAMediaTimingFunctionName.easeIn,
+//                                                  delegate: self,
+//                                                  isRemovedOnCompletion: false,
+//                                                  completionBlocks:
+//                                                    [{ [weak self] in
+//                        guard let self = self else { return }
+//                        self.icon.category = destinationCategory
+//                    }])
+//                    shapeLayer.add(pathAnim, forKey: nil)
+//                    shapeLayer.path = destinationPath
+//
+//
+//
+//                    let colorAnim = Animations.get(property: .FillColor,
+//                                                   fromValue: self.icon.iconColor.cgColor as Any,
+//                                                   toValue: destinationColor.cgColor as Any,
+//                                                   duration: 0.35,
+//                                                   delay: 0,
+//                                                   repeatCount: 0,
+//                                                   autoreverses: false,
+//                                                   timingFunction: CAMediaTimingFunctionName.easeIn,
+//                                                   delegate: nil,
+//                                                   isRemovedOnCompletion: false)
+//                    self.icon.icon.add(colorAnim, forKey: nil)
+//                    self.icon.iconColor = destinationColor
+//                }
+//            }
             menuButton.showsMenuAsPrimaryAction = true
             menuButton.menu = prepareMenu()
             
@@ -165,7 +217,7 @@ class SurveyCell: UICollectionViewListCell {
             }
             
             topicLabel.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-
+            
             var marksStackView: UIStackView!
             if let instance = self.topicHorizontalStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
                 marksStackView = instance
@@ -179,7 +231,7 @@ class SurveyCell: UICollectionViewListCell {
                     .sink { rect in
                         
                         stackView.cornerRadius = rect.height/2.25
-                }
+                    }
                     .store(in: &self.subscriptions)
                 
                 self.topicHorizontalStackView.addArrangedSubview(stackView)
@@ -224,7 +276,7 @@ class SurveyCell: UICollectionViewListCell {
                 instance.addEquallyTo(to: container)
                 marksStackView.addArrangedSubview(container)
             }
-
+            
             if titleLabel.getConstraint(identifier: "height").isNil, descriptionLabel.getConstraint(identifier: "height").isNil, topicView.getConstraint(identifier: "height").isNil {
                 let constraint = titleLabel.heightAnchor.constraint(equalToConstant: 300)
                 constraint.identifier = "height"
@@ -241,16 +293,28 @@ class SurveyCell: UICollectionViewListCell {
             }
         }
     }
-//    public var updatePublisher = PassthroughSubject<SurveyReference, Never>()
-    public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-    public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-    public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+    //    public var updatePublisher = PassthroughSubject<SurveyReference, Never>()
+    public private(set) var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+    public private(set) var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+    public private(set) var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+    public private(set) var profileTapPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public private(set) var subscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public private(set) var unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     //UI
     public private(set) lazy var avatar: Avatar = {
         let instance = Avatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.isUserInteractionEnabled = true
         instance.addInteraction(UIContextMenuInteraction(delegate: self))
+        instance.tapPublisher
+            .sink { [weak self]  in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.profileTapPublisher.send(userprofile)
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
@@ -261,9 +325,9 @@ class SurveyCell: UICollectionViewListCell {
     private var observers: [NSKeyValueObservation] = []
     public var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    private lazy var eventEmitter: EventEmitter = {
-        return EventEmitter()
-    }()
+//    private lazy var eventEmitter: EventEmitter = {
+//        return EventEmitter()
+//    }()
     private var animTask: Task<Void, Never>?
     private lazy var titleLabel: UILabel = {
         let instance = UILabel()
@@ -334,11 +398,11 @@ class SurveyCell: UICollectionViewListCell {
                 guard let self = self,
                       let text = instance.text,
                       let constraint = instance.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
-            
-            self.setNeedsLayout()
-            constraint.constant = text.height(withConstrainedWidth: rect.width, font: instance.font) * 1.5
-            self.layoutIfNeeded()
-        }
+                
+                self.setNeedsLayout()
+                constraint.constant = text.height(withConstrainedWidth: rect.width, font: instance.font) * 1.5
+                self.layoutIfNeeded()
+            }
             .store(in: &subscriptions)
         
         return instance
@@ -369,7 +433,7 @@ class SurveyCell: UICollectionViewListCell {
         instance.textAlignment = .left
         instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-
+        
         return instance
     }()
     private lazy var topicLabel: InsetLabel = {
@@ -381,25 +445,25 @@ class SurveyCell: UICollectionViewListCell {
         instance.publisher(for: \.bounds, options: .new)
             .sink { [weak self] rect in
                 
-            guard let self = self,
-                  let constraint = self.topicView.getConstraint(identifier: "height") else { return }
-            
-            let height = self.item.topic.localized.height(withConstrainedWidth: rect.width, font: instance.font)
-            let width = self.item.topic.localized.width(withConstrainedHeight: height, font: instance.font)
-            
-            self.setNeedsLayout()
-            if let constraint_2 = instance.getAllConstraints().filter({ $0.identifier == "width"}).first {
-                constraint_2.constant = width + instance.insets.right*2.5 + instance.insets.left*2.5
-            } else {
-                let constraint_2 = instance.widthAnchor.constraint(equalToConstant: width + instance.insets.right*2.5 + instance.insets.left*2.5)
-                constraint_2.identifier = "width"
-                constraint_2.isActive = true
+                guard let self = self,
+                      let constraint = self.topicView.getConstraint(identifier: "height") else { return }
+                
+                let height = self.item.topic.localized.height(withConstrainedWidth: rect.width, font: instance.font)
+                let width = self.item.topic.localized.width(withConstrainedHeight: height, font: instance.font)
+                
+                self.setNeedsLayout()
+                if let constraint_2 = instance.getAllConstraints().filter({ $0.identifier == "width"}).first {
+                    constraint_2.constant = width + instance.insets.right*2.5 + instance.insets.left*2.5
+                } else {
+                    let constraint_2 = instance.widthAnchor.constraint(equalToConstant: width + instance.insets.right*2.5 + instance.insets.left*2.5)
+                    constraint_2.identifier = "width"
+                    constraint_2.isActive = true
+                }
+                //            constraint_2.constant = newValue.width + 8
+                constraint.constant = height// + 4
+                self.layoutIfNeeded()
+                instance.cornerRadius = rect.height/2.25
             }
-//            constraint_2.constant = newValue.width + 8
-            constraint.constant = height// + 4
-            self.layoutIfNeeded()
-            instance.cornerRadius = rect.height/2.25
-        }
             .store(in: &subscriptions)
         
         return instance
@@ -416,9 +480,9 @@ class SurveyCell: UICollectionViewListCell {
         
         instance.publisher(for: \.bounds, options: .new)
             .sink {rect in
-            
-            instance.cornerRadius = rect.height/2.25
-        }
+                
+                instance.cornerRadius = rect.height/2.25
+            }
             .store(in: &subscriptions)
         
         let subview = UIView()
@@ -445,21 +509,21 @@ class SurveyCell: UICollectionViewListCell {
         label.publisher(for: \.bounds, options: .new)
             .sink { [weak self] rect in
                 
-            guard let self = self,
-                  let item = self.item,
-                  let constraint = self.progressView.getAllConstraints().filter({ $0.identifier == "width" }).first,
-                  let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
-                  let constraint_2 = progressIndicator.getConstraint(identifier: "width") else { return }
-            
-//            guard view.bounds.size != newValue.size else { return }
-            
-            self.setNeedsLayout()
-            constraint.constant = "100%".width(withConstrainedHeight: rect.height, font: label.font) + label.insets.left + label.insets.right
-            constraint_2.constant = constraint.constant * CGFloat(item.progress)/100
-            self.layoutIfNeeded()
-            
+                guard let self = self,
+                      let item = self.item,
+                      let constraint = self.progressView.getAllConstraints().filter({ $0.identifier == "width" }).first,
+                      let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
+                      let constraint_2 = progressIndicator.getConstraint(identifier: "width") else { return }
+                
+                //            guard view.bounds.size != newValue.size else { return }
+                
+                self.setNeedsLayout()
+                constraint.constant = "100%".width(withConstrainedHeight: rect.height, font: label.font) + label.insets.left + label.insets.right
+                constraint_2.constant = constraint.constant * CGFloat(item.progress)/100
+                self.layoutIfNeeded()
+                
                 label.cornerRadius = rect.height/2.25
-        }
+            }
             .store(in: &subscriptions)
         
         label.addEquallyTo(to: instance)
@@ -482,7 +546,6 @@ class SurveyCell: UICollectionViewListCell {
         
         return instance
     }()
-    
     @MainActor private lazy var viewsLabel: UILabel = {
         let instance = UILabel()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
@@ -528,7 +591,7 @@ class SurveyCell: UICollectionViewListCell {
         constraint.identifier = "height"
         constraint.isActive = true
         
-
+        
         statsStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             statsStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
@@ -555,11 +618,11 @@ class SurveyCell: UICollectionViewListCell {
         instance.addSubview(firstnameLabel)
         instance.addSubview(lastnameLabel)
         avatar.addEquallyTo(to: instance)
-
+        
         firstnameLabel.translatesAutoresizingMaskIntoConstraints = false
         lastnameLabel.translatesAutoresizingMaskIntoConstraints = false
         avatar.translatesAutoresizingMaskIntoConstraints = false
-
+        
         NSLayoutConstraint.activate([
             firstnameLabel.centerYAnchor.constraint(equalTo: lastnameLabel.centerYAnchor),
             firstnameLabel.centerXAnchor.constraint(equalTo: lastnameLabel.centerXAnchor),
@@ -621,7 +684,7 @@ class SurveyCell: UICollectionViewListCell {
         let instance = UIStackView(arrangedSubviews: [topicView, dateLabel])
         instance.axis = .vertical
         instance.spacing = 2
-//        instance.distribution = .fillEqually
+        //        instance.distribution = .fillEqually
         instance.accessibilityIdentifier = "topicVerticalStackView"
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
         dateLabel.heightAnchor.constraint(equalTo: topicView.heightAnchor).isActive = true
@@ -634,8 +697,8 @@ class SurveyCell: UICollectionViewListCell {
         instance.axis = .horizontal
         instance.spacing = 4
         
-//        userView.translatesAutoresizingMaskIntoConstraints = false
-//        userView.heightAnchor.constraint(equalTo: icon.heightAnchor).isActive = true
+        //        userView.translatesAutoresizingMaskIntoConstraints = false
+        //        userView.heightAnchor.constraint(equalTo: icon.heightAnchor).isActive = true
         
         return instance
     }()
@@ -645,10 +708,10 @@ class SurveyCell: UICollectionViewListCell {
         instance.axis = .vertical
         instance.spacing = 16
         return instance
-    }()    
+    }()
     private lazy var statsStack: UIStackView = {
         let ratingStack = UIStackView(arrangedSubviews: [ratingView, ratingLabel])
-//        ratingView.heightAnchor.constraint(equalTo: ratingLabel.heightAnchor, multiplier: 1.5).isActive = true
+        //        ratingView.heightAnchor.constraint(equalTo: ratingLabel.heightAnchor, multiplier: 1.5).isActive = true
         ratingStack.spacing = 2
         
         let viewsStack = UIStackView(arrangedSubviews: [viewsView, viewsLabel])
@@ -665,10 +728,10 @@ class SurveyCell: UICollectionViewListCell {
     private lazy var verticalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [headerStack, bottomStackView])//[subHorizontalStack, descriptionLabel, statsView])
         instance.axis = .vertical
-//        instance.alignment = .leading
+        //        instance.alignment = .leading
         instance.accessibilityIdentifier = "verticalStack"
         instance.spacing = 16
-//        instance.clipsToBounds = false
+        //        instance.clipsToBounds = false
         return instance
     }()
     private lazy var bottomStackView: UIStackView = {
@@ -679,9 +742,10 @@ class SurveyCell: UICollectionViewListCell {
         
         return instance
     }()
-    
     private let padding: CGFloat = 8
     private var constraint: NSLayoutConstraint!
+    
+    
     
     // MARK: - Destructor
     deinit {
@@ -694,6 +758,8 @@ class SurveyCell: UICollectionViewListCell {
 #endif
     }
     
+    
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -704,13 +770,168 @@ class SurveyCell: UICollectionViewListCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
+    
+    // MARK: - Overriden methods
+//    override func updateConstraints() {
+//        super.updateConstraints()
+//
+////        separatorLayoutGuide.leadingAnchor.constraint(equalTo: ratingView.trailingAnchor, constant: 10).isActive = true
+////        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor, constant: .greatestFiniteMagnitude).isActive = true
+//        separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+//        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+////        separatorLayoutGuide.heightAnchor.constraint(equalToConstant: 10).isActive = true
+//    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        var config = UIBackgroundConfiguration.listPlainCell()
+        config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        backgroundConfiguration = config
+        
+        menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        if icon.category != .Hot {
+            icon.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        }
+        progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        commentsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        commentsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        topicLabel.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+//        descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
+        firstnameLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
+        lastnameLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
+        
+        
+        if !item.isNil {
+            if item.isComplete {
+                titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+                descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+            } else {
+                titleLabel.textColor = .label
+                descriptionLabel.textColor = .label
+            }
+        }
+        
+        if let stackView = topicHorizontalStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
+            stackView.arrangedSubviews.forEach { [weak self] in
+                guard let self = self,
+                      let identifier = $0.accessibilityIdentifier else { return }
+                if identifier == "isHot" {
+//                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed
+                } else if identifier == "isComplete" {
+//                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
+                    $0.get(all: UIImageView.self).first?.tintColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
+                } else if identifier == "isFavorite" {
+                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+                } else if identifier == "isOwn" {
+                    //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
+                    $0.get(all: UIImageView.self).first?.tintColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
+                }
+            }
+        }
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                            forTextStyle: .title1)
+        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .caption2)
+        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .caption2)
+        commentsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .caption2)
+        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                            forTextStyle: .callout)
+        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                            forTextStyle: .footnote)
+//        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+//                                                forTextStyle: .caption2)
+//        lastnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+//                                               forTextStyle: .caption2)
+        dateLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+                                               forTextStyle: .caption2)
+        
+        if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
+            label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
+        }
+
+        
+        guard let constraint_1 = titleLabel.getConstraint(identifier: "height"),
+              let constraint_2 = statsView.getConstraint(identifier: "height"),
+              let constraint_3 = descriptionLabel.getConstraint(identifier: "height"),
+              let constraint_4 = topicView.getConstraint(identifier: "height"),
+//              let constraint_5 = progressView.getConstraint(identifier: "width"),
+              let item = item
+        else { return }
+        
+        setNeedsLayout()
+        constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
+                                                  font: titleLabel.font)
+        constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
+                                                                       font: ratingLabel.font)
+        constraint_3.constant = item.truncatedDescription.height(withConstrainedWidth: ratingLabel.bounds.width,
+                                                                       font: ratingLabel.font)
+        constraint_4.constant = item.topic.localized.height(withConstrainedWidth: ratingLabel.bounds.width,
+                                                                       font: ratingLabel.font)
+        layoutIfNeeded()
+        topicLabel.frame.origin = .zero
+    }
+    
+    
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+//        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+
+        //Reset publishers
+        watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+        claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+        shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+        profileTapPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+        subscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+        unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+        
+//        eventEmitter.task?.cancel()
+        animTask?.cancel()
+        
+        icon.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
+        icon.setIconColor(.white)
+        
+        firstnameLabel.text = ""
+        lastnameLabel.text = ""
+        avatar.clearImage()
+        item = nil
+        verticalStack.removeArrangedSubview(descriptionLabel)
+        verticalStack.removeArrangedSubview(imageContainer)
+        descriptionLabel.removeFromSuperview()
+        imageContainer.removeFromSuperview()
+        topicHorizontalStackView.removeArrangedSubview(progressView)
+        progressView.removeFromSuperview()
+    }
+    
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        super.updateConfiguration(using: state)
+        
+        var config = UIBackgroundConfiguration.listPlainCell()
+        config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        backgroundConfiguration = config
+    }
+}
+
+private extension SurveyCell {
     func commonInit() {
         setTasks()
         setupUI()
     }
 
-    // MARK: - Private methods
-    private func setupUI() {
+    func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true
 
@@ -736,7 +957,7 @@ class SurveyCell: UICollectionViewListCell {
         
     }
     
-    private func setTasks() {
+    func setTasks() {
 
             tasks.append(Task { [weak self] in
                 for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
@@ -923,7 +1144,7 @@ class SurveyCell: UICollectionViewListCell {
         })
     }
     
-    private func setProgress() {
+    func setProgress() {
         
         guard let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
               let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
@@ -936,7 +1157,7 @@ class SurveyCell: UICollectionViewListCell {
         self.progressView.layoutIfNeeded()
     }
     
-    private func setColors() {
+    func setColors() {
         
         guard let stackView = topicHorizontalStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView else { return }
         stackView.arrangedSubviews.forEach { [weak self] in
@@ -956,7 +1177,7 @@ class SurveyCell: UICollectionViewListCell {
         }
     }
     
-    private func refreshConstraints() {
+    func refreshConstraints() {
         
         guard let constraint = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
               let constraint_2 = descriptionLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
@@ -978,36 +1199,36 @@ class SurveyCell: UICollectionViewListCell {
     }
     
     @objc
-    private func updateViewsCount(notification: Notification) {
+    func updateViewsCount(notification: Notification) {
         guard let item = item else { return }
         viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
     }
     
     @objc
-    private func switchFavorite(notification: Notification) {
+    func switchFavorite(notification: Notification) {
         guard let item = item else { return }
         ratingLabel.text = String(describing: item.rating)
     }
     
     @objc
-    private func setCompleted(notification: Notification) {
+    func setCompleted(notification: Notification) {
         guard let item = item else { return }
         ratingLabel.text = String(describing: item.rating)
     }
     
     @objc
-    private func switchHot(notification: Notification) {
+    func switchHot(notification: Notification) {
         guard let item = item else { return }
         ratingLabel.text = String(describing: item.rating)
     }
     
     @objc
-    private func handleTap() {
+    func handleTap() {
 //        menuButton.showsMenuAsPrimaryAction = true
 //        menuButton.menu = menu
     }
     
-    private func prepareMenu() -> UIMenu {
+    func prepareMenu() -> UIMenu {
         let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
             guard let self = self,
                   let instance = self.item
@@ -1044,156 +1265,61 @@ class SurveyCell: UICollectionViewListCell {
         
         return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
     }
-    // MARK: - Overriden methods
-//    override func updateConstraints() {
-//        super.updateConstraints()
-//        
-////        separatorLayoutGuide.leadingAnchor.constraint(equalTo: ratingView.trailingAnchor, constant: 10).isActive = true
-////        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor, constant: .greatestFiniteMagnitude).isActive = true
-//        separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-//        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-////        separatorLayoutGuide.heightAnchor.constraint(equalToConstant: 10).isActive = true
-//    }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        var config = UIBackgroundConfiguration.listPlainCell()
-        config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        backgroundConfiguration = config
-        
-        menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        if icon.category != .Hot {
-            icon.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-        }
-        progressView.getSubview(type: UIView.self, identifier: "progress")?.backgroundColor = item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-        viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        commentsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-//        commentsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        topicLabel.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-//        descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-//        descriptionLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
-        firstnameLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
-        lastnameLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : .darkGray
-        
-        
-        if !item.isNil {
-            if item.isComplete {
-                titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
-                descriptionLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
-            } else {
-                titleLabel.textColor = .label
-                descriptionLabel.textColor = .label
-            }
-        }
-        
-        if let stackView = topicHorizontalStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "marksStackView" }).first as? UIStackView {
-            stackView.arrangedSubviews.forEach { [weak self] in
-                guard let self = self,
-                      let identifier = $0.accessibilityIdentifier else { return }
-                if identifier == "isHot" {
-//                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .systemRed
-                } else if identifier == "isComplete" {
-//                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
-                    $0.get(all: UIImageView.self).first?.tintColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
-                } else if identifier == "isFavorite" {
-                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-                } else if identifier == "isOwn" {
-                    //                    $0.get(all: UIImageView.self).first?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
-                    $0.get(all: UIImageView.self).first?.tintColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.item.topic.tagColor
-                }
-            }
-        }
-        
-        //Set dynamic font size
-        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        
-        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
-                                            forTextStyle: .title1)
-        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption2)
-        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption2)
-        commentsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption2)
-        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .callout)
-        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
-                                            forTextStyle: .footnote)
-//        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-//                                                forTextStyle: .caption2)
-//        lastnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-//                                               forTextStyle: .caption2)
-        dateLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                               forTextStyle: .caption2)
-        
-        if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
-            label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
+    func userprofileContextMenuActions(for userprofile: Userprofile) -> UIMenu {
+        var actions: [UIAction]!
+
+        let subscribe: UIAction = .init(title: "subscribe".localized.capitalized,
+                                     image: UIImage(systemName: "hand.point.left.fill",
+                                                    withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+                                     identifier: nil,
+                                     discoverabilityTitle: nil,
+                                      attributes: .init(),
+                                      state: .off,
+                                      handler: { [weak self] _ in
+            guard let self = self else { return }
+
+            self.subscribePublisher.send(userprofile)
+        })
+
+        let unsubscribe: UIAction = .init(title: "unsubscribe".localized,
+                                           image: UIImage(systemName: "hand.raised.slash.fill",
+                                                          withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+                                           identifier: nil,
+                                           discoverabilityTitle: nil,
+                                           attributes: .destructive,
+                                           state: .off,
+                                           handler: { [weak self] _ in
+            guard let self = self else { return }
+
+            self.unsubscribePublisher.send(userprofile)
+        })
+
+        let profile: UIAction = .init(title: "profile".localized,
+                                           image: UIImage(systemName: "person.fill",
+                                                          withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+                                           identifier: nil,
+                                           discoverabilityTitle: nil,
+                                           attributes: .init(),
+                                           state: .off,
+                                           handler: { [weak self] _ in
+            guard let self = self else { return }
+
+            self.profileTapPublisher.send(userprofile)
+        })
+
+        actions = [profile]
+        if userprofile.subscribedAt {
+            actions.append(unsubscribe)
+        } else {
+            actions.append(subscribe)
         }
 
-        
-        guard let constraint_1 = titleLabel.getConstraint(identifier: "height"),
-              let constraint_2 = statsView.getConstraint(identifier: "height"),
-              let constraint_3 = descriptionLabel.getConstraint(identifier: "height"),
-              let constraint_4 = topicView.getConstraint(identifier: "height"),
-//              let constraint_5 = progressView.getConstraint(identifier: "width"),
-              let item = item
-        else { return }
-        
-        setNeedsLayout()
-        constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
-                                                  font: titleLabel.font)
-        constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
-                                                                       font: ratingLabel.font)
-        constraint_3.constant = item.truncatedDescription.height(withConstrainedWidth: ratingLabel.bounds.width,
-                                                                       font: ratingLabel.font)
-        constraint_4.constant = item.topic.localized.height(withConstrainedWidth: ratingLabel.bounds.width,
-                                                                       font: ratingLabel.font)
-        layoutIfNeeded()
-        topicLabel.frame.origin = .zero
-    }
-    
-    
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        
-//        tasks.forEach { $0?.cancel() }
-        subscriptions.forEach { $0.cancel() }
 
-        //Reset publishers
-        watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-        claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-        shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-//        sourcePublisher = PassthroughSubject<Date, Never>()
-        
-        eventEmitter.task?.cancel()
-        animTask?.cancel()
-        
-        icon.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-        icon.setIconColor(.white)
-        
-        firstnameLabel.text = ""
-        lastnameLabel.text = ""
-        avatar.clearImage()
-        item = nil
-        verticalStack.removeArrangedSubview(descriptionLabel)
-        verticalStack.removeArrangedSubview(imageContainer)
-        descriptionLabel.removeFromSuperview()
-        imageContainer.removeFromSuperview()
-        topicHorizontalStackView.removeArrangedSubview(progressView)
-        progressView.removeFromSuperview()
-    }
-    
-    override func updateConfiguration(using state: UICellConfigurationState) {
-        super.updateConfiguration(using: state)
-        
-        var config = UIBackgroundConfiguration.listPlainCell()
-        config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-        backgroundConfiguration = config
+        return UIMenu(title: "", image: nil, identifier: nil, options: .init(), children: actions)
     }
 }
+
 extension SurveyCell: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
@@ -1203,23 +1329,23 @@ extension SurveyCell: CAAnimationDelegate {
 }
 
 extension SurveyCell: UIContextMenuInteractionDelegate {
-    
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
         
-        if let sender = interaction.view as? Avatar {
+        if let sender = interaction.view as? Avatar, let userprofile = sender.userprofile {
             
             return UIContextMenuConfiguration(
                 identifier: nil,
-                previewProvider: { self.makePreview(sender.userprofile) } ) { [weak self] _ in
-                    guard let self = self else { return nil }
-                    
-                    return self.prepareMenu()
-                }
+                previewProvider: { AvatarPreviewController.init(userprofile: userprofile) },
+                actionProvider: { [unowned self] _ in self.userprofileContextMenuActions(for: userprofile) })
         }
         return nil
     }
     
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willDisplayMenuFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
+        
+        animator?.addCompletion {
+            print("addCompletion")
+        }
         
         guard let window = UIApplication.shared.delegate?.window,
               let instance = window!.viewByClassName(className: "_UIPlatterSoftShadowView")
@@ -1231,121 +1357,14 @@ extension SurveyCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configuration: UIContextMenuConfiguration, highlightPreviewForItemWithIdentifier identifier: NSCopying) -> UITargetedPreview? {
         
         if let sender = interaction.view as? Avatar {
-//            let previewTarget = UIPreviewTarget(container: self, center: sender.center)
-//            let previewParams = UIPreviewParameters()
-//            previewParams.backgroundColor = .clear
-//
-//            return UITargetedPreview(view: sender, parameters: previewParams, target: previewTarget)
             let parameters = UIPreviewParameters()
             parameters.backgroundColor = .clear
-//            parameters.shadowPath = .none
-//            parameters.visiblePath = .none
+            parameters.visiblePath = UIBezierPath(ovalIn: sender.bounds)
             
-            let instance = UITargetedPreview(view: sender, parameters: parameters)
-//            instance.view.backgroundColor = .clear
-//            instance.target.container.backgroundColor = .clear
-            return instance
+            return UITargetedPreview(view: sender, parameters: parameters)
         }
         
         return nil
     }
-
-    func makePreview(_ userprofile: Userprofile) -> UIViewController {
-        let viewController = UIViewController()
-        let imageView = UIImageView(image: userprofile.image)
-        imageView.contentMode = .scaleAspectFit
-        viewController.view = imageView
-        imageView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
-    //        imageView.translatesAutoresizingMaskIntoConstraints = false
-        viewController.preferredContentSize = imageView.frame.size
-            viewController.view.cornerRadius = 50
-    
-        return viewController
-    }
 }
-
-//func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
-//    guard !allowsMultipleSelection,
-//          let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
-//      else { return nil }
-//    
-//    return UITargetedPreview(view: cell.avatar.imageView)
-//}
-//
-//func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-//    guard !allowsMultipleSelection,
-//          let indexPath = indexPaths.first,
-//          let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
-//    else { return nil }
-//    
-//    return UIContextMenuConfiguration(
-//        identifier: "\(indexPath.row)" as NSString,
-//        previewProvider: { self.makePreview(cell.avatar.userprofile) }) { _ in
-//            
-//            var actions: [UIAction]!
-//            
-//            let subscribe: UIAction = .init(title: "subscribe".localized.capitalized,
-//                                         image: UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-//                                         identifier: nil,
-//                                         discoverabilityTitle: nil,
-//                                          attributes: .init(),
-//                                          state: .off,
-//                                          handler: { [weak self] _ in
-//                guard let self = self,
-//                      let userprofile = cell.avatar.userprofile
-//                else { return }
-//                
-//                self.subscribePublisher.send([userprofile])
-//            })
-//            
-//            let unsubscribe: UIAction = .init(title: "unsubscribe".localized,
-//                                               image: UIImage(systemName: "hand.raised.slash.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-//                                               identifier: nil,
-//                                               discoverabilityTitle: nil,
-//                                               attributes: .destructive,
-//                                               state: .off,
-//                                               handler: { [weak self] _ in
-//                guard let self = self,
-//                      let userprofile = cell.avatar.userprofile
-//                else { return }
-//                
-//                self.unsubscribePublisher.send([userprofile])
-//            })
-//            
-//            let profile: UIAction = .init(title: "profile".localized,
-//                                               image: UIImage(systemName: "person.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-//                                               identifier: nil,
-//                                               discoverabilityTitle: nil,
-//                                               attributes: .init(),
-//                                               state: .off,
-//                                               handler: { [weak self] _ in
-//                guard let self = self else { return }
-//                
-//                self.userprofilePublisher.send([cell.avatar.userprofile])
-//            })
-//            
-//            actions = [profile]
-//            if cell.avatar.userprofile.subscribedAt {
-//                actions.append(unsubscribe)
-//            } else {
-//                actions.append(subscribe)
-//            }
-//            
-//            
-//            return UIMenu(title: "", image: nil, identifier: nil, options: .init(), children: actions)
-//        }
-//}
-
-//func makePreview(_ userprofile: Userprofile) -> UIViewController {
-//    let viewController = UIViewController()
-//    let imageView = UIImageView(image: userprofile.image)
-//    imageView.contentMode = .scaleAspectFit
-//    viewController.view = imageView
-//    imageView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
-////        imageView.translatesAutoresizingMaskIntoConstraints = false
-//    viewController.preferredContentSize = imageView.frame.size
-////        viewController.view.cornerRadius = 50
-//
-//    return viewController
-//}
 

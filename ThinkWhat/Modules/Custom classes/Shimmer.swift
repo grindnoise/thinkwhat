@@ -37,15 +37,19 @@ class Shimmer: UIView {
                 animation.repeatCount = 100//.greatestFiniteMagnitude
                 gradient.add(animation, forKey: "shimmering")
             } else {
-                gradient.add(Animations.get(property: .Opacity, fromValue: 1, toValue: 0, duration: 0.35, delegate: self, completionBlocks: [
-                    { [weak self] in
-                        guard let self = self else { return }
-                        
-                        self.gradient.removeAnimation(forKey: "shimmering")
-//                        self.gradient.removeFromSuperlayer()
-                    }
-                ]), forKey: nil)
-                gradient.opacity = 0
+                self.gradient.removeAnimation(forKey: "shimmering")
+                self.gradient.opacity = 0
+                self.gradient.removeFromSuperlayer()
+//                gradient.add(Animations.get(property: .Opacity, fromValue: 1, toValue: 0, duration: 0.35, delegate: self, completionBlocks: [
+//                    { [weak self] in
+//                        guard let self = self else { return }
+//
+//                        self.gradient.removeAnimation(forKey: "shimmering")
+////                        self.gradient.removeFromSuperlayer()
+//                        self.gradient.opacity = 0
+//                    }
+//                ]), forKey: nil)
+//                gradient.opacity = 0
             }
         }
     }

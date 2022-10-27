@@ -108,6 +108,16 @@ extension UIView {
         NSLayoutConstraint.activate([horizontalConstraint, verticalConstraint, widthConstraint, heightConstraint])
     }
     
+    func place(inside parent: UIView, insets: UIEdgeInsets = .uniform(size: 0)) {
+        parent.addSubview(self)
+        translatesAutoresizingMaskIntoConstraints = false
+        
+        leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: insets.left).isActive = true
+        topAnchor.constraint(equalTo: parent.topAnchor, constant: insets.top).isActive = true
+        trailingAnchor.constraint(equalTo: parent.trailingAnchor, constant: -insets.right).isActive = true
+        bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -insets.bottom).isActive = true
+    }
+    
     func addEquallyTo(to view: UIView, multiplier: CGFloat) {
         
         self.translatesAutoresizingMaskIntoConstraints = false

@@ -19,7 +19,7 @@ class SubscriptionsController: UIViewController {
     // MARK: - Public properties
     var controllerOutput: SubsciptionsControllerOutput?
     var controllerInput: SubsciptionsControllerInput?
-    
+    public private(set) var isOnScreen = true
     
     
     // MARK: - Private properties
@@ -55,7 +55,6 @@ class SubscriptionsController: UIViewController {
         }
     }
     //UI
-    private var isOnScreen = true
     private var isRightButtonSpinning = false {
         didSet {
             let spinner = UIActivityIndicatorView()

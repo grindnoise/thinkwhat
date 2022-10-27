@@ -540,27 +540,32 @@ private extension SubscriptionsView {
                       let dict = notification.object as? [Userprofile: Userprofile],
                       let owner = dict.keys.first,
                       owner == Userprofiles.shared.current,
-                      let userprofile = dict.values.first
+                      let userprofile = dict.values.first,
+                      let viewInput = self.viewInput
                 else { return }
 
-                self.setDefaultFilter { [weak self] in
-                    guard let self = self else { return }
-                    
-                    self.subscriptionButton.isUserInteractionEnabled = true
-                    self.viewInput?.setDefaultMode()
-                    if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
-                        self.subscriptionButton.configuration!.showsActivityIndicator = false
-                    } else {
-                        guard let imageView = self.subscriptionButton.imageView,
-                              let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
-                        else { return }
+                if viewInput.isOnScreen {
+                    self.setDefaultFilter { [weak self] in
+                        guard let self = self else { return }
                         
-                        indicator.removeFromSuperview()
-                        imageView.tintColor = .systemRed
+                        self.subscriptionButton.isUserInteractionEnabled = true
+                        self.viewInput?.setDefaultMode()
+                        if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
+                            self.subscriptionButton.configuration!.showsActivityIndicator = false
+                        } else {
+                            guard let imageView = self.subscriptionButton.imageView,
+                                  let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+                            else { return }
+                            
+                            indicator.removeFromSuperview()
+                            imageView.tintColor = .systemRed
+                        }
+                        delayAsync(delay: 0.25) {
+                            self.feedCollectionView.removeItem(userprofile)
+                        }
                     }
-                    delayAsync(delay: 0.25) {
-                        self.feedCollectionView.removeItem(userprofile)
-                    }
+                } else {
+                    self.feedCollectionView.removeItem(userprofile)
                 }
             }
         })

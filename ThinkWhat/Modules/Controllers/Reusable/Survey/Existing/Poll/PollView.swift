@@ -97,14 +97,15 @@ class PollView: UIView {
     // MARK: - Public methods
     private func commonInit() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        
         addSubview(contentView)
         contentView.frame = self.bounds
         contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         self.addSubview(contentView)
         setTasks()
         guard !survey.isNil else { return }
-        setupUI()
         
+        setupUI()
     }
     
     private func setTasks() {

@@ -11,12 +11,19 @@ import Combine
 
 class ListView: UIView {
     
-    weak var viewInput: ListViewInput?
+    // MARK: - Public properties
+    public let subscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
+    public let unsubscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
+    public let userprofilePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
+    public weak var viewInput: ListViewInput?
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    //UI
     private lazy var collectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(category: .New)
         
@@ -94,15 +101,15 @@ class ListView: UIView {
             self.viewInput?.addFavorite(value)
         }.store(in: &self.subscriptions)
         
-        instance.shareSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
-            guard let self = self,
-                let value = $0
-            else { return }
-            
-            self.viewInput?.share(value)
-        }.store(in: &self.subscriptions)
+        instance.shareSubject
+            .sink { [weak self] in
+                guard let self = self,
+                      let value = $0
+                else { return }
+                
+                self.viewInput?.share(value)
+            }
+            .store(in: &self.subscriptions)
         
         instance.claimSubject.sink {
             print($0)
@@ -129,6 +136,36 @@ class ListView: UIView {
             
 //            self.viewInput?.addFavorite(surveyReference: value)
         }.store(in: &self.subscriptions)
+        
+        instance.userprofilePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.openUserprofile(userprofile)
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.subscribePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.subscribe(to: userprofile)
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.unsubscribePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.unsubscribe(from: userprofile)
+            }
+            .store(in: &self.subscriptions)
         
         return instance
     }()

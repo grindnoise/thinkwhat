@@ -75,6 +75,7 @@
 		AB234F5628D774C000204EC8 /* Controllers.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB234F5128D774C000204EC8 /* Controllers.storyboard */; };
 		AB234F5728D774C000204EC8 /* Auth.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB234F5228D774C000204EC8 /* Auth.storyboard */; };
 		AB234F5828D774C000204EC8 /* Root.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB234F5328D774C000204EC8 /* Root.storyboard */; };
+		AB235288290A7EB400C5382C /* AvatarPreviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB235287290A7EB400C5382C /* AvatarPreviewController.swift */; };
 		AB238D1E279058A0009E49C2 /* AppData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB238D1D279058A0009E49C2 /* AppData.swift */; };
 		AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */; };
 		AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */; };
@@ -651,6 +652,7 @@
 		AB234F5128D774C000204EC8 /* Controllers.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Controllers.storyboard; sourceTree = "<group>"; };
 		AB234F5228D774C000204EC8 /* Auth.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Auth.storyboard; sourceTree = "<group>"; };
 		AB234F5328D774C000204EC8 /* Root.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Root.storyboard; sourceTree = "<group>"; };
+		AB235287290A7EB400C5382C /* AvatarPreviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarPreviewController.swift; sourceTree = "<group>"; };
 		AB238D1D279058A0009E49C2 /* AppData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppData.swift; sourceTree = "<group>"; };
 		AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNet.mlmodel; sourceTree = "<group>"; };
 		AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveySelectionTypeController.swift; sourceTree = "<group>"; };
@@ -1429,6 +1431,14 @@
 				AB234F5328D774C000204EC8 /* Root.storyboard */,
 			);
 			path = Storyboards;
+			sourceTree = "<group>";
+		};
+		AB235289290A9C1600C5382C /* Taget previews */ = {
+			isa = PBXGroup;
+			children = (
+				AB235287290A7EB400C5382C /* AvatarPreviewController.swift */,
+			);
+			path = "Taget previews";
 			sourceTree = "<group>";
 		};
 		AB25AC31282BBFB200050907 /* Collection */ = {
@@ -2748,6 +2758,7 @@
 		ABADF59927F7009400A26474 /* Reusable */ = {
 			isa = PBXGroup;
 			children = (
+				AB235289290A9C1600C5382C /* Taget previews */,
 				ABCDC72328DC7787003B24F2 /* Userprofile */,
 				ABDEE859237023B7009B52F3 /* Survey */,
 				ABDE82BE28B38ED5004E07BD /* Comments */,
@@ -3870,6 +3881,7 @@
 				AB791D80243B31040085E00E /* VoteCompletionView.swift in Sources */,
 				AB98307C27B68811002C5132 /* LoginView.swift in Sources */,
 				ABCDC73C28DC7814003B24F2 /* UserprofileView.swift in Sources */,
+				AB235288290A7EB400C5382C /* AvatarPreviewController.swift in Sources */,
 				ABCDC73B28DC7814003B24F2 /* UserprofileController.swift in Sources */,
 				AB3C6812223FC71600B57580 /* Constants.swift in Sources */,
 				ABADB08A283E129F00A7F726 /* SurveyCreationView.swift in Sources */,

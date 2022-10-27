@@ -23,6 +23,9 @@ protocol ListViewInput: AnyObject {
     func addFavorite(_: SurveyReference)
     func share(_: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
+    func openUserprofile(_: Userprofile)
+    func unsubscribe(from: Userprofile)
+    func subscribe(to: Userprofile)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -36,6 +39,8 @@ protocol ListControllerInput: AnyObject {
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(surveyReference: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
+    func unsubscribe(from: Userprofile)
+    func subscribe(to: Userprofile)
 }
 
 /// *Model* returns the result to the *Controller*

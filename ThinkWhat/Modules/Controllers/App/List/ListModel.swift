@@ -16,6 +16,18 @@ class ListModel {
 
 // MARK: - Controller Input
 extension ListModel: ListControllerInput {
+    func unsubscribe(from userprofile: Userprofile) {
+        Task {
+            try await API.shared.profiles.unsubscribe(from: [userprofile])
+        }
+    }
+    
+    func subscribe(to userprofile: Userprofile) {
+        Task {
+            try await API.shared.profiles.subscribe(at: [userprofile])
+        }
+    }
+    
     func claim(surveyReference: SurveyReference, claim: Claim) {
         Task {
             try await API.shared.surveys.claim(surveyReference: surveyReference, reason: claim)

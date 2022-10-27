@@ -84,6 +84,23 @@ class ListController: UIViewController {
 
 // MARK: - View Input
 extension ListController: ListViewInput {
+    func unsubscribe(from userprofile: Userprofile) {
+        controllerInput?.unsubscribe(from: userprofile)
+    }
+    
+    func subscribe(to userprofile: Userprofile) {
+        controllerInput?.subscribe(to: userprofile)
+    }
+    
+    func openUserprofile(_ userprofile: Userprofile) {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        navigationItem.backBarButtonItem = backItem
+        
+        navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
     func share(_ surveyReference: SurveyReference) {
         // Setting description
         let firstActivityItem = surveyReference.title

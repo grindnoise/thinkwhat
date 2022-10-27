@@ -1135,7 +1135,7 @@ class API {
                 await MainActor.run {
                     userprofiles.forEach {
                         userprofile.subscriptions.append($0)
-                        userprofile.subscribedAt = true
+                        $0.subscribedAt = true
                     }
                 }
             } catch let error {

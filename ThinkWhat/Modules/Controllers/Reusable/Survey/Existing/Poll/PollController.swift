@@ -30,6 +30,7 @@ class PollController: UIViewController {
         didSet {
             navigationItem.rightBarButtonItem?.isEnabled = !_survey.isNil
             guard !_survey.isNil else { return }
+            
             setBarButtonItem()
         }
     }
@@ -383,14 +384,24 @@ class PollController: UIViewController {
         
         //Set timer to request stats updates
         //Update survey stats every n seconds
-        let events = EventEmitter().emit(every: 5)
-        tasks.append(Task { [weak self] in
-            for await _ in events {
+        Timer
+            .publish(every: 5, on: .current, in: .common)
+            .autoconnect()
+            .sink { [weak self] seconds in
                 guard let self = self else { return }
-
+                
                 self.controllerInput?.updateResultsStats(self._surveyReference)
             }
-        })
+            .store(in: &subscriptions)
+        
+//        let events = EventEmitter().emit(every: 5)
+//        tasks.append(Task { [weak self] in
+//            for await _ in events {
+//                guard let self = self else { return }
+//
+//                self.controllerInput?.updateResultsStats(self._surveyReference)
+//            }
+//        })
     }
     
     private func setSubscriptions() {

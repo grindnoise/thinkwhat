@@ -14,6 +14,7 @@ import UIKit
 protocol SubscriptionsViewInput: AnyObject {
     var controllerOutput: SubsciptionsControllerOutput? { get set }
     var controllerInput: SubsciptionsControllerInput? { get set }
+    var isOnScreen: Bool { get }
     
     func onSubscribersTapped()
     func onSubscpitionsTapped()

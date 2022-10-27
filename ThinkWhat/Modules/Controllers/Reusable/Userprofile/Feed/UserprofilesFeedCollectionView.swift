@@ -175,11 +175,9 @@ private extension UserprofilesFeedCollectionView {
             cell.textStyle = .footnote
             cell.userPublisher
                 .sink { [unowned self] in
-                    guard let instance = $0,
-                          let index = self.indexPath(for: cell)
-                    else { return }
+                    guard let instance = $0 else { return }
                     
-                    self.userPublisher.send([instance: index])
+                    self.userPublisher.send([instance: indexPath])
                 }
                 .store(in: &self.subscriptions)
             
@@ -226,12 +224,36 @@ private extension UserprofilesFeedCollectionView {
 
                 var snap = self.source.snapshot()
                 guard snap.itemIdentifiers.filter({ $0 == userprofile }).isEmpty else { return }
-                snap.appendItems([userprofile])
+                
+                if snap.itemIdentifiers.count > 1, let lastItem = snap.itemIdentifiers.last {
+                    snap.insertItems([userprofile], beforeItem: lastItem)
+                } else {
+                    snap.appendItems([userprofile])
+                }
                 self.source.apply(snap) { [weak self] in
                     guard let self = self else { return }
 
                     self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
                 }
+            }
+        })
+        
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+                guard let self = self,
+                      let dict = notification.object as? [Userprofile: Userprofile],
+                      let owner = dict.keys.first,
+                      owner == self.userprofile,
+                      let userprofile = dict.values.first,
+                      self.source.snapshot().itemIdentifiers.contains(userprofile),
+                      let inputView = superview as? SubscriptionsView,
+                      let viewInput = inputView.viewInput,
+                      viewInput.isOnScreen
+                else { return }
+                
+                var snap = self.source.snapshot()
+                snap.deleteItems([userprofile])
+                self.source.apply(snap)
             }
         })
     }
