@@ -71,6 +71,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
         
         setSubscriptions()
         setViewControllers()
+//        setTasks()
         setupUI()
         loadData()
     }
@@ -88,6 +89,41 @@ class MainController: UITabBarController {//}, StorageProtocol {
 }
 
 private extension MainController {
+    func setTasks() {
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
+                guard let self = self,
+                      let dict = notification.object as? [Userprofile: Userprofile],
+                      let userprofile = dict.values.first
+                else { return }
+                
+                let banner = Banner(bannerDelegate: self,
+                                    backgroundColor: self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray2,
+                                    fadeBackground: false)
+                banner.present(content: SubscriptionBannerContent(mode: .Subscribe,
+                                                                  userprofile: userprofile,
+                                                                  textColor: .white),
+                               dismissAfter: 0.75)
+                
+            }
+        })
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+                guard let self = self,
+                      let dict = notification.object as? [Userprofile: Userprofile],
+                      let userprofile = dict.values.first
+                else { return }
+                
+                let banner = Banner(bannerDelegate: self,
+                                    backgroundColor: self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray2,
+                                    fadeBackground: false)
+                banner.present(content: SubscriptionBannerContent(mode: .Unsubscribe,
+                                                                  userprofile: userprofile,
+                                                                  textColor: .white),
+                               dismissAfter: 0.75)
+            }
+        })
+    }
     
     func updateUserData() {
         Task {
@@ -129,6 +165,7 @@ private extension MainController {
         Task {
             do {
                 try await appLaunch()
+                setTasks()
             } catch {
                 await MainActor.run {
                     onServerUnavailable()
@@ -249,7 +286,6 @@ private extension MainController {
     }
 }
 
-//MARK: -  UITabBarControllerDelegate
 extension MainController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, animationControllerForTransitionFrom fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return ScrollingTransitionAnimator(tabBarController: tabBarController, lastIndex: tabBarController.selectedIndex)
@@ -300,3 +336,18 @@ extension MainController: CallbackObservable {
     }
 }
 
+extension MainController: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
+    
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
+    }
+}

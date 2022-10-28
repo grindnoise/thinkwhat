@@ -28,7 +28,7 @@ class Banner: UIView {
                 .sink { [weak self] in
                     guard let self = self else { return }
                     
-                    self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath
+                    self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.035).cgPath
                 }
                 .store(in: &subscriptions)
         }
@@ -41,7 +41,7 @@ class Banner: UIView {
     }
     @IBOutlet weak var coloredBackround: UIView! {
         didSet {
-            coloredBackround.backgroundColor =  traitCollection.userInterfaceStyle == .dark ? .clear : color
+            coloredBackround.backgroundColor = color//traitCollection.userInterfaceStyle == .dark ? .clear : color
         }
     }
     @IBOutlet weak var body: UIView! {
@@ -57,7 +57,11 @@ class Banner: UIView {
         }
     }
     
-    // MARK: - Properties
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //UI
     private let fadeBackground: Bool
     ///Geometry
     private var heightDivisor:  CGFloat = .zero
@@ -88,10 +92,7 @@ class Banner: UIView {
     private weak var bannerDelegate: BannerObservable?
     private var color: UIColor = .clear
     
-    // MARK: - Private properties
-    private var observers: [NSKeyValueObservation] = []
-    private var subscriptions = Set<AnyCancellable>()
-    private var tasks: [Task<Void, Never>?] = []
+    
     
     // MARK: - Destructor
     deinit {
@@ -104,21 +105,25 @@ class Banner: UIView {
 #endif
     }
     
-    init(frame: CGRect,
-         callbackDelegate: CallbackObservable?,
+    init(frame: CGRect = UIScreen.main.bounds,
+         callbackDelegate: CallbackObservable? = nil,
          bannerDelegate: BannerObservable?,
          backgroundColor: UIColor = .clear,
          heightDivisor _heightDivisor: CGFloat = 6,
          fadeBackground: Bool,
          shadowed: Bool = true) {
+        
         self.fadeBackground = fadeBackground
         self.shadowed = shadowed
+        
         super.init(frame: frame)
+        
         self.callbackDelegate = callbackDelegate
         self.bannerDelegate = bannerDelegate
         self.heightDivisor = _heightDivisor
         self.color = backgroundColor
-        commonInit()
+        
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -126,7 +131,7 @@ class Banner: UIView {
     }
     
     // MARK: - Initialization
-    private func commonInit() {
+    private func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         backgroundColor                 = .clear
         bounds                          = UIScreen.main.bounds
@@ -143,7 +148,7 @@ class Banner: UIView {
         layoutIfNeeded()
         let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:)))
         body.addGestureRecognizer(gestureRecognizer)
-        body.cornerRadius = body.frame.width * 0.05
+        body.cornerRadius = body.frame.width * 0.035
     }
     
     

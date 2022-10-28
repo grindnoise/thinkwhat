@@ -96,6 +96,8 @@
 "third" = "Треть";
 "back" = "Назад";
 "per" = "За";
+"subscribe_to_user_notification" = "Вы подписались на";
+"unsubscribe_from_user_notification" = "Вы отписались от";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";

@@ -34,7 +34,7 @@ class SubscriptionsView: UIView {
     private var isRevealed = false
     private lazy var subscriptionsLabel: UILabel = {
        let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.Light,
+        instance.font = UIFont.scaledFont(fontName: Fonts.Regular,
                                           forTextStyle: .headline)
         instance.text = "zero_subscriptions".localized
         instance.textColor = .secondaryLabel
@@ -177,6 +177,26 @@ class SubscriptionsView: UIView {
 //            self.viewInput?.addFavorite(surveyReference: value)
         }.store(in: &self.subscriptions)
         
+        instance.userprofilePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.openUserprofile(userprofile)
+            }
+            .store(in: &self.subscriptions)
+                
+        instance.unsubscribePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.unsubscribe(from: userprofile)
+            }
+            .store(in: &self.subscriptions)
+        
         return instance
     }()
     private lazy var feedCollectionView: UserprofilesFeedCollectionView = {
@@ -273,7 +293,7 @@ class SubscriptionsView: UIView {
             .sink { [unowned self] in
                 guard let instance = $0 else { return }
                 
-                self.viewInput?.onProfileButtonTapped(instance)
+                self.viewInput?.openUserprofile(instance)
             }
             .store(in: &subscriptions)
         
@@ -545,8 +565,7 @@ private extension SubscriptionsView {
                 else { return }
 
                 if viewInput.isOnScreen {
-                    self.setDefaultFilter { [weak self] in
-                        guard let self = self else { return }
+                    self.setDefaultFilter { [unowned self] in
                         
                         self.subscriptionButton.isUserInteractionEnabled = true
                         self.viewInput?.setDefaultMode()
@@ -566,6 +585,8 @@ private extension SubscriptionsView {
                     }
                 } else {
                     self.feedCollectionView.removeItem(userprofile)
+                    self.feedCollectionView.alpha = 1
+                    self.userView.alpha = 0
                 }
             }
         })
@@ -632,7 +653,7 @@ private extension SubscriptionsView {
     func onProfileButtonTapped() {
         guard let userprofile = userprofile else { return }
         
-        viewInput?.onProfileButtonTapped(userprofile)
+        viewInput?.openUserprofile(userprofile)
     }
     
     @objc
@@ -665,7 +686,9 @@ private extension SubscriptionsView {
 
 extension SubscriptionsView: SubsciptionsControllerOutput {
     func setDefaultFilter(_ completion: Closure? = nil) {
-        guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell else { return }
+        guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
+              let userprofile = userprofile
+        else { return }
         
         surveysCollectionView.category = .Subscriptions
         

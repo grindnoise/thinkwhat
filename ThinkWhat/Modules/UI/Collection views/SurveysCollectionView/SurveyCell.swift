@@ -83,59 +83,7 @@ class SurveyCell: UICollectionViewListCell {
                     self.icon.iconColor = destinationColor
                 }
                 .store(in: &subscriptions)
-            //Update survey stats every n seconds
-//            let events = eventEmitter.emit(every: 2)
-//            animTask = Task {@MainActor [weak self] in
-//                for await _ in events {
-//
-//                    guard let self = self,
-//                          let item = self.item,
-//                          item.isHot,
-//                          //                          let topicCategory = Icon.Category(rawValue: item.topic.id),
-//                          let destinationCategory = self.icon.category != .Hot ? .Hot : Icon.Category(rawValue: item.topic.id) ?? Icon.Category.Null as? Icon.Category,
-//                          let destinationColor = self.icon.category != .Hot ? UIColor.systemRed : UIColor.white as? UIColor,
-//                          let destinationPath = (self.icon.getLayer(destinationCategory) as? CAShapeLayer)?.path,
-//                          let shapeLayer = self.icon.icon as? CAShapeLayer
-//                    else { return }
-//
-//                    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.75, delay: 0) {
-//                        self.icon.backgroundColor = destinationCategory == .Hot ? .clear : self.item.topic.tagColor
-//                    }
-//
-//                    let pathAnim = Animations.get(property: .Path,
-//                                                  fromValue: shapeLayer.path as Any,
-//                                                  toValue: destinationPath,
-//                                                  duration: 0.35,
-//                                                  delay: 0,
-//                                                  repeatCount: 0,
-//                                                  autoreverses: false,
-//                                                  timingFunction: CAMediaTimingFunctionName.easeIn,
-//                                                  delegate: self,
-//                                                  isRemovedOnCompletion: false,
-//                                                  completionBlocks:
-//                                                    [{ [weak self] in
-//                        guard let self = self else { return }
-//                        self.icon.category = destinationCategory
-//                    }])
-//                    shapeLayer.add(pathAnim, forKey: nil)
-//                    shapeLayer.path = destinationPath
-//
-//
-//
-//                    let colorAnim = Animations.get(property: .FillColor,
-//                                                   fromValue: self.icon.iconColor.cgColor as Any,
-//                                                   toValue: destinationColor.cgColor as Any,
-//                                                   duration: 0.35,
-//                                                   delay: 0,
-//                                                   repeatCount: 0,
-//                                                   autoreverses: false,
-//                                                   timingFunction: CAMediaTimingFunctionName.easeIn,
-//                                                   delegate: nil,
-//                                                   isRemovedOnCompletion: false)
-//                    self.icon.icon.add(colorAnim, forKey: nil)
-//                    self.icon.iconColor = destinationColor
-//                }
-//            }
+
             menuButton.showsMenuAsPrimaryAction = true
             menuButton.menu = prepareMenu()
             
@@ -181,6 +129,7 @@ class SurveyCell: UICollectionViewListCell {
             if item.isAnonymous {
                 avatar.userprofile = Userprofile.anonymous
             } else {
+                avatar.addInteraction(UIContextMenuInteraction(delegate: self))
                 avatar.userprofile = item.owner
                 firstnameLabel.text = item.owner.firstNameSingleWord
                 lastnameLabel.text = item.owner.lastNameSingleWord
@@ -305,12 +254,13 @@ class SurveyCell: UICollectionViewListCell {
         let instance = Avatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.isUserInteractionEnabled = true
-        instance.addInteraction(UIContextMenuInteraction(delegate: self))
         instance.tapPublisher
             .sink { [weak self]  in
                 guard let self = self,
-                      let userprofile = $0
+                      let userprofile = $0,
+                      userprofile != Userprofile.anonymous
                 else { return }
+                
                 
                 self.profileTapPublisher.send(userprofile)
             }
@@ -1331,7 +1281,9 @@ extension SurveyCell: CAAnimationDelegate {
 extension SurveyCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
         
-        if let sender = interaction.view as? Avatar, let userprofile = sender.userprofile {
+        if let sender = interaction.view as? Avatar,
+            let userprofile = sender.userprofile,
+            userprofile != Userprofiles.shared.current {
             
             return UIContextMenuConfiguration(
                 identifier: nil,
@@ -1343,9 +1295,9 @@ extension SurveyCell: UIContextMenuInteractionDelegate {
     
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willDisplayMenuFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
         
-        animator?.addCompletion {
-            print("addCompletion")
-        }
+//        animator?.addCompletion {
+//            print("addCompletion")
+//        }
         
         guard let window = UIApplication.shared.delegate?.window,
               let instance = window!.viewByClassName(className: "_UIPlatterSoftShadowView")
@@ -1365,6 +1317,12 @@ extension SurveyCell: UIContextMenuInteractionDelegate {
         }
         
         return nil
+    }
+    
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
+        if animator.previewViewController is AvatarPreviewController {
+            profileTapPublisher.send(item.owner)
+        }
     }
 }
 

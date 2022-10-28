@@ -174,22 +174,23 @@ private extension SubscriptionsController {
             navigationItem.setLeftBarButton(nil, animated: true)
             
         case .Userprofile:
-            guard let userprofile = userprofile,
-                  let notify = userprofile.notifyOnPublication
-            else { return }
+            guard let userprofile = userprofile else { return }
             
-            let notifyAction = UIAction { [weak self] _ in
-                guard let self = self else { return }
+            if let notify = userprofile.notifyOnPublication {
+                let notifyAction = UIAction { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    self.isRightButtonSpinning = true
+                    self.controllerInput?.switchNotifications(userprofile: userprofile,
+                                                              notify: !notify)
+                }
                 
-                self.isRightButtonSpinning = true
-                self.controllerInput?.switchNotifications(userprofile: userprofile,
-                                                          notify: !notify)
+                
+                rightButton = UIBarButtonItem(title: nil,
+                                              image: UIImage(systemName: notify ? "bell.and.waves.left.and.right.fill" : "bell.slash.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .regular)),
+                                              primaryAction: notifyAction,
+                                              menu: nil)
             }
-            
-            rightButton = UIBarButtonItem(title: nil,
-                                          image: UIImage(systemName: notify ? "bell.and.waves.left.and.right.fill" : "bell.slash.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .regular)),
-                                          primaryAction: notifyAction,
-                                          menu: nil)
             
             let action = UIAction { [weak self] _ in
                 guard let self = self else { return }
@@ -312,7 +313,7 @@ private extension SubscriptionsController {
     }
     
     func onModeChanged() {
-        if mode == .Default {
+        if mode == .Default, isOnScreen {
             controllerOutput?.setDefaultFilter(nil)
         }
         
@@ -334,6 +335,9 @@ extension SubscriptionsController: SubscriptionsViewInput {
     }
     
     func onSubcriptionsCountEvent(zeroSubscriptions: Bool) {
+        if mode == .Userprofile {
+            mode = .Default
+        }
         setBarItems(zeroSubscriptions: zeroSubscriptions)
     }
     
@@ -342,7 +346,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
 //        mode = .Default
     }
     
-    func onProfileButtonTapped(_ userprofile: Userprofile) {
+    func openUserprofile(_ userprofile: Userprofile) {
         let backItem = UIBarButtonItem()
         backItem.title = ""
         

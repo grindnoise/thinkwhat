@@ -76,6 +76,7 @@
 		AB234F5728D774C000204EC8 /* Auth.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB234F5228D774C000204EC8 /* Auth.storyboard */; };
 		AB234F5828D774C000204EC8 /* Root.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB234F5328D774C000204EC8 /* Root.storyboard */; };
 		AB235288290A7EB400C5382C /* AvatarPreviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB235287290A7EB400C5382C /* AvatarPreviewController.swift */; };
+		AB23528B290C086200C5382C /* SubscriptionBannerContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB23528A290C086200C5382C /* SubscriptionBannerContent.swift */; };
 		AB238D1E279058A0009E49C2 /* AppData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB238D1D279058A0009E49C2 /* AppData.swift */; };
 		AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */; };
 		AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */; };
@@ -653,6 +654,7 @@
 		AB234F5228D774C000204EC8 /* Auth.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Auth.storyboard; sourceTree = "<group>"; };
 		AB234F5328D774C000204EC8 /* Root.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Root.storyboard; sourceTree = "<group>"; };
 		AB235287290A7EB400C5382C /* AvatarPreviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarPreviewController.swift; sourceTree = "<group>"; };
+		AB23528A290C086200C5382C /* SubscriptionBannerContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionBannerContent.swift; sourceTree = "<group>"; };
 		AB238D1D279058A0009E49C2 /* AppData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppData.swift; sourceTree = "<group>"; };
 		AB2495EE264A8A9900A6F555 /* MobileNet.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNet.mlmodel; sourceTree = "<group>"; };
 		AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveySelectionTypeController.swift; sourceTree = "<group>"; };
@@ -2780,6 +2782,7 @@
 				AB9998BF2805989E009D0E4F /* Claim */,
 				AB883B2F280438E300DBE4EF /* Vote message */,
 				ABADF5A427F73C9000A26474 /* Plain text */,
+				AB23528A290C086200C5382C /* SubscriptionBannerContent.swift */,
 			);
 			path = Content;
 			sourceTree = "<group>";
@@ -3587,6 +3590,7 @@
 				AB3A47E2283F5CA700106407 /* RankingCreationView.swift in Sources */,
 				ABBA1988242B430100F11E0D /* AnswerHeaderCell.swift in Sources */,
 				ABCBDA0E28759EE300888F23 /* Fonts.swift in Sources */,
+				AB23528B290C086200C5382C /* SubscriptionBannerContent.swift in Sources */,
 				ABB1595D28B10C4A003ED9F5 /* Shimmer.swift in Sources */,
 				AB463FB527C3FDB3007D7240 /* UnderlinedSearchTextField.swift in Sources */,
 				AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */,

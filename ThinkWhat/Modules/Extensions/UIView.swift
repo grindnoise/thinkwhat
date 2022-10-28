@@ -65,17 +65,50 @@ extension UIView {
         }
     }
 
-    class func getAllSubviews(from parenView: UIView, types: [UIView.Type]) -> [UIView] {
-        return parenView.subviews.flatMap { subView -> [UIView] in
-            var result = getAllSubviews(from: subView) as [UIView]
+    class func getAllSubviews(from parent: UIView, types: [UIView.Type]) -> [UIView] {
+        return parent.subviews.flatMap { subview -> [UIView] in
+            var result = getAllSubviews(from: subview) as [UIView]
             for type in types {
-                if subView.classForCoder == type {
-                    result.append(subView)
+                if subview.classForCoder == type {
+                    result.append(subview)
                     return result
                 }
             }
             return result
         }
+    }
+    
+//    class func getAllSuperviews(above owner: UIView) -> [UIView] {
+//        var superviews: [UIView] = [owner] {
+//            didSet {
+//                guard let last = superviews.last,
+//                      let superview = last.superview,
+//                      !superview.contains(superview)
+//                else { return }
+//
+//                superviews.append(superview)
+//            }
+//        }
+//
+//        return superviews
+//    }
+    
+    class func getAllSuperviews(above owner: UIView) -> [UIView] {
+        var superviews: [UIView] = [owner] {
+            didSet {
+                guard let last = superviews.last,
+                      let superview = last.superview
+                else { return }
+                
+                superviews += UIView.getAllSuperviews(above: superview)
+            }
+        }
+        
+        guard let superview = owner.superview else { return superviews }
+//
+        superviews.append(superview)
+        
+        return superviews
     }
 
     func getAllSubviews<T: UIView>() -> [T] { return UIView.getAllSubviews(from: self) as [T] }
@@ -84,8 +117,20 @@ extension UIView {
     
     func get(all types: [UIView.Type]) -> [UIView] { return UIView.getAllSubviews(from: self, types: types) }
     
-    func getSubview<T: UIView>(type: T.Type, identifier: String?) -> T? {
+    func getSubview<T: UIView>(type: T.Type, identifier: String? = nil) -> T? {
         return self.get(all: type).filter({ $0.accessibilityIdentifier == identifier }).first
+    }
+    
+    func getAllSuperviews<T: UIView>() -> [T] {
+        let all = UIView.getAllSuperviews(above: self)
+        
+        return UIView.getAllSuperviews(above: self).filter { $0 is T } as? [T] ?? []
+    }
+    
+    func getSuperview<T: UIView>(type: T.Type) -> T? {
+        let all = UIView.getAllSuperviews(above: self)
+        
+        return UIView.getAllSuperviews(above: self).filter { $0 is T }.first as? T
     }
 }
 

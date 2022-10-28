@@ -35,18 +35,19 @@ class UserprofilesFeedCollectionView: UICollectionView {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //Collection
+    private let maxUsers = 20
     private var source: Source!
     private var dataItems: [Userprofile] {
         switch mode {
         case .Subscribers:
             var items = userprofile.subscribers
-            if !items.isEmpty {
+            if items.count > maxUsers {
                 items.append(Userprofile.anonymous)
             }
             return items
         case .Subscriptions:
             var items = userprofile.subscriptions
-            if !items.isEmpty {
+            if items.count > maxUsers {
                 items.append(Userprofile.anonymous)
             }
             return items
@@ -213,6 +214,26 @@ private extension UserprofilesFeedCollectionView {
     }
     
     func setTasks() {
+        
+        Timer
+            .publish(every: 2, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self,
+                      self.source.snapshot().itemIdentifiers.count != self.dataItems.count
+                else { return }
+                
+                var snap = Snapshot()
+                snap.appendSections([.Main])
+                snap.appendItems(self.dataItems)
+                self.source.apply(snap) { [weak self] in
+                    guard let self = self else { return }
+
+                    self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+                }
+            }
+            .store(in: &subscriptions)
+        
         tasks.append( Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
                 guard let self = self,
@@ -238,7 +259,7 @@ private extension UserprofilesFeedCollectionView {
             }
         })
         
-        tasks.append( Task {@MainActor [weak self] in
+        tasks.append( Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
                 guard let self = self,
                       let dict = notification.object as? [Userprofile: Userprofile],
@@ -246,14 +267,20 @@ private extension UserprofilesFeedCollectionView {
                       owner == self.userprofile,
                       let userprofile = dict.values.first,
                       self.source.snapshot().itemIdentifiers.contains(userprofile),
-                      let inputView = superview as? SubscriptionsView,
+                      let inputView = self.getSuperview(type: SubscriptionsView.self),
                       let viewInput = inputView.viewInput,
                       viewInput.isOnScreen
                 else { return }
                 
-                var snap = self.source.snapshot()
-                snap.deleteItems([userprofile])
-                self.source.apply(snap)
+                await MainActor.run {
+                    var snap = self.source.snapshot()
+                    snap.deleteItems([userprofile])
+                    self.source.apply(snap) { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+                    }
+                }
             }
         })
     }

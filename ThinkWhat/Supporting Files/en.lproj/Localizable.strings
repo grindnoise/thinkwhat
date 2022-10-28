@@ -96,6 +96,8 @@
 "third" = "Third";
 "back" = "Back";
 "per" = "Per";
+"subscribe_to_user_notification" = "You subscribed to";
+"unsubscribe_from_user_notification" = "You unsubscribed from";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";

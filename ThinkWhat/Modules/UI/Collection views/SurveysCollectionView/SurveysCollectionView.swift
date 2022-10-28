@@ -341,12 +341,10 @@ private extension SurveysCollectionView {
 //            .delay(for: .seconds(2), scheduler: DispatchQueue.main)
             .sink { [weak self] seconds in
                 guard let self = self,
-                      let cells = self.visibleCells as? [SurveyCell]
+                      let cells = self.visibleCells as? [SurveyCell],
+                      !cells.isEmpty
                 else { return }
-                
-                let items = cells.compactMap { cell in
-                    return cell.item
-                }
+
                 self.updateStatsPublisher.send(cells.compactMap { return $0.item })
             }
             .store(in: &subscriptions)
@@ -503,19 +501,19 @@ private extension SurveysCollectionView {
     
     func setTasks() {
         
-        //Update survey stats every n seconds
-//        let events = EventEmitter().emit(every: 5)
-//        let emitter = EventEmitter()
-//        emitter.task.
-//        tasks.append(Task {@MainActor [weak self] in
-//            for await _ in events {
-//                guard let self = self,
-//                      let cells = self.visibleCells.filter({ $0.isKind(of: SurveyCell.self) }) as? [SurveyCell]
-//                else { return }
-//
-//                self.updateStatsPublisher.send((cells.compactMap({ $0.item })))
-//            }
-//        })
+        Timer.publish(every: 5, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self,
+                      self.source.snapshot().itemIdentifiers.count != self.dataItems.count
+                else { return }
+                
+                var snap = Snapshot()
+                snap.appendSections([.main])
+                snap.appendItems(self.dataItems)
+                self.source.apply(snap, animatingDifferences: true)
+            }
+            .store(in: &subscriptions)
         
         //Empty received
         tasks.append(Task {@MainActor [weak self] in
@@ -711,14 +709,14 @@ private extension SurveysCollectionView {
                       self.category == .Subscriptions,
                       let dict = notification.object as? [Userprofile: Userprofile],
                       self.userprofile.isNil,//Current user
-                      let owner = dict.values.first
+                      let userprofile = dict.values.first
                 else { return }
                 
                 //Append, sort
                 var snap = self.source.snapshot()
                 var items = snap.itemIdentifiers
                 let difference = SurveyReferences.shared.all
-                    .filter({ $0.owner == owner })
+                    .filter({ $0.owner == userprofile })
                     .filter({ !items.contains($0) })
                 items += difference
                 

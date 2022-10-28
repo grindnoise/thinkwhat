@@ -62,8 +62,8 @@ class ListController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = false//true
+        navigationItem.largeTitleDisplayMode = .never//.always
         
         listSwitch.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
@@ -192,7 +192,7 @@ private extension ListController {
     
     func setupUI() {
 //        listSwitch = ListSwitch(callbackDelegate: self)
-        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
+        navigationController?.navigationBar.prefersLargeTitles = false//deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         navigationBar.addSubview(listSwitch)
         listSwitch.translatesAutoresizingMaskIntoConstraints = false
