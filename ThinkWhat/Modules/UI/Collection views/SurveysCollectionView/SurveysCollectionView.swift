@@ -92,7 +92,15 @@ class SurveysCollectionView: UICollectionView {
         }
         return items.uniqued().sorted { $0.startDate > $1.startDate }
     }
-    
+    //Scroll direction
+    private var lastContentOffsetY: CGFloat = 0 {
+        didSet {
+            guard oldValue != lastContentOffsetY else { return }
+            
+            isScrollingDown = lastContentOffsetY > oldValue
+        }
+    }
+    private var isScrollingDown = true
     private var loadingInProgress = false
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
@@ -201,6 +209,12 @@ class SurveysCollectionView: UICollectionView {
     }
 }
 
+extension SurveysCollectionView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        lastContentOffsetY = scrollView.contentOffset.y
+    }
+}
+
 extension SurveysCollectionView: UICollectionViewDelegate {
     
     func deselect() {
@@ -220,7 +234,8 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         cell.layoutIfNeeded()
         
         let max = source.snapshot().itemIdentifiers.count-1
-        let requestThreshold = 3
+        let requestThreshold = max > 5 ? 5 : max-1
+        let triggerRange = max-requestThreshold...max
         
         if max < 10 {
             requestData()
@@ -234,7 +249,7 @@ extension SurveysCollectionView: UICollectionViewDelegate {
 //            guard !loadingIndicator.isAnimating else { return }
 //
             //            loadingIndicator.startAnimating()
-        } else if indexPath.row - requestThreshold == max - requestThreshold {
+        } else if isScrollingDown, triggerRange.contains(indexPath.row) {
             requestData()
             
             guard !loadingIndicator.isAnimating else { return }
